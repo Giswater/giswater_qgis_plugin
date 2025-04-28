@@ -12,6 +12,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
 from ....libs import tools_qt
 
+
 class GwManageCampaignLotButton(GwAction):
     """ Button 87: Campaign Management """
 
@@ -31,7 +32,6 @@ class GwManageCampaignLotButton(GwAction):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
-
     def _fill_action_menu(self):
         """ Fill action menu """
         actions = self.menu.actions()
@@ -46,7 +46,6 @@ class GwManageCampaignLotButton(GwAction):
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(self.clicked_event, action))
-
 
     def clicked_event(self, selected_action):
         """ Open the correct campaign dialog based on user selection """

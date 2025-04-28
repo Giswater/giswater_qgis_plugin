@@ -15,6 +15,7 @@ from .print.massive_composer import GwMassiveComposer
 from ..dialog import GwAction
 from ....libs import tools_qt
 
+
 class GwPrintButton(GwAction):
     """ Button 65: Print """
 

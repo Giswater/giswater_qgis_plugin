@@ -1002,7 +1002,6 @@ class GwNetscenarioManagerButton(GwAction):
         tools_gw.reset_rubberband(self.rubber_band)
         self.iface.actionPan().trigger()
 
-
     def _select_with_expression_dialog(self):
         """Select features by expression for netscenario"""
 

@@ -252,7 +252,6 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(self.task)
         QgsApplication.taskManager().triggerTask(self.task)
 
-
     def manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
         """"""
 
@@ -293,7 +292,6 @@ class GwAdminButton:
             self.error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
             tools_qgis.show_info("A rollback on schema will be done.")
-
 
     def manage_cm_process_result(self):
         """"""
@@ -482,7 +480,6 @@ class GwAdminButton:
 
         # Set signals
         self._set_signals_create_project()
-
 
     # region 'Create Project'
 
@@ -2227,7 +2224,6 @@ class GwAdminButton:
                 msg = "Process finished successfully"
                 tools_qt.show_info_box(msg, "Info", parameter="Delete schema")
                 self._set_buttons_enabled()
-
 
     def _build_replace_dlg(self, replace_json):
 

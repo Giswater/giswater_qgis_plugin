@@ -21,6 +21,7 @@ from ...shared.psector import GwPsector
 from ...shared.workcat import GwWorkcat
 from ....libs import tools_qt
 
+
 class GwUtilsManagerButton(GwAction):
     """ Button 61: Utils manager """
 

@@ -26,7 +26,6 @@ class GwCreateSchemaCmTask(GwTask):
         self.timer = timer
         self.list_process = list_process or ['load_base_schema', 'load_parent_schema', 'load_example']
 
-
     def run(self):
         super().run()
         self.finish_execution = {'import_data': False}

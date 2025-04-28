@@ -11,6 +11,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
 from ....libs import tools_qt
 
+
 class GwAddCampaignButton(GwAction):
     """ Button 84: Add new campaign """
 

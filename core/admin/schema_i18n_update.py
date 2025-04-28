@@ -27,7 +27,6 @@ class GwSchemaI18NUpdate:
         self.schema_name = lib_vars.schema_name
         self.project_type_selected = None
 
-
     def init_dialog(self):
         """ Constructor """
 
@@ -52,7 +51,6 @@ class GwSchemaI18NUpdate:
 
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_update_translation')
 
-
     # region private functions
 
     def _set_signals(self):
@@ -66,7 +64,6 @@ class GwSchemaI18NUpdate:
 
         #Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
-
 
     def _check_connection(self, set_languages):
         """ Check connection to database """
@@ -140,7 +137,6 @@ class GwSchemaI18NUpdate:
                 self.dlg_qm.cmb_schema.clear()
                 return
     
-
         tools_qt.fill_combo_values(self.dlg_qm.cmb_schema, result_list)
 
     def _change_project_type(self, widget):
@@ -463,7 +459,6 @@ class GwSchemaI18NUpdate:
                     print(e)
                     tools_db.dao.rollback()
         
-    
     def _write_dbjson_values(self, rows):
         query = ""
         updates = {}
@@ -666,7 +661,6 @@ class GwSchemaI18NUpdate:
 
         return status
 
-
     def _commit(self):
         """ Commit current database transaction """
         self.conn_i18n.commit()
@@ -696,7 +690,6 @@ class GwSchemaI18NUpdate:
         finally:
             return rows
 
-
     def _replace_invalid_characters(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -708,7 +701,6 @@ class GwSchemaI18NUpdate:
         param = param.replace("\n", " ")
 
         return param
-    
     
     def _replace_invalid_quotation_marks(self, param):
         """
@@ -729,7 +721,6 @@ class GwSchemaI18NUpdate:
             print(e)
             conn.rollback()
 
-            
     def _copy_table_from_another_db(self, full_table_org, full_table_dest, cur_org, cur_dest, conn_dest):
         # Fetch existing rows from cat_feature
         schema_org = full_table_org.split('.')[0]
@@ -774,7 +765,6 @@ class GwSchemaI18NUpdate:
 
         cur_dest.execute(final_query)
         conn_dest.commit()
-
 
     def tables_dic(self, schema_type):
         dbtables_dic = {

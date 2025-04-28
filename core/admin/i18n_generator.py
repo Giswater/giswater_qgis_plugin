@@ -29,7 +29,6 @@ class GwI18NGenerator:
         self.plugin_dir = lib_vars.plugin_dir
         self.schema_name = lib_vars.schema_name
 
-
     def init_dialog(self):
         """ Constructor """
 
@@ -47,7 +46,6 @@ class GwI18NGenerator:
         self.dlg_qm.rejected.connect(self._close_db)
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
-
     def pass_schema_info(self, schema_info, schema_name):
         self.project_epsg = schema_info['project_epsg']
         self.project_version = schema_info['project_version']
@@ -55,7 +53,6 @@ class GwI18NGenerator:
         self.schema_name = schema_name
 
     # region private functions
-
 
     def _check_connection(self):
         """ Check connection to database """
@@ -75,7 +72,6 @@ class GwI18NGenerator:
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
         self._populate_cmb_language()
-
 
     def _populate_cmb_language(self):
         """ Populate combo with languages values """
@@ -276,7 +272,6 @@ class GwI18NGenerator:
         else:
             return False
 
-
     def _get_title(self, py_dialogs, name, key_label):
         """ Return title's according language """
 
@@ -419,7 +414,6 @@ class GwI18NGenerator:
             colums = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
 
-
         # Make the query
         sql = ""
         if self.lower_lang == 'en_us':
@@ -436,7 +430,6 @@ class GwI18NGenerator:
         if not rows:
             return False
         return rows, colums
-
 
     def _write_table_values(self, rows, columns, table, path, file_type):
         """
@@ -504,7 +497,6 @@ class GwI18NGenerator:
                     else:
                         values_str = ",\n    ".join([f"('{row['source']}', '{row['formname']}', '{row['formtype']}', {txt[0]}, {txt[1]})" for row, txt in data])
                         file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
-
 
                 elif "dbparam_user" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data])
@@ -580,7 +572,6 @@ class GwI18NGenerator:
                     file.write(f"UPDATE {context} AS t\nSET label = v.label, descript = v.descript, placeholder = v.placeholder\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, method, label, descript, placeholder)\nWHERE t.parameter = v.parameter AND t.method = v.method;\n\n")
 
         del file
-
 
     # endregion
     # region Generate from Json
@@ -692,8 +683,6 @@ class GwI18NGenerator:
             if closing:
                 file.write("UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n")  
 
-
-
     # endregion
     # region Extra functions
 
@@ -739,7 +728,6 @@ class GwI18NGenerator:
         tools_gw.set_config_parser('i18n_generator', 'chk_py_msg', f"{py_msg}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'chk_i18n_files', f"{i18n_msg}", "user", "session", prefix=False)
 
-
     def _load_user_values(self):
         """
         Load last selected user values
@@ -760,7 +748,6 @@ class GwI18NGenerator:
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_i18n_files, i18n_msg)
 
-
     def _init_db(self, host, port, db, user, password):
         """ Initializes database connection """
 
@@ -773,7 +760,6 @@ class GwI18NGenerator:
             status = False
 
         return status
-
 
     def _close_db(self):
         """ Close database connection """
@@ -792,16 +778,13 @@ class GwI18NGenerator:
 
         return status
 
-
     def _commit(self):
         """ Commit current database transaction """
         self.conn_i18n.commit()
 
-
     def _rollback(self):
         """ Rollback current database transaction """
         self.conn_i18n.rollback()
-
 
     def _get_rows(self, sql, commit=True):
         """ Get multiple rows from selected query """
@@ -820,7 +803,6 @@ class GwI18NGenerator:
         finally:
             return rows
 
-
     def _replace_invalid_characters(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -833,7 +815,6 @@ class GwI18NGenerator:
 
         return param
 
-
     def _replace_invalid_quotation_marks(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -843,7 +824,6 @@ class GwI18NGenerator:
         param = re.sub(r"(?<!')'(?!')", "''", param)
 
         return param
-
 
     def _create_path_dic(self):
         
@@ -891,6 +871,5 @@ class GwI18NGenerator:
                 "tables": [] #["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
             }
         }
-
 
     # endregion

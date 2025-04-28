@@ -121,7 +121,6 @@ class GwResultManagerButton(GwAction):
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority_manager, dlg_name="priority_manager")
 
-
     def _manage_txt_report(self):
 
         dlg = self.dlg_priority_manager
@@ -394,7 +393,6 @@ class GwResultManagerButton(GwAction):
 
         tools_gw.open_dialog(self.dlg_status, dlg_name="status_selector")
         
-
     def _set_corporate(self):
         table = self.dlg_priority_manager.tbl_results
         selected_list = table.selectionModel().selectedRows()

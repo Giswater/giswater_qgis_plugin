@@ -961,7 +961,6 @@ class GwInfo(QObject):
         result = complet_result['body']['data']
         return result
 
-
     def _open_help(self, feature_type):
         """ Open PDF file with selected @project_type and @feature_type """
 

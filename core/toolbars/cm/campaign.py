@@ -41,7 +41,6 @@ class Campaign:
         """ Entry point for campaign creation or editing """
         self.load_campaign_dialog(campaign_id=campaign_id, mode=dialog_type)
 
-
     def campaign_manager(self):
         """ Opens the campaign management interface """
         self.dialog = CampaignManagementUi(self)
@@ -61,7 +60,6 @@ class Campaign:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dialog.campaign_cmb_state, rows, index_to_show=1, add_empty=True)
 
-
         # Set filter events
         self.dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
@@ -76,7 +74,6 @@ class Campaign:
 
         self.manage_date_filter()
         tools_gw.open_dialog(self.dialog, dlg_name="campaign_management")
-
 
     def load_campaign_dialog(self, campaign_id=None, mode="review"):
         """
@@ -108,7 +105,6 @@ class Campaign:
         if self.project_type == 'ud':
             self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
-
 
         self.excluded_layers = [
             "v_edit_arc", "v_edit_node", "v_edit_connec",
@@ -158,7 +154,6 @@ class Campaign:
             if "columnname" in field:
                 widget.setProperty("columnname", field["columnname"])
 
-
             label = QLabel(field["label"]) if field.get("label") else None
             tools_gw.add_widget(self.dialog, field, label, widget)
 
@@ -199,7 +194,6 @@ class Campaign:
                                                                  self.dialog.tbl_campaign_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
-
 
     def _load_campaign_relations(self, campaign_id):
         """
@@ -270,7 +264,6 @@ class Campaign:
 
         return widget
 
-
     def set_widget_value(self, widget, value):
         """Sets the widget value from JSON"""
 
@@ -290,13 +283,11 @@ class Campaign:
             if index >= 0:
                 widget.setCurrentIndex(index)
 
-
     def _on_tab_change(self, index):
         # Get the tab object at the changed index
         tab = self.dialog.tab_widget.widget(index)
         if tab.objectName() == "tab_relations" and self.is_new_campaign and not self.campaign_saved:
             self.save_campaign(from_tab_change=True)
-
 
     def save_campaign(self, from_tab_change=False):
         """Save campaign data to the database. Updates ID and resets map on success."""
@@ -331,7 +322,6 @@ class Campaign:
 
         except Exception as e:
             tools_qgis.show_warning(f"Error saving campaign: {e}")
-
 
     def extract_campaign_fields(self, dialog):
         """Build a JSON string of field values from the campaign dialog"""
@@ -381,7 +371,6 @@ class Campaign:
 
         return fields
 
-
     def setup_tab_relations(self):
         #self.dialog.tab_relations.setCurrentIndex(0)
         self.feature_type = tools_gw.get_signal_change_tab(self.dialog)
@@ -419,17 +408,14 @@ class Campaign:
             partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN)
         )
 
-
     def _on_tab_feature_changed(self):
         self.feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
-
 
     def get_widget_by_columnname(self, dialog, columnname):
         for widget in dialog.findChildren(QWidget):
             if widget.property("columnname") == columnname:
                 return widget
         return None
-
 
     def _update_feature_completer(self, dlg):
         tab_name = dlg.tab_feature.currentWidget().objectName()
@@ -451,7 +437,6 @@ class Campaign:
         completer = QCompleter(values)
         completer.setCaseSensitivity(False)
         dlg.feature_id.setCompleter(completer)
-
 
     def _on_class_changed(self):
         """Called when the user changes the reviewclass or visitclass combo."""
@@ -479,7 +464,6 @@ class Campaign:
         print("Features_type:", feature_types)
         self._manage_tabs_enabled(feature_types)
 
-
     def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int):
         """Query om_reviewclass_x_layer to get allowed feature types for a given reviewclass"""
         sql = f"""
@@ -490,7 +474,6 @@ class Campaign:
         rows = tools_db.get_rows(sql)
         return [r["feature_type"] for r in rows if r.get("feature_type")]
 
-
     def get_allowed_feature_types_from_visitclass(self, table_name: str, visitclass_id: int):
         """Function to get feature types directly from om_visitclass table."""
         sql = f"""
@@ -500,7 +483,6 @@ class Campaign:
         """
         rows = tools_db.get_rows(sql)
         return [r["feature_type"].lower() for r in rows if r.get("feature_type")]
-
 
     def _manage_tabs_enabled(self, feature_types):
         """ Enable or disable relation tabs depending on allowed feature types (e.g., ['node', 'arc']). """
@@ -521,7 +503,6 @@ class Campaign:
             tab_type = object_name.replace("tab_", "")
             enabled = tab_type in normalized
             tab_widget.setTabEnabled(i, enabled)
-
 
     def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
         """Populate a QTableView with the results of a SQL query."""
@@ -546,7 +527,6 @@ class Campaign:
         view.setModel(model)
         view.resizeColumnsToContents()
 
-
     # Campaign manager
     def load_campaigns_into_manager(self):
         """Load campaign data into the campaign management table"""
@@ -556,7 +536,6 @@ class Campaign:
 
         query = "SELECT * FROM cm.om_campaign ORDER BY id DESC"
         self.populate_tableview(self.dialog.tbl_campaign, query)
-
 
     def manage_date_filter(self):
         """Update date filters based on selected field (e.g., real_startdate)"""
@@ -584,7 +563,6 @@ class Campaign:
                 self.dialog.date_event_from.setDate(min_date)
             if max_date:
                 self.dialog.date_event_to.setDate(max_date)
-
 
     def filter_campaigns(self):
         """Filter om_campaign based on status and date"""
@@ -662,7 +640,6 @@ class Campaign:
 
         tools_qgis.show_info(f"{success} campaign(s) deleted.", dialog=self.dialog)
         self.filter_campaigns()
-
 
     def open_campaign(self, index):
         """Open campaign from the clicked index safely (double click handler)."""

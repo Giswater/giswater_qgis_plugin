@@ -145,6 +145,7 @@ class GwSnapshotViewButton(GwAction):
             cursor = tools_gw.get_cursor_multiple_selection()
             global_vars.canvas.setCursor(cursor)
 
+
 def close_dlg(**kwargs):
     """ Close form """
 

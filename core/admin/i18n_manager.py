@@ -40,7 +40,6 @@ class GwSchemaI18NManager:
 
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_i18n_manager')
 
-
     def _set_signals(self):
         # Mysteriously without the partial the function check_connection is not called
         self.dlg_qm.btn_connection.clicked.connect(partial(self._check_connection))
@@ -208,7 +207,6 @@ class GwSchemaI18NManager:
         if self.py_messages:
             self._update_py_messages()
 
-
     # region Missing DB Dialogs
     def _update_db_tables(self):
         self.check_for_su_tables = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_for_su_tables)
@@ -251,11 +249,8 @@ class GwSchemaI18NManager:
                         tools_qt.show_info_box('Incorrect languages, make sure to have the giswater project in english')
                         break                   
 
-                
-
         self.dlg_qm.lbl_info.clear()
         tools_qt.show_info_box(text_error)
-
 
     def _update_tables(self, table_i18n):
         tables_org = self._find_table_org(table_i18n)
@@ -280,7 +275,6 @@ class GwSchemaI18NManager:
                 self.conn_i18n.rollback()
                 return f"An error occured while translating {table_i18n}: {e}\n"
     
-
     def _update_any_table(self, table_i18n, table_org):
         columns_i18n, columns_org, names = self._get_rows_to_compare(table_i18n, table_org)
 
@@ -378,7 +372,6 @@ class GwSchemaI18NManager:
                                     ON CONFLICT (source_code, project_type, context, formname, source) 
                                     DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
                     
-                   
                 elif 'dbconfig_report' in table_i18n:
                     query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, al_en_us, ds_en_us) 
                                     VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', 
@@ -441,7 +434,6 @@ class GwSchemaI18NManager:
                                     ON CONFLICT (source_code, context, project_type, parameter, method) 
                                     DO UPDATE SET lb_en_us = {texts[0]}, ds_en_us = {texts[1]}, pl_en_us = {texts[2]};\n""" 
                     
-
                 query += query_row
         return query              
 
@@ -592,7 +584,6 @@ class GwSchemaI18NManager:
                             query += query_row
         return query
     
-
     # endregion
     # region Config_form_fields_feat
     
@@ -847,7 +838,6 @@ class GwSchemaI18NManager:
 
         return py_files
 
-
     def _search_lines(self, file, key):
         found_lines = []
         try:
@@ -859,7 +849,6 @@ class GwSchemaI18NManager:
             print(f"No se pudo leer el archivo {file}: {e}")
         return found_lines
     
-        
     #endregion
     # region Global funcitons
     def _detect_schema(self, schema_name):
@@ -875,7 +864,6 @@ class GwSchemaI18NManager:
                 break  # Exit the loop early once we find the schema
         
         return existing_schema
-
 
     def detect_table_func(self, table):
         self.cursor_i18n.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
@@ -926,7 +914,6 @@ class GwSchemaI18NManager:
         
         return tables_org
 
-    
     def _get_rows(self, sql, cursor):
         """ Get multiple rows from selected query """
         rows = None
@@ -990,7 +977,6 @@ class GwSchemaI18NManager:
         recurse(data)
         return results
     
-
     def _verify_lang(self):
         if self.project_type in ["ws", "ud"]:
             query = f"SELECT language from {self.schema_org}.sys_version"

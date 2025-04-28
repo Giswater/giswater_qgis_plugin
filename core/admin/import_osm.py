@@ -30,7 +30,6 @@ else:
     ox = None
 
 
-
 class GwImportOsm:
 
     def __init__(self):

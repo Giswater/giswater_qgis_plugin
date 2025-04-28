@@ -438,7 +438,6 @@ class CalculatePriority:
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority, dlg_name="priority")
         
-
     def _add_total(self, lyt):
         lbl = QLabel()
         lbl.setText(tools_qt.tr("Total"))

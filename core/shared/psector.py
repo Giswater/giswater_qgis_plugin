@@ -475,14 +475,12 @@ class GwPsector:
 
         self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
 
-
     def psector_name_changed(self):
         """ Enable buttons and tabs when name is changed """
 
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name")
         self.enable_buttons(psector_name != 'null')
         self.set_tabs_enabled(psector_name != 'null')
-
 
     def flags(self, index, model, editable_columns=None):
 

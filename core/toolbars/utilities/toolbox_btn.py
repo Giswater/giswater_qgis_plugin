@@ -151,7 +151,6 @@ class GwToolBoxButton(GwAction):
                 value = tools_qt.get_calendar_date(dialog, widget, date_format=lib_vars.date_format)
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
 
-
     def save_settings_values(self, dialog, function_name):
         """ Save QGIS settings related with toolbox options """
 
@@ -534,7 +533,6 @@ class GwToolBoxButton(GwAction):
                 date = QDate.fromString(value, lib_vars.date_format)
                 tools_qt.set_calendar(dialog, widget, date)
 
-
     def _load_settings_values(self, dialog, function):
         """ Load QGIS settings related with toolbox options """
 
@@ -805,7 +803,6 @@ class GwToolBoxButton(GwAction):
         """ Select CSV file """
 
         tools_qt.get_save_file_path(self.dlg_reports, 'txt_export_path', '*.csv', "Save report file")
-
 
     def _export_reports(self, dialog, table, path):
 

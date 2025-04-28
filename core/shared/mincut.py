@@ -487,7 +487,6 @@ class GwMincut:
         # Show form in docker?
         self.manage_docker()
 
-
     def manage_docker(self):
 
         tools_gw.init_docker('qgis_form_docker')

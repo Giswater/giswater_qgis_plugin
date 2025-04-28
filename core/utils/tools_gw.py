@@ -4646,7 +4646,6 @@ def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=N
     tools_db.execute_sql(sql)
 
 
-
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
 
