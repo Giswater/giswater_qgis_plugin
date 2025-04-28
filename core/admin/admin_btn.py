@@ -1876,7 +1876,7 @@ class GwAdminButton:
             if do_schema_model_i18n:
                 files_to_execute = [f"{self.project_type_selected}_schema_model.sql"]
             else:
-                #files_to_execute = [f"dml.sql", f"{self.project_type_selected}_dml.sql"]
+                # files_to_execute = [f"dml.sql", f"{self.project_type_selected}_dml.sql"]
                 files_to_execute = [f"{self.project_type_selected}_dml.sql"]
 
             for file in files_to_execute:

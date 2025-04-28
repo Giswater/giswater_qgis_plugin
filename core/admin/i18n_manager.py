@@ -242,12 +242,12 @@ class GwSchemaI18NManager:
                     elif correct_lang:
                         text_error += self._update_tables(table_i18n)
 
-                        #check for all primary keys reapeted, but project_types
+                        # check for all primary keys reapeted, but project_types
                         text_error += self._update_project_type(table_i18n)
                         self._vacuum_commit(table_i18n, self.conn_i18n, self.cursor_i18n)
                     else:
                         tools_qt.show_info_box('Incorrect languages, make sure to have the giswater project in english')
-                        break                   
+                        break 
 
         self.dlg_qm.lbl_info.clear()
         tools_qt.show_info_box(text_error)
@@ -653,7 +653,7 @@ class GwSchemaI18NManager:
         """
         return query
             
-    #endregion
+    # endregion
     # region Rewrite Project_type
     def _update_project_type(self, table):
         """Function to rewrite the repeated rows with different project_type to only one with project_type = 'utils'"""
@@ -782,7 +782,7 @@ class GwSchemaI18NManager:
 
     # endregion
 
-    #region PY Messages
+    # region PY Messages
     def _update_py_messages(self):
         self.project_type = "python"
         self._change_table_lyt("pymessage")
@@ -849,7 +849,7 @@ class GwSchemaI18NManager:
             print(f"No se pudo leer el archivo {file}: {e}")
         return found_lines
     
-    #endregion
+    # endregion
     # region Global funcitons
     def _detect_schema(self, schema_name):
         query = "SELECT schema_name FROM information_schema.schemata;"
@@ -888,7 +888,7 @@ class GwSchemaI18NManager:
         elif "dbconfig_engine" in table_i18n:
             tables_org = ["config_engine", "config_engine_def"]
         elif table_name.startswith("dbconfig"):
-            tables_org = [table_name[2:]] # Get everything after the first two characters
+            tables_org = [table_name[2:]]  # Get everything after the first two characters
         elif table_name.startswith("su_"):
             if self.project_type == "am":
                 tables_org = ["value_result_type", "value_status"]
@@ -907,7 +907,7 @@ class GwSchemaI18NManager:
             row_project_type = row.get("project_type")
             if context not in seen_contexts and row_project_type == self.project_type:
                 tables_org.append(context)
-                seen_contexts.add(context) # Use .get() to avoid KeyError if 'context' doesn't exist
+                seen_contexts.add(context)  # Use .get() to avoid KeyError if 'context' doesn't exist
         print(tables_org)
         if tables_org is None:
             return None  # Or some fallback behavior
@@ -1009,7 +1009,7 @@ class GwSchemaI18NManager:
                 "sutables": []
             },
             "cm": {
-                "dbtables": [], #["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
+                "dbtables": [],  # ["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
                 "sutables": []
             },
         }

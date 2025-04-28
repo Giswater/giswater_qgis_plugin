@@ -841,7 +841,7 @@ class GwI18NGenerator:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson", 
                     "dbconfig_form_fields_json"
-                 ] # "su_feature",
+                 ]  # "su_feature",
             },
             "i18n_ud": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}i18n{os.sep}{self.language}{os.sep}",
@@ -853,7 +853,7 @@ class GwI18NGenerator:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson", 
                     "dbconfig_form_fields_json"
-                 ] # "su_feature",
+                 ]  # "su_feature",
             },
             "am": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}am{os.sep}i18n{os.sep}",
@@ -868,7 +868,7 @@ class GwI18NGenerator:
                 "name": f"{self.language}.sql",
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
-                "tables": [] #["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
+                "tables": []  # ["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
             }
         }
 

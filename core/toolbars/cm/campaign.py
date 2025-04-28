@@ -67,7 +67,7 @@ class Campaign:
         self.dialog.date_event_to.dateChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
-        #self.dialog.tbl_campaign.doubleClicked.connect(self.open_selected_campaign)
+        # self.dialog.tbl_campaign.doubleClicked.connect(self.open_selected_campaign)
         self.dialog.tbl_campaign.doubleClicked.connect(self.open_campaign)
         self.dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
         self.dialog.campaign_btn_open.clicked.connect(self.open_campaign)
@@ -372,7 +372,7 @@ class Campaign:
         return fields
 
     def setup_tab_relations(self):
-        #self.dialog.tab_relations.setCurrentIndex(0)
+        # self.dialog.tab_relations.setCurrentIndex(0)
         self.feature_type = tools_gw.get_signal_change_tab(self.dialog)
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         table_object = "campaign"

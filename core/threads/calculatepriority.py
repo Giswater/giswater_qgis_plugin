@@ -816,7 +816,7 @@ class GwCalculatePriority(GwTask):
         cum_length = 0
 
         for arc in second_iteration:
-            #Assign arc to current year before checking for overflow
+            # Assign arc to current year before checking for overflow
             cum_cost_constr += arc["cost_constr"]
             cum_length += arc["length"]   
 

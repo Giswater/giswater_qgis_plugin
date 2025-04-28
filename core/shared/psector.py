@@ -444,7 +444,7 @@ class GwPsector:
         # get widgets from general tab
         widget_list = self.dlg_plan_psector.tab_general.findChildren(QWidget)
         for widget in widget_list:
-            if  (psector_id is None and widget.objectName() != "tab_general_psector_id") or (psector_id is not None and widget.objectName() not in ("tab_general_psector_id", "tab_general_name")):
+            if (psector_id is None and widget.objectName() != "tab_general_psector_id") or (psector_id is not None and widget.objectName() not in ("tab_general_psector_id", "tab_general_name")):
                 # Set editable/readonly
                 if type(widget) in (QLineEdit, QTextEdit):
                     widget.setReadOnly(False)
