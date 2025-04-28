@@ -1,0 +1,29 @@
+[flake8]
+# Basic formatting
+select = E2,E3,E4,E7,E9,N8,D1,D2,D3,D4,C9,F4,F8,F9
+# Ignore specific QGIS/PyQt related issues
+ignore =
+    E402,
+    F401,
+    F403,
+    F405,
+    F841,
+# Exclude directories
+exclude =
+    __pycache__,
+    .git,
+    .pytest_cache,
+    .idea,
+    i18n,
+    icons,
+    packages,
+    dbmodel,
+    test,
+# Line length (QGIS plugins often need longer lines)
+max-line-length = 120
+# Maximum complexity
+max-complexity = 40
+# Output format
+count = True
+show-source = True
+statistics = True
