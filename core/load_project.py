@@ -472,7 +472,7 @@ class GwLoadProject(QObject):
                 schema_actived = tools_os.set_boolean(schema_actived, False)
 
                 if rows is not None and schema_actived is True:
-                    if toolbar_id == "cm" :
+                    if toolbar_id == "cm":
                         plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
                     elif global_vars.project_type == 'ws':
                         plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)

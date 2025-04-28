@@ -215,7 +215,7 @@ class AddNewLot:
         self.hilight_features(self.rb_list)
 
         # Get columns to ignore for tab_relations when export csv
-        sql = "SELECT columnname FROM config_form_tableview WHERE location_type = 'lot' AND visible IS NOT TRUE AND objectname = 've_lot_x_"+str(self.feature_type)+"'"
+        sql = "SELECT columnname FROM config_form_tableview WHERE location_type = 'lot' AND visible IS NOT TRUE AND objectname = 've_lot_x_" + str(self.feature_type) + "'"
         rows = tools_db.get_rows(sql)
         result_relation = []
         if rows is not None:
@@ -441,9 +441,9 @@ class AddNewLot:
 
         if lot_id:
             _sql = ("SELECT serie from cm.om_visit_lot "
-                    " WHERE id = '"+str(lot_id)+"'")
+                    " WHERE id = '" + str(lot_id) + "'")
             ct = tools_db.get_rows(_sql)
-            sql += " WHERE workorder.serie = '"+str(ct[0])+"'"
+            sql += " WHERE workorder.serie = '" + str(ct[0]) + "'"
         sql += " order by ct desc"
 
         rows = tools_db.get_rows(sql)
@@ -577,13 +577,13 @@ class AddNewLot:
             index_feature = tools_qt.get_col_index_by_col_name(qtable, str(feature_type) + '_id')
             feature_id = row_index.sibling(row, index_feature).data()
             id_list += "'" + feature_id + "', "
-            msg_records += "visit_id: "+str(visit_id)+";\n"
+            msg_records += "visit_id: " + str(visit_id) + ";\n"
         id_list = id_list[:-2] + ")"
         answer = tools_qt.show_question(message, "Delete records", msg_records)
         if answer:
-            sql = ("DELETE FROM om_visit_x_"+str(feature_type)+" "
-                   " WHERE visit_id = '"+str(visit_id)+"' "
-                   " AND "+str(feature_type)+"_id IN "+str(id_list)+";\n")
+            sql = ("DELETE FROM om_visit_x_" + str(feature_type) + " "
+                   " WHERE visit_id = '" + str(visit_id) + "' "
+                   " AND " + str(feature_type) + "_id IN " + str(id_list) + ";\n")
             tools_db.execute_sql(sql)
 
         self.reload_table_visit()
@@ -763,7 +763,7 @@ class AddNewLot:
         """ Set a model with selected filter. Attach that model to selected table """
 
         if self.schemaname not in table_name:
-            table_name = str(self.schemaname) + "."+ str(table_name)
+            table_name = str(self.schemaname) + "." + str(table_name)
 
         # Set model
         model = QSqlTableModel()
@@ -846,7 +846,7 @@ class AddNewLot:
         field_id = feature_type + "_id"
         if param_options and 'featureType' in param_options:
             key = feature_type + "_type"
-            sys_type = param_options ['featureType']
+            sys_type = param_options['featureType']
         elif param_options and 'sysType' in param_options:
             key = "sysType"
             sys_type = param_options['sysType']
@@ -1085,14 +1085,14 @@ class AddNewLot:
         # Create interval dates
         format_low = self.lot_date_format + ' 00:00:00.000'
         format_high = self.lot_date_format + ' 23:59:59.999'
-        interval = "'"+str(visit_start.toString(format_low))+"'::timestamp AND '"+str(visit_end.toString(format_high))+"'::timestamp"
+        interval = "'" + str(visit_start.toString(format_low)) + "'::timestamp AND '" + str(visit_end.toString(format_high)) + "'::timestamp"
 
-        expr_filter = "(startdate BETWEEN "+str(interval)+") AND (enddate BETWEEN "+str(interval)+" OR enddate is NULL)"
+        expr_filter = "(startdate BETWEEN " + str(interval) + ") AND (enddate BETWEEN " + str(interval) + " OR enddate is NULL)"
 
         if object_id != 'null':
-            expr_filter += " AND "+str(feature_type)+"_id::TEXT ILIKE '%"+str(object_id)+"%'"
+            expr_filter += " AND " + str(feature_type) + "_id::TEXT ILIKE '%" + str(object_id) + "%'"
         if lot_id != '':
-           expr_filter += " AND lot_id='"+str(lot_id)+"'"
+           expr_filter += " AND lot_id='" + str(lot_id) + "'"
 
         columns_name = tools_db.get_columns_list(table_name)
 
@@ -1108,8 +1108,8 @@ class AddNewLot:
         tools_gw.set_tablemodel_config(self.dlg_lot, self.dlg_lot.tbl_visit, table_name, isQStandardItemModel=True)
 
         # Populate model visit
-        sql = ("SELECT * FROM " + str(table_name) +""
-               " WHERE "+str(expr_filter)+"")
+        sql = ("SELECT * FROM " + str(table_name) + ""
+               " WHERE " + str(expr_filter) + "")
         rows = tools_db.get_rows(sql, commit=True)
 
         if rows is None:
@@ -1157,7 +1157,7 @@ class AddNewLot:
         elem = combo.itemData(combo.currentIndex())
         i = qtable.model().index(pos_x, widget_pos)
         qtable.model().setData(i, elem[0])
-        i = qtable.model().index(pos_x, widget_pos+1)
+        i = qtable.model().index(pos_x, widget_pos + 1)
         qtable.model().setData(i, elem[1])
 
 
@@ -1239,11 +1239,11 @@ class AddNewLot:
             keys += "" + key + ", "
             if value not in ('', None):
                 if type(value) in (int, bool):
-                    values += "$$"+str(value)+"$$, "
-                    update += ""+str(key)+"=$$"+str(value)+"$$, "
+                    values += "$$" + str(value) + "$$, "
+                    update += "" + str(key) + "=$$" + str(value) + "$$, "
                 else:
-                    values += "$$"+str(value)+"$$, "
-                    update += str(key)+ "=$$"+str(value)+"$$, "
+                    values += "$$" + str(value) + "$$, "
+                    update += str(key) + "=$$" + str(value) + "$$, "
             else:
                 values += "null, "
                 update += key + "=null, "
@@ -1253,21 +1253,21 @@ class AddNewLot:
         update = update[:-2]
 
         if self.is_new_lot is True:
-            sql = ("INSERT INTO cm.om_visit_lot("+str(keys)+") "
-                   " VALUES ("+str(values)+") RETURNING id")
+            sql = ("INSERT INTO cm.om_visit_lot(" + str(keys) + ") "
+                   " VALUES (" + str(values) + ") RETURNING id")
             row = tools_db.execute_returning(sql)
             if row in (None, False):
                 return
             lot_id = row[0]
             sql = ("INSERT INTO cm.selector_lot "
-                   "(lot_id, cur_user) VALUES("+str(lot_id)+", current_user);")
+                   "(lot_id, cur_user) VALUES(" + str(lot_id) + ", current_user);")
             tools_db.execute_sql(sql)
             tools_qgis.refresh_map_canvas()
         else:
             lot_id = tools_qt.get_text(self.dlg_lot, 'lot_id', False, False)
             sql = ("UPDATE cm.om_visit_lot "
-                   " SET "+str(update)+""
-                   " WHERE id = '"+str(lot_id)+"'; \n")
+                   " SET " + str(update) + ""
+                   " WHERE id = '" + str(lot_id) + "'; \n")
             tools_db.execute_sql(sql)
         self.save_relations(lot, lot_id, lot['feature_type'])
         sql = ("SELECT cm.gw_fct_lot_psector_geom(" + str(lot_id) + ")")
@@ -1346,9 +1346,9 @@ class AddNewLot:
                         if result not in ('', None):
                             status = "$$" + str(result[0]) + "$$ "
             if visit_id and status:
-                sql += ("UPDATE "+str(table_name)+" "
-                        "SET status = ("+str(status)+") "
-                        "WHERE visit_id = '"+str(visit_id)+"';\n")
+                sql += ("UPDATE " + str(table_name) + " "
+                        "SET status = (" + str(status) + ") "
+                        "WHERE visit_id = '" + str(visit_id) + "';\n")
         if sql != "":
             status_aux = tools_db.execute_sql(sql)
 
@@ -1531,7 +1531,7 @@ class AddNewLot:
             tools_qt.fill_combo_values(self.dlg_lot_man.cmb_estat, rows, 1, sort_combo=False)
 
         # Populate combo date type
-        rows = [['real_startdate', 'Data inici'],['real_enddate', 'Data fi'], ['startdate', 'Data inici planificada'],
+        rows = [['real_startdate', 'Data inici'], ['real_enddate', 'Data fi'], ['startdate', 'Data inici planificada'],
                 ['enddate', 'Data final planificada']]
         tools_qt.fill_combo_values(self.dlg_lot_man.cmb_date_filter_type, rows, 1, sort_combo=False)
 
@@ -1750,12 +1750,12 @@ class AddNewLot:
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + self.schemaname + "." +tableleft+" WHERE id NOT IN "
-        query_left += "(SELECT "+tableleft+".id FROM "+ self.schemaname + "." +tableleft+""
-        query_left += " RIGHT JOIN "+ self.schemaname + "." +tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_left = "SELECT * FROM " + self.schemaname + "." + tableleft + " WHERE id NOT IN "
+        query_left += "(SELECT " + tableleft + ".id FROM " + self.schemaname + "." + tableleft + ""
+        query_left += " RIGHT JOIN " + self.schemaname + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + ""
         query_left += " WHERE cur_user = current_user)"
         query_left += " AND id::text = ANY(ARRAY" + str(data) + ")"
-        query_left += " AND "+field_id_left+" > -1 ORDER BY id desc"
+        query_left += " AND " + field_id_left + " > -1 ORDER BY id desc"
 
         tools_db.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
@@ -1766,8 +1766,8 @@ class AddNewLot:
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         query_right = "SELECT  * FROM " + self.schemaname + "." + tableleft + ""
-        query_right += " JOIN " + self.schemaname + "." + tableright + " ON " + tableleft + "."+field_id_left+" = "+tableright+"."+field_id_right+""
-        query_right += " WHERE cur_user = current_user AND lot_id::text = ANY(ARRAY" + str(data) + ") ORDER BY " + tableleft +".id desc"
+        query_right += " JOIN " + self.schemaname + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + ""
+        query_right += " WHERE cur_user = current_user AND lot_id::text = ANY(ARRAY" + str(data) + ") ORDER BY " + tableleft + ".id desc"
 
         tools_db.fill_table_by_query(tbl_selected_rows, query_right)
         self.hide_colums(tbl_selected_rows, hide_right)
@@ -1778,8 +1778,8 @@ class AddNewLot:
                                                   query_right, field_id_right, add_sort=False))
 
         # Button unselect
-        query_delete = "DELETE FROM "+tableright+""
-        query_delete += " WHERE current_user = cur_user AND "+tableright+"."+field_id_right+"="
+        query_delete = "DELETE FROM " + tableright + ""
+        query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete,
                                                     query_left, query_right, field_id_right, add_sort=False))
         # QLineEdit
@@ -1833,7 +1833,7 @@ class AddNewLot:
         oder_by = {0: "ASC", 1: "DESC"}
         sort_order = qtable.horizontalHeader().sortIndicatorOrder()
         col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
-        query +=" ORDER BY " +col_to_sort + " " + oder_by[sort_order]+""
+        query += " ORDER BY " + col_to_sort + " " + oder_by[sort_order] + ""
         tools_db.fill_table_by_query(qtable, query)
         tools_qgis.refresh_map_canvas()
 
@@ -1912,7 +1912,7 @@ class AddNewLot:
         try:
             if os.path.exists(str(csv_path)):
                 msg = "Are you sure you want to overwrite this file?"
-                answer =  tools_qt.show_question(msg, "Overwrite")
+                answer = tools_qt.show_question(msg, "Overwrite")
                 if answer:
                     self.write_to_csv(csv_path, all_rows)
             else:
@@ -1938,8 +1938,8 @@ class AddNewLot:
         """Populates the combo box filters by retrieving the necessary data from the database or
         data source and updating the UI component to enable filtering of table entries."""
 
-        sql = ("SELECT "+str(fields)+" "
-               "FROM cm."+str(table_name)+" "
+        sql = ("SELECT " + str(fields) + " "
+               "FROM cm." + str(table_name) + " "
                "ORDER BY idval")
         rows = tools_db.get_rows(sql, commit=True)
         if rows:
@@ -2007,7 +2007,7 @@ class AddNewLot:
         # Close this dialog and open selected object
         dialog.close()
         sql = ("INSERT INTO selector_lot(lot_id, cur_user) "
-               " VALUES("+str(selected_object_id)+", current_user) "
+               " VALUES(" + str(selected_object_id) + ", current_user) "
                " ON CONFLICT DO NOTHING;")
         tools_db.execute_sql(sql)
         # set previous dialog
@@ -2037,7 +2037,7 @@ class AddNewLot:
         # Create interval dates
         format_low = self.lot_date_format + ' 00:00:00.000'
         format_high = self.lot_date_format + ' 23:59:59.999'
-        interval = "'"+str(visit_start.toString(format_low))+"'::timestamp AND '"+str(visit_end.toString(format_high))+"'::timestamp"
+        interval = "'" + str(visit_start.toString(format_low)) + "'::timestamp AND '" + str(visit_end.toString(format_high)) + "'::timestamp"
 
         expr_filter = ("(" + tools_qt.get_combo_value(self.dlg_lot_man, self.dlg_lot_man.cmb_date_filter_type, 0) + " BETWEEN " + str(interval) + " ")
         if show_nulls:
@@ -2045,13 +2045,13 @@ class AddNewLot:
         else:
             expr_filter += ") "
         if serie != 'null':
-            expr_filter += " AND serie ILIKE '%"+str(serie)+"%'"
+            expr_filter += " AND serie ILIKE '%" + str(serie) + "%'"
         if actuacio != '' and actuacio != -1:
-            expr_filter += " AND wotype_id ILIKE '%"+str(actuacio)+"%' "
+            expr_filter += " AND wotype_id ILIKE '%" + str(actuacio) + "%' "
         if adreca != '':
-            expr_filter += " AND address ILIKE '%"+str(adreca)+"%' "
+            expr_filter += " AND address ILIKE '%" + str(adreca) + "%' "
         if status != '':
-            expr_filter += " AND status::TEXT ILIKE '%"+str(status)+"%'"
+            expr_filter += " AND status::TEXT ILIKE '%" + str(status) + "%'"
         if assignat:
             expr_filter += " AND serie IS NULL "
 
@@ -2380,7 +2380,7 @@ class AddNewLot:
         # Get team selected
         filter_team = tools_qt.get_text(self.dlg_resources_man, "cmb_team")
         message = "You are trying delete team '" + str(filter_team) + "'. Do you want continue?"
-        answer =  tools_qt.show_question(message, "Delete team")
+        answer = tools_qt.show_question(message, "Delete team")
         if answer:
             sql = ("SELECT * FROM om_vehicle_x_parameters JOIN cat_team ON cat_team.team_id = om_vehicle_x_parameters.team_id WHERE cat_team.name = '" + str(filter_team) + "'")
             rows = tools_db.get_rows(sql, log_sql=True)

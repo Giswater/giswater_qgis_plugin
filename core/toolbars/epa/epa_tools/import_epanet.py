@@ -892,7 +892,7 @@ class GwImportEpanet:
     def _get_file(self) -> Optional[Path]:
         """ Get the INP file path from the user. """
         file_path = tools_qt.get_file(
-            "Select INP file", "","INP files (*.inp)"
+            "Select INP file", "", "INP files (*.inp)"
         )
 
         # Check if the file extension is .inp

@@ -892,7 +892,7 @@ class GwSchemaI18NManager:
         tables_org = []
         # Process the table name based on its prefix
         if "dbtypevalue" in table_i18n:
-            tables_org = ["edit_typevalue","plan_typevalue","om_typevalue"]
+            tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue"]
         elif "dbjson" in table_i18n:
             tables_org = ["config_report", "config_toolbox"]
         elif "dbconfig_form_fields_json" in table_i18n:
@@ -1003,7 +1003,7 @@ class GwSchemaI18NManager:
     def tables_dic(self, schema_type):
         dbtables_dic = {
             "ws": {
-                "dbtables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
@@ -1011,7 +1011,7 @@ class GwSchemaI18NManager:
                  "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
-                "dbtables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"

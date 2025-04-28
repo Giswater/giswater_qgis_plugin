@@ -105,7 +105,7 @@ class RecursiveEpa():
     def _get_file_dialog(self, widget):
         """ Check if selected file exists. Set default value if necessary """
 
-        tools_qt.get_open_file_path(self.dlg_epa, widget, "","Selected file", str(Path.home()))
+        tools_qt.get_open_file_path(self.dlg_epa, widget, "", "Selected file", str(Path.home()))
 
     def get_folder_dialog(self, widget):
         """ Get folder dialog """

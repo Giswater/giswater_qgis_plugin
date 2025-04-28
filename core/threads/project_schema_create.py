@@ -181,7 +181,7 @@ class GwCreateSchemaTask(GwTask):
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_locale', 'load_base_locale','update_35to40']
+        list_process = ['load_base', 'load_locale', 'load_base_locale', 'update_35to40']
 
         for process_name in list_process:
             # tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")

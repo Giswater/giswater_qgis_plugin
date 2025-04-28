@@ -148,7 +148,7 @@ class GwAmBreakageButton(GwAction):
         self._set_assignation_signals()
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_assignation,dlg_name="assignation")
+        tools_gw.open_dialog(self.dlg_assignation, dlg_name="assignation")
 
 
     def _manage_hidden_form_leaks(self):

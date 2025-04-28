@@ -15,7 +15,7 @@ import json
 
 from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db,tools_log, tools_os
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_log, tools_os
 from qgis.PyQt.QtWidgets import QLabel
 from PyQt5.QtWidgets import QApplication
 
@@ -319,7 +319,7 @@ class GwSchemaI18NUpdate:
             lang_columns = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
 
         # Make the query
-        sql=""
+        sql = ""
         if self.lower_lang == 'en_us':
             sql = (f"SELECT {", ".join(columns)} "
                f"FROM {table} "
@@ -779,14 +779,14 @@ class GwSchemaI18NUpdate:
     def tables_dic(self, schema_type):
         dbtables_dic = {
             "ws": {
-                "dbtables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
                  ]
             },
             "ud": {
-                "dbtables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"

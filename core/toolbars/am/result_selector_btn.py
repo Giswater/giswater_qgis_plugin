@@ -34,7 +34,7 @@ class GwResultSelectorButton(GwAction):
             return
         self._update_descriptions()
         self._set_signals()
-        tools_gw.open_dialog(self.dlg_result_selector,dlg_name="result_selector")
+        tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selector")
         
 
     def _fill_combos(self):

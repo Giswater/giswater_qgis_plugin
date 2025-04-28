@@ -400,7 +400,7 @@ class GwI18NGenerator:
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
 
         elif table == 'dbconfig_form_fields_feat':
-            colums = ["feature_type","source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            colums = ["feature_type", "source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbtable':
@@ -421,7 +421,7 @@ class GwI18NGenerator:
 
 
         # Make the query
-        sql=""
+        sql = ""
         if self.lower_lang == 'en_us':
             sql = (f"SELECT {", ".join(colums)} "
                f"FROM {self.schema_i18n}.{table} "
@@ -495,7 +495,7 @@ class GwI18NGenerator:
                         for row, txt in data:
                             for feature_type in feature_types:
                                 if row['feature_type'] == feature_type:
-                                    if k!= 0:
+                                    if k != 0:
                                         values_str += ",\n"
                                     values_str += f"('{row['source']}', '%_{row['feature_type'].lower()}%', '{row['formtype'].lower()}', {txt[0]}, {txt[1]})"
                                     k = 1 
@@ -856,7 +856,7 @@ class GwI18NGenerator:
                 "name": "ws_dml.sql",
                 "project_type": ["ws", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
-                "tables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson", 
@@ -868,7 +868,7 @@ class GwI18NGenerator:
                 "name": "ud_dml.sql",
                 "project_type": ["ud", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
-                "tables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson", 
