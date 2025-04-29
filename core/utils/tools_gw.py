@@ -64,6 +64,7 @@ from ..toolbars.epa import go2epa_selector_btn  # noqa: F401
 from ..shared import psector  # noqa: F401
 from ..shared import audit  # noqa: F401
 from ..toolbars.utilities import snapshot_view  # noqa: F401
+from ..toolbars.edit import connect_link_btn
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -3730,7 +3731,7 @@ def get_icon(icon, folder="dialogs"):
         return None
 
 
-def add_tableview_header(widget: QWidget, field: dict, json_headers: Optional[list] = []) -> QWidget:
+def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_headers: Optional[list] = []) -> QWidget:
 
     model = widget.model()
     if model is None:
@@ -3744,7 +3745,7 @@ def add_tableview_header(widget: QWidget, field: dict, json_headers: Optional[li
         # Get headers
         headers = []
 
-        if field['value'] is not None:
+        if field and field['value'] is not None:
             for x in field['value'][0]:
                 headers.append(x)
 
