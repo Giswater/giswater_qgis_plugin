@@ -67,7 +67,7 @@ SELECT is (
 -- Extract and test the "text" field from the function's JSON response when message does not exist
 SELECT is (
     (gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-    "data":{"message":"6", "function":"-995","parameters":{"feature_id": 1}, "variables":"value", "is_process":true}}$$)::JSON)->'body'->'data'->'info'->>'text',
+    "data":{"message":"6", "function":"-995","parameters":{"feature_id": 1}, "variables":"value", "is_process":true}}$$)::JSON)->'message'->>'text',
     'The process has returned an error code, but this error code is not present on the sys_message table. Please contact with your system administrator in order to update your sys_message table',
     'Checking gw_fct_getmessage when message does not exist in sys_message'
 );
