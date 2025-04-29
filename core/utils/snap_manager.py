@@ -211,13 +211,14 @@ class GwSnapManager(object):
         self.is_valid = result.isValid()
         return result
 
-    def snap_to_project_config_layers(self, event_point, vertex_marker=None):
+    def snap_to_project_config_layers(self, event_point, vertex_marker=None) -> QgsPointLocator.Match:
 
         self.is_valid = False
         if event_point is None:
             return None, None
 
         result = self.snapper.snapToMap(event_point)
+        print(type(result))
         if vertex_marker:
             if result.isValid():
                 # Get the point and add marker on it
@@ -271,7 +272,7 @@ class GwSnapManager(object):
         finally:
             return event_point
 
-    def get_snapped_layer(self, result):
+    def get_snapped_layer(self, result) -> QgsPointLocator.Match:
 
         layer = None
         if result.isValid():
