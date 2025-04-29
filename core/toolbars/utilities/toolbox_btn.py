@@ -513,22 +513,22 @@ class GwToolBoxButton(GwAction):
         widgets = layout.findChildren(QWidget)
 
         for widget in widgets:
-            if type(widget) in (QCheckBox, QRadioButton):
+            if type(widget) in (QCheckBox, QRadioButton) and widget.property('value') is None:
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 if value not in (None, 'None'):
                     tools_qt.set_checked(dialog, widget, value)
-            elif isinstance(widget, QComboBox) and widget.property('selectedId') in (None, '', 'NULL'):
+            elif isinstance(widget, QComboBox) and widget.property('selectedId') is None:
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
-            elif isinstance(widget, QLineEdit) and widget.property('value') in (None, ''):
+            elif isinstance(widget, QLineEdit) and widget.property('value') is None:
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
-            elif isinstance(widget, tools_gw.CustomQgsDateTimeEdit) and widget.property('value') in (None, ''):
+            elif isinstance(widget, tools_gw.CustomQgsDateTimeEdit) and widget.property('value') is None:
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 date = QDate.fromString(value, lib_vars.date_format)
