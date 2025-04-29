@@ -469,11 +469,12 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
     """ Create and return parameters as body to functions"""
 
     info_types = {'full': 1}
+    plugin_version, message = tools_qgis.get_plugin_version()
     info_type = info_types.get(lib_vars.project_vars['info_type'])
     lang = QSettings().value('locale/globalLocale', QLocale().name())
 
     if body:
-        body.setdefault('client', {"device": 4, "lang": lang})
+        body.setdefault('client', {"device": 4, "lang": lang, "version":f'"{plugin_version}"'})
         body["client"].setdefault('device', 4)
         body["client"].setdefault('lang', lang)
         if info_type is not None:
@@ -487,7 +488,7 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
         body["data"].setdefault("pafeInfo", {})
         str_body = f"$${json.dumps(body)}$$"
     else:
-        client = f'$${{"client":{{"device":4, "lang":"{lang}"'
+        client = f'$${{"client":{{"device":4, "lang":"{lang}", "version":"{plugin_version}"'
         if info_type is not None:
             client += f', "infoType":{info_type}'
         if lib_vars.project_epsg is not None:
