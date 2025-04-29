@@ -32,15 +32,15 @@ BEGIN
     v_schemaname = 'cm';
 
     -- Get version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM SCHEMA_NAME.config_param_system WHERE parameter=''admin_version'') row'
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
     INTO v_version;
 
     -- Parse input
     v_client := (p_data ->> 'client')::json;
     v_fields := (p_data -> 'data' ->> 'fields')::json;
     v_campaign_type := (p_data -> 'data' ->> 'campaign_type')::int;
-	IF (p_data -> 'data' -> 'fields' ->> 'id') IS NOT NULL THEN
-    v_id := (p_data -> 'data' -> 'fields' ->> 'id')::int;
+	IF (p_data -> 'data' -> 'fields' ->> 'campaign_id') IS NOT NULL THEN
+    v_id := (p_data -> 'data' -> 'fields' ->> 'campaign_id')::int;
 	END IF;
 
     -- Parse class ID
@@ -51,17 +51,18 @@ BEGIN
     END IF;
 
     -- Check if the campaign ID exists
-	SELECT id INTO v_exists FROM om_campaign WHERE id = v_id;
+	SELECT campaign_id INTO v_exists FROM om_campaign WHERE campaign_id = v_id;
 
 
     IF v_exists IS NULL THEN
 	    -- INSERT
 	    v_querytext := 'INSERT INTO om_campaign (
-	        id, startdate, enddate, real_startdate, real_enddate, campaign_type,
+	        campaign_id, name, startdate, enddate, real_startdate, real_enddate, campaign_type,
 	        descript, active, organization_id, duration, status, rotation,
 	        exercise, serie, address
 	    ) VALUES (' ||
 	        v_id || ', ' ||
+	        quote_nullable(v_fields ->> 'name') || ', ' ||
 	        quote_nullable(v_fields ->> 'startdate') || '::date, ' ||
 	        quote_nullable(v_fields ->> 'enddate') || '::date, ' ||
 	        quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
@@ -75,8 +76,7 @@ BEGIN
 	        quote_nullable(v_fields ->> 'rotation') || '::numeric, ' ||
 	        quote_nullable(v_fields ->> 'exercise') || ', ' ||
 	        quote_nullable(v_fields ->> 'serie') || ', ' ||
-	        quote_nullable(v_fields ->> 'address') || ') RETURNING id';
-		RAISE NOTICE 'v_querytext de insert % ', v_querytext;
+	        quote_nullable(v_fields ->> 'address') || ') RETURNING campaign_id';
 	    EXECUTE v_querytext INTO v_newid;
 
 	    -- Insert into subtype table
@@ -91,6 +91,7 @@ BEGIN
 	ELSE
 	    -- UPDATE
 	    v_querytext := 'UPDATE om_campaign SET ' ||
+	    	'name = ' || quote_nullable(v_fields ->> 'name') || ', ' ||
 	        'startdate = ' || quote_nullable(v_fields ->> 'startdate') || '::date, ' ||
 	        'enddate = ' || quote_nullable(v_fields ->> 'enddate') || '::date, ' ||
 	        'real_startdate = ' || quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
@@ -105,7 +106,7 @@ BEGIN
 	        'exercise = ' || quote_nullable(v_fields ->> 'exercise') || ', ' ||
 	        'serie = ' || quote_nullable(v_fields ->> 'serie') || ', ' ||
 	        'address = ' || quote_nullable(v_fields ->> 'address') ||
-	        ' WHERE id = ' || v_id || ' RETURNING id';
+	        ' WHERE campaign_id = ' || v_id || ' RETURNING campaign_id';
 		RAISE NOTICE 'v_querytext de update % ', v_querytext;
 	    EXECUTE v_querytext INTO v_newid;
 	END IF;

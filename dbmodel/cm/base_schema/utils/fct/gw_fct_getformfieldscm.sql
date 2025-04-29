@@ -97,7 +97,7 @@ BEGIN
 	-- setting device
 	IF p_device IN (1,2,3) THEN
 		v_device = ' b.camelstyle AS type, columnname AS name, datatype AS "dataType", a.camelstyle AS "widgetAction", a.camelstyle as "updateAction", a.camelstyle as "changeAction",
-		     (CASE WHEN layoutname=''0'' OR layoutname =''lyt_top_1'' THEN ''header'' WHEN layoutname=''9'' OR layoutname =''lyt_bot_1'' OR layoutname =''lyt_bot_2'' 
+		     (CASE WHEN layoutname=''0'' OR layoutname =''lyt_top_1'' THEN ''header'' WHEN layoutname=''9'' OR layoutname =''lyt_bot_1'' OR layoutname =''lyt_bot_2''
 		     THEN ''footer'' ELSE ''body'' END) AS "position",
 		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';
 	ELSE
@@ -111,7 +111,7 @@ BEGIN
 	END IF;
 
 	-- get user variable to show label as column id or not
-	IF (SELECT value::boolean FROM PARENT_SCHEMA.config_param_user WHERE parameter = 'utils_formlabel_show_columname' AND cur_user =  current_user) THEN
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_formlabel_show_columname' AND cur_user =  current_user) THEN
 		v_label = 'columnname AS label';
 	ELSE
 		v_label = 'label';
@@ -124,14 +124,14 @@ BEGIN
 
 	-- starting process - get fields
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
-			WITH typevalue AS (SELECT * FROM PARENT_SCHEMA.config_typevalue)
+			WITH typevalue AS (SELECT * FROM sys_typevalue)
 			SELECT ',v_label,', columnname, columnname as column_id, concat(tabname,''_'',columnname) AS widgetname, widgettype,
 			widgetfunction,', v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY ', v_orderby ,') AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols, web_layoutorder, isfilter, tabname
 			FROM config_form_fields
-			LEFT JOIN PARENT_SCHEMA.config_typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
-			LEFT JOIN PARENT_SCHEMA.config_typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
+			LEFT JOIN sys_typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
+			LEFT JOIN sys_typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
 			WHERE formname IN (',quote_nullable(p_formname),', ''generic'') AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ',v_filter_widgets,' ORDER BY orderby) a');
 
 		EXECUTE v_querystring INTO fields_array;
@@ -140,8 +140,8 @@ BEGIN
 	-- for image widgets
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'image'
 	LOOP
-      		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE((aux_json->>'queryText'), ''));
-      		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
+      		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE((aux_json->>'queryText'), ''));
+      		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT],
       		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 
@@ -149,9 +149,9 @@ BEGIN
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'button'
 	LOOP
 		IF json_extract_path_text(aux_json,'widgetcontrols','text') IS NOT NULL THEN
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
 		ELSE
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', COALESCE(field_value, ''));
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'value', COALESCE(field_value, ''));
 		END IF;
 	END LOOP;
 
@@ -178,7 +178,7 @@ BEGIN
 		END IF;
 		combo_json = array_to_json(v_array);
 		v_combo_id = combo_json;
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 
 		-- Get combo values
 		IF  (aux_json->>'queryText') is not null and (aux_json->>'queryText') != '' then
@@ -188,23 +188,23 @@ BEGIN
 			IF (aux_json->>'isNullValue')::boolean IS TRUE THEN
 				v_array = array_prepend('',v_array);
 				-- remove key when is used
-				fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'isNullValue');
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'isNullValue');
 			END IF;
 		END IF;
 
 		combo_json = array_to_json(v_array);
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 
 		-- for typeahead widgets
 		IF aux_json->>'widgettype' = 'typeahead' and (aux_json->>'queryText') IS NOT NULL THEN
 
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'getDataAction', 'dataset'::text);
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectAction', 'setWidgetValue'::text);
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'threshold', 3);
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'dataset', combo_json);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'getDataAction', 'dataset'::text);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'selectAction', 'setWidgetValue'::text);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'threshold', 3);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'dataset', combo_json);
 		ELSE
 			--removing the not used keys
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT],
 			'queryText', 'orderById', 'parentId', 'queryTextFilter');
 		END IF;
 
@@ -218,10 +218,10 @@ BEGIN
 		-- Get selected value from parent
 		IF p_tgop ='INSERT' THEN
 			IF (aux_json->>'parentId') = 'expl_id' THEN -- specific case for exploitation as parent mapzone
-				v_selected_id = (SELECT value FROM PARENT_SCHEMA.config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user);
+				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user);
 
 			ELSIF (aux_json->>'parentId') = 'muni_id' THEN -- specific case for exploitation as parent mapzone
-				v_selected_id = (SELECT value FROM PARENT_SCHEMA.config_param_user WHERE parameter = 'edit_municipality_vdefault' AND cur_user = current_user);
+				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' AND cur_user = current_user);
 			ELSIF (aux_json->>'parentId') = 'arc_id' THEN -- specific case for arc_id as parent
 				v_selected_id = p_id;
 			ELSIF (aux_json->>'parentId') = 'team_id' THEN -- specific case for team_id as parent
@@ -230,7 +230,7 @@ BEGIN
 					v_selected_id = (select team_id from om_visit_lot_x_user where user_id = current_user and endtime is null);
 				END IF;*/
 			ELSE
-				v_querystring = concat('SELECT value::text FROM sys_param_user JOIN PARENT_SCHEMA.config_param_user ON sys_param_user.id=parameter
+				v_querystring = concat('SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter
 					WHERE cur_user=current_user AND feature_field_id=',quote_literal(quote_ident(aux_json->>'parentId')));
 				EXECUTE v_querystring INTO v_selected_id;
 			END IF;
@@ -266,7 +266,7 @@ BEGIN
 		v_editability = replace (v_editability, ']', '}');
 
 		IF v_selected_id::text != ANY (v_editability::text[]) THEN
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'iseditable', false);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'iseditable', false);
 		END IF;
 
 		-- Enable null values
@@ -274,7 +274,7 @@ BEGIN
 			v_array = array_prepend('',v_array);
 		END IF;
 		combo_json = array_to_json(v_array);
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 
 		-- Get combo values
 		IF (aux_json->>'queryTextFilter') IS NOT NULL AND v_selected_id IS NOT NULL THEN
@@ -290,24 +290,24 @@ BEGIN
 		IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
 			v_array = array_prepend('',v_array);
 			-- remove key when is used
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'isNullValue');
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'isNullValue');
 		END IF;
 		combo_json = array_to_json(v_array);
 
 		combo_json := COALESCE(combo_json, '[]');
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', combo_json);
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'comboNames', combo_json);
 
 		-- for typeahead widgets
 		IF aux_json->>'widgettype' = 'typeahead' and (aux_json->>'queryText') IS NOT NULL THEN
 
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'getDataAction', 'dataset'::text);
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectAction', 'setWidgetValue'::text);
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'threshold', 3);
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'dataset', combo_json);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'getDataAction', 'dataset'::text);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'selectAction', 'setWidgetValue'::text);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'threshold', 3);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'dataset', combo_json);
 
 		ELSE
 			--removing the not used keys
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT],
 			'queryText', 'orderById', 'parentId', 'queryTextFilter');
 		END IF;
 
@@ -331,7 +331,7 @@ BEGIN
 	        SELECT 1 FROM unnest(v_user_roles) AS user_role WHERE user_role = v_min_role
 	    ) THEN
 	        fields_array[(aux_json->>'orderby')::INT] :=
-	            PARENT_SCHEMA.gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'hidden', true);
+	            gw_fct_json_object_set_key_cm(fields_array[(aux_json->>'orderby')::INT], 'hidden', true);
 
 	        --RAISE NOTICE 'Hiding field % - user lacks required role', aux_json->>'columnname';
 	    END IF;
@@ -340,65 +340,65 @@ BEGIN
 	-- for the rest of widgets removing not used keys
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead')
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT],
 		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 
 	-- Remove widgetaction when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgetaction' is null
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'widgetaction');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'widgetaction');
 	END LOOP;
 
 	-- Remove updateaction when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'updateaction' is null
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'updateaction');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'updateaction');
 	END LOOP;
 
 	-- Remove changeaction when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'changeaction' is null
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'changeaction');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'changeaction');
 	END LOOP;
 
 	-- Remove widgetfunction when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgetfunction' is null
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'widgetfunction');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'widgetfunction');
 	END LOOP;
 
 	/*
 	-- Remove stylesheet when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'stylesheet' is null
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'stylesheet');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'stylesheet');
 	END LOOP;
 	*/
 
 	-- Remove tooltip when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'tooltip' is null
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'tooltip');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'tooltip');
 	END LOOP;
 
 	-- Remove linkedobject when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'linkedobject' is null
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'linkedobject');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'linkedobject');
 	END LOOP;
 
 	-- Remove placeholder when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'placeholder' is null
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'placeholder');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'placeholder');
 	END LOOP;
 
 	IF p_device != 5 THEN
 		-- Remove web_layoutorder if form is not for web
 		FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a
 		LOOP
-			fields_array[(aux_json->>'orderby')::INT] := PARENT_SCHEMA.gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'web_layoutorder');
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys_cm(fields_array[(aux_json->>'orderby')::INT], 'web_layoutorder');
 		END LOOP;
 	END IF;
 

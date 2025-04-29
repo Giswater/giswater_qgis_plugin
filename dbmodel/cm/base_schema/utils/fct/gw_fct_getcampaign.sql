@@ -113,7 +113,7 @@ BEGIN
 
 		FOR array_index IN array_lower(v_fields, 1)..array_upper(v_fields, 1) LOOP
 		    aux_json := v_fields[array_index];
-		    IF (aux_json ->> 'columnname') = 'id' THEN
+		    IF (aux_json ->> 'columnname') = 'campaign_id' THEN
 		        v_fields[array_index] := gw_fct_json_object_set_key(aux_json, 'value', v_id::text);
 		    END IF;
 		END LOOP;

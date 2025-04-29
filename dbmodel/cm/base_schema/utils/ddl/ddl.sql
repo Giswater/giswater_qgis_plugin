@@ -141,6 +141,15 @@ CREATE TABLE config_param_system (
 	CONSTRAINT config_param_system_pkey PRIMARY KEY (parameter)
 );
 
+CREATE TABLE config_param_user (
+	"parameter" varchar(50) NOT NULL,
+	value text NULL,
+	cur_user varchar(50) NOT NULL,
+	CONSTRAINT config_param_user_pkey PRIMARY KEY (parameter, cur_user)
+);
+CREATE INDEX config_param_user_cur_user ON cm.config_param_user USING btree (cur_user);
+CREATE INDEX config_param_user_value ON cm.config_param_user USING btree (value);
+
 
 CREATE TABLE sys_typevalue (
 	typevalue text NOT NULL,
