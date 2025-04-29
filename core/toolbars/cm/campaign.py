@@ -137,6 +137,7 @@ class Campaign:
             return
 
         form_fields = response["body"]["data"].get("fields", [])
+        self.fields_form = form_fields
         self.dialog = AddCampaignReviewUi(self) if mode == "review" else AddCampaignVisitUi(self)
 
         tools_gw.load_settings(self.dialog)
@@ -157,7 +158,8 @@ class Campaign:
                 self.set_widget_value(widget, field["value"])
             if "columnname" in field:
                 widget.setProperty("columnname", field["columnname"])
-
+            if "widgetname" in field:
+                widget.setObjectName(field["widgetname"])
 
             label = QLabel(field["label"]) if field.get("label") else None
             tools_gw.add_widget(self.dialog, field, label, widget)
@@ -301,36 +303,52 @@ class Campaign:
     def save_campaign(self, from_tab_change=False):
         """Save campaign data to the database. Updates ID and resets map on success."""
 
-        try:
-            fields_str = self.extract_campaign_fields(self.dialog)
-            extras = f'"fields":{{{fields_str}}}, "campaign_type":{self.campaign_type}'
-            body = tools_gw.create_body(feature='"tableName":"om_campaign", "idName":"campaign_id"', extras=extras)
+        fields_str = self.extract_campaign_fields(self.dialog)
+        extras = f'"fields":{{{fields_str}}}, "campaign_type":{self.campaign_type}'
+        body = tools_gw.create_body(feature='"tableName":"om_campaign", "idName":"campaign_id"', extras=extras)
 
-            result = tools_gw.execute_procedure("gw_fct_setcampaign", body, schema_name="cm")
+        # Check mandatory fields
+        list_mandatory = []
+        for field in self.fields_form:
+            if field.get('hidden', False):
+                continue
 
-            if result.get("status") == "Accepted":
-                tools_qgis.show_info("Campaign saved successfully.", dialog=self.dialog)
-                self.campaign_saved = True
-                self.is_new_campaign = False
-                tools_gw.remove_selection(True, layers=self.layers)
-                tools_gw.reset_rubberband(self.rubber_band)
+            if field.get('ismandatory', False):
+                widget = self.dialog.findChild(QWidget, field.get('widgetname'))
+                if widget:
+                    widget.setStyleSheet(None)  # Reset style first
+                    value = tools_qt.get_text(self.dialog, widget)
+                    if value in ('null', None, ''):
+                        widget.setStyleSheet("border: 1px solid red")
+                        list_mandatory.append(field['widgetname'])
 
-                # Update campaign ID in the dialog
-                campaign_id = result.get("body", {}).get("campaign_id")
-                self.campaign_id = campaign_id
-                if campaign_id:
-                    id_field = self.dialog.findChild(QLineEdit, "id")
-                    if id_field:
-                        id_field.setText(str(campaign_id))
+        if list_mandatory:
+            tools_qgis.show_warning("Some mandatory values are missing. Please check the widgets marked in red.",
+                                    dialog=self.dialog)
+            return False
 
-                if not from_tab_change:
-                    self.dialog.accept()
+        result = tools_gw.execute_procedure("gw_fct_setcampaign", body, schema_name="cm")
 
-            else:
-                tools_qgis.show_warning(result.get("message", "Failed to save campaign."))
+        if result.get("status") == "Accepted":
+            tools_qgis.show_info("Campaign saved successfully.", dialog=self.dialog)
+            self.campaign_saved = True
+            self.is_new_campaign = False
+            tools_gw.remove_selection(True, layers=self.layers)
+            tools_gw.reset_rubberband(self.rubber_band)
 
-        except Exception as e:
-            tools_qgis.show_warning(f"Error saving campaign: {e}")
+            # Update campaign ID in the dialog
+            campaign_id = result.get("body", {}).get("campaign_id")
+            self.campaign_id = campaign_id
+            if campaign_id:
+                id_field = self.dialog.findChild(QLineEdit, "campaign_id")
+                if id_field:
+                    id_field.setText(str(campaign_id))
+
+            if not from_tab_change:
+                self.dialog.accept()
+
+        else:
+            tools_qgis.show_warning(result.get("message", "Failed to save campaign."))
 
 
     def extract_campaign_fields(self, dialog):
