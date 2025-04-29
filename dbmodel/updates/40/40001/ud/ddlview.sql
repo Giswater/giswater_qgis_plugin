@@ -288,14 +288,14 @@ AS WITH
             ) a ON a.link_id = l.link_id
             WHERE a.link_id IS NULL
             AND EXISTS (
-            SELECT 1 FROM selector_expl se
-            WHERE s.cur_user = current_user
-            AND (
-                (l.expl_visibility IS NOT NULL AND se.expl_id = ANY(l.expl_visibility))
-                OR
-                (l.expl_visibility IS NULL OR l.expl_visibility = '{}')
-                AND se.expl_id = l.expl_id
+                SELECT 1 FROM selector_expl se
+                WHERE s.cur_user = current_user
+                AND se.expl_id = ANY (array_append(l.expl_visibility, l.expl_id))
             )
+            AND EXISTS (
+                SELECT 1 FROM selector_sector sc
+                WHERE sc.cur_user = current_user
+                AND sc.sector_id = l.sector_id
             )
             UNION ALL
             SELECT link_id FROM link_psector
@@ -363,7 +363,6 @@ AS WITH
             l.custom_length
 			FROM inp_network_mode, link_selector
 			JOIN link l using (link_id)
-			JOIN selector_sector ss ON (ss.cur_user =current_user AND ss.sector_id = l.sector_id)
 			JOIN exploitation ON l.expl_id = exploitation.expl_id
 			JOIN ext_municipality mu ON l.muni_id = mu.muni_id
 			JOIN sector_table ON l.sector_id = sector_table.sector_id
@@ -483,12 +482,12 @@ AS WITH
             AND EXISTS (
                 SELECT 1 FROM selector_expl se
                 WHERE s.cur_user = current_user
-                AND (
-                (arc.expl_visibility IS NOT NULL AND se.expl_id = ANY(arc.expl_visibility))
-                OR
-                (arc.expl_visibility IS NULL OR arc.expl_visibility = '{}')
-                AND se.expl_id = arc.expl_id
-                )
+                AND se.expl_id = ANY (array_append(arc.expl_visibility, arc.expl_id))
+            )
+            AND EXISTS (
+                SELECT 1 FROM selector_sector sc
+                WHERE sc.cur_user = current_user
+                AND sc.sector_id = arc.sector_id
             )
             UNION ALL
             SELECT arc_id FROM arc_psector
@@ -668,7 +667,6 @@ AS WITH
 			arc.sys_slope AS slope
 			FROM arc_selector
 			JOIN arc using (arc_id)
-			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id)
 			JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 			JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
 			JOIN exploitation e on e.expl_id = arc.expl_id
@@ -732,14 +730,14 @@ AS WITH
             ) a USING (node_id)
             WHERE a.node_id IS NULL
             AND EXISTS (
-            SELECT 1 FROM selector_expl se
-            WHERE s.cur_user = current_user
-            AND (
-                (node.expl_visibility IS NOT NULL AND se.expl_id = ANY(node.expl_visibility))
-                OR
-                (node.expl_visibility IS NULL OR node.expl_visibility = '{}')
-                AND se.expl_id = node.expl_id
+                SELECT 1 FROM selector_expl se
+                WHERE s.cur_user = current_user
+                AND se.expl_id = ANY (array_append(node.expl_visibility, node.expl_id))
             )
+            AND EXISTS (
+                SELECT 1 FROM selector_sector sc
+                WHERE sc.cur_user = current_user
+                AND sc.sector_id = node.sector_id
             )
             UNION ALL
             SELECT node_id FROM node_psector
@@ -869,7 +867,6 @@ AS WITH
             node.hemisphere
 			FROM node_selector
 			JOIN node USING (node_id)
-			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
 			JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
 			JOIN cat_feature ON cat_feature.id::text = node.node_type::text
 			JOIN exploitation ON node.expl_id = exploitation.expl_id
@@ -1062,14 +1059,14 @@ AS WITH
             ) a USING (connec_id)
             WHERE a.connec_id IS NULL
             AND EXISTS (
-            SELECT 1 FROM selector_expl se
-            WHERE s.cur_user = current_user
-            AND (
-                (connec.expl_visibility IS NOT NULL AND se.expl_id = ANY(connec.expl_visibility))
-                OR
-                (connec.expl_visibility IS NULL OR connec.expl_visibility = '{}')
-                AND se.expl_id = connec.expl_id
+                SELECT 1 FROM selector_expl se
+                WHERE s.cur_user = current_user
+                AND se.expl_id = ANY (array_append(connec.expl_visibility, connec.expl_id))
             )
+            AND EXISTS (
+                SELECT 1 FROM selector_sector sc
+                WHERE sc.cur_user = current_user
+                AND sc.sector_id = connec.sector_id
             )
             UNION ALL
             SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
@@ -1209,7 +1206,6 @@ AS WITH
 			connec.plot_code
 			FROM connec_selector
 			JOIN connec USING (connec_id)
-			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
 			JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
 			JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text::text
 			JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -1292,14 +1288,14 @@ AS WITH
             ) a USING (gully_id)
             WHERE a.gully_id IS NULL
             AND EXISTS (
-            SELECT 1 FROM selector_expl se
-            WHERE s.cur_user = current_user
-            AND (
-                (gully.expl_visibility IS NOT NULL AND se.expl_id = ANY(gully.expl_visibility))
-                OR
-                (gully.expl_visibility IS NULL OR gully.expl_visibility = '{}')
-                AND se.expl_id = gully.expl_id
+                SELECT 1 FROM selector_expl se
+                WHERE s.cur_user = current_user
+                AND se.expl_id = ANY (array_append(gully.expl_visibility, gully.expl_id))
             )
+            AND EXISTS (
+                SELECT 1 FROM selector_sector sc
+                WHERE sc.cur_user = current_user
+                AND sc.sector_id = gully.sector_id
             )
             UNION ALL
             SELECT gully_id, gully_psector.arc_id::varchar(16), link_id FROM gully_psector
@@ -1462,7 +1458,6 @@ AS WITH
 			gully.width
 			FROM inp_network_mode, gully_selector
 			JOIN gully using (gully_id)
-			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = gully.sector_id)
 			JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
 			JOIN exploitation ON gully.expl_id = exploitation.expl_id
 			JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
