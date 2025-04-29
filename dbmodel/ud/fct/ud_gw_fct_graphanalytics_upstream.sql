@@ -31,14 +31,11 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_upstream($${
 */
 DECLARE
 
-v_affectrow numeric;
-
 v_result_info json;
 v_result_point json;
 v_result_line json;
 v_result_polygon json;
 v_result text;
-v_count integer;
 v_version text;
 
 v_debug boolean;
@@ -55,14 +52,20 @@ v_point public.geometry;
 v_sensibility_f float;
 v_sensibility float;
 v_zoomratio float;
-v_fid integer=220;
-v_cur_user text;
+v_fid integer;
 v_device integer;
 v_xcoord float;
 v_ycoord float;
 v_epsg integer;
 v_client_epsg integer;
 
+v_query text;
+v_source text;
+v_target text;
+v_distance int;
+v_dry text;
+v_rain text;
+v_context text;
 
 BEGIN
 
@@ -77,36 +80,11 @@ BEGIN
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 	v_node = json_array_elements_text(json_extract_path_text(p_data,'feature','id')::json)::integer;
 
+
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
 	-- select config values
 	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-
-	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
-
-	CREATE OR REPLACE TEMP VIEW v_temp_graphanalytics_upstream AS
-	 SELECT temp_t_anlgraph.arc_id,
-	    temp_t_anlgraph.node_1,
-	    temp_t_anlgraph.node_2,
-	    temp_t_anlgraph.flag,
-	    a2.flag AS flagi,
-	    a2.value,
-	    a2.trace,
-	    v.cat_geom1
-	   FROM temp_t_anlgraph
-	     JOIN ( SELECT temp_t_anlgraph_1.arc_id,
-	            temp_t_anlgraph_1.node_1,
-	            temp_t_anlgraph_1.node_2,
-	            temp_t_anlgraph_1.water,
-	            temp_t_anlgraph_1.flag,
-	            temp_t_anlgraph_1.checkf,
-	            temp_t_anlgraph_1.value,
-	            temp_t_anlgraph_1.trace
-	           FROM temp_t_anlgraph temp_t_anlgraph_1
-	          WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_2::text = a2.node_1::text
-	     JOIN v_edit_arc v ON temp_t_anlgraph.arc_id::text = v.arc_id::text
-	  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag = 0;
-
 
 	--Look for closest node using coordinates
 	IF v_node IS NULL THEN
@@ -118,48 +96,88 @@ BEGIN
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 		SELECT node_id INTO v_node FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 		IF v_node IS NULL THEN
-			SELECT node_2 INTO v_node FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point,100)  order by st_distance (the_geom, v_point) LIMIT 1;
+			SELECT node_1 INTO v_node FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point,100)  order by st_distance (the_geom, v_point) LIMIT 1;
 		END IF;
 	END IF;
-
-	-- fill the graph table
-	INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
-	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id
-	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND v_edit_arc.state > 0;
-
-	-- Close mapzone headers
-	EXECUTE 'UPDATE temp_t_anlgraph SET flag=0, water=1, trace = 1::integer  WHERE node_2::integer IN ('||v_node||')';
-
-	-- inundation process
-	LOOP
-		v_count = v_count+1;
-		UPDATE temp_t_anlgraph n SET water=1, trace = a.trace FROM v_temp_graphanalytics_upstream a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
-		GET DIAGNOSTICS v_affectrow = row_count;
-		raise notice 'v_count --> %' , v_count;
-		EXIT WHEN v_affectrow = 0;
-		EXIT WHEN v_count = 5000;
-	END LOOP;
-
-	RAISE NOTICE 'Finish engine....';
 
 	v_result := COALESCE(v_result, '{}');
 	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-        -- Reset values
-        DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
-        DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	-- Reset values
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 
-        INSERT INTO anl_arc (arc_id, fid, arccat_id, expl_id, the_geom)
-        SELECT arc_id, v_fid, arc_type, expl_id, the_geom FROM temp_t_anlgraph
-        join arc using(arc_id) where water=1;
+	v_context = 'Flow exit';
+	v_fid = 220;
 
-        INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
-        SELECT node_id, node_type, state, expl_id, v_fid, the_geom
-        FROM v_edit_node WHERE node_id IN (SELECT  node_1 from temp_t_anlgraph where water=1 union SELECT  node_2 from temp_t_anlgraph where water=1);
+	-- pgrouting part
+	v_source= 'node_2';
+	v_target= 'node_1';
+	v_dry = 'dry scenario';
+	v_rain = 'new apportation for rain scenario';
 
-        DROP VIEW v_temp_graphanalytics_upstream;
-        DROP TABLE temp_t_anlgraph;
+	-- rain
+	v_query = '
+		WITH 
+			arc_selected AS (
+				SELECT a.arc_id, a.node_1, a.node_2
+				FROM v_edit_arc a
+				WHERE a.node_1 IS NOT NULL 
+				AND a.node_2 IS NOT NULL 
+				AND a.state > 0 
+				AND a.is_operative = TRUE
+			)
+		SELECT 
+			a.arc_id::int AS id, '||v_source||'::int AS source, '||v_target||'::int AS target,
+			1 as cost, -1 as reverse_cost
+			FROM arc_selected a
+	';
+
+	EXECUTE 'select count(*)::int from v_edit_arc'
+	INTO v_distance;
+
+	INSERT INTO anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
+	SELECT n.node_id, v_fid, n.node_type, n.state, n.expl_id, n.drainzone_id, v_rain, n.the_geom
+	FROM (
+		SELECT node::varchar
+		FROM pgr_drivingdistance(v_query, v_node, v_distance)
+	) p 
+	JOIN v_edit_node n ON n.node_id =p.node;
+
+	--dry
+	v_query = '
+		WITH 
+			arc_selected AS (
+				SELECT a.arc_id, a.node_1, a.node_2
+				FROM v_edit_arc a
+				WHERE a.node_1 IS NOT NULL 
+				AND a.node_2 IS NOT NULL 
+				AND a.state > 0 
+				AND a.is_operative = TRUE
+				AND (a.initoverflowpath IS NULL OR a.initoverflowpath = FALSE)
+			)
+		SELECT 
+			a.arc_id::int AS id, '||v_source||'::int AS source, '||v_target||'::int AS target,
+			1 as cost, -1 as reverse_cost
+			FROM arc_selected a
+	';
+
+	UPDATE anl_node n set addparam = v_dry
+	FROM (
+		SELECT node::varchar
+		FROM pgr_drivingdistance(v_query, v_node, v_distance)
+	) p 
+	WHERE n.cur_user="current_user"() AND n.fid = v_fid
+	AND n.node_id = p.node;
+
+	INSERT INTO anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
+	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
+	FROM v_edit_arc a
+	JOIN anl_node n1 ON a.node_1 = n1.node_id 
+	JOIN anl_node n2 ON a.node_2 = n2.node_id
+	WHERE n1.cur_user="current_user"() AND n1.fid = v_fid 
+	AND n2.cur_user="current_user"() AND n2.fid = v_fid;
 
 	SELECT jsonb_agg(features.feature) INTO v_result
 	FROM (
@@ -169,8 +187,8 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom',
 	'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT arc_id, arc_type, 'Flow trace' as context, a.expl_id, st_length(a.the_geom) as length, a.the_geom
-	FROM anl_arc join arc a using (arc_id) WHERE fid=v_fid) row) features;
+	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, drainzone_id, addparam, st_length(the_geom) as length, the_geom
+	FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
 	v_result := COALESCE(v_result, '{}');
 	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowtrace arc", "features":',v_result, '}');
@@ -183,14 +201,20 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom',
 		'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT node_id as feature_id, n.node_type as feature_type, 'Flow trace' as context, n.expl_id, n.the_geom
-	FROM  anl_node join node n using (node_id) WHERE fid=v_fid
+	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, drainzone_id, addparam, the_geom
+	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
 	UNION
-	SELECT connec_id, 'CONNEC', 'Flow trace' as context, c.expl_id, c.the_geom
-	FROM anl_arc JOIN connec c using (arc_id) WHERE fid=v_fid
+	SELECT v_context as context, c.expl_id, c.connec_id, c.state, 'CONNEC', c.drainzone_id, a.addparam, c.the_geom
+	FROM anl_arc a JOIN v_edit_connec c using (arc_id) 
+	WHERE cur_user="current_user"() AND fid=v_fid
+	AND c.state > 0 
+	AND c.is_operative = TRUE
 	UNION
-	SELECT gully_id, 'GULLY',  'Flow trace' as context, g.expl_id, g.the_geom
-	FROM anl_arc JOIN gully g using (arc_id) WHERE fid=v_fid) row) features;
+	SELECT v_context as context, g.expl_id, g.gully_id, g.state, 'GULLY', g.drainzone_id, a.addparam, g.the_geom
+	FROM anl_arc a JOIN v_edit_gully g using (arc_id) 
+	WHERE cur_user="current_user"() AND fid=v_fid
+	AND g.state > 0 
+	AND g.is_operative = TRUE) row) features;
 
 	v_result := COALESCE(v_result, '{}');
 	v_result_point = concat ('{"geometryType":"Point", "layerName": "Flowtrace node", "features":',v_result, '}');
@@ -202,7 +226,6 @@ BEGIN
 	v_message = 'Flow  analysis done succesfully';
 
 	--  Return
-
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 				   ',"body":{"form":{}'||
 				   ',"data":{ "info":'||v_result_info||','||
@@ -211,7 +234,11 @@ BEGIN
 					  '"line":'||v_result_line||','||
 					  '"polygon":'||v_result_polygon||'}'||
 					 '}'
-		'}')::json, 2218, null, null, null);
+		'}')::json, 2214, null, null, null);
+
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$
