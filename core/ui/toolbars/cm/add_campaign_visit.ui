@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Lot</string>
+   <string>Visit</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -72,6 +72,13 @@
               <property name="icon">
                <iconset>
                 <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_expr_select">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
