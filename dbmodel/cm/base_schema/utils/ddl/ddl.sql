@@ -71,6 +71,38 @@ CREATE TABLE sys_version (
 	CONSTRAINT sys_version_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE sys_param_user (
+	id text NOT NULL,
+	formname text NULL,
+	descript text NULL,
+	sys_role varchar(30) NULL,
+	idval text NULL,
+	"label" text NULL,
+	dv_querytext text NULL,
+	dv_parent_id text NULL,
+	isenabled bool NULL,
+	layoutorder int4 NULL,
+	project_type varchar NULL,
+	isparent bool NULL,
+	dv_querytext_filterc text NULL,
+	feature_field_id text NULL,
+	feature_dv_parent_value text NULL,
+	isautoupdate bool NULL,
+	"datatype" varchar(30) NULL,
+	widgettype varchar(30) NULL,
+	ismandatory bool NULL,
+	widgetcontrols json NULL,
+	vdefault text NULL,
+	layoutname text NULL,
+	iseditable bool NULL,
+	dv_orderby_id bool NULL,
+	dv_isnullvalue bool NULL,
+	stylesheet json NULL,
+	placeholder text NULL,
+	"source" text NULL,
+	CONSTRAINT sys_param_user_pkey PRIMARY KEY (id)
+);
+
 CREATE TABLE config_form_fields (
 	formname varchar(50) NOT NULL,
 	formtype varchar(50) NOT NULL,
