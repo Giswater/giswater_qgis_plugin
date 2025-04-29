@@ -63,6 +63,12 @@ AS WITH typevalue AS (
                 WHERE sc.cur_user = CURRENT_USER
                 AND sc.sector_id = arc.sector_id
             )
+            AND EXISTS (
+                SELECT 1
+                FROM selector_municipality sm
+                WHERE sm.cur_user = CURRENT_USER
+                AND sm.muni_id = arc.muni_id
+            )
             UNION ALL
             SELECT arc_psector.arc_id
             FROM arc_psector
@@ -429,6 +435,12 @@ AS WITH typevalue AS (
                 WHERE sc.cur_user = CURRENT_USER
                 AND sc.sector_id = connec.sector_id
             )
+            AND EXISTS (
+                SELECT 1
+                FROM selector_municipality sm
+                WHERE sm.cur_user = CURRENT_USER
+                AND sm.muni_id = connec.muni_id
+            )
             UNION ALL
             SELECT connec_psector.connec_id, connec_psector.arc_id, connec_psector.link_id
             FROM connec_psector
@@ -741,6 +753,12 @@ AS WITH typevalue AS (
                 WHERE sc.cur_user = CURRENT_USER
                 AND sc.sector_id = gully.sector_id
             )
+            AND EXISTS (
+                SELECT 1
+                FROM selector_municipality sm
+                WHERE sm.cur_user = CURRENT_USER
+                AND sm.muni_id = gully.muni_id
+            )
             UNION ALL
             SELECT gully_psector.gully_id, gully_psector.arc_id, gully_psector.link_id
             FROM gully_psector
@@ -1051,6 +1069,12 @@ AS WITH typevalue AS (
                 FROM selector_sector sc
                 WHERE sc.cur_user = CURRENT_USER
                 AND sc.sector_id = node.sector_id
+            )
+            AND EXISTS (
+                SELECT 1
+                FROM selector_municipality sm
+                WHERE sm.cur_user = CURRENT_USER
+                AND sm.muni_id = node.muni_id
             )
             UNION ALL
             SELECT node_psector.node_id
