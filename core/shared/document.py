@@ -208,7 +208,7 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT))
         self.dlg_add_doc.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object)
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object, None)
         )
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,

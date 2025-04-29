@@ -3233,13 +3233,16 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
     global_vars.canvas.setCursor(cursor)
 
 
-def select_with_expression_dialog(class_object, dialog, table_object):
+def select_with_expression_dialog(class_object, dialog, table_object, selection_mode=None):
     """Select features by expression"""
+
+    if selection_mode is None:
+        selection_mode = GwSelectionMode.EXPRESSION
 
     # Get the current feature type
     class_object.feature_type = get_signal_change_tab(dialog)
     # Connect the signal selection changed
-    connect_signal_selection_changed(class_object, dialog, table_object, GwSelectionMode.EXPRESSION)
+    connect_signal_selection_changed(class_object, dialog, table_object, selection_mode)
     # Show the expression dialog
     show_expression_dialog(class_object.feature_type, dialog, table_object)
     # Disconnect the signal selection changed
@@ -3261,7 +3264,7 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
 
-    if selection_mode != GwSelectionMode.EXPRESSION:
+    if selection_mode not in (GwSelectionMode.EXPRESSION, GwSelectionMode.EXPRESSION_CAMPAIGN):
         tools_qgis.disconnect_signal_selection_changed()
     field_id = f"{class_object.feature_type}_id"
     expected_table_name = f"tbl_{table_object}_x_{class_object.feature_type}"
@@ -3318,7 +3321,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         remove_selection()
         load_tableview_psector(dialog, class_object.feature_type)
         set_model_signals(class_object)
-    if selection_mode == GwSelectionMode.CAMPAIGN:
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
         _insert_feature_campaign(dialog, class_object.feature_type, class_object.campaign_id, ids=class_object.list_ids[class_object.feature_type])
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
     else:

@@ -120,7 +120,7 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT))
         self.dlg_work_end.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dlg_work_end, self.table_object))
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_work_end, self.table_object, None))
 
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self._fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(

@@ -170,6 +170,7 @@ class Campaign:
         tools_gw.add_icon(self.dialog.btn_insert, '111')
         tools_gw.add_icon(self.dialog.btn_delete, '112')
         tools_gw.add_icon(self.dialog.btn_snapping, '137')
+        tools_gw.add_icon(self.dialog.btn_expr_select, '178')
 
         self.dialog.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dialog.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.layers))
@@ -441,6 +442,9 @@ class Campaign:
 
         self.dialog.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN)
+        )
+        self.dialog.btn_expr_select.clicked.connect(
+            partial(tools_gw.select_with_expression_dialog, self, self.dialog, table_object, selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN)
         )
 
 
