@@ -56,8 +56,8 @@ class Campaign:
                 ['enddate', 'Data final planificada']]
         tools_qt.fill_combo_values(self.dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
 
-        # Fill combo values for campaign status (based on edit_typevalue table)
-        sql = "SELECT id, idval FROM lots3_ws.edit_typevalue WHERE typevalue = 'cm_campaing_lot_status' ORDER BY id"
+        # Fill combo values for campaign status (based on sys_typevalue table)
+        sql = "SELECT id, idval FROM cm.sys_typevalue WHERE typevalue = 'campaign_status' ORDER BY id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dialog.campaign_cmb_state, rows, index_to_show=1, add_empty=True)
 
@@ -68,8 +68,8 @@ class Campaign:
         self.dialog.date_event_from.dateChanged.connect(self.filter_campaigns)
         self.dialog.date_event_to.dateChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.filter_campaigns)
+        self.dialog.campaign_chk_show_nulls.stateChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
-        #self.dialog.tbl_campaign.doubleClicked.connect(self.open_selected_campaign)
         self.dialog.tbl_campaign.doubleClicked.connect(self.open_campaign)
         self.dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
         self.dialog.campaign_btn_open.clicked.connect(self.open_campaign)
@@ -121,12 +121,12 @@ class Campaign:
         body = {
             "feature": {
                 "tableName": "om_campaign",
-                "idName": "id",
+                "idName": "campaign_id",
                 "campaign_mode": mode
             }
         }
         if campaign_id:
-            body["feature"]["campaign_id"] = campaign_id
+            body["feature"]["id"] = campaign_id
         p_data = tools_gw.create_body(body=body)
         self.is_new_campaign = campaign_id is None
         self.campaign_saved = False
@@ -589,7 +589,7 @@ class Campaign:
         if not hasattr(self.dialog, "tbl_campaign"):
             return
 
-        query = "SELECT * FROM cm.om_campaign ORDER BY id DESC"
+        query = "SELECT * FROM cm.om_campaign ORDER BY campaign_id DESC"
         self.populate_tableview(self.dialog.tbl_campaign, query)
 
 
@@ -626,18 +626,18 @@ class Campaign:
 
         filters = []
 
-        # Estado
+        # State
         status_row = self.dialog.campaign_cmb_state.currentData()
         if status_row and status_row[0]:
             filters.append(f"status = {status_row[0]}")
 
-        # Columna de fecha
+        # Date
         date_type = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_date_filter_type, 0)
         if not date_type:
             tools_qgis.show_warning("Select a valid date column to filter.", dialog=self.dialog)
             return
 
-        # Rango de fechas
+        # Range of dates
         date_from = self.dialog.date_event_from.date()
         date_to = self.dialog.date_event_to.date()
 
@@ -652,7 +652,7 @@ class Campaign:
         interval = f"'{date_from.toString(date_format_low)}' AND '{date_to.toString(date_format_high)}'"
         date_filter = f"({date_type} BETWEEN {interval}"
 
-        # Mostrar nulos
+        # Show null
         if self.dialog.campaign_chk_show_nulls.isChecked():
             date_filter += f" OR {date_type} IS NULL)"
         else:
@@ -665,8 +665,7 @@ class Campaign:
         query = "SELECT * FROM cm.om_campaign"
         if where_clause:
             query += f" WHERE {where_clause}"
-        query += " ORDER BY id DESC"
-
+        query += " ORDER BY campaign_id DESC"
         self.populate_tableview(self.dialog.tbl_campaign, query)
 
     def delete_selected_campaign(self):
@@ -691,7 +690,7 @@ class Campaign:
             campaign_id = index.data()
             if not str(campaign_id).isdigit():
                 continue
-            sql = f"DELETE FROM cm.om_campaign WHERE id = {campaign_id}"
+            sql = f"DELETE FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
             if tools_db.execute_sql(sql):
                 success += 1
 
@@ -716,9 +715,4 @@ class Campaign:
                 QTimer.singleShot(0, lambda: self.load_campaign_dialog(campaign_id))
         except (ValueError, TypeError):
             tools_qgis.show_warning("Invalid campaign ID.")
-
-    def _on_campaign_double_click(self, index):
-        campaign_id = index.model().data(index.model().index(index.row(), 0))
-        self.load_campaign_dialog(int(campaign_id))
-
 
