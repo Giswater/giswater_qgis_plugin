@@ -743,7 +743,7 @@ AS WITH typevalue AS (
             FROM connec
             JOIN selector_state ss ON ss.cur_user = CURRENT_USER AND connec.state = ss.state_id
             LEFT JOIN (
-                SELECT connec_psector.connec_id, connec_psector.arc_id connec_psector.arc_id
+                SELECT connec_psector.connec_id, connec_psector.arc_id, connec_psector.link_id
                 FROM connec_psector
                 WHERE connec_psector.p_state = 0
             ) a USING (connec_id, arc_id)
