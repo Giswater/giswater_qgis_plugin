@@ -20,7 +20,7 @@ SELECT has_table('sys_message'::name, 'Table sys_message should exist');
 SELECT columns_are(
     'sys_message',
     ARRAY[
-        'id', 'error_message', 'hint_message', 'log_level', 'show_user', 'project_type', 'source'
+        'id', 'error_message', 'hint_message', 'log_level', 'show_user', 'project_type', 'source', 'message_type'
     ],
     'Table sys_message should have the correct columns'
 );
@@ -36,6 +36,7 @@ SELECT col_type_is('sys_message', 'log_level', 'smallint', 'Column log_level sho
 SELECT col_type_is('sys_message', 'show_user', 'boolean', 'Column show_user should be boolean');
 SELECT col_type_is('sys_message', 'project_type', 'text', 'Column project_type should be text');
 SELECT col_type_is('sys_message', 'source', 'text', 'Column source should be text');
+SELECT col_type_is('sys_message', 'message_type', 'character varying(50)', 'Column message_type should be character varying(50)');
 
 -- Check default values
 SELECT col_default_is('sys_message', 'log_level', '1', 'Column log_level should default to 1');
@@ -47,7 +48,8 @@ SELECT col_not_null('sys_message', 'id', 'Column id should be NOT NULL');
 SELECT col_has_check('sys_message', 'log_level', 'Column log_level should have check constraint');
 
 -- Check triggers
-SELECT has_trigger('sys_message', 'gw_trg_typevalue_fk', 'Table sys_message should have gw_trg_typevalue_fk trigger');
+SELECT has_trigger('sys_message', 'gw_trg_typevalue_fk_insert', 'Table sys_message should have gw_trg_typevalue_fk_insert trigger');
+SELECT has_trigger('sys_message', 'gw_trg_typevalue_fk_update', 'Table sys_message should have gw_trg_typevalue_fk_update trigger');
 
 SELECT * FROM finish();
 

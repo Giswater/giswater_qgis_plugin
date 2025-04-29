@@ -469,9 +469,6 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('message_type','DEBUG','
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','message_type','sys_message','message_type');
 
--- messages:
-UPDATE sys_message SET message_type = 'UI';
-
 -- new messages for audit porpouses:
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1001, '--------', 'Audit separator', 0, true, 'generic', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1003, '------------------------------', 'Audit separator', 0, true, 'generic', 'core', 'AUDIT');
@@ -479,3 +476,15 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1005, 'ERRORS', 'Audit separator', 3, true, 'generic', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1007, 'WARNINGS', 'Audit separator', 2, true, 'generic', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1009, 'INFO', 'Audit separator', 1, true, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1101, 'INFO: Deactivated node proximity check.', 0, 'UD', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1103, 'CONNECT TO NETWORK', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1105, '-------------------------------------------------------------', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1107, 'Trying to connect %feature_type% with id %connect_id% to an arc with a diameter smaller than %check_arcdnom% and at maximum distance of %max_distance% meters.', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1109, 'Trying to connect %feature_type% with id %connect_id% to an arc at maximum ditance of %max_distance% meters.', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1111, 'Trying to connect %feature_type% with id %connect_id%.', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1113, 'FAILED: Link not created because connect %connect__id% is over arc %arc_id%', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1115, 'Create new link connected to the closest arc with the appropriate conditions.', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1117, 'Create new link connected to the selected arc: %arc_id%.', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1119, 'Create new link connected to the closest arc.', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1121, 'Creating new link by using geometry of existing one.', 0, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1123, 'Reverse the direction of drawn link.', 0, 'generic', 'core', 'AUDIT');

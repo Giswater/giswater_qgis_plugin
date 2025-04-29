@@ -392,3 +392,6 @@ CREATE TABLE archived_psector_link_traceability (
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"polygon", "column":"undelete"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"polygon", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+
+-- 25/04/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_message", "column":"message_type", "dataType":"varchar(50)", "isUtils":"False"}}$$);
