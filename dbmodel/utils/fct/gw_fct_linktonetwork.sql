@@ -124,8 +124,6 @@ BEGIN
 	SELECT value INTO v_dma_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_dma';
 	SELECT value INTO v_fluidtype_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_fluid';
 	v_check_status:= (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_link2network');
-	v_check_arcdnom:= (SELECT value::json->>'diameter' FROM config_param_system WHERE parameter = 'edit_link_link2network');
-	v_check_maxdistance:= (SELECT value::json->>'maxDistance' FROM config_param_system WHERE parameter = 'edit_link_link2network');
 
 	-- get user variables
 	v_psector_current = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current' AND cur_user = current_user);
@@ -139,6 +137,8 @@ BEGIN
 	v_isarcdivide = (p_data->>'data')::json->>'isArcDivide';
 	v_link_id = (p_data->>'data')::json->>'linkId';
 	v_linkcat_id = (p_data->>'data')::json->>'linkcatId';
+	v_check_arcdnom = (p_data->>'data')::json->>'pipeDiameter';
+	v_check_maxdistance = (p_data->>'data')::json->>'maxDistance';
 
 	--profilactic values
 	IF v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
@@ -473,7 +473,7 @@ BEGIN
 						IF (st_dwithin (st_startpoint(v_link.the_geom), v_connect.the_geom, 0.01)) IS FALSE THEN
 							v_point_aux := St_closestpoint(v_endfeature_geom, St_startpoint(v_link.the_geom));
 							v_link.the_geom = ST_SetPoint(v_link.the_geom, 0, v_point_aux) ;
-							
+
 							EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1123","fid": 217,"v_temp_table": false,"v_criticity": 4}}$$);';
 							-- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 							-- VALUES (217, null, 4, concat('Reverse the direction of drawn link.'));
