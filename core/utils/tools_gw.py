@@ -1697,6 +1697,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.clear()  # Set the date to NULL initially
                     if field.get('value') not in ('', None, 'null'):
                         date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+                        widget.setProperty('value', field['value'].replace('/', '-'))
                         widget.setDate(date)
                     widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

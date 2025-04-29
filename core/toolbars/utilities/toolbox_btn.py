@@ -528,7 +528,7 @@ class GwToolBoxButton(GwAction):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
-            elif isinstance(widget, tools_gw.CustomQgsDateTimeEdit):
+            elif isinstance(widget, tools_gw.CustomQgsDateTimeEdit) and widget.property('value') in (None, ''):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 date = QDate.fromString(value, lib_vars.date_format)
