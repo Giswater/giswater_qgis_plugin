@@ -523,22 +523,22 @@ class GwToolBoxButton(GwAction):
         widgets = layout.findChildren(QWidget)
 
         for widget in widgets:
-            if type(widget) in (QCheckBox, QRadioButton):
+            if type(widget) in (QCheckBox, QRadioButton) and widget.property('value') is None:
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 if value not in (None, 'None'):
                     tools_qt.set_checked(dialog, widget, value)
-            elif type(widget) is QComboBox and widget.property('selectedId') in (None,'','NULL'):
+            elif type(widget) is QComboBox and widget.property('selectedId') is None:
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
-            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') in (None, ''):
+            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') is None:
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
-            elif type(widget) is QgsDateTimeEdit:
+            elif type(widget) is QgsDateTimeEdit and widget.property('value') is None:
                  value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                     "session")
                  date = QDate.fromString(value, lib_vars.date_format)
