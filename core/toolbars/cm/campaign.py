@@ -178,7 +178,13 @@ class Campaign:
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
         self.dialog.tab_widget.currentChanged.connect(self._on_tab_change)
         self.setup_tab_relations()
+        self._check_enable_tab_relations()
         self._update_feature_completer(self.dialog)
+
+        # Enable tab relations if name has value
+        name_widget = self.get_widget_by_columnname(self.dialog, "name")
+        if name_widget:
+            name_widget.textChanged.connect(self._check_enable_tab_relations)
 
         # Code logic to deal with the review/visit combo change to load tabs in relations
         self.reviewclass_combo = self.get_widget_by_columnname(self.dialog, "reviewclass_id")
@@ -448,6 +454,13 @@ class Campaign:
                 return widget
         return None
 
+    def _check_enable_tab_relations(self):
+        name_widget = self.get_widget_by_columnname(self.dialog, "name")
+        if not name_widget:
+            return
+
+        enable = bool(name_widget.text().strip())
+        self.dialog.tab_widget.setTabEnabled(self.dialog.tab_widget.indexOf(self.dialog.tab_relations), enable)
 
     def _update_feature_completer(self, dlg):
         tab_name = dlg.tab_feature.currentWidget().objectName()
