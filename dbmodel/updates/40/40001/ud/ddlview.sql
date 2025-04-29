@@ -297,6 +297,11 @@ AS WITH
                 WHERE sc.cur_user = current_user
                 AND sc.sector_id = l.sector_id
             )
+            AND EXISTS (
+                SELECT 1 FROM selector_municipality sm
+                WHERE sm.cur_user = current_user
+                AND sm.muni_id = l.muni_id
+            )
             UNION ALL
             SELECT link_id FROM link_psector
             WHERE p_state = 1
@@ -488,6 +493,11 @@ AS WITH
                 SELECT 1 FROM selector_sector sc
                 WHERE sc.cur_user = current_user
                 AND sc.sector_id = arc.sector_id
+            )
+            AND EXISTS (
+                SELECT 1 FROM selector_municipality sm
+                WHERE sm.cur_user = current_user
+                AND sm.muni_id = arc.muni_id
             )
             UNION ALL
             SELECT arc_id FROM arc_psector
@@ -738,6 +748,11 @@ AS WITH
                 SELECT 1 FROM selector_sector sc
                 WHERE sc.cur_user = current_user
                 AND sc.sector_id = node.sector_id
+            )
+            AND EXISTS (
+                SELECT 1 FROM selector_municipality sm
+                WHERE sm.cur_user = current_user
+                AND sm.muni_id = node.muni_id
             )
             UNION ALL
             SELECT node_id FROM node_psector
@@ -1068,6 +1083,11 @@ AS WITH
                 WHERE sc.cur_user = current_user
                 AND sc.sector_id = connec.sector_id
             )
+            AND EXISTS (
+                SELECT 1 FROM selector_municipality sm
+                WHERE sm.cur_user = current_user
+                AND sm.muni_id = connec.muni_id
+            )
             UNION ALL
             SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
             WHERE p_state = 1
@@ -1296,6 +1316,11 @@ AS WITH
                 SELECT 1 FROM selector_sector sc
                 WHERE sc.cur_user = current_user
                 AND sc.sector_id = gully.sector_id
+            )
+            AND EXISTS (
+                SELECT 1 FROM selector_municipality sm
+                WHERE sm.cur_user = current_user
+                AND sm.muni_id = gully.muni_id
             )
             UNION ALL
             SELECT gully_id, gully_psector.arc_id::varchar(16), link_id FROM gully_psector
