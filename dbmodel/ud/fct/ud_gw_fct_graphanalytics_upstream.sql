@@ -80,7 +80,15 @@ BEGIN
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 	v_node = json_array_elements_text(json_extract_path_text(p_data,'feature','id')::json)::integer;
 
+	v_context = 'Flow trace';
+	v_fid = 220;
 
+	-- pgrouting
+	v_source= 'node_2';
+	v_target= 'node_1';
+	v_dry = 'maintream';
+	v_rain = 'diverted flow';
+	
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
 	-- select config values
@@ -96,7 +104,7 @@ BEGIN
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 		SELECT node_id INTO v_node FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 		IF v_node IS NULL THEN
-			SELECT node_1 INTO v_node FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point,100)  order by st_distance (the_geom, v_point) LIMIT 1;
+			SELECT v_source INTO v_node FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point,100)  order by st_distance (the_geom, v_point) LIMIT 1;
 		END IF;
 	END IF;
 
@@ -107,15 +115,6 @@ BEGIN
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
-
-	v_context = 'Flow exit';
-	v_fid = 220;
-
-	-- pgrouting part
-	v_source= 'node_2';
-	v_target= 'node_1';
-	v_dry = 'dry scenario';
-	v_rain = 'new apportation for rain scenario';
 
 	-- rain
 	v_query = '
@@ -145,7 +144,7 @@ BEGIN
 	) p 
 	JOIN v_edit_node n ON n.node_id =p.node;
 
-	--dry
+	-- dry
 	v_query = '
 		WITH 
 			arc_selected AS (
@@ -187,7 +186,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom',
 	'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, sys_type, drainzone_id, addparam, st_length(the_geom) as length, the_geom
+	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, sys_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, the_geom
 	FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
 	v_result := COALESCE(v_result, '{}');
@@ -201,16 +200,16 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom',
 		'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, sys_type, drainzone_id, addparam, the_geom
+	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, sys_type, drainzone_id, addparam as stream_type, the_geom
 	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
 	UNION
-	SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, c.sys_type, c.drainzone_id, a.addparam, c.the_geom
+	SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, c.sys_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
 	FROM anl_arc a JOIN v_edit_connec c using (arc_id) 
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND c.state > 0 
 	AND c.is_operative = TRUE
 	UNION
-	SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, g.sys_type, g.drainzone_id, a.addparam, g.the_geom
+	SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, g.sys_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
 	FROM anl_arc a JOIN v_edit_gully g using (arc_id) 
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND g.state > 0 
@@ -234,7 +233,7 @@ BEGIN
 					  '"line":'||v_result_line||','||
 					  '"polygon":'||v_result_polygon||'}'||
 					 '}'
-		'}')::json, 2214, null, null, null);
+		'}')::json, 2218, null, null, null);
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
