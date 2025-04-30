@@ -168,3 +168,6 @@ ALTER TABLE cat_link DROP CONSTRAINT IF EXISTS cat_link_linktype_fkey;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_gully_traceability", "column":"expl_visibility", "dataType":"int[]"}}$$);
 UPDATE archived_psector_gully_traceability SET expl_visibility = ARRAY[expl_id];
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_gully_traceability", "column":"expl_id2"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"dwfzone_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"dwfzone_id", "dataType":"int4"}}$$);
