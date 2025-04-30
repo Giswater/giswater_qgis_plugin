@@ -524,9 +524,9 @@ BEGIN
 						v_linkcat_id);
 					ELSIF v_projecttype = 'UD' THEN
 
-						IF NEW.feature_type = 'CONNEC' THEN
+						IF v_feature_type = 'CONNEC' THEN
 							v_link_type := 'SERVCONNECTION';
-						ELSIF NEW.feature_type = 'GULLY' THEN
+						ELSIF v_feature_type = 'GULLY' THEN
 							v_link_type := 'INLETPIPE';
 						END IF;
 
