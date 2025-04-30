@@ -67,7 +67,7 @@ v_dry text;
 v_rain text;
 v_context text;
 
-v_simbology int; 
+v_symbology int; 
 
 BEGIN
 
@@ -84,7 +84,7 @@ BEGIN
 
 	v_context = 'Flow trace';
 	v_fid = 220;
-	v_simbology = 2218;
+	v_symbology = 2218;
 
 	-- pgrouting
 	v_source= 'node_2';
@@ -236,7 +236,7 @@ BEGIN
 					  '"line":'||v_result_line||','||
 					  '"polygon":'||v_result_polygon||'}'||
 					 '}'
-		'}')::json, v_simbology, null, null, null);
+		'}')::json, v_symbology, null, null, null);
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
