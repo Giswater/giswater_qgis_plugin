@@ -196,146 +196,157 @@ BEGIN
 
 	
 
-	raise notice 'connec_id, arc_id: % %', v_connec, v_rec_point_final.arc_id;
+	raise notice 'connec_id: % - arc_id: %', v_connec, v_rec_point_final.arc_id;
 -----------------
 
 	-- si HAY ramal, hacerlo
 
-	--raise exception 'v_sql_ramal %', v_sql_ramal;
+	IF v_sql_ramal IS NOT NULL THEN
+	
+		execute 'select count(*) from ('||v_sql_ramal||')a' into v_count;
 
-
-	execute 'select count(*) from ('||v_sql_ramal||')a' into v_count;
-
-	if v_count > 0 then --existe una capa de ramal con geometria
+		if v_count > 0 then --existe una capa de ramal con geometria
 		
-		execute v_sql_ramal into v_ramal_table, v_ramal_geom;
-	
-		-- busca els connecs que tocan a un ramal y a un tramo
-		v_sql = 'select c.connec_id, c.the_geom as connec_geom, a.arc_id, a.the_geom as arc_geom, r.geom as ramal_geom from connec c, '||v_ramal_layer||' r, arc a 
-		where st_dwithin(c.the_geom, r.geom, 0.01) 
-		and st_dwithin (a.the_geom, c.the_geom, 0.01)
-		';
-	
-		execute 'select count(*) from ('||v_sql||')a' into v_count;
-	
-		if v_count > 0 then -- hacer cosas con el ramal
-
-			execute 'select connec_id, ramal_geom, st_linelocatepoint((ST_Dump(ramal_geom)).geom, connec_geom) from ('||v_sql||')a
-			where connec_id = '||quote_literal(v_connec)||''
-			into v_percent_ramal;
+			execute v_sql_ramal into v_ramal_table, v_ramal_geom;
 		
-			if v_percent_ramal >= 0.6 then  --el connec está en el endpoint del ramal -> hay que updatera su geometria para que sea el startpoint del ramal
+			-- busca els connecs que tocan a un ramal y a un tramo
+			v_sql = 'select c.connec_id, c.the_geom as connec_geom, a.arc_id, a.the_geom as arc_geom, r.geom as ramal_geom 
+			from connec c, '||v_ramal_layer||' r, arc a 
+			where st_dwithin(c.the_geom, r.geom, 0.1) 
+			and st_dwithin (a.the_geom, c.the_geom, 0.1)
+			';
+		
+			execute 'select count(*) from ('||v_sql||')a' into v_count;
+		
+			if v_count > 0 then -- hacer cosas con el ramal
+	
+				execute 'select st_linelocatepoint((ST_Dump(ramal_geom)).geom, connec_geom) from ('||v_sql||')a
+				where connec_id = '||quote_literal(v_connec)||''
+				into v_percent_ramal;
+			/*
+			v_sql =  'select connec_id, ramal_geom, st_linelocatepoint((ST_Dump(ramal_geom)).geom, connec_geom) from ('||v_sql||')a
+				where connec_id = '||quote_literal(v_connec)||'';
+			*/
+				--raise notice 'v_sql %¡', v_sql;
 			
-				EXECUTE '
-				update connec c set the_geom = st_startpoint(a.ramal_geom) from ('||v_sql||')a
-				where c.connec_id = a.connec_id and c.connec_id = '||quote_literal(v_connec)||'';
-		
-			elsif v_percent_ramal <= 0.6 then -- el connec está en el startpoint del ramal -> hay que updatear su geometrai para que sea el endpoint del ramal
-			
-				EXECUTE '
-				update connec c set the_geom = st_endpoint(a.ramal_geom) from ('||v_sql||')a
-				where c.connec_id = a.connec_id and c.connec_id = '||quote_literal(v_connec)||'';
-		
-			end if;	
-		
+				if v_percent_ramal >= 0.6 then  --el connec está en el endpoint del ramal -> hay que updatera su geometria para que sea el startpoint del ramal
 				
-		end if;
+					EXECUTE '
+					update connec c set the_geom = st_startpoint(a.ramal_geom) from ('||v_sql||')a
+					where c.connec_id = a.connec_id and c.connec_id = '||quote_literal(v_connec)||'';
+				
+					return '{"sucess connec_id":"'||v_connec||'"}';
+			
+				elsif v_percent_ramal <= 0.6 then -- el connec está en el startpoint del ramal -> hay que updatear su geometrai para que sea el endpoint del ramal
+				
+					EXECUTE '
+					update connec c set the_geom = st_endpoint(a.ramal_geom) from ('||v_sql||')a
+					where c.connec_id = a.connec_id and c.connec_id = '||quote_literal(v_connec)||'';
+				
+					return '{"sucess connec_id":"'||v_connec||'"}';
+			
+				end if;	
+			
+					
+			end if;
+			
 		
+		end if;
 	
-	end if;
-
+	END IF;
 
 	-- si no hay ramal: mira si tiene la capa de parcelas
 
-	execute 'select count(*) from ('||v_sql_parcel||')a' into v_count;
+	IF v_sql_parcel IS NOT NULL then
 
+		execute 'select count(*) from ('||v_sql_parcel||')a' into v_count;
 	
-	-- SI QUIERE TENER EN CUENTA LAS PARCELAS!
-	if v_count > 0 then		
 		
-		-- mirar si el connec está dentro de parcela
-		execute 'select count(*) from ('||v_sql_connec_parcel||')a' into v_count;
-		
-	
-		if v_count > 0 then -- connec dentro de parcela
+		-- SI QUIERE TENER EN CUENTA LAS PARCELAS!
+		if v_count > 0 then		
 			
-			execute 'select count(*) from ('||v_sql_connec_tram||')a' into v_count;
-		
-			if v_count > 0 then -- dentro de parcela + encima de tramo		
+			-- mirar si el connec está dentro de parcela
+			execute 'select count(*) from ('||v_sql_connec_parcel||')a' into v_count;
 			
-				if (st_distance(st_centroid(v_closest_parcel), v_rec_point_final.point_final) > 
-					st_distance(st_centroid(v_closest_parcel), v_connec_geom)) then
-								
-					update connec set the_geom = v_point_final_reverse where connec_id = v_connec;
+			--RAISE EXCEPTION 'v_sql_connec_parcel %', v_sql_connec_parcel;
 			
-				else
+			if v_count > 0 then -- connec dentro de parcela
+				
+				execute 'select count(*) from ('||v_sql_connec_tram||')a' into v_count;
+			
+				if v_count > 0 then -- dentro de parcela + encima de tramo		
 					
-					update connec set the_geom = v_rec_point_final.point_final where connec_id = v_connec;
+					if (st_distance(st_centroid(v_closest_parcel), v_rec_point_final.point_final) > 
+						st_distance(st_centroid(v_closest_parcel), v_connec_geom)) then
+									
+						update connec set the_geom = v_point_final_reverse where connec_id = v_connec;
+				
+					else
 						
-				end if;
-			
-				execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"['||v_connec||']"},
-				"data":{"feature_type":"CONNEC", "forcedArcs":"['||v_rec_point_final.arc_id||']"}}$$)';
-			
-				return '{"sucess connec_id":"'||v_connec||'"}';
-				
-			else -- dentro de la parcela + fuera del tramo
-					
-			
-				execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25830}, 
-				"form":{}, "feature":{"id":"['||v_connec||']"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
-				';
-				return '{"sucess connec_id":"'||v_connec||'"}';
-	
-			end if; 
-		
-		else -- connec fuera de parcela
-			
-			execute 'select count(*) from ('||v_sql_connec_tram||')a' into v_count;	
-
-			if v_count > 0 then -- fuera de parcela + encima de tramo		
-				--tamos dentro de este if
-
-				if (st_distance(st_centroid(v_closest_parcel), v_rec_point_final.point_final) > 
-					st_distance(st_centroid(v_closest_parcel), v_connec_geom)) then
+						update connec set the_geom = v_rec_point_final.point_final where connec_id = v_connec;
 							
-					--raise exception 'v_rec_point_final.point_final %', v_rec_point_final.point_final;
-					update connec set the_geom = v_point_final_reverse where connec_id = v_connec;
+					end if;
 				
-					raise notice 'v_rec_point_final %', v_rec_point_final.arc_id;
 					execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"['||v_connec||']"},
 					"data":{"feature_type":"CONNEC", "forcedArcs":"['||v_rec_point_final.arc_id||']"}}$$)';
-	
-				else -- fuera de parcela + fuera dle tramo
-					
-					update connec set the_geom = v_rec_point_final.point_final where connec_id = v_connec;	
 				
-					raise notice 'v_rec_point_final %', v_rec_point_final.arc_id;
-					execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"['||v_connec||']"},
-					"data":{"feature_type":"CONNEC", "forcedArcs":"[]"}}$$)';
+					return '{"sucess connec_id":"'||v_connec||'"}';
+					
+				else -- dentro de la parcela + fuera del tramo
 						
-				end if;
+				
+					execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_srid||'}, 
+					"form":{}, "feature":{"id":"['||v_connec||']"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
+					';
+					return '{"sucess connec_id":"'||v_connec||'"}';
+		
+				end if; 
 			
-			
-				return '{"sucess connec_id":"'||v_connec||'"}';
-			
-			else -- fuera de la parcela + fuera del tramo
-			
-				execute 'SELECT gw_fct_setlinktonetwork($${
-				"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25830}, 
-				"form":{}, 
-				"feature":{"id":"['||v_connec||']"}, 
-				"data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$)
-				';
-			
-				return '{"sucess connec_id":"'||v_connec||'"}';
-
-			end if; 
-
-		end if;
+			else -- connec fuera de parcela
+				
+				execute 'select count(*) from ('||v_sql_connec_tram||')a' into v_count;	
 	
+				if v_count > 0 then -- fuera de parcela + encima de tramo		
+						
+					if (st_distance(st_centroid(v_closest_parcel), v_rec_point_final.point_final) < 
+						st_distance(st_centroid(v_closest_parcel), v_connec_geom)) then
+								
+						--raise exception 'v_rec_point_final.point_final %', v_rec_point_final.point_final;
+						update connec set the_geom = v_rec_point_final.point_final where connec_id = v_connec;
+		
+					else -- fuera de parcela + fuera dle tramo
+						
+						update connec set the_geom = v_point_final_reverse where connec_id = v_connec;
+						--update connec set the_geom = v_rec_point_final.point_final where connec_id = v_connec;	
+							
+					end if;
+				
+				
+					execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"['||v_connec||']"},
+					"data":{"feature_type":"CONNEC", "forcedArcs":"['||v_rec_point_final.arc_id||']"}}$$)';
+				
+					return '{"sucess connec_id":"'||v_connec||'"}';
+				
+				else -- fuera de la parcela + fuera del tramo
+				
+					execute 'SELECT gw_fct_setlinktonetwork($${
+					"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_srid||'}, 
+					"form":{}, 
+					"feature":{"id":"['||v_connec||']"}, 
+					"data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$)
+					';
+				
+					return '{"sucess connec_id":"'||v_connec||'"}';
+	
+				end if; 
+	
+			end if;
+		
+		END IF;
+	END IF;
   -- si no quiere tener en cuenta la parcela:
-	else
+
+	IF v_sql_connec_tram IS NOT NULL then
 		
 		-- saber si el connec está encima del arco (v_count del v_rec).
 		execute 'select * from ('||v_sql_connec_tram||')a' INTO v_count;
@@ -350,7 +361,7 @@ BEGIN
 		
 		end if; 
 	
-		v_sql = 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25830}, "form":{}, 
+		v_sql = 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_epsg||'}, "form":{}, 
 		"feature":{"id":"['||v_connec||']"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);';
 		
 		execute v_sql;
