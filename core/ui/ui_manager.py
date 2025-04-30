@@ -816,6 +816,15 @@ class ResourcesManagementUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
+UINAME = "organization_create"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class OrganizationCreateUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
 UINAME = "team_create"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
