@@ -386,11 +386,6 @@ def remove(**kwargs):
     this.selected_features.remove(feature)
     this.fill_tbl_ids()
 
-def filter_expression(**kwargs):
-    """ Remove button clicked event """
-
-    print("Filter expression button clicked")
-
 def accept(**kwargs):
     """ Accept button clicked event """
 
