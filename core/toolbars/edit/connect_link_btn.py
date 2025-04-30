@@ -22,7 +22,7 @@ from ...ui.ui_manager import GwConnectLinkUi
 
 class SelectAction(Enum):
     CONNEC_LINK = tools_qt.tr('Connec to link')
-    CONNEC_GULLY = tools_qt.tr('Gully to link')
+    GULLY_LINK = tools_qt.tr('Gully to link')
 
 
 class GwConnectLinkButton(GwMaptool):
@@ -35,7 +35,7 @@ class GwConnectLinkButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.dragging = False
         self.select_rect = QRect()
-        self.connec_features = []
+        self.selected_features = []
         self.project_type = tools_gw.get_project_type()
 
         # Check project type
@@ -55,13 +55,14 @@ class GwConnectLinkButton(GwMaptool):
         """ Event when button is clicked """
 
         if self.project_type == 'ws':
-            self.open_dlg("connec")
+            self.feature = 'connec'
+            self.open_dlg()
 
-    def open_dlg(self, feature_type):
+    def open_dlg(self):
         """ Open connect link dialog """
 
         # Create form and body
-        form = {"formName": "generic", "formType": f"link_to_{feature_type}"}
+        form = {"formName": "generic", "formType": f"link_to_{self.feature}"}
         body = {"client": {"cur_user": tools_db.current_user}, "form": form}
 
         # Execute procedure
@@ -82,7 +83,7 @@ class GwConnectLinkButton(GwMaptool):
         self.tbl_ids = self.dlg_connect_link.findChild(QWidget, "tab_none_tbl_ids")
 
         self.tbl_ids.setMinimumWidth(300)
-        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header':f'{feature_type}_id'}])
+        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header':f'{self.feature}_id'}])
 
         # Open form
         tools_gw.open_dialog(self.dlg_connect_link, 'connect_link')
@@ -90,7 +91,7 @@ class GwConnectLinkButton(GwMaptool):
     def fill_tbl_ids(self):
         """ Fill table with selected features """
 
-        field = { "value": self.connec_features }
+        field = { "value": self.selected_features }
 
         # Clear previous rows
         self.tbl_ids.model().removeRows(0, self.tbl_ids.model().rowCount())
@@ -112,6 +113,25 @@ class GwConnectLinkButton(GwMaptool):
             # Use `action.value` for user-friendly labels
             obj_action = QAction(action.value, ag)
             self.menu.addAction(obj_action)
+            # connect signal
+            obj_action.triggered.connect(self._action_triggered)
+
+    def _action_triggered(self):
+        """ Action triggered event """
+
+        # Get the action that was triggered
+        action = self.sender()
+
+        # Check if the action is valid
+        if action is None:
+            return
+
+        # Get the selected action from the menu
+        selected_action = SelectAction(action.text())
+
+        # Open dialog based on selected action
+        self.feature = 'connec' if selected_action == SelectAction.CONNEC_LINK else 'gully'
+        self.open_dlg()
 
     """ QgsMapTools inherited event functions """
 
@@ -240,36 +260,6 @@ class GwConnectLinkButton(GwMaptool):
         tools_qgis.set_layer_index('v_edit_link')
         tools_qgis.set_layer_index('v_edit_vnode')
 
-    def manage_gully_result(self):
-
-        # Manage if task is already running
-        if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
-            try:
-                if self.connect_link_task.isActive():
-                    message = "Connect link task is already active!"
-                    tools_qgis.show_warning(message)
-                    return
-            except RuntimeError:
-                pass
-
-        layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
-        if layer_gully:
-            # Check selected records
-            number_features = 0
-            number_features += layer_gully.selectedFeatureCount()
-            if number_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible():
-                message = "Number of features selected in the group of"
-                title = "Connect to network"
-                answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
-                if answer:
-                    # Create link
-                    self.connect_link_task = GwConnectLink("Connect link", self, 'gully', layer_gully)
-                    QgsApplication.taskManager().addTask(self.connect_link_task)
-                    QgsApplication.taskManager().triggerTask(self.connect_link_task)
-
-            if number_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible() is False:
-                self.cancel_map_tool()
-
     # endregion
 
     # region private functions
@@ -310,37 +300,33 @@ class GwConnectLinkButton(GwMaptool):
             behaviour = QgsVectorLayer.AddToSelection
 
         # Selection for all connec and gully layers
-        layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
+        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature}')
         if layer:
 
             if behaviour == QgsVectorLayer.RemoveFromSelection and len(layer.selectedFeatures()) == 1:
-                selected_connec = {"connec_id": layer.selectedFeatures()[0].attribute("connec_id")}
-                if selected_connec in self.connec_features:
+                selected_feature = {f"{self.feature}_id": layer.selectedFeatures()[0].attribute(f"{self.feature}_id")}
+                if selected_feature in self.selected_features:
 
                     # Remove the selected feature from the list
-                    self.connec_features.remove(selected_connec)
+                    self.selected_features.remove(selected_feature)
 
             layer.selectByRect(select_geometry, behaviour)
 
             if layer.selectedFeatureCount() > 0:
                 for connec_feature in layer.selectedFeatures():
                     # Get the connec_id attribute of the selected feature
-                    selected_connec = {"connec_id": connec_feature.attribute("connec_id")}
+                    selected_feature = {f"{self.feature}_id": connec_feature.attribute(f"{self.feature}_id")}
 
                     # Check if the connec_id is already in the list
-                    if behaviour == QgsVectorLayer.AddToSelection and selected_connec not in self.connec_features:
+                    if behaviour == QgsVectorLayer.AddToSelection and selected_feature not in self.selected_features:
                         # Add the new connec_id to the list
-                        self.connec_features.append(selected_connec)
+                        self.selected_features.append(selected_feature)
 
-                    elif behaviour == QgsVectorLayer.RemoveFromSelection and selected_connec in self.connec_features:
+                    elif behaviour == QgsVectorLayer.RemoveFromSelection and selected_feature in self.selected_features:
                         # Remove the connec_id from the list
-                        self.connec_features.remove(selected_connec)
+                        self.selected_features.remove(selected_feature)
 
             self.fill_tbl_ids()
-
-        layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
-        if layer:
-            layer.selectByRect(select_geometry, behaviour)
 
         layer = tools_qgis.get_layer_by_tablename('v_edit_arc')
         if layer:
@@ -359,16 +345,6 @@ class GwConnectLinkButton(GwMaptool):
 
     # endregion
 
-def snapping(**kwargs):
-    """ Accept button clicked event """
-
-    GwMaptool.clicked_event(kwargs['class'])
-
-def close(**kwargs):
-    """ Close button clicked event """
-
-    tools_gw.close_dialog(kwargs['dialog'])
-
 def add(**kwargs):
     """ Add button clicked event """
 
@@ -381,13 +357,13 @@ def add(**kwargs):
         tools_qgis.show_warning(message, title='Connect to network')
         return
 
-    new_connec = {"connec_id": selected_id}
-    if new_connec in this.connec_features:
+    new_feature = {f"{this.feature}_id": selected_id}
+    if new_feature in this.selected_features:
         message = "This feature is already in the list"
         tools_qgis.show_warning(message, title='Connect to network')
         return
 
-    this.connec_features.append(new_connec)
+    this.selected_features.append(new_feature)
     this.fill_tbl_ids()
 
 def remove(**kwargs):
@@ -401,13 +377,13 @@ def remove(**kwargs):
         tools_qt.delete_rows_tableview(this.tbl_ids)
         return
 
-    connec = {"connec_id": selected_id }
-    if connec not in this.connec_features:
+    feature = {f"{this.feature}_id": selected_id }
+    if feature not in this.selected_features:
         message = "This feature is not in the list"
         tools_qgis.show_warning(message, title='Connect to network', dialog=this.dlg_connect_link)
         return
 
-    this.connec_features.remove(connec)
+    this.selected_features.remove(feature)
     this.fill_tbl_ids()
 
 def filter_expression(**kwargs):
@@ -437,11 +413,9 @@ def accept(**kwargs):
         selected_arc = selected_arc_feature.attribute("arc_id")
 
     this.ids = []
-
     model = this.tbl_ids.model()
-    row_count = model.rowCount()
 
-    for row in range(row_count):
+    for row in range(model.rowCount()):
         item = model.item(row, 0)
         if item is not None:
             this.ids.append(int(item.text()))
@@ -452,15 +426,24 @@ def accept(**kwargs):
         return
 
     # Create the task
-    this.connect_link_task = GwConnectLink("Connect link", this, 'connec', selected_arc=selected_arc)
+    this.connect_link_task = GwConnectLink("Connect link", this, this.feature, selected_arc=selected_arc)
 
     # Add and trigger the task
     QgsApplication.taskManager().addTask(this.connect_link_task)
     QgsApplication.taskManager().triggerTask(this.connect_link_task)
-
 
     # Cancel map tool if no features are selected or the layer is not visible
     this.cancel_map_tool()
 
     # Close dialog
     tools_gw.close_dialog(this.dlg_connect_link)
+
+def snapping(**kwargs):
+    """ Accept button clicked event """
+
+    GwMaptool.clicked_event(kwargs['class'])
+
+def close(**kwargs):
+    """ Close button clicked event """
+
+    tools_gw.close_dialog(kwargs['dialog'])
