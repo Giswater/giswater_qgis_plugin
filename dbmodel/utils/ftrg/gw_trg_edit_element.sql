@@ -176,9 +176,6 @@ BEGIN
 			NEW.enddate := NULL;
 		END IF;
 
-		--Inventory
-		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
-
 		--Publish
 		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
 

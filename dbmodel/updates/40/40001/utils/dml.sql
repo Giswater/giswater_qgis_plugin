@@ -488,3 +488,10 @@ INSERT INTO sys_message (id, error_message, log_level, project_type, source, mes
 INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1119, 'Create new link connected to the closest arc.', 0, 'generic', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1121, 'Creating new link by using geometry of existing one.', 0, 'generic', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1123, 'Reverse the direction of drawn link.', 0, 'generic', 'core', 'AUDIT');
+
+-- 30/04/2025
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_plan_psector','form_feature','tab_none','creation_date','date','datetime','Creation Date:','Creation Date',false,false,true,false,'{"setMultiline":false}'::json,false);
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('generic','psector','tab_general','creation_date','lyt_general_7',5,'date','datetime','Creation date:','Creation date:',false,false,true,false,false,'{"setMultiline":false}'::json,false,3);

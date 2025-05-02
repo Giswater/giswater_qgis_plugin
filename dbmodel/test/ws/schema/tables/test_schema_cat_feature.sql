@@ -20,7 +20,7 @@ SELECT has_table('cat_feature'::name, 'Table cat_feature should exist');
 SELECT columns_are(
     'cat_feature',
     ARRAY[
-        'id', 'feature_class', 'feature_type', 'shortcut_key', 'parent_layer', 'child_layer', 'descript', 'link_path', 'code_autofill', 'active', 'addparam'
+        'id', 'feature_class', 'feature_type', 'shortcut_key', 'parent_layer', 'child_layer', 'descript', 'link_path', 'code_autofill', 'active', 'addparam', 'inventory_vdefault'
     ],
     'Table cat_feature should have the correct columns'
 );
@@ -43,6 +43,7 @@ SELECT col_type_is('cat_feature', 'link_path', 'text', 'Column link_path should 
 SELECT col_type_is('cat_feature', 'code_autofill', 'boolean', 'Column code_autofill should be boolean');
 SELECT col_type_is('cat_feature', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('cat_feature', 'addparam', 'json', 'Column addparam should be json');
+SELECT col_type_is('cat_feature', 'inventory_vdefault', 'boolean', 'Column inventory_vdefault should be boolean');
 
 -- Check foreign keys
 SELECT has_fk('cat_feature', 'Table cat_feature should have foreign keys');

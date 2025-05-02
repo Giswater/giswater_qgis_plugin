@@ -27,7 +27,6 @@ INSERT INTO config_param_user VALUES ('edit_nodecat_vdefault', 'AIR VALVE DN50',
 INSERT INTO config_param_user VALUES ('edit_pavementcat_vdefault', 'Asphalt', current_user);
 INSERT INTO config_param_user VALUES ('edit_elementcat_vdefault', 'COVER', current_user);
 INSERT INTO config_param_user VALUES ('edit_soilcat_vdefault', 'soil1', current_user);
-INSERT INTO config_param_user VALUES ('edit_ownercat_vdefault', 'owner1', current_user);
 INSERT INTO config_param_user VALUES ('qgis_dim_tooltip', 'false', current_user);
 INSERT INTO config_param_user VALUES ('qgis_composers_folderpath', NULL, current_user);
 INSERT INTO config_param_user VALUES ('edit_statetype_0_vdefault', '1', current_user);

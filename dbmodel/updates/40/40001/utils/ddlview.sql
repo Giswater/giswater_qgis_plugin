@@ -80,6 +80,9 @@ DROP VIEW IF EXISTS vu_node;
 
 DROP VIEW IF EXISTS v_sector_node;
 
+DROP VIEW IF EXISTS v_edit_plan_psector;;
+DROP VIEW IF EXISTS v_ui_plan_psector;
+
 
 CREATE OR REPLACE VIEW v_edit_cat_feature_link
 AS SELECT cat_feature.id,
@@ -814,3 +817,63 @@ AS SELECT doc_x_element.doc_id,
   doc.user_name
 FROM doc_x_element
   JOIN doc ON doc.id::text = doc_x_element.doc_id::text;
+
+CREATE OR REPLACE VIEW v_edit_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.name,
+    plan_psector.descript,
+    plan_psector.priority,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    plan_psector.atlas_id,
+    plan_psector.gexpenses,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.the_geom,
+    plan_psector.expl_id,
+    plan_psector.psector_type,
+    plan_psector.active,
+    plan_psector.archived,
+    plan_psector.ext_code,
+    plan_psector.status,
+    plan_psector.text3,
+    plan_psector.text4,
+    plan_psector.text5,
+    plan_psector.text6,
+    plan_psector.num_value,
+    plan_psector.workcat_id,
+    plan_psector.parent_id,
+    plan_psector.creation_date
+   FROM selector_expl,
+    plan_psector
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_ui_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.ext_code,
+    plan_psector.name,
+    plan_psector.descript,
+    p.idval AS priority,
+    s.idval AS status,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.expl_id,
+    t.idval AS psector_type,
+    plan_psector.active,
+    plan_psector.archived,
+    plan_psector.workcat_id,
+    plan_psector.parent_id,
+    plan_psector.creation_date
+   FROM selector_expl,
+    plan_psector
+     JOIN exploitation USING (expl_id)
+     LEFT JOIN plan_typevalue p ON p.id::text = plan_psector.priority::text AND p.typevalue = 'value_priority'::text
+     LEFT JOIN plan_typevalue s ON s.id::text = plan_psector.status::text AND s.typevalue = 'psector_status'::text
+     LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;

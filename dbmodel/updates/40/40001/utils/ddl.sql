@@ -157,3 +157,8 @@ UPDATE archived_psector_node_traceability SET expl_visibility = ARRAY[expl_id];
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_arc_traceability", "column":"expl_id2"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_connec_traceability", "column":"expl_id2"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_node_traceability", "column":"expl_id2"}}$$);
+
+-- 29/04/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"creation_date", "dataType":"date"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"owner_vdefault", "dataType":"varchar(30)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"inventory_vdefault", "dataType":"boolean"}}$$);

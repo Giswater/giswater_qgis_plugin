@@ -970,10 +970,8 @@ BEGIN
 					END IF;
 
 				WHEN 'inventory' THEN
-					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_inventory_sysvdefault') IS TRUE THEN
-						field_value = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_inventory_sysvdefault');
-					END IF;
-
+					field_value = v_catfeature.inventory_vdefault;
+					
 				WHEN 'publish' THEN
 					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_publish_sysvdefault') IS TRUE THEN
 						field_value = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_publish_sysvdefault');
@@ -1004,6 +1002,9 @@ BEGIN
 						ELSE field_value = NULL;
 					END IF;
 				END IF;
+
+				WHEN 'ownercat_id' THEN
+					field_value = (SELECT owner_vdefault FROM exploitation WHERE expl_id = v_expl_id LIMIT 1);
 
 				-- rest (including addfields)
 				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'columnname');
