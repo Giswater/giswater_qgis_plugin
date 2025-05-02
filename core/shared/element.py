@@ -397,7 +397,6 @@ class GwElement:
         self._manage_combo(self.dlg_add_element.elementcat_id, 'edit_elementcat_vdefault')
         self._manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
         self._manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
-        self._manage_combo(self.dlg_add_element.ownercat_id, 'edit_ownercat_vdefault')
         self._manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
         self._manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
         self._manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
