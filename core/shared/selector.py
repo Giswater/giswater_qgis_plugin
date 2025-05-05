@@ -275,102 +275,6 @@ class GwSelector:
         if tab:
             main_tab.setCurrentWidget(tab)
 
-    def _get_layers(self):
-            
-        # self.arc_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_arc')] if lyr is not None]
-        # self.node_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_node')] if lyr is not None]
-        # self.connec_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_connec')] if lyr is not None]
-        # self.gully_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_gully')] if lyr is not None]
-        # self.link_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_link')] if lyr is not None]
-
-        filter_layers = {}
-        filter_layers['muni'] = []
-        filter_layers['expl'] = []
-        filter_layers['sector'] = []
-
-        for layer in QgsProject.instance().mapLayers().values():
-            if "muni_id" in [field.name() for field in layer.fields()]: 
-                filter_layers['muni'].append(tools_qgis.get_layer_source_table_name(layer))
-            if "expl_id" in [field.name() for field in layer.fields()] or "expl_id2" in [field.name() for field in layer.fields()]:
-                filter_layers['expl'].append(tools_qgis.get_layer_source_table_name(layer))
-            if "sector_id" in [field.name() for field in layer.fields()]:
-                filter_layers['sector'].append(tools_qgis.get_layer_source_table_name(layer))
-
-        return filter_layers
-        # return self.arc_layers, self.node_layers, self.connec_layers, self.gully_layers, self.link_layers
-                
-    def _apply_filter(self, muni_filter: str, sector_filter: str) -> None:
-        """
-        Apply a subset filter to layers based on the project type.
-
-        :param subset_filter: SQL-like filter string to apply to the layers.
-        """
-
-        # Iterate over all layers in the current QGIS project
-        for layer in QgsProject.instance().mapLayers().values():
-            if isinstance(layer, QgsVectorLayer):
-                # Get the field names once to avoid multiple iterations
-                field_names = {field.name() for field in layer.fields()}
-                
-                # If neither filter is set and the layer contains 'muni_id' or 'sector_id' fields, remove any existing subset string
-                if not any([muni_filter, sector_filter]) and any(field in field_names for field in ['muni_id', 'sector_id']):
-                    layer.setSubsetString(None)
-                    continue
-
-                # Initialize the list to hold the subset filters
-                subset_filter = []
-
-                # Add 'muni_filter' to the subset filter if the 'muni_id' field exists and 'muni_filter' is set
-                subset_filter = [
-                    muni_filter if "muni_id" in field_names and muni_filter else None,
-                    sector_filter if "sector_id" in field_names and sector_filter else None,
-                ]
-
-                # Remove any 'None' values from the subset filter list
-                subset_filter = [f for f in subset_filter if f]
-
-                # Apply the subset filter to the layer; if the list is empty, set it to None
-                layer.setSubsetString(" AND ".join(subset_filter) if subset_filter else None)
-
-    def _build_filter(self) -> str:
-
-        # Call get_selectors
-        extras = f'"selectorType":"selector_basic", "filterText":""'
-        body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
-
-        muni_filter = ''
-        sector_filter = ''
-
-        if json_result is not None:
-            try:
-                form_tabs = json_result.get('body', {}).get('form', {}).get('formTabs', [])
-                for selector in form_tabs:
-                    if selector.get('tableName') == 'selector_municipality':
-                        filter = []  
-                        for field in selector.get('fields', []):
-                            if field.get('value'):
-                                column_name = field.get('columnname')
-                                if column_name:
-                                    filter.append(f"{field[column_name]}")
-                        if filter:
-                            muni_filter = (f"ARRAY[muni_id] && ARRAY[{ ','.join(filter) }]")
-
-                    elif selector.get('tableName') == 'selector_sector':
-                        filter = []  
-                        for field in selector.get('fields', []):
-                            if field.get('value'):
-                                column_name = field.get('columnname')
-                                if column_name:
-                                    filter.append(f"{field[column_name]}")
-                        if filter:
-                            sector_filter = (f"ARRAY[sector_id] && ARRAY[{ ','.join(filter) }]")
-
-            except KeyError as e:
-                print(f"KeyError encountered: {e}")
-
-        return muni_filter, sector_filter
-
     # region private functions
 
     def _show_help(self, dialog, selection_modes):
@@ -472,9 +376,6 @@ class GwSelector:
                     tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
             except KeyError:
                 pass
-
-        # Build and Apply filters
-        tools_gw.reload_layers_filters()
 
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')

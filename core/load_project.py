@@ -19,8 +19,6 @@ from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.project_check import GwProjectCheckTask
 from .. import global_vars
 from ..libs import lib_vars, tools_qgis, tools_log, tools_db, tools_qt, tools_os
-from .shared.selector import GwSelector
-
 
 class GwLoadProject(QObject):
 
@@ -188,9 +186,6 @@ class GwLoadProject(QObject):
 
         # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
         self._config_layers()
-
-        # Build and Apply filters
-        tools_gw.reload_layers_filters()
 
     # region private functions
 

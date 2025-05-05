@@ -5276,28 +5276,6 @@ def _manage_tablewidget(**kwargs):
 
     return _manage_tableview(**kwargs)
 
-
-def reload_layers_filters():
-
-    # Get basic_selector_options param
-    sector_options = get_config_value("basic_selector_options", table='config_param_system')
-    json_options = json.loads(sector_options[0])
-    muni_option = json_options.get('muniClientFilter', False)
-    sector_option = json_options.get('sectorClientFilter', False)
-
-    # Build and Apply filters
-    selector = GwSelector()
-    muni_filter, sector_filter = selector._build_filter()
-
-    # Create a dict to manage filters
-    filters = {
-        "muni_filter": muni_filter if muni_option and muni_filter else None,
-        "sector_filter": sector_filter if sector_option and sector_filter else None,
-    }
-
-    # Apply filters
-    selector._apply_filter(filters["muni_filter"], filters["sector_filter"])
-
 # endregion
 
 # region Right Click TableView Menu
