@@ -974,8 +974,7 @@ AS WITH typevalue AS (
             sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
             connec.n_inhabitants,
             dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style
-           FROM inp_network_mode,
-            connec_selector
+           FROM connec_selector
              JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
              JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
              JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
@@ -989,6 +988,7 @@ AS WITH typevalue AS (
              LEFT JOIN link_planned USING (link_id)
              LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
              LEFT JOIN value_state_type vst ON vst.id = connec.state_type
+             LEFT JOIN inp_network_mode ON true
         )
  SELECT connec_id,
     code,

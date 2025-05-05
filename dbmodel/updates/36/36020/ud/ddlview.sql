@@ -898,8 +898,7 @@ AS WITH typevalue AS (
             date_trunc('second'::text, gully.lastupdate) AS lastupdate,
             gully.lastupdate_user,
             gully.the_geom
-           FROM inp_network_mode,
-            gully_selector
+           FROM gully_selector
              JOIN gully USING (gully_id)
              JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
              JOIN exploitation ON gully.expl_id = exploitation.expl_id
@@ -911,6 +910,7 @@ AS WITH typevalue AS (
              LEFT JOIN dma_table ON gully.dma_id = dma_table.dma_id
              LEFT JOIN drainzone_table ON gully.dma_id = drainzone_table.drainzone_id
              LEFT JOIN link_planned ON gully.gully_id::text = link_planned.feature_id::text
+             LEFT JOIN inp_network_mode ON true
         )
  SELECT gully_id,
     code,
