@@ -1357,8 +1357,14 @@ AS WITH
 			END AS connec_matcat_id,
 			gully.top_elev - gully.ymax + gully.sandbox AS connec_y1,
 			gully.connec_y2,
-			cat_gully.width AS grate_width,
-			cat_gully.length AS grate_length,
+            CASE
+                WHEN gully.grate_width IS NULL THEN cat_gully.width
+                ELSE gully.grate_width
+            END AS grate_width,
+            CASE
+                WHEN gully.grate_length IS NULL THEN cat_gully.length
+                ELSE gully.grate_length
+            END AS grate_length,
 			gully.arc_id,
             gully.omunit_id,
 			gully.epa_type,
@@ -1479,9 +1485,7 @@ AS WITH
 			gully.gullycat2_id,
 			gully.units_placement,
 			gully.siphon_type,
-			gully.odorflap,
-			gully.length,
-			gully.width
+			gully.odorflap
 			FROM inp_network_mode, gully_selector
 			JOIN gully using (gully_id)
 			JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
