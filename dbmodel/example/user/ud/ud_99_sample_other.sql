@@ -505,7 +505,7 @@ om_visit.id
 FROM doc, om_visit;
 
 UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
-AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
+AND columnname in ('streetaxis_id','streetaxis2_id', 'postnumber','postnumber2','postcomplement','postcomplement2');
 
 UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
 AND columnname = 'district_id';

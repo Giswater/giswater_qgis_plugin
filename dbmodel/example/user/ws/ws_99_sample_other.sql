@@ -368,7 +368,7 @@ UPDATE config_form_fields SET layoutorder = 24 where columnname ='svg' and formn
 
 UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE (formname ilike 've_arc_%' or
  formname ilike 've_node_%' or  formname ilike  've_connec_%')
-AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
+AND columnname in ('streetaxis_id','streetaxis2_id', 'postnumber','postnumber2','postcomplement','postcomplement2');
 
 UPDATE config_form_fields set hidden = false  WHERE (formname in ('ve_arc', 've_node', 've_connec')
 or (formname ilike 've_arc_%' or  formname ilike 've_node_%' or  formname ilike  've_connec_%'))

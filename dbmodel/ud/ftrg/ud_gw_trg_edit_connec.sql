@@ -328,9 +328,9 @@ BEGIN
 		END IF;
 
 		--Address
-		IF (NEW.streetaxis IS NULL) THEN
+		IF (NEW.streetaxis_id IS NULL) THEN
 			IF (v_auto_streetvalues_status is true) THEN
-				NEW.streetaxis := (select v_ext_streetaxis.id from v_ext_streetaxis
+				NEW.streetaxis_id := (select v_ext_streetaxis.id from v_ext_streetaxis
 								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
 								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
 			END IF;
