@@ -29,7 +29,7 @@ SELECT columns_are(
         'minsector_id', 'dqa_id', 'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
         'om_state', 'conserv_state', 'parent_id', 'expl_visibility', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
-        'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
+        'macrominsector_id', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table arc should have the correct columns'
@@ -52,8 +52,6 @@ SELECT has_index('arc', 'arc_presszone', 'Table should have index on presszone_i
 SELECT has_index('arc', 'arc_sector', 'Table should have index on sector_id');
 SELECT has_index('arc', 'arc_street1', 'Table should have index on streetaxis_id');
 SELECT has_index('arc', 'arc_street2', 'Table should have index on streetaxis2_id');
-SELECT has_index('arc', 'arc_streetname', 'Table should have index on streetname');
-SELECT has_index('arc', 'arc_streetname2', 'Table should have index on streetname2');
 SELECT has_index('arc', 'arc_sys_code_idx', 'Table should have index on sys_code');
 SELECT has_index('arc', 'arc_asset_id_idx', 'Table should have index on asset_id');
 
@@ -128,8 +126,6 @@ SELECT col_type_is('arc', 'model_id', 'varchar(50)', 'Column model_id should be 
 SELECT col_type_is('arc', 'serial_number', 'varchar(100)', 'Column serial_number should be varchar(100)');
 SELECT col_type_is('arc', 'label_quadrant', 'varchar(12)', 'Column label_quadrant should be varchar(12)');
 SELECT col_type_is('arc', 'macrominsector_id', 'integer', 'Column macrominsector_id should be integer');
-SELECT col_type_is('arc', 'streetname', 'varchar(100)', 'Column streetname should be varchar(100)');
-SELECT col_type_is('arc', 'streetname2', 'varchar(100)', 'Column streetname2 should be varchar(100)');
 SELECT col_type_is('arc', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
 SELECT col_type_is('arc', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('arc', 'lock_level', 'integer', 'Column lock_level should be integer');

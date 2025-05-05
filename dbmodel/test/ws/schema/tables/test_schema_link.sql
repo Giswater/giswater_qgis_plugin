@@ -25,7 +25,8 @@ SELECT columns_are(
         'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_visibility', 'epa_type', 'is_operative',
         'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
         'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource',
-        'omzone_id', 'lock_level', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'omzone_id', 'lock_level', 'annotation', 'comment', 'descript', 'link', 'location_type', 'num_value', 'observ',
+        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table link should have the correct columns'
 );

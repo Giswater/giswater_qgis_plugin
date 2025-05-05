@@ -30,8 +30,8 @@ SELECT columns_are(
         'expl_id', 'num_value', 'feature_type', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate',
         'adescript', 'accessibility', 'workcat_id_plan', 'asset_id', 'om_state', 'conserv_state',
         'access_type', 'placement_type', 'expl_visibility', 'brand_id', 'model_id', 'serial_number',
-        'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id',
-        'lock_level', 'is_scadamap', 'pavcat_id', 'omzone_id',
+        'label_quadrant', 'macrominsector_id', 'supplyzone_id', 'lock_level', 'is_scadamap', 'pavcat_id',
+        'omzone_id',
         'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table node should have the correct columns'

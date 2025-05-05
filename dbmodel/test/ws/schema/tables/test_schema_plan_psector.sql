@@ -24,7 +24,7 @@ SELECT columns_are(
         'observ', 'rotation', 'scale', 'atlas_id', 'gexpenses', 'vat', 'other', 'active',
         'the_geom', 'enable_all', 'status', 'ext_code', 'text3', 'text4', 'text5', 'text6',
         'num_value', 'workcat_id', 'parent_id', 'tstamp', 'insert_user', 'lastupdate', 'lastupdate_user',
-        'archived'
+        'archived', 'creation_date'
     ],
     'Table plan_psector should have the correct columns'
 );
