@@ -43,3 +43,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('parent');
 
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_genelem
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('parent');
+
+CREATE TRIGGER gw_trg_ui_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_plan_psector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_plan_psector();
+
+CREATE TRIGGER gw_trg_edit_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_plan_psector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_psector('plan');
