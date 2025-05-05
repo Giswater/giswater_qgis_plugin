@@ -21,7 +21,7 @@ rec_tab record;
 
 v_formTabsAux  json;
 v_formTabs text;
-v_version json;
+v_version text;
 v_active boolean=false;
 v_firsttab boolean=false;
 v_selector_list text;
@@ -103,10 +103,9 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get system values
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
-
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
+	v_version = (SELECT giswater FROM sys_version LIMIT 1);
+
 
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
@@ -161,9 +160,6 @@ BEGIN
 	 FROM (SELECT formname, tabname, f.label, f.tooltip, tabfunction, tabactions, unnest(device) AS device, value, orderby FROM config_form_tabs f, config_param_system
 	 WHERE formname=',quote_literal(v_selector_type),' AND isenabled IS TRUE AND concat(''basic_selector_'', tabname) = parameter ',(v_querytab),
 	' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')))a WHERE device = ',v_device, v_exclude_tab,' ORDER BY orderby');
-	v_debug_vars := json_build_object('v_selector_type', v_selector_type, 'v_querytab', v_querytab);
-	v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 
 	DROP TABLE IF EXISTS temp_om_campaign;
@@ -171,37 +167,37 @@ BEGIN
 
 
 	-- creation of the temporal tables in function of the role
-	if 'role_cm_admin' in (	SELECT r.rolname AS role_name FROM pg_roles r JOIN pg_auth_members m ON r.oid = m.roleid 
-						  	JOIN pg_roles u ON u.oid = m.member WHERE u.rolname = 'postgres') then 
-						  	
+	if 'role_cm_admin' in (	SELECT r.rolname AS role_name FROM pg_roles r JOIN pg_auth_members m ON r.oid = m.roleid
+						  	JOIN pg_roles u ON u.oid = m.member WHERE u.rolname = 'postgres') then
+
 		CREATE TEMP TABLE temp_om_campaign AS
-		select c.* from om_campaign c 
+		select c.* from om_campaign c
 		where c.active;
-		
+
 		CREATE TEMP TABLE temp_om_campaign_lot AS
 		select l.* from om_campaign_lot l
 		join selector_campaign sc using (campaign_id)
-		where l.active 
+		where l.active
 		and cur_user = current_user; -- only campaigns enabled for user
 
-	else 
+	else
 
 		CREATE TEMP TABLE temp_om_campaign  AS
-		select c.* from om_campaign c 
+		select c.* from om_campaign c
 		join cat_organization  using (organization_id)
 		join cat_team t using (organization_id)
 		join cat_user using (team_id)
 		where c.active and username = current_user;
-		
+
 		CREATE TEMP TABLE temp_om_campaign_lot AS
 		select l.* from om_campaign_lot l
 		join selector_campaign sc using (campaign_id)
 		join cat_team t using (team_id)
 		join cat_user using (team_id)
-		where l.active 
+		where l.active
 		and cur_user = current_user -- only campaigns enabled for user
 		and username = current_user; -- only lots enabled for user ;
-	
+
 	end if;
 
 	-- starting loop for tabs
@@ -227,12 +223,6 @@ BEGIN
 		v_typeaheadForced = v_tab.value::json->>'typeaheadForced';
 		v_orderby_check = v_tab.value::json->>'orderbyCheck';
 
-		-- profilactic control of v_orderby
-		v_querystring = concat('SELECT gw_fct_getpkeyfield(''',v_table,''');');
-		v_debug_vars := json_build_object('v_table', v_table);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 20);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_pkeyfield;
 		IF v_orderby IS NULL THEN v_orderby = v_pkeyfield; end if;
 		IF v_name IS NULL THEN v_name = v_orderby; end if;
 
@@ -269,17 +259,12 @@ BEGIN
 		v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
 				select *, row_number() OVER (',v_orderby_query,') as orderby from (
 				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
-				v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-				FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
+				v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value"
+				FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION
 				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
-				v_orderby, ' , ''',v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+				v_orderby, ' , ''',v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value"
 				FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
 				 v_fullfilter ,') a)b');
-
-		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id,
-						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
-		v_debug := json_build_object('querystring', v_finalquery, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 30);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 
 		EXECUTE  v_finalquery INTO v_formTabsAux;
@@ -301,15 +286,15 @@ BEGIN
 		END IF;
 
 		-- setting other variables of tab
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabName', v_tab.tabname::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tableName', v_selector);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabLabel', v_tab.label::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tooltip', v_tab.tooltip::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectorType', v_tab.formname::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadForced', v_typeaheadForced::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'tabName', v_tab.tabname::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'tableName', v_selector);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'tabLabel', v_tab.label::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'tooltip', v_tab.tooltip::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'selectorType', v_tab.formname::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'manageAll', v_manageall::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key_cm(v_formTabsAux, 'typeaheadForced', v_typeaheadForced::TEXT);
 
 		-- Create tabs array
 		IF v_firsttab THEN
@@ -464,25 +449,17 @@ BEGIN
 
 
 		-- Return formtabs
-		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
-			',"body":{"message":'||v_message||
+		RETURN '{"status":"Accepted", "version":'||v_version||
+			',"body":{"message":' || v_message ||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
 			',"feature":{}'||
 			',"data":{
 				"userValues":'||v_uservalues||',
 				"geometry":'||v_geometry||',
 				"layerColumns":'||v_layerColumns||
-				(case when v_selector_type = 'selector_mincut' then ',
-					"tiled":'||v_tiled||',
-					"mincutInit":'||v_mincut_init||',
-					"mincutProposedValve":'||v_mincut_valve_proposed||',
-					"mincutNotProposedValve":'||v_mincut_valve_not_proposed||',
-					"mincutNode":'||v_mincut_node||',
-					"mincutConnec":'||v_mincut_connec||',
-					"mincutArc":'||v_mincut_arc else '' end ) ||
 				'}'||
 			'}'||
-		    '}')::json,2796, null, null, v_action::json);
+		    '}';
 	END IF;
 
 	-- Exception handling

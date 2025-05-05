@@ -57,3 +57,8 @@ INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, te
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
 (13, '84023910S', 'cgil',      'cgil',      'Carla Gil Torras',     'o2 field 2', 7, true),
 (14, '92034185M', 'rbueno',    'rbueno',    'Raul Bueno Soler',     'o2 field 2', 7, true);
+
+-- Easy user for test in local
+INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
+(15, '92034185M', 'postgres', 'postgres', 'Postgres', 'o2 field 2', 1, true);
+

@@ -77,8 +77,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	v_version = (SELECT giswater FROM sys_version LIMIT 1);
 
 	-- get system variables
 	v_sectorfromexpl = (SELECT value::json->>'sectorFromExpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
@@ -146,37 +145,37 @@ BEGIN
 
 
 	-- creation of the temporal tables in function of the role
-	if 'role_cm_admin' in (	SELECT r.rolname AS role_name FROM pg_roles r JOIN pg_auth_members m ON r.oid = m.roleid 
-						  	JOIN pg_roles u ON u.oid = m.member WHERE u.rolname = 'postgres') then 
-						  	
+	if 'role_cm_admin' in (	SELECT r.rolname AS role_name FROM pg_roles r JOIN pg_auth_members m ON r.oid = m.roleid
+						  	JOIN pg_roles u ON u.oid = m.member WHERE u.rolname = 'postgres') then
+
 		CREATE TEMP TABLE temp_om_campaign AS
-		select c.* from om_campaign c 
+		select c.* from om_campaign c
 		where c.active;
-		
+
 		CREATE TEMP TABLE temp_om_campaign_lot AS
 		select l.* from om_campaign_lot l
 		join selector_campaign sc using (campaign_id)
-		where l.active 
+		where l.active
 		and cur_user = current_user; -- only campaigns enabled for user
 
-	else 
+	else
 
 		CREATE TEMP TABLE temp_om_campaign  AS
-		select c.* from om_campaign c 
+		select c.* from om_campaign c
 		join cat_organization  using (organization_id)
 		join cat_team t using (organization_id)
 		join cat_user using (team_id)
 		where c.active and username = current_user;
-		
+
 		CREATE TEMP TABLE temp_om_campaign_lot AS
 		select l.* from om_campaign_lot l
 		join selector_campaign sc using (campaign_id)
 		join cat_team t using (team_id)
 		join cat_user using (team_id)
-		where l.active 
+		where l.active
 		and cur_user = current_user -- only campaigns enabled for user
 		and username = current_user; -- only lots enabled for user ;
-	
+
 	end if;
 
 	-- manage check all
@@ -203,23 +202,23 @@ BEGIN
 
 	END IF;
 
-	
+
 	-- get envelope
-	SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
+	--SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
 
 	IF v_tabname='tab_campaign' THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM exploitation where expl_id IN
-		(SELECT expl_id FROM selector_expl WHERE cur_user=current_user)) b) a;
+		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM om_campaign where campaign_id IN
+		(SELECT campaign_id FROM selector_campaign WHERE cur_user=current_user)) b) a;
 
 	ELSIF v_tabname='tab_lot' THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM ext_municipality where muni_id IN
-		(SELECT muni_id FROM selector_municipality WHERE cur_user=current_user)) b) a;
+		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM om_campaign_lot where lot_id IN
+		(SELECT lot_id FROM selector_lot WHERE cur_user=current_user)) b) a;
 
 	END IF;
 
@@ -231,11 +230,13 @@ BEGIN
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 
 	-- Return
-	v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
-	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', 
-	"selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'",
+	v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{},
+	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "action":',v_action,',
+	"selectorType":"',v_selectortype,'", "id":"', v_id,'", "ids":"', v_ids,'",
 	"layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}');
-	RETURN gw_fct_getselectors(v_return);
+
+	--RAISE EXCEPTION 'return %', v_return;
+	RETURN gw_fct_getselectorscm(v_return);
 
 
 	--Exception handling
