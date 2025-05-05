@@ -367,7 +367,7 @@ AS WITH
 			l.the_geom,
 			st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
             l.custom_length
-			FROM inp_network_mode, link_selector
+			FROM link_selector
 			JOIN link l using (link_id)
 			JOIN exploitation ON l.expl_id = exploitation.expl_id
 			JOIN ext_municipality mu ON l.muni_id = mu.muni_id
@@ -375,8 +375,9 @@ AS WITH
             JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
             JOIN cat_feature ON cat_feature.id::text = l.link_type::text
 			LEFT JOIN omzone_table ON l.omzone_id = omzone_table.omzone_id
-			LEFT join drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
+			LEFT JOIN drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
+            LEFT JOIN inp_network_mode ON true
 		)
      SELECT link_selected.*
 	 FROM link_selected;
@@ -1486,7 +1487,7 @@ AS WITH
 			gully.units_placement,
 			gully.siphon_type,
 			gully.odorflap
-			FROM inp_network_mode, gully_selector
+			FROM gully_selector
 			JOIN gully using (gully_id)
 			JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
 			JOIN exploitation ON gully.expl_id = exploitation.expl_id
@@ -1499,6 +1500,7 @@ AS WITH
 			LEFT JOIN drainzone_table ON gully.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON gully.dwfzone_id = dwfzone_table.dwfzone_id
 			LEFT JOIN link_planned ON gully.gully_id = feature_id
+			LEFT JOIN inp_network_mode ON true
 		)
 	SELECT gully_selected.*
 	FROM gully_selected;

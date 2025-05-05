@@ -641,7 +641,7 @@ AS WITH
         st_length(l.the_geom)::numeric(12,3) AS gis_length,
         l.custom_length,
         l.staticpressure
-        FROM inp_network_mode, link_selector
+        FROM link_selector
         JOIN link l ON l.link_id = link_selector.link_id
         LEFT JOIN connec c ON c.connec_id = l.feature_id
         JOIN sector_table ON sector_table.sector_id = l.sector_id
@@ -653,6 +653,7 @@ AS WITH
         LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id
         LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = l.supplyzone_id
         LEFT JOIN omzone_table ON omzone_table.omzone_id = l.omzone_id
+        LEFT JOIN inp_network_mode ON true
       )
     SELECT l.*
     FROM link_selected l;
@@ -960,7 +961,7 @@ AS WITH
           connec.the_geom,
           connec.n_inhabitants,
           connec.block_zone
-        FROM inp_network_mode, connec_selector
+        FROM connec_selector
         JOIN connec ON connec.connec_id = connec_selector.connec_id
         JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
         JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
@@ -976,6 +977,7 @@ AS WITH
         LEFT JOIN link_planned USING (link_id)
         LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
         LEFT JOIN value_state_type vst ON vst.id = connec.state_type
+        LEFT JOIN inp_network_mode ON true
       )
     SELECT c.*
     FROM connec_selected c;
