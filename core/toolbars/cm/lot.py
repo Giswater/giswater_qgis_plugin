@@ -144,7 +144,7 @@ class AddNewLot:
 
         new_lot_id = lot_id
         if lot_id is None:
-            new_lot_id = self.get_next_id('om_campaign_lot', 'id')
+            new_lot_id = self.get_next_id('om_campaign_lot', 'lot_id')
         tools_qt.set_widget_text(self.dlg_lot, self.lot_id, new_lot_id)
 
 
@@ -344,7 +344,7 @@ class AddNewLot:
             tools_qgis.show_message(msg, 0)
             return
 
-        sql = ("SELECT DISTINCT(name) FROM cm.cat_team")
+        sql = ("SELECT DISTINCT(teamname) FROM cm.cat_team")
         rows = tools_db.get_rows(sql)
         if rows:
             for row in rows:
@@ -353,11 +353,11 @@ class AddNewLot:
                     tools_qgis.show_message(msg, 0)
                     return
 
-        sql = (f"INSERT INTO {self.schemaname}.cat_team (name, descript, active) "
+        sql = (f"INSERT INTO {self.schemaname}.cat_team (teamname, descript, active) "
                f"VALUES('{team_name}', '{team_descript}', '{team_active}');")
         tools_db.execute_sql(sql)
 
-        sql = ("SELECT team_id, name FROM cm.cat_team WHERE active is True ORDER BY idval")
+        sql = ("SELECT team_id, teamname FROM cm.cat_team WHERE active is True ORDER BY team_id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows)
 
@@ -393,8 +393,8 @@ class AddNewLot:
     def populate_cmb_team(self):
         """ Fill ComboBox cmb_assigned_to """
 
-        sql = ("SELECT DISTINCT(cat_team.team_id), name "
-               "FROM cm.cat_team WHERE active is True ORDER BY name")
+        sql = ("SELECT DISTINCT(cat_team.team_id), teamname "
+               "FROM cm.cat_team WHERE active is True ORDER BY teamname")
         rows = tools_db.get_rows(sql, commit=True)
 
         if rows:

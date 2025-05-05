@@ -16,8 +16,9 @@ from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
-from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi
+from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, GwSelectorUi
 from qgis.gui import QgsDateTimeEdit
+from ...shared.selector import GwSelector
 
 
 class Campaign:
@@ -73,9 +74,30 @@ class Campaign:
         self.dialog.tbl_campaign.doubleClicked.connect(self.open_campaign)
         self.dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
         self.dialog.campaign_btn_open.clicked.connect(self.open_campaign)
+        self.dialog.btn_campaign_selector.clicked.connect(self.open_campaign_selector)
 
         self.manage_date_filter()
         tools_gw.open_dialog(self.dialog, dlg_name="campaign_management")
+
+
+    def open_campaign_selector(self):
+        """ Open the campaign-specific selector when the button is clicked """
+        # Set is_campaign flag to True to trigger the campaign logic
+        campaignSelector = GwSelector()
+
+        dlg_selector = GwSelectorUi(self)
+        tools_gw.load_settings(dlg_selector)
+        current_tab = tools_gw.get_config_parser('dialogs_tab_cm', "dlg_selector_campaign", "user", "session")
+        selector_values = f"selector_campaign"
+
+        dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
+        dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
+        dlg_selector.rejected.connect(
+            partial(tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'campaign'))
+
+        campaignSelector.get_selector(dlg_selector, selector_values, current_tab=current_tab)
+
+        tools_gw.open_dialog(dlg_selector, dlg_name='selector')
 
 
     def load_campaign_dialog(self, campaign_id=None, mode="review"):
@@ -186,6 +208,10 @@ class Campaign:
         name_widget = self.get_widget_by_columnname(self.dialog, "name")
         if name_widget:
             name_widget.textChanged.connect(self._check_enable_tab_relations)
+
+        # Refresh the manager table when campaign dialog closes (if it was opened from manager)
+        if isinstance(self.dialog.parent(), CampaignManagementUi):
+            self.dialog.finished.connect(self.filter_campaigns)
 
         # Code logic to deal with the review/visit combo change to load tabs in relations
         self.reviewclass_combo = self.get_widget_by_columnname(self.dialog, "reviewclass_id")
@@ -707,7 +733,7 @@ class Campaign:
         row = index.row()
         id_index = model.index(row, 0)
         campaign_id = model.data(id_index)
-
+        print("open campaign: ", campaign_id)
         try:
             campaign_id = int(campaign_id)
             if campaign_id > 0:

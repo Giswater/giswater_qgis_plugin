@@ -21,10 +21,11 @@ from ...libs import lib_vars, tools_qgis, tools_qt, tools_os
 
 class GwSelector:
 
-    def __init__(self):
+    def __init__(self, is_campaign= False):
         self.checkall = False
         self.help_button = None
         self.scrolled_amount = 0
+        self.is_campaign = is_campaign
 
     def open_selector(self, selector_type="selector_basic", reload_dlg=None):
         """
@@ -35,6 +36,9 @@ class GwSelector:
             if selector_type == "selector_mincut":
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
                 aux_params = tools_gw.get_config_parser("selector_mincut", f"aux_params", "user", "session")
+            elif selector_type == "selector_campaign":
+                current_tab = tools_gw.get_config_parser('dialogs_tab_cm', "dlg_selector_campaign", "user", "session")
+                print(current_tab)
             else:
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
@@ -99,7 +103,8 @@ class GwSelector:
             if widget:
                 widget.setFocus()
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None, aux_params=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
+                     aux_params=None):
         """
         Ask to DB for selectors and make dialog
             :param dialog: Is a standard dialog, from file selector.ui, where put widgets
@@ -125,15 +130,25 @@ class GwSelector:
             text_filter = ''
         if '"' in selector_type:
             selector_type = selector_type.strip('"')
-        # Built querytext
-        form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
-        if aux_params:
-            tools_gw.set_config_parser("selector_mincut", f"aux_params", f"{aux_params}", "user", "session")
-            extras = f"{extras}, {aux_params}"
-        extras += f', "addSchema":"{lib_vars.project_vars["add_schema"]}"'
-        body = tools_gw.create_body(form=form, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
+
+        # Determine which function to call based on the campaign flag
+        if selector_type == 'selector_campaign':
+            # For campaign, use the gw_fct_getselectorscm function
+            body = tools_gw.create_body(
+                form=f'"currentTab":"{current_tab}"',
+                extras=f'"selectorType":"{selector_type}", "filterText":"{text_filter}", "addSchema":"{lib_vars.project_vars["add_schema"]}"'
+            )
+            json_result = tools_gw.execute_procedure('gw_fct_getselectorscm', body, schema_name='cm')
+        else:
+            # For non-campaign, use the gw_fct_getselectors function
+            form = f'"currentTab":"{current_tab}"'
+            extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
+            if aux_params:
+                tools_gw.set_config_parser("selector_mincut", f"aux_params", f"{aux_params}", "user", "session")
+                extras = f"{extras}, {aux_params}"
+            extras += f', "addSchema":"{lib_vars.project_vars["add_schema"]}"'
+            body = tools_gw.create_body(form=form, extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
 
         if not json_result or json_result['status'] == 'Failed':
             return False
@@ -355,8 +370,16 @@ class GwSelector:
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
 
-        body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+        # Determine which function to call based on the campaign flag
+        if selector_type == 'selector_campaign':
+            # If it's a campaign, use the gw_fct_setselectocm procedure
+            body = tools_gw.create_body(extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_setselectorscm', body, schema_name='cm')
+        else:
+            # If not campaign, use the original gw_fct_setselectors procedure
+            body = tools_gw.create_body(extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+
         if json_result is None or json_result['status'] == 'Failed':
             return
         level = json_result['body']['message']['level']
@@ -376,6 +399,13 @@ class GwSelector:
                     tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
             except KeyError:
                 pass
+
+
+        # Build and Apply filters
+        if selector_type == 'selector_campaign':
+            tools_gw.reload_layers_filters(iscampaign=True)
+        else:
+            tools_gw.reload_layers_filters()
 
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')
