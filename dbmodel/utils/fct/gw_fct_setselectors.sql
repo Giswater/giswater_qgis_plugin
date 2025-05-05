@@ -73,9 +73,6 @@ v_result_valve json;
 v_result_node json;
 v_result_connec json;
 v_result_arc json;
-v_sectorfromexpl boolean;
-v_sectorfrommacro boolean;
-v_explfrommacro boolean;
 v_expl_x_user boolean;
 v_project_type text;
 v_psector_current_value integer;
@@ -91,9 +88,6 @@ BEGIN
 		INTO v_version;
 
 	-- get system variables
-	v_sectorfromexpl = (SELECT value::json->>'sectorFromExpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
-	v_sectorfrommacro = (SELECT value::json->>'sectorFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
-	v_explfrommacro = (SELECT value::json->>'explFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
@@ -323,10 +317,6 @@ BEGIN
 		IF v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
 
 			IF v_tabname = 'tab_exploitation' THEN
-
-				IF v_explfrommacro is false THEN
-					DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-				end if;
 				INSERT INTO selector_macroexpl
 				SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 				ON CONFLICT (macroexpl_id, cur_user) DO NOTHING;
@@ -401,9 +391,6 @@ BEGIN
 		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 
 			IF v_tabname = 'tab_sector' THEN
-				IF v_sectorfrommacro is false THEN
-					DELETE FROM selector_macrosector WHERE cur_user = current_user;
-				end if;
 				INSERT INTO selector_macrosector
 				SELECT DISTINCT macrosector_id, current_user FROM sector WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)
 				AND macrosector_id IS NOT NULL
@@ -417,18 +404,11 @@ BEGIN
 			END IF;
 
 			-- expl
-			IF v_sectorfromexpl IS FALSE THEN
-				DELETE FROM selector_expl WHERE cur_user = current_user;
-			END IF;
 			INSERT INTO selector_expl
 			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 			ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 			-- muni
-			IF v_sectorfromexpl IS FALSE THEN
-				DELETE FROM selector_municipality WHERE cur_user = current_user;
-			END IF;
-
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;

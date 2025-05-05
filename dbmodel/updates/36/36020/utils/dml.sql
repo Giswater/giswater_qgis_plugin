@@ -7,3 +7,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 update sys_table set sys_role = 'role_basic' where id = 'cat_users';
+
+DELETE FROM config_param_system WHERE parameter = 'basic_selector_options';

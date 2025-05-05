@@ -99,10 +99,7 @@ v_mincut_connec json;
 v_mincut_arc json;
 v_exclude_tab text='';
 v_orderby_query text;
-v_sectorfromexpl boolean;
 v_orderby_check boolean;
-v_sectorfrommacro boolean;
-v_explfrommacro boolean;
 v_project_type text;
 
 BEGIN
@@ -148,9 +145,6 @@ BEGIN
 
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
-	v_sectorfromexpl = (SELECT value::json->>'sectorFromExpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
-	v_sectorfrommacro = (SELECT value::json->>'sectorFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
-	v_explfrommacro = (SELECT value::json->>'explFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
 
 	v_stylesheet = (SELECT value FROM config_param_system WHERE parameter = 'qgis_form_selector_stylesheet');
 
@@ -187,7 +181,7 @@ BEGIN
 		CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
 		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
 		CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
-	
+
 		IF v_project_type = 'WS' THEN
 			CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
 		END IF;
@@ -214,13 +208,13 @@ BEGIN
 		JOIN temp_sector e USING (macrosector_id)
 		WHERE m.active and m.macrosector_id > 0;
 
-		CREATE TEMP TABLE temp_municipality as 
+		CREATE TEMP TABLE temp_municipality as
 		select distinct on (muni_id) muni_id, em.name, descript, em.active from ext_municipality em
 		JOIN (SELECT DISTINCT expl_id, muni_id FROM node)n USING (muni_id)
 		JOIN exploitation e ON e.expl_id=n.expl_id
-		JOIN config_user_x_expl c ON c.expl_id=n.expl_id 
+		JOIN config_user_x_expl c ON c.expl_id=n.expl_id
 		WHERE em.active and username = current_user;
-	
+
 		IF v_project_type = 'WS' THEN
 			CREATE TEMP TABLE temp_t_mincut AS select distinct on (m.id) m.* from om_mincut m
 			JOIN config_user_x_expl USING (expl_id)
@@ -279,31 +273,6 @@ BEGIN
 			v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 		END IF;
 
-		-- built additional filter for only those sector related to selected exploitation
-		IF v_sectorfromexpl THEN
-			IF v_tab.tabname = 'tab_sector' THEN
-				v_filterfrominput = concat (COALESCE(v_filterfrominput),
-				' AND sector_id IN (SELECT DISTINCT sector_id FROM node JOIN selector_expl USING (expl_id) WHERE cur_user = current_user
-									UNION
-									SELECT sector_id FROM sector LEFT JOIN node USING (sector_id) WHERE node.sector_id is null)');
-
-			ELSIF v_tab.tabname = 'tab_macrosector' THEN
-				v_filterfrominput = concat (COALESCE(v_filterfrominput),
-				' AND macrosector_id IN (SELECT DISTINCT macrosector_id FROM vu_sector JOIN node USING (sector_id) JOIN selector_expl USING (expl_id) WHERE cur_user = current_user)');
-			END IF;
-		END IF;
-
-		-- built additional filter for only those sectors related to selected macrosector
-		IF  v_sectorfrommacro AND v_tab.tabname = 'tab_sector' THEN
-			v_filterfrominput = concat (COALESCE(v_filterfrominput),
-			' AND macrosector_id IN (SELECT macrosector_id FROM selector_macrosector WHERE cur_user = current_user) ');
-		END IF;
-
-		-- built additional filter for only those expl related to selected macroexpl
-		IF v_explfrommacro AND v_tab.tabname = 'tab_exploitation' THEN
-			v_filterfrominput = concat (COALESCE(v_filterfrominput),
-			' AND macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user) ');
-		END IF;
 
 		-- Manage filters from ids (only mincut)
 		IF v_selector = 'selector_mincut_result' THEN
