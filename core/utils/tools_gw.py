@@ -1984,7 +1984,14 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
         if widget.isReadOnly() and not ignore_editability:
             return _json
-        value = tools_qt.get_text(dialog, widget, return_string_null=False)
+        if isinstance(widget, QLineEdit):
+            selected_id = widget.property("selected_id")
+            if selected_id is not None:
+                value = selected_id  # Use selected_id for saving
+            else:
+                value = tools_qt.get_text(dialog, widget, return_string_null=False)
+        else:
+            value = tools_qt.get_text(dialog, widget, return_string_null=False)
     elif isinstance(widget, QComboBox):
         if not widget.isEnabled() and not ignore_editability:
             return _json
@@ -2208,7 +2215,7 @@ def set_typeahead(field, dialog, widget, completer, feature_id=None):
     if field.get('queryText') is not None and 'queryTextFilter' in field:
         # Typeahead with queryText and queryTextFilter
         widget.setProperty('typeahead', True)
-        model = QStringListModel()
+        model = QStandardItemModel()
         widget.textEdited.connect(partial(fill_typeahead, completer, model, field, dialog, widget, feature_id))
         return widget
 
@@ -2243,15 +2250,15 @@ def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
     # Custom logic for the "Doc" tab
     if active_tab_name == "Doc":
         search_text = tools_qt.get_text(dialog, widget)
-        query = f"SELECT name as idval FROM doc WHERE name ILIKE '%{search_text}%'"
+        query = f"SELECT name as id, name as idval FROM doc WHERE name ILIKE '%{search_text}%'"
         rows = tools_db.get_rows(query)
 
         if not rows:
             # Handle the case when no matching documents are found
             print("No matching documents found.")
-            list_items = []
+            list_items = {}
         else:
-            list_items = [row['idval'] for row in rows]
+            list_items = {row['id']: row['idval'] for row in rows}
 
         tools_qt.set_completer_object(completer, model, widget, list_items)
         return
@@ -2276,10 +2283,7 @@ def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
     if not complet_list or complet_list['status'] == 'Failed':
         return False
 
-    list_items = []
-    for field in complet_list['body']['data']:
-        list_items.append(field['idval'])
-    tools_qt.set_completer_object(completer, model, widget, list_items)
+    tools_qt.set_completer_object(completer, model, widget, complet_list['body']['data'])
 
 
 def set_data_type(field, widget):

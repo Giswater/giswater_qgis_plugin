@@ -9,7 +9,8 @@ import json
 import operator
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate, QStringListModel
+from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSizePolicy, QGridLayout, QLabel, \
     QTextEdit, QLineEdit, QCompleter, QTabWidget, QWidget, QGroupBox
 from qgis.gui import QgsDateTimeEdit
@@ -231,7 +232,7 @@ class GwConfigButton(GwAction):
                             completer = QCompleter()
                             if field.get('dv_querytext'):
                                 widget.setProperty('typeahead', True)
-                                model = QStringListModel()
+                                model = QStandardItemModel()
                                 widget.textChanged.connect(
                                     partial(self.populate_typeahead, completer, model, field, self.dlg_config, widget))
 
@@ -317,11 +318,7 @@ class GwConfigButton(GwAction):
         if not complet_list:
             return False
 
-        list_items = []
-
-        for field in complet_list['body']['data']:
-            list_items.append(field['idval'])
-            tools_qt.set_completer_object(completer, model, widget, list_items)
+        tools_qt.set_completer_object(completer, model, widget, complet_list['body']['data'])
 
     def _check_child_to_parent(self, widget_child, widget_parent):
 
