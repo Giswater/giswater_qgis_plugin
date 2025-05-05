@@ -26,8 +26,6 @@ v_addfields record;
 v_new_value_param text;
 v_old_value_param text;
 v_featurecat text;
-v_streetaxis text;
-v_streetaxis2 text;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_psector integer;
@@ -56,18 +54,6 @@ BEGIN
 	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
 	v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
 	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_current' AND cur_user=current_user);
-
-	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		-- check if streetname exists
-		IF NEW.streetname IS NOT NULL AND ((NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis))) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3246", "function":"1302","parameters":null}}$$);';
-		END IF;
-
-		-- transforming streetaxis name into id
-		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
-		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
-	END IF;
 
 
 	IF TG_OP = 'INSERT' THEN
@@ -419,13 +405,13 @@ BEGIN
 		INSERT INTO arc (arc_id, code, sys_code, datasource, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 					workcat_id, workcat_id_end, workcat_id_plan, builtdate,enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement,
 					streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value,
-					adate, adescript, updated_at, updated_by, asset_id, pavcat_id, om_state, conserv_state, parent_id,expl_visibility, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2, lock_level, is_scadamap)
+					adate, adescript, updated_at, updated_by, asset_id, pavcat_id, om_state, conserv_state, parent_id,expl_visibility, brand_id, model_id, serial_number, label_quadrant, lock_level, is_scadamap)
 					VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.datasource, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.custom_length,NEW.dma_id,NEW.presszone_id,
 					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
-					NEW.muni_id, NEW.postcode, NEW.district_id,v_streetaxis,NEW.postnumber, NEW.postcomplement, v_streetaxis2, NEW.postnumber2, NEW.postcomplement2, NEW.descript,NEW.link, NEW.verified,
+					NEW.muni_id, NEW.postcode, NEW.district_id,NEW.streetaxis_id,NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2, NEW.descript,NEW.link, NEW.verified,
 					NEW.the_geom,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value,
 					NEW.adate, NEW.adescript, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.pavcat_id, NEW.om_state, NEW.conserv_state,
-					NEW.parent_id, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.is_scadamap);
+					NEW.parent_id, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.lock_level, NEW.is_scadamap);
 
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
 		IF v_edit_enable_arc_nodes_update IS TRUE THEN
@@ -639,13 +625,13 @@ BEGIN
 		SET code=NEW.code, sys_code=NEW.sys_code, datasource=NEW.datasource, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ,
 				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, presszone_id=NEW.presszone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
 				category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan,
-				builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,
-				streetaxis2_id=v_streetaxis2,postcode=NEW.postcode, district_id = NEW.district_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified,
+				builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,
+				streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode, district_id = NEW.district_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified,
 				label_x=NEW.label_x, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory,
 				expl_id=NEW.expl_id,num_value=NEW.num_value, link=NEW.link, updated_at=now(), updated_by=current_user,
 				adate=NEW.adate, adescript=NEW.adescript, asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id,
 				om_state=NEW.om_state, conserv_state=NEW.conserv_state, parent_id = NEW.parent_id,expl_visibility =NEW.expl_visibility, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
-				label_quadrant=NEW.label_quadrant, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
+				label_quadrant=NEW.label_quadrant, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
 				WHERE arc_id=OLD.arc_id;
 
 		-- childtable update

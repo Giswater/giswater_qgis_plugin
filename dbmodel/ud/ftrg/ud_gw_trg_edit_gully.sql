@@ -47,8 +47,6 @@ v_srid integer;
 v_featurecat text;
 v_psector_vdefault integer;
 v_arc_id text;
-v_streetaxis text;
-v_streetaxis2 text;
 v_autorotation_disabled boolean;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
@@ -123,16 +121,6 @@ BEGIN
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
 		FROM cat_feature_gully WHERE id='||quote_literal(NEW.gully_type)||''
 		INTO v_doublegeometry, v_unitsfactor;
-
-		-- check if streetname exists
-		IF NEW.streetname IS NOT NULL AND ((NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis))) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3246", "function":"1206","parameters":null}}$$);';
-		END IF;
-
-        -- transforming streetaxis name into id
-		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
-		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
 
 		IF NEW.arc_id IS NOT NULL AND NEW.expl_id IS NOT NULL THEN
 			IF (SELECT expl_id FROM arc WHERE arc_id = NEW.arc_id) != NEW.expl_id THEN
@@ -368,9 +356,9 @@ BEGIN
 		END IF;
 
 		--Address
-		IF (v_streetaxis IS NULL) THEN
+		IF (NEW.streetaxis_id) THEN
 			IF (v_auto_streetvalues_status is true) THEN
-				v_streetaxis := (select v_ext_streetaxis.id from v_ext_streetaxis
+				NEW.streetaxis_id = (select v_ext_streetaxis.id from v_ext_streetaxis
 								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
 								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
 			END IF;
@@ -581,17 +569,17 @@ BEGIN
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
 				updated_at, updated_by, asset_id, gullycat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_visibility, adate, adescript,
-				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level, length, width)
+				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, lock_level, length, width)
 			VALUES (NEW.gully_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
 				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate,
-				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2,
+				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id,
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
 				NEW.uncertain, NEW.num_value,NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.gullycat2_id, NEW.epa_type, NEW.units_placement,
 				NEW.groove_height, NEW.groove_length, NEW.drainzone_id,NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.siphon_type, NEW.odorflap,
-				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.length, NEW.width);
+				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width);
 		ELSE
 
 			INSERT INTO gully (gully_id, code, sys_code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, _connec_arccat_id, connec_length,
@@ -600,17 +588,17 @@ BEGIN
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom, label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
 				updated_at, updated_by, asset_id, connec_matcat_id, gullycat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_visibility, adate, adescript,
-				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level, length, width)
+				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, lock_level, length, width)
 			VALUES (NEW.gully_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
 				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate,
-				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2,
+				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id,
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
 				NEW.uncertain, NEW.num_value,NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.connec_matcat_id, NEW.gullycat2_id,
 				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length, NEW.drainzone_id,NEW.expl_visibility, NEW.adate, NEW.adescript,
-				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.length, NEW.width);
+				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width);
 
 		END IF;
 
@@ -915,13 +903,13 @@ BEGIN
 			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id,
 			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
-			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement,
+			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement,
 			postcomplement2=NEW.postcomplement2, descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
-			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,
+			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, updated_at=now(), updated_by=current_user,
 			asset_id=NEW.asset_id, gullycat2_id = NEW.gullycat2_id, epa_type=NEW.epa_type, units_placement=NEW.units_placement, groove_height=NEW.groove_height,
 			groove_length=NEW.groove_length, drainzone_id=NEW.drainzone_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript, siphon_type=NEW.siphon_type, odorflap=NEW.odorflap, connec_y2=NEW.connec_y2,
-			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, length=NEW.length, width=NEW.width
+			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, length=NEW.length, width=NEW.width
 			WHERE gully_id = OLD.gully_id;
 
 		ELSE
@@ -931,13 +919,13 @@ BEGIN
 			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id,
 			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
-			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement,
+			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement,
 			postcomplement2=NEW.postcomplement2, descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
-			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,
+			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, updated_at=now(), updated_by=current_user,
 			asset_id=NEW.asset_id, gullycat2_id = NEW.gullycat2_id, epa_type=NEW.epa_type, units_placement=NEW.units_placement, groove_height=NEW.groove_height,
 			groove_length=NEW.groove_length, drainzone_id=NEW.drainzone_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript, siphon_type=NEW.siphon_type, odorflap=NEW.odorflap, connec_y2=NEW.connec_y2,
-			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, length=NEW.length, width=NEW.width
+			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, length=NEW.length, width=NEW.width
 			WHERE gully_id = OLD.gully_id;
 
 		END IF;

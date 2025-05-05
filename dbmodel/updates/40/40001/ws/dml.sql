@@ -333,3 +333,9 @@ UPDATE config_toolbox SET inputparams =
 WHERE id = 3142;
 
 UPDATE om_typevalue set typevalue = 'waterbalance_method_' WHERE typevalue = 'waterbalance_method' AND id = 'DCW';
+
+-- 30/04/2025
+UPDATE config_form_fields SET columnname='streetaxis_id' WHERE formname IN ('v_edit_node', 'v_edit_arc', 'v_edit_connec') AND formtype='form_feature' AND columnname='streetname' AND tabname='tab_data';
+UPDATE config_form_fields SET columnname='streetaxis2_id' WHERE formname IN ('v_edit_node', 'v_edit_arc', 'v_edit_connec') AND formtype='form_feature' AND columnname='streetname2' AND tabname='tab_data';
+UPDATE config_form_fields SET columnname='streetaxis_id' WHERE formname ILIKE 've_%' AND formtype='form_feature' AND columnname='streetname' AND tabname='tab_data';
+UPDATE config_form_fields SET columnname='streetaxis2_id' WHERE formname ILIKE 've_%' AND formtype='form_feature' AND columnname='streetname2' AND tabname='tab_data';

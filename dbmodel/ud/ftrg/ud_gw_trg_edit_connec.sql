@@ -24,8 +24,6 @@ v_customfeature text;
 v_featurecat text;
 v_psector_vdefault integer;
 v_arc_id text;
-v_streetaxis text;
-v_streetaxis2 text;
 v_matfromcat boolean = false;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
@@ -72,15 +70,6 @@ BEGIN
 
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		-- check if streetname exists
-		IF NEW.streetname IS NOT NULL AND ((NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis))) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3246", "function":"1204","parameters":null}}$$);';
-		END IF;
-
-        -- transforming streetaxis name into id
-		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
-		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
 
 		-- managing matcat
 		IF (SELECT matcat_id FROM cat_connec WHERE id = NEW.conneccat_id) IS NOT NULL THEN
@@ -339,9 +328,9 @@ BEGIN
 		END IF;
 
 		--Address
-		IF (v_streetaxis IS NULL) THEN
+		IF (NEW.streetaxis IS NULL) THEN
 			IF (v_auto_streetvalues_status is true) THEN
-				v_streetaxis := (select v_ext_streetaxis.id from v_ext_streetaxis
+				NEW.streetaxis := (select v_ext_streetaxis.id from v_ext_streetaxis
 								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
 								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
 			END IF;
@@ -479,30 +468,30 @@ BEGIN
 			builtdate, enddate, ownercat_id, muni_id, postcode, district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value,
-			updated_at, updated_by, asset_id, drainzone_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level)
+			updated_at, updated_by, asset_id, drainzone_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
-			v_streetaxis2, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
+			NEW.streetaxis2_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value,
 			NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.drainzone_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level);
+			NEW.label_quadrant, NEW.access_type, NEW.lock_level);
 		ELSE
 			INSERT INTO connec (connec_id, code, sys_code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
 			"observ","comment",  omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id,postcode,district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom, label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, matcat_id,
-			updated_at, updated_by, asset_id, drainzone_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level)
+			updated_at, updated_by, asset_id, drainzone_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
-			v_streetaxis2, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
+			NEW.streetaxis2_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id,
 			NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.drainzone_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level);
+			NEW.label_quadrant, NEW.access_type, NEW.lock_level);
 		END IF;
 
 		--check if feature is double geom
@@ -754,11 +743,11 @@ BEGIN
 			connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, annotation=NEW.annotation, "observ"=NEW."observ",
 			"comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
-			ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, postcode=NEW.postcode, district_id =NEW.district_id, streetaxis2_id=v_streetaxis2, streetaxis_id=v_streetaxis, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
+			ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, postcode=NEW.postcode, district_id =NEW.district_id, streetaxis2_id=NEW.streetaxis2_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
 			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified,
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(), updated_by=current_user, asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
-			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level
+			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level
 			WHERE connec_id = OLD.connec_id;
 		ELSE
 			UPDATE connec
@@ -766,12 +755,12 @@ BEGIN
 			connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, annotation=NEW.annotation, "observ"=NEW."observ",
 			"comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
-			ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, streetaxis_id=v_streetaxis, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
+			ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=NEW.streetaxis2_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
 			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified,
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(),
 			updated_by=current_user, matcat_id = NEW.matcat_id, asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
-			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level
+			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level
 			WHERE connec_id = OLD.connec_id;
 		END IF;
 

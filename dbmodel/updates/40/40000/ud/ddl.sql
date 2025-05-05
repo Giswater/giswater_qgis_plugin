@@ -881,11 +881,9 @@ CREATE TABLE node (
 	district_id int4 NULL,
 	postcode varchar(16) NULL,
 	streetaxis_id varchar(16) NULL,
-	streetname varchar(100) NULL,
 	postnumber int4 NULL,
 	postcomplement varchar(100) NULL,
 	streetaxis2_id varchar(16) NULL,
-	streetname2 varchar(100) NULL,
 	postnumber2 int4 NULL,
 	postcomplement2 varchar(100) NULL,
 	workcat_id varchar(255) NULL,
@@ -954,8 +952,6 @@ CREATE INDEX node_nodetype_index ON node USING btree (node_type);
 CREATE INDEX node_sector ON node USING btree (sector_id);
 CREATE INDEX node_street1 ON node USING btree (streetaxis_id);
 CREATE INDEX node_street2 ON node USING btree (streetaxis2_id);
-CREATE INDEX node_streetname ON node USING btree (streetname);
-CREATE INDEX node_streetname2 ON node USING btree (streetname2);
 CREATE INDEX node_sys_code_idx ON node USING btree (sys_code);
 CREATE INDEX node_asset_id_idx ON node USING btree (asset_id);
 
@@ -1098,11 +1094,9 @@ CREATE TABLE arc (
 	district_id int4 NULL,
 	postcode varchar(16) NULL,
 	streetaxis_id varchar(16) NULL,
-	streetname varchar(100) NULL,
 	postnumber int4 NULL,
 	postcomplement varchar(100) NULL,
 	streetaxis2_id varchar(16) NULL,
-	streetname2 varchar(100) NULL,
 	postnumber2 int4 NULL,
 	postcomplement2 varchar(100) NULL,
 	workcat_id varchar(255) NULL,
@@ -1175,10 +1169,6 @@ CREATE INDEX arc_node2 ON arc USING btree (node_2);
 CREATE INDEX arc_sector ON arc USING btree (sector_id);
 CREATE INDEX arc_street1 ON arc USING btree (streetaxis_id);
 CREATE INDEX arc_street2 ON arc USING btree (streetaxis2_id);
-CREATE INDEX arc_streetname ON arc USING btree (streetname);
-CREATE INDEX arc_streetname2 ON arc USING btree (streetname2);
-CREATE INDEX gully_streetname ON arc USING btree (streetname);
-CREATE INDEX gully_streetname2 ON arc USING btree (streetname2);
 CREATE INDEX arc_sys_code_idx ON arc USING btree (sys_code);
 CREATE INDEX arc_asset_id_idx ON arc USING btree (asset_id);
 
@@ -1291,11 +1281,9 @@ CREATE TABLE connec (
 	district_id int4 NULL,
 	postcode varchar(16) NULL,
 	streetaxis_id varchar(16) NULL,
-	streetname varchar(100) NULL,
 	postnumber int4 NULL,
 	postcomplement varchar(100) NULL,
 	streetaxis2_id varchar(16) NULL,
-	streetname2 varchar(100) NULL,
 	postnumber2 int4 NULL,
 	postcomplement2 varchar(100) NULL,
 	block_code text NULL,
@@ -1362,8 +1350,6 @@ CREATE INDEX connec_muni ON connec USING btree (muni_id);
 CREATE INDEX connec_sector ON connec USING btree (sector_id);
 CREATE INDEX connec_street1 ON connec USING btree (streetaxis_id);
 CREATE INDEX connec_street2 ON connec USING btree (streetaxis2_id);
-CREATE INDEX connec_streetname ON connec USING btree (streetname);
-CREATE INDEX connec_streetname2 ON connec USING btree (streetname2);
 CREATE INDEX connec_sys_code_idx ON connec USING btree (sys_code);
 CREATE INDEX connec_asset_id_idx ON connec USING btree (asset_id);
 
@@ -1481,11 +1467,9 @@ CREATE TABLE gully (
 	district_id int4 NULL,
 	postcode varchar(16) NULL,
 	streetaxis_id varchar(16) NULL,
-	streetname varchar(100) NULL,
 	postnumber int4 NULL,
 	postcomplement varchar(100) NULL,
 	streetaxis2_id varchar(16) NULL,
-	streetname2 varchar(100) NULL,
 	postnumber2 int4 NULL,
 	postcomplement2 varchar(100) NULL,
 	workcat_id varchar(255) NULL,

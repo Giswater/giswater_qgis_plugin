@@ -37,8 +37,6 @@ v_featurecat text;
 v_new_epatable text;
 v_old_epatable text;
 v_new_epatype text;
-v_streetaxis text;
-v_streetaxis2 text;
 v_sys_type text;
 v_force_delete boolean;
 v_feature_class text;
@@ -120,16 +118,6 @@ BEGIN
 		-- man2inp_values
 		SELECT child_layer, feature_class INTO v_man_view, v_feature_class FROM cat_feature f JOIN cat_node c ON c.node_type = f.id WHERE c.id = NEW.nodecat_id;
 		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
-
-		-- check if streetname exists
-		IF NEW.streetname IS NOT NULL AND ((NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis))) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3246", "function":"1320","parameters":null}}$$);';
-		END IF;
-
-		-- transforming streetaxis name into id
-		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
-		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
 	END IF;
 
 	-- Control insertions ID
@@ -429,9 +417,9 @@ BEGIN
 		END IF;
 
 		--Address
-		IF (v_streetaxis IS NULL) THEN
+		IF (NEW.streetaxis_id IS NULL) THEN
 			IF (v_auto_streetvalues_status is true) THEN
-				v_streetaxis := (select v_ext_streetaxis.id from v_ext_streetaxis
+				NEW.streetaxis_id := (select v_ext_streetaxis.id from v_ext_streetaxis
 								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
 								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
 			END IF;
@@ -535,14 +523,14 @@ BEGIN
 		soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id,streetaxis_id,
 		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified,label_x,label_y,label_rotation,
 		expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility, updated_at, updated_by, asset_id,
-		om_state, conserv_state, access_type, placement_type, expl_visibility, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2, pavcat_id, lock_level, is_scadamap)
+		om_state, conserv_state, access_type, placement_type, expl_visibility, brand_id, model_id, serial_number, label_quadrant, pavcat_id, lock_level, is_scadamap)
 		VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW.custom_top_elev, NEW.datasource, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 		NEW.comment,NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,
-		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, v_streetaxis, v_streetaxis2, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id,
+		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.streetaxis_id, NEW.streetaxis2_id, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified,NEW.label_x,NEW.label_y,NEW.label_rotation,
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere,NEW.num_value,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id,
-		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.streetname, NEW.streetname2, NEW.pavcat_id, NEW.lock_level, NEW.is_scadamap);
+		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.pavcat_id, NEW.lock_level, NEW.is_scadamap);
 
 
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
@@ -950,13 +938,13 @@ BEGIN
 		SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev, datasource=NEW.datasource, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, arc_id=NEW.arc_id, parent_id=NEW.parent_id,
 		state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, presszone_id=NEW.presszone_id, soilcat_id=NEW.soilcat_id,
 		function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,
-		workcat_id_plan=NEW.workcat_id_plan,builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,
-		postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, streetaxis2_id=v_streetaxis2,postcode=NEW.postcode,district_id=NEW.district_id,postnumber=NEW.postnumber,
+		workcat_id_plan=NEW.workcat_id_plan,builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,
+		postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode,district_id=NEW.district_id,postnumber=NEW.postnumber,
 		postnumber2=NEW.postnumber2, descript=NEW.descript, verified=NEW.verified, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation,
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link, updated_at=now(), updated_by=current_user,
 		adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility, asset_id=NEW.asset_id,
 		om_state=NEW.om_state, conserv_state=NEW.conserv_state, access_type=NEW.access_type, placement_type=NEW.placement_type, expl_visibility=NEW.expl_visibility,
-		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, streetname = NEW.streetname, streetname2 = NEW.streetname2, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
+		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
 		WHERE node_id = OLD.node_id;
 
 

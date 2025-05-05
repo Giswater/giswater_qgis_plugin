@@ -971,7 +971,7 @@ BEGIN
 
 				WHEN 'inventory' THEN
 					field_value = v_catfeature.inventory_vdefault;
-					
+
 				WHEN 'publish' THEN
 					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_publish_sysvdefault') IS TRUE THEN
 						field_value = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_publish_sysvdefault');
@@ -982,7 +982,7 @@ BEGIN
 						field_value = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_uncertain_sysvdefault');
 					END IF;
 
-				WHEN 'streetname' THEN
+				WHEN 'streetaxis_id' THEN
 					IF (v_auto_streetvalues_status is true) then
 						field_value = v_streetname;
 					END IF;
@@ -1051,7 +1051,13 @@ BEGIN
 
 
 			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
-				field_value := (v_values_array->>(aux_json->>'columnname'));
+
+				CASE (aux_json->>'columnname')
+				WHEN 'streetaxis_id' THEN
+					SELECT descript INTO field_value FROM v_ext_streetaxis WHERE id = (v_values_array->>(aux_json->>'columnname'));
+				ELSE
+					field_value := (v_values_array->>(aux_json->>'columnname'));
+				END CASE;
 			END IF;
 
 			-- setting values

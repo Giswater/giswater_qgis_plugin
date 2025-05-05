@@ -146,21 +146,21 @@ BEGIN
 						"data":{"message":"3096", "function":"2816","parameters":null}}$$);
 					END IF;
 
-					--query text HAS SAME id THAN idval (with the exception of streetname and streename2)
-					IF NEW.dv_querytext IS NOT NULL THEN
+					-- --query text HAS SAME id THAN idval (with the exception of streetname and streename2)
+					-- IF NEW.dv_querytext IS NOT NULL THEN
 
-						IF NEW.columnname = 'streetname' OR NEW.columnname = 'streetname2' THEN
-							-- do nothing (with the exception of streetname and streename2
-						ELSE
-							EXECUTE 'SELECT count(*) FROM( ' ||NEW.dv_querytext|| ')a WHERE id::text != idval::text' INTO v_count;
+					-- 	IF NEW.columnname = 'streetname' OR NEW.columnname = 'streetname2' THEN
+					-- 		-- do nothing (with the exception of streetname and streename2
+					-- 	ELSE
+					-- 		EXECUTE 'SELECT count(*) FROM( ' ||NEW.dv_querytext|| ')a WHERE id::text != idval::text' INTO v_count;
 
-							IF v_count > 0 THEN
-								v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3100",
-								"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');
-								PERFORM gw_fct_getmessage(v_message);
-							END IF;
-						END IF;
-					END IF;
+					-- 		IF v_count > 0 THEN
+					-- 			v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3100",
+					-- 			"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');
+					-- 			PERFORM gw_fct_getmessage(v_message);
+					-- 		END IF;
+					-- 	END IF;
+					-- END IF;
 				END IF;
 
 			ELSIF TG_OP = 'UPDATE' THEN

@@ -35,8 +35,6 @@ v_featurecat text;
 v_psector_vdefault integer;
 v_arc_id text;
 v_auto_pol_id text;
-v_streetaxis text;
-v_streetaxis2 text;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_message text;
@@ -93,16 +91,6 @@ BEGIN
 			    = 'plan_psector_current'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-
-		-- check if streetname exists
-		IF NEW.streetname IS NOT NULL AND ((NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis))) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3246", "function":"1304","parameters":null}}$$);';
-		END IF;
-
-        -- transforming streetaxis name into id
-		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
-		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
 
 		-- check arc exploitation
 		IF NEW.arc_id IS NOT NULL AND NEW.expl_id IS NOT NULL THEN
@@ -387,9 +375,9 @@ BEGIN
 		END IF;
 
 		--Address
-		IF (v_streetaxis IS NULL) THEN
+		IF (NEW.streetaxis_id IS NULL) THEN
 			IF (v_auto_streetvalues_status is true) THEN
-				v_streetaxis := (select v_ext_streetaxis.id from v_ext_streetaxis
+				NEW.streetaxis_id := (select v_ext_streetaxis.id from v_ext_streetaxis
 								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
 								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
 			END IF;
@@ -532,15 +520,15 @@ BEGIN
 		muni_id, streetaxis2_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, pjoint_id, pjoint_type,
 		adate, adescript, accessibility, updated_at, updated_by, asset_id, epa_type, om_state, conserv_state, priority,
-		access_type, placement_type, crmzone_id, expl_visibility, plot_code, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2, n_inhabitants, lock_level, block_zone)
+		access_type, placement_type, crmzone_id, expl_visibility, plot_code, brand_id, model_id, serial_number, label_quadrant, n_inhabitants, lock_level, block_zone)
 		VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.datasource, NEW.top_elev, NEW.depth, NEW.conneccat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan,
-		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis2, NEW.postcode, NEW.district_id, NEW.postcomplement,
+		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.muni_id, NEW.streetaxis2_id, NEW.postcode, NEW.district_id, NEW.postcomplement,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory,
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
 		NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_visibility, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
-		NEW.label_quadrant, NEW.streetname, NEW.streetname2, NEW.n_inhabitants, NEW.lock_level, NEW.block_zone);
+		NEW.label_quadrant, NEW.n_inhabitants, NEW.lock_level, NEW.block_zone);
 
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
 		JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.conneccat_id;
@@ -877,8 +865,8 @@ BEGIN
 			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, datasource=NEW.datasource, "depth"=NEW.depth, conneccat_id=NEW.conneccat_id, sector_id=NEW.sector_id,
 			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszone_id=NEW.presszone_id,
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
-			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=v_streetaxis2,
-			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, postcode=NEW.postcode,
+			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=NEW.streetaxis2_id,
+			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode,
 			district_id =NEW.district_id, descript=NEW.descript, verified=NEW.verified, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
 			label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish,
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, updated_at=now(), updated_by=current_user,
@@ -886,7 +874,7 @@ BEGIN
 			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
 			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority, access_type = NEW.access_type, placement_type = NEW.placement_type,
 			crmzone_id=NEW.crmzone_id, expl_visibility=NEW.expl_visibility, plot_code=NEW.plot_code, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
-			label_quadrant=NEW.label_quadrant, streetname = NEW.streetname, streetname2 = NEW.streetname2, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_zone=NEW.block_zone
+			label_quadrant=NEW.label_quadrant, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_zone=NEW.block_zone
 			WHERE connec_id=OLD.connec_id;
 
 		IF v_man_table ='man_greentap' THEN
