@@ -1391,3 +1391,127 @@ AS WITH typevalue AS (
     serial_number,
     hemisphere
    FROM node_base;
+
+CREATE OR REPLACE VIEW v_edit_link AS
+WITH typevalue AS
+  (
+    SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
+    FROM edit_typevalue
+    WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+  ), sector_table AS
+  (
+    SELECT sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
+    FROM sector
+    LEFT JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
+  ), dma_table AS
+  (
+    SELECT dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type
+    FROM dma
+    LEFT JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
+  ), drainzone_table AS
+  (
+    SELECT drainzone_id, name as drainzone_name, stylesheet, id::varchar(16) as drainzone_type
+    FROM drainzone
+    LEFT JOIN typevalue t ON t.id::text = drainzone.drainzone_type AND t.typevalue::text = 'drainzone_type'::text
+  ), inp_network_mode AS
+  (
+    SELECT value
+    FROM config_param_user
+    WHERE parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+  ), link_psector AS
+  (
+    (
+      SELECT DISTINCT ON (pp.connec_id, pp.state) 'CONNEC' AS feature_type, pp.connec_id AS feature_id, pp.state AS p_state, pp.psector_id, pp.link_id
+      FROM plan_psector_x_connec pp
+      JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+      ORDER BY pp.connec_id, pp.state, pp.link_id DESC NULLS LAST
+    )
+		UNION ALL
+    (
+      SELECT DISTINCT ON (pp.gully_id, pp.state) 'GULLY' AS feature_type, pp.gully_id AS feature_id, pp.state AS p_state, pp.psector_id, pp.link_id
+      FROM plan_psector_x_gully pp
+      JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+      ORDER BY pp.gully_id, pp.state, pp.link_id DESC NULLS LAST
+    )
+  ), link_selector AS
+  (
+    SELECT l.link_id
+    FROM link l
+    JOIN selector_state s ON s.cur_user =current_user AND l.state = s.state_id
+    LEFT JOIN (SELECT link_id FROM link_psector WHERE p_state = 0) a USING (link_id)
+    WHERE a.link_id IS NULL
+    AND EXISTS (
+        SELECT 1
+        FROM selector_expl se
+        WHERE se.cur_user = CURRENT_USER
+        AND se.expl_id = l.expl_id
+    )
+    AND EXISTS (
+        SELECT 1
+        FROM selector_sector sc
+        WHERE sc.cur_user = CURRENT_USER
+        AND sc.sector_id = l.sector_id
+    )
+    AND EXISTS (
+        SELECT 1
+        FROM selector_municipality sm
+        WHERE sm.cur_user = CURRENT_USER
+        AND sm.muni_id = l.muni_id
+    )
+    UNION ALL
+    SELECT link_id
+    FROM link_psector
+    WHERE p_state = 1
+  ), link_selected AS
+  (
+    SELECT DISTINCT ON (l.link_id) l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    macroexpl_id,
+    l.sector_id,
+    sector_type,
+    macrosector_id,
+    l.muni_id,
+    l.drainzone_id,
+    drainzone_type,
+    l.dma_id,
+    macrodma_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.the_geom,
+    sector_name,
+    dma_name,
+    l.expl_id2,
+    l.epa_type,
+    l.is_operative,
+    l.connecat_id,
+    l.workcat_id,
+    l.workcat_id_end,
+    l.builtdate,
+    l.enddate,
+    date_trunc('second'::text, l.lastupdate) AS lastupdate,
+    l.lastupdate_user,
+    l.uncertain
+    FROM link_selector
+    JOIN link l USING (link_id)
+    JOIN exploitation ON l.expl_id = exploitation.expl_id
+    JOIN ext_municipality mu ON l.muni_id = mu.muni_id
+    JOIN sector_table ON l.sector_id = sector_table.sector_id
+    LEFT JOIN dma_table ON l.dma_id = dma_table.dma_id
+    LEFT JOIN drainzone_table ON l.dma_id = drainzone_table.drainzone_id
+    LEFT JOIN inp_network_mode ON true
+  )
+  SELECT link_selected.*
+  FROM link_selected;
+
+DROP VIEW IF EXISTS v_edit_link_connec;
+CREATE OR REPLACE VIEW v_edit_link_connec AS SELECT * FROM v_edit_link WHERE feature_type = 'CONNEC';
+
+DROP VIEW IF EXISTS v_edit_link_gully;
+CREATE OR REPLACE VIEW v_edit_link_gully AS SELECT * FROM v_edit_link WHERE feature_type = 'GULLY';
