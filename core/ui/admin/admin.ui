@@ -486,7 +486,7 @@
                  <item row="3" column="2">
                   <widget class="QPushButton" name="btn_reload_audit_triggers">
                    <property name="text">
-                    <string>Reload audit triggers</string>
+                    <string>Refresh audit</string>
                    </property>
                   </widget>
                  </item>
