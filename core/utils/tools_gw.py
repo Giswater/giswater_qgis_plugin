@@ -1400,7 +1400,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                         widget.setProperty('ismandatory', field['isMandatory'])
                     else:
                         widget.setProperty('ismandatory', False)
-                    if 'value' in field:
+                    if field.get('value') is not None:
                         widget.setText(field['value'])
                         widget.setProperty('value', field['value'])
                     widgetcontrols = field.get('widgetcontrols')
@@ -1423,10 +1423,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
-                    if field['value'] is not None and field['value'].lower() == "true":
-                        widget.setChecked(True)
-                    else:
-                        widget.setChecked(False)
+                    if field.get('value') is not None:
+                        widget.setChecked(tools_os.set_boolean(field['value']))
+                        widget.setProperty('value', field['value'])
                     widget.stateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
@@ -1437,8 +1436,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if lib_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
                         widget.setDisplayFormat(lib_vars.date_format)
                     widget.clear()  # Set date to NULL initially
-                    if field.get('value') not in ('', None, 'null'):
+                    if field.get('value') is not None:
                         date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+                        widget.setProperty('value', field['value'].replace('/', '-'))
                         widget.setDate(date)
                     widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -1452,9 +1452,10 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                         maximumNumber = widgetcontrols.get('maximumNumber')
                         if maximumNumber is not None:
                             widget.setMaximum(maximumNumber)
-                    if field.get('value') not in (None, ""):
+                    if field.get('value') is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
+                        widget.setProperty('value', field['value'])
                     widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'button':
