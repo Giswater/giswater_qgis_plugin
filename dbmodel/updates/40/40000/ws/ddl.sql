@@ -1895,6 +1895,8 @@ ALTER TABLE sector DROP CONSTRAINT sector_macrosector_id_fkey;
 -- Drop restrictions from table macrosector
 ALTER TABLE _macrosector DROP CONSTRAINT macrosector_pkey;
 
+ALTER SEQUENCE macrosector_macrosector_id_seq RENAME TO macrosector_macrosector_id_seq1;
+
 -- Drop rules from table macrosector
 DROP RULE IF EXISTS macrosector_del_undefined ON _macrosector;
 DROP RULE IF EXISTS macrosector_undefined ON _macrosector;
@@ -1935,6 +1937,8 @@ ALTER TABLE _macrodma DROP CONSTRAINT macrodma_expl_id_fkey;
 -- Drop restrictions from table macrodma
 ALTER TABLE _macrodma DROP CONSTRAINT macrodma_pkey;
 
+ALTER SEQUENCE macrodma_macrodma_id_seq RENAME TO macrodma_macrodma_id_seq1;
+
 -- Drop rules from table macrodma
 DROP RULE IF EXISTS macrodma_del_undefined ON _macrodma;
 DROP RULE IF EXISTS macrodma_undefined ON _macrodma;
@@ -1974,6 +1978,8 @@ ALTER TABLE _macrodqa DROP CONSTRAINT macrodqa_expl_id_fkey;
 
 -- Drop restrictions from table macrodqa
 ALTER TABLE _macrodqa DROP CONSTRAINT macrodqa_pkey;
+
+ALTER SEQUENCE macrodqa_macrodqa_id_seq RENAME TO macrodqa_macrodqa_id_seq1;
 
 -- Drop rules from table macrodqa
 DROP RULE IF EXISTS macrodqa_del_undefined ON _macrodqa;

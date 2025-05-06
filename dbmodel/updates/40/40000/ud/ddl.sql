@@ -556,7 +556,7 @@ CREATE TABLE dwfzone (
 	link text NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
-	lock_level bool NULL,
+	lock_level int4 NULL,
 	active bool DEFAULT true NULL,
 	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	created_at timestamp DEFAULT now() NULL,
@@ -1712,7 +1712,7 @@ CREATE TABLE link (
 	omzone_id int4 DEFAULT 0 NULL,
 	macrominsector_id int4 DEFAULT 0 NULL,
 	fluid_type varchar(50) NULL,
-	location_type varchar(50) NULL,	
+	location_type varchar(50) NULL,
 	custom_length numeric(12, 2) NULL,
 	sys_slope numeric (12,3),
 	annotation text NULL,
@@ -1899,6 +1899,8 @@ ALTER TABLE macrosector RENAME TO _macrosector;
 ALTER TABLE sector DROP CONSTRAINT IF EXISTS sector_macrosector_id_fkey;
 ALTER TABLE _macrosector DROP CONSTRAINT macrosector_pkey;
 
+ALTER SEQUENCE macrosector_macrosector_id_seq RENAME TO macrosector_macrosector_id_seq1;
+
 DROP INDEX IF EXISTS macrosector_index;
 
 CREATE TABLE macrosector (
@@ -1964,6 +1966,8 @@ ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_drainzone_id_fkey;
 ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_drainzone_id_fkey;
 ALTER TABLE _drainzone DROP CONSTRAINT drainzone_pkey;
 
+ALTER SEQUENCE drainzone_drainzone_id_seq RENAME TO drainzone_drainzone_id_seq1;
+
 DROP INDEX IF EXISTS drainzone_index;
 
 CREATE TABLE drainzone (
@@ -2007,6 +2011,8 @@ ALTER TABLE link DROP CONSTRAINT IF EXISTS link_sector_id_fkey;
 ALTER TABLE _config_user_x_sector DROP CONSTRAINT IF EXISTS config_user_x_sector_sector_id_fkey;
 
 ALTER TABLE _sector DROP CONSTRAINT sector_pkey;
+
+ALTER SEQUENCE sector_sector_id_seq RENAME TO sector_sector_id_seq1;
 
 DROP INDEX IF EXISTS sector_index;
 
