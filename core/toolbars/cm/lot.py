@@ -287,8 +287,8 @@ class AddNewLot:
         selected_list = qtable.selectionModel().selectedRows()
 
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
 
         index = selected_list[0]
@@ -340,7 +340,7 @@ class AddNewLot:
         team_active = tools_qt.get_combo_value(self.dlg_create_team, self.dlg_create_team.cmb_active, 1)
 
         if team_name is None:
-            msg = f"El parametre 'Nom equip' es obligatori."
+            msg = "The parameter 'team name' is mandatory."
             tools_qgis.show_message(msg, 0)
             return
 
@@ -349,7 +349,7 @@ class AddNewLot:
         if rows:
             for row in rows:
                 if team_name == row[0]:
-                    msg = f"Aquest 'Nom equip' ja existeix."
+                    msg = "This 'team name' already exists."
                     tools_qgis.show_message(msg, 0)
                     return
 
@@ -563,10 +563,10 @@ class AddNewLot:
         feature_type = tools_qt.get_combo_value(None, self.dlg_lot.cmb_visit_class, 2).lower()
 
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
-        message = "Are you sure you want to delete these records? \n"
+        
         msg_records = ""
         id_list = "(  "
         for x in range(0, len(selected_list)):
@@ -581,7 +581,9 @@ class AddNewLot:
             id_list += "'" + feature_id + "', "
             msg_records += "visit_id: "+str(visit_id)+";\n"
         id_list = id_list[:-2] + ")"
-        answer = tools_qt.show_question(message, "Delete records", msg_records)
+        msg = "Are you sure you want to delete these records? \n"
+        title = "Delete records"
+        answer = tools_qt.show_question(msg, title, msg_records)
         if answer:
             sql = ("DELETE FROM om_visit_x_"+str(feature_type)+" "
                    " WHERE visit_id = '"+str(visit_id)+"' "
@@ -598,8 +600,8 @@ class AddNewLot:
         selected_list = qtable.selectionModel().selectedRows()
 
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
 
         index = selected_list[0]
@@ -969,8 +971,8 @@ class AddNewLot:
         index_list = qtable.selectionModel().selectedRows()
 
         if len(index_list) == 0:
-            message = "Any record selected"
-            tools_qt.show_info_box(message)
+            msg = "Any record selected"
+            tools_qt.show_info_box(msg)
             return
         index = index_list[0]
         model = qtable.model()
@@ -1067,8 +1069,8 @@ class AddNewLot:
         date_from = visit_start.toString('yyyyMMdd 00:00:00')
         date_to = visit_end.toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
-            message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            msg = "Selected date interval is not valid"
+            tools_qgis.show_warning(msg)
             return
 
         visit_class_id = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
@@ -1418,7 +1420,8 @@ class AddNewLot:
 
         selected_list = qtable.selectionModel().selectedRows()
         if not selected_list:
-            tools_qgis.show_warning("No record selected")
+            msg = "No record selected"
+            tools_qgis.show_warning(msg)
             return
 
         index = selected_list[0]
@@ -1686,8 +1689,8 @@ class AddNewLot:
         visit_start = self.dlg_work_register.date_event_from.date()
         visit_end = self.dlg_work_register.date_event_to.date()
         if visit_start > visit_end:
-            message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            msg = "Selected date interval is not valid"
+            tools_qgis.show_warning(msg)
             return
 
         # Create interval dates
@@ -1932,8 +1935,8 @@ class AddNewLot:
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        message = "El fitxer csv ha estat exportat correctament"
-        tools_qgis.show_info(message)
+        msg = "El fitxer csv ha estat exportat correctament"
+        tools_qgis.show_info(msg)
 
 
     def populate_combo_filters(self, combo, table_name, fields="id, idval"):
@@ -1954,15 +1957,16 @@ class AddNewLot:
 
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
         elif len(selected_list) > 1:
-            message = "Please, select only one row"
-            tools_qgis.show_warning(message)
+            msg = "Please, select only one row"
+            tools_qgis.show_warning(msg)
             return
-        message = "Are you sure you want to delete this lot?"
-        answer = tools_qt.show_question(message, "Delete lots")
+        msg = "Are you sure you want to delete this lot?"
+        title = "Delete lots"
+        answer = tools_qt.show_question(msg, title)
         if answer:
             result = selected_list[0].row()
 
@@ -1974,8 +1978,9 @@ class AddNewLot:
             rows = tools_db.get_rows(sql)
 
             if rows not in ("[]", None):
-                message = "This lot has associated visits and will be deleted. Do you want to continue?"
-                answer = tools_qt.show_question(message, "Delete lots")
+                msg = "This lot has associated visits and will be deleted. Do you want to continue?"
+                title = "Delete lots"
+                answer = tools_qt.show_question(msg, title)
                 if not answer:
                     return
 
@@ -1996,8 +2001,8 @@ class AddNewLot:
 
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
 
         row = selected_list[0].row()
@@ -2032,8 +2037,8 @@ class AddNewLot:
         visit_end = self.dlg_lot_man.date_event_to.date()
 
         if visit_start > visit_end:
-            message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            msg = "Selected date interval is not valid"
+            tools_qgis.show_warning(msg)
             return
 
         # Create interval dates
@@ -2122,13 +2127,13 @@ class AddNewLot:
         selected_list = qtable.selectionModel().selectedRows(0)
 
         if selected_list == 0 or str(selected_list) == '[]':
-            message = "Any load selected"
-            tools_qt.show_info_box(message)
+            msg = "Any load selected"
+            tools_qt.show_info_box(msg)
             return
 
         elif len(selected_list) > 1:
-            message = "More then one event selected. Select just one"
-            tools_qgis.show_warning(message)
+            msg = "More then one event selected. Select just one"
+            tools_qgis.show_warning(msg)
             return
 
         # Get path of selected image
@@ -2151,8 +2156,8 @@ class AddNewLot:
         else:
             # If its not URL ,check if file exist
             if not os.path.exists(path):
-                message = "File not found"
-                tools_qgis.show_warning(message, parameter=path)
+                msg = "File not found"
+                tools_qgis.show_warning(msg, parameter=path)
             else:
                 # Open the image
                 os.startfile(path)
@@ -2448,8 +2453,8 @@ class AddNewLot:
         selected_list = qtable_left.selectionModel().selectedRows()
 
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
         id_list = []
         for i in range(0, len(selected_list)):
@@ -2465,8 +2470,8 @@ class AddNewLot:
 
             if row:
                 # if exist - show warning
-                message = "Id already selected"
-                tools_qt.show_info_box(message, "Info", parameter=str(id_list[i]))
+                msg = "Id already selected"
+                tools_qt.show_info_box(msg, "Info", parameter=str(id_list[i]))
             else:
                 sql = ("INSERT INTO " + self.schemaname + "." + tablename_des + " (" + field_id + ", team) "
                        " VALUES ('" + str(id_list[i]) + "', '" + filter_team + "')")
@@ -2481,8 +2486,8 @@ class AddNewLot:
 
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
         expl_id = []
         for i in range(0, len(selected_list)):
@@ -2504,8 +2509,10 @@ class AddNewLot:
 
         # Get team selected
         filter_team = tools_qt.get_text(self.dlg_resources_man, "cmb_team")
-        message = "You are trying delete team '" + str(filter_team) + "'. Do you want continue?"
-        answer =  tools_qt.show_question(message, "Delete team")
+        msg = "You are trying delete team '{0}'. Do you want continue?"
+        msg_params = (str(filter_team),)
+        title = "Delete team"
+        answer =  tools_qt.show_question(msg, title, msg_params=msg_params)
         if answer:
             sql = ("SELECT * FROM om_vehicle_x_parameters JOIN cat_team ON cat_team.team_id = om_vehicle_x_parameters.team_id WHERE cat_team.name = '" + str(filter_team) + "'")
             rows = tools_db.get_rows(sql, log_sql=True)
@@ -2528,8 +2535,8 @@ class AddNewLot:
 
         # Get vehicle selected
         filter_vehicle = tools_qt.get_text(self.dlg_resources_man, "cmb_vehicle")
-        message = "You are trying delete vehicle '" + str(filter_vehicle) + "'. Do you want continue?"
-        answer = tools_qt.show_question(message, "Delete vehicle")
+        msg = "You are trying delete vehicle '" + str(filter_vehicle) + "'. Do you want continue?"
+        answer = tools_qt.show_question(msg, "Delete vehicle")
         if answer:
             sql = ("DELETE FROM ext_cat_vehicle WHERE idval = '" + str(filter_vehicle) + "'")
             tools_db.execute_sql(sql)

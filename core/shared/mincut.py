@@ -1188,8 +1188,8 @@ class GwMincut:
                     connec_id = feature.attribute("connec_id")
                     # Add element
                     if connec_id in self.list_ids['connec']:
-                        message = "Feature already in the list"
-                        tools_qt.show_info_box(message, parameter=connec_id)
+                        msg = "Feature already in the list"
+                        tools_qt.show_info_box(msg, parameter=connec_id)
                         return
                     else:
                         self.list_ids['connec'].append(connec_id)
@@ -1341,14 +1341,14 @@ class GwMincut:
         # Check if user entered hydrometer_id
         hydrometer_cc = tools_qt.get_text(self.dlg_hydro, self.dlg_hydro.hydrometer_cc)
         if hydrometer_cc == "null":
-            message = "You need to enter hydrometer_id"
-            tools_qt.show_info_box(message)
+            msg = "You need to enter hydrometer_id"
+            tools_qt.show_info_box(msg)
             return
 
         # Show message if element is already in the list
         if hydrometer_cc in self.hydro_list:
-            message = "Selected element already in the list"
-            tools_qt.show_info_box(message, parameter=hydrometer_cc)
+            msg = "Selected element already in the list"
+            tools_qt.show_info_box(msg, parameter=hydrometer_cc)
             return
 
         # Check if hydrometer_id belongs to any 'connec_id'
@@ -1356,13 +1356,13 @@ class GwMincut:
                f" WHERE {self.col2} = '{hydrometer_cc}'")
         row = tools_db.get_row(sql)
         if not row:
-            message = "Selected hydrometer_id not found"
-            tools_qt.show_info_box(message, parameter=hydrometer_cc)
+            msg = "Selected hydrometer_id not found"
+            tools_qt.show_info_box(msg, parameter=hydrometer_cc)
             return
 
         if row[0] in self.hydro_list:
-            message = "Selected element already in the list"
-            tools_qt.show_info_box(message, parameter=hydrometer_cc)
+            msg = "Selected element already in the list"
+            tools_qt.show_info_box(msg, parameter=hydrometer_cc)
             return
 
         # Set expression filter with 'hydro_list'
@@ -1489,8 +1489,8 @@ class GwMincut:
         # Get 'connec_id' from selected 'customer_code'
         customer_code = tools_qt.get_text(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
-            message = "You need to enter a customer code"
-            tools_qt.show_info_box(message)
+            msg = "You need to enter a customer code"
+            tools_qt.show_info_box(msg)
             return
 
         connec_id = self._get_connec_id_from_customer_code(customer_code)
@@ -1510,8 +1510,8 @@ class GwMincut:
 
         # Show message if element is already in the list
         if connec_id in self.list_ids['connec']:
-            message = "Selected element already in the list"
-            tools_qt.show_info_box(message, parameter=connec_id)
+            msg = "Selected element already in the list"
+            tools_qt.show_info_box(msg, parameter=connec_id)
             return
 
         # If feature id doesn't exist in list -> add
@@ -1551,8 +1551,8 @@ class GwMincut:
                f" WHERE {self.col1} = '{customer_code}'")
         row = tools_db.get_row(sql)
         if not row:
-            message = "Any connec_id found with this customer_code"
-            tools_qt.show_info_box(message, parameter=customer_code)
+            msg = "Any connec_id found with this customer_code"
+            tools_qt.show_info_box(msg, parameter=customer_code)
             return None
         else:
             return str(row[0])
@@ -1596,9 +1596,9 @@ class GwMincut:
             customer_code = widget.model().record(row).value(f"{self.col1}")
             inf_text += str(customer_code) + ", "
         inf_text = inf_text[:-2]
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
         if not answer:
             return
 
@@ -1646,9 +1646,9 @@ class GwMincut:
             inf_text += str(id_feature) + ", "
             del_id.append(hydro_id)
         inf_text = inf_text[:-2]
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
         if not answer:
             return
 
@@ -1955,15 +1955,15 @@ class GwMincut:
             real_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
             mincutOverlap = complet_result.get('mincutOverlap')
             if mincutOverlap not in (None, ""):
-                message = "Mincut done, but has conflict and overlaps with"
-                tools_qt.show_info_box(message, parameter=mincutOverlap)
+                msg = "Mincut done, but has conflict and overlaps with"
+                tools_qt.show_info_box(msg, parameter=mincutOverlap)
             else:
-                message = complet_result.get('message')
+                msg = complet_result.get('message')
                 if not message:
-                    message = "Mincut done successfully"
-                    tools_qgis.show_message(message, 3)
+                    msg = "Mincut done successfully"
+                    tools_qgis.show_message(msg, 3)
                 else:
-                    tools_qgis.show_message(message.get('text'), message.get('level'))
+                    tools_qgis.show_message(msg.get('text'), msg.get('level'))
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data'].get('geometry')
@@ -2080,15 +2080,15 @@ class GwMincut:
             complet_result = signal[1]
             mincutOverlap = complet_result.get('mincutOverlap')
             if mincutOverlap not in (None, ""):
-                message = "Mincut done, but has conflict and overlaps with"
-                tools_qt.show_info_box(message, parameter=mincutOverlap)
+                msg = "Mincut done, but has conflict and overlaps with"
+                tools_qt.show_info_box(msg, parameter=mincutOverlap)
             else:
-                message = complet_result.get('message')
-                if not message:
-                    message = "Mincut done successfully"
-                    tools_qgis.show_message(message, 3)
+                msg = complet_result.get('message')
+                if not msg:
+                    msg = "Mincut done successfully"
+                    tools_qgis.show_message(msg, 3)
                 else:
-                    tools_qgis.show_message(message.get('text'), message.get('level'))
+                    tools_qgis.show_message(msg.get('text'), msg.get('level'))
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data'].get('geometry')
@@ -2202,7 +2202,8 @@ class GwMincut:
 
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
-                tools_qgis.show_message(result['message']['text'], level)
+                msg = result['message']['text']
+                tools_qgis.show_message(msg, level)
 
         # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
@@ -2258,8 +2259,8 @@ class GwMincut:
         try:
             template_files = os.listdir(template_folder)
         except FileNotFoundError:
-            message = "Your composer's path is bad configured. Please, modify it and try again."
-            tools_qgis.show_message(message, 1)
+            msg = "Your composer's path is bad configured. Please, modify it and try again."
+            tools_qgis.show_message(msg, 1)
             return
 
         # Set dialog add_connec
@@ -2525,7 +2526,8 @@ class GwMincut:
             result = tools_gw.execute_procedure('gw_fct_setchangevalvestatus', body)
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
-                tools_qgis.show_message(result['message']['text'], level)
+                msg = result['message']['text']
+                tools_qgis.show_message(msg, level)
 
     def _calculate_elapsed_time(self, dialog):
 

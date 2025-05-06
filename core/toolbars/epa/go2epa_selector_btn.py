@@ -88,8 +88,8 @@ def accept(**kwargs):
     tools_qgis.force_refresh_map_canvas()
 
     # Show message to user
-    message = "Values has been updated"
-    tools_qgis.show_info(message)
+    msg = "Values has been updated"
+    tools_qgis.show_info(msg)
     tools_gw.close_dialog(dialog)
 
 

@@ -155,7 +155,8 @@ class Campaign:
 
         response = tools_gw.execute_procedure("gw_fct_getcampaign", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
-            tools_qgis.show_warning("Failed to load campaign form.")
+            msg = "Failed to load campaign form."
+            tools_qgis.show_warning(msg)
             return
 
         form_fields = response["body"]["data"].get("fields", [])
@@ -660,7 +661,8 @@ class Campaign:
         # Date
         date_type = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_date_filter_type, 0)
         if not date_type:
-            tools_qgis.show_warning("Select a valid date column to filter.", dialog=self.dialog)
+            msg = "Select a valid date column to filter."
+            tools_qgis.show_warning(msg, dialog=self.dialog)
             return
 
         # Range of dates
@@ -698,17 +700,21 @@ class Campaign:
         """Delete the selected campaign"""
         selected = self.dialog.tbl_campaign.selectionModel().selectedRows()
         if not selected:
-            tools_qgis.show_warning("Select a campaign to delete.", dialog=self.dialog)
+            msg = "Select a campaign to delete."
+            tools_qgis.show_warning(msg, dialog=self.dialog)
             return
 
         index = selected[0]
         campaign_id = index.data()
         if not str(campaign_id).isdigit():
-            tools_qgis.show_warning("Invalid campaign ID.", dialog=self.dialog)
+            msg = "Invalid campaign ID."
+            tools_qgis.show_warning(msg, dialog=self.dialog)
             return
 
         # Confirm deletion
-        if not tools_qt.show_question(f"Are you sure you want to delete {len(selected)} campaign(s)?"):
+        msg = "Are you sure you want to delete {0} campaign(s)?"
+        msg_params = (len(selected),)
+        if not tools_qt.show_question(msg, msg_params=msg_params):
             return
 
         success = 0
@@ -720,7 +726,9 @@ class Campaign:
             if tools_db.execute_sql(sql):
                 success += 1
 
-        tools_qgis.show_info(f"{success} campaign(s) deleted.", dialog=self.dialog)
+        msg = "{0} campaign(s) deleted."
+        msg_params = (success,)
+        tools_qgis.show_info(msg, dialog=self.dialog, msg_params=msg_params)
         self.filter_campaigns()
 
 
@@ -740,5 +748,6 @@ class Campaign:
                 # Delay dialog creation to avoid access violation during double-click stack
                 QTimer.singleShot(0, lambda: self.load_campaign_dialog(campaign_id))
         except (ValueError, TypeError):
-            tools_qgis.show_warning("Invalid campaign ID.")
+            msg = "Invalid campaign ID."
+            tools_qgis.show_warning(msg)
 

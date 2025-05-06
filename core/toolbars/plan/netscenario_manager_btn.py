@@ -159,7 +159,8 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Ensure a row is selected
         if not selected_list:
-            tools_qgis.show_warning("Any record selected", dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get ID and active status of the first selected row
@@ -172,8 +173,8 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Check if the netscenario is active
         if not active:
-            tools_qgis.show_warning(
-                "Cannot set the current netscenario of an inactive scenario. Please activate it first.", dialog=dialog)
+            msg = "Cannot set the current netscenario of an inactive scenario. Please activate it first."
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Prepare JSON body for gw_fct_set_current
@@ -186,7 +187,8 @@ class GwNetscenarioManagerButton(GwAction):
             # Refresh the label with the latest netscenario data
             self._set_label_current_netscenario(dialog, result=result)
         else:
-            tools_qgis.show_warning("Failed to set netscenario", dialog=dialog)
+            msg = "Failed to set netscenario"
+            tools_qgis.show_warning(msg, dialog=dialog)
 
         # Re-open the dialog to reflect the changes
         tools_gw.open_dialog(dialog, dlg_name='netscenario_manager')
@@ -304,8 +306,8 @@ class GwNetscenarioManagerButton(GwAction):
         # Get selected row
         selected_list = self.tbl_netscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario_manager)
             return
 
         # Get selected netscenario id
@@ -322,8 +324,8 @@ class GwNetscenarioManagerButton(GwAction):
         """ Executes the current netscenario """
 
         if self.current_netscenario_id is None:
-            message = "No current netscenario"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            msg = "No current netscenario"
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario_manager)
             return
 
         # Execute toolbox function
@@ -338,16 +340,17 @@ class GwNetscenarioManagerButton(GwAction):
         # Get selected row
         selected_list = self.tbl_netscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario_manager)
             return
 
         # Get selected netscenario ids
         values = [index.sibling(index.row(), 0).data() for index in selected_list]
 
-        message = "CAUTION! Deleting a netscenario will delete data from features related to the netscenario.\n" \
-                  "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", values, force_action=True)
+        msg = ("CAUTION! Deleting a netscenario will delete data from features related to the netscenario.\n"
+                  "Are you sure you want to delete these records?")
+        title = "Delete records"
+        answer = tools_qt.show_question(msg, title, values, force_action=True)
         if answer:
             # Build WHERE IN clause for SQL
             where_clause = f"netscenario_id IN ({', '.join(map(str, values))})"
@@ -369,8 +372,8 @@ class GwNetscenarioManagerButton(GwAction):
         # Check if there are selected rows
         selected_list = self.tbl_netscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario_manager)
             return
 
         # Get selected netscenario_id
@@ -621,8 +624,8 @@ class GwNetscenarioManagerButton(GwAction):
 
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario_manager)
             return
 
         for index in selected_list:
@@ -659,8 +662,8 @@ class GwNetscenarioManagerButton(GwAction):
         view = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
+            messamsgge = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario)
             return
 
         # Get selected mapzone data
@@ -683,8 +686,8 @@ class GwNetscenarioManagerButton(GwAction):
         # Get selected row
         selected_list = self.tbl_netscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario_manager)
             return
 
         # Get selected netscenario id
@@ -741,7 +744,8 @@ class GwNetscenarioManagerButton(GwAction):
             # Refresh tableview
             self._fill_manager_table()
             return
-        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
+        msg = "Error"
+        tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)
 
     def _manage_add_layers(self):
         """ Opens menu to add/remove layers to ToC """
@@ -825,7 +829,8 @@ class GwNetscenarioManagerButton(GwAction):
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
                 msg = "Remove layer from project?"
-                answer = tools_qt.show_question(msg, title="Warning", parameter=f"'{layer.name()}'", force_action=True)
+                title = "Warning"
+                answer = tools_qt.show_question(msg, title, parameter=f"'{layer.name()}'", force_action=True)
                 if answer:
                     tools_qgis.remove_layer_from_toc(alias, "MASTERPLAN", "Netscenario")
 
@@ -841,9 +846,9 @@ class GwNetscenarioManagerButton(GwAction):
 
         feature_id = p_feature_id if p_feature_id is not None else self.dlg_netscenario.cmb_feature_id.lineEdit().text()
         if feature_id == '':
-            message = "Feature_id is mandatory."
+            msg = "Feature_id is mandatory."
             self.dlg_netscenario.cmb_feature_id.setStyleSheet("border: 1px solid red")
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario)
             return
         self.dlg_netscenario.cmb_feature_id.setStyleSheet(None)
         tableview = self.dlg_netscenario.main_tab.currentWidget()
@@ -853,9 +858,9 @@ class GwNetscenarioManagerButton(GwAction):
             sql = f"SELECT name, pattern_id, graphconfig, the_geom, active FROM dma WHERE dma_id = '{feature_id}';"
             row = tools_db.get_row(sql)
             if not row:
-                message = f"This dma doesn't exist"
+                msg = "This dma doesn't exist"
                 self.dlg_netscenario.cmb_feature_id.setStyleSheet("border: 1px solid red")
-                tools_qgis.show_warning(message, parameter=feature_id, dialog=self.dlg_netscenario)
+                tools_qgis.show_warning(msg, parameter=feature_id, dialog=self.dlg_netscenario)
                 return
             dma_name = row[0]
             pattern_id = row[1]
@@ -869,9 +874,9 @@ class GwNetscenarioManagerButton(GwAction):
             sql = f"SELECT name, head, graphconfig, the_geom, active FROM presszone WHERE presszone_id = '{feature_id}';"
             row = tools_db.get_row(sql)
             if not row:
-                message = f"This presszone doesn't exist"
+                msg = "This presszone doesn't exist"
                 self.dlg_netscenario.cmb_feature_id.setStyleSheet("border: 1px solid red")
-                tools_qgis.show_warning(message, parameter=feature_id, dialog=self.dlg_netscenario)
+                tools_qgis.show_warning(msg, parameter=feature_id, dialog=self.dlg_netscenario)
                 return
             presszone_name = row[0]
             head = row[1]
@@ -897,8 +902,8 @@ class GwNetscenarioManagerButton(GwAction):
         # Get selected row
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_netscenario)
             return
 
         # Get selected feature_id
@@ -916,8 +921,9 @@ class GwNetscenarioManagerButton(GwAction):
         for index in selected_list:
             values.append(index.sibling(index.row(), col_idx).data())
 
-        message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", values)
+        msg = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.show_question(msg, title, values)
         if answer:
             for value in values:
                 sql = f"DELETE FROM {view} WHERE netscenario_id = {self.selected_netscenario_id} AND {feature_type} = '{value}'"

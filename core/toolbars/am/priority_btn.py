@@ -700,39 +700,21 @@ class CalculatePriority:
             if not row["qtd"]:
                 continue
             if row["check"] == "invalid_arccat_ids" and self.config.method == "WM":
-                msg = (
-                    tools_qt.tr("Pipes with invalid arccat_ids: {qtd}.")
-                    + "\n"
-                    + tools_qt.tr("Invalid arccat_ids: {list}.")
-                    + "\n\n"
-                    + tools_qt.tr(
+                msg = ("Pipes with invalid arccat_ids: {0}.\nInvalid arccat_ids: {1}.\n\n"
                         "An arccat_id is considered invalid if it is not listed in the catalog configuration table. "
-                        "As a result, these pipes will NOT be assigned a priority value."
-                    )
-                    + "\n\n"
-                    + tools_qt.tr("Do you want to proceed?")
-                )
-                if not tools_qt.show_question(
-                    msg.format(qtd=row["qtd"], list=row["list"]), force_action=True
-                ):
+                        "As a result, these pipes will NOT be assigned a priority value.\n\n"
+                        "Do you want to proceed?")
+                msg_params = (row["qtd"], row["list"],)
+                if not tools_qt.show_question(msg, force_action=True, msg_params=msg_params):
                     return
             elif row["check"] == "invalid_diameters" and self.config.method == "SH":
-                msg = (
-                    tools_qt.tr("Pipes with invalid diameters: {qtd}.")
-                    + "\n"
-                    + tools_qt.tr("Invalid diameters: {list}.")
-                    + "\n\n"
-                    + tools_qt.tr(
+                msg = ("Pipes with invalid diameters: {0}.\nInvalid diameters: {1}.\n\n"
                         "A diameter value is considered invalid if it is zero, negative, NULL "
                         "or greater than the maximum diameter in the configuration table. "
-                        "As a result, these pipes will NOT be assigned a priority value."
-                    )
-                    + "\n\n"
-                    + tools_qt.tr("Do you want to proceed?")
-                )
-                if not tools_qt.show_question(
-                    msg.format(qtd=row["qtd"], list=row["list"]), force_action=True
-                ):
+                        "As a result, these pipes will NOT be assigned a priority value.\n\n"
+                        "Do you want to proceed?")
+                msg_params = (row["qtd"], row["list"],)
+                if not tools_qt.show_question(msg, force_action=True, msg_params=msg_params):
                     return
             elif row["check"] == "invalid_materials":
                 main_msg = tools_qt.tr(
@@ -740,49 +722,35 @@ class CalculatePriority:
                 )
                 main_msg += " "
                 if config_material.has_material(self.config.unknown_material):
-                    main_msg += tools_qt.tr(
-                        "As a result, the material of these pipes will be treated "
-                        "as the configured unknown material, {unknown_material}."
-                    )
+                    msg_line =("As a result, the material of these pipes will be treated "
+                                "as the configured unknown material, {0}.")
+                    msg_params = (self.config.unknown_material,)
+                    main_msg += tools_qt.tr(msg_line, list_params=msg_params)
                 else:
-                    main_msg += tools_qt.tr(
-                        "These pipes will NOT be assigned a priority value "
-                        "as the configured unknown material, {unknown_material}, "
-                        "is not listed in the configuration tab for materials."
-                    )
+                    msg_line =("These pipes will NOT be assigned a priority value "
+                                "as the configured unknown material, {0}, "
+                                "is not listed in the configuration tab for materials.")
+                    msg_params = (self.config.unknown_material,)
+                    main_msg += tools_qt.tr(msg_line, list_params=msg_params)
                 msg = (
-                    tools_qt.tr("Pipes with invalid materials: {qtd}.")
+                    tools_qt.tr("Pipes with invalid materials: {0}.", list_params=(row["qtd"]))
                     + "\n"
-                    + tools_qt.tr("Invalid materials: {list}.")
+                    + tools_qt.tr("Invalid materials: {0}.", list_params=(row["list"]))
                     + "\n\n"
                     + main_msg
                     + "\n\n"
                     + tools_qt.tr("Do you want to proceed?")
                 )
-                if not tools_qt.show_question(
-                    msg.format(
-                        qtd=row["qtd"],
-                        list=row["list"],
-                        unknown_material=self.config.unknown_material,
-                    ),
-                    force_action=True,
-                ):
+                if not tools_qt.show_question(msg, force_action=True):
                     return
             elif row["check"] == "null_pressures" and self.config.method == "WM":
-                msg = (
-                    tools_qt.tr("Pipes with invalid pressures: {qtd}.")
-                    + "\n"
-                    + tools_qt.tr(
+                msg = ("Pipes with invalid pressures: {0}.\n"
                         "These pipes have no pressure information for their nodes. "
                         "This will result in them receiving the maximum longevity value for their material, "
-                        "which may affect the final priority value."
-                    )
-                    + "\n\n"
-                    + tools_qt.tr("Do you want to proceed?")
-                )
-                if not tools_qt.show_question(
-                    msg.format(qtd=row["qtd"]), force_action=True
-                ):
+                        "which may affect the final priority value.\n\n"
+                        "Do you want to proceed?")
+                msg_params = (row["qtd"],)
+                if not tools_qt.show_question(msg, force_action=True, msg_params=msg_params):
                     return
 
         self.thread = GwCalculatePriority(
@@ -924,8 +892,9 @@ class CalculatePriority:
         fp = Path(file_path)
         self.thread.df.to_excel(file_path)
 
-        message = tools_qt.tr(f"{fp.name} successfully saved.")
-        tools_qt.show_info_box(message)
+        msg = "{0} successfully saved."
+        msg_params = (fp.name,)
+        tools_qt.show_info_box(msg, msg_params=msg_params)
 
     def _set_signals(self):
         dlg = self.dlg_priority
@@ -1059,8 +1028,9 @@ class CalculatePriority:
             return
         target_year = int(target_year)
         if target_year <= date.today().year or target_year > date.today().year + 100:
-            msg = f"The target year must be between {date.today().year + 1} and {date.today().year + 100}."
-            tools_qt.show_info_box(msg)
+            msg = "The target year must be between {0} and {1}."
+            msg_params = (date.today().year + 1, date.today().year + 100,)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return
         try:
             key = "dnom" if self.config.method == "SH" else "arccat_id"
@@ -1078,9 +1048,7 @@ class CalculatePriority:
             return
 
         if any(round(total, 5) != 1 for total in self.total_weight.values()):
-            msg = (
-                "The sum of weights must equal 1. Please adjust the values accordingly."
-            )
+            msg = "The sum of weights must equal 1. Please adjust the values accordingly."
             tools_qt.show_info_box(msg)
             return
         config_engine = {}

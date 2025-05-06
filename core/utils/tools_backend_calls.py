@@ -53,8 +53,8 @@ def add_object(**kwargs):
     # Get values from dialog
     object_id = tools_qt.get_text(dialog, f"{func_params['sourcewidget']}")
     if object_id == 'null':
-        message = "You need to insert data"
-        tools_qgis.show_warning(message, parameter=func_params['sourcewidget'])
+        msg = "You need to insert data"
+        tools_qgis.show_warning(msg, parameter=func_params['sourcewidget'])
         return
 
     # Special case for documents: get the document ID using the name
@@ -62,7 +62,8 @@ def add_object(**kwargs):
         sql = f"SELECT id FROM doc WHERE name = '{object_id}'"
         row = tools_db.get_row(sql, log_sql=True)
         if not row:
-            tools_qgis.show_warning("Document name not found", parameter=object_id)
+            msg = "Document name not found"
+            tools_qgis.show_warning(msg, parameter=object_id)
             return
         # Use the found document ID
         object_id = row['id']
@@ -73,7 +74,8 @@ def add_object(**kwargs):
            " WHERE id = '" + object_id + "'")
     row = tools_db.get_row(sql, log_sql=True)
     if not row:
-        tools_qgis.show_warning("Object id not found", parameter=object_id)
+        msg = "Object id not found"
+        tools_qgis.show_warning(msg, parameter=object_id)
         return
 
     # Check if this object is already associated to current feature
@@ -89,8 +91,8 @@ def add_object(**kwargs):
 
     # If object already exist show warning message
     if row:
-        message = "Object already associated with this feature"
-        tools_qgis.show_warning(message)
+        msg = "Object already associated with this feature"
+        tools_qgis.show_warning(msg)
     # If object not exist perform an INSERT
     else:
         sql = ("INSERT INTO " + tablename + " "
@@ -134,8 +136,8 @@ def delete_object(**kwargs):
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
     if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
+        msg = "Any record selected"
+        tools_qgis.show_warning(msg)
         return
 
     inf_text = ""
@@ -158,7 +160,8 @@ def delete_object(**kwargs):
     list_object_id = list_object_id[:-2]
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
-    answer = tools_qt.show_question(message, "Delete records", list_object_id)
+    title = "Delete records"
+    answer = tools_qt.show_question(message, title, list_object_id)
     if answer:
         sql = f"DELETE FROM {tablename} WHERE {func_params['columnfind']}::text IN ({list_id})"
         tools_db.execute_sql(sql, log_sql=False)
@@ -188,12 +191,12 @@ def open_visit(**kwargs):
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
     if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
+        msg = "Any record selected"
+        tools_qgis.show_warning(msg)
         return
     elif len(selected_list) > 1:
-        message = "Select just one visit"
-        tools_qgis.show_warning(message)
+        msg = "Select just one visit"
+        tools_qgis.show_warning(msg)
         return
 
     # Get document path (can be relative or absolute)
@@ -325,12 +328,12 @@ def open_selected_path(**kwargs):
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
     if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
+        msg = "Any record selected"
+        tools_qgis.show_warning(msg)
         return
     elif len(selected_list) > 1:
-        message = "Select just one document"
-        tools_qgis.show_warning(message)
+        msg = "Select just one document"
+        tools_qgis.show_warning(msg)
         return
 
     # Get document path (can be relative or absolute)
@@ -464,8 +467,8 @@ def open_rpt_result(**kwargs):
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
     if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
+        msg = "Any record selected"
+        tools_qgis.show_warning(msg)
         return
 
     index = selected_list[0]
@@ -932,8 +935,8 @@ def open_selected_manager_item(**kwargs):
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
     if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
+        msg = "Any record selected"
+        tools_qgis.show_warning(msg)
         return
 
     index = selected_list[0]
@@ -993,8 +996,9 @@ def reload_table_manager(**kwargs):
         widgetname = table.objectName()
         columnname = table.property('columnname')
         if columnname is None:
-            msg = f"widget {widgetname} has not columnname and can't be configured"
-            tools_qgis.show_info(msg, 1)
+            msg = "widget {0} has not columnname and can't be configured"
+            msg_params = (widgetname,)
+            tools_qgis.show_info(msg, 1, msg_params=msg_params)
             continue
 
         linkedobject = table.property('linkedobject')
@@ -1075,10 +1079,12 @@ def _reload_table(**kwargs):
         columnname = table.property('columnname')
         if columnname is None:
             if no_tabs:
-                msg = f"widget {widgetname} has not columnname and cant be configured"
+                msg = "widget {0} has not columnname and cant be configured"
+                msg_params = (widgetname,)
             else:
-                msg = f"widget {widgetname} in tab {dialog.tab_main.widget(index_tab).objectName()} has not columnname and cant be configured"
-            tools_qgis.show_info(msg, 1)
+                msg = "widget {0} in tab {1} has not columnname and cant be configured"
+                msg_params = (widgetname, dialog.tab_main.widget(index_tab).objectName(),)
+            tools_qgis.show_info(msg, 1, msg_params=msg_params)
             continue
 
         # Get value from filter widgets

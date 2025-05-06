@@ -80,8 +80,8 @@ class GwArcDivideButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on disconnected node, move the pointer to the desired location on pipe to break it"
-            tools_qgis.show_info(message)
+            msg = "Click on disconnected node, move the pointer to the desired location on pipe to break it"
+            tools_qgis.show_info(msg)
 
     def deactivate(self):
         """ Called when map tool is being deactivated """
@@ -226,8 +226,8 @@ class GwArcDivideButton(GwMaptool):
                     self.dlg_info.finished.connect(partial(tools_gw.save_settings, self.dlg_info))
                     tools_gw.open_dialog(self.dlg_info, dlg_name='dialog_text')
         else:
-            message = "Move node: Error updating geometry"
-            tools_qgis.show_warning(message)
+            msg = "Move node: Error updating geometry"
+            tools_qgis.show_warning(msg)
 
         # Check in init config file if user wants to keep map tool active or not
         self.cancel_map_tool()
@@ -300,11 +300,11 @@ class GwArcDivideButton(GwMaptool):
         ask = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_prev_warning", 'user', 'init')
         if not tools_os.set_boolean(ask, False):
             # Show message before executing
-            message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
+            msg = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
                        "Please ensure that features has no undelete value on true.\n"
                        "On the other hand you must know that traceability table will storage precedent information.")
             title = "Info"
-            answer = tools_qt.show_question(message, title)
+            answer = tools_qt.show_question(msg, title)
         if answer:
             self._move_node(node_id, point)
             tools_qgis.set_layer_index('v_edit_arc')

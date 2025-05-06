@@ -154,9 +154,11 @@ class GwProjectLayersConfig(GwTask):
             tools_gw.config_layer_attributes(self.json_result, layer, layer_name, thread=self)
 
         if msg_failed != "":
-            tools_qt.show_exception_message("Execute failed.", msg_failed)
+            title = "Execute failed."
+            tools_qt.show_exception_message(title, msg_failed)
 
         if msg_key != "":
-            tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg_key)
+            title = "Key on returned json from ddbb is missed."
+            tools_qt.show_exception_message(title, msg_key)
 
     # endregion

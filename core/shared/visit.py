@@ -407,8 +407,8 @@ class GwVisit(QObject):
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qt.show_info_box(message)
+            msg = "Any record selected"
+            tools_qt.show_info_box(msg)
             return
 
         list_values = ""
@@ -426,9 +426,9 @@ class GwVisit(QObject):
             list_values += "'" + str(value) + "',\n"
         list_values = list_values[:-2]
 
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, list_values)
+        answer = tools_qt.show_question(msg, title, list_values)
         if answer:
             sql = (f"DELETE FROM om_visit_event_photo "
                    f"WHERE visit_id='{visit_id}' "
@@ -462,8 +462,8 @@ class GwVisit(QObject):
 
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         row = selected_list[0].row()
@@ -1076,8 +1076,8 @@ class GwVisit(QObject):
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
         if visit_start > visit_end:
-            message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Selected date interval is not valid"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Create interval dates
@@ -1278,8 +1278,8 @@ class GwVisit(QObject):
         parameter_text = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 1)
 
         if not parameter_id or parameter_id == -1:
-            message = "You need to select a valid parameter id"
-            tools_qt.show_info_box(message)
+            msg = "You need to select a valid parameter id"
+            tools_qt.show_info_box(msg)
             return
 
         # get form associated
@@ -1301,8 +1301,8 @@ class GwVisit(QObject):
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
         else:
-            message = "Unrecognised form type"
-            tools_qt.show_info_box(message, parameter=form_type)
+            msg = "Unrecognised form type"
+            tools_qt.show_info_box(msg, parameter=form_type)
             return
 
         # form_type event_ud_arc_rehabit dont have widget value
@@ -1496,8 +1496,8 @@ class GwVisit(QObject):
         self.files_added = []
         self.files_all = []
         if not self.tbl_event.selectionModel().hasSelection():
-            message = "Any record selected"
-            tools_qt.show_info_box(message)
+            msg = "Any record selected"
+            tools_qt.show_info_box(msg)
             return
 
         # Get selected rows
@@ -1505,13 +1505,13 @@ class GwVisit(QObject):
         # 0 is the column of the pk 0 'id'
         selected_list = self.tbl_event.selectionModel().selectedRows(0)
         if selected_list == 0:
-            message = "Any record selected"
-            tools_qt.show_info_box(message)
+            msg = "Any record selected"
+            tools_qt.show_info_box(msg)
             return
 
         elif len(selected_list) > 1:
-            message = "More then one event selected. Select just one"
-            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
+            msg = "More then one event selected. Select just one"
+            tools_qgis.show_warning(msg, dialog=self.dlg_add_visit)
             return
 
         # fetch the record
@@ -1653,8 +1653,8 @@ class GwVisit(QObject):
         """ Delete a selected event. """
 
         if not self.tbl_event.selectionModel().hasSelection():
-            message = "Any record selected"
-            tools_qt.show_info_box(message)
+            msg = "Any record selected"
+            tools_qt.show_info_box(msg)
             return
 
         # a fake event to get some ancyllary data
@@ -1679,22 +1679,22 @@ class GwVisit(QObject):
             list_id += "\n"
 
         # ask for deletion
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         if any_docs:
-            message += "\nSome events have documents"
+            msg = "Are you sure you want to delete these records?\nSome events have documents"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, list_id)
+        answer = tools_qt.show_question(msg, title, list_id)
         if not answer:
             return
 
         # do the action
         if not event.delete(pks=selected_id):
-            message = "Error deleting records"
-            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
+            msg = "Error deleting records"
+            tools_qgis.show_warning(msg, dialog=self.dlg_add_visit)
             return
 
-        message = "Records deleted"
-        tools_qgis.show_info(message, dialog=self.dlg_add_visit)
+        msg = "Records deleted"
+        tools_qgis.show_info(msg, dialog=self.dlg_add_visit)
 
         # update Table
         self.tbl_event.model().select()
@@ -1706,20 +1706,20 @@ class GwVisit(QObject):
         doc_name = self.doc_id.text()
         visit_id = self.visit_id.text()
         if not doc_name:
-            message = "You need to insert a document name"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "You need to insert a document name"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
         if not visit_id:
-            message = "You need to insert visit_id"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "You need to insert visit_id"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get doc_id using doc_name
         sql = f"SELECT id FROM doc WHERE name = '{doc_name}'"
         row = tools_db.get_row(sql)
         if not row:
-            message = "Document name not found"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Document name not found"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         doc_id = row['id']
@@ -1739,8 +1739,8 @@ class GwVisit(QObject):
                f" VALUES ('{doc_id}', {visit_id})")
         status = tools_db.execute_sql(sql)
         if status:
-            message = "Document inserted successfully"
-            tools_qgis.show_info(message, dialog=dialog)
+            mesmsgsage = "Document inserted successfully"
+            tools_qgis.show_info(msg, dialog=dialog)
 
         self.dlg_add_visit.tbl_document.model().select()
         self.doc_id.clear()
@@ -1751,25 +1751,25 @@ class GwVisit(QObject):
         # Get selected rows. 0 is the column of the pk 0 'id'
         selected_list = self.tbl_document.selectionModel().selectedRows(0)
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         selected_id = []
         for index in selected_list:
             doc_id = index.data()
             selected_id.append(str(doc_id))
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, ','.join(selected_id))
+        answer = tools_qt.show_question(msg, title, ','.join(selected_id))
         if answer:
             # Delete from table
             sql = (f"DELETE FROM doc_x_visit"
                    f" WHERE id IN ({','.join(selected_id)})")
             status = tools_db.execute_sql(sql)
             if status:
-                message = "Documents deleted successfully"
-                tools_qgis.show_info(message, dialog=dialog)
+                msg = "Documents deleted successfully"
+                tools_qgis.show_info(msg, dialog=dialog)
 
             self.tbl_document.model().select()
 

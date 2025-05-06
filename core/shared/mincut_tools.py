@@ -52,10 +52,12 @@ class GwMincutTools:
             level = 1
             if 'level' in json_result['message']:
                 level = int(json_result['message']['level'])
-            msg = f"Execution of {function_name} failed."
+            msg = "Execution of {0} failed."
+            msg_params = (function_name,)
             if 'text' in json_result['message']:
                 msg = json_result['message']['text']
-            tools_qgis.show_message(msg, level)
+                msg_params = None
+            tools_qgis.show_message(msg, level, msg_params=msg_params)
             return False, None
 
         self.complet_result = json_result
@@ -111,9 +113,9 @@ class GwMincutTools:
                     prev_layout = layout.objectName()
 
                 if field['layoutorder'] is None:
-                    message = "The field layoutorder is not configured for"
-                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_mincut_man)
+                    msg = "The field layoutorder is not configured for"
+                    param = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_mincut_man)
                     continue
 
                 # Manage widget and label positions
@@ -164,9 +166,9 @@ class GwMincutTools:
                         layout.addWidget(widget, 0, widget_pos)
 
             elif field['layoutname'] != 'lyt_none':
-                message = "The field layoutname is not configured for"
-                msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_mincut_man)
+                msg = "The field layoutname is not configured for"
+                param = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_mincut_man)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -240,7 +242,7 @@ def delete_mincut(**kwargs):
         list_id += f"'{id_}', "
     inf_text = inf_text[:-2]
     list_id = list_id[:-2]
-    message = "Are you sure you want to delete these mincuts?"
+    msg = "Are you sure you want to delete these mincuts?"
     title = "Delete mincut"
 
     # Check for mincuts not allowed to be deleted
@@ -248,12 +250,12 @@ def delete_mincut(**kwargs):
            f" WHERE {column_id} IN ({list_id}) AND (anl_user != current_user OR mincut_state != 0)")
     rows = tools_db.execute_returning(sql, show_exception=False)
     if rows:
-        message = "You can't delete these mincuts because they aren't planified \n" \
-                  "or they were created by another user:"
-        tools_qt.show_info_box(message, title, inf_text)
+        msg = ("You can't delete these mincuts because they aren't planified \n"
+                  "or they were created by another user:")
+        tools_qt.show_info_box(msg, title, inf_text)
         return
 
-    answer = tools_qt.show_question(message, title, inf_text)
+    answer = tools_qt.show_question(msg, title, inf_text)
     if answer:
         sql = (f"DELETE FROM {table_name}"
                f" WHERE {column_id} IN ({list_id})")
@@ -328,9 +330,9 @@ def cancel_mincut(**kwargs):
         list_id += f"'{id_}', "
     inf_text = inf_text[:-2]
     list_id = list_id[:-2]
-    message = "Are you sure you want to cancel these mincuts?"
+    msg = "Are you sure you want to cancel these mincuts?"
     title = "Cancel mincuts"
-    answer = tools_qt.show_question(message, title, inf_text)
+    answer = tools_qt.show_question(msg, title, inf_text)
     if answer:
         sql = (f"UPDATE om_mincut SET mincut_state = 3 "
                f" WHERE id::text IN ({list_id})")

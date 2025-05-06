@@ -88,7 +88,7 @@ class RecursiveEpa():
 
         msg = "These are the lists that will be used. Do you want to continue?"
         if settings.value("list1/list2") or settings.value("list2/list2") or settings.value("list3/list2"):
-            msg = "There are multiple queries configured." + msg
+            msg = "There are multiple queries configured. These are the lists that will be used. Do you want to continue?"
         inf_text = f"{list1}"
         if list2:
             inf_text += f"\n{list2}"

@@ -47,5 +47,6 @@ class GwAction:
 
     def clicked_event(self):
 
-        tools_qgis.show_message("Action has no function!!")
+        msg = "Action has no function!!"
+        tools_qgis.show_message(msg)
 

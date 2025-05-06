@@ -86,8 +86,8 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
-            tools_qgis.show_info(message)
+            msg = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
+            tools_qgis.show_info(msg)
 
     def canvasMoveEvent(self, event):
 
@@ -227,8 +227,9 @@ class GwFeatureReplaceButton(GwMaptool):
         # Avoid to replace obsolete or planified features
         if feature.attribute('state') in (0, 2):
             state = 'OBSOLETE' if feature.attribute('state') == 0 else 'PLANIFIED'
-            message = f"Current feature has state '{state}'. Therefore it is not replaceable"
-            tools_qt.show_info_box(message, "Info")
+            msg = "Current feature has state '{0}'. Therefore it is not replaceable"
+            msg_params = (state,)
+            tools_qt.show_info_box(msg, "Info", msg_params=msg_params)
             return
 
         if self.project_type == 'ud':
@@ -398,19 +399,20 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Check null values
         if feature_type_new in (None, 'null'):
-            message = "Mandatory field is missing. Please, set a value for field"
-            tools_qgis.show_warning(message, parameter="'New feature type'", dialog=dialog)
+            msg = "Mandatory field is missing. Please, set a value for field"
+            tools_qgis.show_warning(msg, parameter="'New feature type'", dialog=dialog)
             return
 
         if featurecat_id in (None, 'null'):
-            message = "Mandatory field is missing. Please, set a value for field"
-            tools_qgis.show_warning(message, parameter="'Catalog id'", dialog=dialog)
+            msg = "Mandatory field is missing. Please, set a value for field"
+            tools_qgis.show_warning(msg, parameter="'Catalog id'", dialog=dialog)
             return
 
         # Ask question before executing
-        message = f"Are you sure you want to replace selected feature with a new one?\n " \
-                  f"If you have different addfields in your feature, they will be deleted."
-        answer = tools_qt.show_question(message, "Replace feature")
+        msg = ("Are you sure you want to replace selected feature with a new one?\n "
+                  "If you have different addfields in your feature, they will be deleted.")
+        title = "Replace feature"
+        answer = tools_qt.show_question(msg, title)
         if answer:
             # Get function input parameters
             feature = f'"type":"{self.feature_type}"'
@@ -428,15 +430,15 @@ class GwFeatureReplaceButton(GwMaptool):
             # Execute SQL function and show result to the user
             complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplace', body)
             if not complet_result:
-                message = "Error replacing feature"
-                tools_qgis.show_warning(message)
+                msg = "Error replacing feature"
+                tools_qgis.show_warning(msg)
                 # Check in init config file if user wants to keep map tool active or not
                 self.manage_active_maptool()
                 tools_gw.close_dialog(dialog)
                 return
 
-            message = "Feature replaced successfully"
-            tools_qgis.show_info(message)
+            msg = "Feature replaced successfully"
+            tools_qgis.show_info(msg)
 
             # Fill tab 'Info log'
             if complet_result and complet_result['status'] == "Accepted":

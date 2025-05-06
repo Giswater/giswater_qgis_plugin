@@ -36,7 +36,8 @@ class GwLoadProject(QObject):
 
         global_vars.project_loaded = False
         if show_warning:
-            tools_log.log_info("Project read started")
+            msg = "Project read started"
+            tools_log.log_info(msg)
 
         self._get_user_variables()
         # Get variables from qgis project
@@ -94,7 +95,8 @@ class GwLoadProject(QObject):
         # Check if schema exists
         schema_exists = tools_db.check_schema(lib_vars.schema_name)
         if not schema_exists:
-            tools_qgis.show_warning("Selected schema not found", parameter=lib_vars.schema_name)
+            msg = "Selected schema not found"
+            tools_qgis.show_warning(msg, parameter=lib_vars.schema_name)
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
@@ -170,13 +172,14 @@ class GwLoadProject(QObject):
         except Exception:
             pass
         if project_version == plugin_version:
-            message = "Project read finished"
-            tools_log.log_info(message)
+            msg = "Project read finished"
+            tools_log.log_info(msg)
         else:
-            message = (f"Project read finished with different versions on plugin metadata ({plugin_version}) and "
-                       f"PostgreSQL sys_version table ({project_version}).")
-            tools_log.log_warning(message)
-            tools_qgis.show_warning(message)
+            msg = ("Project read finished with different versions on plugin metadata ({0}) and "
+                       "PostgreSQL sys_version table ({1}).")
+            msg_params = (plugin_version, project_version,)
+            tools_log.log_warning(msg, msg_params=msg_params)
+            tools_qgis.show_warning(msg, msg_params=msg_params)
 
         # Reset dialogs position
         tools_gw.reset_position_dialog()
@@ -223,7 +226,7 @@ class GwLoadProject(QObject):
         if postgresql_version is not None and minorPgVersion is not None and majorPgVersion is not None:
             if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
-                tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
+                tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
 
     def _get_project_variables(self):
         """ Manage QGIS project variables """
@@ -267,8 +270,9 @@ class GwLoadProject(QObject):
         if missing_layers:
             if show_warning:
                 title = "Giswater plugin cannot be loaded"
-                msg = f"QGIS project seems to be a Giswater project, but layer(s) {[k for k, v in missing_layers.items()]} are missing"
-                tools_qgis.show_warning(msg, 20, title=title)
+                msg = f"QGIS project seems to be a Giswater project, but layer(s) {0} are missing"
+                msg_params = ([k for k, v in missing_layers.items()],)
+                tools_qgis.show_warning(msg, 20, title=title, msg_params=msg_params)
             return False
 
         return True
@@ -293,7 +297,8 @@ class GwLoadProject(QObject):
 
         try:
             if tools_db.dao and force_commit:
-                tools_log.log_info("Force commit")
+                msg = "Force commit"
+                tools_log.log_info(msg)
                 tools_db.dao.commit()
         except Exception as e:
             tools_log.log_info(str(e))
@@ -328,10 +333,10 @@ class GwLoadProject(QObject):
         if len(repeated_layers) > 1:
             if lib_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
                     or lib_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
-                msg = "QGIS project has more than one v_edit_node layer coming from different schemas. " \
-                      "If you are looking to manage two schemas, it is mandatory to define which is the master and " \
-                      "which isn't. To do this, you need to configure the QGIS project setting this project's " \
-                      "variables: gwMainSchema and gwAddSchema."
+                msg = ("QGIS project has more than one v_edit_node layer coming from different schemas. " 
+                      "If you are looking to manage two schemas, it is mandatory to define which is the master and " 
+                      "which isn't. To do this, you need to configure the QGIS project setting this project's " 
+                      "variables: gwMainSchema and gwAddSchema.")
                 tools_qt.show_info_box(msg)
                 return False
 
@@ -364,12 +369,14 @@ class GwLoadProject(QObject):
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
         if toolbar_names in (None, 'None'):
-            tools_log.log_info("Parameter 'toolbar_names' is None")
+            msg = "Parameter 'toolbar_names' is None"
+            tools_log.log_info(msg)
             return
 
         toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         if toolbars_order in (None, 'None'):
-            tools_log.log_info("Parameter 'toolbars_order' is None")
+            msg = "Parameter 'toolbars_order' is None"
+            tools_log.log_info(msg)
             return
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
@@ -538,8 +545,8 @@ class GwLoadProject(QObject):
         if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
             try:
                 if self.task_get_layers.isActive():
-                    message = "ConfigLayerFields task is already active!"
-                    tools_qgis.show_warning(message)
+                    msg = "ConfigLayerFields task is already active!"
+                    tools_qgis.show_warning(msg)
                     return
             except RuntimeError:
                 pass
@@ -580,7 +587,8 @@ class GwLoadProject(QObject):
                 if variables:
                     guided_map = variables.get('useGuideMap')
                     if guided_map:
-                        tools_log.log_info("manage_guided_map")
+                        msg = "manage_guided_map"
+                        tools_log.log_info(msg)
                         self._manage_guided_map()
             except Exception as e:
                 tools_log.log_info(str(e))
@@ -615,7 +623,8 @@ class GwLoadProject(QObject):
         features = self.layer_muni.getSelectedFeatures()
         for feature in features:
             muni_id = feature["muni_id"]
-            tools_log.log_info(f"Selected muni_id: {muni_id}")
+            msg = "Selected muni_id"
+            tools_log.log_info(msg, parameter=muni_id)
             break
 
         tools_gw.disconnect_signal('load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')

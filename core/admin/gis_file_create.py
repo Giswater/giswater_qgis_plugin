@@ -39,7 +39,8 @@ class GwGisFileCreate:
         # Check if template_path and folder_path exists
         template_path = f"{gis_locale_path}{os.sep}{project_type}_{roletype}.{gis_extension}"
         if not os.path.exists(template_path):
-            tools_qgis.show_warning("Template GIS file not found", parameter=template_path, duration=20)
+            msg = "Template GIS file not found"
+            tools_qgis.show_warning(msg, parameter=template_path, duration=20)
             return False, None
 
         # Manage default parameters
@@ -55,8 +56,9 @@ class GwGisFileCreate:
         # Set QGS file path
         qgs_path = folder_path + os.sep + filename + "." + gis_extension
         if os.path.exists(qgs_path):
-            message = "Do you want to overwrite file?"
-            answer = tools_qt.show_question(message, "overwrite file", force_action=True)
+            msg = "Do you want to overwrite file?"
+            title = "Overwrite file"
+            answer = tools_qt.show_question(msg, title, force_action=True)
             if not answer:
                 return False, qgs_path
 
@@ -86,15 +88,17 @@ class GwGisFileCreate:
         try:
             with open(qgs_path, "w") as f:
                 f.write(content)
-            tools_qgis.show_info("GIS file generated successfully", parameter=qgs_path)
-            message = "Do you want to open GIS project?"
-            answer = tools_qt.show_question(message, "GIS file generated successfully", force_action=True)
+            msg = "GIS file generated successfully"
+            tools_qgis.show_info(msg, parameter=qgs_path)
+            msg = "Do you want to open GIS project?"
+            title = "GIS file generated successfully"
+            answer = tools_qt.show_question(msg, title, force_action=True)
             if answer:
                 return True, qgs_path
             return False, qgs_path
         except IOError:
-            message = "File cannot be created. Check if it is already opened"
-            tools_qgis.show_warning(message, parameter=qgs_path)
+            msg = "File cannot be created. Check if it is already opened"
+            tools_qgis.show_warning(msg, parameter=qgs_path)
 
     # region private functions
 
@@ -103,7 +107,8 @@ class GwGisFileCreate:
 
         layer_source, not_version = tools_db.get_layer_source_from_credentials('prefer')
         if layer_source is None:
-            tools_qgis.show_warning("Error getting database parameters")
+            msg = "Error getting database parameters"
+            tools_qgis.show_warning(msg)
             return False, None
         else:
             layer_source['srid'] = tools_db.get_srid('v_edit_node', schema)

@@ -48,19 +48,19 @@ class StaticCalibration:
         inp_exists = os.path.exists(inp_file)
         csv_file = prefix + ".csv"
         csv_exists = os.path.exists(csv_file)
-
+        
         if inp_exists and csv_exists:
-            return tools_qt.show_question(
-                f'The files "{file_name}.inp" and "{file_name}.csv" already exist. Do you want to overwrite them?'
-            )
+            msg = 'The files "{0}.inp" and "{1}.csv" already exist. Do you want to overwrite them?'
+            msg_params = (file_name, file_name,)
+            return tools_qt.show_question(msg, msg_params=msg_params)
         elif inp_exists:
-            return tools_qt.show_question(
-                f'The file "{file_name}.inp" already exists. Do you want to overwrite it?'
-            )
+            msg = 'The file "{0}.inp" already exists. Do you want to overwrite it?'
+            msg_params = (file_name, file_name,)
+            return tools_qt.show_question(msg, msg_params=msg_params)
         elif csv_exists:
-            return tools_qt.show_question(
-                f'The file "{file_name}.csv" already exists. Do you want to overwrite it?'
-            )
+            msg = 'The file "{0}.csv" already exists. Do you want to overwrite it?'
+            msg_params = (file_name,)
+            return tools_qt.show_question(msg, msg_params=msg_params)
 
         return True
 
@@ -174,12 +174,11 @@ class StaticCalibration:
 
     def _save2dscenario(self):
         dscenario_name, dscenario_id = self.dlg_epa.cmb_dscenario.currentData()
-        msg = (
-            f'Do you want to save changes to dscenario "{dscenario_name}"?\n'
-            "This operation cannot be undone.\n\n"
-            "(Please note that any changes made to node elevations cannot be saved to dscenarios.)"
-        )
-        if not tools_qt.show_question(msg):
+        msg = ('Do you want to save changes to dscenario "{0}"?\n'
+                "This operation cannot be undone.\n\n"
+                "(Please note that any changes made to node elevations cannot be saved to dscenarios.)")
+        msg_params = (dscenario_name,)
+        if not tools_qt.show_question(msg, msg_params=msg_params):
             return
 
         sql = ""
@@ -267,9 +266,9 @@ class StaticCalibration:
         if tools_db.dao.conn.closed:
             tools_db.dao.init_db()
         if tools_db.execute_sql(sql):
-            tools_qt.show_info_box(
-                f'Changes applied to "{dscenario_name}" successfully.'
-            )
+            msg = 'Changes applied to "{0}" successfully.'
+            msg_params = (dscenario_name,)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
 
     def _save_user_values(self):
         self._user_values("save")
@@ -342,38 +341,44 @@ class StaticCalibration:
 
         input_file = dlg.data_inp_input_file.toPlainText()
         if not input_file:
-            tools_qt.show_info_box("You should select an input INP file!")
+            msg = "You should select an input INP file!"
+            tools_qt.show_info_box(msg)
             return
 
         config_file = dlg.data_config_file.toPlainText()
         if not config_file:
-            tools_qt.show_info_box("You should select a config file!")
+            msg = "You should select a config file!"
+            tools_qt.show_info_box(msg)
             return
         elif not os.path.exists(config_file):
-            tools_qt.show_info_box(
-                f'"{config_file}" does not exist. Please select a valid config file.'
-            )
+            msg = '"{0}" does not exist. Please select a valid config file.'
+            msg_params = (config_file,)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return
 
         try:
             config = ConfigSC(config_file)
         except Exception as e:
-            tools_qt.show_info_box(f"Configuration file couldn't be imported:\n{e}")
+            msg = "Configuration file couldn't be imported:\n{0}"
+            msg_params = (str(e),)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return
 
         output_folder = dlg.data_output_folder.toPlainText()
         if not output_folder:
-            tools_qt.show_info_box("You should select an output folder!")
+            msg = "You should select an output folder!"
+            tools_qt.show_info_box(msg)
             return
         elif not os.path.exists(output_folder):
-            tools_qt.show_info_box(
-                f'"{output_folder}" does not exist. Please select a valid folder.'
-            )
+            msg = '"{0}" does not exist. Please select a valid folder.'
+            msg_params = (output_folder,)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return
 
         file_name = dlg.txt_filename.text()
         if not file_name:
-            tools_qt.show_info_box("You should inform a file name!")
+            msg = "You should inform a file name!"
+            tools_qt.show_info_box(msg)
             return
 
         return input_file, config, output_folder, file_name

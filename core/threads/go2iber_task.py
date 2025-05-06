@@ -126,13 +126,15 @@ class GwGo2IberTask(GwTask):
                     tools_gw.manage_json_exception(self.rpt_result)
 
         if self.error_msg:
-            title = f"Task aborted - {self.description()}"
-            tools_qt.show_info_box(self.error_msg, title=title)
+            title = "Task aborted - {0}"
+            title_params = (self.description(),)
+            tools_qt.show_info_box(self.error_msg, title=title, title_params=title_params)
             return
 
         if self.exception:
-            title = f"Task aborted - {self.description()}"
-            tools_qt.show_info_box(self.exception, title=title)
+            title = "Task aborted - {0}"
+            title_params = (self.description(),)
+            tools_qt.show_info_box(self.exception, title=title, title_params=title_params)
             raise self.exception
 
         # If Database exception, show dialog after task has finished
@@ -140,7 +142,8 @@ class GwGo2IberTask(GwTask):
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
 
     def cancel(self):
-
-        tools_qgis.show_info(f"Task canceled - {self.description()}")
+        msg = "Task canceled - {0}"
+        msg_params = (self.description(),)
+        tools_qgis.show_info(msg, msg_params=msg_params)
         self._close_file()
         super().cancel()

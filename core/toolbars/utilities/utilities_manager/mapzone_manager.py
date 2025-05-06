@@ -254,7 +254,8 @@ class GwMapzoneManager:
         body = tools_gw.create_body()
         json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
         if not json_result or json_result.get('status') != 'Accepted':
-            tools_qgis.show_warning("No valid data received from the SQL function.", dialog=dialog)
+            msg = "No valid data received from the SQL function."
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Extract mapzone_ids with data from json_result
@@ -276,7 +277,8 @@ class GwMapzoneManager:
         # Call gw_fct_getgraphconfig
         config_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', config_body)
         if not config_result or config_result.get('status') != 'Accepted':
-            tools_qgis.show_warning("Failed to retrieve graph configuration.", dialog=dialog)
+            msg = "Failed to retrieve graph configuration."
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get mapzones style by calling gw_fct_getstylemapzones
@@ -285,7 +287,8 @@ class GwMapzoneManager:
 
         style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', style_body)
         if not style_result or style_result.get('status') != 'Accepted':
-            tools_qgis.show_warning("Failed to retrieve mapzone styles.", dialog=dialog)
+            msg = "Failed to retrieve mapzone styles."
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Add the flooding data to a temporal layer
@@ -296,11 +299,13 @@ class GwMapzoneManager:
             # Apply styling only to valid mapzones
             self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'], valid_mapzone_ids)
             self._setup_temporal_layer(vlayer)
-            tools_qgis.show_success("Temporal layer created successfully.", dialog=dialog)
+            msg = "Temporal layer created successfully."
+            tools_qgis.show_success(msg, dialog=dialog)
             self.iface.mapCanvas().setExtent(vlayer.extent())
             self.iface.mapCanvas().refresh()
         else:
-            tools_qgis.show_warning("Failed to retrieve the temporal layer", dialog=dialog)
+            msg = "Failed to retrieve the temporal layer"
+            tools_qgis.show_warning(msg, dialog=dialog)
 
     def _setup_temporal_layer(self, vlayer: QgsVectorLayer):
         """Sets the temporal properties for the layer, specifically using the timestep field."""
@@ -372,7 +377,8 @@ class GwMapzoneManager:
             self.iface.layerTreeView().refreshLayerSymbology(vlayer.id())
             self.iface.mapCanvas().refreshAllLayers()
         else:
-            tools_qgis.show_warning("No valid mapzones with values were found to apply styles.")
+            msg = "No valid mapzones with values were found to apply styles."
+            tools_qgis.show_warning(msg)
 
     def _activate_temporal_controller(self, vlayer: QgsVectorLayer):
         """Activates the Temporal Controller with animated temporal navigation."""
@@ -468,7 +474,8 @@ class GwMapzoneManager:
         # Ensure that the snapper returned a valid result
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if not result.isValid():
-            tools_qgis.show_warning("No valid snapping result. Please select a valid point.", dialog=dialog)
+            msg = "No valid snapping result. Please select a valid point."
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get the snapped feature and ensure it's from the correct layer (node layer)
@@ -479,7 +486,8 @@ class GwMapzoneManager:
 
         # Check that node_id is valid
         if not node_id:
-            tools_qgis.show_warning("No node ID found at the snapped location.", dialog=dialog)
+            msg = "No node ID found at the snapped location."
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Highlight the snapped feature (like you do with the arc highlighting)
@@ -490,10 +498,13 @@ class GwMapzoneManager:
             self.rubber_band.setWidth(5)
             self.rubber_band.show()
         except AttributeError:
-            tools_qgis.show_warning("Unable to highlight the snapped node.", dialog=dialog)
+            msg = "Unable to highlight the snapped node."
+            tools_qgis.show_warning(msg, dialog=dialog)
 
         # Show the node ID in a message box
-        tools_qgis.show_info(f"Flood analysis will start from node ID: {node_id}", dialog=dialog)
+        msg = "Flood analysis will start from node ID"
+        param = node_id
+        tools_qgis.show_info(msg, dialog=dialog, parameter=param)
         self.selected_node_id = node_id
 
         # Retrieve graphClass and exploitation from the dialog or set defaults
@@ -537,9 +548,11 @@ class GwMapzoneManager:
 
         # Check if a valid result was returned
         if not result or result.get('status') != 'Accepted':
-            tools_qgis.show_warning("Failed to execute the mapzones analysis.")
+            msg = "Failed to execute the mapzones analysis."
+            tools_qgis.show_warning(msg)
         else:
-            tools_qgis.show_info("Mapzones analysis completed successfully.")
+            msg = "Mapzones analysis completed successfully."
+            tools_qgis.show_info(msg)
 
         # TODO: Implement flood analysis starting from this node ID in the future
 
@@ -553,8 +566,8 @@ class GwMapzoneManager:
             tableview = dialog.main_tab.currentWidget()
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get selected mapzone data
@@ -794,7 +807,8 @@ class GwMapzoneManager:
             feat_id = snapped_feat.attribute(f'{options[option][0]}')
             getattr(self, options[option][1])(feat_id)
         except Exception as e:
-            tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
+            msg = "Exception in info (def _get_id)"
+            tools_qgis.show_warning(msg, parameter=e)
         finally:
             if option == 'nodeParent':
                 self._cancel_snapping_tool(dialog, action)
@@ -891,7 +905,8 @@ class GwMapzoneManager:
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
             if preview:
@@ -923,7 +938,8 @@ class GwMapzoneManager:
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
             if preview:
@@ -955,7 +971,8 @@ class GwMapzoneManager:
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
             if preview:
@@ -987,7 +1004,8 @@ class GwMapzoneManager:
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
             if preview:
@@ -1019,7 +1037,8 @@ class GwMapzoneManager:
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
             if preview:
@@ -1051,7 +1070,8 @@ class GwMapzoneManager:
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
             if preview:
@@ -1080,7 +1100,8 @@ class GwMapzoneManager:
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
         if not json_result or 'status' not in json_result:
-            tools_qgis.show_message("Failed to get a valid response from gw_fct_config_mapzones.", level=2)
+            msg = "Failed to get a valid response from gw_fct_config_mapzones."
+            tools_qgis.show_message(msg, level=2)
             return
 
         if 'status' in json_result and json_result['status'] == 'Accepted':
@@ -1088,7 +1109,8 @@ class GwMapzoneManager:
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level)
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level)
 
             if global_vars.project_type != 'ud':
                 self._get_graph_config()
@@ -1201,8 +1223,8 @@ class GwMapzoneManager:
         view = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
             return
 
         # Get selected mapzone data
@@ -1243,8 +1265,8 @@ class GwMapzoneManager:
         tablename = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get selected mapzone data
@@ -1278,16 +1300,17 @@ class GwMapzoneManager:
         view = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
             return
 
         # Get selected mapzone data
         field_id = tableview.model().headerData(0, Qt.Horizontal)
         mapzone_ids = [index.sibling(index.row(), 0).data() for index in selected_list]
 
-        message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", [index.sibling(index.row(), 1).data() for index in selected_list], force_action=True)
+        msg = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.show_question(msg, title, [index.sibling(index.row(), 1).data() for index in selected_list], force_action=True)
         if answer:
             # Build WHERE IN clause for SQL
             where_clause = f"{field_id} IN ({', '.join(map(str, mapzone_ids))})"
@@ -1436,4 +1459,5 @@ class GwMapzoneManager:
             tools_gw.close_dialog(dialog)
             return
 
-        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
+        msg = "Error"
+        tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)

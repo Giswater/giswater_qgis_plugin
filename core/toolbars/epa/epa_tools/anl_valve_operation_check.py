@@ -240,24 +240,30 @@ class ValveOperationCheck:
 
         input_file = dlg.data_inp_input_file.toPlainText()
         if not input_file or not Path(input_file).exists():
-            tools_qt.show_info_box("You should select an input INP file!")
+            msg = "You should select an input INP file!"
+            tools_qt.show_info_box(msg)
             return False
 
         try:
             network = wntr.network.WaterNetworkModel(input_file)
         except Exception as e:
-            tools_qt.show_info_box(f"INP file couldn't be imported:\n{e}")
+            msg = "INP file couldn't be imported:\n{0}"
+            msg_params = (str(e),)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return False
 
         config_file = dlg.data_config_file.toPlainText()
         if not config_file or not Path(config_file).exists():
-            tools_qt.show_info_box("You should select an config file!")
+            msg = "You should select an config file!"
+            tools_qt.show_info_box(msg)
             return False
 
         try:
             config = ConfigVOC(config_file)
         except Exception as e:
-            tools_qt.show_info_box(f"Configuration file couldn't be imported:\n{e}")
+            msg = "Configuration file couldn't be imported:\n{0}"
+            msg_params = (str(e),)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return False
 
         if self.dlg_voc.rdb_scenarios_config.isChecked():
@@ -274,17 +280,19 @@ class ValveOperationCheck:
 
         output_folder = dlg.data_output_folder.toPlainText()
         if not output_folder:
-            tools_qt.show_info_box("You should select an output folder!")
+            msg = "You should select an output folder!"
+            tools_qt.show_info_box(msg)
             return False
         elif not Path(output_folder).exists():
-            tools_qt.show_info_box(
-                f'"{output_folder}" does not exist. Please select a valid folder.'
-            )
+            msg = '"{0}" does not exist. Please select a valid folder.'
+            msg_params = (output_folder,)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return False
 
         file_name = dlg.txt_filename.text()
         if not file_name:
-            tools_qt.show_info_box("You should inform a file name!")
+            msg = "You should inform a file name!"
+            tools_qt.show_info_box(msg)
             return False
 
         self.network = network

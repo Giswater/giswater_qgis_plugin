@@ -78,12 +78,12 @@ class GwImportEpanet:
             self.parse_inp_file(self.file_path)
 
         except ImportError:
-            message: str = (
+            msg: str = (
                 "Couldn't import wntr package. "
                 "Try to reload the Giswater plugin. "
                 "If the issue persists restart QGIS."
             )
-            tools_qgis.show_message(message)
+            tools_qgis.show_message(msg)
 
     def parse_inp_file(self, file_path: Path) -> None:
         """Parse INP file, showing a log to the user"""
@@ -177,12 +177,14 @@ class GwImportEpanet:
         self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count() - 1)
         if TESTING_MODE:
             # Show warning message
-            message = "You are about to import the INP file in TESTING MODE. This will delete all the data in the database related to the network you are importing. Are you sure you want to proceed?"
-            res = tools_qt.show_question(message, title="WARNING", force_action=True)
+            msg = "You are about to import the INP file in TESTING MODE. This will delete all the data in the database related to the network you are importing. Are you sure you want to proceed?"
+            title = "WARNING"
+            res = tools_qt.show_question(msg, title, force_action=True)
             if not res:
                 return
-            message = "!!!!! THIS WILL DELETE ALL DATA IN THE DATABASE !!!!!\nARE YOU SURE YOU WANT TO PROCEED?"
-            res = tools_qt.show_question(message, title="WARNING", force_action=True)
+            msg = "!!!!! THIS WILL DELETE ALL DATA IN THE DATABASE !!!!!\nARE YOU SURE YOU WANT TO PROCEED?"
+            title = "WARNING"
+            res = tools_qt.show_question(msg, title, force_action=True)
             if not res:
                 return
 
@@ -278,39 +280,40 @@ class GwImportEpanet:
         workcat, exploitation, sector, municipality, dscenario, _ = self._get_config_values()
         # Workcat
         if workcat == "":
-            message = "Please enter a Workcat_id to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please enter a Workcat_id to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         sql: str = "SELECT id FROM cat_work WHERE id = %s"
         row = tools_db.get_row(sql, params=(workcat,))
         if row is not None:
-            message = f'The Workcat_id "{workcat}" is already in use. Please enter a different ID.'
-            tools_qt.show_info_box(message)
+            msg = 'The Workcat_id "{0}" is already in use. Please enter a different ID.'
+            msg_params = (workcat,)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return
 
         # Exploitation
         if exploitation == "":
-            message = "Please select an exploitation to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please select an exploitation to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         # Sector
         if sector == "":
-            message = "Please select a sector to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please select a sector to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         # Municipality
         if municipality == "":
-            message = "Please select a municipality to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please select a municipality to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         # Demands dscenario
         if dscenario in ("", "null", None):
-            message = "Please enter a demands dscenario name to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please enter a demands dscenario name to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         # Tables (Arcs and Nodes)
@@ -330,8 +333,8 @@ class GwImportEpanet:
                 combo_value = combo.currentText()
 
                 if combo_value == "":
-                    message = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials, Features."
-                    tools_qt.show_info_box(message)
+                    msg = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials, Features."
+                    tools_qt.show_info_box(msg)
                     return
 
                 new_catalog = None
@@ -341,8 +344,9 @@ class GwImportEpanet:
                     new_catalog = new_catalog_cell.text().strip()
 
                     if combo_value == CREATE_NEW and new_catalog == "":
-                        message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
-                        tools_qt.show_info_box(message)
+                        msg = 'Please enter a new catalog name when the "{0}" option is selected.'
+                        msg_params = (CREATE_NEW,)
+                        tools_qt.show_info_box(msg, msg_params=msg_params)
                         return
 
                 result[element] = (
@@ -899,7 +903,8 @@ class GwImportEpanet:
         if file_path and file_path.suffix == ".inp":
             return file_path
         else:
-            tools_qgis.show_warning("The file selected is not an INP file")
+            msg ="The file selected is not an INP file"
+            tools_qgis.show_warning(msg)
             return
 
     def _update_time_elapsed(self, text: str, dialog: GwDialog) -> None:

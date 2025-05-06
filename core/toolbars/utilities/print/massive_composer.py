@@ -109,14 +109,14 @@ class GwMassiveComposer:
                 try:
                     int(row[0])
                 except ValueError:
-                    message = "All the values in the column 'atlas_id' from the table 'plan_psector' have to be INTEGER. " \
-                              "This is not the case for your table, please fix this before continuing."
-                    tools_qgis.show_warning(message)
+                    msg = ("All the values in the column 'atlas_id' from the table 'plan_psector' have to be INTEGER. "
+                              "This is not the case for your table, please fix this before continuing.")
+                    tools_qgis.show_warning(msg)
                     return
             else:
-                message = "The table 'plan_psector' contains NULL values in the column 'atlas_id'. " \
-                          "Please fix this before continuing."
-                tools_qgis.show_warning(message)
+                msg = ("The table 'plan_psector' contains NULL values in the column 'atlas_id'. "
+                          "Please fix this before continuing.")
+                tools_qgis.show_warning(msg)
                 return
 
         # Get user current selectors
@@ -154,9 +154,9 @@ class GwMassiveComposer:
             atlas.setEnabled(True)
         layer = tools_qgis.get_layer_by_tablename("v_edit_plan_psector")
         if atlas.coverageLayer() != layer:
-            message = "Generation of atlas uses v_edit_plan_psector as coverage layer ordered by atlas_id column. " \
-                      "Please update the atlas' coverage layer before continuing."
-            tools_qgis.show_warning(message)
+            msg = ("Generation of atlas uses v_edit_plan_psector as coverage layer ordered by atlas_id column. "
+                      "Please update the atlas' coverage layer before continuing.")
+            tools_qgis.show_warning(msg)
             # TODO: set the coverage layer here with "atlas.setCoverageLayer(layer)". It doesn't work for some reason, QGIS crash.
             designer.close()
             return

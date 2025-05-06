@@ -93,8 +93,8 @@ class GwWorkcat:
     def _open_selected_workcat(self, dialog, widget):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
         row = selected_list[0].row()
         field_object_id = "id"
@@ -148,11 +148,13 @@ class GwWorkcat:
 
         status = tools_db.execute_sql(sql)
         if status:
-            tools_qgis.show_info("Workcat created successfully.")
+            msg = "Workcat created successfully."
+            tools_qgis.show_info(msg)
             self._refresh_manager_table()
             dialog.accept()
         else:
-            tools_qgis.show_warning("Error creating Workcat.")
+            msg = "Error creating Workcat."
+            tools_qgis.show_warning(msg)
 
     def _check_workcat_exists(self, dialog):
         workid = dialog.cat_work_id.text()
@@ -428,8 +430,8 @@ class GwWorkcat:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
         tools_gw.set_config_parser('btn_search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
-        message = "The csv file has been successfully exported"
-        tools_qgis.show_info(message, dialog=dialog)
+        msg = "The csv file has been successfully exported"
+        tools_qgis.show_info(msg, dialog=dialog)
 
     def _workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """ Filter list of workcats by workcat_id and field_id """
@@ -500,8 +502,8 @@ class GwWorkcat:
         # Get selected code from combo
         element = qtable.selectionModel().selectedRows()
         if len(element) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
 
         row = element[0].row()
@@ -563,8 +565,8 @@ class GwWorkcat:
                     if row:
                         length = length + row[0]
                     else:
-                        message = "Some data is missing. Check gis_length for arc"
-                        tools_qgis.show_warning(message, parameter=arc_id, dialog=self.items_dialog)
+                        msg = "Some data is missing. Check gis_length for arc"
+                        tools_qgis.show_warning(msg, parameter=arc_id, dialog=self.items_dialog)
                         return
                 if extension is not None:
                     widget = self.items_dialog.findChild(QLabel, f"lbl_length{extension}")
@@ -585,8 +587,8 @@ class GwWorkcat:
         doc_id = tools_qt.get_combo_value(dialog, dialog.doc_id)
 
         if not doc_id:
-            message = "Any document selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any document selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Check if document already exist
@@ -604,8 +606,8 @@ class GwWorkcat:
                f" VALUES ('{doc_id}', '{field_value}')")
         status = tools_db.execute_sql(sql)
         if status:
-            message = "Document inserted successfully"
-            tools_qgis.show_info(message, dialog=dialog)
+            msg = "Document inserted successfully"
+            tools_qgis.show_info(msg, dialog=dialog)
 
         dialog.doc_id.blockSignals(True)
         dialog.doc_id.setCurrentIndex(0)

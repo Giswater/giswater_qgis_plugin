@@ -263,9 +263,9 @@ class GwSelector:
                     field['layoutorder'] = order + i + 1
                     gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
                 except Exception:
-                    msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
-                          f"widgetname='{field['widgetname']}'"
-                    tools_qgis.show_message(msg, 2)
+                    msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND widgetname='{1}'"
+                    msg_params = (field['columnname'], field['widgetname'],)
+                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
@@ -301,15 +301,16 @@ class GwSelector:
         tab_name = dialog.main_tab.widget(index).objectName()
         selection_mode = selection_modes[tab_name]
 
-        msg = "Clicking an item will check/uncheck it. "
+        msg = f"{tools_qt.tr("Clicking an item will check/uncheck it.")}"
         if selection_mode == 'keepPrevious':
-            msg += "Checking any item will not uncheck any other item.\n"
+            msg += f"{tools_qt.tr("Checking any item will not uncheck any other item.")}\n"
         elif selection_mode == 'keepPreviousUsingShift':
-            msg += "Checking any item will uncheck all other items unless Shift is pressed.\n"
+            msg += f"{tools_qt.tr("Checking any item will uncheck all other items unless Shift is pressed.")}\n"
         elif selection_mode == 'removePrevious':
-            msg += "Checking any item will uncheck all other items.\n"
-        msg += f"This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector_{tab_name}')."
-        tools_qt.show_info_box(msg, "Selector help")
+            msg += f"{tools_qt.tr("Checking any item will uncheck all other items.")}\n"
+        msg += f"{tools_qt.tr("This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector")}_{tab_name}')."
+        title = "Selector help"
+        tools_qt.show_info_box(msg, title)
 
     def _set_selection_mode(self, dialog, widget, selection_mode):
         """

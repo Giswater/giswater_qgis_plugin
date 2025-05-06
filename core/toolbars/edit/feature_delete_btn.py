@@ -144,8 +144,8 @@ class GwFeatureDeleteButton(GwAction):
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
         feature_id = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
         if feature_id in (None, "null"):
-            message = f"Select one"
-            tools_qgis.show_warning(message, parameter=feature_type)
+            msg = "Select one"
+            tools_qgis.show_warning(msg, parameter=feature_type)
             return
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
@@ -177,7 +177,8 @@ class GwFeatureDeleteButton(GwAction):
         complet_result = tools_gw.execute_procedure('gw_fct_setfeaturedelete', body)
 
         if not complet_result:
-            tools_qgis.show_message("Function gw_fct_setfeaturedelete executed with no result ", 3)
+            msg = "Function gw_fct_setfeaturedelete executed with no result "
+            tools_qgis.show_message(msg, 3)
             return
 
         if complet_result.get('status') == 'Failed':

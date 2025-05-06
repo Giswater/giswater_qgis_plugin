@@ -150,9 +150,9 @@ class GwConnectLinkButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select connecs or gullies with qgis tool and use right click to connect them with network. " \
-                      "CTRL + SHIFT over selection to remove it"
-            tools_qgis.show_info(message, duration=9)
+            msg = ("Select connecs or gullies with qgis tool and use right click to connect them with network. "
+                      "CTRL + SHIFT over selection to remove it")
+            tools_qgis.show_info(msg, duration=9)
 
     def canvasMoveEvent(self, event):
         """ With left click the digitizing is finished """
@@ -178,8 +178,8 @@ class GwConnectLinkButton(GwMaptool):
         if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
             try:
                 if self.connect_link_task.isActive():
-                    message = "Connect link task is already active!"
-                    tools_qgis.show_warning(message)
+                    msg = "Connect link task is already active!"
+                    tools_qgis.show_warning(msg)
                     return
             except RuntimeError:
                 pass
@@ -249,7 +249,8 @@ class GwConnectLinkButton(GwMaptool):
             tools_gw.fill_tab_log(self.dlg_info, result['body']['data'], False)
             tools_gw.open_dialog(self.dlg_info, dlg_name='dialog_text')
         else:
-            tools_qgis.show_warning("gw_fct_setlinktonetwork (Check log messages)", title='Function error')
+            msg = "gw_fct_setlinktonetwork (Check log messages)"
+            tools_qgis.show_warning(msg, title='Function error')
 
         # Refresh map canvas
         tools_gw.reset_rubberband(self.rubber_band)

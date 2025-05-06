@@ -247,8 +247,8 @@ class GwDocument(QObject):
         workcat_id = tools_qt.get_text(dialog, "feature_id_workcat")
 
         if workcat_id == 'null':
-            message = "You need to enter a workcat id"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "You need to enter a workcat id"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         sql = f"INSERT INTO doc_x_workcat (doc_id, workcat_id) VALUES ('{self.doc_id}', '{workcat_id}')"
@@ -264,8 +264,8 @@ class GwDocument(QObject):
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         col_idx = tools_qt.get_col_index_by_col_name(qtable, "workcat_id")
@@ -275,9 +275,9 @@ class GwDocument(QObject):
             workcat_ids.append(workcat_id)
 
         inf_text = ", ".join(workcat_ids)
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
 
         if not answer:
             return
@@ -299,15 +299,15 @@ class GwDocument(QObject):
         psector_name = tools_qt.get_text(dialog, "feature_id_psector")
 
         if psector_name == 'null' or not psector_name:
-            message = "You need to enter a psector name"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "You need to enter a psector name"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         sql = f"SELECT psector_id FROM plan_psector WHERE name = '{psector_name}'"
         row = tools_db.get_row(sql)
         if not row:
-            message = "Psector name not found"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Psector name not found"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
         psector_id = row[0]
 
@@ -323,8 +323,8 @@ class GwDocument(QObject):
         qtable = dialog.tbl_doc_x_psector
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         col_idx = tools_qt.get_col_index_by_col_name(qtable, "psector_name")
@@ -341,14 +341,14 @@ class GwDocument(QObject):
                 psector_ids.append(row[0])
 
         if not psector_ids:
-            message = "No valid psector IDs found"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "No valid psector IDs found"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         inf_text = ", ".join(map(str, psector_names))
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
 
         if not answer:
             return
@@ -370,8 +370,8 @@ class GwDocument(QObject):
         visit_id = tools_qt.get_text(dialog, "feature_id_visit")
 
         if visit_id == 'null' or not visit_id:
-            message = "You need to enter a visit ID"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "You need to enter a visit ID"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         sql = f"INSERT INTO doc_x_visit (doc_id, visit_id) VALUES ('{self.doc_id}', '{visit_id}')"
@@ -386,8 +386,8 @@ class GwDocument(QObject):
         qtable = dialog.tbl_doc_x_visit
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         col_idx = tools_qt.get_col_index_by_col_name(qtable, "visit_id")
@@ -397,9 +397,9 @@ class GwDocument(QObject):
             visit_ids.append(visit_id)
 
         inf_text = ", ".join(map(str, visit_ids))
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
 
         if not answer:
             return
@@ -582,7 +582,8 @@ class GwDocument(QObject):
             else:
                 msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
                        "all selected documents and your name won't be used.")
-                answer = tools_qt.show_question(msg, tools_qt.tr("Add document"))
+                title = "Add document"
+                answer = tools_qt.show_question(msg, title)
                 if answer:
                     for file in self.files_path:
                         sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, name)
@@ -593,7 +594,8 @@ class GwDocument(QObject):
             else:
                 msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
                        "all selected documents and your name won't be used.")
-                answer = tools_qt.show_question(msg, tools_qt.tr("Add document"))
+                title = "Add document"
+                answer = tools_qt.show_question(msg, title)
                 if answer:
                     for cont, file in enumerate(self.files_path):
                         if cont == 0:
@@ -745,8 +747,8 @@ class GwDocument(QObject):
 
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         row = selected_list[0].row()

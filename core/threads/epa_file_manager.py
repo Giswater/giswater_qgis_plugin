@@ -146,8 +146,8 @@ class GwEpaFileManager(GwTask):
             replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
                                                  prefix=False)
             if tools_os.set_boolean(replace, default=False) and self.replaced_velocities:
-                msg = "There were velocities >50 in the rpt file. You have activated the option to force the import " \
-                      "so they have been set to 50."
+                msg = ("There were velocities >50 in the rpt file. You have activated the option to force the import "
+                      "so they have been set to 50.")
                 tools_qt.show_info_box(msg)
 
             if self.common_msg != "":
@@ -168,13 +168,15 @@ class GwEpaFileManager(GwTask):
                     tools_gw.manage_json_exception(self.rpt_result)
 
         if self.error_msg:
-            title = f"Task aborted - {self.description()}"
-            tools_qt.show_info_box(self.error_msg, title=title)
+            title = "Task aborted - {0}"
+            title_params = (self.description(),)
+            tools_qt.show_info_box(self.error_msg, title=title, title_params=title_params)
             return
 
         if self.exception:
-            title = f"Task aborted - {self.description()}"
-            tools_qt.show_info_box(self.exception, title=title)
+            title = "Task aborted - {0}"
+            title_params = (self.description(),)
+            tools_qt.show_info_box(self.exception, title=title, title_params=title_params)
             raise self.exception
 
         # If Database exception, show dialog after task has finished
@@ -182,8 +184,9 @@ class GwEpaFileManager(GwTask):
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
 
     def cancel(self):
-
-        tools_qgis.show_info(f"Task canceled - {self.description()}")
+        msg = "Task canceled - {0}"
+        msg_params = (self.description(),)
+        tools_qgis.show_info(msg, msg_params=msg_params)
         self._close_file()
         super().cancel()
 

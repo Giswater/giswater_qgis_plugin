@@ -375,8 +375,8 @@ class GwSnapManager(object):
         self.point_xy['x'] = point.x()
         self.point_xy['y'] = point.y()
 
-        message = "Geometry has been added!"
-        tools_qgis.show_info(message)
+        msg = "Geometry has been added!"
+        tools_qgis.show_info(msg)
         tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
         tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
         global_vars.iface.mapCanvas().refreshAllLayers()

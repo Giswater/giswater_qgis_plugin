@@ -193,8 +193,8 @@ class GwConfigButton(GwAction):
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)
 
-        message = "Values has been updated"
-        tools_qgis.show_info(message)
+        msg = "Values has been updated"
+        tools_qgis.show_info(msg)
         # Close dialog
         tools_gw.close_dialog(self.dlg_config)
 
@@ -301,8 +301,9 @@ class GwConfigButton(GwAction):
                     self._order_widgets(field, lbl, widget)
 
             except Exception as e:
-                msg = f"{type(e).__name__} {e}. widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
-                tools_qgis.show_message(msg, 2, dialog=self.dlg_config)
+                msg = "{0}: {1}. widgetname='{2}' AND widgettype='{3}'"
+                msg_params = (type(e).__name__, e, field['widgetname'], field['widgettype'],)
+                tools_qgis.show_message(msg, 2, dialog=self.dlg_config, msg_params=msg_params)
 
     def populate_typeahead(self, completer, model, field, dialog, widget):
 

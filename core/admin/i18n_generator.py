@@ -7,21 +7,19 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import re
-import psycopg2
-import psycopg2.extras
 import subprocess
 from functools import partial
 import json
 import ast
-from collections import defaultdict
-import logging
 
+import psycopg2
+import psycopg2.extras
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db
-from PyQt5.QtWidgets import QApplication
+from ...libs import lib_vars, tools_qt, tools_qgis
 
+from PyQt5.QtWidgets import QApplication
 
 class GwI18NGenerator:
 
@@ -168,7 +166,8 @@ class GwI18NGenerator:
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
-            answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{ts_path}")
+            title = "Overwrite"
+            answer = tools_qt.show_question(msg, title, parameter=f"\n\n{ts_path}")
             if not answer:
                 return None
         ts_file = open(ts_path, "w")
@@ -304,7 +303,8 @@ class GwI18NGenerator:
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
-            answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
+            title = "Overwrite"
+            answer = tools_qt.show_question(msg, title, parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
                 return None, ""
         else:

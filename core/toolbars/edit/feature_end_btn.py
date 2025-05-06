@@ -375,8 +375,8 @@ class GwFeatureEndButton(GwAction):
 
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_work)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_work)
             return
 
         row = selected_list[0].row()
@@ -402,8 +402,8 @@ class GwFeatureEndButton(GwAction):
         aux += f"'{arc_id}'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error"
-            tools_qgis.show_warning(message, parameter=expr.parserErrorString(), dialog=self.dlg_work)
+            msg = "Expression Error"
+            tools_qgis.show_warning(msg, parameter=expr.parserErrorString(), dialog=self.dlg_work)
             return
 
         id_list = None
@@ -423,9 +423,9 @@ class GwFeatureEndButton(GwAction):
 
     def _check_downgrade(self):
 
-        message = "Are you sure you want to disconnect this elements?"
+        msg = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
-        answer = tools_qt.show_question(message, title)
+        answer = tools_qt.show_question(msg, title)
         if not answer:
             return
 
@@ -514,7 +514,8 @@ class GwFeatureEndButton(GwAction):
                 ids_ = ids_[:-2]
                 if show_warning and len(ids_) != 0:
                     msg = 'These items could not be downgrade to state 0'
-                    tools_qt.show_info_box(msg, title="Warning", inf_text=str(ids_))
+                    title = "Warning"
+                    tools_qt.show_info_box(msg, title, inf_text=str(ids_))
                 sql = ("DELETE FROM audit_log_data "
                        "WHERE fid = 128 AND cur_user = current_user")
                 tools_db.execute_sql(sql)
@@ -595,6 +596,7 @@ class GwFeatureEndButton(GwAction):
 
             else:
                 msg = "This Workcat already exist"
-                tools_qt.show_info_box(msg, "Warning")
+                title = "Warning"
+                tools_qt.show_info_box(msg, title)
 
     # endregion

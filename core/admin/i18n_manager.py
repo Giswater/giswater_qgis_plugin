@@ -85,19 +85,22 @@ class GwSchemaI18NManager:
         if not status_i18n:
             self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
-            tools_qt.show_info_box(f"Error connecting to i18n databse")
+            msg = "Error connecting to i18n database"
+            tools_qt.show_info_box(msg)
             QApplication.processEvents()
             return
         elif host_i18n != '188.245.226.42' and port_i18n != '5432' and db_i18n != 'giswater':
             self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
-            tools_qt.show_info_box(f"Error connecting to i18n databse")
+            msg = "Error connecting to i18n dataabse"
+            tools_qt.show_info_box(msg)
             QApplication.processEvents()
             return
         elif 'password authentication failed' in str(self.last_error):
             self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
-            tools_qt.show_info_box(f"Incorrect user or password")
+            msg = "Incorrect user or password"
+            tools_qt.show_info_box(msg)
             QApplication.processEvents()
             return
         else:
@@ -109,13 +112,15 @@ class GwSchemaI18NManager:
         if not status_org:
             self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
-            tools_qt.show_info_box(f"Error connecting to origin database")
+            msg = "Error connecting to origin database"
+            tools_qt.show_info_box(msg)
             QApplication.processEvents()
             return
         elif 'password authentication failed' in str(self.last_error):
             self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
-            tools_qt.show_info_box(f"Error connecting to origin database")
+            msg = "Error connecting to origin database"
+            tools_qt.show_info_box(msg)
             QApplication.processEvents()
             return
 
@@ -225,7 +230,9 @@ class GwSchemaI18NManager:
 
             schema_exists = self._detect_schema(self.schema_org)
             if not schema_exists:
-                tools_qt.show_info_box(f"The schema ({self.schema_org}) does not exists")
+                msg = "The schema ({0}) does not exists"
+                msg_params = (self.schema_org,)
+                tools_qt.show_info_box(msg, msg_params=msg_params)
                 return
             if self.check_for_su_tables:
                 tables_i18n.extend(sutables_i18n)
@@ -239,7 +246,9 @@ class GwSchemaI18NManager:
                     correct_lang = self._verify_lang()
                     self._change_table_lyt(table_i18n.split(".")[1])
                     if not table_exists:
-                        tools_qt.show_info_box(f"The table ({table_i18n.split(".")[1]}) does not exists")
+                        msg = "The table ({0}) does not exists"
+                        msg_params = (self.schema_org,)
+                        tools_qt.show_info_box(msg, msg_params=msg_params)
                         no_repeat_table.append(table_i18n)
                     elif correct_lang:
                         text_error += self._update_tables(table_i18n)
@@ -248,7 +257,8 @@ class GwSchemaI18NManager:
                         text_error += self._update_project_type(table_i18n)
                         self._vacuum_commit(table_i18n, self.conn_i18n, self.cursor_i18n)
                     else:
-                        tools_qt.show_info_box('Incorrect languages, make sure to have the giswater project in english')
+                        msg = "Incorrect languages, make sure to have the giswater project in english"
+                        tools_qt.show_info_box(msg)
                         break                   
 
                 
@@ -832,7 +842,8 @@ class GwSchemaI18NManager:
         if len(text_error) > 1:
             tools_qt.show_info_box(text_error)
         else:
-            tools_qt.show_info_box("All messages updated correctly")
+            msg = "All messages updated correctly"
+            tools_qt.show_info_box(msg)
 
         self.conn_i18n.commit()
 
@@ -859,6 +870,52 @@ class GwSchemaI18NManager:
             print(f"No se pudo leer el archivo {file}: {e}")
         return found_lines
     
+    def _extra_messages_to_find():
+        # writen to be detected by the automatical finder of pymessages
+        message = "File name"
+        message = "Function name"
+        message = "Detail"
+        message = "Context"
+        message = "Message error"
+        message = "Key"
+        message = "Key container"
+        message = "Python file"
+        message = "Python function"
+        message = "There have been errors translating:"
+        message = "Database translation canceled."
+        message = "Database translation failed."
+        message = "Database translation successful to"
+        message = "Do you want to copy its values to the current node?"
+        message = "Selected snapped feature_id to copy values from"
+        message = "Clicking an item will check/uncheck it. "
+        message = "Checking any item will not uncheck any other item."
+        message = "Checking any item will uncheck all other items unless Shift is pressed."
+        message = "Checking any item will uncheck all other items."
+        message = "This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector"
+        message = "Pipes with invalid arccat_ids: {0}."
+        message = "Invalid arccat_ids: {1}."
+        message = "Do you want to proceed?"
+        message = ("An arccat_id is considered invalid if it is not listed in the catalog configuration table. "
+                    "As a result, these pipes will NOT be assigned a priority value.")
+        message = "Pipes with invalid diameters: {0}."
+        message = "Invalid diameters: {1}."
+        message = ("A diameter value is considered invalid if it is zero, negative, NULL "
+                    "or greater than the maximum diameter in the configuration table. "
+                    "As a result, these pipes will NOT be assigned a priority value.")
+        message = "A material is considered invalid if it is not listed in the material configuration table."
+        message = ("As a result, the material of these pipes will be treated "
+                    "as the configured unknown material, {0}.")
+        message = ("These pipes will NOT be assigned a priority value "
+                    "as the configured unknown material, {1}, "
+                    "is not listed in the configuration tab for materials.")
+        message = "Pipes with invalid materials: {2}."
+        message = "Invalid materials: {3}."
+        message = "Field child_layer of id: "
+        message = "is not defined in table cat_feature"
+        message = "widgettype not found. "
+        message = "layoutorder not found."
+        message = "widgetname not found. "
+        message = "widgettype is wrongly configured. Needs to be in "
         
     #endregion
     # region Global funcitons

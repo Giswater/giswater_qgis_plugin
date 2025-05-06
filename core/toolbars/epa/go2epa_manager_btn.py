@@ -297,8 +297,8 @@ class GwGo2EpaManagerButton(GwAction):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
 
         inf_text = ""
@@ -311,9 +311,9 @@ class GwGo2EpaManagerButton(GwAction):
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
         if answer:
             sql = f"DELETE FROM {table_name}"
             sql += f" WHERE {column_id} IN ({list_id})"
@@ -330,8 +330,8 @@ class GwGo2EpaManagerButton(GwAction):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
 
         row = selected_list[0].row()
@@ -347,12 +347,12 @@ class GwGo2EpaManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_set_rpt_archived', body)
 
         if not result or result.get('status') != 'Accepted':
-            message = "gw_fct_set_rpt_archived execution failed. See logs for more details..."
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            msg = "gw_fct_set_rpt_archived execution failed. See logs for more details..."
+            tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
 
-        message = "Set rpt archived execution successful."
-        tools_qgis.show_info(message, dialog=self.dlg_manager)
+        msg = "Set rpt archived execution successful."
+        tools_qgis.show_info(msg, dialog=self.dlg_manager)
         # Refresh table
         self._fill_manager_table()
 
@@ -366,12 +366,12 @@ class GwGo2EpaManagerButton(GwAction):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
 
         msg = ("You are going to make this result corporate. From now on the result values will appear on feature form. "
-            "Do you want to continue?")
+                "Do you want to continue?")
 
         answer = tools_qt.show_question(msg)
         if not answer:
@@ -390,8 +390,8 @@ class GwGo2EpaManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_epa2data', parameter)
 
         if not result or result.get('status') != 'Accepted':
-            message = "Epa2data execution failed. See logs for more details..."
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            msg = "Epa2data execution failed. See logs for more details..."
+            tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
         elif result['message'].get('level') == 2:
             tools_qgis.show_warning(result['message']['text'], dialog=self.dlg_manager)
@@ -407,8 +407,8 @@ class GwGo2EpaManagerButton(GwAction):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
         index = selected_list[0]
 
@@ -430,8 +430,8 @@ class GwGo2EpaManagerButton(GwAction):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
 
         result_ids = []
@@ -454,8 +454,8 @@ class GwGo2EpaManagerButton(GwAction):
         )
 
         if not json_result or 'status' not in json_result or json_result['status'] == 'Failed':
-            message = "Failed to retrieve GeoJSON data."
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            msg = "Failed to retrieve GeoJSON data."
+            tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
 
         # Zoom layer arc if exists
@@ -463,7 +463,7 @@ class GwGo2EpaManagerButton(GwAction):
         if arc_layer:
             tools_qgis.zoom_to_layer(arc_layer)
 
-        message = "Data retrieved and displayed successfully."
-        tools_qgis.show_info(message, dialog=self.dlg_manager)
+        msg = "Data retrieved and displayed successfully."
+        tools_qgis.show_info(msg, dialog=self.dlg_manager)
 
     # endregion

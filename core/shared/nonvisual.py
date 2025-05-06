@@ -43,7 +43,7 @@ class GwNonVisual:
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg: GwNonVisualManagerUi = None
-        self.dict_views = {'ws': {'cat_mat_roughness': 'roughness', 'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
+        self.dict_views = {'ws': {'cat_mat_roughness': 'aa', 'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
                                   'v_edit_inp_controls': 'controls', 'v_edit_inp_rules': 'rules'},
                            'ud': {'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
                                   'v_edit_inp_timeseries': 'timeseries', 'v_edit_inp_controls': 'controls',
@@ -386,8 +386,8 @@ class GwNonVisual:
             value = idx.sibling(idx.row(), 0).data()
             id_list.append(value)
 
-        message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", id_list)
+        msg = "Are you sure you want to delete these records?"
+        answer = tools_qt.show_question(msg, "Delete records", id_list)
         if answer:
             # Add quotes to id if not inp_controls/inp_rules
             if tablename not in ('inp_controls', 'inp_rules'):
@@ -2825,7 +2825,9 @@ class GwNonVisual:
                     # Control values that cannot be 0
                     if widget.objectName() in control_values[lidco_type] and value == "'0'":
                         dialog.tab_lidlayers.setCurrentWidget(dialog.tab_lidlayers.widget(i))
-                        tools_qt.show_info_box("Marked values must be greater than 0", "LIDS")
+                        msg = "Marked values must be greater than 0"
+                        title = "LIDS"
+                        tools_qt.show_info_box(msg, title)
                         tools_qt.set_stylesheet(widget)
 
                         return False

@@ -162,7 +162,8 @@ class GwAddChildLayerButton(GwAction):
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
                 msg = "Remove layer from project?"
-                answer = tools_qt.show_question(msg, title="Warning", parameter=f"'{layer.name()}'", force_action=True)
+                title = "Warning"
+                answer = tools_qt.show_question(msg, title, parameter=f"'{layer.name()}'", force_action=True)
                 if answer:
                     tools_qgis.remove_layer_from_toc(layer.name(), group, sub_group)
 
