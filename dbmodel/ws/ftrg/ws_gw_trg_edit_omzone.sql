@@ -26,9 +26,8 @@ BEGIN
 			RETURN NULL;
 		END IF;
 
-		INSERT INTO omzone (omzone_id, name, descript, macroomzone_id, expl_id, link, stylesheet, omzone_type, graphconfig, lock_level)
-		VALUES (NEW.omzone_id, NEW.name, NEW.descript, NEW.macroomzone_id, NEW.expl_id, NEW.link, NEW.stylesheet,
-		NEW.omzone_type, NEW.graphconfig::json, NEW.lock_level);
+		INSERT INTO omzone (omzone_id, code, name, descript, omzone_type, muni_id, expl_id, macroomzone_id, link, lock_level)
+		VALUES (NEW.omzone_id, NEW.code, NEW.name, NEW.descript, NEW.omzone_type, NEW.muni_id, NEW.expl_id, NEW.macroomzone_id, NEW.link, NEW.lock_level);
 
 		IF view_name = 'UI' THEN
 			IF NEW.active IS NULL THEN
@@ -53,9 +52,8 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE omzone
-		SET omzone_id=NEW.omzone_id, name=NEW.name, descript=NEW.descript, expl_id=NEW.expl_id,
-		link=NEW.link, updated_at=now(), updated_by = current_user, macroomzone_id = NEW.macroomzone_id, stylesheet=NEW.stylesheet,
-		omzone_type=NEW.omzone_type, graphconfig=NEW.graphconfig::json, lock_level=NEW.lock_level
+		SET code=NEW.code, name=NEW.name, descript=NEW.descript, omzone_type=NEW.omzone_type, muni_id=NEW.muni_id, expl_id=NEW.expl_id,
+		macroomzone_id=NEW.macroomzone_id, link=NEW.link, lock_level=NEW.lock_level
 		WHERE omzone_id=OLD.omzone_id;
 
 		IF view_name = 'UI' THEN
