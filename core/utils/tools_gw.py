@@ -1488,11 +1488,8 @@ def manage_feature_cat():
 
     body = create_body()
     result = execute_procedure('gw_fct_getcatfeaturevalues', body)
-    # If result ara none, probably the conection has broken so try again
     if not result:
-        result = execute_procedure('gw_fct_getcatfeaturevalues', body)
-        if not result:
-            return None
+        return None
 
     msg = tools_qt.tr("Field child_layer of id: ")
     for value in result['body']['data']['values']:

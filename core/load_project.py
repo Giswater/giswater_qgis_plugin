@@ -119,9 +119,6 @@ class GwLoadProject(QObject):
         except AttributeError:
             pass
 
-        # Get feature cat
-        global_vars.feature_cat = tools_gw.manage_feature_cat()
-
         # Create menu
         tools_gw.create_giswater_menu(True)
 
@@ -522,10 +519,6 @@ class GwLoadProject(QObject):
             self._enable_toolbar("plan")
             self._hide_button("72", False)
 
-        # Check if exist some feature_cat with active True on cat_feature table
-        if global_vars.feature_cat is None:
-            self._enable_button("21", False)
-            self._enable_button("22", False)
 
     def _config_layers(self):
         """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """

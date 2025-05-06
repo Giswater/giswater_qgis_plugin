@@ -59,13 +59,10 @@ class GwPointAddButton(GwAction):
             action.disconnect()
             self.menu.removeAction(action)
             del action
-        action_group = self.action.property('action_group')
-
-        # Update featurecatvalues
-        global_vars.feature_cat = tools_gw.manage_feature_cat()
+        action_group = self.action.property('action_group')        
 
         # Get list of different connec, gully and node types
-        features_cat = global_vars.feature_cat
+        features_cat = tools_gw.manage_feature_cat()
         project_type = tools_gw.get_project_type()
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
@@ -83,36 +80,34 @@ class GwPointAddButton(GwAction):
                     obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
 
             self.menu.addSeparator()
-            if features_cat is not None:
-                list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
-                for feature_cat in list_feature_cat:
-                    if feature_cat.feature_type.upper() == 'CONNEC':
-                        obj_action = QAction(str(feature_cat.id), action_group)
-                        if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
-                            obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
-                        try:
-                            obj_action.setShortcutVisibleInContextMenu(True)
-                        except Exception:
-                            pass
-                        self.menu.addAction(obj_action)
-                        obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
-                        obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
-                self.menu.addSeparator()
-                if features_cat is not None:
-                    list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
-                    for feature_cat in list_feature_cat:
-                        if feature_cat.feature_type.upper() == 'GULLY' and project_type == 'ud':
-                            obj_action = QAction(str(feature_cat.id), action_group)
-                            if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
-                                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
-                            try:
-                                obj_action.setShortcutVisibleInContextMenu(True)
-                            except Exception:
-                                pass
-                            self.menu.addAction(obj_action)
-                            obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
-                            obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
-                    self.menu.addSeparator()
+            list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
+            for feature_cat in list_feature_cat:
+                if feature_cat.feature_type.upper() == 'CONNEC':
+                    obj_action = QAction(str(feature_cat.id), action_group)
+                    if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
+                        obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                    try:
+                        obj_action.setShortcutVisibleInContextMenu(True)
+                    except Exception:
+                        pass
+                    self.menu.addAction(obj_action)
+                    obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
+                    obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
+            self.menu.addSeparator()
+            list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
+            for feature_cat in list_feature_cat:
+                if feature_cat.feature_type.upper() == 'GULLY' and project_type == 'ud':
+                    obj_action = QAction(str(feature_cat.id), action_group)
+                    if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
+                        obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                    try:
+                        obj_action.setShortcutVisibleInContextMenu(True)
+                    except Exception:
+                        pass
+                    self.menu.addAction(obj_action)
+                    obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
+                    obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
+            self.menu.addSeparator()
 
     def _save_last_selection(self, menu, feature_cat):
         menu.setProperty("last_selection", feature_cat)

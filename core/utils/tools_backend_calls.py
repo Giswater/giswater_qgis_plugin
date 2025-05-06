@@ -771,14 +771,6 @@ def load_qml(**kwargs):
     return True
 
 
-def update_catfeaturevalues(**kwargs):
-    """
-    Reload global_vars.feature_cat
-
-    """
-    global_vars.feature_cat = tools_gw.manage_feature_cat()
-
-
 def open_url(widget):
     """ Function called in def add_hyperlink(field): -->
         widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget)) """
