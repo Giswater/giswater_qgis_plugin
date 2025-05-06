@@ -88,6 +88,8 @@ class GwConnectLinkButton(GwMaptool):
         # Open form
         tools_gw.open_dialog(self.dlg_connect_link, 'connect_link')
 
+        self.dlg_connect_link.setWindowTitle(tools_qt.tr(f"{self.feature.capitalize()} to link"))
+
     def fill_tbl_ids(self):
         """ Fill table with selected features """
 
