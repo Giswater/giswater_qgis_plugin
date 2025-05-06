@@ -514,3 +514,10 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source"
 VALUES(642, 'Connec which id is not an integer', 'utils', NULL, 'core', true, 'Check om-data', NULL, 3, 'connec which id is not an integer. Please, check your data before continue', NULL, NULL, 'SELECT CASE WHEN connec_id~E''^\\d+$'' THEN CAST (connec_id AS INTEGER)  ELSE 0 END  as feature_id, ''CONNEC'' as type, conneccat_id, expl_id FROM t_connec', 'All connecs features with id integer.', '[gw_fct_om_check_data, gw_fct_admin_check_data]', true);
 
 DELETE FROM sys_fprocess WHERE fid IN (202, 542);
+
+INSERT INTO sys_table (id, descript, sys_role, "source") 
+VALUES('sys_label', 'Specific table to keep labels indexed and ready to translate', 'role_admin', 'core');
+
+INSERT INTO sys_label VALUES (1001, 'INFO');
+INSERT INTO sys_label VALUES (1002, 'WARNING');
+INSERT INTO sys_label VALUES (1003, 'ERROR');

@@ -162,3 +162,11 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_p
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"creation_date", "dataType":"date"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"owner_vdefault", "dataType":"varchar(30)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"inventory_vdefault", "dataType":"boolean"}}$$);
+
+
+-- 06/05/2025
+CREATE TABLE sys_label (
+	id integer PRIMARY KEY,
+	idval text NOT NULL,
+	label_type text
+);
