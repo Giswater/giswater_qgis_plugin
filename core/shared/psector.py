@@ -434,7 +434,6 @@ class GwPsector:
 
         # manage widgets
         tools_gw.manage_dlg_widgets(self, self.dlg_plan_psector, json_result)
-        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
         # set window title
         if psector_id is not None:
@@ -474,6 +473,9 @@ class GwPsector:
             tools_qt.set_checked(self.dlg_plan_psector, "tab_general_chk_enable_all", True)
 
         self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
+
+        # Open dialog
+        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
 
     def psector_name_changed(self):
