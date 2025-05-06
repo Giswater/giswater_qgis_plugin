@@ -446,8 +446,8 @@ BEGIN
 
 						IF v_count > 0 THEN
 							FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=v_arc_id  LOOP
-								INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
-								INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
+								INSERT INTO element_x_arc (element_id, arc_id) VALUES (rec_aux.element_id, rec_aux1.arc_id);
+								INSERT INTO element_x_arc (element_id, arc_id) VALUES (rec_aux.element_id, rec_aux2.arc_id);
 								DELETE FROM element_x_arc WHERE arc_id=v_arc_id;
 							END LOOP;
 
@@ -459,8 +459,8 @@ BEGIN
 						SELECT count(*) into v_count FROM doc_x_arc WHERE arc_id=v_arc_id;
 						IF v_count > 0 THEN
 							FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=v_arc_id  LOOP
-								INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
-								INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
+								INSERT INTO doc_x_arc (doc_id, arc_id) VALUES (rec_aux.doc_id, rec_aux1.arc_id);
+								INSERT INTO doc_x_arc (doc_id, arc_id) VALUES (rec_aux.doc_id, rec_aux2.arc_id);
 								DELETE FROM doc_x_arc WHERE arc_id=v_arc_id;
 							END LOOP;
 
