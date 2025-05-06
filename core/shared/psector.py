@@ -21,7 +21,7 @@ from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu, QHBoxLayout
 from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapToPixel, QgsMapLayer
-from qgis.gui import QgsMapToolEmitPoint
+from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from .document import GwDocument, global_vars
 from ..toolbars.utilities.toolbox_btn import GwToolBoxButton
@@ -457,7 +457,7 @@ class GwPsector:
 
         # fill my_json when field change
         for widget in widget_list:
-            if type(widget) is QLineEdit:
+            if type(widget) is QLineEdit and widget.objectName() != 'qt_spinbox_lineedit':
                 widget.editingFinished.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
             elif isinstance(widget, QComboBox):
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
@@ -467,6 +467,8 @@ class GwPsector:
                 widget.stateChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
             elif type(widget) is QTextEdit:
                 widget.textChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
+            elif isinstance(widget, QgsDateTimeEdit):
+                widget.dateChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
 
         # Set checked enable all layers
         if self.all_layers_checked:
