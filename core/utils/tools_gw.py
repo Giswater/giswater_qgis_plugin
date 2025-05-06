@@ -4999,10 +4999,6 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
         # Add widget into layout
         add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
-        # Apply consistent column stretch across all layouts
-        layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
-        layout.setColumnStretch(1, 3)  # Widget column stretch for sufficient space
-
 
 def set_widgets(dialog, complet_result, field, tablename, class_info):
     """
