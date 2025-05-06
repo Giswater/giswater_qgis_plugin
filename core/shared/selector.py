@@ -401,13 +401,6 @@ class GwSelector:
             except KeyError:
                 pass
 
-
-        # Build and Apply filters
-        if selector_type == 'selector_campaign':
-            tools_gw.reload_layers_filters(iscampaign=True)
-        else:
-            tools_gw.reload_layers_filters()
-
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')
         tools_qgis.set_layer_index('v_edit_node')
