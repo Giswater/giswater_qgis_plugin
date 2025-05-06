@@ -17,15 +17,15 @@ $BODY$
  * PARAMETERS OPTIONS:
  * * project_type: string -> 'WS' | 'UD' (mandatory)
  * * table_name: string -> 'doc' | 'element' (mandatory)
- * * element_id: string -> 'element_id' (mandatory)
+ * * object_id: string -> 'object_id' (mandatory)
  * * data: object - {'arc': [], 'node': [], 'connec': [], 'gully': [], 'psector': [], 'visit': [], 'workcat': []} (mandatory)
 
  * EXAMPLE CALLS:
- * * SELECT SCHEMA_NAME.gw_fct_manage_relations('{"data":{"parameters":{"project_type":"WS", "element_id": 1897, "table_name":"element", "data":{"arc": [135, 2028, 2030, 20851, 2027], "node": [113883, 1092], "connec": []}}}}');
- * * SELECT SCHEMA_NAME.gw_fct_manage_relations('{"data":{"parameters":{"project_type":"WS", "table_name":"doc, "data":{"arc": [], "node": [4], "connec": [], 'psector': [], 'visit': [], 'workcat': [2, 4]}}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_relations('{"data":{"parameters":{"project_type":"WS", "object_id": 1897, "table_name":"element", "data":{"arc": [135, 2028, 2030, 20851, 2027], "node": [113883, 1092], "connec": []}}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_relations('{"data":{"parameters":{"project_type":"WS", "object_id": 1897, "table_name":"doc, "data":{"arc": [], "node": [4], "connec": [], 'psector': [], 'visit': [], 'workcat': [2, 4]}}}}');
 
- * * SELECT SCHEMA_NAME.gw_fct_manage_relations('{"data":{"parameters":{"project_type":"UD", "table_name":"element", "data":{"arc": [1, 2, 3], "node": [4, 5, 6], "connec": [7, 8, 9], "gully": [10, 11, 12]}}}}');
- * * SELECT SCHEMA_NAME.gw_fct_manage_relations('{"data":{"parameters":{"project_type":"UD", "table_name":"doc", "data":{"arc": [], "node": [4], "connec": [], "gully": [10], "psector": [13, 14], "visit": [], "workcat": []}}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_relations('{"data":{"parameters":{"project_type":"UD", "object_id": 1897, "table_name":"element", "data":{"arc": [1, 2, 3], "node": [4, 5, 6], "connec": [7, 8, 9], "gully": [10, 11, 12]}}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_relations('{"data":{"parameters":{"project_type":"UD", "object_id": 1897, "table_name":"doc", "data":{"arc": [], "node": [4], "connec": [], "gully": [10], "psector": [13, 14], "visit": [], "workcat": []}}}}');
 
 */
 
@@ -36,7 +36,7 @@ DECLARE
     -- parameters
     v_parameters json;
     v_table_name text;
-    v_element_id text;
+    v_object_id text;
     v_data jsonb;
 
     v_relations_table_prefix text;
@@ -52,7 +52,7 @@ BEGIN
 	v_parameters := (((p_data ->>'data')::json->>'parameters')::json);
     v_project_type = UPPER(v_parameters->>'project_type');
     v_table_name = LOWER(v_parameters->>'table_name');
-    v_element_id = v_parameters->>'element_id';
+    v_object_id = v_parameters->>'object_id';
     v_data = v_parameters->>'data';
 
     -- validate parameters
@@ -78,9 +78,9 @@ BEGIN
         RETURN ('{"status":"Failed","message":{"level":1, "text":"table_name is invalid"}}')::json;
     END IF;
 
-    -- validate element_id
-    IF v_element_id IS NULL THEN
-        RETURN ('{"status":"Failed","message":{"level":1, "text":"element_id is required"}}')::json;
+    -- validate object_id
+    IF v_object_id IS NULL THEN
+        RETURN ('{"status":"Failed","message":{"level":1, "text":"object_id is required"}}')::json;
     END IF;
 
 
@@ -106,7 +106,7 @@ BEGIN
     END IF;
 
     -- element_x_arc, element_x_node, element_x_connec, element_x_gully
-    -- doc_x_arc, doc_x_node, doc_x_connec, doc_x_gully, doc_x_link, doc_x_psector, doc_x_visit, doc_x_workcat
+    -- doc_x_arc, doc_x_node, doc_x_connec, doc_x_gully, doc_x_link, doc_x_psector, doc_x_visit, doc_x_workcat, doc_x_element
 
     v_relations_table_prefix = v_table_name||'_x_';
 
@@ -115,49 +115,63 @@ BEGIN
         v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
             v_relations_table_prefix||'arc', v_table_name||'_id', 'arc_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'arc';
+        EXECUTE v_querytext USING v_object_id, v_data->>'arc';
     END IF;
 
     IF v_data->>'node' IS NOT NULL AND v_data->>'node' != '[]' THEN
         v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
             v_relations_table_prefix||'node', v_table_name||'_id', 'node_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'node';
+        EXECUTE v_querytext USING v_object_id, v_data->>'node';
     END IF;
 
     IF v_data->>'connec' IS NOT NULL AND v_data->>'connec' != '[]' THEN
         v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
             v_relations_table_prefix||'connec', v_table_name||'_id', 'connec_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'connec';
+        EXECUTE v_querytext USING v_object_id, v_data->>'connec';
+    END IF;
+
+    IF v_data->>'link' IS NOT NULL AND v_data->>'link' != '[]' THEN
+        v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
+            v_relations_table_prefix||'link', v_table_name||'_id', 'link_id');
+
+        EXECUTE v_querytext USING v_object_id, v_data->>'link';
     END IF;
 
     IF v_project_type = 'UD' AND v_data->>'gully' IS NOT NULL AND v_data->>'gully' != '[]' THEN
         v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
             v_relations_table_prefix||'gully', v_table_name||'_id', 'gully_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'gully';
+        EXECUTE v_querytext USING v_object_id, v_data->>'gully';
     END IF;
 
     IF v_data->>'psector' IS NOT NULL AND v_data->>'psector' != '[]' THEN
         v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
             v_relations_table_prefix||'psector', v_table_name||'_id', 'psector_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'psector';
+        EXECUTE v_querytext USING v_object_id, v_data->>'psector';
     END IF;
 
     IF v_data->>'visit' IS NOT NULL AND v_data->>'visit' != '[]' THEN
         v_querytext = format('DELETE FROM %I WHERE %I::text = $1 AND %I::text NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
             v_relations_table_prefix||'visit', v_table_name||'_id', 'visit_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'visit';
+        EXECUTE v_querytext USING v_object_id, v_data->>'visit';
     END IF;
 
     IF v_data->>'workcat' IS NOT NULL AND v_data->>'workcat' != '[]' THEN
         v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
             v_relations_table_prefix||'workcat', v_table_name||'_id', 'workcat_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'workcat';
+        EXECUTE v_querytext USING v_object_id, v_data->>'workcat';
+    END IF;
+
+    IF v_data->>'element' IS NOT NULL AND v_data->>'element' != '[]' THEN
+        v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
+            v_relations_table_prefix||'element', v_table_name||'_id', 'element_id');
+
+        EXECUTE v_querytext USING v_object_id, v_data->>'element';
     END IF;
 
     -- Insert new relations
@@ -165,49 +179,63 @@ BEGIN
         v_querytext = format('INSERT INTO %I (%I, arc_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
             v_relations_table_prefix||'arc', v_table_name||'_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'arc';
+        EXECUTE v_querytext USING v_object_id, v_data->>'arc';
     END IF;
 
     IF v_data->>'node' IS NOT NULL AND v_data->>'node' != '[]' THEN
         v_querytext = format('INSERT INTO %I (%I, node_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
             v_relations_table_prefix||'node', v_table_name||'_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'node';
+        EXECUTE v_querytext USING v_object_id, v_data->>'node';
     END IF;
 
     IF v_data->>'connec' IS NOT NULL AND v_data->>'connec' != '[]' THEN
         v_querytext = format('INSERT INTO %I (%I, connec_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
             v_relations_table_prefix||'connec', v_table_name||'_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'connec';
+        EXECUTE v_querytext USING v_object_id, v_data->>'connec';
+    END IF;
+
+    IF v_data->>'link' IS NOT NULL AND v_data->>'link' != '[]' THEN
+        v_querytext = format('INSERT INTO %I (%I, link_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
+            v_relations_table_prefix||'link', v_table_name||'_id');
+
+        EXECUTE v_querytext USING v_object_id, v_data->>'link';
     END IF;
 
     IF v_project_type = 'UD' AND v_data->>'gully' IS NOT NULL AND v_data->>'gully' != '[]' THEN
         v_querytext = format('INSERT INTO %I (%I, gully_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
             v_relations_table_prefix||'gully', v_table_name||'_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'gully';
+        EXECUTE v_querytext USING v_object_id, v_data->>'gully';
     END IF;
 
     IF v_data->>'psector' IS NOT NULL AND v_data->>'psector' != '[]' THEN
         v_querytext = format('INSERT INTO %I (%I, psector_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
             v_relations_table_prefix||'psector', v_table_name||'_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'psector';
+        EXECUTE v_querytext USING v_object_id, v_data->>'psector';
     END IF;
 
     IF v_data->>'visit' IS NOT NULL AND v_data->>'visit' != '[]' THEN
         v_querytext = format('INSERT INTO %I (%I, visit_id) SELECT $1, jsonb_array_elements_text($2::jsonb)::int ON CONFLICT DO NOTHING',
             v_relations_table_prefix||'visit', v_table_name||'_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'visit';
+        EXECUTE v_querytext USING v_object_id, v_data->>'visit';
     END IF;
 
     IF v_data->>'workcat' IS NOT NULL AND v_data->>'workcat' != '[]' THEN
         v_querytext = format('INSERT INTO %I (%I, workcat_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
             v_relations_table_prefix||'workcat', v_table_name||'_id');
 
-        EXECUTE v_querytext USING v_element_id, v_data->>'workcat';
+        EXECUTE v_querytext USING v_object_id, v_data->>'workcat';
+    END IF;
+
+    IF v_data->>'element' IS NOT NULL AND v_data->>'element' != '[]' THEN
+        v_querytext = format('INSERT INTO %I (%I, element_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
+            v_relations_table_prefix||'element', v_table_name||'_id');
+
+        EXECUTE v_querytext USING v_object_id, v_data->>'element';
     END IF;
 
 
