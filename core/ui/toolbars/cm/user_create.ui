@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>team_create</class>
- <widget class="QDialog" name="team_create">
+ <class>user_create</class>
+ <widget class="QDialog" name="user_create">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,11 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Create team</string>
+   <string>Create user</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <layout class="QGridLayout" name="lyt_create_team_1"/>
+    <layout class="QGridLayout" name="lyt_create_user_1"/>
    </item>
    <item>
     <spacer name="verticalSpacer">

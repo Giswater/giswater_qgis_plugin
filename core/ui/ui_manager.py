@@ -834,6 +834,15 @@ class TeamCreateUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
+UINAME = "user_create"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class UserCreateUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
 UINAME = "team_management"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
