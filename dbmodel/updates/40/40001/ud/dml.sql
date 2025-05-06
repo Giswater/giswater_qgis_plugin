@@ -864,3 +864,5 @@ UPDATE config_form_tableview SET columnindex=9 WHERE objectname='tbl_element_x_g
 UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_gully' AND columnname='builtdate';
 UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_gully' AND columnname='enddate';
 UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_gully' AND columnname='descript';
+
+UPDATE sys_table SET id='cat_gully', descript='Catalog of gullys.', sys_role='role_edit', criticity=2, context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=10, alias='Gully catalog', notify_action=NULL, isaudit=NULL, keepauditdays=NULL, "source"='core', addparam=NULL WHERE id='cat_grate';
