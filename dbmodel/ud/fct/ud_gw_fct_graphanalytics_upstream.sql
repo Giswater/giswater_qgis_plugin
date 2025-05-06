@@ -63,8 +63,8 @@ v_query text;
 v_source text;
 v_target text;
 v_distance int;
-v_dry text;
-v_rain text;
+v_mainstream text;
+v_diverted_flow text;
 v_context text;
 
 v_symbology int; 
@@ -89,8 +89,8 @@ BEGIN
 	-- pgrouting
 	v_source= 'node_2';
 	v_target= 'node_1';
-	v_dry = 'maintream';
-	v_rain = 'diverted flow';
+	v_mainstream = 'maintream';
+	v_diverted_flow = 'diverted flow';
 	
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
@@ -119,7 +119,7 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 
-	-- rain
+	-- mainstream + diverted flow
 	v_query = '
 		WITH 
 			arc_selected AS (
@@ -140,14 +140,14 @@ BEGIN
 	INTO v_distance;
 
 	INSERT INTO anl_node (node_id, fid, nodecat_id, sys_type, state, expl_id, drainzone_id, addparam, the_geom)
-	SELECT n.node_id, v_fid, n.node_type, n.sys_type, n.state, n.expl_id, n.drainzone_id, v_rain, n.the_geom
+	SELECT n.node_id, v_fid, n.node_type, n.sys_type, n.state, n.expl_id, n.drainzone_id, v_diverted_flow, n.the_geom
 	FROM (
 		SELECT node::varchar
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
 	) p 
 	JOIN v_edit_node n ON n.node_id =p.node;
 
-	-- dry
+	-- mainstream
 	v_query = '
 		WITH 
 			arc_selected AS (
@@ -165,7 +165,7 @@ BEGIN
 			FROM arc_selected a
 	';
 
-	UPDATE anl_node n set addparam = v_dry
+	UPDATE anl_node n set addparam = v_mainstream
 	FROM (
 		SELECT node::varchar
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
