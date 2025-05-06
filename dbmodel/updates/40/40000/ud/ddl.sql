@@ -1286,7 +1286,7 @@ CREATE TABLE connec (
 	streetaxis2_id varchar(16) NULL,
 	postnumber2 int4 NULL,
 	postcomplement2 varchar(100) NULL,
-	block_code text NULL,
+	block_zone text NULL,
 	plot_code text NULL,
 	workcat_id varchar(255) NULL,
 	workcat_id_end varchar(255) NULL,
@@ -1352,6 +1352,8 @@ CREATE INDEX connec_street1 ON connec USING btree (streetaxis_id);
 CREATE INDEX connec_street2 ON connec USING btree (streetaxis2_id);
 CREATE INDEX connec_sys_code_idx ON connec USING btree (sys_code);
 CREATE INDEX connec_asset_id_idx ON connec USING btree (asset_id);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"connec", "column":"block_zone", "newName":"block_code"}}$$);
 
 
 

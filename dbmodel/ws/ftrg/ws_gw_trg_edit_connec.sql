@@ -520,7 +520,7 @@ BEGIN
 		muni_id, streetaxis2_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, pjoint_id, pjoint_type,
 		adate, adescript, accessibility, updated_at, updated_by, asset_id, epa_type, om_state, conserv_state, priority,
-		access_type, placement_type, crmzone_id, expl_visibility, plot_code, brand_id, model_id, serial_number, label_quadrant, n_inhabitants, lock_level, block_zone)
+		access_type, placement_type, crmzone_id, expl_visibility, plot_code, brand_id, model_id, serial_number, label_quadrant, n_inhabitants, lock_level, block_code)
 		VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.datasource, NEW.top_elev, NEW.depth, NEW.conneccat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.muni_id, NEW.streetaxis2_id, NEW.postcode, NEW.district_id, NEW.postcomplement,
@@ -528,7 +528,7 @@ BEGIN
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
 		NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_visibility, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
-		NEW.label_quadrant, NEW.n_inhabitants, NEW.lock_level, NEW.block_zone);
+		NEW.label_quadrant, NEW.n_inhabitants, NEW.lock_level, NEW.block_code);
 
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
 		JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.conneccat_id;
@@ -874,7 +874,7 @@ BEGIN
 			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
 			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority, access_type = NEW.access_type, placement_type = NEW.placement_type,
 			crmzone_id=NEW.crmzone_id, expl_visibility=NEW.expl_visibility, plot_code=NEW.plot_code, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
-			label_quadrant=NEW.label_quadrant, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_zone=NEW.block_zone
+			label_quadrant=NEW.label_quadrant, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_code=NEW.block_code
 			WHERE connec_id=OLD.connec_id;
 
 		IF v_man_table ='man_greentap' THEN

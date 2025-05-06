@@ -596,10 +596,10 @@ AS WITH
         l.state,
         l.expl_id,
         exploitation.macroexpl_id,
+        l.muni_id,
         l.sector_id,
         sector_table.sector_type,
         sector_table.macrosector_id,
-        l.muni_id,
         l.supplyzone_id,
         supplyzone_table.supplyzone_type,
         l.presszone_id,
@@ -779,11 +779,15 @@ AS WITH
           cat_connec.pnom AS cat_pnom,
           cat_connec.dnom AS cat_dnom,
           cat_connec.dint AS cat_dint,
+          connec.customer_code,
+          connec.connec_length,
           connec.epa_type,
           connec.state,
           connec.state_type,
+          connec_selector.arc_id,
           connec.expl_id,
           exploitation.macroexpl_id,
+          connec.muni_id,
           CASE
             WHEN link_planned.sector_id IS NULL THEN connec.sector_id
             ELSE link_planned.sector_id
@@ -796,7 +800,6 @@ AS WITH
             WHEN link_planned.sector_type IS NULL THEN sector_table.sector_type
             ELSE link_planned.sector_type
           END AS sector_type,
-          connec.muni_id,
           CASE
             WHEN link_planned.supplyzone_id IS NULL THEN supplyzone_table.supplyzone_id
             ELSE link_planned.supplyzone_id
@@ -822,25 +825,25 @@ AS WITH
             ELSE link_planned.dma_id
           END AS dma_id,
           CASE
-            WHEN link_planned.dma_type IS NULL then dma_table.dma_type
-            ELSE link_planned.dma_type::varchar
-          END AS dma_type,
-          CASE
             WHEN link_planned.macrodma_id IS NULL THEN dma_table.macrodma_id
             ELSE link_planned.macrodma_id
           END AS macrodma_id,
+          CASE
+            WHEN link_planned.dma_type IS NULL then dma_table.dma_type
+            ELSE link_planned.dma_type::varchar
+          END AS dma_type,
           CASE
             WHEN link_planned.dqa_id IS NULL THEN dqa_table.dqa_id
             ELSE link_planned.dqa_id
           END AS dqa_id,
           CASE
-            WHEN link_planned.dqa_type IS NULL THEN dqa_table.dqa_type
-            ELSE link_planned.dqa_type
-          END AS dqa_type,
-          CASE
             WHEN link_planned.macrodqa_id IS NULL THEN dqa_table.macrodqa_id
             ELSE link_planned.macrodqa_id
           END AS macrodqa_id,
+          CASE
+            WHEN link_planned.dqa_type IS NULL THEN dqa_table.dqa_type
+            ELSE link_planned.dqa_type
+          END AS dqa_type,
           CASE
             WHEN link_planned.omzone_id IS NULL THEN omzone_table.omzone_id
             ELSE link_planned.omzone_id
@@ -859,10 +862,6 @@ AS WITH
             WHEN link_planned.macrominsector_id IS NULL THEN connec.macrominsector_id
             ELSE link_planned.macrominsector_id
           END AS macrominsector_id,
-          connec.customer_code,
-          connec.connec_length,
-          connec.n_hydrometer,
-          connec_selector.arc_id,
           connec.soilcat_id,
           connec.function_type,
           connec.category_type,
@@ -871,25 +870,18 @@ AS WITH
             WHEN link_planned.fluid_type IS NULL THEN connec.fluid_type
             ELSE link_planned.fluid_type::character varying(50)
           END AS fluid_type,
+          connec.n_hydrometer,
+          connec.n_inhabitants,
+          CASE
+            WHEN link_planned.staticpressure IS NULL THEN connec.staticpressure
+            ELSE link_planned.staticpressure
+          END AS staticpressure,
           connec.descript,
-          cat_connec.svg,
           connec.annotation,
           connec.observ,
           connec.comment,
           concat(cat_feature.link_path, connec.link) AS link,
           connec.num_value,
-          CASE
-            WHEN link_planned.staticpressure IS NULL THEN connec.staticpressure
-            ELSE link_planned.staticpressure
-          END AS staticpressure,
-          CASE
-            WHEN link_planned.link_id IS NULL THEN connec.pjoint_id
-            ELSE link_planned.exit_id
-          END AS pjoint_id,
-          CASE
-            WHEN link_planned.link_id IS NULL THEN connec.pjoint_type
-            ELSE link_planned.exit_type
-          END AS pjoint_type,
           connec.district_id,
           connec.postcode,
           streetaxis_id,
@@ -900,17 +892,28 @@ AS WITH
           connec.postcomplement2,
           mu.region_id,
           mu.province_id,
+          connec.block_code,
+          connec.plot_code,
           connec.workcat_id,
           connec.workcat_id_end,
           connec.workcat_id_plan,
           connec.builtdate,
           connec.enddate,
           connec.ownercat_id,
-          connec.priority,
-          connec.access_type,
-          connec.placement_type,
+          CASE
+            WHEN link_planned.link_id IS NULL THEN connec.pjoint_id
+            ELSE link_planned.exit_id
+          END AS pjoint_id,
+          CASE
+            WHEN link_planned.link_id IS NULL THEN connec.pjoint_type
+            ELSE link_planned.exit_type
+          END AS pjoint_type,
           connec.om_state,
           connec.conserv_state,
+          connec.accessibility,
+          connec.access_type,
+          connec.placement_type,
+          connec.priority,
           CASE
             WHEN connec.brand_id IS NULL THEN cat_connec.brand_id
             ELSE connec.brand_id
@@ -923,7 +926,6 @@ AS WITH
           connec.asset_id,
           connec.adate,
           connec.adescript,
-          connec.accessibility,
           connec.verified,
           connec.datasource,
           cat_connec.label,
@@ -932,10 +934,10 @@ AS WITH
           connec.label_rotation,
           connec.rotation,
           connec.label_quadrant,
+          cat_connec.svg,
           connec.inventory,
           connec.publish,
           vst.is_operative,
-          connec.plot_code,
           CASE
             WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text THEN connec.epa_type::character varying
             ELSE NULL::character varying(16)
@@ -965,9 +967,7 @@ AS WITH
           connec.created_by,
           date_trunc('second'::text, connec.updated_at) AS updated_at,
           connec.updated_by,
-          connec.the_geom,
-          connec.n_inhabitants,
-          connec.block_zone
+          connec.the_geom
         FROM connec_selector
         JOIN connec ON connec.connec_id = connec_selector.connec_id
         JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text

@@ -1321,7 +1321,7 @@ CREATE TABLE connec (
 	streetaxis2_id varchar(16) NULL,
 	postnumber2 int4 NULL,
 	postcomplement2 varchar(100) NULL,
-	block_zone text NULL,
+	block_code text NULL,
 	plot_code text NULL,
 	workcat_id varchar(255) NULL,
 	workcat_id_end varchar(255) NULL,

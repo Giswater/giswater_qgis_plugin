@@ -31,7 +31,7 @@ SELECT columns_are(
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority',
         '_valve_type', '_shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_visibility', 'plot_code',
         'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id', 'n_hydrometer',
-        'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone',
+        'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_code',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table connec should have the correct columns'
@@ -120,7 +120,7 @@ SELECT col_type_is('connec', 'n_inhabitants', 'int4', 'Column n_inhabitants shou
 SELECT col_type_is('connec', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
 SELECT col_type_is('connec', 'datasource', 'int4', 'Column datasource should be int4');
 SELECT col_type_is('connec', 'lock_level', 'int4', 'Column lock_level should be int4');
-SELECT col_type_is('connec', 'block_zone', 'text', 'Column block_zone should be text');
+SELECT col_type_is('connec', 'block_code', 'text', 'Column block_code should be text');
 SELECT col_type_is('connec', 'omzone_id', 'integer', 'Column omzone_id should be integer');
 SELECT col_type_is('connec', 'the_geom', 'geometry(Point,SRID_VALUE)', 'Column the_geom should be geometry(Point,SRID_VALUE)');
 SELECT col_type_is('connec', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');

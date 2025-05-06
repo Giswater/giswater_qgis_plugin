@@ -119,7 +119,7 @@ BEGIN
 					c.postcomplement, c.streetaxis2_id, c.postnumber2, c.postcomplement2, c.descript, c.link, c.verified, c.rotation, c.the_geom, c.label_x, c.label_y, c.label_rotation, c.publish, c.inventory, c.expl_id,
 					c.num_value, c.feature_type, c.tstamp, c.pjoint_type, c.pjoint_id, c.lastupdate, c.lastupdate_user, c.insert_user, c.minsector_id, c.dqa_id, c.staticpressure, c.district_id, c.adate, c.adescript, c.accessibility,
 					c.workcat_id_plan, c.asset_id, c.epa_type, c.om_state, c.conserv_state, c.priority, c.access_type, c.placement_type, c.crmzone_id, c.expl_visibility, c.plot_code, c.brand_id, c.model_id, c.serial_number, c.label_quadrant,
-					c.macrominsector_id, c.streetname, c.streetname2, c.n_inhabitants, c.supplyzone_id, c.datasource, c.lock_level, c.block_zone, c.n_hydrometer
+					c.macrominsector_id, c.streetname, c.streetname2, c.n_inhabitants, c.supplyzone_id, c.datasource, c.lock_level, c.block_code, c.n_hydrometer
 				FROM plan_psector_x_connec pc
 				JOIN connec c USING (connec_id)
 				JOIN link l USING (link_id)
@@ -453,7 +453,7 @@ BEGIN
 					c.postcomplement, c.streetaxis2_id, c.postnumber2, c.postcomplement2, c.descript, c.link, c.verified, c.rotation, c.the_geom, c.label_x, c.label_y, c.label_rotation, c.publish, c.inventory, c.expl_id,
 					c.num_value, c.feature_type, c.tstamp, c.pjoint_type, c.pjoint_id, c.lastupdate, c.lastupdate_user, c.insert_user, c.minsector_id, c.dqa_id, c.staticpressure, c.district_id, c.adate, c.adescript, c.accessibility,
 					c.workcat_id_plan, c.asset_id, c.epa_type, c.om_state, c.conserv_state, c.priority, c.access_type, c.placement_type, c.crmzone_id, c.expl_visibility, c.plot_code, c.brand_id, c.model_id, c.serial_number, c.label_quadrant,
-					c.macrominsector_id, c.streetname, c.streetname2, c.n_inhabitants, c.supplyzone_id, c.datasource, c.lock_level, c.block_zone, c.n_hydrometer
+					c.macrominsector_id, c.streetname, c.streetname2, c.n_inhabitants, c.supplyzone_id, c.datasource, c.lock_level, c.block_code, c.n_hydrometer
 				FROM plan_psector_x_connec pc
 				JOIN connec c USING (connec_id)
 				JOIN link l USING (link_id)
