@@ -89,7 +89,7 @@ BEGIN
 	-- pgrouting
 	v_source= 'node_1';
 	v_target= 'node_2';
-	v_mainstream = 'maintream';
+	v_mainstream = 'mainstream';
 	v_diverted_flow = 'diverted flow';
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
@@ -193,7 +193,7 @@ BEGIN
 	FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
 	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowtrace arc", "features":',v_result, '}');
+	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowexit arc", "features":',v_result, '}');
 
 	SELECT jsonb_agg(features.feature) INTO v_result
 	FROM (
@@ -219,7 +219,7 @@ BEGIN
 	AND g.is_operative = TRUE) row) features;
 
 	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "layerName": "Flowtrace node", "features":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "layerName": "Flowexit node", "features":',v_result, '}');
 
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 

@@ -89,7 +89,7 @@ BEGIN
 	-- pgrouting
 	v_source= 'node_2';
 	v_target= 'node_1';
-	v_mainstream = 'maintream';
+	v_mainstream = 'mainstream';
 	v_diverted_flow = 'diverted flow';
 	
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
