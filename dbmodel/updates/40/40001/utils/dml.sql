@@ -494,7 +494,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",
 	VALUES ('v_edit_plan_psector','form_feature','tab_none','creation_date','date','datetime','Creation Date:','Creation Date',false,false,true,false,'{"setMultiline":false}'::json,false);
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden,web_layoutorder)
-	VALUES ('generic','psector','tab_general','creation_date','lyt_general_7',5,'date','datetime','Creation date:','Creation date:',false,false,true,false,false,'{"setMultiline":false}'::json,false,3);
+	VALUES ('generic','psector','tab_general','creation_date','lyt_general_7',1,'date','datetime','Creation date:','Creation date:',false,false,true,false,false,'{"setMultiline":false}'::json,false,3);
 
 -- 06/05/2025
 UPDATE config_form_fields SET label = 'sys_ymax' WHERE columnname = 'sys_ymax';
