@@ -77,6 +77,7 @@ DROP VIEW IF EXISTS vu_dma;
 DROP VIEW IF EXISTS vu_link;
 DROP VIEW IF EXISTS vu_arc;
 DROP VIEW IF EXISTS vu_node;
+DROP VIEW IF EXISTS vu_connec;
 
 DROP VIEW IF EXISTS v_sector_node;
 
