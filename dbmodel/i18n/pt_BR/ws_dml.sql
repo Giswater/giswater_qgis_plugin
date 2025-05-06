@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association,
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
 
 UPDATE config_form_fields SET formname = 've_node_valvula_geral' WHERE formname LIKE 've_node_gen_purp_valve';
 UPDATE config_form_fields SET formname = 've_arc_tubulacao' WHERE formname LIKE 've_arc_pipe';
@@ -52,3 +53,4 @@ UPDATE config_form_fields SET formname = 've_node_valvula_quebra_vacuo' WHERE fo
 UPDATE config_form_fields SET formname = 've_node_valvula_parada' WHERE formname LIKE 've_node_shutoff_valve';
 UPDATE config_form_fields SET formname = 've_node_throttle_valve' WHERE formname LIKE 've_node_throttle_valve';
 UPDATE config_form_fields SET formname = 've_node_eta' WHERE formname LIKE 've_node_wtp';
+UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';

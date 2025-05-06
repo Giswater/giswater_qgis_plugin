@@ -7755,4 +7755,4 @@ FROM (
 ) AS v(columnname, formname, formtype, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;
 
-UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
+UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';
