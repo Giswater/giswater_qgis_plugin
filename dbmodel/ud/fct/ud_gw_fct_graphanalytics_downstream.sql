@@ -139,8 +139,8 @@ BEGIN
 	EXECUTE 'select count(*)::int from v_edit_arc'
 	INTO v_distance;
 
-	INSERT INTO anl_node (node_id, fid, nodecat_id, sys_type, state, expl_id, drainzone_id, addparam, the_geom)
-	SELECT n.node_id, v_fid, n.node_type, n.sys_type, n.state, n.expl_id, n.drainzone_id, v_diverted_flow, n.the_geom
+	INSERT INTO anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
+	SELECT n.node_id, v_fid, n.node_type, n.state, n.expl_id, n.drainzone_id, v_diverted_flow, n.the_geom
 	FROM (
 		SELECT node::varchar
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
@@ -173,8 +173,8 @@ BEGIN
 	WHERE n.cur_user="current_user"() AND n.fid = v_fid
 	AND n.node_id = p.node;
 
-	INSERT INTO anl_arc (arc_id, fid, arccat_id, sys_type, state, expl_id, drainzone_id, addparam, the_geom)
-	SELECT a.arc_id, v_fid, a.arc_type, a.sys_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
+	INSERT INTO anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
+	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
 	FROM v_edit_arc a
 	JOIN anl_node n1 ON a.node_1 = n1.node_id 
 	JOIN anl_node n2 ON a.node_2 = n2.node_id
@@ -189,7 +189,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom',
 	'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, the_geom
+	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS sys_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, the_geom
 	FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
 	v_result := COALESCE(v_result, '{}');
@@ -203,16 +203,16 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom',
 		'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, sys_type, drainzone_id, addparam as stream_type, the_geom
+	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, 'NODE' AS sys_type, drainzone_id, addparam as stream_type, the_geom
 	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
 	UNION
-	SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, c.sys_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
+	SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' as sys_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
 	FROM anl_arc a JOIN v_edit_connec c using (arc_id) 
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND c.state > 0 
 	AND c.is_operative = TRUE
 	UNION
-	SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, g.sys_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
+	SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' as sys_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
 	FROM anl_arc a JOIN v_edit_gully g using (arc_id) 
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND g.state > 0 
