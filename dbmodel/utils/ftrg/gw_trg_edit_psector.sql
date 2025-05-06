@@ -129,13 +129,13 @@ BEGIN
 				INSERT INTO archived_psector_link_traceability (id, psector_id, psector_state, doable, audit_tstamp, audit_user, "action",
 					link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, exit_topelev, exit_elev, sector_id, dma_id, fluid_type,
 					presszone_id, dqa_id, minsector_id, expl_visibility, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, conneccat_id, workcat_id, workcat_id_end,
-					builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer, custom_length, datasource
+					builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, custom_length, datasource
 				)
 				SELECT
 					nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), pc.psector_id, pc.state, pc.doable, now(), current_user, 'Execute psector',
 					l.link_id, l.code, l.feature_id, l.feature_type, l.exit_id, l.exit_type, l.userdefined_geom, l.state, l.expl_id, l.the_geom, l.exit_topelev, l.exit_elev, l.sector_id, l.dma_id, l.fluid_type,
 					l.presszone_id, l.dqa_id, l.minsector_id, l.expl_visibility, l.epa_type, l.is_operative, l.insert_user, l.lastupdate, l.lastupdate_user, l.staticpressure, l.conneccat_id, l.workcat_id, l.workcat_id_end,
-					l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified, l.supplyzone_id, l.n_hydrometer, l.custom_length, l.datasource
+					l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified, l.supplyzone_id, l.custom_length, l.datasource
 				FROM plan_psector_x_connec pc
 				JOIN link l USING (link_id)
 				WHERE pc.psector_id = 2;
@@ -252,13 +252,13 @@ BEGIN
 					id, psector_id, psector_state, doable, audit_tstamp, audit_user, "action",
 					link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,
 					expl_visibility, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified,
-					supplyzone_id, n_hydrometer, custom_length, datasource
+					supplyzone_id, custom_length, datasource
 				)
 				SELECT
 					nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), pc.psector_id, pc.state, pc.doable, now(), current_user, 'Execute psector',
 					l.link_id, l.code, l.feature_id, l.feature_type, l.exit_id, l.exit_type, l.userdefined_geom, l.state, l.expl_id, l.the_geom, l.exit_topelev, l.exit_elev, l.sector_id, l.dma_id, l.fluid_type, l.presszone_id, l.dqa_id, l.minsector_id,
 					l.expl_visibility, l.epa_type, l.is_operative, l.insert_user, l.lastupdate, l.lastupdate_user, l.staticpressure, l.conneccat_id, l.workcat_id, l.workcat_id_end, l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified,
-					l.supplyzone_id, l.n_hydrometer, l.custom_length, l.datasource
+					l.supplyzone_id, l.custom_length, l.datasource
 				FROM plan_psector_x_connec pc
 				JOIN link l USING (link_id)
 				WHERE pc.psector_id=NEW.psector_id;
@@ -462,13 +462,13 @@ BEGIN
 				INSERT INTO archived_psector_link_traceability (id, psector_id, psector_state, doable, audit_tstamp, audit_user, "action",
 					link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, exit_topelev, exit_elev, sector_id, dma_id, fluid_type,
 					presszone_id, dqa_id, minsector_id, expl_visibility, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, conneccat_id, workcat_id, workcat_id_end,
-					builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer, custom_length, datasource
+					builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, custom_length, datasource
 				)
 				SELECT
 					nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), pc.psector_id, pc.state, pc.doable, now(), current_user, v_action,
 					l.link_id, l.code, l.feature_id, l.feature_type, l.exit_id, l.exit_type, l.userdefined_geom, l.state, l.expl_id, l.the_geom, l.exit_topelev, l.exit_elev, l.sector_id, l.dma_id, l.fluid_type,
 					l.presszone_id, l.dqa_id, l.minsector_id, l.expl_visibility, l.epa_type, l.is_operative, l.insert_user, l.lastupdate, l.lastupdate_user, l.staticpressure, l.conneccat_id, l.workcat_id, l.workcat_id_end,
-					l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified, l.supplyzone_id, l.n_hydrometer, l.custom_length, l.datasource
+					l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified, l.supplyzone_id, l.custom_length, l.datasource
 				FROM plan_psector_x_connec pc
 				JOIN link l USING (link_id)
 				WHERE pc.psector_id = 2;
@@ -586,13 +586,13 @@ BEGIN
 					id, psector_id, psector_state, doable, audit_tstamp, audit_user, "action",
 					link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,
 					expl_visibility, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified,
-					supplyzone_id, n_hydrometer, custom_length, datasource
+					supplyzone_id, custom_length, datasource
 				)
 				SELECT
 					nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), pc.psector_id, pc.state, pc.doable, now(), current_user, v_action,
 					l.link_id, l.code, l.feature_id, l.feature_type, l.exit_id, l.exit_type, l.userdefined_geom, l.state, l.expl_id, l.the_geom, l.exit_topelev, l.exit_elev, l.sector_id, l.dma_id, l.fluid_type, l.presszone_id, l.dqa_id, l.minsector_id,
 					l.expl_visibility, l.epa_type, l.is_operative, l.insert_user, l.lastupdate, l.lastupdate_user, l.staticpressure, l.conneccat_id, l.workcat_id, l.workcat_id_end, l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified,
-					l.supplyzone_id, l.n_hydrometer, l.custom_length, l.datasource
+					l.supplyzone_id, l.custom_length, l.datasource
 				FROM plan_psector_x_connec pc
 				JOIN link l USING (link_id)
 				WHERE pc.psector_id=NEW.psector_id;

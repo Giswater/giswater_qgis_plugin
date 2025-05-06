@@ -644,13 +644,12 @@ BEGIN
 
 			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
 			fluid_type, omzone_id, dqa_id, presszone_id, minsector_id, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate,
-			uncertain, muni_id, verified, custom_length, datasource, top_elev1, depth1, top_elev2, depth2)
+			uncertain, muni_id, verified, datasource, top_elev1, depth1, top_elev2, depth2, location_type, custom_length, annotation,
+			observ, comment, descript, link, num_value, dma_id)
 			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector,
 			v_fluidtype, v_omzone, v_dqa, v_presszone, v_minsector, NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
-			NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource, NEW.top_elev1, NEW.depth1, NEW.top_elev2, NEW.depth2);
-			IF v_projectype = 'WS' THEN
-				UPDATE link SET dma_id = v_dma WHERE link_id = NEW.link_id;
-			END IF;
+			NEW.uncertain, NEW.muni_id, NEW.verified, NEW.datasource, NEW.top_elev1, NEW.depth1, NEW.top_elev2, NEW.depth2, NEW.location_type,
+			NEW.custom_length, NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, v_dma);
 
 		ELSIF  v_projectype = 'UD' THEN
 			IF NEW.linkcat_id IS NULL THEN
@@ -688,11 +687,6 @@ BEGIN
 			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_omzone,
 			NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource,
 			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, NEW.link_type);
-
-			IF v_projectype = 'WS' THEN
-				UPDATE link SET dma_id = v_dma WHERE link_id = NEW.link_id;
-			END IF;
-
 		END IF;
 
 		-- update feature

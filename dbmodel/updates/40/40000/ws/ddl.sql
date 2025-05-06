@@ -1786,7 +1786,6 @@ CREATE TABLE link (
 	macrominsector_id int4 DEFAULT 0 NULL,
 	location_type varchar(50) NULL,
 	fluid_type varchar(50) NULL,
-	n_hydrometer int4 NULL,
 	custom_length numeric(12, 2) NULL,
 	staticpressure numeric(12, 3) NULL,
 	annotation text NULL,

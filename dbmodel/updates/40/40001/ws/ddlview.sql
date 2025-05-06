@@ -616,13 +616,24 @@ AS WITH
         omzone_table.macroomzone_id,
         l.minsector_id,
         l.macrominsector_id,
+        l.location_type,
         l.fluid_type,
+        l.custom_length,
+        st_length(l.the_geom)::numeric(12,3) AS gis_length,
+        l.staticpressure,
+        l.annotation,
+        l.observ,
+        l.comment,
+        l.descript,
+        l.link,
+        l.num_value,
         l.workcat_id,
         l.workcat_id_end,
         l.builtdate,
         l.enddate,
         l.verified,
         l.uncertain,
+        l.userdefined_geom,
         l.datasource,
         l.is_operative,
         CASE
@@ -636,11 +647,7 @@ AS WITH
         l.created_by,
         l.updated_at,
         l.updated_by,
-        l.the_geom,
-        l.n_hydrometer,
-        st_length(l.the_geom)::numeric(12,3) AS gis_length,
-        l.custom_length,
-        l.staticpressure
+        l.the_geom
         FROM link_selector
         JOIN link l ON l.link_id = link_selector.link_id
         LEFT JOIN connec c ON c.connec_id = l.feature_id
