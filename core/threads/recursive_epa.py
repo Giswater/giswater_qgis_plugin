@@ -246,8 +246,6 @@ class GwRecursiveEpa(GwTask):
     def _calculate_remaining_time(self, t0):
         tf = time()  # Final time
         td = tf - t0  # Delta time
-        print(f"{td} * ({self.total_objects} - {self.cur_idx})")
-        print(td * (self.total_objects - self.cur_idx))
         time_remaining = td * (self.total_objects - self.cur_idx)  # Delta time * remaining pages
         self.time_changed.emit(f"Remaining: {timedelta(seconds=round(time_remaining))} ({self.cur_idx}/{self.total_objects})")
 

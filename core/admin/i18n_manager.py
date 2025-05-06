@@ -583,8 +583,6 @@ class GwSchemaI18NManager:
 
                         safe_text = text.replace("'", "''")
                         if "config_form_fields" in table_i18n:
-                            print(row)
-                            print(f"data: {data}")
                             query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, formname, formtype, source, hint, text, lb_en_us)
                             VALUES ('giswater', '{self.project_type}', '{table_org}', '{row['formname']}', '{row['formtype']}', '{row['columnname']}', '{key}_{i}', '{safe_row_column}', '{safe_text}')
                             ON CONFLICT (source_code, project_type, context, formname, formtype, source, hint, text)
