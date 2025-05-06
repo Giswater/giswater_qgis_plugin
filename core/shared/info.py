@@ -1721,21 +1721,8 @@ class GwInfo(QObject):
         parent_fields = complet_result['body']['data']['parentFields']
         fields_reload = ""
         list_mandatory = []
-        for field in complet_result['body']['data']['fields']:
-            if field.get('hidden', False):
-                continue
-
-            if p_widget and (field['widgetname'] == p_widget.objectName()):
-                if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
-                    fields_reload = field['widgetcontrols']['autoupdateReloadFields']
-
-            if field['ismandatory']:
-                widget = dialog.findChild(QWidget, field['widgetname'])
-                widget.setStyleSheet(None)
-                value = tools_qt.get_text(dialog, widget)
-                if value in ('null', None, ''):
-                    widget.setStyleSheet("border: 1px solid red")
-                    list_mandatory.append(field['widgetname'])
+        # Manage autoupdate and mandatory widgets
+        fields_reload = self._manage_autoupdate_and_mandatory_widgets(dialog, complet_result, p_widget, list_mandatory)
 
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
@@ -1743,6 +1730,7 @@ class GwInfo(QObject):
             tools_qt.set_action_checked("actionEdit", True, dialog)
             return False
 
+        # Manage tab data
         if _json != '' and str(_json) != '{}':
             if global_vars.project_type == 'ud':
                 if not generic and self._has_elev_and_y_json(_json):
@@ -1890,6 +1878,24 @@ class GwInfo(QObject):
             return None
 
         return True
+
+    def _manage_autoupdate_and_mandatory_widgets(self, dialog, complet_result, p_widget, list_mandatory):
+        for field in complet_result['body']['data']['fields']:
+            if field.get('hidden', False):
+                continue
+
+            if p_widget and (field['widgetname'] == p_widget.objectName()):
+                if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
+                    fields_reload = field['widgetcontrols']['autoupdateReloadFields']
+
+            if field['ismandatory']:
+                widget = dialog.findChild(QWidget, field['widgetname'])
+                widget.setStyleSheet(None)
+                value = tools_qt.get_text(dialog, widget)
+                if value in ('null', None, ''):
+                    widget.setStyleSheet("border: 1px solid red")
+                    list_mandatory.append(field['widgetname'])
+        return fields_reload
 
     def _manage_prev_action(self):
         if self.prev_action:
