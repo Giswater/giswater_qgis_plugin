@@ -228,17 +228,17 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
 </qgis>' WHERE layername='line' AND styleconfig_id in (105,106);
 
 
---flowexit/flowtrace arc
+--flowexit/flowtrace node
 UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis styleCategories="Symbology" version="3.40.6-Bratislava">
   <renderer-v2 enableorderby="0" type="RuleRenderer" referencescale="-1" forceraster="0" symbollevels="0">
     <rules key="{e4d87f5e-3fd2-4d97-8962-998d1cba9adf}">
       <rule label="Connec mainstream" filter="&quot;sys_type&quot; = ''CONNEC'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{9c94b1b8-8153-4cce-b198-b2bda93a93d6}" symbol="0"/>
       <rule label="Gully mainstream" filter=" &quot;sys_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{979e0699-2e15-403a-9c69-e30227975796}" symbol="1"/>
-      <rule label="Node mainstream" filter=" &quot;sys_type&quot;  NOT IN (''GULLY'', ''CONNEC'') and  &quot;stream_type&quot;  =  ''mainstream'' " key="{a38e0b7e-b58a-4a05-baab-8018a82d3727}" symbol="2"/>
+      <rule label="Node mainstream" filter=" &quot;sys_type&quot;  = ''NODE'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{a38e0b7e-b58a-4a05-baab-8018a82d3727}" symbol="2"/>
       <rule label="Connec diverted flow" filter="&quot;sys_type&quot; = ''CONNEC'' and  &quot;stream_type&quot; = ''diverted flow''" key="{b32d9276-a77a-4179-8d27-2b2015c5b2f1}" symbol="3"/>
       <rule label="Gully diverted flow" filter=" &quot;sys_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''diverted flow''" key="{10fed0c0-d299-4d2f-b388-0722768847f0}" symbol="4"/>
-      <rule label="Node diverted flow" filter=" &quot;sys_type&quot;  NOT IN (''GULLY'', ''CONNEC'') and  &quot;stream_type&quot;  =  ''diverted flow''" key="{26c49b63-1fab-4676-afc2-37a7b531592c}" symbol="5"/>
+      <rule label="Node diverted flow" filter=" &quot;sys_type&quot;  = ''NODE'' and  &quot;stream_type&quot;  =  ''diverted flow''" key="{26c49b63-1fab-4676-afc2-37a7b531592c}" symbol="5"/>
     </rules>
     <symbols>
       <symbol alpha="1" type="marker" clip_to_extent="1" is_animated="0" name="0" frame_rate="10" force_rhr="0">

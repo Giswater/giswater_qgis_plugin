@@ -193,7 +193,7 @@ BEGIN
 	FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
 	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowexit arc", "features":',v_result, '}');
+	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowtrace arc", "features":',v_result, '}');
 
 	SELECT jsonb_agg(features.feature) INTO v_result
 	FROM (
@@ -219,7 +219,7 @@ BEGIN
 	AND g.is_operative = TRUE) row) features;
 
 	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "layerName": "Flowexit node", "features":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "layerName": "Flowtrace node", "features":',v_result, '}');
 
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
