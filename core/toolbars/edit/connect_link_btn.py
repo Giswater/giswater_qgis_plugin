@@ -334,7 +334,7 @@ def add(**kwargs):
         return
 
     # Create expression filter
-    expr_filter = f""""{this.feature_type}_id" = ('{selected_id}')"""
+    expr_filter = f"{this.feature_type}_id = '{selected_id}'"
     is_valid, expr = tools_qt.check_expression_filter(expr_filter)
 
     # Get layer from feature
