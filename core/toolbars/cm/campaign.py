@@ -29,7 +29,7 @@ class Campaign:
         self.reviewclass_combo = None
         self.iface = global_vars.iface
         self.campaign_date_format = 'yyyy-MM-dd'
-        self.schema_name = lib_vars.schema_name
+        self.schema_parent = lib_vars.schema_name
         self.project_type = tools_gw.get_project_type()
         self.dialog = None
         self.campaign_type = None
@@ -217,11 +217,14 @@ class Campaign:
         # Code logic to deal with the review/visit combo change to load tabs in relations
         self.reviewclass_combo = self.get_widget_by_columnname(self.dialog, "reviewclass_id")
         self.visitclass_combo = self.get_widget_by_columnname(self.dialog, "visitclass_id")
-        if isinstance(self.reviewclass_combo, QComboBox):
-            self.reviewclass_combo.currentIndexChanged.connect(self._on_class_changed)
 
-        if isinstance(self.visitclass_combo, QComboBox):
-            self.visitclass_combo.currentIndexChanged.connect(self._on_class_changed)
+        for combo in (self.reviewclass_combo, self.visitclass_combo):
+            if isinstance(combo, QComboBox):
+                # Connect to handler passing the combo itself
+                combo.currentIndexChanged.connect(partial(self._on_class_changed, combo))
+                # Also call initially
+                self._on_class_changed(combo)
+
 
         self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                self.dialog.tbl_campaign_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
@@ -506,7 +509,7 @@ class Campaign:
         if not table_name:
             return
 
-        sql = f"SELECT {id_column}::text FROM {self.schema_name}.{table_name} ORDER BY {id_column} LIMIT 100"
+        sql = f"SELECT {id_column}::text FROM {self.schema_parent}.{table_name} ORDER BY {id_column} LIMIT 100"
         result = tools_db.get_rows(sql)
         values = [row[id_column] for row in result if row.get(id_column)]
 
@@ -514,11 +517,12 @@ class Campaign:
         completer.setCaseSensitivity(False)
         dlg.feature_id.setCompleter(completer)
 
+    def _on_class_changed(self, sender=None):
+        """Called when the user changes the reviewclass or visitclass combo or when dialog opens"""
+        # If sender is not passed, try get it from signal
+        if sender is None:
+            sender = self.dialog.sender()
 
-    def _on_class_changed(self):
-        """Called when the user changes the reviewclass or visitclass combo."""
-
-        sender = self.dialog.sender()  # Automatically gets the QComboBox that triggered the event
         if not isinstance(sender, QComboBox):
             return
 
@@ -544,10 +548,13 @@ class Campaign:
 
     def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int):
         """Query om_reviewclass_x_layer to get allowed feature types for a given reviewclass"""
+
         sql = f"""
-            SELECT DISTINCT feature_type
-            FROM cm.om_reviewclass_x_layer
-            WHERE reviewclass_id = {reviewclass_id}
+            SELECT DISTINCT r.object_id, f.feature_class, f.feature_type
+            FROM cm.om_reviewclass_x_object r
+            JOIN {self.schema_parent}.cat_feature f
+                ON r.object_id = f.id
+            WHERE r.reviewclass_id = {reviewclass_id}
         """
         rows = tools_db.get_rows(sql)
         return [r["feature_type"] for r in rows if r.get("feature_type")]

@@ -35,7 +35,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
-    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes
+    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes,QgsExpression
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog, QgsExpressionBuilderDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -3338,7 +3338,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         set_model_signals(class_object)
     if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
         _insert_feature_campaign(dialog, class_object.feature_type, class_object.campaign_id, ids=class_object.list_ids[class_object.feature_type])
-        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
+        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3511,7 +3511,7 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         _insert_feature_campaign(dialog, feature_type, class_object.campaign_id, ids=selected_ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
-        load_tableview_campaign(dialog, feature_type, class_object.campaign_id)
+        load_tableview_campaign(dialog, feature_type, class_object.campaign_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -4064,7 +4064,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
         if extra_field is not None and len(selected_list) == 1:
             state = widget.model().record(selected_list[0].row()).value(extra_field)
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
-        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
+        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -4640,7 +4640,7 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
         tools_db.execute_sql(sql)
 
 
-def load_tableview_campaign(dialog, feature_type, campaign_id):
+def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
     """ Reload QTableView for campaign_x_<feature_type> """
 
     if not campaign_id:
@@ -4652,9 +4652,35 @@ def load_tableview_campaign(dialog, feature_type, campaign_id):
     qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
     tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
     message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+
+    # Get ids from qtable (that will only mark the ones whanted in snapping)
+    feature_id_column = f"{feature_type}_id"
+    feature_ids = get_ids_from_qtable(qtable, feature_id_column)
+
+    if feature_ids:
+        expr = QgsExpression(f"{feature_id_column} IN ({','.join(feature_ids)})")
+        tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+
     if message:
         tools_qgis.show_warning(message)
     set_tablemodel_config(dialog, qtable, tablename)
+
+
+def get_ids_from_qtable(qtable, id_column):
+    """ Get all IDs from a QTableView model for the given column """
+    ids = []
+    model = qtable.model()
+
+    if model is None:
+        return ids
+
+    for row in range(model.rowCount()):
+        index = model.index(row, model.fieldIndex(id_column))
+        value = model.data(index)
+        if value is not None:
+            ids.append(str(value))
+
+    return ids
 
 
 def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=None):
