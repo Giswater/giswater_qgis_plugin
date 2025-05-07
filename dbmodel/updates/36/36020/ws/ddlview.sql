@@ -928,7 +928,7 @@ AS WITH typevalue AS (
             connec.adescript,
             connec.accessibility,
             connec.asset_id,
-            dqa_table.stylesheet ->> 'featureColor'::text AS dma_style,
+            dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
             presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
             connec.priority,
             connec.valve_location,
