@@ -189,7 +189,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom',
 	'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS sys_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, the_geom
+	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, the_geom
 	FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
 	v_result := COALESCE(v_result, '{}');
@@ -203,16 +203,16 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom',
 		'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, 'NODE' AS sys_type, drainzone_id, addparam as stream_type, the_geom
+	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, the_geom
 	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
 	UNION
-	SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' AS sys_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
+	SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
 	FROM anl_arc a JOIN v_edit_connec c using (arc_id) 
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND c.state > 0 
 	AND c.is_operative = TRUE
 	UNION
-	SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' AS sys_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
+	SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
 	FROM anl_arc a JOIN v_edit_gully g using (arc_id) 
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND g.state > 0 
