@@ -356,7 +356,7 @@ BEGIN
 		END IF;
 
 		--Address
-		IF (NEW.streetaxis_id) THEN
+		IF (NEW.streetaxis_id IS NULL) THEN
 			IF (v_auto_streetvalues_status is true) THEN
 				NEW.streetaxis_id = (select v_ext_streetaxis.id from v_ext_streetaxis
 								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
