@@ -2355,6 +2355,12 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   "functionName": "close",
   "module": "connect_link_btn"
 }'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'link_to_connec', 'tab_none', 'btn_filter_expression', 'lyt_connect_link_2', 4, NULL, 'button', NULL, 'Filter by expression', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
+  "icon": "178"
+}'::json, NULL, '{
+  "functionName": "filter_expression",
+  "module": "connect_link_btn"
+}'::json, NULL, false, 0);
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 
