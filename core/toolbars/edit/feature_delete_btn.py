@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsFeatureRequest
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureDeleteUi
@@ -164,6 +164,25 @@ class GwFeatureDeleteButton(GwAction):
         # Enable button delete feature
         if result_msg != '':
             self.dlg_feature_delete.btn_delete.setEnabled(True)
+
+        if feature_type:
+            feature_type = feature_type.lower()
+
+            # Create expression filter
+            expr_filter = f"{feature_type}_id = '{feature_id}'"
+            is_valid, expr = tools_qt.check_expression_filter(expr_filter)
+
+            # Get layer from feature
+            layer = tools_qgis.get_layer_by_tablename(f'v_edit_{feature_type}')
+
+            # Check if layer exists and expression is valid
+            if layer and is_valid:
+                # Get all selected features in canvas + the new current selected feature
+                features = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [feature.id() for feature in features]
+
+                # Show selected ids in canvas
+                layer.selectByIds(id_list)
 
     def _delete_feature_relation(self):
 
