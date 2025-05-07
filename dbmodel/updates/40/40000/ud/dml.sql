@@ -2523,6 +2523,10 @@ SELECT id, result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arcc
 addparam, arcparent, q0, qmax, barrels, slope, flag, culvert, kentry, kexit, kavg, flap, seepage, age
 FROM _temp_arc;
 
+INSERT INTO temp_gully (id, result_id, gully_id, gully_type, gullycat_id, arc_id, node_id, sector_id, state, state_type, top_elev, units, units_placement, outlet_type, width, length, depth, method, weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom, expl_id, addparam, parent, arcposition, fusioned_node, age)
+SELECT id, result_id, gully_id, gully_type, gullycat_id, arc_id, node_id, sector_id, state, state_type, top_elev, units, units_placement, outlet_type, width, length, depth, method, weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom, expl_id, addparam, parent, arcposition, fusioned_node, age
+FROM _temp_gully;
+
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_edit_link', 'form_feature', 'tab_none', 'verified', 'lyt_data_1', 29, 'integer', 'combo', 'Verified', 'Verified', NULL, false, false, true, false, NULL, 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_verified''', true, false, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, true, NULL);
 
 UPDATE config_form_fields SET datatype = 'integer', widgettype = 'combo', label = 'Verified', tooltip = 'verified', iseditable = true,
