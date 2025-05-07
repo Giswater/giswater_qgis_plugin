@@ -2166,20 +2166,19 @@ class AddNewLot:
         # Create tables dictionary
         self.dict_tables = {
             "cat_organization":{
-                "query": "SELECT organization_id::text, code, orgname, descript, active::text \
-                          FROM cm.cat_organization WHERE organization_id IS NOT NULL",
+                "query": "SELECT organization_id::text, code, orgname, descript, active::text FROM cm.cat_organization",
                 "idname": "organization_id",
                 "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_organizations")
             },
             "cat_team":{
-                "query": "SELECT team_id::text, organization_id::text, code, teamname, descript, \
-                          active::text, role_id FROM cm.cat_team WHERE team_id IS NOT NULL",
+                "query": "SELECT team_id::text, co.orgname, ct.code, teamname, ct.descript, ct.active::text, role_id \
+                          FROM cm.cat_team ct INNER JOIN cm.cat_organization co ON co.organization_id = ct.organization_id",
                 "idname": "team_id",
                 "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_teams")
             },
             "cat_user":{
-                "query": "SELECT user_id::text, team_id::text, code, loginname, username, \
-                          fullname, descript, active::text FROM cm.cat_user WHERE user_id IS NOT NULL",
+                "query": "SELECT user_id::text, teamname, cu.code, loginname, username, fullname, cu.descript, cu.active::text \
+                          FROM cm.cat_user cu INNER JOIN cm.cat_team ct ON cu.team_id = ct.team_id",
                 "idname": "user_id",
                 "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_users"),
                 "cmbParent": tools_qt.get_widget(self.dlg_resources_man, "cmb_team")
@@ -2250,14 +2249,14 @@ class AddNewLot:
         """ Filter table by organization id """
 
         org_name = tools_qt.get_text(self.dlg_resources_man, "txt_orgname")
-        filter = f" AND orgname ILIKE '%{org_name}%'" if org_name != 'null' else None
+        filter = f" WHERE orgname ILIKE '%{org_name}%'" if org_name != 'null' else None
         self.populate_tableview("cat_organization", filter)
 
     def cmb_org_id_changed(self):
         """ Filter table by organization id """
 
         org_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_orga")
-        filter = f" AND organization_id = {org_id}" if org_id != '' else None
+        filter = f" WHERE co.organization_id = {org_id}" if org_id != '' else None
         self.populate_tableview("cat_team", filter)
 
     def cmb_team_id_changed(self):
@@ -2265,7 +2264,7 @@ class AddNewLot:
 
         team_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team")
 
-        filter = f" AND team_id = {team_id}" if team_id != '' else None
+        filter = f" WHERE ct.team_id = {team_id}" if team_id != '' else None
         self.populate_tableview("cat_user", filter)
 
     def populate_tableview(self, table_name: str, filter: Optional[str] = None):
