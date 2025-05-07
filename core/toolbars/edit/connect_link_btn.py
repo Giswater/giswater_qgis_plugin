@@ -54,14 +54,14 @@ class GwConnectLinkButton(GwMaptool):
         """ Event when button is clicked """
 
         if self.project_type == 'ws':
-            self.feature = 'connec'
+            self.feature_type = 'connec'
             self.open_dlg()
 
     def open_dlg(self):
         """ Open connect link dialog """
 
         # Create form and body
-        form = {"formName": "generic", "formType": f"link_to_{self.feature}"}
+        form = {"formName": "generic", "formType": f"link_to_{self.feature_type}"}
         body = {"client": {"cur_user": tools_db.current_user}, "form": form}
 
         # Execute procedure
@@ -85,10 +85,10 @@ class GwConnectLinkButton(GwMaptool):
         self.tbl_ids.clicked.connect(self.on_row_clicked)
 
         # Add headers to table
-        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header':f'{self.feature}_id'}])
+        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header':f'{self.feature_type}_id'}])
 
         # Set window title from dialog depending of the current feature
-        self.dlg_connect_link.setWindowTitle(tools_qt.tr(f"{self.feature.capitalize()} to link"))
+        self.dlg_connect_link.setWindowTitle(tools_qt.tr(f"{self.feature_type.capitalize()} to link"))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_connect_link, 'connect_link')
@@ -110,7 +110,7 @@ class GwConnectLinkButton(GwMaptool):
         for connec_feature in layer.selectedFeatures():
 
             # Build object with feature selected
-            selected_feature = { f"{self.feature}_id": connec_feature.attribute(f"{self.feature}_id") }
+            selected_feature = { f"{self.feature_type}_id": connec_feature.attribute(f"{self.feature_type}_id") }
 
             # Add built object to the list
             field["value"].append(selected_feature)
@@ -152,7 +152,7 @@ class GwConnectLinkButton(GwMaptool):
         selected_action = SelectAction(action.text())
 
         # Open dialog based on selected action
-        self.feature = 'connec' if selected_action == SelectAction.CONNEC_LINK else 'gully'
+        self.feature_type = 'connec' if selected_action == SelectAction.CONNEC_LINK else 'gully'
         self.open_dlg()
 
     """ QgsMapTools inherited event functions """
@@ -294,7 +294,7 @@ class GwConnectLinkButton(GwMaptool):
                 layer.selectByIds([selected_ids[0]])
 
         # Get current feature layer (connec/gully)
-        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature}')
+        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature_type}')
 
         # Check if layer exists
         if layer:
@@ -304,6 +304,21 @@ class GwConnectLinkButton(GwMaptool):
 
             # Refresh table
             self.fill_tbl_ids(layer)
+
+    def _selection_init(self):
+        """ Initialize selection mode """
+
+        self.iface.actionSelect().trigger()
+
+    def _selection_end(self):
+        """ Process selected features """
+
+        # Get current feature layer (connec/gully)
+        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature_type}')
+
+        # Refresh table
+        self.fill_tbl_ids(layer)
+        self.iface.actionPan().trigger()
 
     # endregion
 
@@ -323,11 +338,11 @@ def add(**kwargs):
         return
 
     # Create expression filter
-    expr_filter = f""""{this.feature}_id" = ('{selected_id}')"""
+    expr_filter = f""""{this.feature_type}_id" = ('{selected_id}')"""
     is_valid, expr = tools_qt.check_expression_filter(expr_filter)
 
     # Get layer from feature
-    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature}')
+    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature_type}')
 
     # Check if layer exists and expression is valid
     if layer and is_valid:
@@ -358,7 +373,7 @@ def remove(**kwargs):
         return
 
     # Get layer from feature
-    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature}')
+    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature_type}')
 
     # Check if layer exists
     if layer:
@@ -370,7 +385,7 @@ def remove(**kwargs):
         for feature in layer.selectedFeatures():
 
             # Append features expect the feature to remove
-            if feature.attribute(f"{this.feature}_id") != selected_id:
+            if feature.attribute(f"{this.feature_type}_id") != selected_id:
                 id_list.append(feature.id())
 
         # Show selected ids in canvas
@@ -421,7 +436,7 @@ def accept(**kwargs):
             this.ids.append(int(item.text()))
 
     # Create connect link task
-    this.connect_link_task = GwConnectLink("Connect link", this, this.feature, selected_arc=selected_arc)
+    this.connect_link_task = GwConnectLink("Connect link", this, this.feature_type, selected_arc=selected_arc)
 
     # Add and trigger the task
     QgsApplication.taskManager().addTask(this.connect_link_task)
@@ -445,3 +460,29 @@ def close(**kwargs):
     tools_gw.close_dialog(kwargs['dialog'])
 
 
+def filter_expression(**kwargs):
+    """Select features by expression for mapzone config"""
+
+    # Get class
+    this = kwargs['class']
+
+    # Get current layer and feature type
+    layer_name = f'v_edit_{this.feature_type}'
+
+    layer = tools_qgis.get_layer_by_tablename(layer_name)
+    if not layer:
+        return
+
+    # Set active layer
+    this.iface.setActiveLayer(layer)
+    tools_qgis.set_layer_visible(layer)
+
+    # Show expression dialog
+    tools_gw.select_with_expression_dialog_custom(
+        this,
+        this.dlg_connect_link,
+        None,  # No table object needed for expression selection
+        layer_name,
+        this._selection_init,
+        this._selection_end
+    )
