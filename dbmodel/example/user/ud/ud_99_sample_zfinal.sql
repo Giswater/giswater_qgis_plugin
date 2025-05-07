@@ -20,8 +20,7 @@ INSERT INTO cat_node (id, matcat_id, shape, geom1, geom2, geom3, descript, link,
 INSERT INTO cat_node (id, matcat_id, shape, geom1, geom2, geom3, descript, link, brand_id, model_id, svg, estimated_y, cost_unit, "cost", active, "label", node_type, acoeff) VALUES('SANDBOX_1', NULL, NULL, 1.00, 1.00, NULL, 'Sandbox', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true, NULL, 'SANDBOX', NULL);
 INSERT INTO cat_node (id, matcat_id, shape, geom1, geom2, geom3, descript, link, brand_id, model_id, svg, estimated_y, cost_unit, "cost", active, "label", node_type, acoeff) VALUES('PUMP_STATION', NULL, NULL, 1.00, 1.00, NULL, 'Pump station', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PUMP_STN', true, NULL, 'PUMP_STATION', NULL);
 
-INSERT INTO cat_gully (id, matcat_id, length, width, total_area, effective_area, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand_id, model_id, svg, active, "label", gully_type) VALUES('PGULLY', 'FD', 50.0000, 25.0000, 860.0000, 400.0000, 3.0000, 1.0000, 0.0000, 0.3485, 0.6580, NULL, NULL, NULL, NULL, NULL, true, NULL, 'PGULLY');
-
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('PGULLY', 'PGULLY', 'FD', 50.0000, 25.0000, 400.0000/860.0000, true);
 
 UPDATE om_visit SET startdate = startdate -  random() * (startdate - timestamp '2022-01-01 10:00:00');
 UPDATE om_visit SET enddate = startdate;

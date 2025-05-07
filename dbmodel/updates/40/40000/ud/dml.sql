@@ -22,8 +22,14 @@ INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, 
 SELECT id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label"
 FROM _cat_connec;
 
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, total_area, effective_area, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand_id, model_id, svg, active, "label")
-SELECT id, gully_type, matcat_id, length, width, total_area, effective_area, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand_id, model_id, svg, active, "label"
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, descript, link, brand_id, model_id, svg, label, active)
+SELECT id, gully_type, matcat_id, length, width,
+CASE
+  WHEN effective_area IS NOT NULL AND total_area IS NOT NULL THEN
+    effective_area/total_area
+  ELSE
+    0.8
+END AS efficiency, descript, link, brand_id, model_id, svg, label, active
 FROM _cat_grate;
 
 UPDATE sys_param_user SET dv_querytext='SELECT id AS id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE id='edit_gratecat_vdefault';
@@ -2817,7 +2823,7 @@ _connec_arccat_id, arc_id, "_pol_id_", sector_id, state, state_type, annotation,
 builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
 postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, label_x, label_y, label_rotation,
 publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, pjoint_type, pjoint_id, updated_at,
-created_by, updated_by, district_id, workcat_id_plan, asset_id, _connec_matcat_id, connec_y2, gullycat2_id,
+created_by, updated_by, district_id, workcat_id_plan, asset_id, _connec_matcat_id, connec_y2, _gratecat2_id,
 epa_type, groove_height, groove_length, units_placement, drainzone_id, expl_visibility, adate, adescript, siphon_type,
 odorflap, placement_type, access_type, label_quadrant, minsector_id, macrominsector_id)
 SELECT gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon,

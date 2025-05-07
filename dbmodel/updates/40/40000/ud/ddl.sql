@@ -180,32 +180,21 @@ ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_gratecat_id_fkey;
 ALTER TABLE man_netgully DROP CONSTRAINT IF EXISTS man_netgully_gratecat2_id_fkey;
 ALTER TABLE man_netgully DROP CONSTRAINT IF EXISTS man_netgully_gratecat_id_fkey;
 
-ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_pkey;
-ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_brand_fkey;
-ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_gully_type_fkey;
-ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_matcat_id_fkey;
-ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_model_fkey;
-
 CREATE TABLE cat_gully (
 	id varchar(30) NOT NULL,
-	gully_type text NULL,
-	matcat_id varchar(16) NULL,
-	length numeric(12, 4) DEFAULT 0 NULL,
-	width numeric(12, 4) DEFAULT 0.00 NULL,
-	total_area numeric(12, 4) DEFAULT 0.00 NULL,
-	effective_area numeric(12, 4) DEFAULT 0.00 NULL,
-	n_barr_l numeric(12, 4) DEFAULT 0.00 NULL,
-	n_barr_w numeric(12, 4) DEFAULT 0.00 NULL,
-	n_barr_diag numeric(12, 4) DEFAULT 0.00 NULL,
-	a_param numeric(12, 4) DEFAULT 0.00 NULL,
-	b_param numeric(12, 4) DEFAULT 0.00 NULL,
-	descript varchar(255) NULL,
-	link varchar(512) NULL,
-	brand_id varchar(30) NULL,
-	model_id varchar(30) NULL,
-	svg varchar(50) NULL,
-	active bool DEFAULT true NULL,
-	"label" varchar(255) NULL,
+    gully_type text NULL,
+    matcat_id varchar(16) NULL,
+    length numeric(12, 4) DEFAULT 0 NULL,
+    width numeric(12, 4) DEFAULT 0.00 NULL,
+    ymax numeric(12, 4) DEFAULT 0.00 NULL,
+    efficiency numeric(12, 4) DEFAULT 0.00 NULL,
+    descript varchar(255) NULL,
+    link varchar(512) NULL,
+    brand_id varchar(30) NULL,
+    model_id varchar(30) NULL,
+    svg varchar(50) NULL,
+    label varchar(255) NULL,
+    active bool DEFAULT true NULL,
 	CONSTRAINT cat_gully_pkey PRIMARY KEY (id),
 	CONSTRAINT cat_gully_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_gully_gully_type_fkey FOREIGN KEY (gully_type) REFERENCES cat_feature_gully(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1422,11 +1411,13 @@ CREATE TABLE gully (
 	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
 	ymax numeric(12, 4) NULL,
+	length numeric(12, 3) NULL,
+	width numeric(12, 3) NULL,
 	sandbox numeric(12, 4) NULL,
 	matcat_id varchar(18) NULL,
 	feature_type varchar(16) DEFAULT 'GULLY'::character varying NULL,
 	gullycat_id varchar(30) NULL,
-	gullycat2_id text NULL,
+	_gratecat2_id text NULL,
 	gully_type varchar(30) NOT NULL,
 	units numeric(12, 2) NULL,
 	units_placement varchar(16) NULL,
@@ -1436,9 +1427,6 @@ CREATE TABLE gully (
 	siphon bool NULL,
 	siphon_type text NULL,
 	odorflap text NULL,
-	gratecat_id varchar(30) NOT NULL,
-	grate_length numeric(12, 3) NULL,
-	grate_width numeric(12, 3) NULL,
 	connec_length numeric(12, 3) NULL,
 	connec_depth numeric(12, 3) NULL,
 	connec_y2 numeric(12, 3) NULL,
@@ -1525,8 +1513,7 @@ CREATE TABLE gully (
 	CONSTRAINT gully_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT gully_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT gully_gratecat_id_fkey FOREIGN KEY (gratecat_id) REFERENCES cat_gully(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT gully_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX gully_omzone ON gully USING btree (omzone_id);
 CREATE INDEX gully_exploitation ON gully USING btree (expl_id);

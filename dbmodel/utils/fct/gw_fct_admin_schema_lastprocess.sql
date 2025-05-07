@@ -278,6 +278,7 @@ BEGIN
 				ALTER TABLE cat_feature_gully DROP COLUMN IF EXISTS _type;
 				ALTER TABLE gully ALTER COLUMN verified DROP NOT NULL;
 				ALTER TABLE gully ALTER COLUMN workcat_id DROP NOT NULL;
+				ALTER TABLE gully DROP COLUMN IF EXISTS _gratecat2_id;
 			END IF;
 
 			-- inserting on config_param_system table

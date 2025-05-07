@@ -39,7 +39,7 @@ BEGIN
 	END IF;
 
 	--getting original values
-	SELECT gully_id, top_elev, ymax, sandbox, gully.matcat_id, gully.gully_type, gullycat_id, units, groove, siphon,
+	SELECT gully_id, top_elev, gully.ymax, sandbox, gully.matcat_id, gully.gully_type, gullycat_id, units, groove, siphon,
 		_connec_arccat_id, annotation, observ, expl_id, the_geom INTO rec_gully
 	FROM gully JOIN cat_gully ON cat_gully.id=gully.gullycat_id
 	WHERE gully_id=NEW.gully_id;

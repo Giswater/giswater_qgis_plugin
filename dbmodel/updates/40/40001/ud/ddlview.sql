@@ -1334,7 +1334,18 @@ AS WITH
 			gully.code,
             gully.sys_code,
 			gully.top_elev,
-			gully.ymax,
+            CASE
+                WHEN gully.width IS NULL THEN cat_gully.width
+                ELSE gully.width
+            END AS width,
+            CASE
+                WHEN gully.length IS NULL THEN cat_gully.length
+                ELSE gully.length
+            END AS length,
+			CASE
+                WHEN gully.ymax IS NULL THEN cat_gully.ymax
+                ELSE gully.ymax
+            END AS ymax,
 			gully.sandbox,
 			gully.matcat_id,
 			gully.gully_type,
@@ -1358,14 +1369,6 @@ AS WITH
 			END AS connec_matcat_id,
 			gully.top_elev - gully.ymax + gully.sandbox AS connec_y1,
 			gully.connec_y2,
-            CASE
-                WHEN gully.grate_width IS NULL THEN cat_gully.width
-                ELSE gully.grate_width
-            END AS grate_width,
-            CASE
-                WHEN gully.grate_length IS NULL THEN cat_gully.length
-                ELSE gully.grate_length
-            END AS grate_length,
 			gully.arc_id,
             gully.omunit_id,
 			gully.epa_type,
@@ -1483,7 +1486,6 @@ AS WITH
 				WHEN link_planned.exit_type IS NULL THEN gully.pjoint_type
 				ELSE link_planned.exit_type
 			END AS pjoint_type,
-			gully.gullycat2_id,
 			gully.units_placement,
 			gully.siphon_type,
 			gully.odorflap
@@ -2318,8 +2320,6 @@ AS SELECT n.node_id,
     man_netgully.groove,
     man_netgully.groove_height,
     man_netgully.groove_length,
-    cat_gully.a_param,
-    cat_gully.b_param,
         CASE
             WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_gully.width / 100::numeric)::numeric(12,3)
             WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_gully.length / 100::numeric)::numeric(12,3)
@@ -4325,8 +4325,8 @@ AS SELECT g.gully_id,
     g.top_elev,
     g.gully_type,
     g.gullycat_id,
-    (g.grate_width / 100::numeric)::numeric(12,2) AS grate_width,
-    (g.grate_length / 100::numeric)::numeric(12,2) AS grate_length,
+    (g.width / 100::numeric)::numeric(12,2) AS grate_width,
+    (g.length / 100::numeric)::numeric(12,2) AS grate_length,
     g.arc_id,
     g.sector_id,
     g.expl_id,
@@ -4340,16 +4340,14 @@ AS SELECT g.gully_id,
     g.groove_length,
     g.pjoint_id,
     g.pjoint_type,
-    cat_gully.a_param,
-    cat_gully.b_param,
         CASE
-            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_width / 100::numeric)::numeric(12,3)
-            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_length / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.width / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.length / 100::numeric)::numeric(12,3)
             ELSE (cat_gully.width / 100::numeric)::numeric(12,3)
         END AS total_width,
         CASE
-            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_width / 100::numeric)::numeric(12,3)
-            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_length / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.width / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.length / 100::numeric)::numeric(12,3)
             ELSE (cat_gully.length / 100::numeric)::numeric(12,3)
         END AS total_length,
     g.ymax - COALESCE(g.sandbox, 0::numeric) AS depth,

@@ -399,8 +399,9 @@ BEGIN
 	    temp_t_gully.orifice_cd::numeric(12,3) AS orifice_cd,
 	    temp_t_gully.a_param::numeric(12,3) AS a_param,
 	    temp_t_gully.b_param::numeric(12,3) AS b_param,
-	    temp_t_gully.efficiency
-	   FROM temp_t_gully;
+		COALESCE(temp_t_gully.efficiency, cat_gully.efficiency) AS efficiency
+	   FROM temp_t_gully
+	     JOIN cat_gully ON cat_gully.id = temp_t_gully.gullycat_id;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_gwf AS

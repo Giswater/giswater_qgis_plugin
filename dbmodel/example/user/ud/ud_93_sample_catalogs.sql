@@ -102,20 +102,20 @@ INSERT INTO cat_work VALUES ('work2', NULL, NULL, NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_work VALUES ('work3', NULL, NULL, NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_work VALUES ('work4', NULL, NULL, NULL, NULL, NULL, NULL, true);
 
-INSERT INTO cat_gully VALUES ('SGRT3', 'GULLY', 'FD', 64.0000, 30.0000, 1920.0000, 693.0000, 1.0000, 0.0000, 12.0000, 0.4958, 0.7124, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('SGRT6', 'GULLY', 'FD', 56.5000, 29.5000, 1667.0000, 725.0000, 1.0000, 0.0000, 9.0000, 0.4538, 0.6592, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('BGRT4', 'GULLY', 'FD', 12.4000, 100.0000, 1240.0000, 582.4000, 3.0000, 0.0000, 59.0000, 0.4111, 0.1784, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('SGRT1', 'GULLY', 'FD', 78.0000, 36.4000, 2839.0000, 1214.0000, 6.0000, 1.0000, 0.0000, 0.5676, 0.7416, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('SGRT2', 'GULLY', 'FD', 78.0000, 34.1000, 2659.0000, 873.0000, 1.0000, 21.0000, 0.0000, 0.6804, 0.7661, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('SGRT5', 'GULLY', 'FD', 97.5000, 47.5000, 4825.0000, 1400.0000, 3.0000, 7.0000, 0.0000, 0.8184, 0.7577, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('SGRT7', 'GULLY', 'FD', 50.0000, 25.0000, 860.0000, 400.0000, 3.0000, 1.0000, 0.0000, 0.3485, 0.6580, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('BGRT1', 'GULLY', 'Iron', 32.5000, 100.0000, 3020.0000, 1112.4000, 35.0000, 1.0000, 0.0000, 0.5949, 0.3465, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('BGRT5', 'GULLY', 'FD', 47.5000, 100.0000, 4825.0000, 1400.0000, 7.0000, 3.0000, 0.0000, 0.7792, 0.3230, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('SGRT4', 'GULLY', 'FD', 77.6000, 34.5000, 2677.0000, 1050.0000, 0.0000, 15.0000, 0.0000, 0.4569, 0.7590, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('BGRT2', 'GULLY', 'FD', 19.5000, 100.0000, 1950.0000, 751.9000, 36.0000, 0.0000, 0.0000, 0.4729, 0.2437, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('BGRT3', 'GULLY', 'FD', 10.0000, 100.0000, 1140.0000, 397.4000, 36.0000, 0.0000, 0.0000, 0.3877, 0.1429, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('N/I', 'GULLY', 'N/I', 0.0000, 0.0000, NULL, NULL, 0.0000, 0.0000, 0.0000, 0.4000, 0.8000, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_gully VALUES ('VGULLY', 'VGULLY', 'FD', 10.0000, 100.0000, 1140.0000, 397.4000, 36.0000, 0.0000, 0.0000, 0.3877, 0.1429, NULL, NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT3', 'GULLY', 'FD', 64.0000, 30.0000, 693.0000/1920.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT6', 'GULLY', 'FD', 56.5000, 29.5000, 725.0000/1667.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT4', 'GULLY', 'FD', 12.4000, 100.0000, 582.4000/1240.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT1', 'GULLY', 'FD', 78.0000, 36.4000, 1214.0000/2839.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT2', 'GULLY', 'FD', 78.0000, 34.1000, 873.0000/2659.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT5', 'GULLY', 'FD', 97.5000, 47.5000, 1400.0000/4825.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT7', 'GULLY', 'FD', 50.0000, 25.0000, 400.0000/860.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT1', 'GULLY', 'Iron', 32.5000, 100.0000, 1112.4000/3020.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT5', 'GULLY', 'FD', 47.5000, 100.0000, 1400.0000/4825.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT4', 'GULLY', 'FD', 77.6000, 34.5000, 1050.0000/2677.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT2', 'GULLY', 'FD', 19.5000, 100.0000, 751.9000/1950.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT3', 'GULLY', 'FD', 10.0000, 100.0000, 397.4000/1140.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('N/I', 'GULLY', 'N/I', 0.0000, 0.0000, NULL, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('VGULLY', 'VGULLY', 'FD', 10.0000, 100.0000, 397.4000/1140.0000, true);
 
 -----------------------------
 -- Records of man_type_category
