@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
 from enum import Enum
 
 from qgis.PyQt.QtCore import QRect, Qt
@@ -13,13 +12,10 @@ from qgis.PyQt.QtWidgets import QApplication, QActionGroup, QWidget, QAction, QM
 from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsFeatureRequest
 
 from ..maptool import GwMaptool
-from ...ui.ui_manager import GwDialogShowInfoUi
 from ...utils import tools_gw
 from ....libs import tools_qgis, tools_qt, tools_db
 from ...threads.connect_link import GwConnectLink
-from .... import global_vars
 from ...ui.ui_manager import GwConnectLinkUi
-from ...utils.selection_mode import GwSelectionMode
 class SelectAction(Enum):
     CONNEC_LINK = tools_qt.tr('Connec to link')
     GULLY_LINK = tools_qt.tr('Gully to link')
