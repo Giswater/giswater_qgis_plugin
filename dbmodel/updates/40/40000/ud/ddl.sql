@@ -447,6 +447,35 @@ CREATE INDEX temp_arc_node_2_type ON temp_arc USING btree (node_2);
 CREATE INDEX temp_arc_omzone_id ON temp_arc USING btree (omzone_id);
 CREATE INDEX temp_arc_result_id ON temp_arc USING btree (result_id);
 
+ALTER TABLE temp_gully RENAME TO _temp_gully;
+ALTER TABLE _temp_gully RENAME CONSTRAINT temp_gully_pkey TO _temp_gully_pkey;
+
+CREATE TABLE temp_gully (
+	gully_id varchar(16) NOT NULL,
+	gully_type varchar(30) NULL,
+	gullycat_id varchar(30) NULL,
+	arc_id varchar(16) NULL,
+	node_id varchar(16) NULL,
+	sector_id int4 NULL,
+	state int2 NULL,
+	state_type int2 NULL,
+	top_elev float8 NULL,
+	units int4 NULL,
+	units_placement varchar(16) NULL,
+	outlet_type varchar(30) NULL,
+	width float8 NULL,
+	length float8 NULL,
+	"depth" float8 NULL,
+	"method" varchar(30) NULL,
+	weir_cd float8 NULL,
+	orifice_cd float8 NULL,
+	a_param float8 NULL,
+	b_param float8 NULL,
+	efficiency int4 NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
+	CONSTRAINT temp_gully_pkey PRIMARY KEY (gully_id)
+);
+
 DROP VIEW IF EXISTS v_edit_inp_dscenario_frpump;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_froutlet;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_frorifice;
