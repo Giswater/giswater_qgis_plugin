@@ -12,3 +12,10 @@ ALTER TABLE cat_element ADD CONSTRAINT cat_element_fkey_element_type FOREIGN KEY
 
 -- 29/04/2025
 ALTER TABLE exploitation ADD CONSTRAINT exploitation_cat_owner_id_fkey FOREIGN KEY (owner_vdefault) REFERENCES cat_owner(id);
+
+-- 08/05/2025
+ALTER TABLE sys_param_user
+ADD CONSTRAINT chk_widgettype_combo_requires_dv_querytext
+CHECK (
+  widgettype != 'combo' OR dv_querytext IS NOT NULL
+);

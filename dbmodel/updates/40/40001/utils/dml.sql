@@ -537,3 +537,5 @@ VALUES
 ('v_edit_link', 'form_feature', 'tab_data', 'descript', 'lyt_data_1', 46, 'string', 'text', 'Descript', 'Descript', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
 ('v_edit_link', 'form_feature', 'tab_data', 'link', 'lyt_data_1', 47, 'string', 'hyperlink', 'Link', 'Link', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
 ('v_edit_link', 'form_feature', 'tab_data', 'num_value', 'lyt_data_1', 48, 'double', 'text', 'Num Value', 'Num Value', false, false, true, false, '{"setMultiline":false}'::json, false, NULL);
+
+UPDATE sys_param_user SET widgettype='text' WHERE id='qgis_composers_folderpath';
