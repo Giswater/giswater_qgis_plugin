@@ -610,7 +610,6 @@ class GwDocument(QObject):
         self.point_xy = {"x": None, "y": None}
 
         # Refresh manager table
-        self._refresh_manager_table()
         tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
 
     def _insert_doc_sql(self, doc_type, observ, date, path, the_geom, name):
