@@ -75,21 +75,23 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2012", "function":"1122","parameters":null}}$$);';
 			END IF;
-		NEW.omzone_id := (SELECT omzone_id FROM omzone WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, omzone.the_geom,0.001) LIMIT 1);
-		IF (NEW.omzone_id IS NULL) THEN
-			NEW.omzone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_omzone_vdefault' AND "cur_user"="current_user"());
+			NEW.omzone_id := (SELECT omzone_id FROM omzone WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, omzone.the_geom,0.001) LIMIT 1);
+			IF (NEW.omzone_id IS NULL) THEN
+				NEW.omzone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_omzone_vdefault' AND "cur_user"="current_user"());
+			END IF;
 		END IF;
 
 		IF v_projectype = 'WS' THEN
 			-- Dma ID
 			IF (NEW.dma_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM dma WHERE active IS TRUE) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"2012", "function":"1122","parameters":null}}$$);';
-			END IF;
-			NEW.dma_id := (SELECT dma_id FROM dma WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
+				IF ((SELECT COUNT(*) FROM dma WHERE active IS TRUE) = 0) THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"2012", "function":"1122","parameters":null}}$$);';
+				END IF;
+				NEW.dma_id := (SELECT dma_id FROM dma WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+				IF (NEW.dma_id IS NULL) THEN
+					NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
+				END IF;
 			END IF;
 		END IF;
 
