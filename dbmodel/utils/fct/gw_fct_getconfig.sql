@@ -177,40 +177,42 @@ BEGIN
 
 				v_dv_querytext=(aux_json->>'dv_querytext');
 
-				IF (aux_json->>'widgettype') = 'combo' THEN
+				IF v_dv_querytext IS NOT NULL THEN
+					IF (aux_json->>'widgettype') = 'combo' THEN
 
-					-- Get combo id's
-					v_querystring = concat('SELECT (array_agg(id)) FROM (',v_dv_querytext,' ORDER BY ',v_orderby,')a');
-					v_debug_vars := json_build_object('v_dv_querytext', v_dv_querytext, 'v_orderby', v_orderby);
-					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 20);
-					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-					EXECUTE v_querystring INTO v_array;
+						-- Get combo id's
+						v_querystring = concat('SELECT (array_agg(id)) FROM (',v_dv_querytext,' ORDER BY ',v_orderby,')a');
+						v_debug_vars := json_build_object('v_dv_querytext', v_dv_querytext, 'v_orderby', v_orderby);
+						v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 20);
+						SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+						EXECUTE v_querystring INTO v_array;
 
-					-- Enable null values
-					IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
-						v_array = array_prepend('',v_array);
+						-- Enable null values
+						IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
+							v_array = array_prepend('',v_array);
+						END IF;
+						combo_json = array_to_json(v_array);
+						v_combo_id = combo_json;
+						fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+
+						-- Get combo values
+						v_querystring = concat('SELECT (array_agg(idval)) FROM (',v_dv_querytext,' ORDER BY ',v_orderby,')a');
+						v_debug_vars := json_build_object('v_dv_querytext', v_dv_querytext, 'v_orderby', v_orderby);
+						v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 30);
+						SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+						EXECUTE v_querystring INTO v_array;
+
+						-- Enable null values
+						IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
+							v_array = array_prepend('',v_array);
+						END IF;
+						combo_json = array_to_json(v_array);
+						fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
+
+
+						-- Get selected value
+						fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
 					END IF;
-					combo_json = array_to_json(v_array);
-					v_combo_id = combo_json;
-					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
-
-					-- Get combo values
-					v_querystring = concat('SELECT (array_agg(idval)) FROM (',v_dv_querytext,' ORDER BY ',v_orderby,')a');
-					v_debug_vars := json_build_object('v_dv_querytext', v_dv_querytext, 'v_orderby', v_orderby);
-					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 30);
-					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-					EXECUTE v_querystring INTO v_array;
-
-					-- Enable null values
-					IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
-						v_array = array_prepend('',v_array);
-					END IF;
-					combo_json = array_to_json(v_array);
-					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
-
-
-					-- Get selected value
-					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
 				END IF;
 
 				-- looking for childs
@@ -308,8 +310,6 @@ BEGIN
 					END LOOP;
 				END IF;
 			END IF;
-
-						raise notice ' aux_json 1%', aux_json;
 
 			--removing the not used fields
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
