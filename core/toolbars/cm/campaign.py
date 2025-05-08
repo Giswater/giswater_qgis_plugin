@@ -163,6 +163,13 @@ class Campaign:
         self.fields_form = form_fields
         self.dialog = AddCampaignReviewUi(self) if mode == "review" else AddCampaignVisitUi(self)
 
+        # When open from campaign manager
+        if campaign_id:
+            widget = self.get_widget_by_columnname(self.dialog, "campaign_id")
+            if widget:
+                widget.setText(str(campaign_id))
+                widget.setProperty("columnname", "campaign_id")
+
         tools_gw.load_settings(self.dialog)
 
         # Hide gully tab if project_type is 'ws'
@@ -381,6 +388,10 @@ class Campaign:
                 if id_field:
                     id_field.setText(str(campaign_id))
 
+            # Reload manager table only if from manager
+            if hasattr(self, 'manager_dialog') and self.manager_dialog:
+                self.filter_campaigns()
+
             if not from_tab_change:
                 self.dialog.accept()
 
@@ -579,8 +590,6 @@ class Campaign:
 
         tab_widget = self.dialog.tab_feature
 
-        print("Enabled tabs should be:", normalized)
-
         for i in range(tab_widget.count()):
             widget = tab_widget.widget(i)
             if not widget:
@@ -619,12 +628,10 @@ class Campaign:
     # Campaign manager
     def load_campaigns_into_manager(self):
         """Load campaign data into the campaign management table"""
-
-        if not hasattr(self.dialog, "tbl_campaign"):
+        if not hasattr(self.manager_dialog, "tbl_campaign"):
             return
-
-        query = "SELECT * FROM cm.om_campaign ORDER BY campaign_id DESC"
-        self.populate_tableview(self.dialog.tbl_campaign, query)
+        query = "SELECT * FROM cm.v_ui_campaign ORDER BY campaign_id DESC"
+        self.populate_tableview(self.manager_dialog.tbl_campaign, query)
 
 
     def manage_date_filter(self):
@@ -697,7 +704,7 @@ class Campaign:
 
         # Build SQL
         where_clause = " AND ".join(filters)
-        query = "SELECT * FROM cm.om_campaign"
+        query = "SELECT * FROM cm.v_ui_campaign"
         if where_clause:
             query += f" WHERE {where_clause}"
         query += " ORDER BY campaign_id DESC"
