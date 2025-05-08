@@ -7,7 +7,17 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE OR REPLACE VIEW v_edit_arc
-AS WITH typevalue AS (
+AS WITH sel_state AS (
+            SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
+        ), sel_sector AS (
+            SELECT selector_sector.sector_id FROM selector_sector WHERE selector_sector.cur_user = CURRENT_USER
+        ), sel_expl AS (
+            SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+        ), sel_muni AS (
+            SELECT selector_municipality.muni_id FROM selector_municipality WHERE selector_municipality.cur_user = CURRENT_USER
+        ), sel_ps AS (
+            SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
+        ), typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
             edit_typevalue.idval
@@ -42,37 +52,22 @@ AS WITH typevalue AS (
            FROM plan_psector_x_arc pp
              JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
         ), arc_selector AS (
-            SELECT arc.arc_id
-            FROM arc
-            JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
-            LEFT JOIN (
-                SELECT arc_psector.arc_id
-                FROM arc_psector
-                WHERE arc_psector.p_state = 0
-            ) a USING (arc_id)
-            WHERE a.arc_id IS NULL
-            AND EXISTS (
-                SELECT 1
-                FROM selector_expl se
-                WHERE se.cur_user = CURRENT_USER
-                AND se.expl_id = arc.expl_id
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM selector_sector sc
-                WHERE sc.cur_user = CURRENT_USER
-                AND sc.sector_id = arc.sector_id
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM selector_municipality sm
-                WHERE sm.cur_user = CURRENT_USER
-                AND sm.muni_id = arc.muni_id
-            )
+            SELECT a.arc_id
+            FROM arc a
+            WHERE (a.state IN (SELECT sel_state.state_id FROM sel_state))
+            AND (a.sector_id IN (SELECT sel_sector.sector_id FROM sel_sector))
+            AND ((a.expl_id IN (SELECT sel_expl.expl_id FROM sel_expl)) OR (a.expl_id2 IN ( SELECT sel_expl.expl_id FROM sel_expl)))
+            AND (a.muni_id IN (SELECT sel_muni.muni_id FROM sel_muni))
+            AND NOT (
+                    EXISTS (
+                    SELECT 1
+                    FROM arc_psector ap
+                    WHERE ap.arc_id::text = a.arc_id::text AND ap.p_state = 0)
+                )
             UNION ALL
-            SELECT arc_psector.arc_id
-            FROM arc_psector
-            WHERE arc_psector.p_state = 1
+            SELECT ap.arc_id
+            FROM arc_psector ap
+            WHERE ap.p_state = 1
         ), arc_selected AS (
          SELECT distinct on (arc_id) arc.arc_id,
             arc.code,
@@ -349,7 +344,17 @@ AS WITH typevalue AS (
 
 
 CREATE OR REPLACE VIEW v_edit_connec
-AS WITH typevalue AS (
+AS WITH sel_state AS (
+            SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
+        ), sel_sector AS (
+            SELECT selector_sector.sector_id FROM selector_sector WHERE selector_sector.cur_user = CURRENT_USER
+        ), sel_expl AS (
+            SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+        ), sel_muni AS (
+            SELECT selector_municipality.muni_id FROM selector_municipality WHERE selector_municipality.cur_user = CURRENT_USER
+        ), sel_ps AS (
+            SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
+        ), typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
             edit_typevalue.idval
@@ -414,37 +419,23 @@ AS WITH typevalue AS (
              JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
           ORDER BY pp.connec_id, pp.state, pp.link_id DESC NULLS LAST
         ), connec_selector AS (
-            SELECT connec_id, connec.arc_id, NULL::integer AS link_id
-            FROM connec
-            JOIN selector_state ss ON ss.cur_user = CURRENT_USER AND connec.state = ss.state_id
-            LEFT JOIN (
-                SELECT connec_psector.connec_id, connec_psector.arc_id
-                FROM connec_psector
-                WHERE connec_psector.p_state = 0
-            ) a USING (connec_id, arc_id)
-            WHERE a.connec_id IS NULL
-            AND EXISTS (
-                SELECT 1
-                FROM selector_expl se
-                WHERE se.cur_user = CURRENT_USER
-                AND se.expl_id = connec.expl_id
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM selector_sector sc
-                WHERE sc.cur_user = CURRENT_USER
-                AND sc.sector_id = connec.sector_id
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM selector_municipality sm
-                WHERE sm.cur_user = CURRENT_USER
-                AND sm.muni_id = connec.muni_id
+            SELECT c.connec_id, c.arc_id, NULL::integer AS link_id
+            FROM connec c
+            WHERE (c.state IN ( SELECT sel_state.state_id FROM sel_state))
+            AND (c.sector_id IN ( SELECT sel_sector.sector_id FROM sel_sector))
+            AND ((c.expl_id IN ( SELECT sel_expl.expl_id FROM sel_expl)) OR (c.expl_id2 IN ( SELECT sel_expl.expl_id FROM sel_expl)))
+            AND (c.muni_id IN ( SELECT sel_muni.muni_id FROM sel_muni))
+            AND NOT (
+                EXISTS (
+                    SELECT 1
+                    FROM connec_psector cp
+                    WHERE cp.connec_id::text = c.connec_id::text AND cp.p_state = 0
+                )
             )
             UNION ALL
-            SELECT connec_psector.connec_id, connec_psector.arc_id, connec_psector.link_id
-            FROM connec_psector
-            WHERE connec_psector.p_state = 1
+            SELECT cp.connec_id, cp.arc_id, cp.link_id
+            FROM connec_psector cp
+            WHERE cp.p_state = 1
         ), connec_selected AS (
          SELECT distinct on (connec_id) connec.connec_id,
             connec.code,
@@ -663,7 +654,17 @@ AS WITH typevalue AS (
 
 
 CREATE OR REPLACE VIEW v_edit_gully
-AS WITH typevalue AS (
+AS WITH sel_state AS (
+        SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
+    ), sel_sector AS (
+        SELECT selector_sector.sector_id FROM selector_sector WHERE selector_sector.cur_user = CURRENT_USER
+    ), sel_expl AS (
+        SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+    ), sel_muni AS (
+        SELECT selector_municipality.muni_id FROM selector_municipality WHERE selector_municipality.cur_user = CURRENT_USER
+    ), sel_ps AS (
+        SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
+    ), typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
             edit_typevalue.idval
@@ -732,37 +733,23 @@ AS WITH typevalue AS (
              JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
           ORDER BY pp.gully_id, pp.state, pp.link_id DESC NULLS LAST
         ), gully_selector AS (
-            SELECT gully.gully_id, gully.arc_id, NULL::integer AS link_id
-            FROM gully
-            JOIN selector_state ss ON ss.cur_user = CURRENT_USER AND gully.state = ss.state_id
-            LEFT JOIN (
-                SELECT gully_psector.gully_id, gully_psector.arc_id
-                FROM gully_psector
-                WHERE gully_psector.p_state = 0
-            ) a USING (gully_id, arc_id)
-            WHERE a.gully_id IS NULL
-            AND EXISTS (
-                SELECT 1
-                FROM selector_expl se
-                WHERE se.cur_user = CURRENT_USER
-                AND se.expl_id = gully.expl_id
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM selector_sector sc
-                WHERE sc.cur_user = CURRENT_USER
-                AND sc.sector_id = gully.sector_id
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM selector_municipality sm
-                WHERE sm.cur_user = CURRENT_USER
-                AND sm.muni_id = gully.muni_id
+            SELECT g.gully_id, g.arc_id, NULL::integer AS link_id
+            FROM gully g
+            WHERE (g.state IN ( SELECT sel_state.state_id FROM sel_state))
+            AND (g.sector_id IN ( SELECT sel_sector.sector_id FROM sel_sector))
+            AND ((g.expl_id IN ( SELECT sel_expl.expl_id FROM sel_expl)) OR (g.expl_id2 IN ( SELECT sel_expl.expl_id FROM sel_expl)))
+            AND (g.muni_id IN ( SELECT sel_muni.muni_id FROM sel_muni))
+            AND NOT (
+                EXISTS (
+                    SELECT 1
+                    FROM gully_psector gp
+                    WHERE gp.gully_id::text = g.gully_id::text AND gp.p_state = 0
+                )
             )
             UNION ALL
-            SELECT gully_psector.gully_id, gully_psector.arc_id, gully_psector.link_id
-            FROM gully_psector
-            WHERE gully_psector.p_state = 1
+            SELECT gp.gully_id, gp.arc_id, gp.link_id
+            FROM gully_psector gp
+            WHERE gp.p_state = 1
         ), gully_selected AS (
          SELECT distinct on (gully_id) gully.gully_id,
             gully.code,
@@ -1014,7 +1001,17 @@ AS WITH typevalue AS (
 
 
 CREATE OR REPLACE VIEW v_edit_node
-AS WITH typevalue AS (
+AS WITH sel_state AS (
+            SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
+        ), sel_sector AS (
+            SELECT selector_sector.sector_id FROM selector_sector WHERE selector_sector.cur_user = CURRENT_USER
+        ), sel_expl AS (
+            SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+        ), sel_muni AS (
+            SELECT selector_municipality.muni_id FROM selector_municipality WHERE selector_municipality.cur_user = CURRENT_USER
+        ), sel_ps AS (
+            SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
+        ), typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
             edit_typevalue.idval
@@ -1049,37 +1046,23 @@ AS WITH typevalue AS (
            FROM plan_psector_x_node pp
              JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
         ), node_selector AS (
-            SELECT node.node_id
-            FROM node
-            JOIN selector_state s ON s.cur_user = CURRENT_USER AND node.state = s.state_id
-            LEFT JOIN (
-                SELECT node_psector.node_id
-                FROM node_psector
-                WHERE node_psector.p_state = 0
-            ) a USING (node_id)
-            WHERE a.node_id IS NULL
-            AND EXISTS (
-                SELECT 1
-                FROM selector_expl se
-                WHERE se.cur_user = CURRENT_USER
-                AND se.expl_id = node.expl_id
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM selector_sector sc
-                WHERE sc.cur_user = CURRENT_USER
-                AND sc.sector_id = node.sector_id
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM selector_municipality sm
-                WHERE sm.cur_user = CURRENT_USER
-                AND sm.muni_id = node.muni_id
-            )
+            SELECT n.node_id
+            FROM node n
+            WHERE (n.state IN ( SELECT sel_state.state_id FROM sel_state))
+            AND (n.sector_id IN ( SELECT sel_sector.sector_id FROM sel_sector))
+            AND ((n.expl_id IN ( SELECT sel_expl.expl_id FROM sel_expl)) OR (n.expl_id2 IN ( SELECT sel_expl.expl_id FROM sel_expl)))
+            AND (n.muni_id IN ( SELECT sel_muni.muni_id FROM sel_muni))
+            AND NOT (
+                EXISTS (
+                    SELECT 1
+                    FROM node_psector np
+                    WHERE np.node_id::text = n.node_id::text AND np.p_state = 0
+                    )
+                )
             UNION ALL
-            SELECT node_psector.node_id
-            FROM node_psector
-            WHERE node_psector.p_state = 1
+            SELECT np.node_id
+            FROM node_psector np
+            WHERE np.p_state = 1
         ), node_selected AS (
          SELECT distinct on (node_id) node.node_id,
             node.code,
@@ -1393,7 +1376,17 @@ AS WITH typevalue AS (
    FROM node_base;
 
 CREATE OR REPLACE VIEW v_edit_link AS
-WITH typevalue AS
+WITH sel_state AS (
+        SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
+    ), sel_sector AS (
+        SELECT selector_sector.sector_id FROM selector_sector WHERE selector_sector.cur_user = CURRENT_USER
+    ), sel_expl AS (
+        SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+    ), sel_muni AS (
+        SELECT selector_municipality.muni_id FROM selector_municipality WHERE selector_municipality.cur_user = CURRENT_USER
+    ), sel_ps AS (
+        SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
+    ), typevalue AS
   (
     SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
     FROM edit_typevalue
@@ -1437,31 +1430,21 @@ WITH typevalue AS
   (
     SELECT l.link_id
     FROM link l
-    JOIN selector_state s ON s.cur_user =current_user AND l.state = s.state_id
-    LEFT JOIN (SELECT link_id FROM link_psector WHERE p_state = 0) a USING (link_id)
-    WHERE a.link_id IS NULL
-    AND EXISTS (
-        SELECT 1
-        FROM selector_expl se
-        WHERE se.cur_user = CURRENT_USER
-        AND se.expl_id = l.expl_id
-    )
-    AND EXISTS (
-        SELECT 1
-        FROM selector_sector sc
-        WHERE sc.cur_user = CURRENT_USER
-        AND sc.sector_id = l.sector_id
-    )
-    AND EXISTS (
-        SELECT 1
-        FROM selector_municipality sm
-        WHERE sm.cur_user = CURRENT_USER
-        AND sm.muni_id = l.muni_id
-    )
+    WHERE (l.state IN ( SELECT sel_state.state_id FROM sel_state))
+    AND (l.sector_id IN ( SELECT sel_sector.sector_id FROM sel_sector))
+    AND ((l.expl_id IN ( SELECT sel_expl.expl_id FROM sel_expl)) OR (l.expl_id2 IN ( SELECT sel_expl.expl_id FROM sel_expl)))
+    AND (l.muni_id IN ( SELECT sel_muni.muni_id FROM sel_muni))
+    AND NOT (
+        EXISTS (
+            SELECT 1
+            FROM link_psector lp
+            WHERE lp.link_id::text = l.link_id::text AND lp.p_state = 0
+            )
+        )
     UNION ALL
-    SELECT link_id
-    FROM link_psector
-    WHERE p_state = 1
+    SELECT lp.link_id
+    FROM link_psector lp
+    WHERE lp.p_state = 1
   ), link_selected AS
   (
     SELECT DISTINCT ON (l.link_id) l.link_id,
