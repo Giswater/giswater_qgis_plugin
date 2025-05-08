@@ -527,10 +527,6 @@ UPDATE config_form_tableview SET columnindex=0 WHERE objectname='tbl_relations' 
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('arc form', 'utils', 'tbl_relations', 'sys_table_id', 12, true, NULL, 'sys_table_id', NULL, NULL);
 
 
-INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,
-ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('v_edit_link','form_feature','tab_data','location_type','lyt_data_1',42,'text','text','Location Type','Location Type',false,false,true,false,'{"setMultiline":false}'::json,false);
-
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip,
     ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, hidden, dv_querytext)
 VALUES
