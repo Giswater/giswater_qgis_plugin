@@ -617,6 +617,15 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+
+		-- Muni ID
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
+				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin((the_geom), NEW.the_geom, 0) LIMIT 1);
+			END IF;
+		END IF;
+
 	END IF;
 
 	-- Verified
@@ -675,7 +684,7 @@ BEGIN
 					NEW.top_elev1 = (SELECT top_elev FROM gully WHERE gully_id=NEW.feature_id LIMIT 1);
 				END IF;
 			END IF;
-			
+
 			IF NEW.feature_type ='GULLY' THEN
 				NEW.link_type = 'INLETPIPE';
 			ELSEIF NEW.feature_type ='CONNEC' THEN

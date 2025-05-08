@@ -119,6 +119,15 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+
+		-- Muni ID
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
+				NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
+			END IF;
+		END IF;
+
 	END IF;
 
 	-- INSERT
@@ -164,11 +173,6 @@ BEGIN
 		-- Sector
 		IF (NEW.sector_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
-		END IF;
-
-		-- Municipality
-		IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
-			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
 		END IF;
 
 		-- Enddate
@@ -347,11 +351,6 @@ BEGIN
 		-- Sector
 		IF (NEW.sector_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
-		END IF;
-
-		-- Municipality
-		IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
-			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
 		END IF;
 
 		UPDATE "element" SET code=NEW.code, sys_code=NEW.sys_code, elementcat_id=NEW.elementcat_id, serial_number=NEW.serial_number, num_elements=NEW.num_elements, state=NEW.state,

@@ -185,3 +185,6 @@ ALTER TABLE anl_gully ADD CONSTRAINT anl_gully_drainzone_id_fkey FOREIGN KEY (dr
 
 ALTER TABLE anl_node ADD CONSTRAINT anl_node_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
 ALTER TABLE anl_arc ADD CONSTRAINT anl_arc_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
+
+ALTER TABLE inp_subcatchment ALTER COLUMN muni_id SET DEFAULT 0;
+ALTER TABLE inp_subcatchment ALTER COLUMN muni_id SET NOT NULL;

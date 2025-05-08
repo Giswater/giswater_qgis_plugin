@@ -170,3 +170,5 @@ CREATE TABLE sys_label (
 	idval text NOT NULL,
 	label_type text
 );
+
+ALTER TABLE dimensions ALTER COLUMN muni_id SET DEFAULT 0;

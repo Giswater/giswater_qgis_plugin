@@ -14,17 +14,28 @@ or (at your option) any later version.
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dimensions()
   RETURNS trigger AS
 $BODY$
-DECLARE 
+DECLARE
 dimensions_id_seq integer;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||',public';
 
+
+	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		-- Muni ID
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
+				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin((the_geom), NEW.the_geom, 0) LIMIT 1);
+			END IF;
+		END IF;
+	END IF;
+
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN
 
-		
+
 		IF NEW.expl_id IS NULL THEN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.expl_id IS NULL) THEN
@@ -32,7 +43,7 @@ BEGIN
 			END IF;
 		END IF;
 
-	
+
 		-- Sector
 		IF (NEW.sector_id IS NULL) THEN
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
@@ -41,12 +52,7 @@ BEGIN
 				NEW.sector_id := 0;
 			END IF;
 		END IF;
-	
-		-- Municipality
-		IF (NEW.muni_id IS NULL) THEN
-			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_DWithin(m.the_geom, NEW.the_geom,0) limit 1);
-		END IF;
-	
+
 		-- State
 		IF (NEW.state IS NULL) THEN
 			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"());
@@ -54,50 +60,49 @@ BEGIN
 				NEW.state := '1';
 			END IF;
 		END IF;
-			
+
 		-- dimension_id
 		IF (NEW.id IS NULL) THEN
 			NEW.id:= (SELECT nextval('dimensions_id_seq'));
 		END IF;
-		
+
 		--distance
 		IF (NEW.distance IS NULL) THEN
 			NEW.distance= ST_Length(NEW.the_geom);
 		END IF;
-		
+
 		-- Insert
-		INSERT INTO dimensions (id, distance, depth, the_geom, x_label, y_label, rotation_label, offset_label, direction_arrow, x_symbol, y_symbol, 
+		INSERT INTO dimensions (id, distance, depth, the_geom, x_label, y_label, rotation_label, offset_label, direction_arrow, x_symbol, y_symbol,
 			feature_id, feature_type, state, expl_id, observ, comment, sector_id, muni_id)
-		VALUES (NEW.id, NEW.distance, NEW.depth, NEW.the_geom, NEW.x_label, NEW.y_label, NEW.rotation_label, NEW.offset_label, NEW.direction_arrow, 
+		VALUES (NEW.id, NEW.distance, NEW.depth, NEW.the_geom, NEW.x_label, NEW.y_label, NEW.rotation_label, NEW.offset_label, NEW.direction_arrow,
 			NEW.x_symbol, NEW.y_symbol, NEW.feature_id, NEW.feature_type, NEW.state, NEW.expl_id, NEW.observ, NEW.comment, NEW.sector_id, NEW.muni_id);
 
-	
+
 		RETURN NEW;
 
 	-- UPDATE
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE dimensions
-		SET id=NEW.id, distance=NEW.distance, depth=NEW.depth, the_geom=NEW.the_geom, x_label=NEW.x_label, y_label=NEW.y_label, 
-		rotation_label=NEW.rotation_label, offset_label=NEW.offset_label, direction_arrow=NEW.direction_arrow, x_symbol=NEW.x_symbol, 
-		y_symbol=NEW.y_symbol, feature_id=NEW.feature_id, feature_type=NEW.feature_type, 
+		SET id=NEW.id, distance=NEW.distance, depth=NEW.depth, the_geom=NEW.the_geom, x_label=NEW.x_label, y_label=NEW.y_label,
+		rotation_label=NEW.rotation_label, offset_label=NEW.offset_label, direction_arrow=NEW.direction_arrow, x_symbol=NEW.x_symbol,
+		y_symbol=NEW.y_symbol, feature_id=NEW.feature_id, feature_type=NEW.feature_type,
 		expl_id=NEW.expl_id, observ=NEW.observ, state=NEW.state, comment=NEW.comment, lastupdate=now(), lastupdate_user = current_user, sector_id=NEW.sector_id, muni_id=NEW.muni_id
 		WHERE id=NEW.id;
 
 		RETURN NEW;
-    
+
 	-- DELETE
 	ELSIF TG_OP = 'DELETE' THEN
-	
-		DELETE FROM dimensions 
+
+		DELETE FROM dimensions
 		WHERE id=OLD.id;
-				
+
         RETURN NULL;
-   
+
     END IF;
-    
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
- 
