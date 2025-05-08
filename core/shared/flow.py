@@ -92,5 +92,10 @@ class GwFlow(GwMaptool):
             result = tools_gw.execute_procedure(procedure_name, body)
             if not result or result['status'] == 'Failed':
                 return
+            
+            # Zoom layer flowtrace_arc if exists
+            flowtrace_arc = tools_qgis.get_layer_by_layername(result['body']['data']['line']['layerName'])
+            if flowtrace_arc:
+                tools_qgis.zoom_to_layer(flowtrace_arc)
 
             self.refresh_map_canvas()
