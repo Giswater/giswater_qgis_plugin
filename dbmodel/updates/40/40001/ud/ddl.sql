@@ -170,4 +170,18 @@ UPDATE archived_psector_gully_traceability SET expl_visibility = ARRAY[expl_id];
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_gully_traceability", "column":"expl_id2"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"dwfzone_id", "dataType":"int4"}}$$);
+ALTER TABLE anl_node ADD CONSTRAINT anl_node_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"dwfzone_id", "dataType":"int4"}}$$);
+ALTER TABLE anl_arc ADD CONSTRAINT anl_arc_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_connec", "column":"dwfzone_id", "dataType":"int4"}}$$);
+ALTER TABLE anl_connec ADD CONSTRAINT anl_connec_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_gully", "column":"dwfzone_id", "dataType":"int4"}}$$);
+ALTER TABLE anl_gully ADD CONSTRAINT anl_gully_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_connec", "column":"drainzone_id", "dataType":"int4"}}$$);
+ALTER TABLE anl_connec ADD CONSTRAINT anl_connec_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_gully", "column":"drainzone_id", "dataType":"int4"}}$$);
+ALTER TABLE anl_gully ADD CONSTRAINT anl_gully_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
+
+ALTER TABLE anl_node ADD CONSTRAINT anl_node_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
+ALTER TABLE anl_arc ADD CONSTRAINT anl_arc_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
