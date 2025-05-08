@@ -194,12 +194,12 @@ BEGIN
 		WHERE m.active and m.macroexpl_id > 0 order by 1;
 
 		CREATE TEMP TABLE temp_sector as
-		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.active from sector s
+		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active from sector s
 		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
 		JOIN exploitation e ON e.expl_id=n.expl_id
 		JOIN config_user_x_expl c ON c.expl_id=n.expl_id WHERE s.active and s.sector_id > 0 and username = current_user
  			UNION
-		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.active from sector s
+		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active from sector s
 		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
 		WHERE n.sector_id is null AND s.active and s.sector_id > 0
 		order by 1;
