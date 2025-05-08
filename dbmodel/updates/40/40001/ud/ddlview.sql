@@ -346,7 +346,7 @@ AS WITH
 			l.omzone_id,
 			omzone_table.macroomzone_id,
             l.macrominsector_id,
-            l.location_type
+            l.location_type,
 			l.fluid_type,
             l.custom_length,
 			st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
