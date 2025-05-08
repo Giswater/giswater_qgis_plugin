@@ -34,12 +34,13 @@ BEGIN
 
 		-- Insert into polygon table
 		INSERT INTO polygon (pol_id, sys_type, the_geom, featurecat_id, feature_id)
-		SELECT NEW.pol_id, 'ELEMENT', NEW.the_geom, element_type, NEW.element_id
-		FROM element WHERE element_id=NEW.element_id
+		SELECT NEW.pol_id, feature_class, NEW.the_geom, element_type, NEW.element_id
+		FROM element e
+		JOIN cat_element ce ON ce.id = e.elementcat_id
+		JOIN cat_feature_element cfe ON cfe.id = ce.element_type
+		JOIN cat_feature cf ON cf.id = cfe.id
+		WHERE element_id=NEW.element_id
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
-
-		-- Update man table
-		UPDATE element SET pol_id=NEW.pol_id WHERE element_id=NEW.element_id;
 
 		RETURN NEW;
 
@@ -54,8 +55,6 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
    			"data":{"message":"2098", "function":"2996","parameters":null}}$$);';
 			END IF;
-			UPDATE element SET pol_id=NULL WHERE element_id=OLD.element_id;
-			UPDATE element SET pol_id=NEW.pol_id WHERE element_id=NEW.element_id;
 
 			UPDATE polygon SET feature_id=NEW.element_id, featurecat_id = element_type
 			FROM element WHERE element_id=OLD.element_id AND pol_id=NEW.pol_id;
@@ -66,7 +65,6 @@ BEGIN
 	-- DELETE
 	ELSIF TG_OP = 'DELETE' THEN
 
-		UPDATE element SET pol_id=NULL WHERE element_id=OLD.element_id;
 		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
 
 		RETURN NULL;

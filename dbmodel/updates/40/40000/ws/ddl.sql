@@ -1454,7 +1454,6 @@ CREATE TABLE element (
 	num_elements int4 NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,
-	pol_id varchar(16) NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,

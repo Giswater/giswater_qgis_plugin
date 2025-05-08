@@ -2846,12 +2846,12 @@ FROM _gully;
 INSERT INTO element (element_id, code, sys_code, elementcat_id, serial_number, num_elements, state, state_type, observ,
 "comment", function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory,
-expl_id, feature_type, created_at, updated_at, created_by, updated_by, pol_id, top_elev, expl_visibility, trace_featuregeom,
+expl_id, feature_type, created_at, updated_at, created_by, updated_by, top_elev, expl_visibility, trace_featuregeom,
 muni_id, sector_id, brand_id, model_id, asset_id)
 SELECT element_id, code, code, elementcat_id, serial_number, num_elements, state, state_type, observ,
 "comment", function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, rotation, link, verified::integer, the_geom, label_x, label_y, label_rotation, publish, inventory,
-expl_id, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, pol_id, top_elev, ARRAY[expl_id2], trace_featuregeom,
+expl_id, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, top_elev, ARRAY[expl_id2], trace_featuregeom,
 muni_id, sector_id, brand_id, model_id, asset_id
 FROM _element;
 

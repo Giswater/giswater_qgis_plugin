@@ -276,12 +276,12 @@ BEGIN
 
 		INSERT INTO "element" (element_id, code, sys_code, elementcat_id, serial_number, num_elements, state, state_type, observ, "comment", function_type, category_type,
 		fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified, label_x, label_y, label_rotation,
-		publish, inventory, expl_id, feature_type, pol_id, top_elev, expl_visibility, trace_featuregeom, muni_id, sector_id, brand_id, model_id, asset_id, datasource,
-		lock_level, the_geom, created_at, created_by, updated_at, updated_by)
+		publish, inventory, expl_id, feature_type, top_elev, expl_visibility, trace_featuregeom, muni_id, sector_id, brand_id, model_id, asset_id, datasource,
+		lock_level, the_geom, created_at, created_by, updated_at, updated_by, epa_type, omzone_id)
 		VALUES(NEW.element_id, NEW.code, NEW.sys_code, NEW.elementcat_id, NEW.serial_number, NEW.num_elements, NEW.state, NEW.state_type, NEW.observ, NEW."comment", NEW.function_type, NEW.category_type,
 		NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.label_x, NEW.label_y, NEW.label_rotation,
-		NEW.publish, NEW.inventory, NEW.expl_id, NEW.feature_type, NEW.pol_id, NEW.top_elev, NEW.expl_visibility, NEW.trace_featuregeom, NEW.muni_id, NEW.sector_id, NEW.brand_id, NEW.model_id, NEW.asset_id, NEW.datasource,
-		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by);
+		NEW.publish, NEW.inventory, NEW.expl_id, NEW.feature_type, NEW.top_elev, NEW.expl_visibility, NEW.trace_featuregeom, NEW.muni_id, NEW.sector_id, NEW.brand_id, NEW.model_id, NEW.asset_id, NEW.datasource,
+		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by, NEW.epa_type, NEW.omzone_id);
 
 		IF v_man_table='man_frelem' THEN
 			INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length)
@@ -358,9 +358,9 @@ BEGIN
 		state_type=NEW.state_type, observ=NEW.observ, "comment"=NEW."comment",  function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,
 		location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id,
 		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish,
-		inventory=NEW.inventory, expl_id=NEW.expl_id, feature_type='ELEMENT', pol_id=NEW.pol_id, top_elev=NEW.top_elev, expl_visibility=NEW.expl_visibility, trace_featuregeom=NEW.trace_featuregeom,
+		inventory=NEW.inventory, expl_id=NEW.expl_id, feature_type='ELEMENT', top_elev=NEW.top_elev, expl_visibility=NEW.expl_visibility, trace_featuregeom=NEW.trace_featuregeom,
 		muni_id=NEW.muni_id, sector_id=NEW.sector_id, brand_id=NEW.brand_id, model_id=NEW.model_id, asset_id=NEW.asset_id, datasource=NEW.datasource,
-		lock_level=NEW.lock_level, the_geom=NEW.the_geom, created_at=NEW.created_at, created_by=NEW.created_by, updated_at=NEW.updated_at, updated_by=NEW.updated_by
+		lock_level=NEW.lock_level, the_geom=NEW.the_geom, created_at=NEW.created_at, created_by=NEW.created_by, updated_at=NEW.updated_at, updated_by=NEW.updated_by, epa_type=NEW.epa_type, omzone_id=NEW.omzone_id
 		WHERE element_id=OLD.element_id;
 
 
@@ -449,7 +449,6 @@ BEGIN
 				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
 					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
 					VALUES ('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_element_type, NEW.element_id);
-					UPDATE element SET pol_id=v_pol_id WHERE element_id = NEW.element_id;
 				ELSE
 					SELECT trace_featuregeom INTO v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
 					IF v_trace_featuregeom IS TRUE THEN
@@ -496,7 +495,6 @@ BEGIN
 				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
 					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
 					VALUES ('ELEMENT', v_the_geom_pol, v_pol_id, v_element_type, NEW.element_id);
-					UPDATE element SET pol_id=v_pol_id WHERE element_id = NEW.element_id;
 
 				ELSE
 					SELECT trace_featuregeom INTO v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
@@ -523,7 +521,7 @@ BEGIN
 	ELSIF TG_OP = 'DELETE' THEN
 
         -- delete related polygon if exists
-    	IF OLD.pol_id IS NOT NULL THEN
+    	IF (SELECT 1 FROM polygon WHERE feature_id=OLD.element_id) IS NOT NULL THEN
 			DELETE FROM polygon WHERE feature_id=OLD.element_id;
 		END IF;
 
