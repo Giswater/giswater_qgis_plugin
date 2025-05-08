@@ -377,7 +377,7 @@ AS WITH
             l.created_by,
             date_trunc('second'::text, l.updated_at) AS updated_at,
             l.updated_by,
-			l.the_geom,
+			l.the_geom
 			FROM link_selector
 			JOIN link l using (link_id)
 			JOIN exploitation ON l.expl_id = exploitation.expl_id
