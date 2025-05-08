@@ -525,3 +525,19 @@ INSERT INTO sys_label VALUES (1003, 'ERROR');
 -- 08/05/2025
 UPDATE config_form_tableview SET columnindex=0 WHERE objectname='tbl_relations' AND columnname='rid';
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('arc form', 'utils', 'tbl_relations', 'sys_table_id', 12, true, NULL, 'sys_table_id', NULL, NULL);
+
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,
+ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_link','form_feature','tab_data','location_type','lyt_data_1',42,'text','text','Location Type','Location Type',false,false,true,false,'{"setMultiline":false}'::json,false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip,
+    ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, hidden, dv_querytext)
+VALUES
+('v_edit_link', 'form_feature', 'tab_data', 'location_type', 'lyt_data_1', 43, 'string', 'combo', 'Location Type', 'Location Type', false, false, true, false, '{"setMultiline":false}'::json, false, 'SELECT location_type as id, location_type as idval FROM man_type_location WHERE ((featurecat_id is null AND feature_type=''LINK'') ) AND active IS TRUE'),
+('v_edit_link', 'form_feature', 'tab_data', 'annotation', 'lyt_data_1', 43, 'string', 'text', 'Annotation', 'Annotation', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
+('v_edit_link', 'form_feature', 'tab_data', 'observ', 'lyt_data_1', 44, 'string', 'text', 'Observ', 'Observ', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
+('v_edit_link', 'form_feature', 'tab_data', 'comment', 'lyt_data_1', 45, 'string', 'text', 'Comment', 'Comment', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
+('v_edit_link', 'form_feature', 'tab_data', 'descript', 'lyt_data_1', 46, 'string', 'text', 'Descript', 'Descript', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
+('v_edit_link', 'form_feature', 'tab_data', 'link', 'lyt_data_1', 47, 'string', 'hyperlink', 'Link', 'Link', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
+('v_edit_link', 'form_feature', 'tab_data', 'num_value', 'lyt_data_1', 48, 'double', 'text', 'Num Value', 'Num Value', false, false, true, false, '{"setMultiline":false}'::json, false, NULL);
