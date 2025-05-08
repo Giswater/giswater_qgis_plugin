@@ -45,39 +45,39 @@ class Campaign:
 
     def campaign_manager(self):
         """ Opens the campaign management interface """
-        self.dialog = CampaignManagementUi(self)
-        tools_gw.load_settings(self.dialog)
+        self.manager_dialog = CampaignManagementUi(self)
+        tools_gw.load_settings(self.manager_dialog)
         self.load_campaigns_into_manager()
 
-        self.dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
-        self.dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
+        self.manager_dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
+        self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
 
         # Populate combo date type
         rows = [['real_startdate', 'Data inici'], ['real_enddate', 'Data fi'], ['startdate', 'Data inici planificada'],
                 ['enddate', 'Data final planificada']]
-        tools_qt.fill_combo_values(self.dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
+        tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
 
         # Fill combo values for campaign status (based on sys_typevalue table)
         sql = "SELECT id, idval FROM cm.sys_typevalue WHERE typevalue = 'campaign_status' ORDER BY id"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dialog.campaign_cmb_state, rows, index_to_show=1, add_empty=True)
+        tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_state, rows, index_to_show=1, add_empty=True)
 
 
         # Set filter events
-        self.dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
-        self.dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
-        self.dialog.date_event_from.dateChanged.connect(self.filter_campaigns)
-        self.dialog.date_event_to.dateChanged.connect(self.filter_campaigns)
-        self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.filter_campaigns)
-        self.dialog.campaign_chk_show_nulls.stateChanged.connect(self.filter_campaigns)
-        self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
-        self.dialog.tbl_campaign.doubleClicked.connect(self.open_campaign)
-        self.dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
-        self.dialog.campaign_btn_open.clicked.connect(self.open_campaign)
-        self.dialog.btn_campaign_selector.clicked.connect(self.open_campaign_selector)
+        self.manager_dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
+        self.manager_dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
+        self.manager_dialog.date_event_from.dateChanged.connect(self.filter_campaigns)
+        self.manager_dialog.date_event_to.dateChanged.connect(self.filter_campaigns)
+        self.manager_dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.filter_campaigns)
+        self.manager_dialog.campaign_chk_show_nulls.stateChanged.connect(self.filter_campaigns)
+        self.manager_dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
+        self.manager_dialog.tbl_campaign.doubleClicked.connect(self.open_campaign)
+        self.manager_dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
+        self.manager_dialog.campaign_btn_open.clicked.connect(self.open_campaign)
+        self.manager_dialog.btn_campaign_selector.clicked.connect(self.open_campaign_selector)
 
         self.manage_date_filter()
-        tools_gw.open_dialog(self.dialog, dlg_name="campaign_management")
+        tools_gw.open_dialog(self.manager_dialog, dlg_name="campaign_management")
 
 
     def open_campaign_selector(self):
@@ -630,8 +630,8 @@ class Campaign:
     def manage_date_filter(self):
         """Update date filters based on selected field (e.g., real_startdate)"""
 
-        field = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_date_filter_type, 0)
-        print(field)
+        field = tools_qt.get_combo_value(self.manager_dialog, self.manager_dialog.campaign_cmb_date_filter_type, 0)
+
         if not field:
             return
 
@@ -650,9 +650,9 @@ class Campaign:
             max_date = result.get("max_date")
 
             if min_date:
-                self.dialog.date_event_from.setDate(min_date)
+                self.manager_dialog.date_event_from.setDate(min_date)
             if max_date:
-                self.dialog.date_event_to.setDate(max_date)
+                self.manager_dialog.date_event_to.setDate(max_date)
 
 
     def filter_campaigns(self):
@@ -661,24 +661,24 @@ class Campaign:
         filters = []
 
         # State
-        status_row = self.dialog.campaign_cmb_state.currentData()
+        status_row = self.manager_dialog.campaign_cmb_state.currentData()
         if status_row and status_row[0]:
             filters.append(f"status = {status_row[0]}")
 
         # Date
-        date_type = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_date_filter_type, 0)
+        date_type = tools_qt.get_combo_value(self.manager_dialog, self.manager_dialog.campaign_cmb_date_filter_type, 0)
         if not date_type:
             msg = "Select a valid date column to filter."
-            tools_qgis.show_warning(msg, dialog=self.dialog)
+            tools_qgis.show_warning(msg, dialog=self.manager_dialog)
             return
 
         # Range of dates
-        date_from = self.dialog.date_event_from.date()
-        date_to = self.dialog.date_event_to.date()
+        date_from = self.manager_dialog.date_event_from.date()
+        date_to = self.manager_dialog.date_event_to.date()
 
         # Auto-correct date range
         if date_from > date_to:
-            self.dialog.date_event_to.setDate(date_from)
+            self.manager_dialog.date_event_to.setDate(date_from)
             date_to = date_from  # Update variable too
 
         date_format_low = self.campaign_date_format + ' 00:00:00'
@@ -688,7 +688,7 @@ class Campaign:
         date_filter = f"({date_type} BETWEEN {interval}"
 
         # Show null
-        if self.dialog.campaign_chk_show_nulls.isChecked():
+        if self.manager_dialog.campaign_chk_show_nulls.isChecked():
             date_filter += f" OR {date_type} IS NULL)"
         else:
             date_filter += ")"
@@ -701,27 +701,27 @@ class Campaign:
         if where_clause:
             query += f" WHERE {where_clause}"
         query += " ORDER BY campaign_id DESC"
-        self.populate_tableview(self.dialog.tbl_campaign, query)
+        self.populate_tableview(self.manager_dialog.tbl_campaign, query)
 
     def delete_selected_campaign(self):
         """Delete the selected campaign"""
-        selected = self.dialog.tbl_campaign.selectionModel().selectedRows()
+        selected = self.manager_dialog.tbl_campaign.selectionModel().selectedRows()
         if not selected:
             msg = "Select a campaign to delete."
-            tools_qgis.show_warning(msg, dialog=self.dialog)
+            tools_qgis.show_warning(msg, dialog=self.manager_dialog)
             return
 
         index = selected[0]
         campaign_id = index.data()
         if not str(campaign_id).isdigit():
             msg = "Invalid campaign ID."
-            tools_qgis.show_warning(msg, dialog=self.dialog)
+            tools_qgis.show_warning(msg, dialog=self.manager_dialog)
             return
 
         # Confirm deletion
-        msg = "Are you sure you want to delete {0} campaign(s)?"
-        msg_params = (len(selected),)
-        if not tools_qt.show_question(msg, msg_params=msg_params):
+        count = len(selected)
+        msg = f"Are you sure you want to delete {count} campaign(s)?"
+        if not tools_qt.show_question(msg):
             return
 
         success = 0
@@ -733,27 +733,33 @@ class Campaign:
             if tools_db.execute_sql(sql):
                 success += 1
 
-        msg = "{0} campaign(s) deleted."
-        msg_params = (success,)
-        tools_qgis.show_info(msg, dialog=self.dialog, msg_params=msg_params)
+        msg = f"{count} campaign(s) deleted."
+        tools_qgis.show_info(msg, dialog=self.manager_dialog)
         self.filter_campaigns()
 
+    def open_campaign(self, index=None):
+        """Open campaign from the clicked index safely (double click handler or button handler)."""
 
-    def open_campaign(self, index):
-        """Open campaign from the clicked index safely (double click handler)."""
-        if not index.isValid():
-            return
+        # If called by double click, index is passed
+        if index and hasattr(index, "isValid") and index.isValid():
+            model = index.model()
+            row = index.row()
+            id_index = model.index(row, 0)
+            campaign_id = model.data(id_index)
 
-        model = index.model()
-        row = index.row()
-        id_index = model.index(row, 0)
-        campaign_id = model.data(id_index)
-        print("open campaign: ", campaign_id)
+        # If called by button, no index → get selected row
+        else:
+            selected = self.manager_dialog.tbl_campaign.selectionModel().selectedRows()
+            if not selected:
+                tools_qgis.show_warning("No campaign selected.", dialog=self.manager_dialog)
+                return
+
+            campaign_id = selected[0].data()
+
         try:
             campaign_id = int(campaign_id)
             if campaign_id > 0:
-                # Delay dialog creation to avoid access violation during double-click stack
-                QTimer.singleShot(0, lambda: self.load_campaign_dialog(campaign_id))
+                self.load_campaign_dialog(campaign_id)
         except (ValueError, TypeError):
             msg = "Invalid campaign ID."
             tools_qgis.show_warning(msg)
