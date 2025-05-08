@@ -370,3 +370,10 @@ UPDATE config_form_fields SET "label"='Block_code',columnname='block_code',toolt
 UPDATE config_form_fields SET "label"='Block_code',columnname='block_code',tooltip='block_code' WHERE formname='ve_connec_fountain' AND formtype='form_feature' AND columnname='block_zone' AND tabname='tab_data';
 UPDATE config_form_fields SET "label"='Block_code',columnname='block_code',tooltip='block_code' WHERE formname='ve_connec_tap' AND formtype='form_feature' AND columnname='block_zone' AND tabname='tab_data';
 UPDATE config_form_fields SET "label"='Block_code',columnname='block_code',tooltip='block_code' WHERE formname='ve_connec_greentap' AND formtype='form_feature' AND columnname='block_zone' AND tabname='tab_data';
+
+UPDATE sys_function SET descript='Function to analyze network as a graph. Multiple analysis is avaliable (SECTOR, DQA, PRESSZONE & DMA). Before start you need to configurate:
+- Field graph_delimiter on [cat_feature_node] table. 
+- Field graphconfig on [dma, sector, cat_presszone and dqa] tables.
+- Enable status for variable utils_graphanalytics_status on [config_param_system] table.
+Stop your mouse over labels for more information about input parameters.
+This function could be automatic triggered by valve status (open or closed) by configuring utils_graphanalytics_automatic_trigger variable on [config_param_system] table.' WHERE id=2768;
