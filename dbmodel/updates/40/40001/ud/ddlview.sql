@@ -809,10 +809,10 @@ AS WITH
 			node.parent_id,
 			node.expl_id,
 			exploitation.macroexpl_id,
+			node.muni_id,
 			node.sector_id,
 			sector_table.macrosector_id,
 			sector_table.sector_type,
-			node.muni_id,
 			node.drainzone_id,
 			drainzone_table.drainzone_type,
 			node.dwfzone_id,
@@ -860,6 +860,7 @@ AS WITH
 			node.verified,
 			node.xyz_date,
 			node.uncertain,
+            node.datasource,
 			node.unconnected,
 			cat_node.label,
 			node.label_x,
@@ -867,6 +868,7 @@ AS WITH
 			node.label_rotation,
 			node.rotation,
 			node.label_quadrant,
+            node.hemisphere,
 			cat_node.svg,
 			node.inventory,
 			node.publish,
@@ -890,9 +892,7 @@ AS WITH
 			node.created_by,
 			date_trunc('second'::text, node.updated_at) AS updated_at,
 			node.updated_by,
-			node.the_geom,
-            -- extra we don't know the order
-            node.hemisphere
+			node.the_geom
 			FROM node_selector
 			JOIN node USING (node_id)
 			JOIN cat_node ON node.nodecat_id::text = cat_node.id::text

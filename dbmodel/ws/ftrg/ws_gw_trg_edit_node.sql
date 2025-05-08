@@ -944,7 +944,7 @@ BEGIN
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link, updated_at=now(), updated_by=current_user,
 		adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility, asset_id=NEW.asset_id,
 		om_state=NEW.om_state, conserv_state=NEW.conserv_state, access_type=NEW.access_type, placement_type=NEW.placement_type, expl_visibility=NEW.expl_visibility,
-		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
+		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, hemisphere=NEW.hemisphere
 		WHERE node_id = OLD.node_id;
 
 
