@@ -64,6 +64,7 @@ v_gully_id integer;
 rec_node record;
 rec_arc record;
 rec_gully record;
+rec_link record;
 id_last integer;
 v_parent_id integer;
 v_visitclass_arc integer;
@@ -74,7 +75,7 @@ v_schemaname text;
 v_idname text;
 v_client_epsg integer;
 v_epsg integer;
-
+v_visitclass_link integer;
 
 
 BEGIN
