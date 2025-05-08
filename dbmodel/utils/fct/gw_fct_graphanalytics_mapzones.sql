@@ -393,9 +393,10 @@ BEGIN
 			v_query_arc = 'SELECT a.* FROM arc a JOIN v_edit_arc USING (arc_id) WHERE a.expl_id IN ('||v_expl_id||')';
 			v_query_node = 'SELECT n.* FROM node n JOIN v_edit_node USING (node_id) WHERE n.expl_id IN ('||v_expl_id||')';
 			v_query_connec = 'SELECT c.* FROM connec c JOIN v_edit_connec USING (connec_id) WHERE c.expl_id IN ('||v_expl_id||')';
-			v_query_link = 'SELECT l.* FROM link l JOIN v_edit_link USING (link_id) WHERE l.expl_id IN ('||v_expl_id||')';
+			v_query_link = 'SELECT l.* FROM link l JOIN v_edit_link USING (link_id) WHERE l.feature_type = ''CONNEC'' AND l.expl_id IN ('||v_expl_id||')';
 			IF v_project_type='UD' THEN
 				v_query_gully = 'SELECT g.* FROM gully g JOIN v_edit_gully USING (gully_id) WHERE g.expl_id IN ('||v_expl_id||')';
+				v_query_link_gully = 'SELECT l.* FROM link l JOIN gully g ON g.gully_id = l.feature_id WHERE l.feature_type = ''GULLY'' AND l.expl_id IN ('||v_expl_id||')';
 			END IF;
 		ELSE
 			v_query_arc = 'SELECT * FROM arc WHERE state=1 AND expl_id IN ('||v_expl_id||')';
