@@ -93,23 +93,12 @@ class AddNewLot:
         self.dlg_lot = AddLotUi(self)
         tools_gw.load_settings(self.dlg_lot)
         self.load_user_values(self.dlg_lot)
-        self.dropdown = self.dlg_lot.findChild(QToolButton, 'action_selector')
-        self.dropdown.setPopupMode(QToolButton.MenuButtonPopup)
-
-        # Create action and put into QToolButton
-        action_by_expression = self.create_action('action_by_expression', self.dlg_lot.action_selector, '204',
-                                                  'Select by expression')
-        action_by_polygon = self.create_action('action_by_polygon', self.dlg_lot.action_selector, '205',
-                                               'Select by polygon')
-        self.dropdown.addAction(action_by_expression)
-        self.dropdown.addAction(action_by_polygon)
-        self.dropdown.setDefaultAction(action_by_expression)
 
         # Set icons
-        tools_gw.add_icon(self.dlg_lot.btn_feature_insert, "111")
-        tools_gw.add_icon(self.dlg_lot.btn_feature_delete, "112")
-        tools_gw.add_icon(self.dlg_lot.btn_feature_snapping, "137")
-        tools_gw.add_icon(self.dlg_lot.btn_refresh_materialize_view, "116")
+        tools_gw.add_icon(self.dlg_lot.btn_insert, '111')
+        tools_gw.add_icon(self.dlg_lot.btn_delete, '112')
+        tools_gw.add_icon(self.dlg_lot.btn_snapping, '137')
+        tools_gw.add_icon(self.dlg_lot.btn_expr_select, '178')
 
         tools_qt.check_date(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
         tools_qt.check_date(self.dlg_lot.enddate, self.dlg_lot.btn_accept, 1)
@@ -121,11 +110,6 @@ class AddNewLot:
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
 
         # Tab 'Relations'
-        self.feature_type = self.dlg_lot.findChild(QComboBox, "feature_type")
-        self.tbl_relation = self.dlg_lot.findChild(QTableView, "tbl_relation")
-        tools_qt.set_tableview_config(self.tbl_relation)
-        tools_qt.set_tableview_config(self.dlg_lot.tbl_visit)
-        self.feature_type.setEnabled(False)
 
         # Fill QWidgets of the form
         self.fill_fields(lot_id)
@@ -140,36 +124,29 @@ class AddNewLot:
         tools_qt.set_widget_text(self.dlg_lot, self.lot_id, new_lot_id)
 
 
-        if self.feature_type != '':
-            viewname = "v_edit_" + self.feature_type.currentText()
-            tools_gw.set_completer_feature_id(self.dlg_lot.feature_id, self.feature_type.currentText(), viewname)
-        else:
-            self.feature_type = 'arc'
+        self.feature_type = 'arc'
         self.clear_selection()
 
-        self.event_feature_type_selected(self.dlg_lot)
+        #self.event_feature_type_selected(self.dlg_lot)
 
         # Set actions signals
-        action_by_expression.triggered.connect(
-            partial(self.activate_selection, self.dlg_lot, action_by_expression, 'mActionSelectByExpression'))
-        action_by_polygon.triggered.connect(
-            partial(self.activate_selection, self.dlg_lot, action_by_polygon, 'mActionSelectPolygon'))
+
 
         # Set widgets signals
         self.dlg_lot.cmb_ot.activated.connect(partial(self.set_ot_fields))
         self.dlg_lot.cmb_ot.editTextChanged.connect(partial(self.filter_by_list, self.dlg_lot.cmb_ot))
 
-        self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_row))
-        self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
-        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer))
-        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot))
+        self.dlg_lot.btn_insert.clicked.connect(partial(self.insert_row))
+        #self.dlg_lot.btn_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
+        self.dlg_lot.btn_snapping.clicked.connect(partial(self.set_active_layer))
+        self.dlg_lot.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot))
         self.dlg_lot.cmb_status.currentIndexChanged.connect(partial(self.manage_cmb_status))
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.btn_validate_all.clicked.connect(partial(self.validate_all, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_photo.clicked.connect(partial(self.open_photo, self.dlg_lot.tbl_visit))
-        self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_relation))
+        #self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
@@ -180,10 +157,9 @@ class AddNewLot:
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
-        self.set_lot_headers()
-        self.set_active_layer()
+        #self.set_lot_headers()
+        #self.set_active_layer()
 
-        tools_gw.add_icon(self.dlg_lot.btn_open_image, "136b")
 
         if lot_id is not None and visitclass_id not in (None, '', 'NULL'):
             self.set_values(lot_id)
@@ -202,7 +178,7 @@ class AddNewLot:
         self.dlg_lot.txt_observ.setReadOnly(True)
 
         # Check if enable or disable tab relation if
-        self.set_tab_dis_enabled()
+        #self.set_tab_dis_enabled()
 
         # Set autocompleters of the form
         self.set_completers()
@@ -219,11 +195,9 @@ class AddNewLot:
             result = ''
 
         # Set listeners for export csv
-        self.dlg_lot.btn_export_rel.clicked.connect(
-            partial(self.export_model_to_csv, self.dlg_lot, self.dlg_lot.tbl_relation, 'txt_path_rel', result_relation,
-                    self.lot_date_format))
-        self.dlg_lot.btn_path.clicked.connect(partial(self.select_path, self.dlg_lot, 'txt_path'))
-        self.dlg_lot.btn_path_rel.clicked.connect(partial(self.select_path, self.dlg_lot, 'txt_path_rel'))
+        #self.dlg_lot.btn_export_rel.clicked.connect(
+        #    partial(self.export_model_to_csv, self.dlg_lot, self.dlg_lot.tbl_relation, 'txt_path_rel', result_relation,
+        #            self.lot_date_format))
         self.check_for_ids()
 
         # Open the dialog
@@ -655,9 +629,7 @@ class AddNewLot:
                f" FROM {self.schema_name}.sys_feature_type"
                " WHERE classlevel = 1 or classlevel = 2"
                " ORDER BY id")
-        feature_type = tools_db.get_rows(sql, commit=self.autocommit)
-        if feature_type:
-            tools_qt.fill_combo_values(self.dlg_lot.feature_type, feature_type, 1)
+
 
 
     def get_next_id(self, table_name, pk):
