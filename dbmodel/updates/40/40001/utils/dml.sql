@@ -521,3 +521,7 @@ VALUES('sys_label', 'Specific table to keep labels indexed and ready to translat
 INSERT INTO sys_label VALUES (1001, 'INFO');
 INSERT INTO sys_label VALUES (1002, 'WARNING');
 INSERT INTO sys_label VALUES (1003, 'ERROR');
+
+-- 08/05/2025
+UPDATE config_form_tableview SET columnindex=0 WHERE objectname='tbl_relations' AND columnname='rid';
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('arc form', 'utils', 'tbl_relations', 'sys_table_id', 12, true, NULL, 'sys_table_id', NULL, NULL);
