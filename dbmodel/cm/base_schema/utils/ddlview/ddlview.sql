@@ -57,3 +57,38 @@ FROM om_campaign_lot
 LEFT JOIN workorder ON workorder.workorder_id = om_campaign_lot.workorder_id
 LEFT JOIN cat_team ON cat_team.team_id = om_campaign_lot.team_id
 LEFT JOIN sys_typevalue ON sys_typevalue.id::integer = om_campaign_lot.status AND sys_typevalue.typevalue = 'lot_status'::text;
+
+
+
+CREATE VIEW cm.v_ui_campaign AS
+
+WITH campaign_reviewvisit AS (SELECT ocr.campaign_id, omr.idval FROM om_campaign_review ocr
+	LEFT JOIN om_reviewclass omr ON ocr.reviewclass_id = omr.id
+	UNION
+	SELECT ocr.campaign_id, omr.idval FROM om_campaign_visit ocr
+	LEFT JOIN om_reviewclass omr ON ocr.visitclass_id = omr.id)
+
+	select
+	c.campaign_id,
+	c."name",
+	c.startdate,
+	c.enddate,
+	c.real_startdate,
+	c.real_enddate,
+	st.idval AS campaign_type,
+	crv.idval AS campaign_class,
+	c.descript,
+	c.active,
+	c.organization_id,
+	c.duration,
+	c.status,
+	c.the_geom,
+	c.rotation,
+	c.exercise,
+	c.serie,
+	c.address
+
+	FROM cm.om_campaign c
+	LEFT JOIN campaign_reviewvisit crv USING (campaign_id)
+	LEFT JOIN sys_typevalue st ON st.id = c.campaign_type::TEXT
+	WHERE st.typevalue = 'campaign_type'
