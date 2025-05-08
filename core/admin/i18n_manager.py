@@ -297,12 +297,10 @@ class GwSchemaI18NManager:
         columns = ", ".join(columns_i18n)
         query = f"SELECT {columns} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        print(query)
 
         columns = ", ".join(columns_org)
         query = f"SELECT {columns} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
-        print(query)
 
         query = ""
         if rows_i18n:
@@ -651,7 +649,7 @@ class GwSchemaI18NManager:
                 FROM {table_org} 
                 WHERE formtype = 'form_feature' AND (formname LIKE 've_flwreg%' OR formname = 'v_edit_flwreg')
             ) AS unioned
-            ON CONFLICT (feature_type, source_code, project_type, context, formname, formtype, source)
+            ON CONFLICT (feature_type, source_code, project_type, context, formtype, source)
             DO NOTHING;
 
             delete from {table_org}  where formtype = 'form_feature' and (formname like 've_arc%' or formname in ('v_edit_arc'));
@@ -975,7 +973,6 @@ class GwSchemaI18NManager:
             if context not in seen_contexts and row_project_type == self.project_type:
                 tables_org.append(context)
                 seen_contexts.add(context) # Use .get() to avoid KeyError if 'context' doesn't exist
-        print(tables_org)
         if tables_org is None:
             return None  # Or some fallback behavior
         

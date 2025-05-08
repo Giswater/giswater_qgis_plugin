@@ -389,7 +389,7 @@ class GwI18NGenerator:
 
         elif table == 'dbconfig_form_tableview':
             colums = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
-            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", ]
+            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}"]
 
         elif table == 'dbjson':
             colums = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
@@ -400,7 +400,7 @@ class GwI18NGenerator:
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
 
         elif table == 'dbconfig_form_fields_feat':
-            colums = ["feature_type","source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            colums = ["feature_type","source", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbtable':
@@ -422,14 +422,17 @@ class GwI18NGenerator:
 
         # Make the query
         sql=""
-        if self.lower_lang == 'en_us':
-            sql = (f"SELECT {", ".join(colums)} "
-               f"FROM {self.schema_i18n}.{table} "
-               f"ORDER BY context;")
-        else:
-            sql = (f"SELECT {", ".join(colums)}, {", ".join(lang_colums)} "
-               f"FROM {self.schema_i18n}.{table} "
-               f"ORDER BY context;")
+        try:
+            if self.lower_lang == 'en_us':
+                sql = (f"SELECT {", ".join(colums)} "
+                f"FROM {self.schema_i18n}.{table} "
+                f"ORDER BY context;")
+            else:
+                sql = (f"SELECT {", ".join(colums)}, {", ".join(lang_colums)} "
+                f"FROM {self.schema_i18n}.{table} "
+                f"ORDER BY context;")
+        except Exception as e:
+            print(e)
         rows = self._get_rows(sql, self.cursor_i18n)
 
         # Return the corresponding information

@@ -800,7 +800,6 @@ class GwAdminButton:
         self.dlg_readsql.btn_delete.clicked.connect(partial(self._delete_schema))
         self.dlg_readsql.btn_copy.clicked.connect(partial(self._copy_schema))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self._create_qgis_template))
-        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_custom_sql_path, self.dlg_readsql))
@@ -812,7 +811,6 @@ class GwAdminButton:
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self._open_manage_field, 'delete'))
-        self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
         self.dlg_readsql.btn_import_osm_streetaxis.clicked.connect(partial(self._import_osm))
 
         # Asset manage buttons
@@ -829,7 +827,10 @@ class GwAdminButton:
         self.dlg_readsql.btn_reload_audit_triggers.clicked.connect(partial(self._reload_audit_triggers))
         self.dlg_readsql.btn_delete_audit.clicked.connect(partial(self._delete_other_schema, 'audit'))
 
+        # i18n
         self.dlg_readsql.btn_i18n.clicked.connect(partial(self._i18n_manager))
+        self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
+        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
 
     def _activate_audit(self):
         """ Activate audit functionality """

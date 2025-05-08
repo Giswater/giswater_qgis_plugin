@@ -205,13 +205,11 @@ class GwSchemaI18NUpdate:
         schema_i18n = "i18n"
         for dbtable in dbtables:
             dbtable = f"{schema_i18n}.{dbtable}"
-            print(dbtable)
             dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
             if not dbtable_rows:
                 messages.append(dbtable)  # Corregido
             else:
                 if "json" in dbtable:
-                    print("a")
                     self._write_dbjson_values(dbtable_rows)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable)
@@ -246,9 +244,10 @@ class GwSchemaI18NUpdate:
 
         if 'dbconfig_form_fields' in table:
             columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", 
+                            f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
             if 'feat' in table:
-                columns.append('feature_type')
+                columns = [col.replace("formname", "feature_type") for col in columns]
             elif 'json' in table:
                 columns = columns[:-1]
                 columns.extend(["hint", "text"])
@@ -256,11 +255,13 @@ class GwSchemaI18NUpdate:
 
         elif 'dbparam_user' in table:
             columns = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
+                            f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
         
         elif 'dbconfig_param_system' in table:
             columns = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
+                            f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
         
         elif 'dbconfig_typevalue' in table:
             columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "tt_en_us"]
@@ -268,27 +269,34 @@ class GwSchemaI18NUpdate:
 
         elif 'dbmessage' in table:
             columns = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
-            lang_columns = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang}," f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
+            lang_columns = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang}," 
+                            f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
         
         elif 'dbfprocess' in table:
             columns = ["source", "project_type", "context", "ex_en_us", "in_en_us", "na_en_us"]
-            lang_columns = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang}," f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}", f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
+            lang_columns = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang}," 
+                            f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}", 
+                            f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
         
         elif 'dbconfig_csv' in table:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", 
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
         elif 'dbconfig_form_tabs' in table:
             columns = ["formname", "source", "project_type", "context", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", 
+                            f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
         
         elif 'dbconfig_report' in table:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", 
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
         
         elif 'dbconfig_toolbox' in table:
             columns = ["source", "project_type", "context", "al_en_us", "ob_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}",
+                             f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
        
         elif 'dbfunction' in table:
             columns = ["source", "project_type", "context", "ds_en_us"]
@@ -296,11 +304,12 @@ class GwSchemaI18NUpdate:
        
         elif 'dbtypevalue' in table:
             columns = ["source", "project_type", "context", "typevalue", "vl_en_us", "ds_en_us"]
-            lang_columns = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            lang_columns = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}", 
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
         elif 'dbconfig_form_tableview' in table:
             columns = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", ]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}"]
 
         elif 'dbjson' in table:
             columns = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
@@ -308,15 +317,19 @@ class GwSchemaI18NUpdate:
         
         elif 'dbtable' in table:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", 
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
         elif 'dbconfig_engine' in table:
             columns = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", 
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", 
+                            f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
 
         elif 'su_basic_tables' in table:
             columns = ["project_type", "context", "source", "na_en_us", "ob_en_us"]
-            lang_columns = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+            lang_columns = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", 
+                            f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
 
         # Make the query
         sql=""
@@ -329,7 +342,6 @@ class GwSchemaI18NUpdate:
                f"FROM {table} "
                f"ORDER BY context")
         rows = self._get_rows(sql, self.cursor_i18n)
-        print(sql)
         
         # Return the corresponding information
         if not rows:
@@ -337,7 +349,6 @@ class GwSchemaI18NUpdate:
         return rows, columns
     
     def _write_table_values(self, rows, columns, table):
-        print(table)
 
         schema_type = [self.project_type]
         if self.project_type in ["ud", "ws"]:
@@ -414,7 +425,6 @@ class GwSchemaI18NUpdate:
                 elif 'dbconfig_csv' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE fid = '{row['source']}';\n")
-                    print(sql_text)
                     
                 elif 'dbconfig_form_tabs' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} "
@@ -453,9 +463,6 @@ class GwSchemaI18NUpdate:
                         sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "
                                     f"WHERE id = '{row['source']}';\n")
              
-                #Execute the corresponding query
-                if i == 1:
-                    print(sql_text)
                 try:
                     self.cursor_dest.execute(sql_text)
                     self._commit_dest()
