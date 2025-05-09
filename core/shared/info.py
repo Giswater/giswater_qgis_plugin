@@ -3793,39 +3793,6 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
     tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
 
-def widget_data_changed(info, view, tbl, model, addparam, value):
-
-    # Get view pk
-    ids = f''
-    if addparam:
-        for pk in addparam.split(','):
-            col = tools_qt.get_col_index_by_col_name(tbl, pk.strip())
-            if col is not False:
-                ids += f"{model.index(index.row(), col).data()}, "
-        ids = ids.strip(', ')
-    else:
-        ids = f"{model.index(index.row(), 0).data()}"
-
-    if ids not in getattr(info, f"my_json_{view}"):
-        getattr(info, f"my_json_{view}")[ids] = {}
-
-    # Get edited cell
-    fieldname = model.headerData(index.column(), Qt.Horizontal)
-    field = index.data()
-
-    # Fill my_json
-    if str(field) == '' or field is None:
-        getattr(info, f"my_json_{view}")[ids][fieldname] = None
-    else:
-        getattr(info, f"my_json_{view}")[ids][fieldname] = str(field)
-
-    # Enable btn_accept
-    try:
-        info.dlg.btn_accept.setEnabled(True)
-    except (AttributeError, RuntimeError):
-        pass
-
-
 def tbl_data_changed(info, view, tbl, model, addparam, index):
 
     # Get view pk
