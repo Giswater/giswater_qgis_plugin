@@ -377,3 +377,7 @@ UPDATE sys_function SET descript='Function to analyze network as a graph. Multip
 - Enable status for variable utils_graphanalytics_status on [config_param_system] table.
 Stop your mouse over labels for more information about input parameters.
 This function could be automatic triggered by valve status (open or closed) by configuring utils_graphanalytics_automatic_trigger variable on [config_param_system] table.' WHERE id=2768;
+
+-- 09/05/2025
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, matcat_id as idval FROM cat_mat_roughness'
+WHERE formname='generic' AND formtype='nvo_roughness' AND columnname='matcat_id' AND tabname='tab_none';

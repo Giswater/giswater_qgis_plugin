@@ -15,7 +15,13 @@ ALTER TABLE exploitation ADD CONSTRAINT exploitation_cat_owner_id_fkey FOREIGN K
 
 -- 08/05/2025
 ALTER TABLE sys_param_user
-ADD CONSTRAINT chk_widgettype_combo_requires_dv_querytext
+ADD CONSTRAINT chk_widgets_requires_dv_querytext
 CHECK (
-  widgettype != 'combo' OR dv_querytext IS NOT NULL
+  (widgettype NOT IN ('combo', 'typeahead')) OR dv_querytext IS NOT NULL
+);
+
+ALTER TABLE config_param_system
+ADD CONSTRAINT chk_widgets_requires_dv_querytext
+CHECK (
+  (widgettype NOT IN ('combo', 'typeahead')) OR dv_querytext IS NOT NULL
 );

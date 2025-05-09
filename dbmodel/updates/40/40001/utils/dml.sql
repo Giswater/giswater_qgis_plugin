@@ -515,7 +515,7 @@ VALUES(642, 'Connec which id is not an integer', 'utils', NULL, 'core', true, 'C
 
 DELETE FROM sys_fprocess WHERE fid IN (202, 542);
 
-INSERT INTO sys_table (id, descript, sys_role, "source") 
+INSERT INTO sys_table (id, descript, sys_role, "source")
 VALUES('sys_label', 'Specific table to keep labels indexed and ready to translate', 'role_admin', 'core');
 
 INSERT INTO sys_label VALUES (1001, 'INFO');
@@ -539,3 +539,25 @@ VALUES
 ('v_edit_link', 'form_feature', 'tab_data', 'num_value', 'lyt_data_1', 48, 'double', 'text', 'Num Value', 'Num Value', false, false, true, false, '{"setMultiline":false}'::json, false, NULL);
 
 UPDATE sys_param_user SET widgettype='text' WHERE id='qgis_composers_folderpath';
+
+-- 09/05/2025
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, fluid_type AS idval FROM man_type_fluid WHERE id IS NOT NULL'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='fluid_type' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, location_type AS idval FROM man_type_location WHERE id IS NOT NULL'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='location_type' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, category_type AS idval FROM man_type_category WHERE id IS NOT NULL'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='category_type' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, function_type AS idval FROM man_type_function WHERE id IS NOT NULL'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='function_type' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, id AS idval FROM sys_feature_type WHERE id IS NOT NULL'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='feature_type_new' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, id AS idval FROM cat_feature'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='featurecat_id' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT ARRAY[''composer_plan'', ''composer_mincut''] AS id, ARRAY[''composer_plan'', ''composer_mincut''] AS idval'
+WHERE formname='print' AND formtype='form_print' AND columnname='composer' AND tabname='tab_none';

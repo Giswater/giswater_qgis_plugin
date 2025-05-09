@@ -15,3 +15,9 @@ ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK (id::te
 
 ALTER TABLE om_waterbalance DROP CONSTRAINT om_waterbalance_pkey;
 ALTER TABLE om_waterbalance ADD CONSTRAINT om_waterbalance_pkey PRIMARY KEY (dma_id, startdate, enddate);
+
+ALTER TABLE config_form_fields
+ADD CONSTRAINT chk_widgets_requires_dv_querytext
+CHECK (
+  (widgettype NOT IN ('combo', 'typeahead')) OR dv_querytext IS NOT NULL
+);

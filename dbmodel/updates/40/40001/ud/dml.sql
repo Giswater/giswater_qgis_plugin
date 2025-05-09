@@ -904,3 +904,16 @@ UPDATE config_form_fields SET widgetcontrols='{
     "filterExpression": null
   }
 }'::json WHERE formname IN ('v_edit_gully', 've_gully') AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+
+-- 09/05/2025
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, resultdate AS idval FROM rpt_arc'
+WHERE formname='generic' AND formtype='epa_selector' AND columnname='selector_date' AND tabname='tab_time';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, resultdate AS idval FROM rpt_arc'
+WHERE formname='generic' AND formtype='epa_selector' AND columnname='compare_date' AND tabname='tab_time';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, resulttime AS idval FROM rpt_arc'
+WHERE formname='generic' AND formtype='epa_selector' AND columnname='selector_time' AND tabname='tab_time';
+
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, resulttime AS idval FROM rpt_arc'
+WHERE formname='generic' AND formtype='epa_selector' AND columnname='compare_time' AND tabname='tab_time';
