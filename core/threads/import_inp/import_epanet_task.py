@@ -512,6 +512,7 @@ class GwImportInpTask(GwTask):
         for curve_name, curve in self.network.curves.items():
             if curve.curve_type is None:
                 message = f'The "{curve_name}" curve does not have a specified curve type and was not imported.'
+                self._log_message(message)
                 continue
 
             if curve_name in curves_db:
@@ -520,6 +521,7 @@ class GwImportInpTask(GwTask):
                     if new_name in curves_db:
                         continue
                     message = f'The curve "{curve_name}" has been renamed to "{new_name}" to avoid a collision with an existing curve.'
+                    self._log_message(message)
                     self.mappings["curves"][curve_name] = new_name
                     curve_name = new_name
                     break

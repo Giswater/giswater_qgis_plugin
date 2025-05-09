@@ -226,7 +226,7 @@ def delete_mincut(**kwargs):
     widget = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     table_name = "om_mincut"
     column_id = "id"
-    complet_result = kwargs['complet_result']    
+    complet_result = kwargs['complet_result']
     # Get selected rows
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
@@ -287,8 +287,6 @@ def _reload_table(dialog, complet_result):
     tab_name = 'main'
     list_tables = dialog.findChildren(QTableView)
 
-    feature_id = complet_result['body']['feature']['id']
-    field_id = str(complet_result['body']['feature']['idName'])
     widget_list = []
     widget_list.extend(dialog.findChildren(QComboBox, QRegExp(f"{tab_name}_")))
     widget_list.extend(dialog.findChildren(QTableView, QRegExp(f"{tab_name}_")))
@@ -302,10 +300,6 @@ def _reload_table(dialog, complet_result):
             continue
         # Get value from filter widgets
         filter_fields = tools_backend_calls.get_filter_qtableview_mincut(dialog, widget_list, complet_result)
-        # if tab dont have any filter widget
-        # if filter_fields in ('', None):
-        #    filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
-        # filter_fields = f''
         linkedobject = table.property('linkedobject')
         complet_list, widget_list = tools_backend_calls.fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
         if complet_list is False:

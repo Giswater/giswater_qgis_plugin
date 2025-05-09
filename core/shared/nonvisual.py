@@ -112,7 +112,6 @@ class GwNonVisual:
             self.manager_dlg.main_tab.widget(tab_idx).setObjectName(key)
             self.manager_dlg.main_tab.widget(tab_idx).setProperty('function', f"get_{dict_views_project[key]}")
             function_name = f"get_{dict_views_project[key]}"
-            _id = 0
 
             # Populate custom context menu
             qtableview.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -2617,7 +2616,6 @@ class GwNonVisual:
 
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
-                tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
                 visible_widgets = [widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)]

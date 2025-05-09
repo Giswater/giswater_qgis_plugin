@@ -487,7 +487,7 @@ class GwInfo(QObject):
         # Using variable exist_rb for check if alredy exist rubberband
         try:
             # noinspection PyUnusedLocal
-            exist_rb = complet_result['body']['returnManager']['style']['ruberband']
+            exist_rb = complet_result['body']['returnManager']['style']['ruberband']  # noqa: F841
         except KeyError:
             tools_gw.draw_by_json(complet_result, self.rubber_band)
 
@@ -1345,7 +1345,7 @@ class GwInfo(QObject):
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Set snapping
-        layer = global_vars.iface.activeLayer()
+        # layer = global_vars.iface.activeLayer() TODO: Remove this line if not needed
 
         # Set marker
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -2781,7 +2781,6 @@ class GwInfo(QObject):
             widget = self.dlg_cf.findChild(QTableView, field['widgetname'])
             if widget is None:
                 continue
-            short_name = field['widgetname'].replace(f"tab_{tab_name}_", "", 1)
             widget = tools_gw.add_tableview_header(widget, field, headers)
             widget = tools_gw.fill_tableview_rows(widget, field)
             tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
@@ -3557,7 +3556,6 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
         if not answer:
             return
     feature_id = complet_result['body']['feature']['id']
-    id_name = complet_result['body']['feature']['idName']
 
     feature = f'"tableName":"{tablename}", "isEpa": true'
     if force_action == "UPDATE":
@@ -4385,7 +4383,6 @@ def open_visit_event(**kwargs):
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params.get('targetwidget')}")
-    complet_result = kwargs['complet_result']
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()

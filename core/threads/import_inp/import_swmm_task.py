@@ -768,8 +768,9 @@ class GwImportInpTask(GwTask):
                     new_name = f"{lid_name}_{i}"
                     if new_name in lids_db:
                         continue
-                    message = f'The curve "{lid_name}" has been renamed to "{new_name}" to avoid a collision with an existing curve.'
-                    self.mappings["curves"][lid_name] = new_name
+                    message = f'The lid "{lid_name}" has been renamed to "{new_name}" to avoid a collision with an existing lid.'
+                    self._log_message(message)
+                    self.mappings["lids"][lid_name] = new_name
                     lid_name = new_name
                     break
 

@@ -697,9 +697,10 @@ class GwCalculatePriority(GwTask):
             arc["total_expected_useful_life"] = self.config_material.get_age(
                 arc_material, pressure
             )
-            one_year = timedelta(days=365)
+            # one_year = timedelta(days=365)  # TODO: Remove this line if not needed
             duration = arc["total_expected_useful_life"]
-            remaining_years = arc["calculated_builtdate"].year + duration - date.today().year
+            # TODO: Remove this line if not needed
+            # remaining_years = arc["calculated_builtdate"].year + duration - date.today().year
             # Actual age of the arc
             real_years = date.today().year - arc["calculated_builtdate"].year
             # Calculate the longevity value [real life/ expected useful life]

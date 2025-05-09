@@ -1739,7 +1739,7 @@ class GwVisit(QObject):
                f" VALUES ('{doc_id}', {visit_id})")
         status = tools_db.execute_sql(sql)
         if status:
-            mesmsgsage = "Document inserted successfully"
+            msg = "Document inserted successfully"
             tools_qgis.show_info(msg, dialog=dialog)
 
         self.dlg_add_visit.tbl_document.model().select()

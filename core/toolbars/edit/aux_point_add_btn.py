@@ -209,11 +209,11 @@ class GwAuxPointAddButton(GwMaptool):
         value_y = tools_qt.get_text(dialog, 'dist_y')
         try:
             distance_x = float(value_x)
-        except ValueError as e:
+        except ValueError:
             distance_x = 0.0
         try:
             distance_y = float(value_y)
-        except ValueError as e:
+        except ValueError:
             distance_y = 0.0
 
         if point1 is None or point2 is None:

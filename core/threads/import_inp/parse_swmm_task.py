@@ -215,9 +215,9 @@ class Catalogs:
             geom2 = xs.parameter_2
             geom3 = xs.parameter_3
             geom4 = xs.parameter_4
-            n_barrels = xs.n_barrels
-            culvert = xs.culvert
-            transect = xs.transect
+            # n_barrels = xs.n_barrels
+            # culvert = xs.culvert
+            # transect = xs.transect
             curve_name = xs.curve_name
             if shape == 'CUSTOM':
                 geom2 = curve_name

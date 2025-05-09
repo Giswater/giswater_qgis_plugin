@@ -84,8 +84,6 @@ class GwPsector:
         # Manage btn set to arc
         self._manage_btn_set_to_arc(self.dlg_plan_psector)
 
-        # Capture the current layer to return it at the end of the operation
-        cur_active_layer = self.iface.activeLayer()
         widget_list = self.dlg_plan_psector.findChildren(QTableView)
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)

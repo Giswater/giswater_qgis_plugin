@@ -210,7 +210,7 @@ class GwNetscenarioManagerButton(GwAction):
         try:
             # Extract name and netscenario_id from the result
             name_value = result["body"]["data"]["name"]
-            netscenario_id = result["body"]["data"]["netscenario_id"]
+            netscenario_id = result["body"]["data"]["netscenario_id"]  # noqa: F841
 
             # Set the label text
             tools_qt.set_widget_text(dialog, 'lbl_vdefault_netscenario', name_value)
@@ -694,8 +694,9 @@ class GwNetscenarioManagerButton(GwAction):
         index = self.tbl_netscenario.selectionModel().currentIndex()
         col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_id')
         selected_netscenario_id = index.sibling(index.row(), col_idx).data()
-        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_type')
-        selected_netscenario_type = index.sibling(index.row(), col_idx).data()
+        # TODO: Remove these lines if not needed
+        # col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_type')
+        # selected_netscenario_type = index.sibling(index.row(), col_idx).data()
         tablename = f"plan_netscenario"
         pkey = "netscenario_id"
 

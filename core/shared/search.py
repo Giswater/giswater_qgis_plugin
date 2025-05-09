@@ -216,7 +216,8 @@ class GwSearch:
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self._close_search)
-        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
+        # TODO: Remove this line if not needed
+        # docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
 
     def _reset_rubber_band(self):
 
