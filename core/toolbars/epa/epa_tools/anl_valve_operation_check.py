@@ -151,6 +151,7 @@ class ValveOperationCheck:
 
     def _ovewrite_existing_files(self, folder, file_name):
         prefix = f"{folder}/{file_name}"
+
         def exists(sufix):
             return Path(prefix + sufix).exists()
         sufixes = ["-report.csv", "-nodes.csv", "-arcs.csv", ".in"]
