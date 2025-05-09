@@ -528,7 +528,7 @@ BEGIN
 		NEW.comment,NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.streetaxis_id, NEW.streetaxis2_id, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified,NEW.label_x,NEW.label_y,NEW.label_rotation,
-		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere,NEW.num_value,
+		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere, NEW.num_value,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id,
 		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.pavcat_id, NEW.lock_level, NEW.is_scadamap);
 
@@ -944,7 +944,7 @@ BEGIN
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link, updated_at=now(), updated_by=current_user,
 		adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility, asset_id=NEW.asset_id,
 		om_state=NEW.om_state, conserv_state=NEW.conserv_state, access_type=NEW.access_type, placement_type=NEW.placement_type, expl_visibility=NEW.expl_visibility,
-		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, hemisphere=NEW.hemisphere
+		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
 		WHERE node_id = OLD.node_id;
 
 
