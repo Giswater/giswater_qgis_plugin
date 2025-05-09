@@ -341,8 +341,10 @@ AS WITH
 			sector_table.sector_type,
 			l.drainzone_id,
 			drainzone_table.drainzone_type,
+			l.drainzone_outfall,
 			l.dwfzone_id,
 			dwfzone_table.dwfzone_type,
+			l.dwfzone_outfall,
 			l.omzone_id,
 			omzone_table.macroomzone_id,
             l.macrominsector_id,
@@ -608,8 +610,10 @@ AS WITH
 			arc.muni_id,
 			arc.drainzone_id,
 			drainzone_table.drainzone_type,
+			arc.drainzone_outfall,
 			arc.dwfzone_id,
 			dwfzone_table.dwfzone_type,
+			arc.dwfzone_outfall,
 			arc.omzone_id,
 			omzone_table.macroomzone_id,
 			omzone_table.omzone_type,
@@ -815,8 +819,10 @@ AS WITH
 			sector_table.sector_type,
 			node.drainzone_id,
 			drainzone_table.drainzone_type,
+			node.drainzone_outfall,
 			node.dwfzone_id,
 			dwfzone_table.dwfzone_type,
+			node.dwfzone_outfall,
 			node.omzone_id,
 			omzone_table.macroomzone_id,
             node.omunit_id,
@@ -946,8 +952,10 @@ AS WITH
 			sector_type,
 			drainzone_id,
 			drainzone_type,
+            drainzone_outfall,
 			dwfzone_id,
 			dwfzone_type,
+			dwfzone_outfall,
 			omzone_id,
 			macroomzone_id,
             omunit_id,
@@ -1146,6 +1154,7 @@ AS WITH
 				WHEN link_planned.drainzone_type IS NULL THEN drainzone_table.drainzone_type
 				ELSE link_planned.drainzone_type
 			END AS drainzone_type,
+            connec.drainzone_outfall,
             CASE
 				WHEN link_planned.dwfzone_id IS NULL THEN connec.dwfzone_id
 				ELSE link_planned.dwfzone_id
@@ -1154,6 +1163,7 @@ AS WITH
 				WHEN link_planned.dwfzone_type IS NULL THEN dwfzone_table.dwfzone_type
 				ELSE link_planned.dwfzone_type
 			END AS dwfzone_type,
+            connec.dwfzone_outfall,
 			CASE
 				WHEN link_planned.omzone_id IS NULL THEN connec.omzone_id
 				ELSE link_planned.omzone_id
@@ -1411,6 +1421,7 @@ AS WITH
 				WHEN link_planned.drainzone_type IS NULL THEN drainzone_table.drainzone_type
 				ELSE link_planned.drainzone_type
 			END AS drainzone_type,
+            gully.drainzone_outfall,
 			CASE
 				WHEN link_planned.omzone_id IS NULL THEN omzone_table.omzone_id
 				ELSE link_planned.omzone_id
@@ -1431,6 +1442,7 @@ AS WITH
 				WHEN link_planned.dwfzone_type IS NULL THEN dwfzone_table.dwfzone_type
 				ELSE link_planned.dwfzone_type
 			END AS dwfzone_type,
+			gully.dwfzone_outfall,
 			gully.minsector_id,
 			gully.macrominsector_id,
 			gully.soilcat_id,

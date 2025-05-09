@@ -468,7 +468,7 @@ BEGIN
 			builtdate, enddate, ownercat_id, muni_id, postcode, district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value,
-			updated_at, updated_by, asset_id, drainzone_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level)
+			updated_at, updated_by, asset_id, drainzone_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level, drainzone_outfall, dwfzone_outfall)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
@@ -476,14 +476,14 @@ BEGIN
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value,
 			NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.drainzone_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.lock_level);
+			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.drainzone_outfall, NEW.dwfzone_outfall);
 		ELSE
 			INSERT INTO connec (connec_id, code, sys_code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
 			"observ","comment",  omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id,postcode,district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom, label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, matcat_id,
-			updated_at, updated_by, asset_id, drainzone_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level)
+			updated_at, updated_by, asset_id, drainzone_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level, drainzone_outfall, dwfzone_outfall)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
@@ -491,7 +491,7 @@ BEGIN
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id,
 			NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.drainzone_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.lock_level);
+			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.drainzone_outfall, NEW.dwfzone_outfall);
 		END IF;
 
 		--check if feature is double geom
@@ -747,7 +747,7 @@ BEGIN
 			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified,
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(), updated_by=current_user, asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
-			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level
+			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall
 			WHERE connec_id = OLD.connec_id;
 		ELSE
 			UPDATE connec
@@ -760,7 +760,7 @@ BEGIN
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(),
 			updated_by=current_user, matcat_id = NEW.matcat_id, asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
-			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level
+			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall
 			WHERE connec_id = OLD.connec_id;
 		END IF;
 
