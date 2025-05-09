@@ -506,7 +506,7 @@ class GwInfo(QObject):
             try:
                 list_points = (f'"x1": {complet_result["body"]["feature"]["geometry"]["x"]}, '
                                f'"y1": {complet_result["body"]["feature"]["geometry"]["y"]}')
-            except Exception as e:
+            except Exception:
                 pass
 
         for tab in complet_result['body']['form']['visibleTabs']:
@@ -530,7 +530,7 @@ class GwInfo(QObject):
             try:
                 self.tab_main.setTabText(x, self.visible_tabs[tab_name]['tabLabel'])
                 self.tab_main.setTabToolTip(x, self.visible_tabs[tab_name]['tooltip'])
-            except Exception as e:
+            except Exception:
                 pass
             if tab_name not in tabs_to_show:
                 tools_qt.remove_tab(self.tab_main, tab_name)

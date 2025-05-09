@@ -456,7 +456,7 @@ class GwAdminButton:
             chk_widget = self.dlg_readsql_create_project.findChild(QWidget, create_schema_type)
             try:
                 chk_widget.setChecked(True)
-            except Exception as e:
+            except Exception:
                 pass
 
         # TODO: do and call listener for buton + table -> temp_csv
@@ -522,7 +522,7 @@ class GwAdminButton:
         return True
 
     def load_base_locale(self):
-            
+
         folder_locale = os.path.join(self.sql_dir, 'i18n', 'en_US')
         if self._process_folder(folder_locale) is False:
             return False
@@ -532,12 +532,12 @@ class GwAdminButton:
                 return False
 
         return True
-    
+
     def load_locale(self, lang=None):
 
         lang = lang or self.locale
         folder_locale = os.path.join(self.sql_dir, 'i18n', lang)
-        
+
         if self._process_folder(folder_locale) is False:
             self.load_locale('en_US')
         else:

@@ -412,7 +412,7 @@ def connect_signal(obj, pfunc, section, signal_name):
         signal = obj.connect(pfunc)
         global_vars.active_signals[section][signal_name] = (obj, signal, pfunc)
         return signal
-    except Exception as e:
+    except Exception:
         pass
     return None
 
@@ -442,7 +442,7 @@ def disconnect_signal(section, signal_name=None, pop=True):
     obj, signal, pfunc = global_vars.active_signals[section][signal_name]
     try:
         obj.disconnect(signal)
-    except Exception as e:
+    except Exception:
         pass
     finally:
         if pop:
@@ -1196,7 +1196,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
         try:
             dialog.btn_accept.disconnect()
             dialog.btn_accept.hide()
-        except Exception as e:
+        except Exception:
             pass
 
         try:
@@ -1627,7 +1627,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
 
     try:
         fields = row[pos]
-    except Exception as e:
+    except Exception:
         fields = row
     field_id = ''
     if 'fields' in fields:
@@ -3773,7 +3773,7 @@ def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_heade
 
         # Set headers
         model.setHorizontalHeaderLabels(headers)
-    except Exception as e:
+    except Exception:
         # if field['value'][0] is None
         pass
 
@@ -4344,7 +4344,7 @@ def user_params_to_userconfig():
                             # Get the comment (inventory) and set it (user config file)
                             comment = value2.split('#')[1]
                             set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
-    except Exception as e:
+    except Exception:
         pass
 
 
@@ -4396,7 +4396,7 @@ def remove_deprecated_config_vars():
         with open(path, 'w') as configfile:
             init_parser.write(configfile)
             configfile.close()
-    except Exception as e:
+    except Exception:
         pass
 
     # Remove deprecated sections for session
@@ -4418,7 +4418,7 @@ def remove_deprecated_config_vars():
         with open(path, 'w') as configfile:
             session_parser.write(configfile)
             configfile.close()
-    except Exception as e:
+    except Exception:
         pass
 
     # Remove deprecated vars for init
@@ -4445,7 +4445,7 @@ def remove_deprecated_config_vars():
         with open(path, 'w') as configfile:
             init_parser.write(configfile)
             configfile.close()
-    except Exception as e:
+    except Exception:
         pass
 
     # Remove deprecated vars for session
@@ -4472,7 +4472,7 @@ def remove_deprecated_config_vars():
         with open(path, 'w') as configfile:
             session_parser.write(configfile)
             configfile.close()
-    except Exception as e:
+    except Exception:
         pass
 
 

@@ -132,7 +132,7 @@ class GwImportInpTask(GwTask):
             execute_sql("select 1", commit=True)
             self.progress_changed.emit("", self.PROGRESS_END, "\n\nALL DONE! INP successfully imported.", True)
             return True
-        except Exception as e:
+        except Exception:
             self.exception = traceback.format_exc()
             self._log_message(f"{traceback.format_exc()}")
             tools_db.dao.rollback()

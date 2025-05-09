@@ -127,7 +127,7 @@ class GwCalculatePriority(GwTask):
                     )
                 )
 
-        except Exception as e:
+        except Exception:
             self._emit_report(traceback.format_exc())
             return False
 

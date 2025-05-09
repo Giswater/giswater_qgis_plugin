@@ -1820,7 +1820,7 @@ class AddNewLot:
                     self.write_to_csv(csv_path, all_rows)
             else:
                 self.write_to_csv(csv_path, all_rows)
-        except Exception as e:
+        except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
             pass

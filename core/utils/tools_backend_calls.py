@@ -392,7 +392,7 @@ def filter_table(**kwargs):
     try:
         index_tab = dialog.tab_main.currentIndex()
         tab_name = dialog.tab_main.widget(index_tab).objectName()
-    except Exception as e:
+    except Exception:
         tab_name = 'main'
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id, id_name=field_id)
     if complet_list is False:
@@ -434,7 +434,7 @@ def filter_table_mincut(**kwargs):
     try:
         index_tab = dialog.tab_main.currentIndex()
         tab_name = dialog.tab_main.widget(index_tab).objectName()
-    except Exception as e:
+    except Exception:
         tab_name = 'main'
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
     if complet_list is False:
@@ -786,7 +786,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     try:
         index_tab = dialog.tab_main.currentIndex()
         tab_name = dialog.tab_main.widget(index_tab).objectName()
-    except Exception as e:
+    except Exception:
         tab_name = 'main'
         no_tabs = True
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject)
@@ -1048,7 +1048,7 @@ def _reload_table(**kwargs):
         index_tab = dialog.tab_main.currentIndex()
         tab_name = dialog.tab_main.widget(index_tab).objectName()
         list_tables = dialog.tab_main.widget(index_tab).findChildren(QTableView)
-    except Exception as e:
+    except Exception:
         no_tabs = True
         tab_name = 'main'
         list_tables = dialog.findChildren(QTableView)

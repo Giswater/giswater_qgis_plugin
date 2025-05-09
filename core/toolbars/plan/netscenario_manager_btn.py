@@ -594,7 +594,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.mapzone_manager.manage_config(self.dlg_netscenario)
         try:
             self.mapzone_manager.config_dlg.finished.connect(partial(self._manage_current_changed))
-        except Exception as e:
+        except Exception:
             pass
 
     def _manage_create(self):
@@ -603,7 +603,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.mapzone_manager.manage_create(self.dlg_netscenario)
         try:
             self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
-        except Exception as e:
+        except Exception:
             pass
 
     def _manage_update(self):
@@ -612,7 +612,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.mapzone_manager.manage_update(self.dlg_netscenario)
         try:
             self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
-        except Exception as e:
+        except Exception:
             pass
 
     def _manage_toggle_active(self, tableview, view, is_manager):
