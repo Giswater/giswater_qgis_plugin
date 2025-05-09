@@ -190,22 +190,31 @@ class GwAssignation(GwTask):
         self.any_pipe = 0
         arcs = {}
         for leak_id, leak_arcs in leaks.items():
+            def is_arc_valid(x, validation_type):
+                if validation_type == "material_diameter":
+                    return x["same_material"] and x["same_diameter"]
+                elif validation_type == "diameter":
+                    return x["same_diameter"]
+                elif validation_type == "material":
+                    return x["same_material"]
+                return True
+
             if any(a["same_material"] and a["same_diameter"] for a in leak_arcs):
-                is_arc_valid = lambda x: x["same_material"] and x["same_diameter"]
+                validation_type = "material_diameter"
                 self.by_material_diameter += 1
             elif any(a["same_diameter"] for a in leak_arcs):
-                is_arc_valid = lambda x: x["same_diameter"]
+                validation_type = "diameter"
                 self.by_diameter += 1
             elif any(a["same_material"] for a in leak_arcs):
-                is_arc_valid = lambda x: x["same_material"]
+                validation_type = "material"
                 self.by_material += 1
             else:
-                is_arc_valid = lambda x: True
+                validation_type = "any"
                 self.any_pipe += 1
 
             valid_arcs = list(
                 filter(
-                    is_arc_valid,
+                    lambda x: is_arc_valid(x, validation_type),
                     leak_arcs,
                 )
             )

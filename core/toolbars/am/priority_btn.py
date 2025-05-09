@@ -539,7 +539,8 @@ class CalculatePriority:
             self._add_total("lyt_engine_2")
 
     def _get_weight_widgets(self, lyt):
-        is_weight = lambda x: x["layoutname"] == lyt
+        def is_weight(x):
+            return x["layoutname"] == lyt
         fields = filter(is_weight, self.config_engine_fields)
         return [tools_qt.get_widget(self.dlg_priority, x["widgetname"]) for x in fields]
 

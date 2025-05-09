@@ -122,7 +122,8 @@ class Calibrator:
                 if i + 1 == len(self.modders):
                     self.success = False
             else:
-                difference = lambda factor: self.check_difference(wn, modder, factor)
+                def difference(factor):
+                    return self.check_difference(wn, modder, factor)
                 results = root_scalar(
                     difference,
                     bracket=bracket,
