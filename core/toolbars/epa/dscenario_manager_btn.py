@@ -594,7 +594,7 @@ class GwDscenarioManagerButton(GwAction):
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
-            tools_qgis.show_warning(memsgssage, dialog=dialog)
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get selected dscenario id

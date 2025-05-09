@@ -1843,7 +1843,7 @@ class GwInfo(QObject):
                     # If param is true show question and create thread
                     msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
                     if lib_vars.user_level['level'] in ('1', '2'):
-                        msg = ("You closed a valve, this will modify the current mapzones and it may take a little bit of time." 
+                        msg = ("You closed a valve, this will modify the current mapzones and it may take a little bit of time."
                               "Would you like to continue?")
                         answer = tools_qt.show_question(msg)
                     else:
@@ -3550,7 +3550,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
     info = kwargs['class']
     my_json = getattr(info, f"my_json_{view}")
     if my_json:
-        msg = ("You are trying to add/remove a record from the table, with changes to the current records." 
+        msg = ("You are trying to add/remove a record from the table, with changes to the current records."
                   "If you continue, the changes will be discarded without saving. Do you want to continue?")
         title = "Info Message"
         answer = tools_qt.show_question(msg, title, force_action=True)
@@ -3683,7 +3683,7 @@ def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name
 
     my_json = getattr(info, f"my_json_{view}")
     if my_json:
-        msg = ("You are trying to add/remove a record from the table, with changes to the current records." 
+        msg = ("You are trying to add/remove a record from the table, with changes to the current records."
                   "If you continue, the changes will be discarded without saving. Do you want to continue?")
         title = "Info Message"
         answer = tools_qt.show_question(msg, title, force_action=True)
@@ -3796,7 +3796,7 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
 def tbl_data_changed(info, view, tbl, model, addparam, index):
 
     # Get view pk
-    ids = f''
+    ids = ''
     if addparam:
         for pk in addparam.split(','):
             col = tools_qt.get_col_index_by_col_name(tbl, pk.strip())

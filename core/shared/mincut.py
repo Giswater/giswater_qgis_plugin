@@ -1958,7 +1958,7 @@ class GwMincut:
                 tools_qt.show_info_box(msg, parameter=mincutOverlap)
             else:
                 msg = complet_result.get('message')
-                if not message:
+                if not msg:
                     msg = "Mincut done successfully"
                     tools_qgis.show_message(msg, 3)
                 else:
