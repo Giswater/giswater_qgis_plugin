@@ -479,7 +479,6 @@ class GwPsector:
         # Open dialog
         tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
-
     def psector_name_changed(self):
         """ Enable buttons and tabs when name is changed """
 

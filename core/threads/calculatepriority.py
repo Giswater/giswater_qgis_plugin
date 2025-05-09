@@ -800,7 +800,6 @@ class GwCalculatePriority(GwTask):
                 self.target_year - date.today().year
             ):
                 break
-            
 
         if not len(second_iteration):
             self._emit_report(
@@ -819,7 +818,7 @@ class GwCalculatePriority(GwTask):
         for arc in second_iteration:
             # Assign arc to current year before checking for overflow
             cum_cost_constr += arc["cost_constr"]
-            cum_length += arc["length"]   
+            cum_length += arc["length"]
 
             arc["replacement_year"] = replacement_year
             arc["cum_cost_constr"] = cum_cost_constr

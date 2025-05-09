@@ -16,6 +16,8 @@ from ...utils import tools_gw
 from ....libs import tools_qgis, tools_qt, tools_db
 from ...threads.connect_link import GwConnectLink
 from ...ui.ui_manager import GwConnectLinkUi
+
+
 class SelectAction(Enum):
     CONNEC_LINK = tools_qt.tr('Connec to link')
     GULLY_LINK = tools_qt.tr('Gully to link')
@@ -94,7 +96,6 @@ class GwConnectLinkButton(GwMaptool):
 
         value = self.tbl_ids.model().data(index)
         tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_id", value)
-
 
     def fill_tbl_ids(self, layer):
         """ Fill table with selected features """
@@ -318,6 +319,7 @@ class GwConnectLinkButton(GwMaptool):
 
     # endregion
 
+
 def add(**kwargs):
     """ Add button clicked event """
 
@@ -352,6 +354,7 @@ def add(**kwargs):
 
     # Refresh table
     this.fill_tbl_ids(layer)
+
 
 def remove(**kwargs):
     """ Remove button clicked event """
@@ -390,6 +393,7 @@ def remove(**kwargs):
     # Clear selected id txt and refresh table
     tools_qt.set_widget_text(this.dlg_connect_link, "tab_none_id", "")
     this.fill_tbl_ids(layer)
+
 
 def accept(**kwargs):
     """ Accept button clicked event """
@@ -444,10 +448,12 @@ def accept(**kwargs):
     # Close dialog
     tools_gw.close_dialog(this.dlg_connect_link)
 
+
 def snapping(**kwargs):
     """ Accept button clicked event """
 
     GwMaptool.clicked_event(kwargs['class'])
+
 
 def close(**kwargs):
     """ Close button clicked event """

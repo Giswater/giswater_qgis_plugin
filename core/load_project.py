@@ -20,6 +20,7 @@ from .threads.project_check import GwProjectCheckTask
 from .. import global_vars
 from ..libs import lib_vars, tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
+
 class GwLoadProject(QObject):
 
     def __init__(self):
@@ -330,9 +331,9 @@ class GwLoadProject(QObject):
         if len(repeated_layers) > 1:
             if lib_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
                     or lib_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
-                msg = ("QGIS project has more than one v_edit_node layer coming from different schemas. " 
-                      "If you are looking to manage two schemas, it is mandatory to define which is the master and " 
-                      "which isn't. To do this, you need to configure the QGIS project setting this project's " 
+                msg = ("QGIS project has more than one v_edit_node layer coming from different schemas. "
+                      "If you are looking to manage two schemas, it is mandatory to define which is the master and "
+                      "which isn't. To do this, you need to configure the QGIS project setting this project's "
                       "variables: gwMainSchema and gwAddSchema.")
                 tools_qt.show_info_box(msg)
                 return False
@@ -518,7 +519,6 @@ class GwLoadProject(QObject):
             self._enable_toolbar("epa")
             self._enable_toolbar("plan")
             self._hide_button("72", False)
-
 
     def _config_layers(self):
         """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """

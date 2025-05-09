@@ -279,10 +279,9 @@ class GwWorkspaceManagerButton(GwAction):
             tools_gw.refresh_selectors()
 
             # Refresh go2epa options
-            self._check_goe2pa_options()
+            self._check_go2epa_options()
 
-
-    def _check_goe2pa_options(self, tab_name=None):
+    def _check_go2epa_options(self, tab_name=None):
         """ Refreshes the selectors' UI if it's open """
 
         # Get the selector UI if it's open
