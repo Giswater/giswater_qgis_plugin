@@ -917,3 +917,138 @@ WHERE formname='generic' AND formtype='epa_selector' AND columnname='selector_ti
 
 UPDATE config_form_fields SET dv_querytext =  'SELECT id, resulttime AS idval FROM rpt_arc'
 WHERE formname='generic' AND formtype='epa_selector' AND columnname='compare_time' AND tabname='tab_time';
+
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname, layoutorder, columnname)=('ve_gully', 'form_feature', 'tab_data', 11, 'connec_length');
+
+UPDATE config_form_fields SET layoutorder = 0
+WHERE (formname, formtype, tabname, columnname)=('v_edit_gully', 'form_feature', 'tab_data', 'tstamp');
+
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname, columnname)=('v_edit_gully', 'form_feature', 'tab_data', 'macroexpl_id');
+
+UPDATE config_form_fields SET layoutorder = 0
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'z2';
+
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'acoeff';
+
+UPDATE config_form_fields SET layoutorder = 2
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'active';
+
+UPDATE config_form_fields SET layoutorder = 3
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'arc_type';
+
+UPDATE config_form_fields SET layoutorder = 4
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'area';
+
+UPDATE config_form_fields SET layoutorder = 5
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'brand';
+
+UPDATE config_form_fields SET layoutorder = 6
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'bulk';
+
+UPDATE config_form_fields SET layoutorder = 7
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'cost';
+
+UPDATE config_form_fields SET layoutorder = 8
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'cost_unit';
+
+UPDATE config_form_fields SET layoutorder = 9
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'curve_id';
+
+UPDATE config_form_fields SET layoutorder = 10
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'estimated_depth';
+
+UPDATE config_form_fields SET layoutorder = 11
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom_r';
+
+UPDATE config_form_fields SET layoutorder = 12
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom1';
+
+UPDATE config_form_fields SET layoutorder = 13
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom2';
+
+UPDATE config_form_fields SET layoutorder = 14
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom3';
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom4';
+
+UPDATE config_form_fields SET layoutorder = 16
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom5';
+
+UPDATE config_form_fields SET layoutorder = 17
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom6';
+
+UPDATE config_form_fields SET layoutorder = 18
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom7';
+
+UPDATE config_form_fields SET layoutorder = 19
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'geom8';
+
+UPDATE config_form_fields SET layoutorder = 20
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'id';
+
+UPDATE config_form_fields SET layoutorder = 21
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'label';
+
+UPDATE config_form_fields SET layoutorder = 22
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'm2bottom_cost';
+
+UPDATE config_form_fields SET layoutorder = 23
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'm3protec_cost';
+
+UPDATE config_form_fields SET layoutorder = 24
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'matcat_id';
+
+UPDATE config_form_fields SET layoutorder = 25
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'model';
+
+UPDATE config_form_fields SET layoutorder = 26
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'shape';
+
+UPDATE config_form_fields SET layoutorder = 27
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'svg';
+
+UPDATE config_form_fields SET layoutorder = 28
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'tsect_id';
+
+UPDATE config_form_fields SET layoutorder = 29
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'width';
+
+UPDATE config_form_fields SET layoutorder = 30
+WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'z1';
+
