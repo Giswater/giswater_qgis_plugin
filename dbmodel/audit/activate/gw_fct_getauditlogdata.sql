@@ -35,7 +35,7 @@ BEGIN
 	v_schemaname = 'audit';
 
 	-- Get api version
-    SELECT value INTO v_version FROM ws.config_param_system WHERE parameter = 'admin_version';
+    SELECT value INTO v_version FROM PARENT_SCHEMA.config_param_system WHERE parameter = 'admin_version';
 
 	v_log_id = ((p_data ->>'form')::json->>'logId');
 	v_date = ((p_data ->>'form')::json->>'date');
@@ -71,7 +71,7 @@ BEGIN
                  WHERE %I = %L 
                  AND date <= %L 
                  ORDER BY date DESC LIMIT 1) t',
-                'ws_' || v_table_name,
+                'PARENT_SCHEMA_' || v_table_name,
                 v_idname,
                 v_feature_id,
                 v_date

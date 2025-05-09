@@ -19,7 +19,7 @@ $BODY$
 
     SELECT PARENT_SCHEMA.gw_fct_execute_foreign_audit($${"client":
     {"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"sourceSchema":"ws", "auditDate":"10-09-2020"}}}$$)::text
+    "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"sourceSchema":"PARENT_SCHEMA", "auditDate":"10-09-2020"}}}$$)::text
 
 */
 
