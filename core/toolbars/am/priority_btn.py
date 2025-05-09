@@ -721,12 +721,12 @@ class CalculatePriority:
                 )
                 main_msg += " "
                 if config_material.has_material(self.config.unknown_material):
-                    msg_line =("As a result, the material of these pipes will be treated "
+                    msg_line = ("As a result, the material of these pipes will be treated "
                                 "as the configured unknown material, {0}.")
                     msg_params = (self.config.unknown_material,)
                     main_msg += tools_qt.tr(msg_line, list_params=msg_params)
                 else:
-                    msg_line =("These pipes will NOT be assigned a priority value "
+                    msg_line = ("These pipes will NOT be assigned a priority value "
                                 "as the configured unknown material, {0}, "
                                 "is not listed in the configuration tab for materials.")
                     msg_params = (self.config.unknown_material,)

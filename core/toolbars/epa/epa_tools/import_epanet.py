@@ -903,7 +903,7 @@ class GwImportEpanet:
         if file_path and file_path.suffix == ".inp":
             return file_path
         else:
-            msg ="The file selected is not an INP file"
+            msg = "The file selected is not an INP file"
             tools_qgis.show_warning(msg)
             return
 

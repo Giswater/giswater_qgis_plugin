@@ -24,7 +24,7 @@ except ImportError:
         subprocess.run(["python", "-m", "ensurepip"])
         install_matplotlib = subprocess.run(['python', '-m', 'pip', 'install', '-U', 'matplotlib'])
         if install_matplotlib.returncode:
-            msg ="Matplotlib cannot be installed automatically. Please install Matplotlib manually."
+            msg = "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
             tools_qt.show_info_box(msg)
         else:
             msg = "Matplotlib installed successfully. Please restart QGIS."

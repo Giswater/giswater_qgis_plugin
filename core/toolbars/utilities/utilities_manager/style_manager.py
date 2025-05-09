@@ -520,7 +520,7 @@ class GwStyleManager:
             row_result = tools_db.get_row(sql_get_id)
 
             if not row_result:
-                msg ="Could not find an ID for the style group '{0}'."
+                msg = "Could not find an ID for the style group '{0}'."
                 msg_params = (selected_stylegroup_name,)
                 tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
                 return
@@ -534,7 +534,7 @@ class GwStyleManager:
             style_exists = tools_db.get_row(sql_check_exists)[0] > 0
 
             if style_exists:
-                msg ="A style already exists for the layer '{0}' in the selected style group."
+                msg = "A style already exists for the layer '{0}' in the selected style group."
                 msg_params = (table_name,)
                 tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
                 return
