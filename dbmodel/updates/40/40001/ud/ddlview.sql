@@ -1136,6 +1136,7 @@ AS WITH
 			connec_selector.arc_id,
 			connec.expl_id,
 			exploitation.macroexpl_id,
+			connec.muni_id,
 			CASE
 				WHEN link_planned.sector_id IS NULL THEN connec.sector_id
 				ELSE link_planned.sector_id
@@ -1145,7 +1146,6 @@ AS WITH
 				ELSE link_planned.macrosector_id
 			END AS macrosector_id,
 			sector_table.sector_type,
-			connec.muni_id,
 			CASE
 				WHEN link_planned.drainzone_id IS NULL THEN connec.drainzone_id
 				ELSE link_planned.drainzone_id
@@ -1176,6 +1176,7 @@ AS WITH
 				WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
 				ELSE link_planned.omzone_type
 			END AS omzone_type,
+            connec.omunit_id,
 			connec.minsector_id,
 			connec.macrominsector_id,
 			connec.soilcat_id,
@@ -1183,10 +1184,13 @@ AS WITH
 			connec.category_type,
 			connec.location_type,
 			connec.fluid_type,
+            connec.n_hydrometer,
+            connec.n_inhabitants,
+			connec.demand,
+			connec.descript,
 			connec.annotation,
 			connec.observ,
 			connec.comment,
-			connec.descript,
 			connec.link::text,
 			connec.num_value,
 			connec.district_id,
@@ -1199,19 +1203,31 @@ AS WITH
 			connec.postcomplement2,
 			mu.region_id,
 			mu.province_id,
+            connec.block_code,
+			connec.plot_code,
 			connec.workcat_id,
 			connec.workcat_id_end,
 			connec.workcat_id_plan,
 			connec.builtdate,
 			connec.enddate,
 			connec.ownercat_id,
+			CASE
+				WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
+				ELSE link_planned.exit_id
+			END AS pjoint_id,
+			CASE
+				WHEN link_planned.exit_type IS NULL THEN connec.pjoint_type
+				ELSE link_planned.exit_type
+			END AS pjoint_type,
 			connec.access_type,
 			connec.placement_type,
+			connec.accessibility,
 			connec.asset_id,
 			connec.adate,
 			connec.adescript,
 			connec.verified,
 			connec.uncertain,
+            connec.datasource,
 			cat_connec.label,
 			connec.label_x,
 			connec.label_y,
@@ -1237,19 +1253,7 @@ AS WITH
 			date_trunc('second'::text, connec.updated_at) AS updated_at,
 			connec.updated_by,
 			connec.the_geom,
-            -- extra we don't know the order
-			connec.demand,
-			connec.accessibility,
-			connec.diagonal,
-			CASE
-				WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
-				ELSE link_planned.exit_id
-			END AS pjoint_id,
-			CASE
-				WHEN link_planned.exit_type IS NULL THEN connec.pjoint_type
-				ELSE link_planned.exit_type
-			END AS pjoint_type,
-			connec.plot_code
+			connec.diagonal
 			FROM connec_selector
 			JOIN connec USING (connec_id)
 			JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
