@@ -177,14 +177,16 @@ class EmitterCalibration:
 
         if len(sufixes_that_exist) == 1:
             file = f"{file_name}{sufixes_that_exist[0]}"
-            msg = f"The file {file} already exists. Do you want to overwrite it?"
-            return tools_qt.show_question(msg)
+            msg = "The file {0} already exists. Do you want to overwrite it?"
+            msg_params = (file,)
+            return tools_qt.show_question(msg, msg_params=msg_params)
 
         elif len(sufixes_that_exist) > 1:
             file_names = [f'"{file_name}{sufix}"' for sufix in sufixes_that_exist]
             all_files = ", ".join(file_names)
-            msg = f"The files {all_files} already exist. Do you want to overwrite them?"
-            return tools_qt.show_question(msg)
+            msg = "The files {0} already exist. Do you want to overwrite them?"
+            msg_params = (all_files,)
+            return tools_qt.show_question(msg, msg_params=msg_params)
 
         return True
 

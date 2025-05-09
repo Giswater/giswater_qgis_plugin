@@ -139,7 +139,7 @@ class GwElement:
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, GwSelectionMode.DEFAULT))
         self.dlg_add_element.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_element, table_object)
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_element, table_object, None)
         )
 
         self.dlg_add_element.btn_add_geom.clicked.connect(self._get_point_xy)
@@ -278,7 +278,8 @@ class GwElement:
 
         # Check for a valid result
         if not json_result or json_result.get("status") != "Accepted":
-            tools_qgis.show_message(f"Failed to fetch dialog configuration: ", 2, parameter=json_result)
+            msg = "Failed to fetch dialog configuration"
+            tools_qgis.show_message(msg, 2, parameter=json_result)
             return
         self.complet_result = json_result
 
@@ -334,9 +335,9 @@ class GwElement:
                     layout_list.append(layout)
 
                 if field['layoutorder'] is None:
-                    message = "The field layoutorder is not configured for"
-                    msg = f"formname:form_element, columnname:{field['columnname']}"
-                    tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_mng)
+                    msg = "The field layoutorder is not configured for"
+                    param = f"formname:form_element, columnname:{field['columnname']}"
+                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_mng)
                     continue
 
                 if current_layout != field['layoutname']:
@@ -353,9 +354,9 @@ class GwElement:
                 previous_label = label is not None
 
             elif field['layoutname'] != 'lyt_none':
-                message = "The field layoutname is not configured for"
-                msg = f"formname:form_element, columnname:{field['columnname']}"
-                tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_mng)
+                msg = "The field layoutname is not configured for"
+                param = f"formname:form_element, columnname:{field['columnname']}"
+                tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_mng)
 
             if isinstance(widget, QTableView):
                 # Populate custom context menu
@@ -369,8 +370,9 @@ class GwElement:
             widgetname = table.objectName()
             columnname = table.property('columnname')
             if columnname is None:
-                msg = f"widget {widgetname} has not columnname and cant be configured"
-                tools_qgis.show_info(msg, 3)
+                msg = f"widget {0} has not columnname and cant be configured"
+                msg_params = (widgetname,)
+                tools_qgis.show_info(msg, 3, msg_params=msg_params)
                 continue
             linkedobject = table.property('linkedobject')
             complet_list, widget_list = tools_gw.fill_tbl(complet_result, self.dlg_mng, widgetname, linkedobject, '')
@@ -397,7 +399,6 @@ class GwElement:
         self._manage_combo(self.dlg_add_element.elementcat_id, 'edit_elementcat_vdefault')
         self._manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
         self._manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
-        self._manage_combo(self.dlg_add_element.ownercat_id, 'edit_ownercat_vdefault')
         self._manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
         self._manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
         self._manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
@@ -464,17 +465,17 @@ class GwElement:
         lock_level = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.lock_level)
 
         # Check mandatory fields
-        message = "You need to insert value for field"
+        msg = "You need to insert value for field"
         if elementcat_id == '':
-            tools_qgis.show_warning(message, parameter="elementcat_id", dialog=self.dlg_add_element)
+            tools_qgis.show_warning(msg, parameter="elementcat_id", dialog=self.dlg_add_element)
             return
         num_elements = tools_qt.get_text(self.dlg_add_element, "num_elements", return_string_null=False)
         if num_elements == '':
-            tools_qgis.show_warning(message, parameter="num_elements", dialog=self.dlg_add_element)
+            tools_qgis.show_warning(msg, parameter="num_elements", dialog=self.dlg_add_element)
             return
         state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state)
         if state == '':
-            tools_qgis.show_warning(message, parameter="state_id", dialog=self.dlg_add_element)
+            tools_qgis.show_warning(msg, parameter="state_id", dialog=self.dlg_add_element)
             return
 
         state_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state_type)
@@ -553,8 +554,8 @@ class GwElement:
             sql += sql_values
         # If object already exist perform an UPDATE
         else:
-            message = "Are you sure you want to update the data?"
-            answer = tools_qt.show_question(message)
+            msg = "Are you sure you want to update the data?"
+            answer = tools_qt.show_question(msg)
             if not answer:
                 return
             sql = (f"UPDATE v_edit_element"

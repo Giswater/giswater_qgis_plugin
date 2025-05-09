@@ -455,15 +455,10 @@ class GwResultManagerButton(GwAction):
             return
 
         conflict_results_str = ", ".join(str(x) for x in conflict_results)
-        message = tools_qt.tr(
-            "To make the result id {result_id} corporate, "
-            "is necessary to make not corporate the following result ids: "
-            "{conflict_ids}."
-        )
-        message += " " + tools_qt.tr("Do you want to proceed?")
-        answer = tools_qt.show_question(
-            message.format(result_id=result_id, conflict_ids=conflict_results_str)
-        )
+        msg = ("To make the result id {0} corporate, is necessary to make not corporate the following result ids: {1}."
+                " Do you want to proceed?")
+        msg_params = (result_id, conflict_results_str,)
+        answer = tools_qt.show_question(msg, msg_params=msg_params)
 
         if not answer:
             return

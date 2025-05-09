@@ -29,8 +29,9 @@ try:
 except ImportError:
     wntr = None
     error_traceback = traceback.format_exc()
-    tools_qgis.show_critical(title="Epatools Plugin", text=WNTR_IMPORT_ERROR)
-    tools_qgis.show_critical(title="Epatools Plugin", text=error_traceback)
+    title = "Epatools Plugin"
+    tools_qgis.show_critical(title=title, text=WNTR_IMPORT_ERROR)
+    tools_qgis.show_critical(title=title, text=error_traceback)
 
 
 class GwAddDemandCheck(GwTask):

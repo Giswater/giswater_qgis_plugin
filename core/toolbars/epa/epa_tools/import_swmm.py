@@ -64,8 +64,8 @@ class GwImportSwmm:
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
         if sys.version_info < (3, 10):
-            msg = "Import INP is only available on Python 3.10 or higher. " \
-                  "Please update your QGIS's Python version."
+            msg = ("Import INP is only available on Python 3.10 or higher. "
+                  "Please update your QGIS's Python version.")
             tools_qgis.show_warning(msg)
             return
 
@@ -85,12 +85,10 @@ class GwImportSwmm:
             self.parse_inp_file(self.file_path)
 
         except ImportError:
-            message: str = (
-                "Couldn't import swmm_api package. "
-                "Try to reload the Giswater plugin. "
-                "If the issue persists restart QGIS."
-            )
-            tools_qgis.show_message(message)
+            msg = ("Couldn't import swmm_api package. "
+                    "Try to reload the Giswater plugin. "
+                    "If the issue persists restart QGIS.")
+            tools_qgis.show_message(msg)
 
     def _get_file(self) -> Optional[Path]:
         """ Get the INP file path from the user. """
@@ -102,7 +100,8 @@ class GwImportSwmm:
         if file_path and file_path.suffix == ".inp":
             return file_path
         else:
-            tools_qgis.show_warning("The file selected is not an INP file")
+            msg = "The file selected is not an INP file"
+            tools_qgis.show_warning(msg)
             return
 
     def parse_inp_file(self, file_path: Path) -> None:
@@ -331,39 +330,40 @@ class GwImportSwmm:
 
         # Workcat
         if workcat == "":
-            message = "Please enter a Workcat_id to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please enter a Workcat_id to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         sql: str = "SELECT id FROM cat_work WHERE id = %s"
         row = tools_db.get_row(sql, params=(workcat,))
         if row is not None:
-            message = f'The Workcat_id "{workcat}" is already in use. Please enter a different ID.'
-            tools_qt.show_info_box(message)
+            msg = 'The Workcat_id "{0}" is already in use. Please enter a different ID.'
+            msg_params = (workcat,)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return
 
         # Exploitation
         if exploitation == "":
-            message = "Please select an exploitation to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please select an exploitation to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         # Sector
         if sector == "":
-            message = "Please select a sector to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please select a sector to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         # Municipality
         if municipality == "":
-            message = "Please select a municipality to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please select a municipality to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         # Raingage
         if self.dlg_config.txt_raingage.isVisible() and raingage in ("", "null", None):
-            message = "Please select a default raingage to proceed with this import."
-            tools_qt.show_info_box(message)
+            msg = "Please select a default raingage to proceed with this import."
+            tools_qt.show_info_box(msg)
             return
 
         # Tables (Arcs and Nodes)
@@ -383,8 +383,8 @@ class GwImportSwmm:
                 combo_value = combo.currentText()
 
                 if combo_value == "":
-                    message = "Please select a catalog item for all elements in the tabs: Features, Nodes, Arcs, Materials."
-                    tools_qt.show_info_box(message)
+                    msg = "Please select a catalog item for all elements in the tabs: Features, Nodes, Arcs, Materials."
+                    tools_qt.show_info_box(msg)
                     return
 
                 new_catalog = None
@@ -394,8 +394,9 @@ class GwImportSwmm:
                     new_catalog = new_catalog_cell.text().strip()
 
                     if combo_value == CREATE_NEW and new_catalog == "":
-                        message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
-                        tools_qt.show_info_box(message)
+                        msg = 'Please enter a new catalog name when the "{0}" option is selected.'
+                        msg_params = (CREATE_NEW,)
+                        tools_qt.show_info_box(msg, msg_params=msg_params)
                         return
 
                 result[element] = (

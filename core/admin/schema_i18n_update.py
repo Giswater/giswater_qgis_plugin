@@ -136,7 +136,7 @@ class GwSchemaI18NUpdate:
             else:
                 self.dlg_qm.cmb_schema.clear()
                 return
-    
+
         tools_qt.fill_combo_values(self.dlg_qm.cmb_schema, result_list)
 
     def _change_project_type(self, widget):
@@ -162,16 +162,16 @@ class GwSchemaI18NUpdate:
         # Run the updater of db_files and look at the result
         status_cfg_msg, errors = self._copy_db_files()
         if status_cfg_msg is True:
-            msg += f"Database translation successful to {self.lower_lang}.\n"
+            msg += f"{tools_qt.tr('Database translation successful to')} {self.lower_lang}.\n"
             self._commit_dest()
         elif status_cfg_msg is False:
-            msg += "Database translation failed.\n"
+            msg += f"{tools_qt.tr('Database translation failed.')}\n"
         elif status_cfg_msg is None:
-            msg += "Database translation canceled.\n"
+            msg += f"{tools_qt.tr('Database translation canceled.')}\n"
 
         # Look for errors
         if errors:
-            msg += f"There have been errors translating: {', '.join(errors)}"
+            msg += f"{tools_qt.tr('There have been errors translating:')} {', '.join(errors)}"
 
         self._change_lang()
 
@@ -201,13 +201,11 @@ class GwSchemaI18NUpdate:
         schema_i18n = "i18n"
         for dbtable in dbtables:
             dbtable = f"{schema_i18n}.{dbtable}"
-            print(dbtable)
             dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
             if not dbtable_rows:
                 messages.append(dbtable)  # Corregido
             else:
                 if "json" in dbtable:
-                    print("a")
                     self._write_dbjson_values(dbtable_rows)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable)
@@ -216,7 +214,7 @@ class GwSchemaI18NUpdate:
             sql_2 = f"UPDATE {self.schema}.config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger'"
             self.cursor_dest.execute(sql_2)
             self._commit_dest()
-        
+
         # Mostrar mensaje de error si hay errores
         if messages:  # Corregido: Verifica si hay elementos en la lista
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Error translating: {', '.join(messages)}")
@@ -242,9 +240,10 @@ class GwSchemaI18NUpdate:
 
         if 'dbconfig_form_fields' in table:
             columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
+                            f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
             if 'feat' in table:
-                columns.append('feature_type')
+                columns = [col.replace("formname", "feature_type") for col in columns]
             elif 'json' in table:
                 columns = columns[:-1]
                 columns.extend(["hint", "text"])
@@ -252,67 +251,81 @@ class GwSchemaI18NUpdate:
 
         elif 'dbparam_user' in table:
             columns = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
-        
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
+                            f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+
         elif 'dbconfig_param_system' in table:
             columns = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
-        
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
+                            f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+
         elif 'dbconfig_typevalue' in table:
             columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "tt_en_us"]
             lang_columns = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif 'dbmessage' in table:
             columns = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
-            lang_columns = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang}," f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
-        
+            lang_columns = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang},"
+                            f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
+
         elif 'dbfprocess' in table:
             columns = ["source", "project_type", "context", "ex_en_us", "in_en_us", "na_en_us"]
-            lang_columns = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang}," f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}", f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
-        
+            lang_columns = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang},"
+                            f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}",
+                            f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
+
         elif 'dbconfig_csv' in table:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}",
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
         elif 'dbconfig_form_tabs' in table:
             columns = ["formname", "source", "project_type", "context", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
-        
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
+                            f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+
         elif 'dbconfig_report' in table:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
-        
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}",
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+
         elif 'dbconfig_toolbox' in table:
             columns = ["source", "project_type", "context", "al_en_us", "ob_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
-       
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}",
+                             f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+
         elif 'dbfunction' in table:
             columns = ["source", "project_type", "context", "ds_en_us"]
             lang_columns = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
-       
+
         elif 'dbtypevalue' in table:
             columns = ["source", "project_type", "context", "typevalue", "vl_en_us", "ds_en_us"]
-            lang_columns = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            lang_columns = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}",
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
         elif 'dbconfig_form_tableview' in table:
             columns = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", ]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}"]
 
         elif 'dbjson' in table:
             columns = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
             lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
-        
+
         elif 'dbtable' in table:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}",
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
         elif 'dbconfig_engine' in table:
             columns = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
+                            f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}",
+                            f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
 
         elif 'su_basic_tables' in table:
             columns = ["project_type", "context", "source", "na_en_us", "ob_en_us"]
-            lang_columns = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+            lang_columns = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}",
+                            f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
 
         # Make the query
         sql = ""
@@ -325,20 +338,18 @@ class GwSchemaI18NUpdate:
                f"FROM {table} "
                f"ORDER BY context")
         rows = self._get_rows(sql, self.cursor_i18n)
-        print(sql)
-        
+
         # Return the corresponding information
         if not rows:
             return False
         return rows, columns
-    
+
     def _write_table_values(self, rows, columns, table):
-        print(table)
 
         schema_type = [self.project_type]
         if self.project_type in ["ud", "ws"]:
             schema_type.append("utils")
-        
+
         forenames = []
         for column in columns:
             if column[-5:] == "en_us":
@@ -371,7 +382,7 @@ class GwSchemaI18NUpdate:
                 for j, text in enumerate(texts):
                     if "\n" in texts[j] and texts[j] is not None:
                         texts[j] = self._replace_invalid_characters(texts[j])
-                           
+
                 sql_text = ""
                 # Define the query depending on the table
                 if 'dbconfig_form_fields' in table:
@@ -410,8 +421,7 @@ class GwSchemaI18NUpdate:
                 elif 'dbconfig_csv' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE fid = '{row['source']}';\n")
-                    print(sql_text)
-                    
+
                 elif 'dbconfig_form_tabs' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} "
                                 f"WHERE formname = '{row['formname']}' AND tabname = '{row['source']}';\n")
@@ -439,26 +449,23 @@ class GwSchemaI18NUpdate:
                 elif 'dbtable' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE id = '{row['source']}';\n")
-                
+
                 elif 'dbconfig_engine' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, descript = {texts[1]}, placeholder = {texts[2]} "
                                 f"WHERE parameter = '{row['parameter']}' AND method = '{row['method']}';\n")
-                    
+
                 elif 'su_basic_tables' in table:
                     if self.schema == "am":
                         sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "
                                     f"WHERE id = '{row['source']}';\n")
-             
-                # Execute the corresponding query
-                if i == 1:
-                    print(sql_text)
+
                 try:
                     self.cursor_dest.execute(sql_text)
                     self._commit_dest()
                 except Exception as e:
                     print(e)
                     tools_db.dao.rollback()
-        
+
     def _write_dbjson_values(self, rows):
         query = ""
         updates = {}
@@ -544,10 +551,10 @@ class GwSchemaI18NUpdate:
             self.conn_dest.commit()
         except Exception as e:
             self.conn_dest.rollback()
-            print(e)  
-    
+            print(e)
+
     # endregion
-    
+
     # region Extra fucntions
     def _change_lang(self):
         query = f"UPDATE {self.schema}.sys_version SET language = '{self.language}'"
@@ -701,7 +708,7 @@ class GwSchemaI18NUpdate:
         param = param.replace("\n", " ")
 
         return param
-    
+
     def _replace_invalid_quotation_marks(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -711,7 +718,7 @@ class GwSchemaI18NUpdate:
         param = re.sub(r"(?<!')'(?!')", "''", param)
 
         return param
-    
+
     def _delete_table(self, table, cur, conn):
         query = f"DROP TABLE IF EXISTS {table}"
         try:
@@ -742,7 +749,7 @@ class GwSchemaI18NUpdate:
         filtered_columns = [f"{col[0]} {col[1]}" for col in column_types if col[0].lower() != 'lastupdate']
 
         # Generate CREATE TABLE statement
-        columns_def = ", ".join(filtered_columns)  
+        columns_def = ", ".join(filtered_columns)
 
         create_table_query = f"DROP TABLE IF EXISTS {schema_dest}.{table_dest};\n"
         create_table_query += f"CREATE TABLE IF NOT EXISTS {schema_dest}.{table_dest} ({columns_def}, CONSTRAINT {table_org}_pkey PRIMARY KEY (id));\n"
@@ -769,18 +776,18 @@ class GwSchemaI18NUpdate:
     def tables_dic(self, schema_type):
         dbtables_dic = {
             "ws": {
-                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
                  ]
             },
             "ud": {
-                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                 ] 
+                 ]
             },
             "am": {
                 "dbtables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"]

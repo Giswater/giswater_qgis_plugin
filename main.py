@@ -57,7 +57,6 @@ class Giswater(QObject):
                                 is False when you want to show the admin button.
                                 is None when called from QGIS.
         """
-
         try:
             # Reset values for lib_vars.project_vars
             lib_vars.project_vars['info_type'] = None
@@ -68,69 +67,80 @@ class Giswater(QObject):
             lib_vars.project_vars['store_credentials'] = None
             lib_vars.project_vars['current_style'] = None
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when reset values for lib_vars.project_vars: {e}")
+            msg = "Exception in unload when reset values for lib_vars.project_vars"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Remove Giswater dockers
             self._remove_dockers()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when self._remove_dockers(): {e}")
+            msg = "Exception in unload when self._remove_dockers()"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Close all open dialogs
             self._close_open_dialogs()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when self._close_open_dialogs(): {e}")
+            msg = "Exception in unload when self._close_open_dialogs()"
+            tools_log.log_info(msg, parameter=str(e))
             raise e
 
         try:
             # Manage unset signals
             self._unset_signals(hide_gw_button)
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when unset signals: {e}")
+            msg = "Exception in unload when unset signals"
+            tools_log.log_info(msg, parameter=str(e))
             raise e
 
         try:
             # Force action pan
             self.iface.actionPan().trigger()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when self.iface.actionPan().trigger(): {e}")
+            msg = "Exception in unload when self.iface.actionPan().trigger()"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Disconnect QgsProject.instance().crsChanged signal
             tools_gw.disconnect_signal('load_project', 'project_read_crsChanged_set_epsg')
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when disconnecting QgsProject.instance().crsChanged signal: {e}")
+            msg = "Exception in unload when disconnecting QgsProject.instance().crsChanged signal"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             tools_gw.disconnect_signal('load_project', 'manage_attribute_table_focusChanged')
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when disconnecting focusChanged signal: {e}")
+            msg = "Exception in unload when disconnecting focusChanged signal"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Remove 'Main Info button'
             self._unset_info_button()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when self._unset_info_button(): {e}")
+            msg = "Exception in unload when self._unset_info_button()"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Remove ToC buttons
             self._unset_toc_buttons()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when self._unset_toc_buttons(): {e}")
+            msg = "Exception in unload when self._unset_toc_buttons()"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Remove file handler when reloading
             if hide_gw_button:
                 lib_vars.logger.close_logger()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when lib_vars.logger.close_logger(): {e}")
+            msg = "Exception in unload when lib_vars.logger.close_logger()"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Remove 'Giswater menu'
             tools_gw.unset_giswater_menu()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when tools_gw.unset_giswater_menu(): {e}")
+            msg = "Exception in unload when tools_gw.unset_giswater_menu()"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Check if project is current loaded and remove giswater action from PluginMenu and Toolbars
@@ -141,7 +151,8 @@ class Giswater(QObject):
                         self.iface.removePluginMenu(self.plugin_name, button.action)
                         self.iface.removeToolBarIcon(button.action)
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when self.iface.removePluginMenu(self.plugin_name, button.action): {e}")
+            msg = "Exception in unload when self.iface.removePluginMenu(self.plugin_name, button.action)"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Check if project is current loaded and remove giswater toolbars from qgis
@@ -152,7 +163,8 @@ class Giswater(QObject):
                             plugin_toolbar.toolbar.setVisible(False)
                             del plugin_toolbar.toolbar
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when del plugin_toolbar.toolbar: {e}")
+            msg = "Exception in unload when del plugin_toolbar.toolbar"
+            tools_log.log_info(msg, parameter=str(e))
 
         try:
             # Set 'Main Info button' if project is unload or project don't have layers
@@ -161,7 +173,8 @@ class Giswater(QObject):
                 self._set_info_button()
                 tools_gw.create_giswater_menu(False)
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when self._set_info_button(): {e}")
+            msg = "Exception in unload when self._set_info_button()"
+            tools_log.log_info(msg, parameter=str(e))
 
         self.load_project = None
 
@@ -188,13 +201,14 @@ class Giswater(QObject):
         # Create log file
         min_log_level = 20
         tools_log.set_logger(self.plugin_name, min_log_level)
-        tools_log.log_info("Initialize plugin")
+        msg = "Initialize plugin"
+        tools_log.log_info(msg)
 
         # Check if config file exists
         setting_file = os.path.join(plugin_dir, 'config', 'giswater.config')
         if not os.path.exists(setting_file):
-            message = f"Config file not found at: {setting_file}"
-            tools_qgis.show_warning(message)
+            msg = "Config file not found at"
+            tools_qgis.show_warning(msg, parameter=setting_file)
             return False
 
         # Set plugin and QGIS settings: stored in the registry (on Windows) or .ini file (on Unix)
@@ -210,7 +224,8 @@ class Giswater(QObject):
         if not success:
             tools_gw.recreate_config_files()
             msg = "The user config files have been recreated. A backup of the broken ones have been created at"
-            tools_qgis.show_message(msg, message_level=3, title="Parsing error fixed", parameter=f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}")
+            title = "Parsing error fixed"
+            tools_qgis.show_message(msg, title=title, message_level=3, parameter=f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}")
         else:
             # Check if user has config files 'init' and 'session' and its parameters (only those without prefix)
             try:
@@ -262,7 +277,8 @@ class Giswater(QObject):
         try:
             config_folder = f"{user_folder_dir}{os.sep}config{os.sep}"
             if not os.path.exists(config_folder):
-                tools_log.log_info(f"Creating user config folder: {config_folder}")
+                msg = "Creating user config folder"
+                tools_log.log_info(msg, parameter=config_folder)
                 os.makedirs(config_folder)
 
             # Check if config files exists. If not create them empty
@@ -280,7 +296,8 @@ class Giswater(QObject):
                 shutil.copyfile(src, dst)
 
         except Exception as e:
-            tools_log.log_warning(f"manage_user_config_folder: {e}")
+            msg = "manage_user_config_folder"
+            tools_log.log_warning(msg, parameter=str(e))
 
     def _set_signals(self):
         """ Define iface event signals on Project Read / New Project / Save Project """
@@ -432,6 +449,7 @@ class Giswater(QObject):
             try:
                 tools_gw.close_dialog(window)
             except Exception as e:
-                tools_log.log_info(f"Exception in _close_open_dialogs: {e}")
+                msg = "Exception in _close_open_dialogs"
+                tools_log.log_info(msg, parameter=str(e))
 
     # endregion

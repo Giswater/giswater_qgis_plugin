@@ -120,7 +120,7 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT))
         self.dlg_work_end.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dlg_work_end, self.table_object))
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_work_end, self.table_object, None))
 
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self._fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
@@ -375,8 +375,8 @@ class GwFeatureEndButton(GwAction):
 
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_work)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_work)
             return
 
         row = selected_list[0].row()
@@ -402,8 +402,8 @@ class GwFeatureEndButton(GwAction):
         aux += f"'{arc_id}'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error"
-            tools_qgis.show_warning(message, parameter=expr.parserErrorString(), dialog=self.dlg_work)
+            msg = "Expression Error"
+            tools_qgis.show_warning(msg, parameter=expr.parserErrorString(), dialog=self.dlg_work)
             return
 
         id_list = None
@@ -423,9 +423,9 @@ class GwFeatureEndButton(GwAction):
 
     def _check_downgrade(self):
 
-        message = "Are you sure you want to disconnect this elements?"
+        msg = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
-        answer = tools_qt.show_question(message, title)
+        answer = tools_qt.show_question(msg, title)
         if not answer:
             return
 
@@ -514,7 +514,8 @@ class GwFeatureEndButton(GwAction):
                 ids_ = ids_[:-2]
                 if show_warning and len(ids_) != 0:
                     msg = 'These items could not be downgrade to state 0'
-                    tools_qt.show_info_box(msg, title="Warning", inf_text=str(ids_))
+                    title = "Warning"
+                    tools_qt.show_info_box(msg, title, inf_text=str(ids_))
                 sql = ("DELETE FROM audit_log_data "
                        "WHERE fid = 128 AND cur_user = current_user")
                 tools_db.execute_sql(sql)
@@ -595,6 +596,7 @@ class GwFeatureEndButton(GwAction):
 
             else:
                 msg = "This Workcat already exist"
-                tools_qt.show_info_box(msg, "Warning")
+                title = "Warning"
+                tools_qt.show_info_box(msg, title)
 
     # endregion

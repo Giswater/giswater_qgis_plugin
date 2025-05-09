@@ -7,21 +7,19 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import re
-import psycopg2
-import psycopg2.extras
 import subprocess
 from functools import partial
 import json
 import ast
-from collections import defaultdict
-import logging
 
+import psycopg2
+import psycopg2.extras
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db
-from PyQt5.QtWidgets import QApplication
+from ...libs import lib_vars, tools_qt, tools_qgis
 
+from PyQt5.QtWidgets import QApplication
 
 class GwI18NGenerator:
 
@@ -109,7 +107,7 @@ class GwI18NGenerator:
 
         self._create_path_dic()
         for type_db_file in self.path_dic:
-            
+
             if tools_qt.is_checked(self.dlg_qm, self.path_dic[type_db_file]['checkbox']):
                 status_all_db_msg, dbtable = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
                 if status_all_db_msg is True:
@@ -117,7 +115,7 @@ class GwI18NGenerator:
                 elif status_all_db_msg is False:
                     msg += f"{type_db_file} translation failed in table: {dbtable}\n"
                 elif status_all_db_msg is None:
-                    msg += f"{type_db_file} translation canceled\n"        
+                    msg += f"{type_db_file} translation canceled\n"
 
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
@@ -164,7 +162,8 @@ class GwI18NGenerator:
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
-            answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{ts_path}")
+            title = "Overwrite"
+            answer = tools_qt.show_question(msg, title, parameter=f"\n\n{ts_path}")
             if not answer:
                 return None
         ts_file = open(ts_path, "w")
@@ -287,19 +286,20 @@ class GwI18NGenerator:
                     return title
                 return title
         return title
-    
+
     # endregion
     # region Database files
-    
+
     def _create_all_db_files(self, cfg_path, file_type):
         """ Read the values of the database and update the i18n files """
-            
+
         file_name = f"{self.path_dic[file_type]["name"]}"
 
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
-            answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
+            title = "Overwrite"
+            answer = tools_qt.show_question(msg, title, parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
                 return None, ""
         else:
@@ -316,10 +316,10 @@ class GwI18NGenerator:
                 if "json" in dbtable:
                     self._write_dbjson_values(dbtable_rows, cfg_path + file_name)
                 else:
-                    self._write_table_values(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name, file_type)            
+                    self._write_table_values(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name, file_type)
 
         return True, ""
-    
+
     # endregion
     # region Gen. any table files
 
@@ -384,7 +384,7 @@ class GwI18NGenerator:
 
         elif table == 'dbconfig_form_tableview':
             colums = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
-            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", ]
+            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}"]
 
         elif table == 'dbjson':
             colums = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
@@ -395,7 +395,7 @@ class GwI18NGenerator:
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
 
         elif table == 'dbconfig_form_fields_feat':
-            colums = ["feature_type", "source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            colums = ["feature_type","source", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbtable':
@@ -415,15 +415,18 @@ class GwI18NGenerator:
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
 
         # Make the query
-        sql = ""
-        if self.lower_lang == 'en_us':
-            sql = (f"SELECT {", ".join(colums)} "
-               f"FROM {self.schema_i18n}.{table} "
-               f"ORDER BY context;")
-        else:
-            sql = (f"SELECT {", ".join(colums)}, {", ".join(lang_colums)} "
-               f"FROM {self.schema_i18n}.{table} "
-               f"ORDER BY context;")
+        sql=""
+        try:
+            if self.lower_lang == 'en_us':
+                sql = (f"SELECT {", ".join(colums)} "
+                f"FROM {self.schema_i18n}.{table} "
+                f"ORDER BY context;")
+            else:
+                sql = (f"SELECT {", ".join(colums)}, {", ".join(lang_colums)} "
+                f"FROM {self.schema_i18n}.{table} "
+                f"ORDER BY context;")
+        except Exception as e:
+            print(e)
         rows = self._get_rows(sql, self.cursor_i18n)
 
         # Return the corresponding information
@@ -491,7 +494,7 @@ class GwI18NGenerator:
                                     if k != 0:
                                         values_str += ",\n"
                                     values_str += f"('{row['source']}', '%_{row['feature_type'].lower()}%', '{row['formtype'].lower()}', {txt[0]}, {txt[1]})"
-                                    k = 1 
+                                    k = 1
                                     break
                         file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype;\n\n")
                     else:
@@ -550,7 +553,7 @@ class GwI18NGenerator:
                     elif context == "value_state":
                         values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]})" for row, txt in data])
                         file.write(f"UPDATE {context} AS t\nSET name = v.name, observ = v.observ\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, name, observ)\nWHERE t.id = v.id;\n\n")
-       
+
                 elif "dbfunction" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript)\nWHERE t.id = v.id;\n\n")
@@ -593,7 +596,7 @@ class GwI18NGenerator:
         for key, related_rows in updates.items():
             # Unpack key
             source, context, original_text, *extra = key
-            
+
             # Correct column based on context
             if context == "config_report":
                 column = "filterparam"
@@ -681,7 +684,7 @@ class GwI18NGenerator:
                     file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
 
             if closing:
-                file.write("UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n")  
+                file.write("UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n")
 
     # endregion
     # region Extra functions
@@ -826,7 +829,7 @@ class GwI18NGenerator:
         return param
 
     def _create_path_dic(self):
-        
+
         major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir).replace(".", "")
         ver_build = tools_qgis.get_build_version(plugin_dir=self.plugin_dir)
 
@@ -836,10 +839,10 @@ class GwI18NGenerator:
                 "name": "ws_dml.sql",
                 "project_type": ["ws", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
-                "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson", 
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"
                  ]  # "su_feature",
             },
@@ -848,10 +851,10 @@ class GwI18NGenerator:
                 "name": "ud_dml.sql",
                 "project_type": ["ud", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
-                "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson", 
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"
                  ]  # "su_feature",
             },

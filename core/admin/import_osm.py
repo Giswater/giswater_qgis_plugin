@@ -46,7 +46,8 @@ class GwImportOsm:
         sql = f"SELECT project_type FROM {self.schema_name}.sys_version"
         self.projetc_type = tools_db.get_row(sql)
         if self.projetc_type[0] != 'WS':
-            tools_qgis.show_warning("Import OSM Streetaxis its only for WS projects")
+            msg = "Import OSM Streetaxis its only for WS projects"
+            tools_qgis.show_warning(msg)
             return
 
         if ox is None:
@@ -102,7 +103,8 @@ class GwImportOsm:
         checked_municipalities = self.get_checked_municipalities()
 
         if not checked_municipalities:
-            tools_qgis.show_warning("No municipalities selected", dialog=self.dlg_import_osm)
+            msg = "No municipalities selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_import_osm)
             self.logs_list.append('{"id":4,"message":"No municipalities selected"}')
             return
 
@@ -124,7 +126,9 @@ class GwImportOsm:
         # Process each municipality
         for muni_id, boundary_geom_wkt in municipalities:
             if not boundary_geom_wkt or muni_id == 0:
-                tools_qgis.show_warning(f"Skipping muni_id {muni_id}: Invalid geometry", dialog=self.dlg_import_osm)
+                msg = "Skipping muni_id {0}: Invalid geometry"
+                msg_params = (muni_id,)
+                tools_qgis.show_warning(msg, dialog=self.dlg_import_osm, msg_params=msg_params)
                 self.logs_list.append('{"id":5,"message":"Skipping muni_id ' + str(muni_id) + ': Invalid geometry"}')
                 continue
 
@@ -138,11 +142,15 @@ class GwImportOsm:
 
                 # Ensure the geometry is valid
                 if not boundary_geom.is_valid:
-                    tools_qgis.show_warning(f"Skipping muni_id {muni_id}: Invalid geometry.", dialog=self.dlg_import_osm)
+                    msg = "Skipping muni_id {0}: Invalid geometry"
+                    msg_params = (muni_id,)
+                    tools_qgis.show_warning(msg, dialog=self.dlg_import_osm, msg_params=msg_params)
                     self.logs_list.append('{"id":6,"message":"Skipping muni_id ' + str(muni_id) + ': Invalid geometry"}')
                     continue
-
-                tools_qgis.show_info(f"Processing muni_id {muni_id}")
+                
+                msg = "Processing muni_id {0}"
+                msg_params = (muni_id,)
+                tools_qgis.show_info(msg, msg_params=msg_params)
                 self.logs_list.append('{"id":7,"message":"Processing muni_id ' + str(muni_id) + '"}')
 
                 # Download road network for this municipality
@@ -191,13 +199,17 @@ class GwImportOsm:
                 all_edges = pd.concat([all_edges, edges], ignore_index=True)
 
             except Exception as e:
-                tools_qgis.show_warning(f"Error processing muni_id {muni_id}: {e}", dialog=self.dlg_import_osm)
+                msg = "Error processing muni_id {0}: {1}"
+                msg_params = (muni_id, e,)
+                tools_qgis.show_warning(msg, msg_params=msg_params, dialog=self.dlg_import_osm)
                 self.logs_list.append('{"id":8,"message":"ERROR: Processing muni_id ' + str(muni_id) + ': ' + e + '"}')
                 continue
 
         # Debug: Show summary
         if len(all_edges) > 0:
-            tools_qgis.show_info(f"Total municipalities processed: {len(all_edges['muni_id'].unique())}")
+            msg = "Total municipalities processed: {0}"
+            msg_params = (len(all_edges['muni_id'].unique()),)
+            tools_qgis.show_info(msg, msg_params=msg_params)
             self.logs_list.append('{"id":9,"message":"Total municipalities processed: ' + str(len(all_edges['muni_id'].unique())) + '"}')
 
         # Insert data into the database
@@ -217,8 +229,12 @@ class GwImportOsm:
 
             except Exception as e:
                 tools_db.dao.rollback()
-                tools_qgis.show_warning(f"Error inserting row: {e}", self.dlg_import_osm)
-                tools_qgis.show_warning(f"Failing data: {row.to_dict()}", self.dlg_import_osm)
+                msg = "Error inserting row: {0}"
+                msg_params = (str(e),)
+                tools_qgis.show_warning(msg, self.dlg_import_osm, msg_params=msg_params)
+                msg = "Failing data: {0}"
+                msg_params = (row.to_dict(),)
+                tools_qgis.show_warning(msg, self.dlg_import_osm, msg_params=msg_params)
                 self.logs_list.append('{"id":10,"message":"ERROR: Inserting row: ' + e + '"}')
                 self.logs_list.append('{"id":11,"message":"ERROR: Failing data: ' + row.to_dict() + '"}')
                 errors += 1
@@ -242,12 +258,16 @@ class GwImportOsm:
             success += 1
         except Exception as e:
             tools_db.dao.rollback()
-            tools_qgis.show_warning(f"Error updating expl_id: {e}", self.dlg_import_osm)
+            msg = "Error updating expl_id: {0}"
+            msg_params = (str(e),)
+            tools_qgis.show_warning(msg, self.dlg_import_osm, msg_params=msg_params)
             self.logs_list.append('{"id":12,"message":"ERROR: Updating expl_id: ' + e + '}"')
             errors += 1
 
         # Show summary
-        tools_qgis.show_info(f"Data insertion completed: {success} successful, {errors} errors.")
+        msg = "Data insertion completed: {0} successful, {1} errors."
+        msg_params = (success, errors,)
+        tools_qgis.show_info(msg, msg_params=msg_params)
         # tools_qt.show_details(f"Data insertion completed: {success} successful, {errors} errors.")
         self.logs_list.append('{"id":13,"message":"Data insertion completed: ' + str(success) + ' successful, ' + str(errors) + ' errors."}')
 
@@ -279,12 +299,16 @@ class GwImportOsm:
                 # Check if imported_muni is selected
                 if imported_muni[0] in selected_munis:
                     # Ask if user wants to overwrite the municipaly imports
-                    result = tools_qt.show_question(f"""Municipality with id[{imported_muni[0]}] is already imported on om_streetaxis. \n\rDo you want to overwrite it? \n\r(This decision will not cancel the other selections, the process will keep running)
-                                                    """, "Info", force_action=True)
+                    msg = ("Municipality with id[{0}] is already imported on om_streetaxis.\n\rDo you want to overwrite it?"
+                            "\n\r(This decision will not cancel the other selections, the process will keep running)")
+                    msg_params = (imported_muni[0],)
+                    result = tools_qt.show_question(msg, "Info", force_action=True, msg_params=msg_params)
                     if not result:
                         selected_munis.remove(imported_muni[0])
                         self.dlg_import_osm.findChild(QCheckBox, f"chk_{imported_muni[0]}").setChecked(False)
-                        tools_qgis.show_info(f"Municipality with ID: {imported_muni[0]} deleted from selection")
+                        msg = "Municipality with ID: {0} deleted from selection"
+                        msg_params = (imported_muni[0],)
+                        tools_qgis.show_info(msg, msg_params=msg_params)
                         self.logs_list.append('{"id":1,"message":"Municipality with ID: ' + str(imported_muni[0]) + ' deleted from selection"}')
                     else:
                         # Delete municipality imports

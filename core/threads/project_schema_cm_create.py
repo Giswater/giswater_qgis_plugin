@@ -64,11 +64,12 @@ class GwCreateSchemaCmTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f"<b>Key: </b>{self.exception}<br>"
-            msg += f"<b>key container: </b>'body/data/ <br>"
-            msg += f"<b>Python file: </b>{__name__} <br>"
-            msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
-            tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
+            msg = f"<b>{tools_qt.tr("key")}: </b>{self.exception}<br>"
+            msg += f"<b>{tools_qt.tr("key container")}: </b>'body/data/ <br>"
+            msg += f"<b>{tools_qt.tr("Python file")}: </b>{__name__} <br>"
+            msg += f"<b>{tools_qt.tr("Python function")}:</b> {self.__class__.__name__} <br>"
+            title = "Key on returned json from ddbb is missed."
+            tools_qt.show_exception_message(title, msg)
 
         if self.timer:
             self.timer.stop()

@@ -21,7 +21,7 @@ from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu, QHBoxLayout
 from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapToPixel, QgsMapLayer
-from qgis.gui import QgsMapToolEmitPoint
+from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from .document import GwDocument, global_vars
 from ..toolbars.utilities.toolbox_btn import GwToolBoxButton
@@ -434,7 +434,6 @@ class GwPsector:
 
         # manage widgets
         tools_gw.manage_dlg_widgets(self, self.dlg_plan_psector, json_result)
-        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
         # set window title
         if psector_id is not None:
@@ -458,7 +457,7 @@ class GwPsector:
 
         # fill my_json when field change
         for widget in widget_list:
-            if type(widget) is QLineEdit:
+            if type(widget) is QLineEdit and widget.objectName() != 'qt_spinbox_lineedit':
                 widget.editingFinished.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
             elif isinstance(widget, QComboBox):
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
@@ -468,12 +467,18 @@ class GwPsector:
                 widget.stateChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
             elif type(widget) is QTextEdit:
                 widget.textChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
+            elif isinstance(widget, QgsDateTimeEdit):
+                widget.dateChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
 
         # Set checked enable all layers
         if self.all_layers_checked:
             tools_qt.set_checked(self.dlg_plan_psector, "tab_general_chk_enable_all", True)
 
         self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
+
+        # Open dialog
+        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
+
 
     def psector_name_changed(self):
         """ Enable buttons and tabs when name is changed """
@@ -613,8 +618,8 @@ class GwPsector:
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_composer_path')
             if file_name is None or file_name == 'null':
-                message = "File name is required"
-                tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+                msg = "File name is required"
+                tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
             path = folder_path + '/' + file_name
@@ -625,8 +630,8 @@ class GwPsector:
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
             viewname = f"v_plan_psector_budget_detail"
             if file_name is None or file_name == 'null':
-                message = "Price list csv file name is required"
-                tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+                msg = "Price list csv file name is required"
+                tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             if file_name.find('.csv') is False:
                 file_name += '.csv'
             path = folder_path + '/' + file_name
@@ -637,8 +642,8 @@ class GwPsector:
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_detail_path')
             viewname = f"v_plan_psector_budget"
             if file_name is None or file_name == 'null':
-                message = "Price list csv file name is required"
-                tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+                msg = "Price list csv file name is required"
+                tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             if file_name.find('.csv') is False:
                 file_name += '.csv'
             path = folder_path + '/' + file_name
@@ -670,14 +675,14 @@ class GwPsector:
                 exporter = QgsLayoutExporter(layout)
                 exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
                 if os.path.exists(path):
-                    message = "Document PDF created in"
-                    tools_qgis.show_info(message, parameter=path, dialog=self.dlg_plan_psector)
+                    msg = "Document PDF created in"
+                    tools_qgis.show_info(msg, parameter=path, dialog=self.dlg_plan_psector)
                     status, message = tools_os.open_file(path)
                     if status is False and message is not None:
                         tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_plan_psector)
                 else:
-                    message = "Cannot create file, check if its open"
-                    tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_plan_psector)
+                    msg = "Cannot create file, check if its open"
+                    tools_qgis.show_warning(msg, parameter=path, dialog=self.dlg_plan_psector)
             except Exception as e:
                 tools_log.log_warning(str(e))
                 msg = "Cannot create file, check if selected composer is the correct composer"
@@ -685,7 +690,8 @@ class GwPsector:
             finally:
                 designer_window.close()
         else:
-            tools_qgis.show_warning("Layout not found", parameter=layout_name, dialog=self.dlg_plan_psector)
+            msg = "Layout not found"
+            tools_qgis.show_warning(msg, parameter=layout_name, dialog=self.dlg_plan_psector)
 
     def generate_csv(self, path, viewname):
 
@@ -698,8 +704,8 @@ class GwPsector:
         columns = []
 
         if not rows or rows is None or rows == '':
-            message = "CSV not generated. Check fields from table or view"
-            tools_qgis.show_warning(message, parameter=viewname, dialog=self.dlg_plan_psector)
+            msg = "CSV not generated. Check fields from table or view"
+            tools_qgis.show_warning(msg, parameter=viewname, dialog=self.dlg_plan_psector)
             return
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -917,8 +923,8 @@ class GwPsector:
 
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name", return_string_null=False)
         if psector_name == "":
-            message = "Mandatory field is missing. Please, set a value"
-            tools_qgis.show_warning(message, parameter='Name', dialog=self.dlg_plan_psector)
+            msg = "Mandatory field is missing. Please, set a value"
+            tools_qgis.show_warning(msg, parameter='Name', dialog=self.dlg_plan_psector)
             return
 
         rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
@@ -928,8 +934,8 @@ class GwPsector:
         name_exist = self.check_name(psector_name)
 
         if name_exist and not self.update:
-            message = "The name is current in use"
-            tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+            msg = "The name is current in use"
+            tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return
 
         viewname = f"'v_edit_plan_psector'"
@@ -939,8 +945,8 @@ class GwPsector:
                f"ORDER BY ordinal_position;")
         rows = tools_db.get_rows(sql)
         if not rows or rows is None or rows == '':
-            message = "Check fields from table or view"
-            tools_qgis.show_warning(message, parameter=viewname, dialog=self.dlg_plan_psector)
+            msg = "Check fields from table or view"
+            tools_qgis.show_warning(msg, parameter=viewname, dialog=self.dlg_plan_psector)
             return
         columns = []
         for row in rows:
@@ -1021,9 +1027,10 @@ class GwPsector:
             return False
 
         if json_result['message']['level'] == 1:
-            text = f"There are some topological inconsistences on psector '{psector_name}'. Would you like to see the log?"
+            text = "There are some topological inconsistences on psector '{0}'. Would you like to see the log?"
+            text_params = (psector_name,)
             function = partial(self.show_psector_topoerror_log, json_result, psector_id)
-            tools_qgis.show_message_function(text, function, message_level=1, duration=0)
+            tools_qgis.show_message_function(text, function, message_level=1, duration=0, text_params=text_params)
 
         return json_result
 
@@ -1096,8 +1103,8 @@ class GwPsector:
 
         selected_list = tbl_all_rows.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
         expl_id = []
         for i in range(0, len(selected_list)):
@@ -1137,8 +1144,8 @@ class GwPsector:
             row = tools_db.get_row(sql)
             if row is not None:
                 # if exist - show warning
-                message = "Id already selected"
-                tools_qt.show_info_box(message, "Info", parameter=str(expl_id[i]))
+                msg = "Id already selected"
+                tools_qt.show_info_box(msg, "Info", parameter=str(expl_id[i]))
             else:
                 sql = (f"INSERT INTO {tableright}"
                        f" (psector_id, unit, price_id, observ, price) "
@@ -1453,20 +1460,20 @@ class GwPsector:
         doc_name = self.doc_id.text()
         psector_id = str(self.psector_id)
         if not doc_name:
-            message = "You need to insert a document name"
-            tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+            msg = "You need to insert a document name"
+            tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return
         if not psector_id or psector_id == "null":
-            message = "You need to insert psector_id"
-            tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+            msg = "You need to insert psector_id"
+            tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return
 
         # Get doc_id using doc_name
         sql = f"SELECT id FROM doc WHERE name = '{doc_name}'"
         row = tools_db.get_row(sql)
         if not row:
-            message = "Document name not found"
-            tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+            msg = "Document name not found"
+            tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return
 
         doc_id = row['id']
@@ -1486,8 +1493,8 @@ class GwPsector:
                f" VALUES ('{doc_id}', {psector_id})")
         status = tools_db.execute_sql(sql)
         if status:
-            message = "Document inserted successfully"
-            tools_qgis.show_info(message, dialog=self.dlg_plan_psector)
+            msg = "Document inserted successfully"
+            tools_qgis.show_info(msg, dialog=self.dlg_plan_psector)
 
         self.doc_id.clear()
         self.dlg_plan_psector.tbl_document.model().select()
@@ -1601,8 +1608,8 @@ class GwPsector:
         selector_updated = False
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
@@ -1610,15 +1617,16 @@ class GwPsector:
             psector_id = qtbl_psm.model().record(row).value("psector_id")
             active = qtbl_psm.model().record(row).value("active")
             if psector_id == int(self.current_psector_id[0]):
-                message = f"The active state of the current psector cannot be changed. Current psector: {self.current_psector_id[0]}"
-                tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+                msg = "The active state of the current psector cannot be changed. Current psector: {0}"
+                msg_params = (self.current_psector_id[0],)
+                tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng, msg_params=msg_params)
                 return
             if active:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
                 # Remove from selector
                 sql += f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;"
-                message = f"Psector removed from selector"
-                tools_qgis.show_info(message, dialog=self.dlg_psector_mng)
+                msg = f"Psector removed from selector"
+                tools_qgis.show_info(msg, dialog=self.dlg_psector_mng)
                 selector_updated = True
             else:
                 sql += f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
@@ -1637,8 +1645,8 @@ class GwPsector:
 
         # Check if any row is selected
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get the first selected row and retrieve psector_id and active status
@@ -1653,8 +1661,8 @@ class GwPsector:
 
         # Verify that the selected psector is active
         if not active:
-            message = "Cannot set the current psector of an inactive scenario. Please activate it first."
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Cannot set the current psector of an inactive scenario. Please activate it first."
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Prepare the JSON body for gw_fct_set_current
@@ -1670,7 +1678,8 @@ class GwPsector:
             self.set_label_current_psector(dialog, result=result)
         else:
             # If the procedure fails, show a warning
-            tools_qgis.show_warning("Failed to set psector", dialog=dialog)
+            msg = "Failed to set psector"
+            tools_qgis.show_warning(msg, dialog=dialog)
 
         # Re-open the dialog
         tools_gw.open_dialog(dialog, dlg_name='plan_psector')
@@ -1836,15 +1845,16 @@ class GwPsector:
 
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
         row = selected_list[0].row()
         active = qtbl_psm.model().record(row).value("active")
         psector_name = qtbl_psm.model().record(row).value("name")
         if active is False:
-            message = f"To open psector {psector_name}, it must be activated before."
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            msg = "To open psector {0}, it must be activated before."
+            msg_params = (psector_name,)
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng, msg_params=msg_params)
             return
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
@@ -1866,7 +1876,8 @@ class GwPsector:
 
         selected_rows = self.qtbl_psm.selectionModel().selectedRows()
         if len(selected_rows) == 0:
-            tools_qgis.show_warning("No sector selected. Please select at least one.", dialog=self.dlg_psector_mng)
+            msg = "No sector selected. Please select at least one."
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
         # Get selected psector_id from the first column (adjust index if needed)
@@ -1879,11 +1890,13 @@ class GwPsector:
 
         # Check for valid result
         if not result or result.get('status') != 'Accepted':
-            tools_qgis.show_warning("Failed to retrieve sector features.", dialog=self.dlg_psector_mng)
+            msg = "Failed to retrieve sector features."
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
         # The SQL procedure manage creating the temporal layers based on the returned features
-        tools_qgis.show_success("Psector features loaded successfully on the map.", dialog=self.dlg_psector_mng)
+        msg = "Psector features loaded successfully on the map."
+        tools_qgis.show_success(msg, dialog=self.dlg_psector_mng)
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
         """
@@ -1896,8 +1909,8 @@ class GwPsector:
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
         cur_psector = tools_gw.get_config_value('plan_psector_current')
         inf_text = ""
@@ -1906,9 +1919,10 @@ class GwPsector:
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
             if cur_psector and (str(id_) == str(cur_psector[0])):
-                message = ("You are trying to delete your current psector. "
-                           "Please, change your current psector before delete.")
-                tools_qt.show_exception_message('Current psector', tools_qt.tr(message))
+                msg = ("You are trying to delete your current psector. "
+                        "Please, change your current psector before delete.")
+                title = "Current psector"
+                tools_qt.show_exception_message(title, tools_qt.tr(msg))
                 return
             inf_text += f'"{id_}", '
             list_id += f'"{id_}", '
@@ -1928,8 +1942,8 @@ class GwPsector:
                         tools_gw.execute_procedure('gw_fct_setdelete', body)
 
         elif action == 'price':
-            message = "Are you sure you want to delete these records?"
-            answer = tools_qt.show_question(message, "Delete records", inf_text)
+            msg = "Are you sure you want to delete these records?"
+            answer = tools_qt.show_question(msg, "Delete records", inf_text)
             if answer:
                 sql = "DELETE FROM selector_plan_result WHERE result_id in ("
                 if list_id != '':
@@ -1959,8 +1973,8 @@ class GwPsector:
 
         selected_list = self.dlg_merm.tbl_om_result_cat.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_merm)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_merm)
             return
         row = selected_list[0].row()
         price_name = self.dlg_merm.tbl_om_result_cat.model().record(row).value("name")
@@ -1971,8 +1985,8 @@ class GwPsector:
                f" VALUES({result_id}, current_user);")
         status = tools_db.execute_sql(sql)
         if status:
-            message = "Values has been updated"
-            tools_qgis.show_info(message, dialog=self.dlg_merm)
+            msg = "Values has been updated"
+            tools_qgis.show_info(msg, dialog=self.dlg_merm)
 
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
@@ -1994,8 +2008,8 @@ class GwPsector:
         # Get selected row
         selected_list = self.qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
         # Get selected dscenario id
@@ -2018,8 +2032,8 @@ class GwPsector:
 
         selected_list = self.qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
         row = selected_list[0].row()
@@ -2199,14 +2213,14 @@ class GwPsector:
         if tab_idx == 2:
             selected_rows = self.qtbl_connec.selectionModel().selectedRows()
             if len(selected_rows) == 0:
-                message = "Any record selected"
-                tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+                msg = "Any record selected"
+                tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
                 return
         elif tab_idx == 3:
             selected_rows = self.qtbl_gully.selectionModel().selectedRows()
             if len(selected_rows) == 0:
-                message = "Any record selected"
-                tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+                msg = "Any record selected"
+                tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
                 return
 
         # Get the point
@@ -2222,15 +2236,15 @@ class GwPsector:
         selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
 
         if row is None:
-            message = "Current user does not have 'plan_psector_current'. Value of current psector will be inserted."
-            tools_qt.show_info_box(message)
+            msg = "Current user does not have 'plan_psector_current'. Value of current psector will be inserted."
+            tools_qt.show_info_box(msg)
 
             sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_current', '{selected_psector}', current_user)")
             tools_db.execute_sql(sql)
 
         elif str(row[0]) != str(selected_psector):
-            message = "This psector does not match the current one. Value of current psector will be updated."
-            tools_qt.show_info_box(message)
+            msg = "This psector does not match the current one. Value of current psector will be updated."
+            tools_qt.show_info_box(msg)
 
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{selected_psector}' "
@@ -2327,8 +2341,8 @@ class GwPsector:
         selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
 
         if str(current_psector) != str(selected_psector):
-            message = "This psector does not match the current one. Value of current psector will be updated."
-            tools_qt.show_info_box(message)
+            msg = "This psector does not match the current one. Value of current psector will be updated."
+            tools_qt.show_info_box(msg)
 
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{selected_psector}' "
@@ -2411,9 +2425,9 @@ class GwPsector:
         log = tools_gw.get_config_parser("user_edit_tricks", "psector_replace_feature_disable_showlog", 'user', 'init')
         showlog = not tools_os.set_boolean(log, False)
 
-        message = json_result['message']['text']
-        if message is not None and showlog:
-            tools_qt.show_info_box(message)
+        msg = json_result['message']['text']
+        if msg is not None and showlog:
+            tools_qt.show_info_box(msg)
 
         text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'], force_tab=showlog)
 
@@ -2477,8 +2491,8 @@ class GwPsector:
                 selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
 
                 if str(current_psector) != str(selected_psector):
-                    message = "This psector does not match the current one. Value of current psector will be updated."
-                    tools_qt.show_info_box(message)
+                    msg = "This psector does not match the current one. Value of current psector will be updated."
+                    tools_qt.show_info_box(msg)
 
                     sql = (f"UPDATE config_param_user "
                            f"SET value = '{selected_psector}' "
@@ -2621,8 +2635,8 @@ class GwPsector:
         sql = ""
         selected_list = qtbl_feature.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
         if idx == 0:

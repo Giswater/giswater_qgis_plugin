@@ -342,8 +342,8 @@ class GwDscenarioManagerButton(GwAction):
 
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         for index in selected_list:
@@ -374,8 +374,8 @@ class GwDscenarioManagerButton(GwAction):
 
         # Check if any row is selected
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get the first selected row and retrieve scenario_id and active status
@@ -390,8 +390,9 @@ class GwDscenarioManagerButton(GwAction):
 
         # Verify that the selected scenario is active
         if not active:
-            message = f"Cannot set the current {scenario_type} scenario of an inactive scenario. Please activate it first."
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Cannot set the current {0} scenario of an inactive scenario. Please activate it first."
+            msg_params = (scenario_type,)
+            tools_qgis.show_warning(msg, dialog=dialog, msg_params=msg_params)
             return
 
         # Prepare the JSON body for gw_fct_set_current
@@ -407,7 +408,9 @@ class GwDscenarioManagerButton(GwAction):
             self._set_label_current_dscenario_type(dialog, result=result)
         else:
             # If the procedure fails, show a warning
-            tools_qgis.show_warning(f"Failed to set {scenario_type} scenario", dialog=dialog)
+            msg = "Failed to set {0} scenario"
+            msg_params = (scenario_type,)
+            tools_qgis.show_warning(msg, dialog=dialog, msg_params=msg_params)
 
         # Re-open the dialog
         tools_gw.open_dialog(dialog, dlg_name='dscenario_manager')
@@ -570,8 +573,8 @@ class GwDscenarioManagerButton(GwAction):
         # Get selected row
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get selected dscenario id
@@ -590,16 +593,17 @@ class GwDscenarioManagerButton(GwAction):
         # Get selected row
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(memsgssage, dialog=dialog)
             return
 
         # Get selected dscenario id
         values = [index.sibling(index.row(), 0).data() for index in selected_list]
 
-        message = "CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\n" \
-                  "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", values, force_action=True)
+        msg = ("CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\n"
+                  "Are you sure you want to delete these records?")
+        title = "Delete records"
+        answer = tools_qt.show_question(msg, title, values, force_action=True)
         if answer:
             # Build WHERE IN clause for SQL
             where_clause = f"{self.views_dict[view]} IN ({', '.join(map(str, values))})"
@@ -621,8 +625,8 @@ class GwDscenarioManagerButton(GwAction):
         # Check if there are selected rows
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_dscenario_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_dscenario_manager)
             return
 
         # Get selected dscenario_id
@@ -723,8 +727,8 @@ class GwDscenarioManagerButton(GwAction):
         """ Insert feature to dscenario via copy paste """
 
         if feature_id == '':
-            message = "Feature_id is mandatory."
-            tools_qgis.show_warning(message, dialog=self.dlg_dscenario)
+            msg = "Feature_id is mandatory."
+            tools_qgis.show_warning(msg, dialog=self.dlg_dscenario)
             return
         self.dlg_dscenario.txt_feature_id.setStyleSheet(None)
         tableview = self.dlg_dscenario.main_tab.currentWidget()
@@ -921,8 +925,8 @@ class GwDscenarioManagerButton(GwAction):
         #     tablename = f'v_edit_{tablename}'
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Get selected mapzone data
@@ -974,8 +978,8 @@ class GwDscenarioManagerButton(GwAction):
         # Check if there are selected rows
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         if feature_id is None:
@@ -986,8 +990,8 @@ class GwDscenarioManagerButton(GwAction):
             feature_id = index.sibling(index.row(), 0).data()
             self.selected_dscenario_id = feature_id
             if feature_id is None:
-                message = "Any record selected"
-                tools_qgis.show_warning(message, dialog=dialog)
+                msg = "Any record selected"
+                tools_qgis.show_warning(msg, dialog=dialog)
                 return
 
         feature = f'"tableName":"{tablename}", "id":"{feature_id}"'
@@ -1046,7 +1050,8 @@ class GwDscenarioManagerButton(GwAction):
             # Refresh tableview
             self._fill_manager_table(tablename)
             return
-        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
+        msg = "Error"
+        tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)
 
     def _manage_add_layers(self, table_name, sub_group):
         """ Opens menu to add/remove layers to ToC """
@@ -1132,7 +1137,7 @@ class GwDscenarioManagerButton(GwAction):
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
                 msg = "Remove layer from project?"
-                answer = tools_qt.show_question(msg, title="Warning", parameter=f"'{layer.name()}'", force_action=True)
+                answer = tools_qt.show_question(msg, "Warning", parameter=f"'{layer.name()}'", force_action=True)
                 if answer:
                     tools_qgis.remove_layer_from_toc(layer.name(), "EPA", sub_group)
 
@@ -1154,9 +1159,9 @@ class GwDscenarioManagerButton(GwAction):
             return self._manage_upsert_rules()
 
         if self.dlg_dscenario.txt_feature_id.text() == '':
-            message = "Feature_id is mandatory."
+            msg = "Feature_id is mandatory."
             self.dlg_dscenario.txt_feature_id.setStyleSheet("border: 1px solid red")
-            tools_qgis.show_warning(message, dialog=self.dlg_dscenario)
+            tools_qgis.show_warning(msg, dialog=self.dlg_dscenario)
             return
         self.dlg_dscenario.txt_feature_id.setStyleSheet(None)
 
@@ -1216,8 +1221,8 @@ class GwDscenarioManagerButton(GwAction):
         # Get selected row
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_dscenario)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_dscenario)
             return
 
         # Get selected feature_id
@@ -1235,8 +1240,9 @@ class GwDscenarioManagerButton(GwAction):
         for index in selected_list:
             values.append(index.sibling(index.row(), col_idx).data())
 
-        message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", values)
+        msg = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.show_question(msg, title, values)
         if answer:
             for value in values:
                 sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {feature_type} = '{value}'"
@@ -1481,6 +1487,7 @@ class GwDscenarioManagerButton(GwAction):
             tools_gw.close_dialog(dialog)
             return
 
-        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
+        msg = "Error"
+        tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)
 
     # endregion

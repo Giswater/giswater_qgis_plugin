@@ -121,7 +121,9 @@ class GwSnapshotViewButton(GwAction):
             self.btn_coordinate_actions.setMenu(menu)
 
         except Exception as e:
-            tools_qgis.show_warning(f"Failed to load layers: {e}", dialog=self.style_mng_dlg)
+            msg = "Failed to load layers"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
     def _update_current_polygon(self, origin, id_name=None, id=None):
         """ Update polygon """
@@ -175,7 +177,8 @@ def run(**kwargs):
 
     # Check null values
     if not polygon or dlg.date.dateTime().isNull() or not any([feature.isChecked() for feature in dlg.features]):
-        tools_qgis.show_warning("Required fields are missing", dialog=dlg.dlg_snapshot_view)
+        msg = "Required fields are missing"
+        tools_qgis.show_warning(msg, dialog=dlg.dlg_snapshot_view)
         return
 
     # Create json input data
@@ -195,7 +198,8 @@ def run(**kwargs):
         add_layers_temp(layers, f"Snapshot - {form['date']}")
         tools_gw.close_dialog(dlg.dlg_snapshot_view)
     else:
-        tools_qgis.show_warning("No results", dialog=dlg.dlg_snapshot_view)
+        msg = "No results"
+        tools_qgis.show_warning(msg, dialog=dlg.dlg_snapshot_view)
 
 
 def add_layers_temp(layers, group):

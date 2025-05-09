@@ -235,7 +235,8 @@ class GwDimensioning:
             # if so: self.layer_dimensions.commitChanges()
             # else: self.layer_dimensions.rollBack()
             msg = 'Are you sure to save this feature?'
-            answer = tools_qt.show_question(msg, "Save feature", None)
+            title = "Save feature"
+            answer = tools_qt.show_question(msg, title, None)
             if not answer:
                 tools_qt.set_action_checked(action, True)
                 return

@@ -44,8 +44,8 @@ class GwArcFusionButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on node, that joins two pipes, in order to remove it and merge pipes"
-            tools_qgis.show_info(message)
+            msg = "Click on node, that joins two pipes, in order to remove it and merge pipes"
+            tools_qgis.show_info(msg)
 
     def canvasReleaseEvent(self, event):
 
@@ -123,7 +123,8 @@ class GwArcFusionButton(GwMaptool):
             # If the node has state 0 (obsolete) don't open arc fusion dlg
             if self.node_state is not None and self.node_state == 0:
                 msg = "The node is obsolete, this tool doesn't work with obsolete nodes."
-                tools_qgis.show_warning(msg, title="Arc fusion")
+                title = "Arc fusion"
+                tools_qgis.show_warning(msg, title=title)
                 return
 
             self.open_arc_fusion_dlg()

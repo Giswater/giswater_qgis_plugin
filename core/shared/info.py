@@ -192,10 +192,12 @@ class GwInfo(QObject):
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                msg = f"Execution of {function_name} failed."
+                msg = "Execution of {0} failed."
+                msg_params = (function_name,)
                 if 'text' in json_result['message']:
                     msg = json_result['message']['text']
-                tools_qgis.show_message(msg, level)
+                    msg_params = None
+                tools_qgis.show_message(msg, level, msg_params=msg_params)
                 return False, None
 
             self.complet_result = json_result
@@ -271,7 +273,8 @@ class GwInfo(QObject):
                 return False, None
 
         except Exception as e:
-            tools_qgis.show_warning("Exception in info", parameter=e)
+            msg = "Exception in info"
+            tools_qgis.show_warning(msg, parameter=e)
             tools_log.log_error(f"{traceback.format_exc()}")
             self._disconnect_signals()  # Disconnect signals
             tools_qgis.restore_cursor()  # Restore overridden cursor
@@ -333,7 +336,9 @@ class GwInfo(QObject):
             widget = dialog.findChild(QWidget, widget_name)
             if widget is None:
                 action.setChecked(False)
-                tools_qgis.show_message(f"Widget: {widget_name} not in form.", dialog=dialog)
+                msg = "Widget: {0} not in form."
+                msg_params = (widget_name,)
+                tools_qgis.show_message(msg, dialog=dialog, msg_params=msg_params)
                 return
         # Block the signals of de dialog so that the key ESC does not close it
         dialog.blockSignals(True)
@@ -382,8 +387,9 @@ class GwInfo(QObject):
                 value = tools_qt.get_calendar_date(dialog, widget)
             else:
                 if widget is None:
-                    msg = f"Widget {field['columnname']} is not configured or have a bad config"
-                    tools_qgis.show_message(msg, dialog=dialog)
+                    msg = "Widget {0} is not configured or have a bad config"
+                    msg_params = (field['columname'],)
+                    tools_qgis.show_message(msg, dialog=dialog, msg_params=msg_params)
             if str(value) not in ('', None, -1, "None", "-1") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
 
@@ -472,7 +478,8 @@ class GwInfo(QObject):
 
         self._get_features(complet_result)
         if self.layer is None:
-            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
+            msg = "Layer not found"
+            tools_qgis.show_message(msg, 2, parameter=self.table_parent)
             return False, self.dlg_cf
 
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
@@ -731,14 +738,14 @@ class GwInfo(QObject):
                     layout_list.append(layout)
 
                 if field['layoutname'] is None:
-                    message = "The field layoutname is not configured for"
-                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
+                    msg = "The field layoutname is not configured for"
+                    param = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
                     continue
                 if field['layoutorder'] is None:
-                    message = "The field layoutorder is not configured for"
-                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
+                    msg = "The field layoutorder is not configured for"
+                    param = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
                     continue
 
                 # The data tab is somewhat special (it has 2 columns)
@@ -755,9 +762,9 @@ class GwInfo(QObject):
                 tools_gw.add_widget_combined(self.dlg_cf, field, label, widget, old_widget_pos)
 
             elif field['layoutname'] != 'lyt_none':
-                message = "The field layoutname is not configured for"
-                msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
+                msg = "The field layoutname is not configured for"
+                param = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -1154,21 +1161,21 @@ class GwInfo(QObject):
             if layer == self.layer_node:
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
-                message = "Selected node"
+                msg = "Selected node"
                 rb = tools_gw.create_rubberband(global_vars.canvas, "point")
                 if self.node1 is None:
                     self.node1 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
-                    tools_qgis.show_message(message, message_level=0, parameter=self.node1)
+                    tools_qgis.show_message(msg, message_level=0, parameter=self.node1)
                     dlg_interpolate.btn_accept.setEnabled(False)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
-                    tools_qgis.show_message(message, message_level=0, parameter=self.node2)
+                    tools_qgis.show_message(msg, message_level=0, parameter=self.node2)
                     dlg_interpolate.btn_accept.setEnabled(True)
 
         if self.node1 and self.node2:
@@ -1206,7 +1213,8 @@ class GwInfo(QObject):
                 text = tools_qt.get_text(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
-                    answer = tools_qt.show_question(msg, "Overwrite values")
+                    title = "Overwrite values"
+                    answer = tools_qt.show_question(msg, title)
                     if answer:
                         self._set_values(dlg_interpolate)
                     break
@@ -1405,8 +1413,8 @@ class GwInfo(QObject):
         # Select only first element of the feature list
         feature = feature_list[0]
         feature_id = feature.attribute(str(self.feature_type) + '_id')
-        msg = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
-               f"Do you want to copy its values to the current node?\n\n")
+        msg = (f"{tools_qt.tr('Selected snapped feature_id to copy values from')}: {snapped_feature_attr[0]}\n"
+               f"{tools_qt.tr('Do you want to copy its values to the current node?')}\n\n")
         # Replace id because we don't have to copy it!
         snapped_feature_attr[0] = feature_id
         snapped_feature_attr_aux = []
@@ -1429,7 +1437,8 @@ class GwInfo(QObject):
             msg += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
 
         # Ask confirmation question showing fields that will be copied
-        answer = tools_qt.show_question(msg, "Update records", None)
+        title = "Update records"
+        answer = tools_qt.show_question(msg, title, None)
         if answer:
             for i in range(0, len(fields)):
                 for x in range(0, len(fields_aux)):
@@ -1638,7 +1647,8 @@ class GwInfo(QObject):
     def _ask_for_save(self, action_edit, fid):
 
         msg = 'Are you sure to save this feature?'
-        answer = tools_qt.show_question(msg, "Save feature", None, parameter=fid)
+        title = "Save feature"
+        answer = tools_qt.show_question(msg, title, None, parameter=fid)
         if not answer:
             tools_qt.set_action_checked(action_edit, True)
             return False
@@ -1810,6 +1820,7 @@ class GwInfo(QObject):
                 epa_type_changed = True
 
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
+            print(json_result)
             if not json_result:
                 return False
 
@@ -1817,13 +1828,13 @@ class GwInfo(QObject):
                 _json.clear()
 
             if "Accepted" in json_result['status']:
-                msg_text = json_result['message']['text']
-                if msg_text is None:
-                    msg_text = 'Feature upserted'
+                msg = json_result['message']['text']
+                if msg is None:
+                    msg = 'Feature upserted'
                 msg_level = json_result['message']['level']
                 if msg_level is None:
                     msg_level = 1
-                tools_qgis.show_message(msg_text, message_level=msg_level, dialog=dialog)
+                tools_qgis.show_message(msg, message_level=msg_level, dialog=dialog)
                 self._reload_fields(dialog, json_result, p_widget)
                 if epa_type_changed:
                     self._reload_epa_tab(dialog)
@@ -1832,7 +1843,8 @@ class GwInfo(QObject):
                     # If param is true show question and create thread
                     msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
                     if lib_vars.user_level['level'] in ('1', '2'):
-                        msg += " Would you like to continue?"
+                        msg = ("You closed a valve, this will modify the current mapzones and it may take a little bit of time." 
+                              "Would you like to continue?")
                         answer = tools_qt.show_question(msg)
                     else:
                         tools_qgis.show_info(msg)
@@ -2074,10 +2086,10 @@ class GwInfo(QObject):
                     tools_qt.show_info_box(message, title)
                     return
                 widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
-                message = "You are going to change the epa_type. With this operation you will lose information about " \
-                            "current epa_type values of this object. Would you like to continue?"
+                msg = ("You are going to change the epa_type. With this operation you will lose information about "
+                            "current epa_type values of this object. Would you like to continue?")
                 title = "Change epa_type"
-                answer = tools_qt.show_question(message, title)
+                answer = tools_qt.show_question(msg, title)
                 if not answer:
                     widget_epatype.blockSignals(True)
                     tools_qt.set_combo_value(widget_epatype, self.epa_type, 1)
@@ -2897,7 +2909,8 @@ class GwInfo(QObject):
 
             result = json_result['body']['data']
             if 'fields' not in result:
-                tools_qgis.show_message("No listValues for: " + json_result['body']['data'], 2)
+                msg = "No listValues for"
+                tools_qgis.show_message(msg, 2, parameter=json_result['body']['data'])
             else:
                 for field in json_result['body']['data']['fields']:
                     label = QLabel()
@@ -3004,7 +3017,8 @@ class GwInfo(QObject):
         for field in result['body']['data']['fields']:
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
             if widget.property('typeahead'):
-                tools_qt.set_completer_object(QCompleter(), QStringListModel(), widget, field['comboIds'])
+                # print(field['comboIds'])
+                tools_qt.set_completer_object(QCompleter(), QStandardItemModel(), widget, field['comboIds'])
                 tools_qt.set_widget_text(self.dlg_cf, widget, field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
             elif isinstance(widget, QComboBox):
@@ -3125,7 +3139,8 @@ class GwInfo(QObject):
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level)
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level)
 
             # Refresh tab epa
             epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
@@ -3535,8 +3550,10 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
     info = kwargs['class']
     my_json = getattr(info, f"my_json_{view}")
     if my_json:
-        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
-        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        msg = ("You are trying to add/remove a record from the table, with changes to the current records." 
+                  "If you continue, the changes will be discarded without saving. Do you want to continue?")
+        title = "Info Message"
+        answer = tools_qt.show_question(msg, title, force_action=True)
         if not answer:
             return
     feature_id = complet_result['body']['feature']['id']
@@ -3666,8 +3683,10 @@ def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name
 
     my_json = getattr(info, f"my_json_{view}")
     if my_json:
-        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
-        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        msg = ("You are trying to add/remove a record from the table, with changes to the current records." 
+                  "If you continue, the changes will be discarded without saving. Do you want to continue?")
+        title = "Info Message"
+        answer = tools_qt.show_question(msg, title, force_action=True)
         if not answer:
             return
 
@@ -3693,8 +3712,9 @@ def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name
             if value:
                 values.append(value)
 
-    message = "Are you sure you want to delete these records?"
-    answer = tools_qt.show_question(message, "Delete records", values, force_action=True)
+    msg = "Are you sure you want to delete these records?"
+    title = "Delete records"
+    answer = tools_qt.show_question(msg, title, values, force_action=True)
     if answer:
         for value in values:
             conditions = []
@@ -3929,8 +3949,9 @@ def add_to_dscenario(**kwargs):
 
     my_json = getattr(info, f"my_json_{tablename}")
     if my_json:
-        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
-        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        msg = ("You are trying to add/remove a record from the table, with changes to the current records. "
+              "If you continue, the changes will be discarded without saving. Do you want to continue?")
+        answer = tools_qt.show_question(msg, "Info Message", force_action=True)
         if not answer:
             return
 
@@ -3949,8 +3970,8 @@ def remove_from_dscenario(**kwargs):
 
     my_json = getattr(info, f"my_json_{tablename}")
     if my_json:
-        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
-        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        msg = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
+        answer = tools_qt.show_question(msg, "Info Message", force_action=True)
         if not answer:
             return
 
@@ -3971,8 +3992,9 @@ def edit_dscenario(**kwargs):
 
     my_json = getattr(info, f"my_json_{tablename}")
     if my_json:
-        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
-        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        msg = ("You are trying to add/remove a record from the table, with changes to the current records. "
+                  "If you continue, the changes will be discarded without saving. Do you want to continue?")
+        answer = tools_qt.show_question(msg, "Info Message", force_action=True)
         if not answer:
             return
 

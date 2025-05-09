@@ -170,7 +170,8 @@ class GwGo2EpaButton(GwAction):
 
         if not export_checked and not exec_checked and not import_result_checked:
             msg = "You need to select at least one process"
-            tools_qt.show_info_box(msg, title="Go2Epa")
+            title = "Go2Epa"
+            tools_qt.show_info_box(msg, title)
             return False
 
         # Control export INP
@@ -201,7 +202,8 @@ class GwGo2EpaButton(GwAction):
         if result_name == '':
             self.dlg_go2epa.txt_result_name.setStyleSheet("border: 1px solid red")
             msg = "This parameter is mandatory. Please, set a value"
-            tools_qt.show_details(msg, title="Rpt fail", inf_text=None)
+            title = "Rpt fail"
+            tools_qt.show_details(msg, title, inf_text=None)
             return False
 
         self.dlg_go2epa.txt_result_name.setStyleSheet(None)
@@ -212,12 +214,14 @@ class GwGo2EpaButton(GwAction):
         if import_result_checked and not export_checked and not exec_checked:
             if not row:
                 msg = "Result name not found. It's not possible to import RPT file into database"
-                tools_qt.show_info_box(msg, "Import RPT file")
+                title = "Import RPT file"
+                tools_qt.show_info_box(msg, title)
                 return False
         else:
             if row:
                 msg = "Result name already exists, do you want overwrite?"
-                answer = tools_qt.show_question(msg, title="Alert")
+                title = "Alert"
+                answer = tools_qt.show_question(msg, title)
                 if not answer:
                     return False
 
@@ -522,8 +526,8 @@ class GwGo2EpaButton(GwAction):
         if any(widget['widget'] == 'inp_options_networkmode' for widget in _json):
             tools_qgis.force_refresh_map_canvas()
 
-        message = "Values has been updated"
-        tools_qgis.show_info(message)
+        msg = "Values has been updated"
+        tools_qgis.show_info(msg)
         # Close dialog
         tools_gw.close_dialog(self.dlg_go2epa_options)
 

@@ -197,7 +197,7 @@ class GwRecursiveEpa(GwTask):
 
         self._close_file()
         if self.files_exported:
-            msg = f"The process has been executed. Files generated:"
+            msg = "The process has been executed. Files generated:"
             tools_qt.show_info_box(msg, inf_text=self.files_exported)
         if self.isCanceled():
             return
@@ -218,15 +218,17 @@ class GwRecursiveEpa(GwTask):
                 if 'status' in self.rpt_result:
                     if "Failed" in self.rpt_result['status']:
                         tools_gw.manage_json_exception(self.rpt_result)
-
+                        
         if self.error_msg:
-            title = f"Task aborted - {self.description()}"
-            tools_qt.show_info_box(self.error_msg, title=title)
+            title = "Task aborted - {0}"
+            title_params = (self.description(),)
+            tools_qt.show_info_box(self.error_msg, title=title, title_params=title_params)
             return
 
         if self.exception:
-            title = f"Task aborted - {self.description()}"
-            tools_qt.show_info_box(self.exception, title=title)
+            title = "Task aborted - {0}"
+            title_params = (self.description(),)
+            tools_qt.show_info_box(self.exception, title=title, title_params=title_params)
             raise self.exception
 
         # If Database exception, show dialog after task has finished
@@ -243,8 +245,6 @@ class GwRecursiveEpa(GwTask):
     def _calculate_remaining_time(self, t0):
         tf = time()  # Final time
         td = tf - t0  # Delta time
-        print(f"{td} * ({self.total_objects} - {self.cur_idx})")
-        print(td * (self.total_objects - self.cur_idx))
         time_remaining = td * (self.total_objects - self.cur_idx)  # Delta time * remaining pages
         self.time_changed.emit(f"Remaining: {timedelta(seconds=round(time_remaining))} ({self.cur_idx}/{self.total_objects})")
 

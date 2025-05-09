@@ -794,12 +794,13 @@ class GwCalculatePriority(GwTask):
         cum_cost_constr = 0
         second_iteration = []
         for arc in arcs:
+            second_iteration.append(arc)
             cum_cost_constr += arc["cost_constr"]
             if cum_cost_constr > self.result_budget * (
                 self.target_year - date.today().year
             ):
                 break
-            second_iteration.append(arc)
+            
 
         if not len(second_iteration):
             self._emit_report(

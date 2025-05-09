@@ -117,7 +117,10 @@ class GwAdminButton:
 
         self.other_project = project
 
-        answer = tools_qt.show_question("This process will take time (few minutes). Are you sure to continue?", f"Create {project} schema")
+        msg = "This process will take time (few minutes). Are you sure to continue?"
+        title = "Create {project} schema"
+        title_params = (project,)
+        answer = tools_qt.show_question(msg, title=title, title_params=title_params)
         if not answer:
             return
 
@@ -161,7 +164,8 @@ class GwAdminButton:
         # Check if srid value is valid
         if self.last_srids is None:
             msg = "This SRID value does not exist on Postgres Database. Please select a diferent one."
-            tools_qt.show_info_box(msg, "Info")
+            title = "Info"
+            tools_qt.show_info_box(msg, title)
             return
 
         msg = "This process will take time (few minutes). Are you sure to continue?"
@@ -170,13 +174,16 @@ class GwAdminButton:
         if not answer:
             return
 
-        tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
+        msg = "Create schema of type '{0}': '{1}'"
+        msg_params = (project_type, project_name_schema,)
+        tools_log.log_info(msg, msg_params=msg_params)
 
         if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
-                result = tools_qt.show_question(msg, "Info Message", force_action=True)
+                title = "Info Message"
+                result = tools_qt.show_question(msg, title, force_action=True)
                 if result:
                     self.project_epsg = '25831'
                     project_srid = '25831'
@@ -273,7 +280,8 @@ class GwAdminButton:
             # Reset count error variable to 0
             self.error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
-            tools_qgis.show_info("A rollback on schema will be done.")
+            msg = "A rollback on schema will be done."
+            tools_qgis.show_info(msg)
             if dlg:
                 tools_gw.close_dialog(dlg)
 
@@ -291,7 +299,8 @@ class GwAdminButton:
             # Reset count error variable to 0
             self.error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
-            tools_qgis.show_info("A rollback on schema will be done.")
+            msg = "A rollback on schema will be done."
+            tools_qgis.show_info(msg)
 
     def manage_cm_process_result(self):
         """"""
@@ -306,7 +315,8 @@ class GwAdminButton:
             # Reset count error variable to 0
             self.cm_error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
-            tools_qgis.show_info("A rollback on schema will be done.")
+            msg = "A rollback on schema will be done."
+            tools_qgis.show_info(msg)
             if self.dlg_readsql_create_cm_project:
                 tools_gw.close_dialog(self.dlg_readsql_create_cm_project)
 
@@ -356,7 +366,8 @@ class GwAdminButton:
         """"""
 
         msg = "Are you sure to update the project schema to last version?"
-        result = tools_qt.show_question(msg, "Info")
+        title = "Info"
+        result = tools_qt.show_question(msg, title)
         if result:
             # Manage Log Messages panel and open tab Giswater PY
             message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
@@ -560,7 +571,8 @@ class GwAdminButton:
         """"""
 
         if not os.path.exists(self.folder_updates):
-            tools_qgis.show_message("The update folder was not found in sql folder")
+            msg = "The update folder was not found in sql folder"
+            tools_qgis.show_message(msg)
             self.error_count = self.error_count + 1
             return
 
@@ -649,7 +661,8 @@ class GwAdminButton:
             if 'Unable to find table' in model.lastError().text():
                 tools_db.reset_qsqldatabase_connection()
             else:
-                tools_qgis.show_warning(model.lastError().text())
+                message = model.lastError().text()
+                tools_qgis.show_warning(message)
         # Attach model to table view
         qtable.setModel(model)
 
@@ -674,7 +687,8 @@ class GwAdminButton:
         # Get SQL folder and check if exists
         self.sql_dir = os.path.normpath(os.path.join(lib_vars.plugin_dir, 'dbmodel'))
         if not os.path.exists(self.sql_dir):
-            tools_qgis.show_message(f"SQL folder not found: {self.sql_dir}")
+            msg = "SQL folder not found"
+            tools_qgis.show_message(msg, parameter=self.sql_dir)
             return
 
         self.project_version = '0'
@@ -783,7 +797,6 @@ class GwAdminButton:
         self.dlg_readsql.btn_delete.clicked.connect(partial(self._delete_schema))
         self.dlg_readsql.btn_copy.clicked.connect(partial(self._copy_schema))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self._create_qgis_template))
-        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_custom_sql_path, self.dlg_readsql))
@@ -795,7 +808,6 @@ class GwAdminButton:
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self._open_manage_field, 'delete'))
-        self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
         self.dlg_readsql.btn_import_osm_streetaxis.clicked.connect(partial(self._import_osm))
 
         # Asset manage buttons
@@ -812,7 +824,10 @@ class GwAdminButton:
         self.dlg_readsql.btn_reload_audit_triggers.clicked.connect(partial(self._reload_audit_triggers))
         self.dlg_readsql.btn_delete_audit.clicked.connect(partial(self._delete_other_schema, 'audit'))
 
+        # i18n
         self.dlg_readsql.btn_i18n.clicked.connect(partial(self._i18n_manager))
+        self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
+        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
 
     def _activate_audit(self):
         """ Activate audit functionality """
@@ -822,12 +837,15 @@ class GwAdminButton:
         rows = tools_db.get_rows(sql, commit=False)
 
         if rows is not None:
-            answer = tools_qt.show_question("This process will active snapshot. Are you sure to continue?", f"Activate water netowrk snapshot")
+            msg = "This process will active snapshot. Are you sure to continue?"
+            title = "Activate water netowrk snapshot"
+            answer = tools_qt.show_question(msg, title)
             if not answer:
                 return
             self.create_process("audit_activation")
         else:
-            tools_qgis.show_warning("Schema audit not found, please create it first")
+            msg = "Schema audit not found, please create it first"
+            tools_qgis.show_warning(msg)
 
     def _reload_audit_triggers(self):
         """ Update audit triggers to start or stop auditing a table """
@@ -836,7 +854,8 @@ class GwAdminButton:
         result = tools_gw.execute_procedure('gw_fct_update_audit_triggers', schema_name=schema_name)
 
         if result:
-            tools_qgis.show_success("Triggers updated successfully")
+            msg = "Triggers updated successfully"
+            tools_qgis.show_success(msg)
 
     def _manage_translations(self):
         """ Initialize the translation functionalities """
@@ -933,7 +952,8 @@ class GwAdminButton:
         self._update_manage_ui()
 
         if not tools_db.check_role(self.username, is_admin=True) and not show_dialog:
-            tools_log.log_warning(f"User not found: {self.username}")
+            msg = "User not found"
+            tools_log.log_warning(msg, parameter=self.username)
             return
 
         # Check PostgreSQL Version
@@ -1042,7 +1062,8 @@ class GwAdminButton:
         # Get gis folder, gis file, project type and schema
         gis_folder = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_folder')
         if gis_folder is None or gis_folder == 'null':
-            tools_qgis.show_warning("GIS folder not set")
+            msg = "GIS folder not set"
+            tools_qgis.show_warning(msg)
             return
 
         tools_gw.set_config_parser('btn_admin', 'qgis_file_path', gis_folder, prefix=False)
@@ -1051,7 +1072,8 @@ class GwAdminButton:
 
         gis_file = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
-            tools_qgis.show_warning("GIS file name not set")
+            msg = "GIS file name not set"
+            tools_qgis.show_warning(msg)
             return
 
         project_type = tools_qt.get_text(self.dlg_readsql, 'cmb_project_type')
@@ -1063,7 +1085,8 @@ class GwAdminButton:
 
         if export_passwd and not self.is_service:
             msg = "Credentials will be stored in GIS project file. Do you want to continue?"
-            answer = tools_qt.show_question(msg, "Warning")
+            title = "Warning"
+            answer = tools_qt.show_question(msg, title)
             if not answer:
                 return
 
@@ -1098,7 +1121,7 @@ class GwAdminButton:
         # Check if exist schema
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            msg = "In order to create a qgis project you have to create a schema first ."
+            msg = "In order to create a qgis project you have to create a schema first."
             tools_qt.show_info_box(msg)
             return
 
@@ -1195,8 +1218,9 @@ class GwAdminButton:
         list_schemas = [row[0] for row in rows if f"{project_name}" in f"{row[0]}"]
         new_name = self._bk_schema_name(list_schemas, f"{project_name}_bk_", 0)
 
-        msg = f"This 'Project_name' is already exist. Do you want rename old schema to '{new_name}"
-        result = tools_qt.show_question(msg, "Info", force_action=True)
+        msg = "This 'Project_name' already exist. Do you want rename old schema to '{0}'"
+        msg_params = (new_name,)
+        result = tools_qt.show_question(msg, "Info", force_action=True, msg_params=msg_params)
         if result:
             self._rename_project_data_schema(str(project_name), str(new_name))
             return True
@@ -1471,7 +1495,8 @@ class GwAdminButton:
         """"""
 
         if not os.path.exists(self.folder_updates):
-            tools_qgis.show_message("The update folder was not found in sql folder")
+            msg = "The update folder was not found in sql folder"
+            tools_qgis.show_message(msg)
             return
 
         folders = sorted(os.listdir(self.folder_updates))
@@ -1688,7 +1713,9 @@ class GwAdminButton:
         if status:
             tools_db.dao.commit()
         else:
-            tools_qt.show_info_box("Reload failed", title="Error")
+            msg = "Reload failed"
+            title = "Error"
+            tools_qt.show_info_box(msg, title=title)
             tools_db.dao.rollback()
             if hasattr(self, 'task_rename_schema'):
                 self.task_rename_schema.cancel()
@@ -1778,8 +1805,9 @@ class GwAdminButton:
         if not self._check_project_name(name, description):
             return
 
-        answer = tools_qt.show_question("This process will take time (few minutes). Are you sure to continue?",
-                                        "Create base schema")
+        msg = "This process will take time (few minutes). Are you sure to continue?"
+        title = "Create base schema"
+        answer = tools_qt.show_question(msg, title)
         if not answer:
             return
 
@@ -1792,8 +1820,10 @@ class GwAdminButton:
 
     def on_btn_create_parent_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        message = f"You are about to perform this action aiming to the following file: {schema_name}\n\nAre you sure you want to continue?"
-        answer = tools_qt.show_question(message, "Create parent schema")
+        msg = "You are about to perform this action aiming to the following file: {0}\n\nAre you sure you want to continue?"
+        msg_params = (schema_name,)
+        title = "Create parent schema"
+        answer = tools_qt.show_question(msg, title, msg_params=msg_params)
 
         if not answer:
             return
@@ -1804,8 +1834,10 @@ class GwAdminButton:
 
     def on_btn_create_example_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        message = f"You are about to perform this action aiming to the following file: {schema_name}\n\nAre you sure you want to continue?"
-        answer = tools_qt.show_question(message, "Create example schema")
+        msg = "You are about to perform this action aiming to the following file: {0}\n\nAre you sure you want to continue?"
+        msg_params = (schema_name,)
+        title = "Create parent schema"
+        answer = tools_qt.show_question(msg, title, msg_params=msg_params)
 
         if not answer:
             return
@@ -1845,12 +1877,14 @@ class GwAdminButton:
         """"""
 
         if not os.path.exists(filedir):
-            tools_log.log_info(f"Folder not found: {filedir}")
+            msg = "Folder not found"
+            tools_log.log_info(msg, parameter=filedir)
             return True
         # Skipping metadata folders for Mac OS
         if '.DS_Store' in filedir:
             return True
-        tools_log.log_info(f"Processing folder: {filedir}")
+        msg = "Processing folder"
+        tools_log.log_info(msg, parameter=filedir)
         filelist = sorted(os.listdir(filedir))
         status = True
         if utils_schema_name:
@@ -1924,8 +1958,10 @@ class GwAdminButton:
                 status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
                 if tools_os.set_boolean(status, False) is False:
                     self.error_count = self.error_count + 1
+                    msg = "{0} error {1}"
                     tools_log.log_info(f"_read_execute_file error {filepath}")
-                    tools_log.log_info(f"Message: {lib_vars.session_vars['last_error']}")
+                    msg = "Message"
+                    tools_log.log_info(msg, parameter=lib_vars.session_vars['last_error'])
                     self.message_infolog = f"_read_execute_file error {filepath}\nMessage: {lib_vars.session_vars['last_error']}"
                     if tools_os.set_boolean(self.dev_commit, False) is False:
                         tools_db.dao.rollback()
@@ -2196,8 +2232,9 @@ class GwAdminButton:
         sql = f"SELECT value FROM {project_name}.config_param_system WHERE parameter='admin_isproduction'"
         row = tools_db.get_row(sql)
         if row and tools_os.set_boolean(row[0], default=False):
-            msg = f"The schema '{project_name}' is being used in production! It can't be deleted."
-            tools_qt.show_info_box(msg, "Warning")
+            msg = "The schema '{0}' is being used in production! It can't be deleted."
+            msg_params = (project_name,)
+            tools_qt.show_info_box(msg, "Warning", msg_params=msg_params)
             return
 
         msg = f"Are you sure you want delete schema '{project_name}' ?"
@@ -2206,8 +2243,8 @@ class GwAdminButton:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = tools_db.execute_sql(sql)
             if status:
-                msg = "Process finished successfully"
-                tools_qt.show_info_box(msg, "Info", parameter="Delete schema")
+                msg = "Process finished successfully: Delete schema"
+                tools_qt.show_info_box(msg, "Info")
                 self._populate_data_schema_name(self.dlg_readsql.cmb_project_type)
                 self._manage_utils()
                 self._set_info_project()
@@ -2215,14 +2252,15 @@ class GwAdminButton:
     def _delete_other_schema(self, schema):
         """ Delete other schema """
 
-        msg = f"Are you sure you want delete schema '{schema}' ?"
-        result = tools_qt.show_question(msg, "Info", force_action=True)
+        msg = "Are you sure you want delete schema '{0}'?"
+        msg_params = (schema,)
+        result = tools_qt.show_question(msg, "Info", force_action=True, msg_params=msg_params)
         if result:
             sql = f'DROP SCHEMA IF EXISTS {schema} CASCADE;'
             status = tools_db.execute_sql(sql)
             if status:
-                msg = "Process finished successfully"
-                tools_qt.show_info_box(msg, "Info", parameter="Delete schema")
+                msg = "Process finished successfully: Delete schema"
+                tools_qt.show_info_box(msg, "Info")
                 self._set_buttons_enabled()
 
     def _build_replace_dlg(self, replace_json):
@@ -2324,8 +2362,7 @@ class GwAdminButton:
 
         # If none of the new words are in the file
         if all_valid:
-            msg = "This will modify your inp file, so a backup will be created.\n" \
-                  "Do you want to proceed?"
+            msg = "This will modify your inp file, so a backup will be created.\nDo you want to proceed?"
             if not tools_qt.show_question(msg):
                 return
 
@@ -2362,8 +2399,8 @@ class GwAdminButton:
             # Get dev config file
             setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
             if not os.path.exists(setting_file):
-                message = "File not found"
-                tools_qgis.show_warning(message, parameter=setting_file)
+                msg = "File not found"
+                tools_qgis.show_warning(msg, parameter=setting_file)
                 return
 
             # Set plugin settings
@@ -2382,8 +2419,8 @@ class GwAdminButton:
             self.xml_set_labels = self.xml_set_labels.split(',')
 
             if not os.path.exists(self.folder_path):
-                message = "Folder not found"
-                tools_qgis.show_warning(message, parameter=self.folder_path)
+                msg = "Folder not found"
+                tools_qgis.show_warning(msg, parameter=self.folder_path)
                 return
 
             # Set wait cursor
@@ -2520,8 +2557,8 @@ class GwAdminButton:
 
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
 
         # Create the dialog and signals
@@ -2847,9 +2884,11 @@ class GwAdminButton:
             os.remove(srcfile)  # remove old encoding file
             os.rename(trgfile, srcfile)  # rename new encoding
         except UnicodeDecodeError:
-            tools_qgis.show_warning('Decode error reading inp file')
+            msg = "Decode error reading inp file"
+            tools_qgis.show_warning(msg)
         except UnicodeEncodeError:
-            tools_qgis.show_warning('Encode error reading inp file')
+            msg = "Encode error reading inp file"
+            tools_qgis.show_warning(msg)
 
         # Read the file
         _file = open(folder_path, "r+", encoding='utf8')
@@ -2971,11 +3010,13 @@ class GwAdminButton:
 
         if status:
             if msg_ok is None:
-                msg_ok = "Process finished successfully"
+                msg = "Process finished successfully"
+                msg_ok = msg
             tools_qgis.show_info(msg_ok, parameter=parameter)
         else:
             if msg_error is None:
-                msg_error = "Process finished with some errors"
+                msg = "Process finished with some errors"
+                msg_error = msg
             tools_qgis.show_warning(msg_error, parameter=parameter)
 
     def _manage_json_message(self, json_result, parameter=None, title=None):
@@ -3022,8 +3063,8 @@ class GwAdminButton:
         if str(self.list_connections) != '[]':
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections)
         else:
-            msg = "You don't have any connection to PostGIS database configurated. " \
-                  "Check your QGIS data source manager and create at least one"
+            msg = ("You don't have any connection to PostGIS database configurated. "
+                  "Check your QGIS data source manager and create at least one")
             tools_qt.show_info_box(msg, "Info")
             return
 
@@ -3170,9 +3211,10 @@ class GwAdminButton:
             self.ud_project_result = row
 
         if self.ws_project_result[0] != self.ud_project_result[0]:
-            msg = (f"You need to select same version for ws and ud projects. "
-                   f"Versions: WS - {self.ws_project_result[0]} ; UD - {self.ud_project_result[0]}")
-            tools_qgis.show_message(msg, 0)
+            msg = ("You need to select same version for ws and ud projects. "
+                   "Versions: WS - {} ; UD - {}")
+            msg_params = (self.ws_project_result, self.ud_project_result,)
+            tools_qgis.show_message(msg, 0, msg_params=msg_params)
             return
 
         # Check is project name already exists
@@ -3180,7 +3222,7 @@ class GwAdminButton:
                f"WHERE schema_name ILIKE 'utils' ORDER BY schema_name")
         row = tools_db.get_row(sql, commit=False)
         if row:
-            msg = f"Schema Utils already exist."
+            msg = "Schema Utils already exist."
             tools_qgis.show_message(msg, 0)
             return
 
@@ -3233,7 +3275,8 @@ class GwAdminButton:
         folder_utils_updates = os.path.join(self.sql_dir, 'corporate', 'utils', 'updates')
 
         if not os.path.exists(folder_utils_updates):
-            tools_qgis.show_message("The update folder was not found in sql folder")
+            msg = "The update folder was not found in sql folder"
+            tools_qgis.show_message(msg)
             self.error_count = self.error_count + 1
             return False
 

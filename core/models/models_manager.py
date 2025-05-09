@@ -65,8 +65,8 @@ class GwTable(object):
         """ Retrieve a record with a specified primary key id."""
 
         if not getattr(self, self.pk()):
-            message = "No primary key value set"
-            tools_qgis.show_info(message, parameter=self.pk)
+            msg = "No primary key value set"
+            tools_qgis.show_info(msg, parameter=self.pk)
             return False
 
         fields = list(vars(self.__class__).keys())
@@ -107,8 +107,8 @@ class GwTable(object):
         status = self.execute_upsert(
             self.table_name(), self.pk(), str(current_pk), fields, values, commit=commit)
         if status:
-            message = "Values has been updated"
-            tools_qgis.show_info(message)
+            msg = "Values has been updated"
+            tools_qgis.show_info(msg)
             return status
 
         # get new added id in case of an insert

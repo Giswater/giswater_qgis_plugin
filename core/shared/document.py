@@ -208,7 +208,7 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT))
         self.dlg_add_doc.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object)
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object, None)
         )
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
@@ -247,8 +247,8 @@ class GwDocument(QObject):
         workcat_id = tools_qt.get_text(dialog, "feature_id_workcat")
 
         if workcat_id == 'null':
-            message = "You need to enter a workcat id"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "You need to enter a workcat id"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         sql = f"INSERT INTO doc_x_workcat (doc_id, workcat_id) VALUES ('{self.doc_id}', '{workcat_id}')"
@@ -264,8 +264,8 @@ class GwDocument(QObject):
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         col_idx = tools_qt.get_col_index_by_col_name(qtable, "workcat_id")
@@ -275,9 +275,9 @@ class GwDocument(QObject):
             workcat_ids.append(workcat_id)
 
         inf_text = ", ".join(workcat_ids)
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
 
         if not answer:
             return
@@ -299,15 +299,15 @@ class GwDocument(QObject):
         psector_name = tools_qt.get_text(dialog, "feature_id_psector")
 
         if psector_name == 'null' or not psector_name:
-            message = "You need to enter a psector name"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "You need to enter a psector name"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         sql = f"SELECT psector_id FROM plan_psector WHERE name = '{psector_name}'"
         row = tools_db.get_row(sql)
         if not row:
-            message = "Psector name not found"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Psector name not found"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
         psector_id = row[0]
 
@@ -323,8 +323,8 @@ class GwDocument(QObject):
         qtable = dialog.tbl_doc_x_psector
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         col_idx = tools_qt.get_col_index_by_col_name(qtable, "psector_name")
@@ -341,14 +341,14 @@ class GwDocument(QObject):
                 psector_ids.append(row[0])
 
         if not psector_ids:
-            message = "No valid psector IDs found"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "No valid psector IDs found"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         inf_text = ", ".join(map(str, psector_names))
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
 
         if not answer:
             return
@@ -370,8 +370,8 @@ class GwDocument(QObject):
         visit_id = tools_qt.get_text(dialog, "feature_id_visit")
 
         if visit_id == 'null' or not visit_id:
-            message = "You need to enter a visit ID"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "You need to enter a visit ID"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         sql = f"INSERT INTO doc_x_visit (doc_id, visit_id) VALUES ('{self.doc_id}', '{visit_id}')"
@@ -386,8 +386,8 @@ class GwDocument(QObject):
         qtable = dialog.tbl_doc_x_visit
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         col_idx = tools_qt.get_col_index_by_col_name(qtable, "visit_id")
@@ -397,9 +397,9 @@ class GwDocument(QObject):
             visit_ids.append(visit_id)
 
         inf_text = ", ".join(map(str, visit_ids))
-        message = "Are you sure you want to delete these records?"
+        msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(message, title, inf_text)
+        answer = tools_qt.show_question(msg, title, inf_text)
 
         if not answer:
             return
@@ -582,7 +582,8 @@ class GwDocument(QObject):
             else:
                 msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
                        "all selected documents and your name won't be used.")
-                answer = tools_qt.show_question(msg, tools_qt.tr("Add document"))
+                title = "Add document"
+                answer = tools_qt.show_question(msg, title)
                 if answer:
                     for file in self.files_path:
                         sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, name)
@@ -593,7 +594,8 @@ class GwDocument(QObject):
             else:
                 msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
                        "all selected documents and your name won't be used.")
-                answer = tools_qt.show_question(msg, tools_qt.tr("Add document"))
+                title = "Add document"
+                answer = tools_qt.show_question(msg, title)
                 if answer:
                     for cont, file in enumerate(self.files_path):
                         if cont == 0:
@@ -608,7 +610,6 @@ class GwDocument(QObject):
         self.point_xy = {"x": None, "y": None}
 
         # Refresh manager table
-        self._refresh_manager_table()
         tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
 
     def _insert_doc_sql(self, doc_type, observ, date, path, the_geom, name):
@@ -663,7 +664,7 @@ class GwDocument(QObject):
             data['gully'] = gully_ids
         parameters = {
             'project_type': self.project_type,
-            'element_id': doc_id,
+            'object_id': doc_id,
             'table_name': 'doc',
             'data': data
         }
@@ -672,6 +673,7 @@ class GwDocument(QObject):
         extras = f'"parameters":{json.dumps(parameters)}'
         body = tools_gw.create_body(extras=extras)
         # Execute function
+        print(body)
         json_result = tools_gw.execute_procedure('gw_fct_manage_relations', body, self.schema_name, log_sql=True)
 
         if json_result['status'] == 'Accepted':
@@ -745,8 +747,8 @@ class GwDocument(QObject):
 
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         row = selected_list[0].row()

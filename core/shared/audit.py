@@ -60,8 +60,8 @@ class GwAudit:
         # Get selected row from table
         selected_list = self.dlg_audit_manager.tbl_audit.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_audit_manager)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
             return
         row = selected_list[0].row()
 
@@ -82,7 +82,8 @@ class GwAudit:
 
         # Check results
         if not old_data or not new_data:
-            tools_qgis.show_warning("No results", dialog=self.dlg_audit_manager)
+            msg = "No results"
+            tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
             return
 
         # Create dialog

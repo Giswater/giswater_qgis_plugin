@@ -173,10 +173,10 @@ class GwMenuLoad(QObject):
 
         tools_qgis.restore_cursor()
 
-        message = "Changes on this page are dangerous and can break Giswater plugin in various ways. \n" \
-                  "You will need to restart QGIS to apply changes. Do you want continue?"
+        msg = ("Changes on this page are dangerous and can break Giswater plugin in various ways. \n"
+                  "You will need to restart QGIS to apply changes. Do you want continue?")
         title = "Advanced Menu"
-        answer = tools_qt.show_question(message, title)
+        answer = tools_qt.show_question(msg, title)
         if not answer:
             return
 
@@ -258,13 +258,13 @@ class GwMenuLoad(QObject):
 
         log_sql = tools_gw.get_config_parser("log", f"log_sql", "user", "init", False, get_none=True)
         if log_sql in ("False", "None"):
-            message = "Variable log_sql from user config file has been enabled."
+            msg = "Variable log_sql from user config file has been enabled."
             tools_gw.set_config_parser("log", "log_sql", "True", file_name="init", prefix=False)
         else:
-            message = "Variable log_sql from user config file has been disabled."
+            msg = "Variable log_sql from user config file has been disabled."
             tools_gw.set_config_parser("log", "log_sql", "None", file_name="init", prefix=False)
 
-        tools_qgis.show_info(message)
+        tools_qgis.show_info(msg)
 
     def _open_current_selections(self):
 
@@ -287,8 +287,8 @@ class GwMenuLoad(QObject):
         if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
             try:
                 if self.task_get_layers.isActive():
-                    message = "ConfigLayerFields task is already active!"
-                    tools_qgis.show_warning(message)
+                    msg = "ConfigLayerFields task is already active!"
+                    tools_qgis.show_warning(msg)
                     return
             except RuntimeError:
                 pass

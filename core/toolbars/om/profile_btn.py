@@ -29,15 +29,16 @@ try:
     import matplotlib.pyplot as plt
 except ImportError:
     plt = None
-    if tools_qt.show_question("Matplotlib Python package not found. Do you want to install Matplotlib?"):
+    msg = "Matplotlib Python package not found. Do you want to install Matplotlib?"
+    if tools_qt.show_question(msg):
         subprocess.run(["python", "-m", "ensurepip"])
         install_matplotlib = subprocess.run(['python', '-m', 'pip', 'install', '-U', 'matplotlib'])
         if install_matplotlib.returncode:
-            tools_qt.show_info_box(
-                "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
-            )
+            msg = "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
+            tools_qt.show_info_box(msg)
         else:
-            tools_qt.show_info_box("Matplotlib installed successfully. Please restart QGIS.")
+            msg = "Matplotlib installed successfully. Please restart QGIS."
+            tools_qt.show_info_box(msg)
 
 
 class GwNodeData:
@@ -198,7 +199,8 @@ class GwProfileButton(GwAction):
         # Manage level and message from query result
         if self.profile_json['message']:
             level = int(self.profile_json['message']['level'])
-            tools_qgis.show_message(self.profile_json['message']['text'], level)
+            msg = self.profile_json['message']['text']
+            tools_qgis.show_message(msg, level)
             if self.profile_json['message']['level'] != 3:
                 return
 
@@ -220,16 +222,16 @@ class GwProfileButton(GwAction):
         mng.window.showMaximized()
 
         if len(self.none_values) > 0:
-            message = "There are missing values in these nodes:"
-            tools_qt.show_info_box(message, inf_text=self.none_values)
+            msg = "There are missing values in these nodes:"
+            tools_qt.show_info_box(msg, inf_text=self.none_values)
 
     def _save_profile(self):
         """ Save profile """
 
         profile_id = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
         if profile_id in (None, 'null'):
-            message = "Profile name is mandatory."
-            tools_qgis.show_warning(message)
+            msg = "Profile name is mandatory."
+            tools_qgis.show_warning(msg)
             return
 
         # Clear and populate list with new arcs
@@ -286,8 +288,8 @@ class GwProfileButton(GwAction):
 
         selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
 
         tools_gw.close_dialog(self.dlg_load)
@@ -316,8 +318,8 @@ class GwProfileButton(GwAction):
 
                 self.id_list = [i.id() for i in it]
                 if not self.id_list:
-                    message = "Couldn't draw profile. You may need to select another exploitation."
-                    tools_qgis.show_warning(message)
+                    msg = "Couldn't draw profile. You may need to select another exploitation."
+                    tools_qgis.show_warning(msg)
                     return
 
                 # Set data in dialog
@@ -349,8 +351,9 @@ class GwProfileButton(GwAction):
         self.first_node = True if not hasattr(self, "first_node") else self.first_node
 
         if self.first_node is False and not self.add_points:
-            message = f"First node already selected with id: {self.initNode}. Select second one."
-            tools_qgis.show_info(message)
+            msg = "First node already selected with id: {0}. Select second one."
+            mgs_params = (self.initNode)
+            tools_qgis.show_info(msg, mgs_params=mgs_params)
 
         # Set vertex marker propierties
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
@@ -404,12 +407,14 @@ class GwProfileButton(GwAction):
                 if self.first_node and not self.add_points:
                     self.initNode = element_id
                     self.first_node = False
-                    message = f"Node 1 selected"
-                    tools_qgis.show_info(message, parameter=element_id)
+                    msg = "Node 1 selected"
+                    tools_qgis.show_info(msg, parameter=element_id)
                 else:
                     if self.element_id == self.initNode or self.element_id == self.endNode \
                             or self.element_id in self.add_points_list:
-                        tools_qgis.show_warning(f"Node already selected: {element_id}")
+                        msg = "Node already selected"
+                        param = element_id
+                        tools_qgis.show_warning(msg, parameter=param)
                         if not self.add_points:
                             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
                             tools_gw.disconnect_signal('profile')
@@ -447,7 +452,8 @@ class GwProfileButton(GwAction):
                         # Manage level and message from query result
                         if result['message']:
                             level = int(result['message']['level'])
-                            tools_qgis.show_message(result['message']['text'], level)
+                            msg = result['message']['text']
+                            tools_qgis.show_message(msg, level)
                             if result['message']['level'] != 3:
                                 # If error reset profile
                                 self._clear_profile()
@@ -1411,8 +1417,8 @@ class GwProfileButton(GwAction):
 
         selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg)
             return
 
         # Selected item from list

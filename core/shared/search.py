@@ -114,9 +114,10 @@ class GwSearch:
                     gridlayout.addWidget(widget, x, 1)
                     x += 1
                 except Exception:
-                    msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
-                          f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
-                    tools_qgis.show_message(msg, 2)
+                    msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND " \
+                          "widgetname='{1}' AND widgettype='{2}'"
+                    msg_params = (field['columnname'], field['widgetname'], field['widgettype'],)
+                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
@@ -202,9 +203,10 @@ class GwSearch:
                         widget = main_tab.findChild(QComboBox, field['widgetname'])
                         tools_gw.fill_combo(widget, field)
                 except Exception:
-                    msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
-                          f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
-                    tools_qgis.show_message(msg, 2)
+                    msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND " \
+                          "widgetname='{1}' AND widgettype='{2}'"
+                    msg_params = (field['columnname'], field['widgetname'], field['widgettype'],)
+                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
 
     # region private functions
 
@@ -308,8 +310,8 @@ class GwSearch:
                 x2, y2 = polygon[2].split(' ')
                 tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
             else:
-                message = f"Zoom unavailable. Doesn't exist the geometry for the street"
-                tools_qgis.show_info(message, parameter=item['display_name'])
+                msg = "Zoom unavailable. Doesn't exist the geometry for the street"
+                tools_qgis.show_info(msg, parameter=item['display_name'])
 
         # Tab 'address'
         elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:

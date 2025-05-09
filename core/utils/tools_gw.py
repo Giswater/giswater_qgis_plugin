@@ -35,7 +35,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
-    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes
+    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes,QgsExpression
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog, QgsExpressionBuilderDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -61,6 +61,8 @@ from ..toolbars.epa import go2epa_selector_btn  # noqa: F401
 from ..shared import psector  # noqa: F401
 from ..shared import audit  # noqa: F401
 from ..toolbars.utilities import snapshot_view  # noqa: F401
+from ..toolbars.edit import connect_link_btn
+from ..toolbars.cm import lot
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -466,11 +468,12 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
     """ Create and return parameters as body to functions"""
 
     info_types = {'full': 1}
+    plugin_version, message = tools_qgis.get_plugin_version()
     info_type = info_types.get(lib_vars.project_vars['info_type'])
     lang = QSettings().value('locale/globalLocale', QLocale().name())
 
     if body:
-        body.setdefault('client', {"device": 4, "lang": lang})
+        body.setdefault('client', {"device": 4, "lang": lang, "version":f'"{plugin_version}"'})
         body["client"].setdefault('device', 4)
         body["client"].setdefault('lang', lang)
         if info_type is not None:
@@ -484,7 +487,7 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
         body["data"].setdefault("pafeInfo", {})
         str_body = f"$${json.dumps(body)}$$"
     else:
-        client = f'$${{"client":{{"device":4, "lang":"{lang}"'
+        client = f'$${{"client":{{"device":4, "lang":"{lang}", "version":"{plugin_version}"'
         if info_type is not None:
             client += f', "infoType":{info_type}'
         if lib_vars.project_epsg is not None:
@@ -584,7 +587,9 @@ def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=
 def draw_wkt_geometry(wkt_string, rubber_band, color, width):
     match = re.match(r'^(\w+)\((.*)\)$', wkt_string)
     if not match:
-        tools_qgis.show_warning('Invalid WKT string', parameter=f'Error in draw_by_json(), wkt={wkt_string}')
+        msg = "Invalid WKT string"
+        param = f'Error in draw_by_json(), wkt={wkt_string}'
+        tools_qgis.show_warning(msg, parameter=param)
     geometry_type = match.group(1)
     coordinates = match.group(2)
 
@@ -614,7 +619,8 @@ def draw_wkt_geometry(wkt_string, rubber_band, color, width):
             geometry_wkt = f'POLYGON(({geometry_coords}))'
             draw_wkt_geometry(geometry_wkt, rubber_band, color, width)
     else:
-        tools_qgis.show_warning('Unsuported geometry type', parameter=geometry_type)
+        msg = "Unsuported geometry type"
+        tools_qgis.show_warning(msg, parameter=geometry_type)
 
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None, widget_table=None):
@@ -1336,8 +1342,8 @@ def delete_selected_rows(widget, table_object):
     # Get selected rows
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
+        msg = "Any record selected"
+        tools_qgis.show_warning(msg)
         return
 
     inf_text = ""
@@ -1479,13 +1485,10 @@ def manage_feature_cat():
 
     body = create_body()
     result = execute_procedure('gw_fct_getcatfeaturevalues', body)
-    # If result ara none, probably the conection has broken so try again
     if not result:
-        result = execute_procedure('gw_fct_getcatfeaturevalues', body)
-        if not result:
-            return None
+        return None
 
-    msg = "Field child_layer of id: "
+    msg = tools_qt.tr("Field child_layer of id: ")
     for value in result['body']['data']['values']:
         tablename = value['child_layer']
         if not tablename:
@@ -1498,8 +1501,8 @@ def manage_feature_cat():
 
     feature_cat = OrderedDict(sorted(feature_cat.items(), key=lambda t: t[0]))
 
-    if msg != "Field child_layer of id: ":
-        tools_qgis.show_warning(f"{msg} is not defined in table cat_feature")
+    if msg != tools_qt.tr("Field child_layer of id: "):
+        tools_qgis.show_warning(f"{msg} {tools_qt.tr("is not defined in table cat_feature")}")
 
     return feature_cat
 
@@ -1654,7 +1657,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                         widget.setProperty('ismandatory', field['isMandatory'])
                     else:
                         widget.setProperty('ismandatory', False)
-                    if 'value' in field:
+                    if field.get('value') is not None:
                         widget.setText(field['value'])
                         widget.setProperty('value', field['value'])
                     widgetcontrols = field.get('widgetcontrols')
@@ -1677,10 +1680,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
-                    if field['value'] is not None and field['value'].lower() == "true":
-                        widget.setChecked(True)
-                    else:
-                        widget.setChecked(False)
+                    if field.get('value') is not None:
+                        widget.setChecked(tools_os.set_boolean(field['value']))
+                        widget.setProperty('value', field['value'])
                     widget.stateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
@@ -1691,8 +1693,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if lib_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
                         widget.setDisplayFormat(lib_vars.date_format)
                     widget.clear()  # Set the date to NULL initially
-                    if field.get('value') not in ('', None, 'null'):
+                    if field.get('value') is not None:
                         date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+                        widget.setProperty('value', field['value'].replace('/', '-'))
                         widget.setDate(date)
                     widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -1706,9 +1709,10 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                         maximumNumber = widgetcontrols.get('maximumNumber')
                         if maximumNumber is not None:
                             widget.setMaximum(maximumNumber)
-                    if field.get('value') not in (None, ""):
+                    if field.get('value') is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
+                        widget.setProperty('value', field['value'])
                     widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'button':
@@ -1743,17 +1747,17 @@ def check_parameters(field):
 
     msg = ""
     if 'widgettype' not in field:
-        msg += "widgettype not found. "
+        msg += tools_qt.tr("widgettype not found. ")
 
     if 'widgetname' not in field:
-        msg += "widgetname not found. "
+        msg += tools_qt.tr("widgetname not found. ")
 
     if field.get('widgettype') not in ('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button'):
-        msg += "widgettype is wrongly configured. Needs to be in " \
-               "('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button')"
+        msg += tools_qt.tr("widgettype is wrongly configured. Needs to be in ")
+        msg += "('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button')"
 
     if 'layoutorder' not in field:
-        msg += "layoutorder not found. "
+        msg += tools_qt.tr("layoutorder not found. ")
 
     if msg != "":
         tools_qgis.show_warning(msg)
@@ -1921,8 +1925,9 @@ def add_button(**kwargs):
     if function_name is not None:
         exist = tools_os.check_python_function(module, function_name)
         if not exist:
-            msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
-            tools_qgis.show_message(msg, 2)
+            msg = "widget {0} has associated function {1}, but {2} not exist"
+            msg_params = (real_name, function_name, function_name,)
+            tools_qgis.show_message(msg, 2, msg_params=msg_params)
             return widget
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
@@ -1977,7 +1982,14 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
         if widget.isReadOnly() and not ignore_editability:
             return _json
-        value = tools_qt.get_text(dialog, widget, return_string_null=False)
+        if isinstance(widget, QLineEdit):
+            selected_id = widget.property("selected_id")
+            if selected_id is not None:
+                value = selected_id  # Use selected_id for saving
+            else:
+                value = tools_qt.get_text(dialog, widget, return_string_null=False)
+        else:
+            value = tools_qt.get_text(dialog, widget, return_string_null=False)
     elif isinstance(widget, QComboBox):
         if not widget.isEnabled() and not ignore_editability:
             return _json
@@ -2038,12 +2050,13 @@ def add_checkbox(**kwargs):
             if function_name:
                 exist = tools_os.check_python_function(module, function_name)
                 if not exist:
-                    msg = f"widget {field['widgetname']} has associated function {function_name}, but {function_name} not exist"
-                    tools_qgis.show_message(msg, 2)
+                    msg = "widget {0} has associated function {1}, but {2} not exist"
+                    msg_params = (field['widgetname'], function_name, function_name,)
+                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
                     return widget
             else:
-                message = "Parameter functionName is null for check"
-                tools_qgis.show_message(message, 2, parameter=widget.objectName())
+                msg = "Parameter functionName is null for check"
+                tools_qgis.show_message(msg, 2, parameter=widget.objectName())
 
     func_params = ""
 
@@ -2052,8 +2065,9 @@ def add_checkbox(**kwargs):
 
         exist = tools_os.check_python_function(module, function_name)
         if not exist:
-            msg = f"widget {field['widgetname']} has associated function {function_name}, but {function_name} not exist"
-            tools_qgis.show_message(msg, 2)
+            msg = "widget {0} has associated function {1}, but {2} not exist"
+            msg_params = (field['widgetname'], function_name, function_name,)
+            tools_qgis.show_message(msg, 2, msg_params=msg_params)
             return widget
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
@@ -2124,17 +2138,18 @@ def add_hyperlink(field):
             if func_name:
                 exist = tools_os.check_python_function(tools_backend_calls, func_name)
                 if not exist:
-                    msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
-                    tools_qgis.show_message(msg, 2)
+                    msg = "widget {0} have associated function {1}, but {2} not exist"
+                    msg_params = (real_name, func_name, func_name,)
+                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
                     return widget
             else:
-                message = "Parameter widgetfunction is null for widget hyperlink"
-                tools_qgis.show_message(message, 2, parameter=real_name)
+                msg = "Parameter widgetfunction is null for widget hyperlink"
+                tools_qgis.show_message(msg, 2, parameter=real_name)
         else:
             tools_log.log_info(field['widgetfunction'])
     else:
-        message = "Parameter widgetfunction not found for widget type hyperlink"
-        tools_qgis.show_message(message, 2)
+        msg = "Parameter widgetfunction not found for widget type hyperlink"
+        tools_qgis.show_message(msg, 2)
 
     if func_name is not None:
         # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
@@ -2173,14 +2188,15 @@ def add_calendar(dlg, fld, **kwargs):
                 function_name = fld['widgetfunction']['functionName']
                 exist = tools_os.check_python_function(module, function_name)
                 if not exist:
-                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                    tools_qgis.show_message(msg, 2)
+                    msg = "widget {0} have associated function {1}, but {2} not exist"
+                    msg_params = (real_name, function_name, function_name,)
+                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
                     return widget
                 if 'parameters' in fld['widgetfunction']:
                     func_params = fld['widgetfunction']['parameters']
             else:
-                message = "Parameter button_function is null for button"
-                tools_qgis.show_message(message, 2, parameter=widget.objectName())
+                msg = "Parameter button_function is null for button"
+                tools_qgis.show_message(msg, 2, parameter=widget.objectName())
 
     kwargs['widget'] = widget
     kwargs['message_level'] = 1
@@ -2201,7 +2217,7 @@ def set_typeahead(field, dialog, widget, completer, feature_id=None):
     if field.get('queryText') is not None and 'queryTextFilter' in field:
         # Typeahead with queryText and queryTextFilter
         widget.setProperty('typeahead', True)
-        model = QStringListModel()
+        model = QStandardItemModel()
         widget.textEdited.connect(partial(fill_typeahead, completer, model, field, dialog, widget, feature_id))
         return widget
 
@@ -2213,8 +2229,9 @@ def set_typeahead(field, dialog, widget, completer, feature_id=None):
         return widget
 
     # If none of the conditions are met, log or display an appropriate message
-    msg = f"Typeahead '{field.get('columnname')}' doesn't have neither a queryText nor comboIds/comboNames."
-    tools_qgis.show_critical(msg)
+    msg = "Typeahead '{0}' doesn't have neither a queryText nor comboIds/comboNames."
+    msg_params = (field.get('columnname'),)
+    tools_qgis.show_critical(msg, msg_params=msg_params)
     return widget
 
 
@@ -2236,15 +2253,15 @@ def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
     # Custom logic for the "Doc" tab
     if active_tab_name == "Doc":
         search_text = tools_qt.get_text(dialog, widget)
-        query = f"SELECT name as idval FROM doc WHERE name ILIKE '%{search_text}%'"
+        query = f"SELECT name as id, name as idval FROM doc WHERE name ILIKE '%{search_text}%'"
         rows = tools_db.get_rows(query)
 
         if not rows:
             # Handle the case when no matching documents are found
             print("No matching documents found.")
-            list_items = []
+            list_items = {}
         else:
-            list_items = [row['idval'] for row in rows]
+            list_items = {row['id']: row['idval'] for row in rows}
 
         tools_qt.set_completer_object(completer, model, widget, list_items)
         return
@@ -2269,10 +2286,7 @@ def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
     if not complet_list or complet_list['status'] == 'Failed':
         return False
 
-    list_items = []
-    for field in complet_list['body']['data']:
-        list_items.append(field['idval'])
-    tools_qt.set_completer_object(completer, model, widget, list_items)
+    tools_qt.set_completer_object(completer, model, widget, complet_list['body']['data'])
 
 
 def set_data_type(field, widget):
@@ -2346,8 +2360,9 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__], c
                 module = globals()[field['widgetfunction']['module']]
             exist = tools_os.check_python_function(module, function_name)
             if not exist:
-                msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                tools_qgis.show_message(msg, 2)
+                msg = "widget {0} have associated function {1}, but {2} not exist"
+                msg_params = (real_name, function_name, function_name,)
+                tools_qgis.show_message(msg, 2, msg_params=msg_params)
                 return widget
             if 'parameters' in field['widgetfunction']:
                 func_params = field['widgetfunction']['parameters']
@@ -2419,12 +2434,13 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
                 if function_name:
                     exist = tools_os.check_python_function(module, function_name)
                     if not exist:
-                        msg = f"widget {widget.property('widgetname')} has associated function {function_name}, but {function_name} not exist"
-                        tools_qgis.show_message(msg, 2)
+                        msg = "widget {0} has associated function {1}, but {2} not exist"
+                        msg_params = (widget.property('widgetname'), function_name, function_name,)
+                        tools_qgis.show_message(msg, 2, msg_params=msg_params)
                         return widget
                 else:
-                    message = "Parameter functionName is null for button"
-                    tools_qgis.show_message(message, 2, parameter=widget.objectName())
+                    msg = "Parameter functionName is null for button"
+                    tools_qgis.show_message(msg, 2, parameter=widget.objectName())
             widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -2449,9 +2465,9 @@ def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
             elem = [combo_ids[i], combo_names[i]]
             combolist.append(elem)
     else:
-        msg = f"key 'comboIds' or/and comboNames not found WHERE widgetname='{field['widgetname']}' " \
-              f"AND widgettype='{field['widgettype']}'"
-        tools_qgis.show_message(msg, 2)
+        msg = "key 'comboIds' or/and comboNames not found WHERE widgetname='{0}' AND widgettype='{1}'"
+        msg_params = (field['widgetname'], field['widgettype'],)
+        tools_qgis.show_message(msg, 2, msg_params=msg_params)
     # Populate combo
     for record in combolist:
         widget.addItem(record[index_to_show], record)
@@ -2769,19 +2785,19 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             # Set exception message details
             title = "Database execution failed"
             msg = ""
-            msg += f"File name: {file_name}\n"
-            msg += f"Function name: {function_name}\n"
-            msg += f"Line number: {function_line}\n"
+            msg += f"{tools_qt.tr('File name')}: {file_name}\n"
+            msg += f"{tools_qt.tr('Function name')}: {function_name}\n"
+            msg += f"{tools_qt.tr('Line number')}: {function_line}\n"
             if 'SQLERR' in json_result:
-                msg += f"Detail: {json_result['SQLERR']}\n"
+                msg += f"{tools_qt.tr('Detail')}: {json_result['SQLERR']}\n"
             elif 'NOSQLERR' in json_result:
-                msg += f"Detail: {json_result['NOSQLERR']}\n"
+                msg += f"{tools_qt.tr('Detail')}: {json_result['NOSQLERR']}\n"
             if 'SQLCONTEXT' in json_result:
-                msg += f"Context: {json_result['SQLCONTEXT']}\n"
+                msg += f"{tools_qt.tr('Context')}: {json_result['SQLCONTEXT']}\n"
             if sql:
                 msg += f"SQL: {sql}\n"
             if 'MSGERR' in json_result:
-                msg += f"Message error: {json_result['MSGERR']}"
+                msg += f"{tools_qt.tr('Message error')}: {json_result['MSGERR']}"
             lib_vars.session_vars['last_error_msg'] = msg
 
             if is_thread:
@@ -3002,7 +3018,8 @@ def get_project_type(schemaname=None):
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
     if not exists:
-        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        msg = "Table not found"
+        tools_qgis.show_warning(msg, parameter=tablename)
         return None
 
     sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
@@ -3025,7 +3042,8 @@ def get_project_info(schemaname=None, order_direction="DESC"):
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
     if not exists:
-        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        msg = "Table not found"
+        tools_qgis.show_warning(msg, parameter=tablename)
         return None
 
     sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
@@ -3227,13 +3245,16 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
     global_vars.canvas.setCursor(cursor)
 
 
-def select_with_expression_dialog(class_object, dialog, table_object):
+def select_with_expression_dialog(class_object, dialog, table_object, selection_mode=None):
     """Select features by expression"""
+
+    if selection_mode is None:
+        selection_mode = GwSelectionMode.EXPRESSION
 
     # Get the current feature type
     class_object.feature_type = get_signal_change_tab(dialog)
     # Connect the signal selection changed
-    connect_signal_selection_changed(class_object, dialog, table_object, GwSelectionMode.EXPRESSION)
+    connect_signal_selection_changed(class_object, dialog, table_object, selection_mode)
     # Show the expression dialog
     show_expression_dialog(class_object.feature_type, dialog, table_object)
     # Disconnect the signal selection changed
@@ -3255,7 +3276,7 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
 
-    if selection_mode != GwSelectionMode.EXPRESSION:
+    if selection_mode not in (GwSelectionMode.EXPRESSION, GwSelectionMode.EXPRESSION_CAMPAIGN):
         tools_qgis.disconnect_signal_selection_changed()
     field_id = f"{class_object.feature_type}_id"
     expected_table_name = f"tbl_{table_object}_x_{class_object.feature_type}"
@@ -3312,9 +3333,9 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         remove_selection()
         load_tableview_psector(dialog, class_object.feature_type)
         set_model_signals(class_object)
-    if selection_mode == GwSelectionMode.CAMPAIGN:
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
         _insert_feature_campaign(dialog, class_object.feature_type, class_object.campaign_id, ids=class_object.list_ids[class_object.feature_type])
-        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
+        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3433,8 +3454,8 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.layers)
 
     if feature_id == 'null':
-        message = "You need to enter a feature id"
-        tools_qt.tools_qgis.show_warning(message, dialog=dialog)
+        msg = "You need to enter a feature id"
+        tools_qt.tools_qgis.show_warning(msg, dialog=dialog)
         return
 
     # Temporarily store IDs to be added for this feature type
@@ -3487,7 +3508,7 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         _insert_feature_campaign(dialog, feature_type, class_object.campaign_id, ids=selected_ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
-        load_tableview_campaign(dialog, feature_type, class_object.campaign_id)
+        load_tableview_campaign(dialog, feature_type, class_object.campaign_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3725,7 +3746,7 @@ def get_icon(icon, folder="dialogs"):
         return None
 
 
-def add_tableview_header(widget: QWidget, field: dict, json_headers: Optional[list] = []) -> QWidget:
+def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_headers: Optional[list] = []) -> QWidget:
 
     model = widget.model()
     if model is None:
@@ -3739,7 +3760,7 @@ def add_tableview_header(widget: QWidget, field: dict, json_headers: Optional[li
         # Get headers
         headers = []
 
-        if field['value'] is not None:
+        if field and field['value'] is not None:
             for x in field['value'][0]:
                 headers.append(x)
 
@@ -3962,8 +3983,8 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
         widget_name = f"tbl_{table_object}_x_{feature_type}"
         widget = tools_qt.get_widget(dialog, widget_name)
         if not widget:
-            message = "Widget not found"
-            tools_qgis.show_warning(message, parameter=widget_name)
+            msg = "Widget not found"
+            tools_qgis.show_warning(msg, parameter=widget_name)
             return
     elif type(table_object) is QTableView:
         widget = table_object
@@ -3980,8 +4001,8 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
         selected_list = []
 
     if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qt.tools_qgis.show_warning(message, dialog=dialog)
+        msg = "Any record selected"
+        tools_qt.tools_qgis.show_warning(msg, dialog=dialog)
         return
 
     if selection_mode == GwSelectionMode.PSECTOR:
@@ -4040,7 +4061,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
         if extra_field is not None and len(selected_list) == 1:
             state = widget.model().record(selected_list[0].row()).value(extra_field)
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
-        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
+        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -4476,7 +4497,8 @@ def get_project_version(schemaname=None):
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
     if not exists:
-        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        msg = "Table not found"
+        tools_qgis.show_warning(msg, parameter=tablename)
         return None
 
     sql = f"SELECT giswater FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
@@ -4602,7 +4624,8 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
     tablename = widget.property('tablename') or f"cm.om_campaign_x_{feature_type}"
 
     if not campaign_id:
-        tools_qgis.show_warning("Campaign ID is missing.")
+        msg = "Campaign ID is missing."
+        tools_qgis.show_warning(msg)
         return
 
     for feature_id in ids or []:
@@ -4614,20 +4637,47 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
         tools_db.execute_sql(sql)
 
 
-def load_tableview_campaign(dialog, feature_type, campaign_id):
+def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
     """ Reload QTableView for campaign_x_<feature_type> """
 
     if not campaign_id:
-        tools_qgis.show_warning("Campaign ID not found.")
+        msg = "Campaign ID not found."
+        tools_qgis.show_warning(msg)
         return
 
     expr = f"campaign_id = '{campaign_id}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
     tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
     message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+
+    # Get ids from qtable (that will only mark the ones whanted in snapping)
+    feature_id_column = f"{feature_type}_id"
+    feature_ids = get_ids_from_qtable(qtable, feature_id_column)
+
+    if feature_ids:
+        expr = QgsExpression(f"{feature_id_column} IN ({','.join(feature_ids)})")
+        tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+
     if message:
         tools_qgis.show_warning(message)
     set_tablemodel_config(dialog, qtable, tablename)
+
+
+def get_ids_from_qtable(qtable, id_column):
+    """ Get all IDs from a QTableView model for the given column """
+    ids = []
+    model = qtable.model()
+
+    if model is None:
+        return ids
+
+    for row in range(model.rowCount()):
+        index = model.index(row, model.fieldIndex(id_column))
+        value = model.data(index)
+        if value is not None:
+            ids.append(str(value))
+
+    return ids
 
 
 def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=None):
@@ -4726,7 +4776,9 @@ def _get_parser_from_filename(filename):
     try:
         parser.read(filepath)
     except (configparser.DuplicateSectionError, configparser.DuplicateOptionError, configparser.ParsingError) as e:
-        tools_qgis.show_critical(f"Error parsing file: {filepath}", parameter=e)
+        msg = "Error parsing file: {0}"
+        msg_params = (filepath,)
+        tools_qgis.show_critical(msg, parameter=e, msg_params=msg_params)
         return filepath, None
 
     return filepath, parser
@@ -4873,12 +4925,13 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
                     if function_name:
                         exist = tools_os.check_python_function(module, function_name)
                         if not exist:
-                            msg = f"widget {widget.property('widgetname')} has associated function {function_name}, but {function_name} not exist"
-                            tools_qgis.show_message(msg, 2)
+                            msg = "widget {0} has associated function {1}, but {2} not exist"
+                            msg_params = (widget.property('widgetname'), function_name, function_name,)
+                            tools_qgis.show_message(msg, 2, msg_params=msg_params)
                             return widget
                     else:
-                        message = "Parameter functionName is null for button"
-                        tools_qgis.show_message(message, 2, parameter=widget.objectName())
+                        msg = "Parameter functionName is null for button"
+                        tools_qgis.show_message(msg, 2, parameter=widget.objectName())
 
             func_params = ""
             function_name = ""
@@ -4887,8 +4940,9 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
 
                 exist = tools_os.check_python_function(module, function_name)
                 if not exist:
-                    msg = f"widget {widget.property('widgetname')} has associated function {function_name}, but {function_name} not exist"
-                    tools_qgis.show_message(msg, 2)
+                    msg = "widget {0} has associated function {1}, but {2} not exist"
+                    msg_params = (widget.property('widgetname'), function_name, function_name,)
+                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
                     return widget
                 if 'parameters' in widgetfunction[i]:
                     func_params = widgetfunction[i]['parameters']
@@ -4967,10 +5021,6 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
         # Add widget into layout
         add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
-        # Apply consistent column stretch across all layouts
-        layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
-        layout.setColumnStretch(1, 3)  # Widget column stretch for sufficient space
-
 
 def set_widgets(dialog, complet_result, field, tablename, class_info):
     """
@@ -5009,9 +5059,9 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
             label.setToolTip(field['label'].capitalize())
 
     if 'widgettype' in field and not field['widgettype']:
-        message = "The field widgettype is not configured for"
-        msg = f"formname:{tablename}, columnname:{field['columnname']}"
-        tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
+        msg = "The field widgettype is not configured for"
+        param = f"formname:{tablename}, columnname:{field['columnname']}"
+        tools_qgis.show_message(msg, 2, parameter=param, dialog=dialog)
         return label, widget
 
     try:
@@ -5019,9 +5069,9 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
                   "class": class_info}
         widget = globals()[f"_manage_{field['widgettype']}"](**kwargs)
     except Exception as e:
-        msg = (f"{type(e).__name__}: {e} Python function: tools_gw.set_widgets. WHERE columname='{field['columnname']}' "
-               f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
-        tools_qgis.show_message(msg, 2, dialog=dialog)
+        msg = "{0}: {1} Python function: tools_gw.set_widgets. WHERE columname='{2}' AND widgetname='{3}' AND widgettype='{4}'"
+        msg_params = (type(e).__name__, e, field['columnname'], field['widgetname'], field['widgettype'],)
+        tools_qgis.show_message(msg, 2, msg_params=msg_params)
         return label, widget
 
     try:
@@ -5257,29 +5307,6 @@ def _manage_tablewidget(**kwargs):
     """
 
     return _manage_tableview(**kwargs)
-
-
-def reload_layers_filters():
-
-    # Get basic_selector_options param
-    sector_options = get_config_value("basic_selector_options", table='config_param_system')
-    json_options = json.loads(sector_options[0])
-    muni_option = json_options.get('muniClientFilter', False)
-    sector_option = json_options.get('sectorClientFilter', False)
-
-    # Build and Apply filters
-    selector = GwSelector()
-    muni_filter, sector_filter = selector._build_filter()
-
-    # Create a dict to manage filters
-    filters = {
-        "muni_filter": muni_filter if muni_option and muni_filter else None,
-        "sector_filter": sector_filter if sector_option and sector_filter else None,
-    }
-
-    # Apply filters
-    selector._apply_filter(filters["muni_filter"], filters["sector_filter"])
-
 # endregion
 
 # region Right Click TableView Menu

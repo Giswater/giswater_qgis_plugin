@@ -5,25 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
 from enum import Enum
 
 from qgis.PyQt.QtCore import QRect, Qt
-from qgis.PyQt.QtWidgets import QApplication, QMenu, QAction, QActionGroup
-from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsProject, QgsWkbTypes
+from qgis.PyQt.QtWidgets import QApplication, QActionGroup, QWidget, QAction, QMenu
+from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsFeatureRequest
 
 from ..maptool import GwMaptool
-from ...ui.ui_manager import GwDialogShowInfoUi
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt
+from ....libs import tools_qgis, tools_qt, tools_db
 from ...threads.connect_link import GwConnectLink
-from .... import global_vars
-
-
+from ...ui.ui_manager import GwConnectLinkUi
 class SelectAction(Enum):
-    CLOSEST_ARCS = tools_qt.tr('Closest arcs')
-    FORCED_ARCS = tools_qt.tr('Forced arcs')
-    FORCED_ARCS2 = tools_qt.tr('Forced arcs (selecting only arcs)')
+    CONNEC_LINK = tools_qt.tr('Connec to link')
+    GULLY_LINK = tools_qt.tr('Gully to link')
 
 
 class GwConnectLinkButton(GwMaptool):
@@ -36,23 +31,91 @@ class GwConnectLinkButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.dragging = False
         self.select_rect = QRect()
+        self.project_type = tools_gw.get_project_type()
 
-        # Store the current selected action
-        self.current_action = SelectAction.CLOSEST_ARCS
+        # Check project type
+        if self.project_type != 'ws':
+            # Create a dropdown menu
+            self.menu = QMenu()
 
-        # Create a dropdown menu
-        self.menu = QMenu()
+            # Fill the menu
+            self._fill_action_menu()
 
-        # Dynamically set actions from the SelectAction Enum, excluding FORCED_ARCS2
-        self.actions = [action for action in SelectAction if action != SelectAction.FORCED_ARCS2]
+            # Add menu to toolbar
+            if toolbar is not None and self.action is not None:
+                self.action.setMenu(self.menu)
+                toolbar.addAction(self.action)
 
-        # Fill the menu
-        self._fill_action_menu()
+    def clicked_event(self):
+        """ Event when button is clicked """
 
-        # Add menu to toolbar
-        if toolbar is not None:
-            self.action.setMenu(self.menu)
-            toolbar.addAction(self.action)
+        if self.project_type == 'ws':
+            self.feature_type = 'connec'
+            self.open_dlg()
+
+    def open_dlg(self):
+        """ Open connect link dialog """
+
+        # Create form and body
+        form = {"formName": "generic", "formType": f"link_to_{self.feature_type}"}
+        body = {"client": {"cur_user": tools_db.current_user}, "form": form}
+
+        # Execute procedure
+        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+
+        # Create dialog
+        self.dlg_connect_link = GwConnectLinkUi(self)
+        tools_gw.load_settings(self.dlg_connect_link)
+        tools_gw.manage_dlg_widgets(self, self.dlg_connect_link, json_result)
+
+        # Get dynamic widgets
+        self.txt_id = self.dlg_connect_link.findChild(QWidget, "tab_none_id")
+        self.pipe_diameter = self.dlg_connect_link.findChild(QWidget, "tab_none_pipe_diameter")
+        self.max_distance = self.dlg_connect_link.findChild(QWidget, "tab_none_max_distance")
+        self.tbl_ids = self.dlg_connect_link.findChild(QWidget, "tab_none_tbl_ids")
+
+        # Set combo ids editable
+        self.txt_id.setEditable(True)
+
+        # Connect signal when row is clicked
+        self.tbl_ids.clicked.connect(self.on_row_clicked)
+
+        # Add headers to table
+        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header':f'{self.feature_type}_id'}])
+
+        # Set window title from dialog depending of the current feature
+        self.dlg_connect_link.setWindowTitle(tools_qt.tr(f"{self.feature_type.capitalize()} to link"))
+
+        # Open dialog
+        tools_gw.open_dialog(self.dlg_connect_link, 'connect_link')
+
+    def on_row_clicked(self, index):
+        """ Set QLineEdit text of id with selected row id """
+
+        value = self.tbl_ids.model().data(index)
+        tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_id", value)
+
+
+    def fill_tbl_ids(self, layer):
+        """ Fill table with selected features """
+
+        # Initialize field variable
+        field = { "value": [] }
+
+        # Loop througth canvas selected features
+        for connec_feature in layer.selectedFeatures():
+
+            # Build object with feature selected
+            selected_feature = { f"{self.feature_type}_id": connec_feature.attribute(f"{self.feature_type}_id") }
+
+            # Add built object to the list
+            field["value"].append(selected_feature)
+
+        # Clear previous table rows
+        self.tbl_ids.model().removeRows(0, self.tbl_ids.model().rowCount())
+
+        # Fill table with selected features
+        tools_gw.fill_tableview_rows(self.tbl_ids, field)
 
     def _fill_action_menu(self):
         """Fill the dropdown menu with actions."""
@@ -64,27 +127,34 @@ class GwConnectLinkButton(GwMaptool):
 
         # Create actions for the menu
         ag = QActionGroup(self.iface.mainWindow())
-        for action in self.actions:
+        for action in SelectAction:
             # Use `action.value` for user-friendly labels
             obj_action = QAction(action.value, ag)
             self.menu.addAction(obj_action)
+            # connect signal
+            obj_action.triggered.connect(self._action_triggered)
 
-            # Connect signals for action selection
-            obj_action.triggered.connect(partial(self._set_current_action, action))
-            obj_action.triggered.connect(partial(super().clicked_event))
+    def _action_triggered(self):
+        """ Action triggered event """
 
-    def _set_current_action(self, action_name):
-        """Set the currently selected action."""
-        self.current_action = action_name
+        # Get the action that was triggered
+        action = self.sender()
 
-    # region QgsMapTools inherited
+        # Check if the action is valid
+        if action is None:
+            return
+
+        # Get the selected action from the menu
+        selected_action = SelectAction(action.text())
+
+        # Open dialog based on selected action
+        self.feature_type = 'connec' if selected_action == SelectAction.CONNEC_LINK else 'gully'
+        self.open_dlg()
+
     """ QgsMapTools inherited event functions """
 
     def activate(self):
-
-        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
-        if hasattr(self.action, "setChecked"):
-            self.action.setChecked(True)
+        """ Activate map tool """
 
         # Rubber band
         tools_gw.reset_rubberband(self.rubber_band)
@@ -98,9 +168,9 @@ class GwConnectLinkButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select connecs or gullies with qgis tool and use right click to connect them with network. " \
-                      "CTRL + SHIFT over selection to remove it"
-            tools_qgis.show_info(message, duration=9)
+            msg = ("Select connecs or gullies with qgis tool and use right click to connect them with network. "
+                      "CTRL + SHIFT over selection to remove it")
+            tools_qgis.show_info(msg, duration=9)
 
     def canvasMoveEvent(self, event):
         """ With left click the digitizing is finished """
@@ -126,184 +196,46 @@ class GwConnectLinkButton(GwMaptool):
         if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
             try:
                 if self.connect_link_task.isActive():
-                    message = "Connect link task is already active!"
-                    tools_qgis.show_warning(message)
+                    msg = "Connect link task is already active!"
+                    tools_qgis.show_warning(msg)
                     return
             except RuntimeError:
                 pass
 
         if event.button() == Qt.LeftButton:
 
-            # Get coordinates
-            event_point = self.snapper_manager.get_event_point(event)
+            # Set valid values for rectangle's width and height
+            if self.select_rect.width() == 1:
+                self.select_rect.setLeft(self.select_rect.left() + 1)
 
-            # Simple selection
-            if not self.dragging:
+            if self.select_rect.height() == 1:
+                self.select_rect.setBottom(self.select_rect.bottom() + 1)
 
-                # Snap to connec or gully
-                result = self.snapper_manager.snap_to_project_config_layers(event_point)
-                if not result.isValid():
-                    return
+            self._set_rubber_band()
+            self._select_multiple_features(self.selected_rectangle)
+            self.dragging = False
 
-                # Check if it belongs to 'connec' or 'gully' group
-                layer = self.snapper_manager.get_snapped_layer(result)
-                feature_id = self.snapper_manager.get_snapped_feature_id(result)
-                layer_connec = tools_qgis.get_layer_by_tablename(layer)
-                layer_gully = tools_qgis.get_layer_by_tablename(layer)
-                if layer_connec or layer_gully:
-                    key = QApplication.keyboardModifiers()
-                    # If Ctrl+Shift is clicked: deselect snapped feature
-                    if key == (Qt.ControlModifier | Qt.ShiftModifier):
-                        layer.deselect([feature_id])
-                    else:
-                        # If Ctrl is not clicked: remove previous selection
-                        if key != Qt.ControlModifier:
-                            layer.removeSelection()
-                        layer.select([feature_id])
-
-                    # Hide marker
-                    self.vertex_marker.hide()
-
-            # Multiple selection
-            else:
-                # Set valid values for rectangle's width and height
-                if self.select_rect.width() == 1:
-                    self.select_rect.setLeft(self.select_rect.left() + 1)
-
-                if self.select_rect.height() == 1:
-                    self.select_rect.setBottom(self.select_rect.bottom() + 1)
-
-                self._set_rubber_band()
-                self._select_multiple_features(self.selected_rectangle)
-                self.dragging = False
-
-                # Refresh map canvas
-                tools_gw.reset_rubberband(self.rubber_band)
+            # Refresh map canvas
+            tools_gw.reset_rubberband(self.rubber_band)
 
             # Force reload dataProvider of layer
             tools_qgis.set_layer_index('v_edit_link')
             tools_qgis.set_layer_index('v_edit_vnode')
 
-        elif event.button() == Qt.RightButton:
-            # Check selected records
-            number_connec_features = 0
-            # Get the connection layer and count selected features
-            layer_connec = tools_qgis.get_layer_by_tablename('v_edit_connec')
-            if layer_connec:
-                number_connec_features += layer_connec.selectedFeatureCount()
-            if number_connec_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible():
-                # Check if the current action is "FORCED ARCS"
-                if self.current_action == SelectAction.FORCED_ARCS:
-                    if number_connec_features > 0:
-                        # Notify user and switch to arc selection
-                        self._set_current_action(SelectAction.FORCED_ARCS2)
-                        tools_qgis.show_info(
-                            "Nodes selected. Now, please select an arc on the map and confirm with a right-click.")
-                        return
-                    else:
-                        tools_qgis.show_warning("No nodes selected. Please select nodes first.")
-                        return
-                # Handle the FORCED_ARCS2 case
-                if self.current_action == SelectAction.FORCED_ARCS2:
-                    # Retrieve the selected arc
-                    layer_arc = tools_qgis.get_layer_by_tablename('v_edit_arc')
-                    selected_arc = None
-                    selected_arc_msg = ""
-                    if layer_arc and layer_arc.selectedFeatureCount() > 0:
-                        # Get the first selected arc (or handle multiple arcs if needed)
-                        selected_arc_feature = layer_arc.selectedFeatures()[0]  # Use the first selected arc
-                        selected_arc = selected_arc_feature.attribute("arc_id")
-                        selected_arc_msg = f" Arc ID: {selected_arc}"
-                    # Append arc info to the message
-                    message = f"For the selected {selected_arc_msg}, wil have a number of features selected in the group of connec"
-                else:
-                    # Default message for non-FORCED_ARCS2 cases
-                    message = "Number of features selected in the group of connec"
-                # Show the confirmation dialog
-                title = "Connect to network"
-                answer = tools_qt.show_question(message, title, parameter=str(number_connec_features))
-                if answer:
-                    # Create the task
-                    if self.current_action == SelectAction.FORCED_ARCS2:
-                        # Include the selected arc in the function call
-                        self.connect_link_task = GwConnectLink(
-                            "Connect link", self, 'connec', layer_connec, selected_arc=selected_arc
-                        )
-                    else:
-                        # Default behavior for non-FORCED_ARCS2 cases
-                        self.connect_link_task = GwConnectLink(
-                            "Connect link", self, 'connec', layer_connec
-                        )
-                    # Add and trigger the task
-                    QgsApplication.taskManager().addTask(self.connect_link_task)
-                    QgsApplication.taskManager().triggerTask(self.connect_link_task)
-                else:
-                    self.manage_gully_result()
-            else:
-                self.manage_gully_result()
-            # Cancel map tool if no features are selected or the layer is not visible
-            if number_connec_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(
-                    layer_connec).isVisible() is False:
-                self.cancel_map_tool()
+    def manage_result(self, result):
 
-    def manage_result(self, result, layer):
-
-        if result and result['status'] != 'Failed':
-            self.dlg_info = GwDialogShowInfoUi()
-            tools_gw.load_settings(self.dlg_info)
-            self.dlg_info.btn_accept.hide()
-            self.dlg_info.setWindowTitle('Connect to network')
-            self.dlg_info.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_info))
-            self.dlg_info.rejected.connect(partial(tools_gw.close_dialog, self.dlg_info))
-            if layer.name() == 'Connec' and global_vars.project_type == 'ud':
-                self.dlg_info.btn_close.clicked.connect(partial(self.manage_gully_result))
-                self.dlg_info.rejected.connect(partial(self.manage_gully_result))
-            tools_gw.fill_tab_log(self.dlg_info, result['body']['data'], False)
-            tools_gw.open_dialog(self.dlg_info, dlg_name='dialog_text')
-        else:
-            tools_qgis.show_warning("gw_fct_setlinktonetwork (Check log messages)", title='Function error')
-
-        layer.removeSelection()
+        if result and result['status'] == 'Failed':
+            msg = "gw_fct_setlinktonetwork (Check log messages)"
+            tools_qgis.show_warning(msg, title='Function error')
 
         # Refresh map canvas
-        if layer.name() == 'Gully' or global_vars.project_type == 'ws':
-            tools_gw.reset_rubberband(self.rubber_band)
-            self.refresh_map_canvas()
-            self.iface.actionPan().trigger()
+        tools_gw.reset_rubberband(self.rubber_band)
+        self.refresh_map_canvas()
+        self.iface.actionPan().trigger()
 
         # Force reload dataProvider of layer
         tools_qgis.set_layer_index('v_edit_link')
         tools_qgis.set_layer_index('v_edit_vnode')
-
-    def manage_gully_result(self):
-
-        # Manage if task is already running
-        if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
-            try:
-                if self.connect_link_task.isActive():
-                    message = "Connect link task is already active!"
-                    tools_qgis.show_warning(message)
-                    return
-            except RuntimeError:
-                pass
-
-        layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
-        if layer_gully:
-            # Check selected records
-            number_features = 0
-            number_features += layer_gully.selectedFeatureCount()
-            if number_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible():
-                message = "Number of features selected in the group of"
-                title = "Connect to network"
-                answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
-                if answer:
-                    # Create link
-                    self.connect_link_task = GwConnectLink("Connect link", self, 'gully', layer_gully)
-                    QgsApplication.taskManager().addTask(self.connect_link_task)
-                    QgsApplication.taskManager().triggerTask(self.connect_link_task)
-
-            if number_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible() is False:
-                self.cancel_map_tool()
 
     # endregion
 
@@ -331,43 +263,222 @@ class GwConnectLinkButton(GwMaptool):
         self.selected_rectangle = QgsRectangle(ll, ur)
 
     def _select_multiple_features(self, select_geometry):
+        """ Select multiple features on canvas """
 
+        # Get pressed keys on keyboard
         key = QApplication.keyboardModifiers()
 
-        # If Ctrl+Shift clicked: remove features from selection
-        if key == (Qt.ControlModifier | Qt.ShiftModifier):
-            behaviour = QgsVectorLayer.RemoveFromSelection
-        # If Ctrl clicked: add features to selection
-        elif key == Qt.ControlModifier:
-            behaviour = QgsVectorLayer.AddToSelection
-        # If Ctrl not clicked: add features to selection
-        else:
-            behaviour = QgsVectorLayer.AddToSelection
+        # Set behaviour depending of the pressed keys on keyboard
+        behaviour = QgsVectorLayer.RemoveFromSelection if key == (Qt.ControlModifier | Qt.ShiftModifier) else QgsVectorLayer.AddToSelection
 
-        # Selection for all connec and gully layers
-        if self.current_action in (SelectAction.FORCED_ARCS, SelectAction.CLOSEST_ARCS):
-            layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
-            if layer:
-                layer.selectByRect(select_geometry, behaviour)
+        # Get arc layer
+        layer = tools_qgis.get_layer_by_tablename('v_edit_arc')
 
-            layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
-            if layer:
-                layer.selectByRect(select_geometry, behaviour)
-            return
-        if self.current_action == SelectAction.FORCED_ARCS2:
-            layer = tools_qgis.get_layer_by_tablename('v_edit_arc')
-            if layer:
-                # Use selectByRect to initially select features
-                layer.selectByRect(select_geometry, behaviour)
+        # Check if layer exists
+        if layer:
+            # Use selectByRect to initially select features
+            layer.selectByRect(select_geometry, behaviour)
 
-                # Get the selected features after selection
-                selected_features = layer.selectedFeatures()
+            # Get the selected features after selection
+            features_list = layer.selectedFeatures()
 
-                # If more than one feature is selected, keep only the first one
-                if len(selected_features) > 1:
-                    # Get the IDs of all selected features
-                    selected_ids = [feature.id() for feature in selected_features]
-                    # Keep only the first ID and deselect the others
-                    layer.selectByIds([selected_ids[0]])
+            # If more than one feature is selected, keep only the first one
+            if len(features_list) > 1:
+                # Get the IDs of all selected features
+                selected_ids = [feature.id() for feature in features_list]
+                # Keep only the first ID and deselect the others
+                layer.selectByIds([selected_ids[0]])
+
+        # Get current feature layer (connec/gully)
+        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature_type}')
+
+        # Check if layer exists
+        if layer:
+
+            # Select/Unselect features of the selected geometry
+            layer.selectByRect(select_geometry, behaviour)
+
+            # Refresh table
+            self.fill_tbl_ids(layer)
+
+    def _selection_init(self):
+        """ Initialize selection mode """
+
+        self.iface.actionSelect().trigger()
+
+    def _selection_end(self):
+        """ Process selected features """
+
+        # Get current feature layer (connec/gully)
+        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature_type}')
+
+        # Refresh table
+        self.fill_tbl_ids(layer)
+        self.iface.actionPan().trigger()
 
     # endregion
+
+def add(**kwargs):
+    """ Add button clicked event """
+
+    # Get class
+    this = kwargs['class']
+
+    # Get selected id
+    selected_id = tools_qt.get_combo_value(this.dlg_connect_link, "tab_none_id")
+
+    # Check if selected id is not empty
+    if selected_id is None or selected_id == '':
+        message = "Please select a feature to add"
+        tools_qgis.show_warning(message, title='Connect to network')
+        return
+
+    # Create expression filter
+    expr_filter = f"{this.feature_type}_id = '{selected_id}'"
+    is_valid, expr = tools_qt.check_expression_filter(expr_filter)
+
+    # Get layer from feature
+    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature_type}')
+
+    # Check if layer exists and expression is valid
+    if layer and is_valid:
+
+        # Get all selected features in canvas + the new current selected feature
+        features = layer.selectedFeatures() + list(layer.getFeatures(QgsFeatureRequest(expr)))
+        id_list = [feature.id() for feature in features]
+
+        # Show selected ids in canvas
+        layer.selectByIds(id_list)
+
+    # Refresh table
+    this.fill_tbl_ids(layer)
+
+def remove(**kwargs):
+    """ Remove button clicked event """
+
+    # Get class
+    this = kwargs['class']
+
+    # Get selected id
+    selected_id = tools_qt.get_combo_value(this.dlg_connect_link, "tab_none_id")
+
+    # Check if selected id is not empty
+    if selected_id is None or selected_id == '':
+        message = "Please select a feature to remove"
+        tools_qgis.show_warning(message, title='Connect to network')
+        return
+
+    # Get layer from feature
+    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature_type}')
+
+    # Check if layer exists
+    if layer:
+
+        # Initialize an empty list
+        id_list = []
+
+        # Loop througth selected features
+        for feature in layer.selectedFeatures():
+
+            # Append features expect the feature to remove
+            if feature.attribute(f"{this.feature_type}_id") != selected_id:
+                id_list.append(feature.id())
+
+        # Show selected ids in canvas
+        layer.selectByIds(id_list)
+
+    # Clear selected id txt and refresh table
+    tools_qt.set_widget_text(this.dlg_connect_link, "tab_none_id", "")
+    this.fill_tbl_ids(layer)
+
+def accept(**kwargs):
+    """ Accept button clicked event """
+
+    # Get class
+    this = kwargs['class']
+
+    # Get selected linkcat
+    this.linkcat = tools_qt.get_combo_value(this.dlg_connect_link, "tab_none_linkcat")
+
+    # Check input values
+    if this.pipe_diameter.text() == '' or this.max_distance.text() == '' or this.linkcat == '':
+        message = "Please fill all fields in the dialog"
+        tools_qgis.show_warning(message, title='Connect to network', dialog=this.dlg_connect_link)
+        return
+
+    # Get arc layer
+    layer_arc = tools_qgis.get_layer_by_tablename('v_edit_arc')
+    selected_arc = None
+
+    # Check if the layer is valid and has selected arc
+    if layer_arc and layer_arc.selectedFeatureCount() > 0:
+        selected_arc_feature = layer_arc.selectedFeatures()[0]  # Use the first selected arc
+        selected_arc = selected_arc_feature.attribute("arc_id")
+
+    # Initialize an empty list
+    this.ids = []
+    model = this.tbl_ids.model()
+
+    # Check if table is empty
+    if model.rowCount() == 0:
+        message = "Please select a feature to add"
+        tools_qgis.show_warning(message, title='Connect to network', dialog=this.dlg_connect_link)
+        return
+
+    # Loop throught table rows
+    for row in range(model.rowCount()):
+        item = model.item(row, 0) # Get the row and the first column (0)
+        if item is not None:
+            this.ids.append(int(item.text()))
+
+    # Create connect link task
+    this.connect_link_task = GwConnectLink("Connect link", this, this.feature_type, selected_arc=selected_arc)
+
+    # Add and trigger the task
+    QgsApplication.taskManager().addTask(this.connect_link_task)
+    QgsApplication.taskManager().triggerTask(this.connect_link_task)
+
+    # Cancel map tool if no features are selected or the layer is not visible
+    this.cancel_map_tool()
+
+    # Close dialog
+    tools_gw.close_dialog(this.dlg_connect_link)
+
+def snapping(**kwargs):
+    """ Accept button clicked event """
+
+    GwMaptool.clicked_event(kwargs['class'])
+
+def close(**kwargs):
+    """ Close button clicked event """
+
+    kwargs['class'].cancel_map_tool()
+    tools_gw.close_dialog(kwargs['dialog'])
+
+
+def filter_expression(**kwargs):
+    """Select features by expression for mapzone config"""
+
+    # Get class
+    this = kwargs['class']
+
+    # Get current layer and feature type
+    layer_name = f'v_edit_{this.feature_type}'
+
+    layer = tools_qgis.get_layer_by_tablename(layer_name)
+    if not layer:
+        return
+
+    # Set active layer
+    this.iface.setActiveLayer(layer)
+    tools_qgis.set_layer_visible(layer)
+
+    # Show expression dialog
+    tools_gw.select_with_expression_dialog_custom(
+        this,
+        this.dlg_connect_link,
+        None,  # No table object needed for expression selection
+        layer_name,
+        this._selection_init,
+        this._selection_end
+    )

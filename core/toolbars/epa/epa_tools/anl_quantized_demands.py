@@ -138,8 +138,9 @@ class QuantizedDemands:
         elif len(sufixes_that_exist) > 1:
             file_names = [f'"{file_name}{sufix}"' for sufix in sufixes_that_exist]
             all_files = ", ".join(file_names)
-            msg = f"The files {all_files} already exist. Do you want to overwrite them?"
-            return tools_qt.show_question(msg)
+            msg = "The files {0} already exist. Do you want to overwrite them?"
+            msg_params = (all_files,)
+            return tools_qt.show_question(msg, msg_params=msg_params)
 
         return True
 
@@ -165,35 +166,41 @@ class QuantizedDemands:
         # Input INP file
         input_file = self.dlg_epa.data_inp_input_file.toPlainText()
         if not input_file:
-            tools_qt.show_info_box("You should select an input INP file!")
+            msg = "You should select an input INP file!"
+            tools_qt.show_info_box(msg)
             return False
 
         # Config file
         config_file = dlg.data_config_file.toPlainText()
         if not config_file or not Path(config_file).exists():
-            tools_qt.show_info_box("You should select an config file!")
+            msg = "You should select an config file!"
+            tools_qt.show_info_box(msg)
             return False
 
         try:
             config = ConfigQD(config_file)
         except Exception as e:
-            tools_qt.show_info_box(f"Configuration file couldn't be imported:\n{e}")
+            msg = "Configuration file couldn't be imported:\n{0}"
+            msg_params = (str(e),)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return False
 
         # Output
         output_folder = dlg.data_output_folder.toPlainText()
         if not output_folder:
-            tools_qt.show_info_box("You should select an output folder!")
+            msg = "You should select an output folder!"
+            tools_qt.show_info_box(msg)
             return False
         elif not Path(output_folder).exists():
-            tools_qt.show_info_box(
-                f'"{output_folder}" does not exist. Please select a valid folder.'
-            )
+            msg = '"{0}" does not exist. Please select a valid folder.'
+            msg_params = (output_folder,)
+            tools_qt.show_info_box(msg, msg_params=msg_params)
             return False
 
         file_name = dlg.txt_filename.text()
         if not file_name:
-            tools_qt.show_info_box("You should inform a file name!")
+            msg = "You should inform a file name!"
+            tools_qt.show_info_box(msg)
             return False
 
         self.input_file = input_file

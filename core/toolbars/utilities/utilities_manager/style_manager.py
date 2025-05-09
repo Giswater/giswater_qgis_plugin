@@ -154,7 +154,8 @@ class GwStyleManager:
 
         # Validate that the mandatory fields are not empty
         if not feature_id or not idval:
-            tools_qgis.show_warning("Feature ID and Idval cannot be empty.", dialog=self.style_mng_dlg)
+            msg = "Feature ID and Idval cannot be empty."
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
             return
 
         # Start building the SQL query
@@ -177,12 +178,15 @@ class GwStyleManager:
         try:
             # Execute the SQL command and retrieve the new ID
             tools_db.execute_sql(sql)
-            tools_qgis.show_info("Feature added successfully!", dialog=self.style_mng_dlg)
+            msg = "Feature added successfully!"
+            tools_qgis.show_info(msg, dialog=self.style_mng_dlg)
             self.populate_stylegroup_combobox()
             dialog_create.accept()
 
         except Exception as e:
-            tools_qgis.show_warning(f"Failed to add feature: {e}", dialog=self.style_mng_dlg)
+            msg = "Failed to add feature"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
     def _filter_styles(self):
         """Applies a filter based on the text in the textbox and the selection in the combobox."""
@@ -218,7 +222,9 @@ class GwStyleManager:
 
         # Check for any errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(f"Database Error: {model.lastError().text()}", dialog=self.style_mng_dlg)
+            msg = "Database Error"
+            param = model.lastError().text()
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
             return
 
         self.style_mng_dlg.tbl_style.setModel(model)
@@ -278,7 +284,8 @@ class GwStyleManager:
         selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText()
 
         if not selected_stylegroup_name:
-            tools_qgis.show_warning("Please select a category to update.", dialog=self.style_mng_dlg)
+            msg = "Please select a category to update."
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
             return
         
         dialog_update = GwUpdateStyleGroupUi(self)
@@ -310,7 +317,8 @@ class GwStyleManager:
 
         # Validate that the mandatory fields are not empty
         if not new_category_name:
-            tools_qgis.show_warning("Category name cannot be empty.", dialog=self.style_mng_dlg)
+            msg = "Category name cannot be empty."
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
             return
 
         # Start building the SQL query
@@ -326,28 +334,30 @@ class GwStyleManager:
         try:
             # Execute the SQL command and retrieve the new ID
             tools_db.execute_sql(sql)
-            tools_qgis.show_info("Category updated successfully!", dialog=self.style_mng_dlg)
+            msg = "Category updated successfully!"
+            tools_qgis.show_info(msg, dialog=self.style_mng_dlg)
             self.populate_stylegroup_combobox()
             tools_gw.close_dialog(dialog_update)
 
         except Exception as e:
-            msg = tools_qt.tr("Failed to update category:")
-            tools_qgis.show_warning(f"{msg} {e}", dialog=self.style_mng_dlg)
+            msg = "Failed to update category"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
     def _delete_style_group(self):
         """Logic for deleting a style group with cascade deletion."""
         selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText()
 
         if not selected_stylegroup_name:
-            tools_qgis.show_warning("Please select a style group to delete.", dialog=self.style_mng_dlg)
+            msg = "Please select a style group to delete."
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
             return
 
-        confirm = tools_qt.show_question(
-            f"Are you sure you want to delete the style group '{selected_stylegroup_name}'?\n\n"
-            "This will also delete all related entries in the sys_style table.",
-            "Confirm Cascade Delete",
-            force_action=True
-        )
+        msg = ("Are you sure you want to delete the style group '{0}'?\n\n"
+                "This will also delete all related entries in the sys_style table.",
+                "Confirm Cascade Delete")
+        msg_params = (selected_stylegroup_name,)
+        confirm = tools_qt.show_question(msg, force_action=True, msg_params=msg_params)
 
         if not confirm:
             return
@@ -359,12 +369,16 @@ class GwStyleManager:
             sql_delete_group = f"DELETE FROM config_style WHERE idval = '{selected_stylegroup_name}'"
             tools_db.execute_sql(sql_delete_group)
 
-            tools_qgis.show_info(f"Style group '{selected_stylegroup_name}' and related entries have been deleted.", dialog=self.style_mng_dlg)
+            msg = "Style group '{0}' and related entries have been deleted."
+            msg_params = (selected_stylegroup_name,)
+            tools_qgis.show_info(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
             self.populate_stylegroup_combobox()
             self._load_styles()
 
         except Exception as e:
-            tools_qgis.show_warning(f"Failed to delete style group: {e}", dialog=self.style_mng_dlg)
+            msg = "Failed to delete style group"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
     # Functions for btn style top right of the dialog
     def _delete_selected_styles(self):
@@ -372,14 +386,13 @@ class GwStyleManager:
         selected_rows = self.style_mng_dlg.tbl_style.selectionModel().selectedRows()
 
         if len(selected_rows) == 0:
-            tools_qgis.show_warning("Please select one or more styles to delete.", dialog=self.style_mng_dlg)
+            msg = "Please select one or more styles to delete."
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
             return
 
-        confirm = tools_qt.show_question(
-            "Are you sure you want to delete the selected styles?",
-            "Confirm Deletion",
-            force_action=True
-        )
+        msg = "Are you sure you want to delete the selected styles?"
+        title = "Confirm Deletion"
+        confirm = tools_qt.show_question(msg, title, force_action=True)
 
         if not confirm:
             return
@@ -400,7 +413,9 @@ class GwStyleManager:
                 row_result = tools_db.get_row(sql_get_id)
 
                 if not row_result:
-                    tools_qgis.show_warning(f"Could not find the corresponding ID for the selected style {idval}.", dialog=self.style_mng_dlg)
+                    msg = "Could not find the corresponding ID for the selected style {0}."
+                    msg_params = (idval,)
+                    tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
                     continue
 
                 styleconfig_id = row_result[0]
@@ -412,11 +427,14 @@ class GwStyleManager:
                 )
                 tools_db.execute_sql(sql_delete_style)
 
-            tools_qgis.show_info("Selected styles were successfully deleted.", dialog=self.style_mng_dlg)
+            msg = "Selected styles were successfully deleted."
+            tools_qgis.show_info(msg, dialog=self.style_mng_dlg)
             self._load_styles()
 
         except Exception as e:
-            tools_qgis.show_warning(f"Failed to delete styles: {e}", dialog=self.style_mng_dlg)
+            msg = "Failed to delete styles"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
     def _load_layers_with_geom(self):
         """Load layers with geometry for the Add Style button."""
@@ -424,13 +442,16 @@ class GwStyleManager:
             body = tools_gw.create_body()
             json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
             if not json_result or json_result['status'] != 'Accepted':
-                tools_qgis.show_warning("Failed to load layers.", dialog=self.style_mng_dlg)
+                msg = "Failed to load layers."
+                tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
                 return None
 
             return json_result['body']['data']['fields']
 
         except Exception as e:
-            tools_qgis.show_warning(f"Failed to load layers: {e}", dialog=self.style_mng_dlg)
+            msg = "Failed to load layers"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
             return None
 
     def _populate_layers_menu(self, layers):
@@ -478,7 +499,9 @@ class GwStyleManager:
             self.style_mng_dlg.btn_add_style.setMenu(menu)
 
         except Exception as e:
-            tools_qgis.show_warning(f"Failed to load layers: {e}", dialog=self.style_mng_dlg)
+            msg = "Failed to load layers"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
     def _add_layer_style(self, table_name, geom_field):
         """Add a new style for the specified layer, copying from 'GwBasic' if available."""
@@ -486,9 +509,8 @@ class GwStyleManager:
             selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText().strip()
 
             if not selected_stylegroup_name:
-                tools_qgis.show_warning(
-                    "Please select a style group before adding a new style.", dialog=self.style_mng_dlg
-                )
+                msg = "Please select a style group before adding a new style."
+                tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
                 return
 
             sql_get_id = (
@@ -498,9 +520,9 @@ class GwStyleManager:
             row_result = tools_db.get_row(sql_get_id)
 
             if not row_result:
-                tools_qgis.show_warning(
-                    f"Could not find an ID for the style group '{selected_stylegroup_name}'.", dialog=self.style_mng_dlg
-                )
+                msg ="Could not find an ID for the style group '{0}'."
+                msg_params = (selected_stylegroup_name,)
+                tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
                 return
 
             new_styleconfig_id = row_result[0]
@@ -512,10 +534,9 @@ class GwStyleManager:
             style_exists = tools_db.get_row(sql_check_exists)[0] > 0
 
             if style_exists:
-                tools_qgis.show_warning(
-                    f"A style already exists for the layer '{table_name}' in the selected style group.",
-                    dialog=self.style_mng_dlg
-                )
+                msg ="A style already exists for the layer '{0}' in the selected style group."
+                msg_params = (table_name,)
+                tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
                 return
 
             sql_gw_basic = (
@@ -544,27 +565,26 @@ class GwStyleManager:
             tools_db.execute_sql(sql_insert_style)
 
             # Show success message
-            msg = (
-                f"A new style has been added to '{selected_stylegroup_name}' for the layer '{table_name}' "
-                f"using the 'GwBasic' style information.\n"
-                f"You can change it and use 'Update Style' to create a personalized version."
-            )
-            tools_qgis.show_message(msg, 3, dialog=self.style_mng_dlg)
+            msg = ("A new style has been added to '{0}' for the layer '{1}' "
+                "using the 'GwBasic' style information.\n"
+                "You can change it and use 'Update Style' to create a personalized version.")
+            msg_params = (selected_stylegroup_name, table_name,)
+            tools_qgis.show_message(msg, 3, dialog=self.style_mng_dlg, msg_params=msg_params)
 
             self._load_styles()
 
         except Exception as e:
-            tools_qgis.show_warning(
-                f"An error occurred while adding the style for layer '{table_name}':\n{str(e)}",
-                dialog=self.style_mng_dlg
-            )
+            msg = "An error occurred while adding the style for layer '{0}':\n{1}"
+            msg_params = (table_name, str(e),)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
 
     def _update_selected_style(self):
         """Update the selected styles in the database with the current QGIS layer style."""
         selected_rows = self.style_mng_dlg.tbl_style.selectionModel().selectedRows()
 
         if not selected_rows:
-            tools_qgis.show_warning("Please select one or more styles to update.", dialog=self.style_mng_dlg)
+            msg = "Please select one or more styles to update."
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
             return
 
         try:
@@ -575,16 +595,19 @@ class GwStyleManager:
                 layername = self.style_mng_dlg.tbl_style.model().data(layername_index)
                 idval = self.style_mng_dlg.tbl_style.model().data(idval_index)
 
-                msg = f"Are you sure you want to update the style of {layername} ({idval}) with the symbology" \
-                          f" of the layer in the project? \nYou are going to lose previous information!"
-
-                reply = tools_qt.show_question(msg, "Update Confirmation", force_action=True)
+                msg = ("Are you sure you want to update the style of {0} ({1}) with the symbology"
+                        " of the layer in the project? \nYou are going to lose previous information!")
+                msg_params = (layername, idval,)
+                title = "Update Confirmation"
+                reply = tools_qt.show_question(msg, title, force_action=True, msg_params=msg_params)
                 if not reply:
                     continue
 
                 layer = tools_qgis.get_layer_by_tablename(layername)
                 if layer is None:
-                    tools_qgis.show_warning(f"Layer '{layername}' not found in QGIS.", dialog=self.style_mng_dlg)
+                    msg = "Layer '{0}' not found in QGIS."
+                    msg_params = (layername,)
+                    tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
                     continue
 
                 style_value = ''
@@ -601,7 +624,9 @@ class GwStyleManager:
                 )
                 styleconfig_id = tools_db.get_row(sql_get_id)
                 if not styleconfig_id:
-                    tools_qgis.show_warning(f"Could not find config_style ID for idval '{idval}'.", dialog=self.style_mng_dlg)
+                    msg = "Could not find config_style ID for idval '{0}'."
+                    msg_params = (idval,)
+                    tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
                     continue
 
                 sql_update = (
@@ -616,7 +641,9 @@ class GwStyleManager:
                 self._load_styles()
 
         except Exception as e:
-            tools_qgis.show_warning(f"Failed to update styles: {e}", dialog=self.style_mng_dlg)
+            msg = "Failed to update styles"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
     def _refresh_all_styles(self, dialog):
         """Refresh all styles in the database based on the current QGIS layer styles."""
@@ -643,12 +670,15 @@ class GwStyleManager:
                     # Apply the style with force_refresh=True
                     apply_styles_to_layers(styleconfig_id[0], style, force_refresh=True)
                 # TODO: show message of all refreshed styles
-                # tools_qgis.show_warning(f"Style '{style}' not found in database.", dialog=self.style_mng_dlg)
+                # msg = f"Style '{style}' not found in database."
+                # tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
 
             msg = "All layers have been successfully refreshed."
             tools_qgis.show_success(msg, dialog=dialog)
             self._load_styles()
 
         except Exception as e:
-            tools_qgis.show_warning(f"Database Error: {e}", dialog=self.style_mng_dlg)
+            msg = "Database Error"
+            param = str(e)
+            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 

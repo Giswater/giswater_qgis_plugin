@@ -232,7 +232,9 @@ def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[
         config.write_to_file(config_path)
         tools_log.log_info(f"Configuration saved to {config_path}")
     except Exception as e:
-        tools_qgis.show_warning(f"Error saving the configuration: {e}", dialog=self_cls.dlg_config)
+        msg = "Error saving the configuration"
+        param = str(e)
+        tools_qgis.show_warning(msg, dialog=self_cls.dlg_config, parameter=param)
 
 
 def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwInpConfig]:
@@ -266,9 +268,11 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
         _set_combo_values_from_swmm_catalogs(self_cls, config.catalogs)
 
     if str(self_cls.file_path) != str(config.file_path):
-        tools_qgis.show_warning("The configuration file doesn't match the selected INP file. Some options may not be loaded.", dialog=self_cls.dlg_config)
+        msg = "The configuration file doesn't match the selected INP file. Some options may not be loaded."
+        tools_qgis.show_warning(msg, dialog=self_cls.dlg_config)
     else:
-        tools_qgis.show_success("Configuration loaded successfully", dialog=self_cls.dlg_config)
+        msg = "Configuration loaded successfully"
+        tools_qgis.show_success(msg, dialog=self_cls.dlg_config)
 
     return config
 

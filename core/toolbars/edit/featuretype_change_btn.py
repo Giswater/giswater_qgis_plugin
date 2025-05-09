@@ -91,8 +91,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on feature to change its type"
-            tools_qgis.show_info(message)
+            msg = "Click on feature to change its type"
+            tools_qgis.show_info(msg)
 
     def canvasMoveEvent(self, event):
 
@@ -279,7 +279,8 @@ def btn_accept_featuretype_change(**kwargs):
     featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
 
     if featurecat_id.startswith('(') and featurecat_id.endswith(')'):
-        tools_qgis.show_warning("Error replacing feature. Chose a valid catalog.")
+        msg = "Error replacing feature. Chose a valid catalog."
+        tools_qgis.show_warning(msg)
         return
     fluid_type = tools_qt.get_combo_value(dialog, 'tab_none_fluid_type', 1)
     if fluid_type is None:
@@ -314,18 +315,18 @@ def btn_accept_featuretype_change(**kwargs):
             # Execute SQL function and show result to the user
             complet_result = tools_gw.execute_procedure('gw_fct_setchangefeaturetype', body)
             if not complet_result:
-                message = "Error replacing feature"
-                tools_qgis.show_warning(message)
+                msg = "Error replacing feature"
+                tools_qgis.show_warning(msg)
                 # Check in init config file if user wants to keep map tool active or not
                 this.manage_active_maptool()
                 tools_gw.close_dialog(dialog)
                 return
 
             if "Accepted" in complet_result['status']:
-                msg_text = complet_result['message']['text']
-                if msg_text is None:
-                    msg_text = 'Replace feature done successfully'
-                tools_qgis.show_info(msg_text)
+                msg = complet_result['message']['text']
+                if msg is None:
+                    msg = 'Replace feature done successfully'
+                tools_qgis.show_info(msg)
             elif "Failed" in complet_result['status']:
                 return
 
@@ -333,13 +334,13 @@ def btn_accept_featuretype_change(**kwargs):
             tools_gw.set_config_parser("btn_featuretype_change", "featurecat_id", featurecat_id)
 
         else:
-            message = "Field catalog_id required!"
-            tools_qgis.show_warning(message, dialog=dialog)
+            msg = "Field catalog_id required!"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
     else:
-        message = "Feature has not been updated because no catalog has been selected"
-        tools_qgis.show_warning(message)
+        msg = "Feature has not been updated because no catalog has been selected"
+        tools_qgis.show_warning(msg)
 
     # Close form
     tools_gw.close_dialog(dialog)

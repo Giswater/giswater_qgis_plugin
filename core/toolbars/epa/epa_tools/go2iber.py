@@ -50,7 +50,8 @@ class Go2Iber:
         self.dlg_go2iber = GwGo2IberUi(self)
         tools_gw.load_settings(self.dlg_go2iber)
         if self.dr_options_class is None:
-            tools_qgis.show_warning("DRAIN plugin not found")
+            msg = "DRAIN plugin not found"
+            tools_qgis.show_warning(msg)
             return
 
         # Connect signals
@@ -61,7 +62,8 @@ class Go2Iber:
         self.dlg_go2iber.btn_cancel.clicked.connect(partial(self._btn_cancel_clicked))
 
         # Open dialog
-        tools_qgis.show_warning("This tool is still in developement, it might not work as intended.", dialog=self.dlg_go2iber)  # TODO: remove this
+        msg = "This tool is still in developement, it might not work as intended."
+        tools_qgis.show_warning(msg, dialog=self.dlg_go2iber)  # TODO: remove this
         tools_gw.open_dialog(self.dlg_go2iber, dlg_name='go2iber')
 
     def _btn_swmm_options_clicked(self):
@@ -71,7 +73,8 @@ class Go2Iber:
 
     def _btn_iber_options_clicked(self):
         if self.dr_options_class is None:
-            tools_qgis.show_warning("DRAIN plugin not found")
+            msg = "DRAIN plugin not found"
+            tools_qgis.show_warning(msg)
             return
         self.dr_options = self.dr_options_class.DrOptions(tabs_to_show=["tab_main", "tab_rpt_iber", "tab_plugins"])
         self.dr_options.open_options_dlg()
@@ -83,8 +86,8 @@ class Go2Iber:
         if hasattr(self, 'go2iber_task') and self.go2iber_task is not None:
             try:
                 if self.go2iber_task.isActive():
-                    message = "Go2Iber task is already active!"
-                    tools_qgis.show_warning(message)
+                    msg = "Go2Iber task is already active!"
+                    tools_qgis.show_warning(msg)
                     return
             except RuntimeError:
                 pass
@@ -162,14 +165,16 @@ class Go2Iber:
         if result_name == '':
             self.dlg_go2iber.txt_result_name.setStyleSheet("border: 1px solid red")
             msg = "This parameter is mandatory. Please, set a value"
-            tools_qt.show_details(msg, title="Result name", inf_text=None)
+            title = "Result name"
+            tools_qt.show_details(msg, title, inf_text=None)
             return False
 
         # Control folder path
         if folder_path == '':
             self.dlg_go2iber.txt_path.setStyleSheet("border: 1px solid red")
             msg = "This parameter is mandatory. Please, set a value"
-            tools_qt.show_details(msg, title="Folder path", inf_text=None)
+            title = "Folder path"
+            tools_qt.show_details(msg, title, inf_text=None)
             return False
 
         self.dlg_go2iber.txt_result_name.setStyleSheet(None)
@@ -179,7 +184,8 @@ class Go2Iber:
         row = tools_db.get_row(sql)
         if row:
             msg = "Result name already exists, do you want overwrite?"
-            answer = tools_qt.show_question(msg, title="Alert")
+            title = "Alert"
+            answer = tools_qt.show_question(msg, title)
             if not answer:
                 return False
 

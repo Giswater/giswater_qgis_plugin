@@ -55,7 +55,6 @@ load_project_menu = None
 
 # region global user variables (values are initialized on load project without changes during session)
 shortcut_keys = []                      # An instance of used shortcut_keys for Giswater menu. This keys are configurated on file "init.config" from user config path "/user/AppData/Roaming/Giswater/"
-feature_cat = None                      # Dictionary to keep every record of table 'cat_feature'. Stored here to avoid executing gw_fct_getcatfeaturevalues multiple times
 # endregion
 
 

@@ -136,8 +136,8 @@ class GwComposerPages(GwTask):
                 exporter_settings.rasterizeWholeImage = True
                 exporter.exportToPdf(path, exporter_settings)
                 if not os.path.exists(path):
-                    message = "Cannot create file, check if its open"
-                    tools_qgis.show_warning(message, parameter=path)
+                    msg = "Cannot create file, check if its open"
+                    tools_qgis.show_warning(msg, parameter=path)
             except Exception as e:
                 tools_log.log_warning(str(e))
                 msg = "Cannot create file, check if selected giswater_advancedtools is the correct giswater_advancedtools"

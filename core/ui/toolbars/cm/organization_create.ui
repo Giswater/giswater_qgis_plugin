@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>team_create</class>
- <widget class="QDialog" name="team_create">
+ <class>organization_create</class>
+ <widget class="QDialog" name="organization_create">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>434</width>
-    <height>344</height>
+    <width>477</width>
+    <height>363</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Create team</string>
+   <string>Create organization</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <layout class="QGridLayout" name="lyt_create_team_1"/>
+    <layout class="QGridLayout" name="lyt_create_org_1"/>
    </item>
    <item>
     <spacer name="verticalSpacer">
