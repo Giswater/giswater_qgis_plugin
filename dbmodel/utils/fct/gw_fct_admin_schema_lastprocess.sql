@@ -238,7 +238,9 @@ BEGIN
 				ALTER TABLE inp_pattern_value DROP COLUMN IF EXISTS _factor_24;
 				ALTER TABLE config_graph_mincut DROP COLUMN IF EXISTS _to_arc;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS hydrometer_category;
-				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS cat_hydrometer_id ;
+				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS cat_hydrometer_id;
+				ALTER TABLE connec DROP COLUMN IF EXISTS _valve_type;
+				ALTER TABLE connec DROP COLUMN IF EXISTS _shutoff_valve;
 			ELSE
 				ALTER TABLE cat_arc_shape DROP COLUMN IF EXISTS _tsect_id;
 				ALTER TABLE cat_arc_shape DROP COLUMN IF EXISTS _curve_id;
