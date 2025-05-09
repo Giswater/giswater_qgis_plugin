@@ -1383,10 +1383,13 @@ AS WITH
 			gully.gullycat_id,
 			cat_gully.matcat_id AS cat_gully_matcat,
 			gully.units,
+			gully.units_placement,
 			gully.groove,
 			gully.groove_height,
 			gully.groove_length,
 			gully.siphon,
+			gully.siphon_type,
+			gully.odorflap,
 			gully._connec_arccat_id as connec_arccat_id, -- todo: remove this
 			gully.connec_length,
 			CASE
@@ -1400,25 +1403,24 @@ AS WITH
 			gully.top_elev - gully.ymax + gully.sandbox AS connec_y1,
 			gully.connec_y2,
 			gully.arc_id,
-            gully.omunit_id,
 			gully.epa_type,
 			gully.state,
 			gully.state_type,
 			gully.expl_id,
 			exploitation.macroexpl_id,
+			gully.muni_id,
 			CASE
 				WHEN link_planned.sector_id IS NULL THEN sector_table.sector_id
 				ELSE link_planned.sector_id
 			END AS sector_id,
 			CASE
-				WHEN link_planned.sector_id IS NULL THEN sector_table.sector_type
-				ELSE link_planned.sector_type
-			END AS sector_type,
-			CASE
 				WHEN link_planned.macrosector_id IS NULL THEN sector_table.macrosector_id
 				ELSE link_planned.macrosector_id
 			END AS macrosector_id,
-			gully.muni_id,
+			CASE
+				WHEN link_planned.sector_id IS NULL THEN sector_table.sector_type
+				ELSE link_planned.sector_type
+			END AS sector_type,
 			CASE
 				WHEN link_planned.drainzone_id IS NULL THEN drainzone_table.drainzone_id
 				ELSE link_planned.drainzone_id
@@ -1429,18 +1431,6 @@ AS WITH
 			END AS drainzone_type,
             gully.drainzone_outfall,
 			CASE
-				WHEN link_planned.omzone_id IS NULL THEN omzone_table.omzone_id
-				ELSE link_planned.omzone_id
-			END AS omzone_id,
-			CASE
-				WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
-				ELSE link_planned.omzone_type
-			END AS omzone_type,
-			CASE
-				WHEN link_planned.macroomzone_id IS NULL THEN omzone_table.macroomzone_id
-				ELSE link_planned.macroomzone_id
-			END AS macroomzone_id,
-			CASE
 				WHEN link_planned.dwfzone_id IS NULL THEN dwfzone_table.dwfzone_id
 				ELSE link_planned.dwfzone_id
 			END AS dwfzone_id,
@@ -1449,6 +1439,19 @@ AS WITH
 				ELSE link_planned.dwfzone_type
 			END AS dwfzone_type,
 			gully.dwfzone_outfall,
+			CASE
+				WHEN link_planned.omzone_id IS NULL THEN omzone_table.omzone_id
+				ELSE link_planned.omzone_id
+			END AS omzone_id,
+			CASE
+				WHEN link_planned.macroomzone_id IS NULL THEN omzone_table.macroomzone_id
+				ELSE link_planned.macroomzone_id
+			END AS macroomzone_id,
+			CASE
+				WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
+				ELSE link_planned.omzone_type
+			END AS omzone_type,
+            gully.omunit_id,
 			gully.minsector_id,
 			gully.macrominsector_id,
 			gully.soilcat_id,
@@ -1478,6 +1481,14 @@ AS WITH
 			gully.builtdate,
 			gully.enddate,
 			gully.ownercat_id,
+            CASE
+				WHEN link_planned.exit_id IS NULL THEN gully.pjoint_id
+				ELSE link_planned.exit_id
+			END AS pjoint_id,
+			CASE
+				WHEN link_planned.exit_type IS NULL THEN gully.pjoint_type
+				ELSE link_planned.exit_type
+			END AS pjoint_type,
 			gully.placement_type,
 			gully.access_type,
 			gully.asset_id,
@@ -1485,6 +1496,7 @@ AS WITH
 			gully.adescript,
 			gully.verified,
 			gully.uncertain,
+            gully.datasource,
 			cat_gully.label,
 			gully.label_x,
 			gully.label_y,
@@ -1509,18 +1521,7 @@ AS WITH
 			gully.created_by,
 			date_trunc('second'::text, gully.updated_at) AS updated_at,
 			gully.updated_by,
-			gully.the_geom,
-            CASE
-				WHEN link_planned.exit_id IS NULL THEN gully.pjoint_id
-				ELSE link_planned.exit_id
-			END AS pjoint_id,
-			CASE
-				WHEN link_planned.exit_type IS NULL THEN gully.pjoint_type
-				ELSE link_planned.exit_type
-			END AS pjoint_type,
-			gully.units_placement,
-			gully.siphon_type,
-			gully.odorflap
+			gully.the_geom
 			FROM gully_selector
 			JOIN gully using (gully_id)
 			JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
