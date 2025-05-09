@@ -71,7 +71,7 @@ class GwStyleManager:
 
     def _show_context_menu(self, qtableview):
         """ Show custom context menu """
-        menu = QMenu(qtableview)        
+        menu = QMenu(qtableview)
 
         action_update = QAction("Update style", qtableview)
         action_update.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update_style"))
@@ -287,7 +287,7 @@ class GwStyleManager:
             msg = "Please select a category to update."
             tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
             return
-        
+
         dialog_update = GwUpdateStyleGroupUi(self)
         tools_gw.load_settings(dialog_update)
 
@@ -307,7 +307,7 @@ class GwStyleManager:
             return
         dialog_update.btn_accept.setEnabled(True)
         tools_qt.set_stylesheet(dialog_update.category_rename_copy, style="")
-        dialog_update.category_rename_copy.setToolTip("") 
+        dialog_update.category_rename_copy.setToolTip("")
 
     def _handle_update_feature(self, dialog_update, old_category_name):
         """Handles the logic when the add button is clicked."""

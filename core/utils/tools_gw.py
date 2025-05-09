@@ -24,18 +24,20 @@ from collections import OrderedDict
 from functools import partial
 from datetime import datetime
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, QRegExp, QItemSelectionModel
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, QRegExp, \
+    QItemSelectionModel
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QVBoxLayout, QDialog, QDialogButtonBox
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QVBoxLayout, QDialog, \
+    QDialogButtonBox
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
-    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes,QgsExpression
+    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes, QgsExpression
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog, QgsExpressionBuilderDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -473,7 +475,7 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
     lang = QSettings().value('locale/globalLocale', QLocale().name())
 
     if body:
-        body.setdefault('client', {"device": 4, "lang": lang, "version":f'"{plugin_version}"'})
+        body.setdefault('client', {"device": 4, "lang": lang, "version": f'"{plugin_version}"'})
         body["client"].setdefault('device', 4)
         body["client"].setdefault('lang', lang)
         if info_type is not None:

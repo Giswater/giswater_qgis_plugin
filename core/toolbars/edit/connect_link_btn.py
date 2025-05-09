@@ -81,7 +81,7 @@ class GwConnectLinkButton(GwMaptool):
         self.tbl_ids.clicked.connect(self.on_row_clicked)
 
         # Add headers to table
-        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header':f'{self.feature_type}_id'}])
+        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header': f'{self.feature_type}_id'}])
 
         # Set window title from dialog depending of the current feature
         self.dlg_connect_link.setWindowTitle(tools_qt.tr(f"{self.feature_type.capitalize()} to link"))
@@ -100,13 +100,13 @@ class GwConnectLinkButton(GwMaptool):
         """ Fill table with selected features """
 
         # Initialize field variable
-        field = { "value": [] }
+        field = {"value": []}
 
         # Loop througth canvas selected features
         for connec_feature in layer.selectedFeatures():
 
             # Build object with feature selected
-            selected_feature = { f"{self.feature_type}_id": connec_feature.attribute(f"{self.feature_type}_id") }
+            selected_feature = {f"{self.feature_type}_id": connec_feature.attribute(f"{self.feature_type}_id")}
 
             # Add built object to the list
             field["value"].append(selected_feature)
@@ -427,7 +427,7 @@ def accept(**kwargs):
 
     # Loop throught table rows
     for row in range(model.rowCount()):
-        item = model.item(row, 0) # Get the row and the first column (0)
+        item = model.item(row, 0)  # Get the row and the first column (0)
         if item is not None:
             this.ids.append(int(item.text()))
 

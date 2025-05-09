@@ -21,7 +21,7 @@ from ...libs import lib_vars, tools_qgis, tools_qt, tools_os
 
 class GwSelector:
 
-    def __init__(self, is_campaign= False):
+    def __init__(self, is_campaign=False):
         self.checkall = False
         self.help_button = None
         self.scrolled_amount = 0
