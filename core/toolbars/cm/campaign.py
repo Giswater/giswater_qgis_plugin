@@ -208,9 +208,7 @@ class Campaign:
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
         self.dialog.tab_widget.currentChanged.connect(self._on_tab_change)
-        self.setup_tab_relations()
-        self._check_enable_tab_relations()
-        self._update_feature_completer(self.dialog)
+
 
         # Enable tab relations if name has value
         name_widget = self.get_widget_by_columnname(self.dialog, "name")
@@ -224,14 +222,17 @@ class Campaign:
         # Code logic to deal with the review/visit combo change to load tabs in relations
         self.reviewclass_combo = self.get_widget_by_columnname(self.dialog, "reviewclass_id")
         self.visitclass_combo = self.get_widget_by_columnname(self.dialog, "visitclass_id")
-
         for combo in (self.reviewclass_combo, self.visitclass_combo):
             if isinstance(combo, QComboBox):
                 # Connect to handler passing the combo itself
                 combo.currentIndexChanged.connect(partial(self._on_class_changed, combo))
+                combo.currentIndexChanged.connect(partial(self._update_feature_completer, self.dialog))
                 # Also call initially
                 self._on_class_changed(combo)
 
+        self._update_feature_completer(self.dialog)
+        self.setup_tab_relations()
+        self._check_enable_tab_relations()
 
         self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                self.dialog.tbl_campaign_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
@@ -476,18 +477,30 @@ class Campaign:
         self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
 
         self.dialog.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None))
-
+            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None),
+        )
+        self.dialog.btn_insert.clicked.connect(
+            lambda: self._update_feature_completer(self.dialog)
+        )
         self.dialog.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None))
-
+            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None),
+        )
+        self.dialog.btn_delete.clicked.connect(
+            lambda: self._update_feature_completer(self.dialog)
+        )
         self.dialog.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN)
+            partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN),
+        )
+        self.dialog.btn_snapping.clicked.connect(
+            lambda: self._update_feature_completer(self.dialog)
         )
         self.dialog.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dialog, table_object, selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN)
+            partial(tools_gw.select_with_expression_dialog, self, self.dialog, table_object,
+                    selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN),
         )
-
+        self.dialog.btn_expr_select.clicked.connect(
+            lambda: self._update_feature_completer(self.dialog)
+        )
 
     def _on_tab_feature_changed(self):
         self.feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
@@ -510,17 +523,39 @@ class Campaign:
     def _update_feature_completer(self, dlg):
         tab_name = dlg.tab_feature.currentWidget().objectName()
         table_map = {
-            'tab_arc': ('v_edit_arc', 'arc_id'),
-            'tab_node': ('v_edit_node', 'node_id'),
-            'tab_connec': ('v_edit_connec', 'connec_id'),
-            'tab_link': ('v_edit_link', 'link_id'),
-            'tab_gully': ('v_edit_gully', 'gully_id')
+            'tab_arc': ('v_edit_arc', 'arc_id', 'arc'),
+            'tab_node': ('v_edit_node', 'node_id', 'node'),
+            'tab_connec': ('v_edit_connec', 'connec_id', 'connec'),
+            'tab_link': ('v_edit_link', 'link_id', 'link'),
+            'tab_gully': ('v_edit_gully', 'gully_id', 'gully')
         }
-        table_name, id_column = table_map.get(tab_name, (None, None))
+        table_name, id_column, feature = table_map.get(tab_name, (None, None, None))
         if not table_name:
             return
 
-        sql = f"SELECT {id_column}::text FROM {self.schema_parent}.{table_name} ORDER BY {id_column} LIMIT 100"
+        # Get allowed feature types
+        if self.campaign_type == 1:
+            reviewclass_id = tools_qt.get_combo_value(self.dialog, self.reviewclass_combo)
+            allowed_types = self.get_allowed_feature_subtypes(feature, reviewclass_id)
+        elif self.campaign_type == 2:
+            visitclass_id = tools_qt.get_combo_value(self.dialog, self.visitclass_combo)
+            allowed_types = self.get_allowed_feature_types_from_visitclass("om_visitclass", visitclass_id)
+
+        if not allowed_types:
+            return
+
+        allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
+
+        sql = f"""
+            SELECT p.{id_column}::text
+            FROM {self.schema_parent}.{feature} p
+            JOIN {self.schema_parent}.cat_{feature} c 
+                ON p.{feature}cat_id = c.id
+            WHERE c.{feature}_type IN ({allowed_types_str})
+            LIMIT 100
+        """
+
+        print(sql)
         result = tools_db.get_rows(sql)
         values = [row[id_column] for row in result if row.get(id_column)]
 
@@ -556,6 +591,20 @@ class Campaign:
         print("Features_type:", feature_types)
         self._manage_tabs_enabled(feature_types)
 
+    def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int):
+        """
+        Get allowed subtypes (e.g., TANK, PR_BREAK_VALVE) based on reviewclass_id and feature (node, arc, connec...).
+        """
+        sql = f"""
+            SELECT DISTINCT r.object_id
+            FROM cm.om_reviewclass_x_object r
+            JOIN {self.schema_parent}.cat_feature f
+                ON r.object_id = f.id
+            WHERE r.reviewclass_id = {reviewclass_id}
+        """
+        print("sql subtype:", sql)
+        rows = tools_db.get_rows(sql)
+        return [r["object_id"] for r in rows if r.get("object_id")]
 
     def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int):
         """Query om_reviewclass_x_layer to get allowed feature types for a given reviewclass"""
