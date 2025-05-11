@@ -6,17 +6,19 @@ or (at your option) any later version.
 */
 
 
-CREATE OR REPLACE FUNCTION gw_fct_formfields_renumber_layoutorders(p_data json)
+CREATE OR REPLACE FUNCTION gw_fct_admin_forms_renum_layoutorder(p_data json)
 RETURNS json AS $$
 
 /*
-SELECT gw_fct_formfields_renumber_layoutorders (formType)
+SELECT gw_fct_formfields_renumber_layoutorder ({data:{parameters{}}})
 */
 
 DECLARE
     rec RECORD;
     current_layout TEXT;
     new_order INTEGER;
+	v_step integer;
+	v_tablename text;
 
 BEGIN
 
@@ -24,28 +26,29 @@ BEGIN
 	
 	
 	-- get input parameters
-	v_formtype = '';
+	v_tablename = 'config_form_fields'; -- config_param_system, sys_param_user
+	v_step = 2; -- the number of steps for each.
+		
 	
-	
-    -- Bucle per cada layoutname ordenat
+    -- loop for each layoutname
     FOR rec IN
         SELECT id, layoutname
         FROM config_form_fields
         ORDER BY layoutname, layoutorder, id
     LOOP
-        -- Si és un layout nou, reinicia el comptador
+        -- reinit counter for new layout
         IF rec.layoutname IS DISTINCT FROM current_layout THEN
             current_layout := rec.layoutname;
-            new_order := 2;
+            new_order := v_step;
         END IF;
 
-        -- Actualitza el layoutorder
+        -- update layoutorder
         UPDATE config_form_fields
         SET layoutorder = new_order
         WHERE id = rec.id;
 
-        -- Incrementa el comptador
-        new_order := new_order + 2;
+        -- Increment the counter
+        new_order := new_order + v_step;
     END LOOP;
 	
 	RETURN '{}';
