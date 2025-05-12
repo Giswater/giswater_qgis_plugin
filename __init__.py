@@ -27,12 +27,12 @@ if sys.version_info >= (3, 10):
     # Improves startup speed for tools by pre-loading required packages
     # (e.g., Import INP tool)
     try:
-        import swmm_api
+        import swmm_api  # noqa: F401
     except ImportError:
         pass
 
     try:
-        import wntr
+        import wntr  # noqa: F401
     except ImportError:
         pass
 

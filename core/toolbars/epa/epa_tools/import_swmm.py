@@ -64,7 +64,7 @@ class GwImportSwmm:
             return
 
         try:
-            import swmm_api
+            import swmm_api  # noqa: F401
             from ....threads.import_inp import parse_swmm_task
 
             global Catalogs, GwParseInpTask  # noqa: F824

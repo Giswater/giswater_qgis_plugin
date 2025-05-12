@@ -59,7 +59,7 @@ class GwImportEpanet:
         tools_qgis.show_warning(msg, duration=30)
 
         try:
-            import wntr
+            import wntr  # noqa: F401
             from ....threads.import_inp import parse_epanet_task
 
             global Catalogs, GwParseInpTask  # noqa: F824
