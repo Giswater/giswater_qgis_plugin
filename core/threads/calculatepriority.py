@@ -150,6 +150,7 @@ class GwCalculatePriority(GwTask):
 
     def _current_value(self, arcs, year, replacements=False):
         current_value = 0
+        skipped_arcs_due_to_replacement = 0
         for arc in arcs:
             if (
                 replacements
@@ -161,12 +162,18 @@ class GwCalculatePriority(GwTask):
                 builtdate = getattr(
                     arc["builtdate"], "year", None
                 ) or self.config_material.get_default_builtdate(arc["matcat_id"])
-            residual_useful_life = builtdate + arc["total_expected_useful_life"] - year
-            current_value += (
-                arc["cost_constr"]
-                * residual_useful_life
-                / arc["total_expected_useful_life"]
-            )
+
+
+            expected_life = arc.get("total_expected_useful_life", 0)
+            cost = arc.get("cost_constr", 0)
+            residual_useful_life = max(0, builtdate + expected_life - year)
+
+            if expected_life <= 0 or cost <= 0:
+                self.skipped_arcs_due_to_replacement += 1
+                continue
+
+            current_value += cost * residual_useful_life / expected_life
+            
         return current_value
 
     def _emit_report(self, *args):
@@ -1148,8 +1155,8 @@ class GwCalculatePriority(GwTask):
 
         current_value = self._current_value(arcs, date.today().year)
         replacement_cost = self._replacement_cost(arcs)
-        ivi = current_value / replacement_cost
-        replacement_rate = self.result_budget / replacement_cost * 100
+        ivi = current_value / replacement_cost if replacement_cost > 0 else 0
+        replacement_rate = self.result_budget / replacement_cost * 100 if replacement_cost > 0 else 0
 
         columns = [
             [
