@@ -1054,3 +1054,5 @@ WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
 
 
 UPDATE config_form_fields SET columnname = 'negative_offset' WHERE columnname = 'negativeoffset';
+
+UPDATE config_csv SET descript='Function to assist the import of timeseries for inp models. The csv file must containts next columns on same position: timseries, timser_type, times_type, descript, expl_id, date, hour, time, value (fill date/hour for ABSOLUTE or time for RELATIVE)' WHERE fid=385;
