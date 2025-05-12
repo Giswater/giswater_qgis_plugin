@@ -596,6 +596,12 @@ CREATE TABLE arc_add (
 	max_veloc numeric(12, 2) NULL,
 	mfull_flow numeric(12, 2) NULL,
 	mfull_depth numeric(12, 2) NULL,
+	manning_veloc numeric(12,3) NULL,
+	manning_flow numeric(12,3) NULL,
+	dwf_minflow numeric(12,3) NULL,
+	dwf_maxflow numeric(12,3) NULL,
+	dwf_minvel numeric(12,3) NULL,
+	dwf_maxvel numeric(12,3) NULL,
 	CONSTRAINT arc_add_pkey PRIMARY KEY (arc_id)
 );
 

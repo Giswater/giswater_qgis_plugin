@@ -460,6 +460,7 @@ ALTER TABLE _arc_add_ DROP CONSTRAINT arc_add_pkey;
 
 CREATE TABLE arc_add (
 	arc_id varchar(16) NOT NULL,
+	result_id text NULL,
 	flow_max numeric(12, 2) NULL,
 	flow_min numeric(12, 2) NULL,
 	flow_avg numeric(12, 2) NULL,
@@ -468,7 +469,11 @@ CREATE TABLE arc_add (
 	vel_avg numeric(12, 2) NULL,
 	tot_headloss_max numeric(12, 2) NULL,
 	tot_headloss_min numeric(12, 2) NULL,
-	result_id text NULL,
+	mincut_connecs int NULL,
+	mincut_hydrometers int NULL,
+	mincut_length numeric(12, 3) NULL,
+	mincut_watervol numeric(12, 3) NULL,
+	mincut_criticity numeric(12, 3) NULL,
 	CONSTRAINT arc_add_pkey PRIMARY KEY (arc_id)
 );
 

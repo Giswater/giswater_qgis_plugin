@@ -172,3 +172,9 @@ CREATE TABLE sys_label (
 );
 
 ALTER TABLE dimensions ALTER COLUMN muni_id SET DEFAULT 0;
+
+-- 12/05/2025
+CREATE TABLE minsector_mincut (
+	minsector_id integer PRIMARY KEY,
+	minsectors integer[]
+);
