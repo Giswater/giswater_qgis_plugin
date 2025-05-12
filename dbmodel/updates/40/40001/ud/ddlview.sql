@@ -684,6 +684,7 @@ AS WITH
             arc.lock_level,
             arc.initoverflowpath,
 			arc.inverted_slope,
+            arc.negative_offset,
 			arc.expl_visibility,
             date_trunc('second'::text, arc.created_at) AS created_at,
 			arc.created_by,
