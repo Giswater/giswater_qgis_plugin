@@ -57,7 +57,6 @@ class GwMapzoneManager:
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood_from_node, "135")
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
-        default_tab_idx = 0
         tabs = ['sector', 'macrosector', 'omzone', 'macroomzone']
         project_tabs = {'ws': ['dma', 'dqa', 'macrodma', 'macrodqa', 'supplyzone', 'presszone'],
                         'ud': ['drainzone', 'dwfzone']}
@@ -77,11 +76,6 @@ class GwMapzoneManager:
 
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
             self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
-
-            # if view.split('_')[-1].upper() == self.selected_dscenario_type:
-            #     default_tab_idx = tab_idx
-
-        # self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))

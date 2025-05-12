@@ -119,7 +119,6 @@ def delete_object(**kwargs):
         at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     dialog = kwargs['dialog']
-    index_tab = dialog.tab_main.currentIndex()
 
     func_params = kwargs['func_params']
     complet_result = kwargs['complet_result']
@@ -169,14 +168,11 @@ def delete_object(**kwargs):
 
 
 def open_visit_manager(**kwargs):
-    dialog = kwargs['dialog']
     complet_result = kwargs['complet_result']
-    func_params = kwargs['func_params']
     feature_type = complet_result['body']['feature']['featureType']
     feature_id = complet_result['body']['feature']['id']
 
     manage_visit = GwVisit()
-    # manage_visit.visit_added.connect(_update_visit_table)
     manage_visit.manage_visits(feature_type, feature_id)
 
 
@@ -279,7 +275,7 @@ def manage_visit_class(**kwargs):
 
     # headers
     headers = complet_list['body']['form'].get('headers')
-    non_editable_columns = []
+    # non_editable_columns = []
     if headers:
         model = table_view.model()
         if model is None:
@@ -290,7 +286,7 @@ def manage_visit_class(**kwargs):
         table_view.setModel(model)
         table_view.horizontalHeader().setStretchLastSection(True)
         # Non-editable columns
-        non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
+        # non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
 
     # values
     for field in complet_list['body']['data']['fields']:
@@ -385,9 +381,6 @@ def filter_table(**kwargs):
     if feature_id is None and complet_result['body'].get('feature'):
         feature_id = complet_result['body']['feature']['id']
     filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}, '
-    colname = None
-    if func_params:
-        colname = func_params.get('columnfind')
     filter_fields = get_filter_qtableview(dialog, widget_list, complet_result, filter_fields)
     try:
         index_tab = dialog.tab_main.currentIndex()
@@ -975,8 +968,6 @@ def reload_table_manager(**kwargs):
     dialog = kwargs['dialog']
     list_tables = dialog.findChildren(QTableView)
     tab_name = 'tab_none'
-    func_params = kwargs.get('func_params')
-    widget = dialog.findChild(QLineEdit)
     filter_fields = ''
 
     widget_list = []
