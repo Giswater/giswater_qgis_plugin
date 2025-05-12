@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 
 from functools import partial
-from qgis.PyQt.QtCore import QDateTime
+from qgis.PyQt.QtCore import QDateTime, QDate
 from qgis.PyQt.QtGui import QStandardItemModel
 from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
@@ -57,13 +57,51 @@ class GwAudit:
         # Connect signals
         self.dlg_audit_manager.tbl_audit.doubleClicked.connect(partial(self.open_audit))
 
-        # Set calendar options
+        # Get yesterday date
+        yesterday = QDateTime.currentDateTime().addDays(-1)
+
+        # Get date widget
         self.date = self.dlg_audit_manager.findChild(QWidget, "tab_none_date_to")
-        self.date.setDateTime(QDateTime.currentDateTime())
-        self.date.setMaximumDateTime(QDateTime.currentDateTime())
+
+        # Get open date button
+        self.btn_open_date = self.dlg_audit_manager.findChild(QWidget, "tab_none_btn_open_date")
+
+        # Set yesterday as default date and maximum date
+        self.date.setDateTime(yesterday)
+
+        # Get first audit log date
+        first_log_date = self.get_first_log_date()
+
+        # Check the first audit log date
+        if not first_log_date or first_log_date > yesterday.date().toPyDate():
+            # Disable open date button and
+            self.btn_open_date.setEnabled(False)
+            self.date.setEnabled(False)
+        else:
+            # Convert first_snapshot_date to QDateTime for widget
+            q_first_snapshot_date = QDateTime(QDate(first_log_date.year, first_log_date.month, first_log_date.day))
+
+            # Set minimum date to first snapshot date
+            self.date.setMinimumDateTime(q_first_snapshot_date)
+
+            self.date.setMaximumDateTime(yesterday)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_audit_manager, 'audit_manager')
+
+    def get_first_log_date(self):
+        """ Get first snapshot date """
+
+        # Get the first snapshot date
+        sql = f"SELECT min(tstamp)::date FROM audit.log WHERE table_name = '{self.table_name}' \
+                AND feature_id = '{self.feature_id}';"
+        result = tools_db.get_row(sql)
+
+        # Check if result is not None
+        if result and result[0]:
+            return result[0]
+        else:
+            return None
 
     def open_audit(self):
         """ Open selected audit """
@@ -105,32 +143,46 @@ class GwAudit:
         # DB fct
         json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
 
+        # Create dialog
         self.dlg_audit = GwAuditUi(self)
         tools_gw.load_settings(self.dlg_audit)
+
+        # Manage dynamic widgets
         tools_gw.manage_dlg_widgets(self, self.dlg_audit, json_result)
+
+        # Open dialog
         tools_gw.open_dialog(self.dlg_audit, 'audit')
 
-        # Get layouts
+        # Get layout to add widgets
         layout = self.dlg_audit.centralwidget.findChild(QScrollArea).findChild(QWidget).findChild(QGridLayout)
+
+        # Create label headers
+        label = QLabel("Old value")
+        label.setStyleSheet("font-weight: bold;")
+        layout.addWidget(label, 0, 1)
+
+        label = QLabel("New value")
+        label.setStyleSheet("font-weight: bold;")
+        layout.addWidget(label, 0, 2)
 
         # Add widgets in form for each value
         for row, (key, new_value) in enumerate(new_data.items()):
-            old_value = old_data.get(key, "")
+            old_value = str(old_data.get(key, ""))
+            new_value = str(new_value)
 
             # Check if the value has changed
-            if str(old_value) != str(new_value):
+            if old_value != new_value:
                 # Create label
                 label = QLabel(str(key))
                 layout.addWidget(label, row, 0)
 
                 # Create line edit for old value
-                line_edit = QLineEdit(str(old_value) + " (old)")
+                line_edit = QLineEdit(old_value)
                 line_edit.setEnabled(False)
-                line_edit.setStyleSheet("color: orange;")
                 layout.addWidget(line_edit, row, 1)
 
                 # Create line edit for new value
-                line_edit = QLineEdit(str(new_value) + " (new)")
+                line_edit = QLineEdit(new_value)
                 line_edit.setEnabled(False)
                 layout.addWidget(line_edit, row, 2)
 
@@ -138,11 +190,11 @@ class GwAudit:
         vertical_spacer = tools_qt.add_verticalspacer()
         final_row = layout.rowCount()
         # layout.addItem(vertical_spacer, final_row, 0, 1, 2)
-        layout.addItem(vertical_spacer, final_row , 0)
+        layout.addItem(vertical_spacer, final_row, 0)
 
     # private region
 
-    def _fill_manager_table(self, complet_list)-> bool:
+    def _fill_manager_table(self, complet_list) -> bool:
         """ Fill log manager table with data from audit.log """
 
         if complet_list is False:
