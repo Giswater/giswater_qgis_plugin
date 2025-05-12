@@ -10,7 +10,6 @@ from qgis.core import QgsApplication, QgsProviderRegistry
 
 from .test_giswater import GwTest
 from ..core.admin.gis_file_create import GwGisFileCreate
-from .. import global_vars
 from ..libs import lib_vars, tools_db, tools_log
 
 

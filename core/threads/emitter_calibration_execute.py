@@ -5,9 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import re
 
 from copy import deepcopy
 from pathlib import Path

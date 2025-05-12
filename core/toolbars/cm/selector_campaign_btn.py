@@ -7,9 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from .campaign import Campaign
 from ..dialog import GwAction
-from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
-from functools import partial
-from ....libs import tools_qt
 
 class GwSelectorCampaignButton(GwAction):
     """ Button 84: Add new campaign """

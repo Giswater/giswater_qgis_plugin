@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import QDateTime, QVariant
-from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton, QSizePolicy
+from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField, QgsSymbol, QgsRuleBasedRenderer
 from qgis.PyQt.QtGui import QColor
 from ..dialog import GwAction

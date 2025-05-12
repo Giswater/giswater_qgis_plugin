@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
 
 from functools import partial
 
@@ -17,7 +16,6 @@ from .... import global_vars
 from ..dialog import GwAction
 from .utilities_manager.mapzone_manager import GwMapzoneManager
 from ...shared.info import GwInfo
-from ...shared.psector import GwPsector
 from ...shared.workcat import GwWorkcat
 from ....libs import tools_qt
 

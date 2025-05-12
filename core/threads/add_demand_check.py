@@ -10,7 +10,6 @@ import csv
 import itertools
 import json
 import math
-import subprocess
 import uuid
 import traceback
 from concurrent.futures import ThreadPoolExecutor

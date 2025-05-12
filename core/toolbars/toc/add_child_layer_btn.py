@@ -10,8 +10,8 @@ import json
 from functools import partial
 
 from qgis.core import QgsProject
-from qgis.PyQt.QtCore import QPoint, Qt, QEvent, QObject
-from qgis.PyQt.QtWidgets import QAction, QMenu, QCheckBox, QWidgetAction
+from qgis.PyQt.QtCore import QPoint
+from qgis.PyQt.QtWidgets import QMenu, QCheckBox, QWidgetAction
 from qgis.PyQt.QtGui import QCursor
 
 from ..dialog import GwAction

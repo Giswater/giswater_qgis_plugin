@@ -20,10 +20,7 @@ from qgis.PyQt.QtWidgets import (
     QMenu,
     QAction,
     QActionGroup,
-    QTableView,
-    QAbstractItemView,
 )
-from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
 
 from .... import global_vars

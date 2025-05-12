@@ -12,7 +12,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QLineEdit
 
 from ...libs import lib_vars
-from ...libs.ui.ui_manager import ShowInfoUi, DialogTextUi
+from ...libs.ui.ui_manager import DialogTextUi
 from .dialog import GwDialog
 from .docker import GwDocker
 from .main_window import GwMainWindow

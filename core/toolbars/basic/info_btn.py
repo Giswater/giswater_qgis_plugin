@@ -13,7 +13,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
-from qgis.core import QgsApplication, QgsGeometry, QgsMapToPixel, QgsPointXY
+from qgis.core import QgsApplication, QgsGeometry, QgsPointXY
 
 from ...shared import info
 from ...shared.info import GwInfo

@@ -13,7 +13,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression

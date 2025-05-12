@@ -14,7 +14,6 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 __revision__ = '$Format:%H$'
 
 from weakref import WeakKeyDictionary
-from ... import global_vars
 from ...libs import lib_vars, tools_db, tools_log, tools_qt, tools_qgis
 
 

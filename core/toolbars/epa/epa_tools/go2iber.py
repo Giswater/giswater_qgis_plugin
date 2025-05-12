@@ -9,25 +9,17 @@ import importlib
 
 from datetime import timedelta
 from functools import partial
-from pathlib import Path
 from time import time
-from typing import Optional, Tuple
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import (
-    QComboBox,
     QLabel,
-    QTableWidget,
-    QTableWidgetItem,
-    QTextEdit,
 )
 from sip import isdeleted
 
 from ..go2epa_btn import GwGo2EpaButton
-from ....ui.dialog import GwDialog
-from ....ui.ui_manager import GwGo2IberUi, GwGo2EpaUI
-from ....threads.import_inp.import_epanet_task import GwImportInpTask
+from ....ui.ui_manager import GwGo2IberUi
 from ....threads.go2iber_task import GwGo2IberTask
 from ....utils import tools_gw
 from .....libs import tools_db, tools_qgis, tools_qt

@@ -14,9 +14,9 @@ from time import time
 from datetime import timedelta
 
 from qgis.PyQt.QtCore import Qt, QTimer, QDate
-from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
-    QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem
+from qgis.PyQt.QtGui import QIcon, QStandardItemModel, QStandardItem
+from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
+    QCompleter, QGridLayout, QLabel, QTableWidgetItem
 from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsDateTimeEdit
 

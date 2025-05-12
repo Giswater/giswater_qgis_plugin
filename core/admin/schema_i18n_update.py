@@ -15,8 +15,7 @@ import json
 
 from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_log, tools_os
-from qgis.PyQt.QtWidgets import QLabel
+from ...libs import lib_vars, tools_qt, tools_db
 from PyQt5.QtWidgets import QApplication
 
 

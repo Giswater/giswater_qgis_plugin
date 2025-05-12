@@ -5,9 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QTableView
 
-from ....libs import lib_vars, tools_db, tools_qgis, tools_os, tools_qt
+from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
 from ...utils import tools_gw
 from ..dialog import GwAction
 

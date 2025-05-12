@@ -5,19 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import re
 import os
 import psycopg2
 import psycopg2.extras
-from psycopg2.extras import execute_values
 from functools import partial
 from datetime import datetime, date
 
 
 from ..ui.ui_manager import GwSchemaI18NManagerUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_log, tools_os
-from qgis.PyQt.QtWidgets import QLabel
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_db
 from PyQt5.QtWidgets import QApplication
 
 

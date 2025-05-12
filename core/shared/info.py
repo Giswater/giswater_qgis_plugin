@@ -16,19 +16,17 @@ from qgis.core import QgsEditFormConfig
 
 from sip import isdeleted
 
-from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt, QSettings, QRegularExpression
-from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel, QCursor
-from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
-    QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
+from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, Qt, QRegularExpression
+from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel, QCursor
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
+    QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QMenu
-from qgis.core import Qgis, QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
-    QgsPointXY, QgsProject, QgsWkbTypes
+from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
+    QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from .catalog import GwCatalog
 from .dimensioning import GwDimensioning
-from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
@@ -41,7 +39,6 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInfoCrossectUi, GwInterpolate, GwPsectorUi
 # WARNING: DO NOT REMOVE THESE IMPORTS, THEY ARE USED BY EPA ACTIONS
 # noinspection PyUnresolvedReferences
-from ..ui.ui_manager import GwInfoEpaUi
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...libs.tools_qt import GwHyperLinkLineEdit

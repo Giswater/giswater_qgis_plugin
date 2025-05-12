@@ -8,16 +8,13 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import QDate, QTimer
-from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QGridLayout, QSpacerItem, \
-    QSizePolicy, QTextEdit, QMenu, QAction, QCompleter, QToolButton, QTableView
+from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QTextEdit, QCompleter, QTableView
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
 from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, GwSelectorUi
-from qgis.gui import QgsDateTimeEdit
 from ...shared.selector import GwSelector
 
 

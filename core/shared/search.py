@@ -9,9 +9,8 @@ import os
 import re
 from functools import partial
 
-from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QGridLayout, QHeaderView, \
-    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget, QCheckBox
+from qgis.PyQt.QtCore import QStringListModel, Qt
+from qgis.PyQt.QtWidgets import QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QCheckBox
 from qgis.core import QgsPointXY
 
 from libs import tools_os

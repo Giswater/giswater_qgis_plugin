@@ -4,19 +4,16 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-import configparser
 import copy
 import csv
 import os
 import re
-from functools import partial
 
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 from scipy.optimize import root_scalar
 
 from .task import GwTask
-from ... import global_vars
 from ...libs import tools_db
 from ..utils import tools_gw
 

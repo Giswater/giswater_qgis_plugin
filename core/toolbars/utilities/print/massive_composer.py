@@ -8,8 +8,8 @@ or (at your option) any later version.
 import os
 from functools import partial
 
-from qgis.core import QgsApplication, QgsLayoutExporter, QgsProject
-from qgis.PyQt.QtWidgets import QAction, QLabel
+from qgis.core import QgsApplication, QgsProject
+from qgis.PyQt.QtWidgets import QLabel
 
 from ....threads.composer_pages import GwComposerPages
 from ....ui.ui_manager import GwCompPagesUi

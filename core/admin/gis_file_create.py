@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 import shutil
 # TODO: Check this - do not delete this import for the moment
-from ..utils import tools_gw
+from ..utils import tools_gw  # noqa: F401
 from ...libs import tools_log, tools_qt, tools_db, tools_qgis
 
 

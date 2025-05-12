@@ -12,7 +12,7 @@ import os
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...libs import tools_qt, tools_log, tools_os, tools_db, tools_qgis
+from ...libs import tools_qt, tools_log, tools_os, tools_db
 
 
 class GwCreateSchemaTask(GwTask):

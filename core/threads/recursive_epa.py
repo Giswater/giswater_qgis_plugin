@@ -9,7 +9,7 @@ import os
 import re
 import subprocess
 from datetime import timedelta
-from time import sleep, time
+from time import time
 from concurrent.futures import ThreadPoolExecutor
 
 from qgis.PyQt.QtCore import pyqtSignal

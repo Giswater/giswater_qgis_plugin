@@ -10,7 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
     QSizePolicy, QSpacerItem
-from qgis.core import QgsPointXY, QgsWkbTypes
+from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 from ..utils import tools_gw

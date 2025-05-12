@@ -11,7 +11,6 @@ from pathlib import Path
 from time import time
 import configparser
 import os
-import json
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
@@ -19,8 +18,6 @@ from qgis.PyQt.QtWidgets import (
     QLabel,
     QMenu,
     QAbstractItemView,
-    QAction,
-    QActionGroup,
     QHeaderView,
     QTableView,
     QTableWidget,
@@ -36,7 +33,7 @@ from ...utils import tools_gw
 from ..dialog import GwAction
 
 
-from ...ui.ui_manager import GwPriorityUi, GwPriorityManagerUi
+from ...ui.ui_manager import GwPriorityUi
 from ...threads.calculatepriority import GwCalculatePriority
 
 

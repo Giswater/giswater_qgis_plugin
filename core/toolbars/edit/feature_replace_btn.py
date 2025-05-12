@@ -8,7 +8,7 @@ or (at your option) any later version.
 from datetime import datetime
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate, Qt, QObject
+from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 
 from ..maptool import GwMaptool

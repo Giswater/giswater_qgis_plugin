@@ -9,13 +9,10 @@ import datetime
 import json
 from functools import partial
 
-from qgis.PyQt.QtCore import QStringListModel, QSize, QDateTime, QDate, Qt, QRegExp
-from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
-    QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QDateTimeEdit, QMenu
-from qgis.PyQt.QtGui import QCursor
+from qgis.PyQt.QtCore import Qt, QRegExp
+from qgis.PyQt.QtWidgets import QComboBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, \
+    QSpinBox, QSpacerItem, QTableView
 from qgis.gui import QgsDateTimeEdit
-from qgis.core import QgsWkbTypes
 
 from ..utils import tools_backend_calls
 

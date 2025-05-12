@@ -7,11 +7,10 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 import platform
-from functools import partial
 import os
 
-from qgis.PyQt.QtCore import Qt, pyqtSignal
-from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtWidgets import QCheckBox
 from qgis.core import Qgis
 
 from .task import GwTask

@@ -5,18 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
 import os
-import re
-import subprocess
 import importlib
 
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .epa_file_manager import GwEpaFileManager
 from ..utils import tools_gw
-from ... import global_vars
-from ...libs import lib_vars, tools_log, tools_qt, tools_db, tools_qgis, tools_os
+from ...libs import lib_vars, tools_log, tools_qt, tools_qgis
 from .task import GwTask
 
 

@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 import datetime
-import os
 from functools import partial
 from pathlib import Path
 from time import time
@@ -15,7 +14,6 @@ from qgis.PyQt.QtCore import QTimer
 
 from ....threads.quantized_demands import GwQuantizedDemands
 from ....ui.ui_manager import QuantizedDemandsUi
-from ..... import global_vars
 from .....libs import tools_qt
 from ....utils import tools_gw
 

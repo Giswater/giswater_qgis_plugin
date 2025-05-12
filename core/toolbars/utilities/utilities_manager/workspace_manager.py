@@ -6,12 +6,11 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import json
-import re
 from functools import partial
 
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegExp, QItemSelectionModel
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
+from qgis.PyQt.QtWidgets import QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
 
 from ...dialog import GwAction
 from ....ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwGo2EpaOptionsUi

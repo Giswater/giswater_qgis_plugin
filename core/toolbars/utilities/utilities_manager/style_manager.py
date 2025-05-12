@@ -15,7 +15,7 @@ from ....utils import tools_gw
 from .....libs import lib_vars, tools_db, tools_qgis, tools_qt
 from ..... import global_vars
 
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QHeaderView, QTableView, QMenu, QAction, QMessageBox, QPushButton
+from qgis.PyQt.QtWidgets import QHeaderView, QTableView, QMenu, QAction, QPushButton
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtGui import QCursor

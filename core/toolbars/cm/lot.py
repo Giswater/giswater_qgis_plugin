@@ -11,10 +11,10 @@ from qgis.PyQt.QtCore import QStringListModel, QDate, QSortFilterProxyModel, Qt,
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QHBoxLayout
-from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget, QDateEdit, QPushButton
+from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QWidget, QPushButton
 from qgis.core import QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsRubberBand
-from typing import Literal, Dict, Optional, List
+from typing import Optional, List
 
 import csv
 import os
@@ -24,13 +24,12 @@ import urllib.parse as parse
 import webbrowser
 import json
 from collections import OrderedDict
-from ..maptool import GwMaptool
 
 #from ...ui.ui_manager import ManageVisit
 from ...ui.ui_manager import TeamCreateUi, UserCreateUi, AddLotUi, LotSelectorUi, DialogTableUi, LotManagementUi, WorkManagementUi, ResourcesManagementUi, TeamManagemenUi, OrganizationCreateUi
 from .... import global_vars
 
-from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_pgdao, tools_log
+from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log
 from ...utils import tools_gw
 
 

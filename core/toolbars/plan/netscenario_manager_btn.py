@@ -13,8 +13,8 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QCompleter, QAction, QPushButton
-from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDateEdit
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, QPushButton
+from qgis.PyQt.QtWidgets import QLineEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton

@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtWidgets import QGridLayout, QSizePolicy, QSpacerItem, QLineEdit
+from qgis.PyQt.QtWidgets import QGridLayout, QSizePolicy, QSpacerItem
 from qgis.core import QgsTask
 
 from .task import GwTask

@@ -7,10 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import os
-import random
 import re
 import sys
-import mmap
 from functools import partial
 from sip import isdeleted
 from time import time
@@ -19,11 +17,11 @@ from datetime import timedelta
 from qgis.PyQt.QtCore import QSettings, Qt, QDate, QTimer
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
-from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, \
+from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
     QGridLayout, QTabWidget
-from qgis.core import QgsProject, QgsTask, QgsApplication, QgsMessageLog
+from qgis.core import QgsProject, QgsApplication, QgsMessageLog
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 

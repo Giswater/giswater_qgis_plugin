@@ -7,12 +7,10 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 import sys
-import psycopg2
 from shapely.wkt import loads
 from shapely.ops import transform
 from pyproj import Transformer
 import pandas as pd
-import geopandas as gpd
 import numpy as np
 
 import json

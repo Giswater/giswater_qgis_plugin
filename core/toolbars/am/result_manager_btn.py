@@ -9,19 +9,14 @@ from functools import partial
 
 from qgis.PyQt.QtWidgets import (
     QAbstractItemView,
-    QMenu,
-    QAction,
-    QActionGroup,
     QTableView,
-    QCompleter,
 )
-from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtSql import QSqlRelation, QSqlRelationalTableModel
 
 from .priority_btn import CalculatePriority
-from ...ui.ui_manager import GwPriorityUi, GwPriorityManagerUi, GwStatusSelectorUi
+from ...ui.ui_manager import GwPriorityManagerUi, GwStatusSelectorUi
 
-from ....libs import lib_vars, tools_db, tools_qgis, tools_os, tools_qt
+from ....libs import lib_vars, tools_db, tools_qt
 from ...utils import tools_gw
 from ..dialog import GwAction
 

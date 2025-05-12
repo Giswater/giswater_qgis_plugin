@@ -14,7 +14,6 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ... import global_vars
 from ...libs import tools_db, tools_qt, lib_vars
 
 

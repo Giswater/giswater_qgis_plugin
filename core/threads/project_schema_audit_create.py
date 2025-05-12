@@ -5,14 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 
-import glob
 import os
 
 from .task import GwTask
-from ..utils import tools_gw
-from ...libs import tools_qt, tools_log, tools_os, tools_db, tools_qgis
+from ...libs import tools_qt, tools_os, tools_db
 
 
 class GwCreateSchemaAuditTask(GwTask):

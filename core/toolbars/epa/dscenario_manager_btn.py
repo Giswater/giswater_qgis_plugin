@@ -14,10 +14,9 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor, QKeyS
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, \
-    QShortcut, QApplication, QTableWidgetItem, QWidget, QLabel, QGridLayout, QToolButton, QPushButton
-from qgis.PyQt.QtWidgets import QDialog, QLineEdit
+    QShortcut, QApplication, QWidget, QLabel, QGridLayout, QToolButton, QPushButton
+from qgis.PyQt.QtWidgets import QLineEdit
 
-from libs import tools_log
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
 from ...shared.nonvisual import GwNonVisual

@@ -10,7 +10,7 @@ import os
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 from itertools import islice
 from math import isnan
 

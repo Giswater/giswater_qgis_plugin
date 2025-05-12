@@ -4,20 +4,17 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-import os
 import sys
 
 from datetime import timedelta
-from enum import Enum
 from functools import partial
 from pathlib import Path
 from time import time
-from typing import Optional, Tuple
+from typing import Optional
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import (
-    QActionGroup,
     QComboBox,
     QLabel,
     QTableWidget,
@@ -26,9 +23,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from sip import isdeleted
 
-from ..... import global_vars
-from .....libs import tools_db, tools_qgis, tools_qt, tools_log, lib_vars
-from ....models.plugin_toolbar import GwPluginToolbar
+from .....libs import tools_db, tools_qgis, tools_qt
 from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 if sys.version_info >= (3, 10):
@@ -40,7 +35,6 @@ else:
     GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file, fill_txt_info = None, None, None, None, None, None
     parse_swmm_task = None
 from ....utils import tools_gw
-from ...dialog import GwAction
 
 CREATE_NEW = "Create new"
 SPATIAL_INTERSECT = "Get from spatial intersect"

@@ -8,7 +8,7 @@ or (at your option) any later version.
 
 import configparser
 import traceback
-from datetime import date, timedelta
+from datetime import date
 from math import log, log1p, exp
 from pathlib import Path
 
@@ -17,7 +17,6 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ... import global_vars
 from ...libs import tools_db, tools_qt, lib_vars
 
 

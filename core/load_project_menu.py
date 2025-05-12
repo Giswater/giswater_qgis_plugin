@@ -11,7 +11,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
-from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
+from qgis.PyQt.QtWidgets import QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
 from qgis.core import QgsApplication
 
 from .ui.ui_manager import GwLoadMenuUi

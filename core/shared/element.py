@@ -8,18 +8,17 @@ or (at your option) any later version.
 import webbrowser
 
 from functools import partial
-from sip import isdeleted
 
 from qgis.PyQt.QtCore import QRegExp, Qt
-from qgis.PyQt.QtGui import QRegExpValidator, QCursor
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox, QGridLayout, QSpacerItem, QSizePolicy, QLineEdit
+from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox, QGridLayout
 
-from ..utils import tools_gw, tools_backend_calls
+from ..utils import tools_gw
 from ..utils.selection_mode import GwSelectionMode
 from ..ui.ui_manager import GwElementUi, GwElementManagerUi
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_db
 
 
 class GwElement:

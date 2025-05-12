@@ -14,7 +14,6 @@ from qgis.PyQt.QtCore import QTimer
 
 from ....threads.static_calibration import GwStaticCalibration
 from ....ui.ui_manager import StaticCalibrationUi
-from ..... import global_vars
 from .....libs import tools_qt, tools_db
 from ....utils import tools_gw
 

@@ -5,14 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
-from sip import isdeleted
-from time import time
-from datetime import timedelta
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QLabel, QGridLayout, QTabWidget, QCheckBox, QWidget
+from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QCheckBox
 
 from ..dialog import GwAction
 from ...threads.project_check import GwProjectCheckTask

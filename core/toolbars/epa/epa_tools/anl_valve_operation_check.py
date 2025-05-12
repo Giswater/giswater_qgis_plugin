@@ -18,7 +18,6 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from ....threads.valve_operation_check import GwValveOperationCheck
 from ....ui.ui_manager import ValveOperationCheckUi
-from ..... import global_vars
 from .....libs import tools_qt, tools_db
 from ....utils import tools_gw
 

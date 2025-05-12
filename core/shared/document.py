@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import os
 import webbrowser
 import json
 from functools import partial
@@ -13,8 +12,8 @@ from osgeo import gdal
 from pyproj import CRS, Transformer
 from sip import isdeleted
 
-from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QCursor
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter, QWidget, QAction, QMenu, QPushButton
+from qgis.PyQt.QtGui import QStandardItemModel, QCursor
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QAction, QMenu, QPushButton
 from qgis.PyQt.QtCore import pyqtSignal, QObject, Qt
 
 from ..utils import tools_gw

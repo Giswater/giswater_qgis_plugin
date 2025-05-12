@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import os
-import sys
 import csv
 from sip import isdeleted
 from time import time

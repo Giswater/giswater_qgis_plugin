@@ -18,7 +18,6 @@ from qgis.PyQt.QtCore import QTimer
 from qgis.core import QgsApplication
 
 from ....ui.ui_manager import EmitterCalibrationUi
-from ..... import global_vars
 
 
 from ....threads.emitter_calibration_execute import EmitterCalibrationExecute

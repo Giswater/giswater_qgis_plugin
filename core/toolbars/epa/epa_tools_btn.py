@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-from datetime import datetime
 from functools import partial
 
 from qgis.core import QgsProject

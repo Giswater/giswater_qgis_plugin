@@ -12,7 +12,7 @@ from functools import partial
 from qgis.core import QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu, QApplication
+from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QApplication
 
 from . import global_vars
 from .core.admin.admin_btn import GwAdminButton

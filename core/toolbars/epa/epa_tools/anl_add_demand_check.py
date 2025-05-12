@@ -18,7 +18,6 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from ....threads.add_demand_check import GwAddDemandCheck
 from ....ui.ui_manager import AddDemandCheckUi
-from ..... import global_vars
 from .....libs import tools_qt, tools_db
 from ....utils import tools_gw
 
