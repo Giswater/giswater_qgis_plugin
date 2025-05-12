@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
-from qgis.PyQt.QtCore import QDateTime, QVariant
+from qgis.PyQt.QtCore import QDateTime, QVariant, QDate
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton, QSizePolicy
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField, QgsSymbol, QgsRuleBasedRenderer
 from qgis.PyQt.QtGui import QColor
@@ -36,6 +36,19 @@ class GwSnapshotViewButton(GwAction):
     def _open_snapshot_view(self):
         """ Get dialog """
 
+        # Get yesterday date
+        yesterday = QDateTime.currentDateTime().addDays(-1)
+
+        # Get first snapshot date
+        first_snapshot_date = self._get_first_snapshot_date()
+
+        # Check previosly if are available snapshots
+        if not first_snapshot_date or first_snapshot_date > yesterday.date().toPyDate():
+            # Show warning
+            msg = "No snapshots available. Please create a snapshot first or wait for tomorrow to travel since today."
+            tools_qgis.show_warning(msg)
+            return
+
         # Create form and body
         form = {"formName": "generic", "formType": "snapshot_view"}
         body = {"client": {"cur_user": tools_db.current_user}, "form": form}
@@ -51,12 +64,18 @@ class GwSnapshotViewButton(GwAction):
         # Get dynamic widgets
         self.dlg_snapshot_view.findChild(QLineEdit, "tab_none_extension").setObjectName("txt_coordinates")
         self.btn_coordinate_actions = self.dlg_snapshot_view.findChild(QPushButton, "tab_none_btn_grid")
-        self.date = self.dlg_snapshot_view.findChild(QWidget, "tab_none_date")
         self.features = self.dlg_snapshot_view.findChildren(QCheckBox)
+        self.date = self.dlg_snapshot_view.findChild(QWidget, "tab_none_date")
 
-        # Set default date to current date
-        self.date.setDateTime(QDateTime.currentDateTime())
-        self.date.setMaximumDateTime(QDateTime.currentDateTime())
+        # Convert first_snapshot_date to QDateTime for widget
+        q_first_snapshot_date = QDateTime(QDate(first_snapshot_date.year, first_snapshot_date.month, first_snapshot_date.day))
+
+        # Set minimum date to first snapshot date
+        self.date.setMinimumDateTime(q_first_snapshot_date)
+
+        # Set yesterday as default date and maximum date
+        self.date.setDateTime(yesterday)
+        self.date.setMaximumDateTime(yesterday)
 
         # Handle coordinate actions
         self._handle_coordinates_actions()
@@ -66,11 +85,21 @@ class GwSnapshotViewButton(GwAction):
             self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
             self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").hide()
 
-        # quiero cambiar el width del txt_coordinates
-        self.dlg_snapshot_view.findChild(QLineEdit, "txt_coordinates").setMinimumWidth(190)
-
         # Open form
         tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')
+
+    def _get_first_snapshot_date(self):
+        """ Get first snapshot date """
+
+        # Get the first snapshot date
+        sql = f"SELECT min(date)::date FROM audit.snapshot WHERE schema = '{lib_vars.schema_name}';"
+        result = tools_db.get_row(sql)
+
+        # Check if result is not None
+        if result and result[0]:
+            return result[0]
+        else:
+            return None
 
     def _handle_coordinates_actions(self):
         """Populate the coordinates actions button with actions"""

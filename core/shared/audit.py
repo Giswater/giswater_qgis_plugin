@@ -38,10 +38,18 @@ class GwAudit:
         self.dlg_audit_manager = GwAuditManagerUi(self)
         tools_gw.load_settings(self.dlg_audit_manager)
         tools_gw.manage_dlg_widgets(self, self.dlg_audit_manager, json_result)
-        tools_gw.open_dialog(self.dlg_audit_manager, 'audit_manager')
+
+        # Get logs from db
+        complet_list = self._get_list()
+
+        if not complet_list or complet_list['body']['data']['fields'][0]['value'] is None:
+            # Show warning
+            msg = "This feature has no log changes, please update this feature before."
+            tools_qgis.show_warning(msg)
+            return
 
         # Fill audit table
-        self._fill_manager_table()
+        self._fill_manager_table(complet_list)
 
         self.dlg_audit_manager.tbl_audit.setSelectionBehavior(QAbstractItemView.SelectRows)
         tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, sectionResizeMode=0)
@@ -53,6 +61,9 @@ class GwAudit:
         self.date = self.dlg_audit_manager.findChild(QWidget, "tab_none_date_to")
         self.date.setDateTime(QDateTime.currentDateTime())
         self.date.setMaximumDateTime(QDateTime.currentDateTime())
+
+        # Open dialog
+        tools_gw.open_dialog(self.dlg_audit_manager, 'audit_manager')
 
     def open_audit(self):
         """ Open selected audit """
@@ -87,8 +98,16 @@ class GwAudit:
             return
 
         # Create dialog
+        user = tools_db.current_user
+        form = {"formName": "generic", "formType": "audit"}
+        body = {"client": {"cur_user": user}, "form": form}
+
+        # DB fct
+        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+
         self.dlg_audit = GwAuditUi(self)
         tools_gw.load_settings(self.dlg_audit)
+        tools_gw.manage_dlg_widgets(self, self.dlg_audit, json_result)
         tools_gw.open_dialog(self.dlg_audit, 'audit')
 
         # Get layouts
@@ -98,27 +117,36 @@ class GwAudit:
         for row, (key, new_value) in enumerate(new_data.items()):
             old_value = old_data.get(key, "")
 
-            # Create widgets
-            label = QLabel(str(key))
-            line_edit = QLineEdit(str(new_value))
-
-            # Highlight field if the value has changed
+            # Check if the value has changed
             if str(old_value) != str(new_value):
-                line_edit.setStyleSheet("color: orange;")
+                # Create label
+                label = QLabel(str(key))
+                layout.addWidget(label, row, 0)
 
-            line_edit.setEnabled(False)
-            layout.addWidget(label, row, 0)
-            layout.addWidget(line_edit, row, 1)
+                # Create line edit for old value
+                line_edit = QLineEdit(str(old_value) + " (old)")
+                line_edit.setEnabled(False)
+                line_edit.setStyleSheet("color: orange;")
+                layout.addWidget(line_edit, row, 1)
+
+                # Create line edit for new value
+                line_edit = QLineEdit(str(new_value) + " (new)")
+                line_edit.setEnabled(False)
+                layout.addWidget(line_edit, row, 2)
+
+        # Add vertical spacer to the layout
+        vertical_spacer = tools_qt.add_verticalspacer()
+        final_row = layout.rowCount()
+        # layout.addItem(vertical_spacer, final_row, 0, 1, 2)
+        layout.addItem(vertical_spacer, final_row , 0)
 
     # private region
 
-    def _fill_manager_table(self):
+    def _fill_manager_table(self, complet_list)-> bool:
         """ Fill log manager table with data from audit.log """
 
-        complet_list = self._get_list()
-
         if complet_list is False:
-            return
+            return False
 
         for field in complet_list['body']['data']['fields']:
             if field.get('hidden'):
@@ -129,6 +157,7 @@ class GwAudit:
                 self.dlg_audit_manager.tbl_audit.setModel(model)
             model.removeRows(0, model.rowCount())
 
+            # Check if has data
             if field['value']:
                 self.dlg_audit_manager.tbl_audit = tools_gw.add_tableview_header(self.dlg_audit_manager.tbl_audit, field)
                 self.dlg_audit_manager.tbl_audit = tools_gw.fill_tableview_rows(self.dlg_audit_manager.tbl_audit, field)
@@ -137,6 +166,8 @@ class GwAudit:
         tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, edit_triggers=QTableView.NoEditTriggers)
 
         self.dlg_audit_manager.tbl_audit.setColumnHidden(0, True)
+
+        return True
 
     def _get_list(self):
         """ Mount and execute the query for gw_fct_getlist """
