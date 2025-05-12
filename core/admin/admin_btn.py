@@ -287,7 +287,7 @@ class GwAdminButton:
         """"""
 
         status = (self.error_count == 0)
-        self._manage_result_message(status, parameter="Process finished with success")
+        self._manage_result_message(status)
         if status:
             tools_db.dao.commit()
             self._set_buttons_enabled()
