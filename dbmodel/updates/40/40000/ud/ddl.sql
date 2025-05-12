@@ -1151,7 +1151,7 @@ CREATE TABLE arc (
 	lock_level int4 NULL,
 	initoverflowpath bool DEFAULT false NULL,
 	inverted_slope bool DEFAULT false NULL,
-	negativeoffset bool DEFAULT false NULL,
+	negative_offset bool DEFAULT false NULL,
 	expl_visibility int2[] NULL,
 	created_at timestamp with time zone DEFAULT now() NULL,
 	created_by varchar(50) DEFAULT CURRENT_USER NULL,
@@ -1807,7 +1807,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_ps
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"om_state", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"last_visitdate", "dataType":"date", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"negativeoffset", "dataType":"bool", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"negative_offset", "dataType":"bool", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"archived_psector_node_traceability", "column":"verified", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"dwfzone_id", "dataType":"int4", "isUtils":"False"}}$$);
