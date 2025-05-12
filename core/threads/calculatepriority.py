@@ -162,17 +162,16 @@ class GwCalculatePriority(GwTask):
                     arc["builtdate"], "year", None
                 ) or self.config_material.get_default_builtdate(arc["matcat_id"])
 
-
             expected_life = arc.get("total_expected_useful_life", 0)
             cost = arc.get("cost_constr", 0)
             residual_useful_life = max(0, builtdate + expected_life - year)
 
             if expected_life <= 0 or cost <= 0:
-                self.skipped_arcs_due_to_replacement += 1
+                skipped_arcs_due_to_replacement += 1
                 continue
 
             current_value += cost * residual_useful_life / expected_life
-            
+
         return current_value
 
     def _emit_report(self, *args):

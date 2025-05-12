@@ -58,10 +58,10 @@ class GwProjectCheckTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f"<b>{tools_qt.tr("key")}: </b>{self.exception}<br>"
-            msg += f"<b>{tools_qt.tr("key container")}: </b>'body/data/ <br>"
-            msg += f"<b>{tools_qt.tr("Python file")}: </b>{__name__} <br>"
-            msg += f"<b>{tools_qt.tr("Python function")}:</b> {self.__class__.__name__} <br>"
+            msg = f"<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"
+            msg += f"<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"
+            msg += f"<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"
+            msg += f"<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
             return
@@ -100,7 +100,7 @@ class GwProjectCheckTask(GwTask):
                 fields += f'"table_id":"{table_name}", '
                 fields += f'"table_dbname":"{db_name}", '
                 fields += f'"table_host":"{host_name}", '
-                fields += f'"fid":101, '
+                fields += '"fid":101, '
                 fields += f'"table_user":"{table_user}"}}, '
         fields = fields[:-2] + ']'
 

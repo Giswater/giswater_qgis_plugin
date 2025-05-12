@@ -88,10 +88,10 @@ class GwCreateSchemaTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f"<b>{tools_qt.tr("key")}: </b>{self.exception}<br>"
-            msg += f"<b>{tools_qt.tr("key container")}: </b>'body/data/ <br>"
-            msg += f"<b>{tools_qt.tr("Python file")}: </b>{__name__} <br>"
-            msg += f"<b>{tools_qt.tr("Python function")}:</b> {self.__class__.__name__} <br>"
+            msg = f"<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"
+            msg += f"<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"
+            msg += f"<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"
+            msg += f"<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
 
@@ -125,12 +125,12 @@ class GwCreateSchemaTask(GwTask):
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
-        
+
         status = self.admin.load_base_locale()
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
-        
+
         status = self.admin.update_dict_folders(True, project_type, dict_update_folders=self.dict_folders_process['update_35to40'])
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
