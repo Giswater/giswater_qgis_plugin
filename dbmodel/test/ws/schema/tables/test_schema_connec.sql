@@ -29,7 +29,7 @@ SELECT columns_are(
         'feature_type', 'pjoint_type', 'pjoint_id',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority',
-        '_valve_type', '_shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_visibility', 'plot_code',
+        'access_type', 'placement_type', 'crmzone_id', 'expl_visibility', 'plot_code',
         'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id', 'n_hydrometer',
         'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_code',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
@@ -103,8 +103,6 @@ SELECT col_type_is('connec', 'epa_type', 'text', 'Column epa_type should be text
 SELECT col_type_is('connec', 'om_state', 'text', 'Column om_state should be text');
 SELECT col_type_is('connec', 'conserv_state', 'text', 'Column conserv_state should be text');
 SELECT col_type_is('connec', 'priority', 'text', 'Column priority should be text');
-SELECT col_type_is('connec', '_valve_type', 'text', 'Column _valve_type should be text');
-SELECT col_type_is('connec', '_shutoff_valve', 'text', 'Column _shutoff_valve should be text');
 SELECT col_type_is('connec', 'access_type', 'text', 'Column access_type should be text');
 SELECT col_type_is('connec', 'placement_type', 'text', 'Column placement_type should be text');
 SELECT col_type_is('connec', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
