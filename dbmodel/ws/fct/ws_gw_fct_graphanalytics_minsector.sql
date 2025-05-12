@@ -102,7 +102,7 @@ BEGIN
     UPDATE temp_pgr_node t SET graph_delimiter = LOWER(cf.graph_delimiter)
     FROM node n
     JOIN cat_node cn ON cn.id = n.nodecat_id
-    JOIN cat_feature_node cf ON cf.id = cn.nodetype_id
+    JOIN cat_feature_node cf ON cf.id = cn.node_type
     WHERE t.node_id = n.node_id AND cf.graph_delimiter = 'MINSECTOR';
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'

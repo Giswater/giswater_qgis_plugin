@@ -241,7 +241,7 @@ BEGIN
 		FROM node n
 		JOIN man_valve v ON n.node_id = v.node_id
 		JOIN cat_node cn ON cn.id = n.nodecat_id
-		JOIN cat_feature_node cf ON cf.id = cn.nodetype_id
+		JOIN cat_feature_node cf ON cf.id = cn.node_type
 		WHERE t.node_id = n.node_id AND cf.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
 
 		-- valves with to_arc NOT NULL
