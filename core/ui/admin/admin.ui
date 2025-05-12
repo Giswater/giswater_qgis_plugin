@@ -471,6 +471,9 @@
                  </property>
                  <item row="3" column="1">
                   <widget class="QPushButton" name="btn_activate_audit">
+                   <property name="toolTip">
+                    <string>It will generate a copy of the network layers from your current schema into the audit schema</string>
+                   </property>
                    <property name="text">
                     <string>Activate audit environment</string>
                    </property>

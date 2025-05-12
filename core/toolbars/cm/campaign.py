@@ -223,9 +223,9 @@ class Campaign:
                 # Also call initially
                 self._on_class_changed(combo)
 
-        self._update_feature_completer(self.dialog)
         self.setup_tab_relations()
         self._check_enable_tab_relations()
+        self._update_feature_completer(self.dialog)
 
         self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                self.dialog.tbl_campaign_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
@@ -457,11 +457,11 @@ class Campaign:
                 tbl.clicked.connect(
                     partial(tools_qgis.highlight_feature_by_id, tbl, layer, id_column, self.rubber_band, size))
 
+        self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
+
         self.dialog.tab_feature.currentChanged.connect(
             lambda: self._update_feature_completer(self.dialog)
         )
-
-        self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
 
         self.dialog.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None),
@@ -679,7 +679,6 @@ class Campaign:
             FROM cm.om_campaign 
             WHERE {field} IS NOT NULL
         """
-        print(sql)
         result = tools_db.get_row(sql)
 
         if result:
