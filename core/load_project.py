@@ -460,24 +460,23 @@ class GwLoadProject(QObject):
         toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = GwPluginToolbar(toolbar_id, toolbar_name, True)
 
-        match toolbar_id:
-            case "toc":
-                 # If the toolbar is ToC, add it to the Layers docker toolbar
-                plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
-            case "cm" | "am":
-                # If the toolbar is cm or am, check if the schema exists and if it is actived
-                sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{toolbar_id}'"
-                rows = tools_db.get_rows(sql, commit=False)
-                schema_actived = tools_gw.get_config_parser('toolbars_add', f'{toolbar_id}_active', 'user', 'init', False)
-                schema_actived = tools_os.set_boolean(schema_actived, False)
+        if toolbar_id == "toc":
+            # If the toolbar is ToC, add it to the Layers docker toolbar
+            plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
+        elif toolbar_id in ("cm", "am"):
+            # If the toolbar is cm or am, check if the schema exists and if it is actived
+            sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{toolbar_id}'"
+            rows = tools_db.get_rows(sql, commit=False)
+            schema_actived = tools_gw.get_config_parser('toolbars_add', f'{toolbar_id}_active', 'user', 'init', False)
+            schema_actived = tools_os.set_boolean(schema_actived, False)
 
-                if rows is not None and schema_actived is True:
-                    if toolbar_id == "cm":
-                        plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
-                    elif global_vars.project_type == 'ws':
-                        plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
-            case _:
-                plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+            if rows is not None and schema_actived is True:
+                if toolbar_id == "cm":
+                    plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+                elif global_vars.project_type == 'ws':
+                    plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+        else:
+            plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
 
         if hasattr(plugin_toolbar, 'toolbar') and plugin_toolbar.toolbar is not None:
             plugin_toolbar.toolbar.setObjectName(toolbar_name)
