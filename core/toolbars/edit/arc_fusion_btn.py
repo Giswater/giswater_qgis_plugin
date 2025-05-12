@@ -74,7 +74,7 @@ class GwArcFusionButton(GwMaptool):
                 if state_type != "":
                     extras += f', "state_type": {state_type}'
                 else:
-                    extras += f', "state_type": null'
+                    extras += ', "state_type": null'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)

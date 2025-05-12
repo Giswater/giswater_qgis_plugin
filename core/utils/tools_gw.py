@@ -159,7 +159,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
     # Needed to avoid errors with giswater plugins
     if path is None:
-        tools_log.log_warning(f"get_config_parser: Config file is not set")
+        tools_log.log_warning("get_config_parser: Config file is not set")
         return None
 
     value = None
@@ -490,7 +490,7 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
             client += f', "infoType":{info_type}'
         if lib_vars.project_epsg is not None:
             client += f', "epsg":{lib_vars.project_epsg}'
-        client += f'}}, '
+        client += '}, '
 
         form = f'"form":{{{form}}}, '
         if list_feature:
@@ -498,11 +498,11 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
         else:
             feature = f'"feature":{{{feature}}}, '
         filter_fields = f'"filterFields":{{{filter_fields}}}'
-        page_info = f'"pageInfo":{{}}'
+        page_info = '"pageInfo":{}'
         data = f'"data":{{{filter_fields}, {page_info}'
         if extras is not None:
             data += ', ' + extras
-        data += f'}}}}$$'
+        data += '}}$$'
         str_body = "" + client + form + feature + data
 
     return str_body
@@ -1397,7 +1397,7 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
 def set_style_mapzones():
     """ Puts the received styles, in the received layers in the json sent by the gw_fct_getstylemapzones function """
 
-    extras = f'"mapzones":""'
+    extras = '"mapzones":""'
     body = create_body(extras=extras)
     json_return = execute_procedure('gw_fct_getstylemapzones', body)
     if not json_return or json_return['status'] == 'Failed':
@@ -2593,7 +2593,7 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
     while json_result is None and attempt < global_vars.exec_procedure_max_retries:
         attempt += 1
         if attempt == 1:
-            tools_log.log_info(f"Starting process...")
+            tools_log.log_info("Starting process...")
         else:
             tools_log.log_info(f"Retrieving process ({attempt}/{global_vars.exec_procedure_max_retries})...")
         json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql, rubber_band, aux_conn,
@@ -2651,7 +2651,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         parameters = create_body(body=parameters)
     if parameters:
         sql += f"{parameters}"
-    sql += f");"
+    sql += ");"
 
     # Get log_sql for developers
     dev_log_sql = get_config_parser('log', 'log_sql', "user", "init", False)
@@ -3648,7 +3648,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
     if schema_name is not None:
         config_table = f"{schema_name}.config_form_tableview"
     else:
-        config_table = f"config_form_tableview"
+        config_table = "config_form_tableview"
 
     # Set width and alias of visible columns
     columns_to_delete = []
@@ -3907,7 +3907,7 @@ def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id
         sql += (f"SELECT DISTINCT({field_id}) as a"
                 f" FROM {tablename}")
         idx += 1
-    sql += f" ORDER BY a"
+    sql += " ORDER BY a"
 
     rows = tools_db.get_rows(sql)
     tools_qt.set_completer_rows(widget, rows)
@@ -4558,7 +4558,7 @@ def get_sysversion_addparam():
     if not tools_db.check_column('sys_version', 'addparam'):
         return None
 
-    sql = f"SELECT addparam FROM sys_version ORDER BY id DESC limit 1"
+    sql = "SELECT addparam FROM sys_version ORDER BY id DESC limit 1"
     row = tools_db.get_row(sql, is_admin=True)
 
     if row:

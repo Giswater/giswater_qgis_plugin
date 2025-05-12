@@ -160,7 +160,7 @@ class GwToolBoxTask(GwTask):
         sql = f"SELECT {self.function_name}("
         if self.body:
             sql += f"{self.body}"
-        sql += f");"
+        sql += ");"
         tools_log.log_info(f"Task 'Toolbox execute' manage json response with parameters: '{self.json_result}', '{sql}', 'None'")
         tools_gw.manage_json_response(self.json_result, sql, None)
 
@@ -189,7 +189,7 @@ class GwToolBoxTask(GwTask):
             tools_gw.manage_json_exception(self.json_result)
         # If sql function return null
         elif result is False:
-            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
+            msg = "Database returned null. Check postgres function 'gw_fct_getinfofromid'"
             tools_log.log_warning(msg)
 
     def cancel(self):

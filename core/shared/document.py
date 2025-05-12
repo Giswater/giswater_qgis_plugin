@@ -509,10 +509,10 @@ class GwDocument(QObject):
     def _fill_combo_doc_type(self, widget):
         """ Executes query and fill combo box """
 
-        sql = (f"SELECT id, idval"
-               f" FROM edit_typevalue"
-               f" WHERE typevalue = 'doc_type'"
-               f" ORDER BY id;")
+        sql = ("SELECT id, idval"
+               " FROM edit_typevalue"
+               " WHERE typevalue = 'doc_type'"
+               " ORDER BY id;")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(widget, rows, add_empty=True)
         doctype_vdefault = tools_gw.get_config_value('edit_doctype_vdefault')

@@ -49,10 +49,10 @@ class GwProjectLayersConfig(GwTask):
 
         super().finished(result)
 
-        sql = f"SELECT gw_fct_getinfofromid("
+        sql = "SELECT gw_fct_getinfofromid("
         if self.body:
             sql += f"{self.body}"
-        sql += f");"
+        sql += ");"
         tools_gw.manage_json_response(self.json_result, sql, None)
 
         # If user cancel task

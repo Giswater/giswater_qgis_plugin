@@ -102,7 +102,7 @@ class GwAmBreakageButton(GwAction):
         elif name == self.txt_priority:
             self.priority_config()
         else:
-            msg = f"No action found"
+            msg = "No action found"
             tools_qgis.show_warning(msg, parameter=name)
 
     def priority_config(self):

@@ -711,12 +711,12 @@ class GwSchemaI18NManager:
             return f"Error inserting rows: {e}"
 
         self.conn_i18n.commit()  # Commit the insertions
-        return f"2- Rows updated successfully.\n"
+        return "2- Rows updated successfully.\n"
 
     def _get_duplicates_rows(self, table):
         """Create query to determine the duplicated rows"""
 
-        query = f"""WITH duplicates AS (
+        query = """WITH duplicates AS (
                 SELECT """
         query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
         query += f""", COUNT(*) AS duplicate_count

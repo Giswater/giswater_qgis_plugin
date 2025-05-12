@@ -330,7 +330,7 @@ class GwWorkcat:
 
         current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "session")
         form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":"selector_basic", "filterText":""'
+        extras = '"selectorType":"selector_basic", "filterText":""'
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
         return json_result

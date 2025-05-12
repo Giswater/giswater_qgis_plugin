@@ -172,7 +172,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_hydrology_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
-        self.dlg_hydrology_manager.setWindowTitle(f'Hydrology scenario manager')
+        self.dlg_hydrology_manager.setWindowTitle('Hydrology scenario manager')
         tools_gw.open_dialog(self.dlg_hydrology_manager, 'dscenario_manager')
 
     def _open_dwf_manager(self):
@@ -233,7 +233,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dwf_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
-        self.dlg_dwf_manager.setWindowTitle(f'DWF scenario manager')
+        self.dlg_dwf_manager.setWindowTitle('DWF scenario manager')
         tools_gw.open_dialog(self.dlg_dwf_manager, 'dscenario_manager')
 
     def _open_dscenario_manager(self):
@@ -294,7 +294,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
-        self.dlg_dscenario_manager.setWindowTitle(f'Dscenario manager')
+        self.dlg_dscenario_manager.setWindowTitle('Dscenario manager')
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
 
     def _show_context_menu(self, qtableview, pos):
@@ -450,7 +450,7 @@ class GwDscenarioManagerButton(GwAction):
         if filter_id is not None:
             filter_fields += f', "dscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
         if not filter_active:
-            filter_fields += f', "active": {{"filterSign":"=", "value":"true"}}'
+            filter_fields += ', "active": {"filterSign":"=", "value":"true"}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
@@ -1182,8 +1182,8 @@ class GwDscenarioManagerButton(GwAction):
             # VALUES
             sql += f")VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}'"
             if view in ("inp_dscenario_controls", "inp_dscenario_rules"):
-                sql += f", ''"
-            sql += f");"
+                sql += ", ''"
+            sql += ");"
         else:
             sql = f"INSERT INTO v_edit_{view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
         tools_db.execute_sql(sql)
@@ -1332,7 +1332,7 @@ class GwDscenarioManagerButton(GwAction):
                 for f in selected_ids:
                     sql = f"INSERT INTO v_edit_{view}"
                     if view == 'inp_dscenario_demand':
-                        sql += f" (dscenario_id, feature_id)"
+                        sql += " (dscenario_id, feature_id)"
                     sql += f" VALUES ({self.selected_dscenario_id}, '{f}');"
                     result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
                     if result:
@@ -1398,7 +1398,7 @@ class GwDscenarioManagerButton(GwAction):
         if self.selected_dscenario_id is not None:
             cmb_dscenario_id = self.add_dlg.findChild(QComboBox, 'tab_none_dscenario_id')
             tools_qt.set_combo_value(cmb_dscenario_id, self.selected_dscenario_id, 0)
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_dscenario_id', False)
+            tools_qt.set_widget_enabled(self.add_dlg, 'tab_none_dscenario_id', False)
             # tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
             field_id = ['dscenario_id', field_id]
             if tablename == "inp_dscenario_pump_additional":

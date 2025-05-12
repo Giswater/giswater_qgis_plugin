@@ -223,7 +223,7 @@ class GwInfoButton(GwMaptool):
         # Build function body
         feature = f'"id":"{valve_id}", '
         feature += f'"tableName":"{table_name}", '
-        feature += f' "featureType":"node" '
+        feature += ' "featureType":"node" '
         extras = f'"fields":{{"closed": "{value}"}}'
         body = tools_gw.create_body(feature=feature, extras=extras)
 

@@ -139,7 +139,7 @@ class EmitterCalibration:
         valid = True
         # INPUT FILE
         if not os.path.exists(self.input_file):
-            print(f"Input file doesn't exist")
+            print("Input file doesn't exist")
             tools_qt.set_stylesheet(self.dlg_vol_cal.data_inp_input_file)
             valid = False
         else:
@@ -152,17 +152,17 @@ class EmitterCalibration:
 
         # OUTPUT FILE
         if not self.output_folder:
-            print(f"Output folder doesn't exist")
+            print("Output folder doesn't exist")
             tools_qt.set_stylesheet(self.dlg_vol_cal.data_output_folder)
             valid = False
         if not self.file_name:
-            print(f"Output folder doesn't exist")
+            print("Output folder doesn't exist")
             tools_qt.set_stylesheet(self.dlg_vol_cal.txt_filename)
             valid = False
 
         # CONFIG FILE
         if not os.path.exists(self.config_file):
-            print(f"Configuration file doesn't exist")
+            print("Configuration file doesn't exist")
             tools_qt.set_stylesheet(self.dlg_vol_cal.data_config_file)
             valid = False
 

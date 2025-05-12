@@ -131,7 +131,7 @@ class GwGo2EpaManagerButton(GwAction):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"{table_name}"'
-        filter_fields = f'"limit": -1'
+        filter_fields = '"limit": -1'
         if filter_id:
             filter_fields += f', "result_id": {{"filterSign":"ILIKE", "value":"{filter_id}"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)

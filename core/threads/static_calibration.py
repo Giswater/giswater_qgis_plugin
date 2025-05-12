@@ -535,7 +535,7 @@ class Calibrations:
         report_valves = []
         report_virtualvalves = []
         rows = tools_db.get_rows(
-            f"""
+            """
             select arc_id from inp_virtualvalve;
             """
         )

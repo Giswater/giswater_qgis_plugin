@@ -865,7 +865,7 @@ class GwVisit(QObject):
                f"WHERE UPPER(parameter_type) = '{self.parameter_type_id.currentText().upper()}' ")
         if self.cmb_feature_type.currentText() != '':
             sql += f"AND UPPER(feature_type) = '{self.cmb_feature_type.currentText().upper()}' "
-        sql += f"ORDER BY id"
+        sql += "ORDER BY id"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(dialog.parameter_id, rows)
@@ -1101,7 +1101,7 @@ class GwVisit(QObject):
     def _fill_visitcat(self, visit_id=None):
 
         # save result in self.visitcat_ids to get id depending on selected combo
-        sql = f"SELECT id, alias"\
+        sql = "SELECT id, alias"\
               " FROM om_visit_cat"\
               " WHERE active is true"
 
@@ -1206,8 +1206,8 @@ class GwVisit(QObject):
     def _fill_combo_parameter_id(self):
         """ Fill combo parameter_id depending feature_type """
 
-        sql = (f"SELECT id, descript "
-               f"FROM config_visit_parameter ")
+        sql = ("SELECT id, descript "
+               "FROM config_visit_parameter ")
         where = None
         parameter_type_id = tools_qt.get_text(self.dlg_add_visit, "parameter_type_id")
         if parameter_type_id:
@@ -1219,7 +1219,7 @@ class GwVisit(QObject):
                 where += f"AND UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
 
         sql += where
-        sql += f"ORDER BY id"
+        sql += "ORDER BY id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_visit.parameter_id, rows)
 

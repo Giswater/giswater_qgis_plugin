@@ -159,7 +159,7 @@ class GwStyleManager:
             return
 
         # Start building the SQL query
-        sql = f"INSERT INTO config_style (id, idval"
+        sql = "INSERT INTO config_style (id, idval"
 
         # Initialize the values part with the mandatory fields
         values = f"'{feature_id}', '{idval}'"
@@ -322,7 +322,7 @@ class GwStyleManager:
             return
 
         # Start building the SQL query
-        sql = f"UPDATE config_style SET idval = "
+        sql = "UPDATE config_style SET idval = "
 
         # Initialize the values part with the mandatory fields
         new_name = f"'{new_category_name}'"

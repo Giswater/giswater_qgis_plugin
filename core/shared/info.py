@@ -1187,7 +1187,7 @@ class GwInfo(QObject):
 
             global_vars.iface.setActiveLayer(self.layer)
             self.vertex_marker.hide()
-            extras = f'"parameters":{{'
+            extras = '"parameters":{'
             extras += f'"action":"{action_dict[rb_extrapolate.isChecked()]}", '
             extras += f'"x":{self.last_point[0]}, '
             extras += f'"y":{self.last_point[1]}, '
@@ -2459,14 +2459,14 @@ class GwInfo(QObject):
                 if 'y' in k:
                     has_elev = self._has_elev(arc_n=k[-1:])
                     if has_elev:
-                        msg = f"This feature already has ELEV values! Review it and use only one"
+                        msg = "This feature already has ELEV values! Review it and use only one"
                         tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_elev
                 # If edited field is ELEV check if feature has Y field
                 if 'elev' in k:
                     has_y = self._has_y(arc_n=k[-1:])
                     if has_y:
-                        msg = f"This feature already has Y values! Review it and use only one"
+                        msg = "This feature already has Y values! Review it and use only one"
                         tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_y
             elif self.feature_type == 'node':
@@ -2475,7 +2475,7 @@ class GwInfo(QObject):
                     has_elev = self._has_elev()
                     has_top_elev = self._has_top_elev()
                     if has_elev and has_top_elev:
-                        msg = f"This feature already has ELEV & TOP_ELEV values! Review it and use at most two"
+                        msg = "This feature already has ELEV & TOP_ELEV values! Review it and use at most two"
                         tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_elev and has_top_elev
                 # If edited field is TOP_ELEV check if feature has Y & ELEV field
@@ -2483,7 +2483,7 @@ class GwInfo(QObject):
                     has_y = self._has_y()
                     has_elev = self._has_elev()
                     if has_y and has_elev:
-                        msg = f"This feature already has Y & ELEV values! Review it and use at most two"
+                        msg = "This feature already has Y & ELEV values! Review it and use at most two"
                         tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_y and has_elev
                 # If edited field is ELEV check if feature has Y & TOP_ELEV field
@@ -2491,7 +2491,7 @@ class GwInfo(QObject):
                     has_y = self._has_y()
                     has_top_elev = self._has_top_elev()
                     if has_y and has_top_elev:
-                        msg = f"This feature already has Y & TOP_ELEV values! Review it and use at most two"
+                        msg = "This feature already has Y & TOP_ELEV values! Review it and use at most two"
                         tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_y and has_top_elev
 
@@ -2501,7 +2501,7 @@ class GwInfo(QObject):
         """If we're creating new feature, check which keys are in json"""
 
         if self.feature_type == 'node':
-            msg = f"This node has redundant data on (top_elev, ymax & elev) values. Review it and use at most two."
+            msg = "This node has redundant data on (top_elev, ymax & elev) values. Review it and use at most two."
             # y
             ymax = _json.get('ymax')
             custom_ymax = _json.get('custom_ymax')
@@ -2534,7 +2534,7 @@ class GwInfo(QObject):
             return False
 
         elif self.feature_type == 'arc':
-            msg = f"This arc has redundant data on both (elev & y) values. Review it and use only one."
+            msg = "This arc has redundant data on both (elev & y) values. Review it and use only one."
             # y1
             y1 = _json.get('y1')
             custom_y1 = _json.get('custom_y1')
@@ -3090,7 +3090,7 @@ class GwInfo(QObject):
                 #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
                 getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name, simple=True)
         except Exception as e:
-            tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
+            tools_qgis.show_warning("Exception in info (def _get_id)", parameter=e)
         finally:
             self._cancel_snapping_tool(dialog, action)
 
@@ -3245,7 +3245,7 @@ def get_list(table_name, id_name=None, filter=None):
     """ Mount and execute the query for gw_fct_getlist """
 
     feature = f'"tableName":"{table_name}"'
-    filter_fields = f'"limit": -1'
+    filter_fields = '"limit": -1'
     if id_name and filter:
         filter_fields += f', "{id_name}": {{"filterSign":"=", "value":"{filter}"}}'
     body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)

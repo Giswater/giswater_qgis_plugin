@@ -590,7 +590,7 @@ class GwPsector:
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             tools_qt.fill_combo_values(self.dlg_psector_rapport.cmb_templates, records)
 
-        row = tools_gw.get_config_value(f'composer_plan_vdefault')
+        row = tools_gw.get_config_value('composer_plan_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0])
 
@@ -624,7 +624,7 @@ class GwPsector:
         # Generate csv detail
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
-            viewname = f"v_plan_psector_budget_detail"
+            viewname = "v_plan_psector_budget_detail"
             if file_name is None or file_name == 'null':
                 msg = "Price list csv file name is required"
                 tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
@@ -636,7 +636,7 @@ class GwPsector:
         # Generate csv
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_detail_path')
-            viewname = f"v_plan_psector_budget"
+            viewname = "v_plan_psector_budget"
             if file_name is None or file_name == 'null':
                 msg = "Price list csv file name is required"
                 tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
@@ -695,7 +695,7 @@ class GwPsector:
         sql = (f"SELECT column_name FROM information_schema.columns"
                f" WHERE table_name = '{viewname}'"
                f" AND table_schema = '" + self.schema_name.replace('"', '') + "'"
-               f" ORDER BY ordinal_position")
+               " ORDER BY ordinal_position")
         rows = tools_db.get_rows(sql)
         columns = []
 
@@ -725,8 +725,8 @@ class GwPsector:
 
         if psector_id is None or psector_id == 'null':
             return
-        sql = (f"SELECT DISTINCT(column_name) FROM information_schema.columns"
-               f" WHERE table_name = 'v_plan_psector'")
+        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns"
+               " WHERE table_name = 'v_plan_psector'")
         rows = tools_db.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
@@ -833,7 +833,7 @@ class GwPsector:
         self.psector_id = psector_id
         if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
             tableleft = "v_price_compost"
-            tableright = f"v_edit_plan_psector_x_other"
+            tableright = "v_edit_plan_psector_x_other"
             if not self.load_signals:
                 self.price_selector(self.dlg_plan_psector, tableleft, tableright)
         elif self.dlg_plan_psector.tabwidget.currentIndex() == 4:
@@ -934,11 +934,11 @@ class GwPsector:
             tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return
 
-        viewname = f"'v_edit_plan_psector'"
+        viewname = "'v_edit_plan_psector'"
         sql = (f"SELECT column_name FROM information_schema.columns "
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
-               f"ORDER BY ordinal_position;")
+               "ORDER BY ordinal_position;")
         rows = tools_db.get_rows(sql)
         if not rows or rows is None or rows == '':
             msg = "Check fields from table or view"
@@ -952,7 +952,7 @@ class GwPsector:
 
             values = "VALUES("
             if columns:
-                sql = f"INSERT INTO v_edit_plan_psector ("
+                sql = "INSERT INTO v_edit_plan_psector ("
                 for column_name in columns:
                     if tools_qt.get_widget(self.dlg_plan_psector, f"tab_general_{column_name}") is not None:
                         column_name = "tab_general_" + column_name
@@ -1621,7 +1621,7 @@ class GwPsector:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
                 # Remove from selector
                 sql += f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;"
-                msg = f"Psector removed from selector"
+                msg = "Psector removed from selector"
                 tools_qgis.show_info(msg, dialog=self.dlg_psector_mng)
                 selector_updated = True
             else:
@@ -1688,11 +1688,11 @@ class GwPsector:
         expr = ""
 
         if not inactive_select:
-            expr += f" active is true"
+            expr += " active is true"
 
         if result_select != 'null':
             if expr != "":
-                expr += f" AND "
+                expr += " AND "
             expr += f" name ILIKE '%{result_select}%'"
         if expr != "":
             # Refresh model with selected filter
@@ -2498,12 +2498,12 @@ class GwPsector:
                 # Execute setarcfusion
                 workcat_id = tools_qt.get_combo_value(self.dlg_plan_psector, self.workcat_id)
                 feature_id = f'"id":["{self.node_id}"]'
-                extras = f'"enddate":null'
+                extras = '"enddate":null'
                 if workcat_id not in (None, 'null', ''):
                     extras += f', "workcatId":"{workcat_id}"'
                 extras += f', "psectorId": "{selected_psector}"'
-                extras += f', "action_mode": 1'
-                extras += f', "state_type": null'
+                extras += ', "action_mode": 1'
+                extras += ', "state_type": null'
                 body = tools_gw.create_body(feature=feature_id, extras=extras)
                 # Execute SQL function and show result to the user
                 result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
@@ -2639,7 +2639,7 @@ class GwPsector:
             for i in range(0, len(selected_list)):
                 row = selected_list[i].row()
                 feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
-                state = qtbl_feature.model().record(row).value(f"state")
+                state = qtbl_feature.model().record(row).value("state")
                 doable = qtbl_feature.model().record(row).value("doable")
                 if doable:
                     sql += f"UPDATE {list_tables[feature_type]} SET doable = False WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector} AND state = '{state}';"

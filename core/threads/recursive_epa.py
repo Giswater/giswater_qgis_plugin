@@ -306,7 +306,7 @@ class GwRecursiveEpa(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info(f"Export INP file into PostgreSQL")
+        tools_log.log_info("Export INP file into PostgreSQL")
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
@@ -350,7 +350,7 @@ class GwRecursiveEpa(GwTask):
         if global_vars.project_type == 'ud' and networkmode and networkmode[0] == "2":
 
             # Replace extension .inp
-            aditional_path = folder_path.replace('.inp', f'.gul')
+            aditional_path = folder_path.replace('.inp', '.gul')
             aditional_file = open(aditional_path, "w")
             read = True
             save_file = False
@@ -393,7 +393,7 @@ class GwRecursiveEpa(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info(f"Execute EPA software")
+        tools_log.log_info("Execute EPA software")
 
         # Set file to execute
         opener = None
@@ -456,7 +456,7 @@ class GwRecursiveEpa(GwTask):
             status = self._read_rpt_file(file_rpt)
             if not status:
                 return False
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _exec_import_function'")
+            tools_log.log_info("Task 'Go2Epa' execute function 'def _exec_import_function'")
             status = self._exec_import_function(result_name)
         except Exception as e:
             self.error_msg = str(e)

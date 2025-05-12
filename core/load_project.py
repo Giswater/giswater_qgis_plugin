@@ -437,11 +437,11 @@ class GwLoadProject(QObject):
         self._hide_button("72")
 
         # Check if audit exists
-        sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
+        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
         rows = tools_db.get_rows(sql, commit=False)
 
         # Check if schema is actived
-        schema_actived = tools_gw.get_config_parser('toolbars_add', f'audit_active', 'user', 'init', False)
+        schema_actived = tools_gw.get_config_parser('toolbars_add', 'audit_active', 'user', 'init', False)
         schema_actived = tools_os.set_boolean(schema_actived, False)
 
         if rows is None or schema_actived is False:
@@ -552,7 +552,7 @@ class GwLoadProject(QObject):
                f"     SELECT table_name FROM information_schema.tables"
                f"     WHERE table_schema = '{schema_name}')")
         rows = tools_db.get_rows(sql)
-        description = f"ConfigLayerFields"
+        description = "ConfigLayerFields"
         params = {"project_type": global_vars.project_type, "schema_name": lib_vars.schema_name, "db_layers": rows,
                   "qgis_project_infotype": lib_vars.project_vars['info_type']}
         self.task_get_layers = GwProjectLayersConfig(description, params)
@@ -691,7 +691,7 @@ class GwLoadProject(QObject):
     def _force_tab_exploitation(self):
         """ Select tab 'tab_exploitation' in dialog 'dlg_selector_basic' """
 
-        tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
+        tools_gw.set_config_parser("dialogs_tab", "dlg_selector_basic", "tab_exploitation", "user", "session")
 
     def _manage_attribute_table(self):
         """ If configured, disable button "Update all" from attribute table """

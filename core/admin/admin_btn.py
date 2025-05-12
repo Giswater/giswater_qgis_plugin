@@ -214,7 +214,7 @@ class GwAdminButton:
 
         self.timer.start(1000)
 
-        description = f"Create schema"
+        description = "Create schema"
         self.task_create_schema = GwCreateSchemaTask(self, description, params, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
@@ -287,7 +287,7 @@ class GwAdminButton:
         """"""
 
         status = (self.error_count == 0)
-        self._manage_result_message(status, parameter=f"Process finished with success")
+        self._manage_result_message(status, parameter="Process finished with success")
         if status:
             tools_db.dao.commit()
             self._set_buttons_enabled()
@@ -387,7 +387,7 @@ class GwAdminButton:
             self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_show_info))
             self.timer.start(1000)
 
-            description = f"Update schema"
+            description = "Update schema"
             params = {'project_type': project_type}
             self.task_update_schema = GwUpdateSchemaTask(self, description, params, timer=self.timer)
             QgsApplication.taskManager().addTask(self.task_update_schema)
@@ -830,8 +830,8 @@ class GwAdminButton:
     def _activate_audit(self):
         """ Activate audit functionality """
 
-        sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata "
-               f"WHERE schema_name = 'audit'")
+        sql = ("SELECT schema_name, schema_name FROM information_schema.schemata "
+               "WHERE schema_name = 'audit'")
         rows = tools_db.get_rows(sql, commit=False)
 
         if rows is not None:
@@ -1172,7 +1172,7 @@ class GwAdminButton:
     def _check_project_name(self, project_name, project_descript):
         """ Check if @project_name and @project_descript are is valid """
 
-        sql = f"SELECT word FROM pg_get_keywords() ORDER BY 1;"
+        sql = "SELECT word FROM pg_get_keywords() ORDER BY 1;"
         pg_keywords = tools_db.get_rows(sql, commit=False)
 
         # Check if project name is valid
@@ -1263,7 +1263,7 @@ class GwAdminButton:
         self.timer.start(1000)
 
         # Set background task 'GwRenameSchemaTask'
-        description = f"Rename schema"
+        description = "Rename schema"
         params = {'schema': schema, 'new_schema_name': self.schema}
         self.task_rename_schema = GwRenameSchemaTask(self, description, params, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_rename_schema)
@@ -2212,7 +2212,7 @@ class GwAdminButton:
         self.timer.start(1000)
 
         # Set background task 'GwCopySchemaTask'
-        description = f"Copy schema"
+        description = "Copy schema"
         params = {'schema': schema}
         self.task_copy_schema = GwCopySchemaTask(self, description, params, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_copy_schema)
@@ -2491,7 +2491,7 @@ class GwAdminButton:
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
 
             if not tools_db.check_table('cat_feature', schema_name):
-                tools_log.log_warning(f"Table not found: 'cat_feature'")
+                tools_log.log_warning("Table not found: 'cat_feature'")
                 return
 
             sql = (f"SELECT cat_feature.id, cat_feature.id "
@@ -2521,19 +2521,19 @@ class GwAdminButton:
         window_title = ""
         if action == 'create':
             if is_multi_addfield:
-                window_title = f'Create multi field'
+                window_title = 'Create multi field'
             else:
                 window_title = 'Create field on "' + str(form_name_fields) + '"'
             self._manage_create_field(form_name_fields, is_multi_addfield)
         elif action == 'update':
             if is_multi_addfield:
-                window_title = f'Update multi field'
+                window_title = 'Update multi field'
             else:
                 window_title = 'Update field on "' + str(form_name_fields) + '"'
             self._manage_update_field(self.dlg_manage_fields, form_name_fields, is_multi_addfield, tableview='ve_config_addfields')
         elif action == 'delete':
             if is_multi_addfield:
-                window_title = f'Delete multi field'
+                window_title = 'Delete multi field'
             else:
                 window_title = 'Delete field on "' + str(form_name_fields) + '"'
             self._manage_delete_field(form_name_fields, is_multi_addfield)
@@ -2582,7 +2582,7 @@ class GwAdminButton:
                                                self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         if is_multi_addfield:
-                window_title = f'Update multi field'
+                window_title = 'Update multi field'
         else:
             window_title = 'Update field on "' + str(form_name_fields) + '"'
         self.dlg_manage_fields.setWindowTitle(window_title)
@@ -2659,7 +2659,7 @@ class GwAdminButton:
         self.model_update_table = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         if is_multi_addfield:
-            expr_filter = f"cat_feature_id IS NULL"
+            expr_filter = "cat_feature_id IS NULL"
         else:
             expr_filter = f"cat_feature_id = '{form_name}'"
 
@@ -3093,7 +3093,7 @@ class GwAdminButton:
 
     def _select_active_locales(self, sqlite_cursor):
 
-        sql = f"SELECT locale as id, name as idval FROM locales WHERE active = 1"
+        sql = "SELECT locale as id, name as idval FROM locales WHERE active = 1"
         sqlite_cursor.execute(sql)
         return sqlite_cursor.fetchall()
 
@@ -3216,8 +3216,8 @@ class GwAdminButton:
             return
 
         # Check is project name already exists
-        sql = (f"SELECT schema_name FROM information_schema.schemata "
-               f"WHERE schema_name ILIKE 'utils' ORDER BY schema_name")
+        sql = ("SELECT schema_name FROM information_schema.schemata "
+               "WHERE schema_name ILIKE 'utils' ORDER BY schema_name")
         row = tools_db.get_row(sql, commit=False)
         if row:
             msg = "Schema Utils already exist."
@@ -3226,7 +3226,7 @@ class GwAdminButton:
 
         self.error_count = 0
         # Set background task 'GwCreateSchemaTask'
-        description = f"Create schema"
+        description = "Create schema"
         params = {'is_test': False, 'project_type': 'utils', 'exec_last_process': False,
                   'project_name_schema': 'utils', 'project_locale': self.ws_project_result[1],
                   'project_srid': self.ws_project_result[2], 'example_data': False, 'schema_version': None,
@@ -3242,7 +3242,7 @@ class GwAdminButton:
             self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
         else:
             self.ws_project_name = schema_name
-        sql = f"SELECT value FROM utils.config_param_system WHERE parameter = 'utils_version'"
+        sql = "SELECT value FROM utils.config_param_system WHERE parameter = 'utils_version'"
         row = tools_db.get_row(sql)
         if row:
             self._update_utils_schema(row, schema_name)

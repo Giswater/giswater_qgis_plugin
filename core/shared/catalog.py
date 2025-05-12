@@ -130,7 +130,7 @@ class GwCatalog:
 
         matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
 
-        form_name = f'upsert_catalog_' + feature_type + ''
+        form_name = 'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{child_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'

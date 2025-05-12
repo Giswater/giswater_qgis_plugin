@@ -74,22 +74,22 @@ class GwEpaFileManager(GwTask):
     def main_process(self) -> bool:
         status = True
         if self.go2epa_export_inp or self.go2epa_execute_epa:
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _exec_function_pg2epa'")
+            tools_log.log_info("Task 'Go2Epa' execute function 'def _exec_function_pg2epa'")
             status = self._exec_function_pg2epa()
             if not status:
                 self.function_name = 'gw_fct_pg2epa_main'
                 return False
 
         if self.go2epa_export_inp:
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _export_inp'")
+            tools_log.log_info("Task 'Go2Epa' execute function 'def _export_inp'")
             status = self._export_inp()
 
         if status and self.go2epa_execute_epa:
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _execute_epa'")
+            tools_log.log_info("Task 'Go2Epa' execute function 'def _execute_epa'")
             status = self._execute_epa()
 
         if status and self.go2epa_import_result:
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _import_rpt'")
+            tools_log.log_info("Task 'Go2Epa' execute function 'def _import_rpt'")
             self.function_name = 'gw_fct_rpt2pg_main'
             status = self._import_rpt()
 
@@ -120,7 +120,7 @@ class GwEpaFileManager(GwTask):
                 if self.complet_result.get('status') == "Accepted":
                     if 'body' in self.complet_result:
                         if 'data' in self.complet_result['body']:
-                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
+                            tools_log.log_info("Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
                             tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
                                                     None, True, True, 1, True, close=False,
                                                     call_set_tabs_enabled=False)
@@ -129,7 +129,7 @@ class GwEpaFileManager(GwTask):
                 if self.rpt_result.get('status') == "Accepted":
                     if 'body' in self.rpt_result:
                         if 'data' in self.rpt_result['body']:
-                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
+                            tools_log.log_info("Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
 
                             tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
                                                     None, True, True, 1, True, close=False,
@@ -138,8 +138,8 @@ class GwEpaFileManager(GwTask):
             sql = f"SELECT {self.function_name}("
             if self.body:
                 sql += f"{self.body}"
-            sql += f");"
-            tools_log.log_info(f"Task 'Go2Epa' manage json response")
+            sql += ");"
+            tools_log.log_info("Task 'Go2Epa' manage json response")
             tools_gw.manage_json_response(self.complet_result, sql, None)
 
             replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
@@ -252,7 +252,7 @@ class GwEpaFileManager(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info(f"Export INP file into PostgreSQL")
+        tools_log.log_info("Export INP file into PostgreSQL")
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
@@ -263,7 +263,7 @@ class GwEpaFileManager(GwTask):
             self.error_msg = f"{message}: INP file"
             return False
 
-        tools_log.log_info(f"Task 'Go2Epa' execute function 'def _fill_inp_file'")
+        tools_log.log_info("Task 'Go2Epa' execute function 'def _fill_inp_file'")
         self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
         self.common_msg += "Export INP finished. "
@@ -302,7 +302,7 @@ class GwEpaFileManager(GwTask):
         if global_vars.project_type == 'ud' and networkmode and networkmode[0] == "2":
 
             # Replace extension .inp
-            aditional_path = folder_path.replace('.inp', f'.dat')
+            aditional_path = folder_path.replace('.inp', '.dat')
             aditional_file = open(aditional_path, "w", errors='replace')
             read = True
             save_file = False
@@ -338,7 +338,7 @@ class GwEpaFileManager(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info(f"Execute EPA software")
+        tools_log.log_info("Execute EPA software")
         self.step_completed.emit({"message": {"level": 1, "text": "Execute EPA software......"}}, "")
 
         if self.file_rpt == "null":
@@ -385,11 +385,11 @@ class GwEpaFileManager(GwTask):
         status = False
         try:
             # Call import function
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _read_rpt_file'")
+            tools_log.log_info("Task 'Go2Epa' execute function 'def _read_rpt_file'")
             status = self._read_rpt_file(self.file_rpt)
             if not status:
                 return False
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _exec_import_function'")
+            tools_log.log_info("Task 'Go2Epa' execute function 'def _exec_import_function'")
             status = self._exec_import_function()
         except Exception as e:
             self.error_msg = str(e)

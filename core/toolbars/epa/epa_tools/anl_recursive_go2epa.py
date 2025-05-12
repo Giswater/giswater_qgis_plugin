@@ -116,13 +116,13 @@ class RecursiveEpa():
     def _enable_cancel_btn(self, enable):
         if enable:
             self.dlg_epa.btn_accept.clicked.disconnect()
-            self.dlg_epa.btn_accept.setText(f"Cancel")
+            self.dlg_epa.btn_accept.setText("Cancel")
             self.dlg_epa.btn_accept.clicked.connect(self.recursive_epa.stop_task)
             self.dlg_epa.btn_close.hide()
         else:
             self.dlg_epa.btn_close.show()
             self.dlg_epa.btn_accept.clicked.disconnect()
-            self.dlg_epa.btn_accept.setText(f"Accept")
+            self.dlg_epa.btn_accept.setText("Accept")
             self.dlg_epa.btn_accept.clicked.connect(partial(self.execute_epa, self.dlg_epa))
 
     def _set_remaining_time(self, time):

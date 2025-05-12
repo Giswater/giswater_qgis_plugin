@@ -53,12 +53,12 @@ class GwCreateSchemaTask(GwTask):
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
         self.admin.progress_value = 0
-        tools_log.log_info(f"Task 'Create schema' execute function 'def main_execution'")
+        tools_log.log_info("Task 'Create schema' execute function 'def main_execution'")
         status = self.main_execution()
         if not tools_os.set_boolean(status, False):
             tools_log.log_info("Function main_execution returned False")
             return False
-        tools_log.log_info(f"Task 'Create schema' execute function 'def custom_execution'")
+        tools_log.log_info("Task 'Create schema' execute function 'def custom_execution'")
         self.custom_execution()
         return True
 
@@ -117,7 +117,7 @@ class GwCreateSchemaTask(GwTask):
         project_srid = self.params['project_srid']
 
         self.admin.progress_ratio = 0.8
-        tools_log.log_info(f"Task 'Create schema' execute function 'def calculate_number_of_files'")
+        tools_log.log_info("Task 'Create schema' execute function 'def calculate_number_of_files'")
         self.admin.total_sql_files = self.calculate_number_of_files()
         tools_log.log_info(f"Number of SQL files 'TOTAL': {self.admin.total_sql_files}")
 

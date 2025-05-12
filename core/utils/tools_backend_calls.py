@@ -1078,7 +1078,7 @@ def _reload_table(**kwargs):
             filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
 
         if no_tabs:
-            filter_fields = f''
+            filter_fields = ''
             widgetname = columnname
         linkedobject = table.property('linkedobject')
         complet_list, widget_list = fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)

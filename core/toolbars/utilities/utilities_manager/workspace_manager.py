@@ -384,7 +384,7 @@ class GwWorkspaceManagerButton(GwAction):
         value = index.sibling(index.row(), 0).data()
 
         msg = "Are you sure you want to delete these records?"
-        sql = f"SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user"
+        sql = "SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user"
         row = tools_db.get_row(sql)
         if row and row[0]:
             if row[0] == f'{value}':

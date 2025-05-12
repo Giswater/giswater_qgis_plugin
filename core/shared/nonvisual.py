@@ -97,7 +97,7 @@ class GwNonVisual:
         self._manage_tabs_changed()
 
         # Open dialog
-        tools_gw.open_dialog(self.manager_dlg, dlg_name=f'nonvisual_manager')
+        tools_gw.open_dialog(self.manager_dlg, dlg_name='nonvisual_manager')
 
     def _manage_tabs_manager(self):
         """ Creates and populates manager tabs """
@@ -145,18 +145,18 @@ class GwNonVisual:
     def _populate_filter_combos(self):
         """ cmb_curve_type, cmb_pattern_type, cmb_timser_type """
 
-        sql = f"SELECT DISTINCT curve_type AS id, curve_type AS idval FROM v_edit_inp_curve"
+        sql = "SELECT DISTINCT curve_type AS id, curve_type AS idval FROM v_edit_inp_curve"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.manager_dlg.cmb_curve_type, rows, add_empty=True)
 
         if global_vars.project_type == 'ud':
-            sql = f"SELECT DISTINCT pattern_type AS id, pattern_type AS idval FROM v_edit_inp_pattern"
+            sql = "SELECT DISTINCT pattern_type AS id, pattern_type AS idval FROM v_edit_inp_pattern"
             rows = tools_db.get_rows(sql)
             if rows:
                 tools_qt.fill_combo_values(self.manager_dlg.cmb_pattern_type, rows, add_empty=True)
 
-            sql = f"SELECT DISTINCT timser_type AS id, timser_type AS idval FROM v_edit_inp_timeseries"
+            sql = "SELECT DISTINCT timser_type AS id, timser_type AS idval FROM v_edit_inp_timeseries"
             rows = tools_db.get_rows(sql)
             if rows:
                 tools_qt.fill_combo_values(self.manager_dlg.cmb_timser_type, rows, add_empty=True)
@@ -307,7 +307,7 @@ class GwNonVisual:
         text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
         expr = ""
         if not active:
-            expr = f"active is true"
+            expr = "active is true"
         if curve_type not in (None, -1):
             if expr:
                 expr += " and "
@@ -436,7 +436,7 @@ class GwNonVisual:
         self.dlg_print.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_print))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_print, dlg_name=f'nonvisual_print')
+        tools_gw.open_dialog(self.dlg_print, dlg_name='nonvisual_print')
 
     def _exec_print(self):
 
@@ -506,11 +506,11 @@ class GwNonVisual:
         self._connect_dialog_signals()
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_roughness')
+        tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_roughness')
 
     def _populate_cmb_matcat_id(self, combobox):
 
-        sql = f"SELECT id, matcat_id as idval FROM cat_mat_roughness"
+        sql = "SELECT id, matcat_id as idval FROM cat_mat_roughness"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(combobox, rows)
@@ -668,7 +668,7 @@ class GwNonVisual:
 
         # Show warning message if scipy/numpy is not available
         if scipy_imported is False:
-            msg = f"Couldn't import scipy/numpy so the graph can't be shown. Please install it manually or try with another QGIS version"
+            msg = "Couldn't import scipy/numpy so the graph can't be shown. Please install it manually or try with another QGIS version"
             tools_qgis.show_warning(msg, dialog=self.manager_dlg)
             return
 
@@ -732,7 +732,7 @@ class GwNonVisual:
         tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_curve')
+        tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_curve')
 
     def _paste_curves_custom_menu(self, tbl):
         menu = QMenu(tbl)
@@ -789,7 +789,7 @@ class GwNonVisual:
 
         curve_type_list = []
         curve_type_headers = {}
-        sql = f"SELECT id, idval, addparam FROM inp_typevalue WHERE typevalue = 'inp_value_curve'"
+        sql = "SELECT id, idval, addparam FROM inp_typevalue WHERE typevalue = 'inp_value_curve'"
         rows = tools_db.get_rows(sql)
         if rows:
             curve_type_list = [[row['id'], row['idval']] for row in rows]
@@ -1034,7 +1034,7 @@ class GwNonVisual:
                 x_list = xnew
                 y_list = y_smooth
             else:
-                msg = f"Can't create curve with only one value if flow is 0. Add more values or change the flow value."
+                msg = "Can't create curve with only one value if flow is 0. Add more values or change the flow value."
                 tools_qgis.show_warning(msg, dialog=dialog)
 
         # Manage inverted plot and mirror plot for SHAPE type
@@ -1772,7 +1772,7 @@ class GwNonVisual:
             if row == (['null'] * table.columnCount()):
                 continue
 
-            sql = f"INSERT INTO v_edit_inp_pattern_value (pattern_id, "
+            sql = "INSERT INTO v_edit_inp_pattern_value (pattern_id, "
             for n, x in enumerate(row):
                 sql += f"factor_{n + 1}, "
             sql = sql.rstrip(', ') + ")"
@@ -1862,7 +1862,7 @@ class GwNonVisual:
         self._connect_dialog_signals()
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_controls')
+        tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_controls')
 
     def _populate_controls_widgets(self, control_id, dscenario_id):
         """ Fills in all the values for control dialog """
@@ -1998,7 +1998,7 @@ class GwNonVisual:
         self._connect_dialog_signals()
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_rules')
+        tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_rules')
 
     def _populate_rules_widgets(self, rule_id, dscenario_id):
         """ Fills in all the values for rule dialog """
@@ -2159,7 +2159,7 @@ class GwNonVisual:
         self._manage_times_type(tbl_timeseries_value, tools_qt.get_combo_value(self.dialog, cmb_times_type))
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_timeseries')
+        tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_timeseries')
 
     def _paste_timeseries_custom_menu(self, tbl):
         menu = QMenu(tbl)
@@ -2454,7 +2454,7 @@ class GwNonVisual:
                     tools_db.dao.rollback()
                     return False
 
-                sql = f"INSERT INTO v_edit_inp_timeseries_value (timser_id, date, hour, value) "
+                sql = "INSERT INTO v_edit_inp_timeseries_value (timser_id, date, hour, value) "
                 sql += f"VALUES ({timeseries_id}, {row[0]}, {row[1]}, {row[2]})"
 
                 result = tools_db.execute_sql(sql, commit=False)
@@ -2474,7 +2474,7 @@ class GwNonVisual:
                     tools_db.dao.rollback()
                     return False
 
-                sql = f"INSERT INTO v_edit_inp_timeseries_value (timser_id, time, value) "
+                sql = "INSERT INTO v_edit_inp_timeseries_value (timser_id, time, value) "
                 sql += f"VALUES ({timeseries_id}, {row[1]}, {row[2]})"
 
                 result = tools_db.execute_sql(sql, commit=False)
@@ -2509,13 +2509,13 @@ class GwNonVisual:
                 tools_qt.double_validator(widget, 0, 9999999, 3)
 
         # Populate LID Type combo
-        sql = f"SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
+        sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
 
         # Populate Control Curve combo
-        sql = f"SELECT id, id as idval FROM v_edit_inp_curve; "
+        sql = "SELECT id, id as idval FROM v_edit_inp_curve; "
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.dialog.txt_7_cmb_control_curve, rows)
@@ -2535,7 +2535,7 @@ class GwNonVisual:
             self._load_lids_widgets(self.dialog)
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_lids')
+        tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_lids')
 
     def _open_help(self):
         webbrowser.open('https://giswater.gitbook.io/giswater-manual/7.-export-import-of-the-hydraulic-model')
@@ -2810,7 +2810,7 @@ class GwNonVisual:
                 widgets_list = [widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)]
                 widgets_list = self._order_list(widgets_list)
 
-                sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
+                sql = "INSERT INTO inp_lid_value (lidco_id, lidlayer,"
                 for y, widget in enumerate(widgets_list):
                     sql += f"value_{y + 2}, "
                 sql = sql.rstrip(', ') + ")"
@@ -2905,7 +2905,7 @@ class GwNonVisual:
 
         tooltip = "Active sectors for user selection (check selector sector)"
         combobox.setToolTip(tooltip)
-        sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
+        sql = "SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(combobox, rows)

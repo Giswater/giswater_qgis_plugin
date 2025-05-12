@@ -141,12 +141,12 @@ class GwAudit:
     def _get_list(self):
         """ Mount and execute the query for gw_fct_getlist """
 
-        feature = f'"tableName":"audit_results"'
+        feature = '"tableName":"audit_results"'
         filter_fields = f""""limit": -1, 
                         "feature_id": {{"filterSign":"=", "value":"{self.feature_id}"}},
                         "table_name": {{"filterSign":"=", "value":"{self.table_name}"}}
                         """
-        page_info = f'"pageInfo":{{"orderBy":"tstamp", "orderType":"DESC"}}'
+        page_info = '"pageInfo":{"orderBy":"tstamp", "orderType":"DESC"}'
 
         # Create json body
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields, extras=page_info)

@@ -215,7 +215,7 @@ class GwMapzoneManager:
         search_text = dialog.txt_name.text()
         expr = ""
         if not active:
-            expr = f"active is true"
+            expr = "active is true"
 
         if search_text:
             if expr:
@@ -569,7 +569,7 @@ class GwMapzoneManager:
         self.mapzone_type = tableview.objectName().split('_')[-1].lower()
         col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_id')
         self.mapzone_id = index.sibling(index.row(), col_idx).data()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'name')
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'name')
         if col_idx is None:
             col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_name')
         mapzone_name = index.sibling(index.row(), col_idx).data()
@@ -1329,8 +1329,8 @@ class GwMapzoneManager:
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
         # Populate netscenario_id
         if self.netscenario_id is not None:
-            tools_qt.set_widget_text(self.add_dlg, f'tab_none_netscenario_id', self.netscenario_id)
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_netscenario_id', False)
+            tools_qt.set_widget_text(self.add_dlg, 'tab_none_netscenario_id', self.netscenario_id)
+            tools_qt.set_widget_enabled(self.add_dlg, 'tab_none_netscenario_id', False)
             tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
             field_id = ['netscenario_id', field_id]
 

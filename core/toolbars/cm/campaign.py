@@ -83,7 +83,7 @@ class Campaign:
         dlg_selector = GwSelectorUi(self)
         tools_gw.load_settings(dlg_selector)
         current_tab = tools_gw.get_config_parser('dialogs_tab_cm', "dlg_selector_campaign", "user", "session")
-        selector_values = f"selector_campaign"
+        selector_values = "selector_campaign"
 
         dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
         dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))

@@ -68,7 +68,7 @@ class GwDialog(QDialog):
             self._messageBar = global_vars.iface
 
         # Connect the help shortcut
-        action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_help", "user", "init", prefix=False)
+        action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", "shortcut_help", "user", "init", prefix=False)
         sh = QShortcut(QKeySequence(f"{action_help_shortcut}"), self)
         sh.activated.connect(tools_gw.open_dlg_help)
         # Set window icon

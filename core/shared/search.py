@@ -53,7 +53,7 @@ class GwSearch:
         if dlg_mincut:
             self.dlg_search = dlg_mincut
             self.is_mincut = True
-            form = f'"singleTab":"tab_address"'
+            form = '"singleTab":"tab_address"'
 
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)

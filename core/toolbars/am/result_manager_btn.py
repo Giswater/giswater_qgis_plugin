@@ -194,7 +194,7 @@ class GwResultManagerButton(GwAction):
         expl_id = tools_qt.get_combo_value(dlg, dlg.cmb_expl, 0)
         status = tools_qt.get_combo_value(dlg, dlg.cmb_status, 0)
 
-        expr = f"result_id is NOT NULL"
+        expr = "result_id is NOT NULL"
 
         if name:
             expr += f" AND result_name = '{name}'"

@@ -141,7 +141,7 @@ class GwAuxCircleAddButton(GwMaptool):
     def _load_missing_layers(self):
         """ Adds any missing Mincut layers to TOC """
 
-        sql = f"SELECT id, alias FROM sys_table WHERE id LIKE 'v_edit_cad_aux%' AND alias IS NOT NULL"
+        sql = "SELECT id, alias FROM sys_table WHERE id LIKE 'v_edit_cad_aux%' AND alias IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
             for tablename, alias in rows:

@@ -37,7 +37,7 @@ class GwProjectCheckTask(GwTask):
         layers = self.params['layers']
         init_project = self.params['init_project']
         self.dlg_audit_project = self.params['dialog']
-        tools_log.log_info(f"Task 'Check project' execute function 'fill_check_project_table'")
+        tools_log.log_info("Task 'Check project' execute function 'fill_check_project_table'")
         status, self.result = self.fill_check_project_table(layers, init_project)
         if not status:
             tools_log.log_info("Function fill_check_project_table returned False")
@@ -137,7 +137,7 @@ class GwProjectCheckTask(GwTask):
             log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
 
         extras = f'"version":"{plugin_version}"'
-        extras += f', "fid":101'
+        extras += ', "fid":101'
         extras += f', "initProject":{init_project}'
         extras += f', "addSchema":"{add_schema}"'
         extras += f', "mainSchema":"{main_schema}"'

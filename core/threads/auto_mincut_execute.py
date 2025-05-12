@@ -68,10 +68,10 @@ class GwAutoMincutTask(GwTask):
 
         super().finished(result)
 
-        sql = f"SELECT gw_fct_setmincut("
+        sql = "SELECT gw_fct_setmincut("
         if self.body:
             sql += f"{self.body}"
-        sql += f");"
+        sql += ");"
         tools_log.log_info(f"Task 'Mincut execute' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
         tools_gw.manage_json_response(self.complet_result, sql, None)
 
@@ -84,7 +84,7 @@ class GwAutoMincutTask(GwTask):
         # If sql function return null
         elif self.complet_result is None:
             self.task_finished.emit([False, self.complet_result])
-            msg = f"Error. Database returned null. Check postgres function 'gw_fct_setmincut'"
+            msg = "Error. Database returned null. Check postgres function 'gw_fct_setmincut'"
             tools_log.log_warning(msg)
 
         # Handle python exception

@@ -501,7 +501,7 @@ class GwCalculatePriority(GwTask):
         loop = 0
         ended = False
         while not ended:
-            save_arcs_sql = f"""
+            save_arcs_sql = """
                 insert into am.arc_engine_sh (
                     arc_id,
                     result_id,
@@ -942,7 +942,7 @@ class GwCalculatePriority(GwTask):
         loop = 0
         ended = False
         while not ended:
-            save_arcs_sql = f"""
+            save_arcs_sql = """
                 insert into am.arc_engine_wm (
                     arc_id,
                     result_id,
@@ -989,7 +989,7 @@ class GwCalculatePriority(GwTask):
         loop = 0
         ended = False
         while not ended:
-            save_arcs_sql = f"""
+            save_arcs_sql = """
                 insert into am.arc_output (
                     arc_id,
                     result_id,

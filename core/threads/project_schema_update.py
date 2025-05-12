@@ -46,7 +46,7 @@ class GwUpdateSchemaTask(GwTask):
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
         self.admin.progress_value = 0
-        tools_log.log_info(f"Task 'Update schema' execute function 'def main_execution'")
+        tools_log.log_info("Task 'Update schema' execute function 'def main_execution'")
         status = self.main_execution()
         if not status:
             tools_log.log_info("Function main_execution returned False")
@@ -76,7 +76,7 @@ class GwUpdateSchemaTask(GwTask):
             if 'body' in self.status:
                 tools_gw.fill_tab_log(self.admin.dlg_readsql_show_info, self.status['body']['data'], True, True, 1)
             else:
-                tools_log.log_warning(f"Key not found: 'body'")
+                tools_log.log_warning("Key not found: 'body'")
 
         # Reset count error variable to 0
         self.admin.error_count = 0

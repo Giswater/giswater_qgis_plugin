@@ -138,11 +138,11 @@ class GwNetscenarioManagerButton(GwAction):
         expr = ""
 
         if not inactive_select:
-            expr += f" active is true"
+            expr += " active is true"
 
         if result_select != 'null':
             if expr != "":
-                expr += f" AND "
+                expr += " AND "
             expr += f" name ILIKE '%{result_select}%'"
         if expr != "":
             # Refresh model with selected filter
@@ -232,7 +232,7 @@ class GwNetscenarioManagerButton(GwAction):
         if filter_id is not None:
             filter_fields += f', "netscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
         if chk_active is False:
-            filter_fields += f', "active": {{"filterSign":"=", "value":true}}'
+            filter_fields += ', "active": {"filterSign":"=", "value":true}'
 
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
@@ -670,7 +670,7 @@ class GwNetscenarioManagerButton(GwAction):
         index = tableview.selectionModel().currentIndex()
         col_idx = tools_qt.get_col_index_by_col_name(tableview, 'netscenario_id')
         netscenario_id = index.sibling(index.row(), col_idx).data()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'node_id')
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'node_id')
         node_id = index.sibling(index.row(), col_idx).data()
         closed = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'closed')).data()
         closed = tools_os.set_boolean(closed)
@@ -697,7 +697,7 @@ class GwNetscenarioManagerButton(GwAction):
         # TODO: Remove these lines if not needed
         # col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_type')
         # selected_netscenario_type = index.sibling(index.row(), col_idx).data()
-        tablename = f"plan_netscenario"
+        tablename = "plan_netscenario"
         pkey = "netscenario_id"
 
         feature = f'"tableName":"{tablename}", "id":"{selected_netscenario_id}"'

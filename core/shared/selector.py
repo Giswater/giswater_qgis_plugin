@@ -33,7 +33,7 @@ class GwSelector:
             aux_params = None
             if selector_type == "selector_mincut":
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
-                aux_params = tools_gw.get_config_parser("selector_mincut", f"aux_params", "user", "session")
+                aux_params = tools_gw.get_config_parser("selector_mincut", "aux_params", "user", "session")
             elif selector_type == "selector_campaign":
                 current_tab = tools_gw.get_config_parser('dialogs_tab_cm', "dlg_selector_campaign", "user", "session")
                 print(current_tab)
@@ -142,7 +142,7 @@ class GwSelector:
             form = f'"currentTab":"{current_tab}"'
             extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
             if aux_params:
-                tools_gw.set_config_parser("selector_mincut", f"aux_params", f"{aux_params}", "user", "session")
+                tools_gw.set_config_parser("selector_mincut", "aux_params", f"{aux_params}", "user", "session")
                 extras = f"{extras}, {aux_params}"
             extras += f', "addSchema":"{lib_vars.project_vars["add_schema"]}"'
             body = tools_gw.create_body(form=form, extras=extras)
@@ -254,7 +254,7 @@ class GwSelector:
 
                     # Set background color every other item (if enabled)
                     if color_rows and order % 2 == 0:
-                        widget.setStyleSheet(f"background-color: #E9E7E3")
+                        widget.setStyleSheet("background-color: #E9E7E3")
 
                     # Add widget to layout
                     field['layoutname'] = gridlayout.objectName()

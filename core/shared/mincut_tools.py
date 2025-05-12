@@ -200,7 +200,7 @@ def mincut_selector(**kwargs):
         msg = "There are no visible mincuts in the table. Try a different filter or make one"
         tools_qgis.show_message(msg, dialog=dialog)
         return
-    selector_values = f"selector_mincut"
+    selector_values = "selector_mincut"
     aux_params = f'"ids":{json.dumps(selected_mincuts)}'
     min_selector = GwSelector()
 
