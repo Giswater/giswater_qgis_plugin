@@ -301,7 +301,6 @@ def add_layers_temp(layers, group):
 
 def apply_layer_style(layer, layer_group, layer_origin):
     """Applies styling to a layer based on its geometry type and feature colors."""
-    symbol = layer.renderer().symbol()
 
     # Get reference symbol style from layer_group
     layer_node = QgsProject.instance().mapLayersByName(layer_group)[0]
