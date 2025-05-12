@@ -1053,4 +1053,4 @@ WHERE (formname, formtype, tabname) = ('cat_arc', 'form_feature', 'tab_none')
   AND layoutorder IS NULL AND columnname = 'z1';
 
 
-UPDATE config_form_fields SET columname = 'negative_offset' WHERE columname = 'negativeoffset';
+UPDATE config_form_fields SET columnname = 'negative_offset' WHERE columnname = 'negativeoffset';
