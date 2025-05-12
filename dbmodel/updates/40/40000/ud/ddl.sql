@@ -1106,7 +1106,6 @@ CREATE TABLE arc (
 	fluid_type varchar(50) NULL,
 	custom_length numeric(12, 2) NULL,
 	sys_slope numeric(12, 4) NULL,
-	hydraulic_capacity float8 NULL,
 	descript text NULL,
 	annotation text NULL,
 	observ text NULL,
@@ -1802,7 +1801,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_ps
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"initoverflowpath", "dataType":"bool", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"omunit_id", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"registration_date", "dataType":"date", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"hydraulic_capacity", "dataType":"float8", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"meandering", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"om_state", "dataType":"text", "isUtils":"False"}}$$);

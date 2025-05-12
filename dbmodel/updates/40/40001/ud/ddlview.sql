@@ -628,7 +628,6 @@ AS WITH
 			arc.custom_length,
 			st_length(arc.the_geom)::numeric(12,2) AS gis_length,
 			arc.sys_slope AS slope,
-            arc.hydraulic_capacity,
 			arc.descript,
 			arc.annotation,
 			arc.observ,
