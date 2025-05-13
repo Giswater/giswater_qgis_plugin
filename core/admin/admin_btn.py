@@ -1606,6 +1606,7 @@ class GwAdminButton:
         tools_db.check_pg_extension('tablefunc')
         tools_db.check_pg_extension('unaccent')
         tools_db.check_pg_extension('fuzzystrmatch')
+        tools_db.check_pg_extension('intarray')
 
         if schema_name == 'null':
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
