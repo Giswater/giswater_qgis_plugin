@@ -58,7 +58,7 @@ class GwAmBreakageButton(GwAction):
         self.menu.setObjectName("AM_breakage_tools")
         self._fill_action_menu()
 
-        if toolbar is not None:
+        if toolbar and self.action:
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
@@ -66,9 +66,10 @@ class GwAmBreakageButton(GwAction):
         self.dlg_assignation = None
 
     def clicked_event(self):
-        button = self.action.associatedWidgets()[1]
-        menu_point = button.mapToGlobal(QPoint(0, button.height()))
-        self.menu.exec(menu_point)
+        if self.action:
+            button = self.action.associatedWidgets()[1]
+            menu_point = button.mapToGlobal(QPoint(0, button.height()))
+            self.menu.exec(menu_point)
 
     def _fill_action_menu(self):
         """Fill action menu"""
@@ -153,6 +154,11 @@ class GwAmBreakageButton(GwAction):
         try:
             # Read the config file
             config = configparser.ConfigParser()
+
+            # Check variable
+            if not lib_vars.plugin_dir:
+                return
+
             config_path = os.path.join(
                 lib_vars.plugin_dir, f"config{os.sep}giswater.config"
             )

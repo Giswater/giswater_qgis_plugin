@@ -18,7 +18,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ...libs import tools_db, tools_qt, lib_vars
-
+from typing import Optional
 
 def get_min_greater_than(iterable, value):
     result = None
@@ -104,13 +104,14 @@ class GwCalculatePriority(GwTask):
         self.config_material = config_material
         self.config_engine = config_engine
 
-        config_path = Path(lib_vars.plugin_dir) / "config" / "giswater.config"
-        config = configparser.ConfigParser()
-        config.read(config_path)
-        self.method = config.get("general", "engine_method")
-        self.unknown_material = config.get("general", "unknown_material")
+        if lib_vars.plugin_dir:
+            config_path = Path(lib_vars.plugin_dir) / "config" / "giswater.config"
+            config = configparser.ConfigParser()
+            config.read(config_path)
+            self.method = config.get("general", "engine_method")
+            self.unknown_material = config.get("general", "unknown_material")
 
-        self.msg_task_canceled = tools_qt.tr("Task canceled.")
+            self.msg_task_canceled = tools_qt.tr("Task canceled.")
 
     def run(self):
         try:
@@ -131,7 +132,7 @@ class GwCalculatePriority(GwTask):
             return False
 
     def _calculate_ivi(self, arcs, year, replacements=False):
-        current_value = self._current_value(arcs, year, replacements)
+        current_value = self._current_value(arcs, year, replacements, True)
         replacement_cost = self._replacement_cost(arcs)
         return current_value / replacement_cost
 
@@ -147,9 +148,8 @@ class GwCalculatePriority(GwTask):
             """
         )
 
-    def _current_value(self, arcs, year, replacements=False):
+    def _current_value(self, arcs, year, replacements=False, invalid_ivi: Optional[bool] = False):
         current_value = 0
-        skipped_arcs_due_to_replacement = 0
         for arc in arcs:
             if (
                 replacements
@@ -161,16 +161,15 @@ class GwCalculatePriority(GwTask):
                 builtdate = getattr(
                     arc["builtdate"], "year", None
                 ) or self.config_material.get_default_builtdate(arc["matcat_id"])
+            residual_useful_life = builtdate + arc["total_expected_useful_life"] - year
+            current_value += (
+                arc["cost_constr"]
+                * residual_useful_life
+                / arc["total_expected_useful_life"]
+            )
 
-            expected_life = arc.get("total_expected_useful_life", 0)
-            cost = arc.get("cost_constr", 0)
-            residual_useful_life = max(0, builtdate + expected_life - year)
-
-            if expected_life <= 0 or cost <= 0:
-                skipped_arcs_due_to_replacement += 1
-                continue
-
-            current_value += cost * residual_useful_life / expected_life
+        if invalid_ivi:
+            current_value = current_value if current_value > 0 else 0
 
         return current_value
 
@@ -211,6 +210,7 @@ class GwCalculatePriority(GwTask):
                 ai.strategic,
                 coalesce(ai.mandatory, false) mandatory
             """
+        else: columns = ""
 
         filter_list = []
         if self.features:
@@ -225,13 +225,14 @@ class GwCalculatePriority(GwTask):
             filter_list.append(f"a.matcat_id = '{self.material}'")
         filters = f"where {' and '.join(filter_list)}" if filter_list else ""
 
-        sql = f"""
-            select {columns}
-            from am.ext_arc_asset a 
-            left join am.arc_input ai using (arc_id)
-            {filters}
-        """
-        return tools_db.get_rows(sql)
+        if columns != "":
+            sql = f"""
+                select {columns}
+                from am.ext_arc_asset a 
+                left join am.arc_input ai using (arc_id)
+                {filters}
+            """
+            return tools_db.get_rows(sql)
 
     def _invalid_arccat_id_report(self, obj):
         if not obj["qtd"]:
@@ -332,9 +333,15 @@ class GwCalculatePriority(GwTask):
         discount_rate = float(self.config_engine["drate"])
         break_growth_rate = float(self.config_engine["bratemain0"])
 
-        last_leak_year = tools_db.get_row(
+        rows = tools_db.get_row(
             "select max(date_part('year', date)) from am.leaks", is_admin=True
-        )[0]
+        )
+
+        if not rows:
+            return
+
+        last_leak_year = rows[0]
+
 
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
@@ -360,16 +367,7 @@ class GwCalculatePriority(GwTask):
         invalid_material = {"qtd": 0, "set": set()}
         invalid_diameter = {"qtd": 0, "set": set()}
         for arc in arcs:
-            (
-                arc_id,
-                arc_material,
-                arc_diameter,
-                arc_length,
-                rleak,
-                expl_id,
-                presszone_id,
-                strategic,
-            ) = arc
+            (arc_id, arc_material, arc_diameter, arc_length, rleak, expl_id, presszone_id, strategic) = arc
             if not self.config_material.has_material(arc_material):
                 invalid_material["qtd"] += 1
                 invalid_material["set"].add(arc_material)
@@ -630,6 +628,9 @@ class GwCalculatePriority(GwTask):
             join lengths as l using (dma_id)
             """
         )
+
+        if not rows:
+            return
 
         nrw = {row["dma_id"]: row["nrw_m3kmd"] for row in rows}
 
@@ -1139,8 +1140,10 @@ class GwCalculatePriority(GwTask):
         )
 
         sql = f"select result_id from am.cat_result where result_name = '{self.result_name}'"
-        result_id = tools_db.get_row(sql, is_admin=True)[0]
-        return result_id
+        row = tools_db.get_row(sql, is_admin=True)
+        if not row:
+            return
+        return row[0]
 
     def _summary(self, arcs):
         title = tools_qt.tr("SUMMARY")

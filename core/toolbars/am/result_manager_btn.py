@@ -16,7 +16,7 @@ from qgis.PyQt.QtSql import QSqlRelation, QSqlRelationalTableModel
 from .priority_btn import CalculatePriority
 from ...ui.ui_manager import GwPriorityManagerUi, GwStatusSelectorUi
 
-from ....libs import lib_vars, tools_db, tools_qt
+from ....libs import lib_vars, tools_db, tools_qt, tools_qgis
 from ...utils import tools_gw
 from ..dialog import GwAction
 
@@ -93,6 +93,11 @@ class GwResultManagerButton(GwAction):
             where objectname = 'cat_result'
             """
         )
+
+        # Check rows
+        if not rows:
+            return
+
         self.headers = {row["columnname"]: row["alias"] for row in rows}
         self.headers["value_result_type_idval_2"] = self.headers.get(
             "result_type", "Type"
@@ -104,13 +109,24 @@ class GwResultManagerButton(GwAction):
 
         # Create dicts for i18n labels:
         self._value_status = {}
-        for id, idval in tools_db.get_rows("select id, idval from am.value_status"):
+
+        rows = tools_db.get_rows("select id, idval from am.value_status")
+        # Check rows
+        if not rows:
+            return
+
+        for id, idval in rows:
             self._value_status[idval] = id
 
         self._value_result_type = {}
-        for id, idval in tools_db.get_rows(
-            "select id, idval from am.value_result_type"
-        ):
+
+        rows =  tools_db.get_rows("select id, idval from am.value_result_type")
+
+        # Check rows
+        if not rows:
+            return
+
+        for id, idval in rows:
             self._value_result_type[idval] = id
 
         # Open the dialog
@@ -230,7 +246,6 @@ class GwResultManagerButton(GwAction):
                 if tools_qt.show_question(
                     msg,
                     inf_text=info,
-                    context_name=lib_vars.plugin_name,
                     parameter=f"{result_id}-{result_name}",
                 ):
                     tools_db.execute_sql(
@@ -245,7 +260,6 @@ class GwResultManagerButton(GwAction):
                 tools_qt.show_info_box(
                     msg,
                     inf_text=info,
-                    context_name=lib_vars.plugin_name,
                     parameter=f"{result_id}-{result_name}",
                 )
         table.model().select()
@@ -274,7 +288,7 @@ class GwResultManagerButton(GwAction):
         result_type_i18n = dlg.tbl_results.model().record(row).value(2)
 
         if not result_type_i18n:
-            tools_gw.show_warning("Please select a result with not empty type", dialog=dlg)
+            tools_qgis.show_warning("Please select a result with not empty type", dialog=dlg)
             return
         result_type = self._value_result_type[result_type_i18n]
 
@@ -292,7 +306,7 @@ class GwResultManagerButton(GwAction):
         result_type_i18n = dlg.tbl_results.model().record(row).value(2)
 
         if not result_type_i18n:
-            tools_gw.show_warning("Please select a result with not empty type", dialog=dlg)
+            tools_qgis.show_warning("Please select a result with not empty type", dialog=dlg)
             return
 
         result_type = self._value_result_type[result_type_i18n]
@@ -308,7 +322,6 @@ class GwResultManagerButton(GwAction):
         widget,
         table_name,
         relations=[],
-        hidde=False,
         set_edit_triggers=QTableView.NoEditTriggers,
         expr=None,
     ):
@@ -345,8 +358,6 @@ class GwResultManagerButton(GwAction):
             else:
                 widget.setModel(model)
 
-            if hidde:
-                self.refresh_table(dialog, widget)
         except Exception as e:
             print(f"EXCEPTION -> {e}")
 
@@ -357,7 +368,7 @@ class GwResultManagerButton(GwAction):
 
         if len(selected) != 1:
             msg = "Please select only one result before changing its status."
-            tools_qt.show_info_box(msg, context_name=lib_vars.plugin_name)
+            tools_qt.show_info_box(msg)
             return
 
         row = tools_db.get_row(
@@ -373,7 +384,7 @@ class GwResultManagerButton(GwAction):
         result_id, result_name, status = row
         if status == "FINISHED":
             msg = "You cannot change the status of a result with status 'FINISHED'."
-            tools_qt.show_info_box(msg, context_name=lib_vars.plugin_name)
+            tools_qt.show_info_box(msg)
             return
 
         self.dlg_status = GwStatusSelectorUi(self)
@@ -387,7 +398,7 @@ class GwResultManagerButton(GwAction):
         self.dlg_status.btn_cancel.clicked.connect(self.dlg_status.reject)
 
         tools_gw.open_dialog(self.dlg_status, dlg_name="status_selector")
-        
+
     def _set_corporate(self):
         table = self.dlg_priority_manager.tbl_results
         selected_list = table.selectionModel().selectedRows()

@@ -34,7 +34,7 @@ class GwResultSelectorButton(GwAction):
         self._update_descriptions()
         self._set_signals()
         tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selector")
-        
+
     def _fill_combos(self):
         dlg = self.dlg_result_selector
         results = tools_db.get_rows(
@@ -45,7 +45,7 @@ class GwResultSelectorButton(GwAction):
         )
         if not results:
             msg = "There are no results available to display."
-            tools_qt.show_info_box(msg, context_name=lib_vars.plugin_name)
+            tools_qt.show_info_box(msg)
             return False
 
         # Combo result_main
