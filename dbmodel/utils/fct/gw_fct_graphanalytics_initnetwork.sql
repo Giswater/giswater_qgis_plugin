@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_initnetwork(p_data 
 RETURNS json AS
 $BODY$
 
-/* Example:
+-- /* NOTE Example query:
 
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"-901"}}'); -- For all user selected exploitations
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"-902"}}'); -- For all exploitations
@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"0"}}')
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"1"}}'); -- For exploitation 1
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"2"}}'); -- For exploitation 2
 
-It is an auxiliary process used by macro_minsector, minsector, or mapzone that generates the tables temp_pgr_node and temp_pgr_arc.
+-- NOTE It is an auxiliary process used by macro_minsector, minsector, or mapzone that generates the tables temp_pgr_node and temp_pgr_arc.
 */
 
 DECLARE
@@ -38,6 +38,8 @@ DECLARE
 
 BEGIN
 
+    -- SECTION Input params
+
 	-- Search path
     SET search_path = "SCHEMA_NAME", public;
 
@@ -49,19 +51,24 @@ BEGIN
 
     IF v_project_type = 'UD' THEN v_reverse_cost = -1; END IF;
 
-    -- For user selected exploitations
+    -- !SECTION
+
+    -- SECTION Get v_macrominsector_id_arc
+
+    -- NOTE For user selected exploitations
+
     IF v_expl_id = '-901' THEN
         SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
         FROM v_edit_arc a
         WHERE a.minsector_id <> '0'
         AND a.macrominsector_id <> '0';
-    -- For all exploitations
+    -- NOTE For all exploitations
     ELSIF v_expl_id = '-902' THEN
         SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
         FROM arc a
         WHERE a.minsector_id <> '0'
         AND a.macrominsector_id <> '0';
-    -- For a specific exploitation/s
+    -- NOTE For a specific exploitation/s
     ELSE
         SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
         FROM arc a
@@ -79,7 +86,10 @@ BEGIN
         AND a.macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','))
     );
 
-    INSERT INTO temp_pgr_node (node_id)
+    -- !SECTION
+
+    -- SECTION: Fill temp_pgr tables
+    INSERT INTO temp_pgr_node (node_id) 
     (
         SELECT DISTINCT node_id
         FROM node n
@@ -131,6 +141,10 @@ BEGIN
         );
     END IF;
 
+-- !SECTION
+
+-- SECTION Return
+
     RETURN jsonb_build_object(
         'status', 'Accepted',
         'message', jsonb_build_object(
@@ -157,6 +171,8 @@ BEGIN
             'data', jsonb_build_object()
         )
     );
+
+    -- !SECTION
 
 END;
 $BODY$
