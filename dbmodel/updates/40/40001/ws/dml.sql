@@ -381,3 +381,6 @@ This function could be automatic triggered by valve status (open or closed) by c
 -- 09/05/2025
 UPDATE config_form_fields SET dv_querytext =  'SELECT id, matcat_id as idval FROM cat_mat_roughness'
 WHERE formname='generic' AND formtype='nvo_roughness' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_valve JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = to_arc::text WHERE node_id NOT IN (node_1, node_2)' WHERE fid=170;
+UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_pump JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = to_arc::text WHERE node_id NOT IN (node_1, node_2)' WHERE fid=171;
+
