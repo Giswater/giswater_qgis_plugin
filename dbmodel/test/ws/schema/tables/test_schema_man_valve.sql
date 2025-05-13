@@ -53,7 +53,7 @@ SELECT col_type_is('man_valve', 'shutter', 'text', 'Column shutter should be tex
 SELECT col_type_is('man_valve', 'brand2', 'text', 'Column brand2 should be text');
 SELECT col_type_is('man_valve', 'model2', 'text', 'Column model2 should be text');
 SELECT col_type_is('man_valve', 'valve_type', 'text', 'Column valve_type should be text');
-SELECT col_type_is('man_valve', 'to_arc', 'varchar(16)', 'Column to_arc should be varchar(16)');
+SELECT col_type_is('man_valve', 'to_arc', 'integer', 'Column to_arc should be integer');
 SELECT col_type_is('man_valve', 'automated', 'boolean', 'Column automated should be boolean');
 SELECT col_type_is('man_valve', 'connection_type', 'integer', 'Column connection_type should be integer');
 
@@ -65,7 +65,6 @@ SELECT col_default_is('man_valve', 'broken', 'false', 'Column broken should defa
 SELECT has_fk('man_valve', 'Table man_valve should have foreign keys');
 SELECT fk_ok('man_valve', 'node_id', 'node', 'node_id', 'FK node_id should reference node.node_id');
 SELECT fk_ok('man_valve', 'cat_valve2', 'cat_node', 'id', 'FK cat_valve2 should reference cat_node.id');
-SELECT fk_ok('man_valve', 'to_arc', 'arc', 'arc_id', 'FK to_arc should reference arc.arc_id');
 
 -- Check triggers
 SELECT has_trigger('man_valve', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');

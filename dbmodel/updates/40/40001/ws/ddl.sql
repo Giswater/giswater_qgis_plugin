@@ -77,3 +77,16 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"v_edit_i
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ve_epa_valve", "column":"valv_type", "newName":"valve_type"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ve_epa_virtualvalve", "column":"valv_type", "newName":"valve_type"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"vi_valves", "column":"valv_type", "newName":"valve_type"}}$$);
+
+
+-- 12/05/2025
+ALTER TABLE man_valve DROP CONSTRAINT IF EXISTS man_valve_to_arc_fky;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_valve", "column":"to_arc", "dataType":"int4"}}$$);
+ALTER TABLE man_pump DROP CONSTRAINT IF EXISTS man_pump_to_arc_fkey;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_pump", "column":"to_arc", "dataType":"int4"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"to_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"to_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"to_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"to_arc", "dataType":"int4", "isUtils":"False"}}$$);
+

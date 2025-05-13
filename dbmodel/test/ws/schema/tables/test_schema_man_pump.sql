@@ -39,14 +39,13 @@ SELECT col_type_is('man_pump', 'pressure', 'numeric(12,4)', 'Column pressure sho
 SELECT col_type_is('man_pump', 'elev_height', 'numeric(12,4)', 'Column elev_height should be numeric(12,4)');
 SELECT col_type_is('man_pump', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('man_pump', 'pump_number', 'integer', 'Column pump_number should be integer');
-SELECT col_type_is('man_pump', 'to_arc', 'varchar(16)', 'Column to_arc should be varchar(16)');
+SELECT col_type_is('man_pump', 'to_arc', 'integer', 'Column to_arc should be integer');
 
 -- Check not null constraints
 SELECT col_not_null('man_pump', 'node_id', 'Column node_id should be NOT NULL');
 
 -- Check foreign keys
 SELECT fk_ok('man_pump', 'node_id', 'node', 'node_id', 'FK node_id should reference node.node_id');
-SELECT fk_ok('man_pump', 'to_arc', 'arc', 'arc_id', 'FK to_arc should reference arc.arc_id');
 
 SELECT * FROM finish();
 

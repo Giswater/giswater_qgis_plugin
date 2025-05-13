@@ -87,14 +87,14 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1,
 		concat('Set to_arc for pump, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
-		UPDATE man_frpump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
+		UPDATE man_pump SET to_arc = v_arc_id::int4 WHERE node_id = v_feature_id;
 
 	ELSIF v_feature_class = 'VALVE' THEN
 
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1,
 		concat('Set to_arc for valve, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
-		UPDATE man_valve SET to_arc = v_arc_id WHERE node_id = v_feature_id;
+		UPDATE man_valve SET to_arc = v_arc_id::int4 WHERE node_id = v_feature_id;
 
 	ELSIF v_feature_class = 'METER' THEN
 
