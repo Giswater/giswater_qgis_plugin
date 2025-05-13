@@ -62,3 +62,9 @@ INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, te
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
 (15, '92034185M', 'postgres', 'postgres', 'Postgres', 'o2 field 2', 1, true);
 
+
+-- Reset sequences
+SELECT setval('cat_organization_organization_id_seq', (SELECT MAX(organization_id) FROM cat_organization), true);
+SELECT setval('cat_team_team_id_seq', (SELECT MAX(team_id) FROM cat_team), true);
+SELECT setval('cat_user_user_id_seq', (SELECT MAX(user_id) FROM cat_user), true);
+

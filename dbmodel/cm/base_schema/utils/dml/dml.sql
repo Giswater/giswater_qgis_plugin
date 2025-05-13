@@ -52,6 +52,10 @@ INSERT into config_param_system values ('basic_selector_tab_campaign',
 INSERT into config_form_tabs values ('selector_campaign','tab_campaign','Campaign','Campaign','role_basic',null, null, 1, '{4}');
 INSERT into config_form_tabs values ('selector_campaign','tab_lot','Lot','Lot','role_basic', null, null, 2,'{4}');
 
+INSERT INTO sys_typevalue (typevalue, id, idval, addparam) VALUES('layout_name_typevalue', 'lyt_buttons', 'lyt_buttons', '{
+  "lytOrientation": "horizontal"
+}'::json);
+
 INSERT INTO sys_typevalue VALUES ('campaign_type', 1, 'REVIEW', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO sys_typevalue VALUES ('campaign_type', 2, 'VISIT', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
