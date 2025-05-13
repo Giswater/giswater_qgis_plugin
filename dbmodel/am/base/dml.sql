@@ -84,3 +84,11 @@ INSERT INTO config_form_tableview VALUES ('priority_manager', 'utils', 'cat_resu
 INSERT INTO config_form_tableview VALUES ('priority_manager', 'utils', 'cat_result', 'material_id', 12, false, NULL, NULL, '{"stretch": true}');
 INSERT INTO config_form_tableview VALUES ('priority_manager', 'utils', 'cat_result', 'features', 13, false, NULL, NULL, '{"stretch": true}');
 INSERT INTO config_form_tableview VALUES ('priority_manager', 'utils', 'cat_result', 'dnom', 14, false, NULL, NULL, '{"stretch": true}');
+
+
+INSERT INTO value_status VALUES ('CANCELED', 'CANCELED');
+INSERT INTO value_status VALUES ('ON PLANNING', 'ON PLANNING');
+INSERT INTO value_status VALUES ('FINISHED', 'FINISHED');
+
+INSERT INTO value_result_type VALUES ('GLOBAL', 'GLOBAL');
+INSERT INTO value_result_type VALUES ('SELECTION', 'SELECTION');
