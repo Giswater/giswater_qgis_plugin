@@ -89,7 +89,7 @@ SET idval = v.idval
 FROM (
     VALUES
     ('GLOBAL', 'GLOBAL'),
-    ('SELECTION', 'SELECCIÓN')
+    ('SELECTION', 'SELECTION')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 
@@ -97,9 +97,9 @@ UPDATE value_status AS t
 SET idval = v.idval
 FROM (
     VALUES
-    ('FINISHED', 'ACABADO'),
-    ('CANCELED', 'CANCELADO'),
-    ('ON PLANNING', 'SOBRE PLANIFICACIÓN')
+    ('FINISHED', 'FINISHED'),
+    ('CANCELED', 'CANCELED'),
+    ('ON PLANNING', 'ON PLANNING')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 
