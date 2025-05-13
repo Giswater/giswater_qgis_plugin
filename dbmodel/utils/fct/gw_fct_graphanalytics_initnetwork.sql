@@ -13,11 +13,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_initnetwork(p_data 
 RETURNS json AS
 $BODY$
 
--- /* NOTE Example query:
+/* NOTE Example query:
 
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"-901"}}'); -- For all user selected exploitations
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"-902"}}'); -- For all exploitations
-SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"0"}}'); -- For exploitations 0
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"0"}}'); -- For exploitation 0
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"1"}}'); -- For exploitation 1
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"2"}}'); -- For exploitation 2
 
@@ -26,19 +26,20 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"2"}}')
 
 DECLARE
 
+    -- configuration
 	v_version TEXT;
     v_project_type TEXT;
-    v_expl_id TEXT;
-    v_macrominsector_id_node TEXT;
-    v_macrominsector_id_arc TEXT;
-    v_macrominsector_id_connec TEXT;
-    v_macrominsector_id_gully TEXT;
+
+    -- parameters
+    v_expl_id_array TEXT;
+    v_mapzone_name TEXT;
+
+    -- extra variables
     v_cost INTEGER = 1;
     v_reverse_cost INTEGER = 1;
+    v_querytext TEXT;
 
 BEGIN
-
-    -- SECTION Input params
 
 	-- Search path
     SET search_path = "SCHEMA_NAME", public;
@@ -47,103 +48,59 @@ BEGIN
     SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Get variables from input JSON
-    v_expl_id = (SELECT (p_data::json->>'data')::json->>'expl_id');
+    v_expl_id_array = (SELECT (p_data::json->>'data')::json->>'expl_id_array');
+    v_mapzone_name = (SELECT (p_data::json->>'data')::json->>'mapzone_name');
+
+    IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
+        RETURN jsonb_build_object(
+            'status', 'Failed',
+            'message', jsonb_build_object(
+                'level', 3,
+                'text', 'v_mapzone_name is null or empty'
+            ),
+            'version', v_version,
+            'body', jsonb_build_object(
+                'form', jsonb_build_object(),
+                'data', jsonb_build_object()
+            )
+        );
+    END IF;
 
     IF v_project_type = 'UD' THEN v_reverse_cost = -1; END IF;
 
-    -- !SECTION
-
-    -- SECTION Get v_macrominsector_id_arc
-
-    -- NOTE For user selected exploitations
-
-    IF v_expl_id = '-901' THEN
-        SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
-        FROM v_edit_arc a
-        WHERE a.minsector_id <> '0'
-        AND a.macrominsector_id <> '0';
-    -- NOTE For all exploitations
-    ELSIF v_expl_id = '-902' THEN
-        SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
-        FROM arc a
-        WHERE a.minsector_id <> '0'
-        AND a.macrominsector_id <> '0';
-    -- NOTE For a specific exploitation/s
-    ELSE
-        SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
-        FROM arc a
-        WHERE a.minsector_id <> '0'
-        AND a.macrominsector_id <> '0'
-        AND a.expl_id::TEXT = ANY(string_to_array(v_expl_id, ','));
-    END IF;
-
-    INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, cost, reverse_cost)
-    (
-        SELECT a.arc_id, a.node_1, a.node_2, v_cost, v_reverse_cost
-        FROM arc a
-        JOIN value_state_type s ON s.id = a.state_type
-        WHERE a.state = 1 AND s.is_operative = TRUE
-        AND a.macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','))
+    v_querytext = '
+    WITH connectedcomponents AS (
+        SELECT * FROM pgr_connectedcomponents($q$
+            SELECT arc_id::int AS id, node_1::int AS source, node_2::int AS target, 1 AS cost
+            FROM v_temp_arc
+        $q$)
+    )
+    INSERT INTO temp_pgr_node (node_id)
+    SELECT DISTINCT c.node::text
+    FROM connectedcomponents c
+    WHERE EXISTS (
+        SELECT 1
+        FROM v_temp_node vtn
+        WHERE c.node = vtn.node_id::int
+          AND vtn.expl_id::text = ANY (''' || v_expl_id_array || ''')
     );
+    ';
 
-    -- !SECTION
+    EXECUTE v_querytext;
 
-    -- SECTION: Fill temp_pgr tables
-    INSERT INTO temp_pgr_node (node_id) 
-    (
-        SELECT DISTINCT node_id
-        FROM node n
-        JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-        JOIN value_state_type s ON s.id = n.state_type
-        WHERE n.state = 1 AND s.is_operative = TRUE
-    );
+    -- Dynamic column name for old_zone_id: %I_id -> dma_id, presszone_id, etc.
+    v_querytext = 'UPDATE temp_pgr_node n SET old_zone_id = t.' || v_mapzone_name || '_id FROM v_temp_node t WHERE n.node_id = t.node_id';
+    EXECUTE v_querytext;
 
-    UPDATE temp_pgr_arc a SET pgr_node_1 = n.pgr_node_id
-    FROM temp_pgr_node n 
-    WHERE a.node_1 = n.node_id;
-    UPDATE temp_pgr_arc a SET pgr_node_2 = n.pgr_node_id
-    FROM temp_pgr_node n 
-    WHERE a.node_2 = n.node_id;
+    v_querytext = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, old_zone_id)
+         SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ' || v_mapzone_name || '_id
+         FROM v_temp_arc a
+         JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
+         JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
 
-    INSERT INTO temp_pgr_connec (connec_id, arc_id)
-    (
-        SELECT c.connec_id, c.arc_id
-        FROM connec c
-        JOIN temp_pgr_arc a ON c.arc_id = a.arc_id
-        JOIN value_state_type s ON s.id = c.state_type
-        WHERE c.state = 1 AND s.is_operative = TRUE
-    );
+    EXECUTE v_querytext;
 
-    INSERT INTO temp_pgr_link (link_id, feature_id, feature_type)
-    (
-        SELECT link_id, feature_id, feature_type
-        FROM link l
-        JOIN temp_pgr_connec c ON l.feature_id=c.connec_id
-        WHERE l.state = 1 AND l.feature_type = 'CONNEC'
-    );
 
-    IF v_project_type = 'UD' THEN
-        INSERT INTO temp_pgr_gully (gully_id, arc_id)
-        (
-            SELECT g.gully_id, g.arc_id
-            FROM gully g
-            JOIN temp_pgr_arc a ON g.arc_id = a.arc_id
-            JOIN value_state_type s ON s.id = g.state_type
-            WHERE g.state = 1 AND s.is_operative = TRUE
-        );
-
-        INSERT INTO temp_pgr_link (link_id, feature_id, feature_type)
-        (
-            SELECT link_id, feature_id, feature_type
-            FROM link l
-            JOIN temp_pgr_gully g ON l.feature_id = g.gully_id
-            WHERE l.state = 1 AND l.feature_type = 'GULLY'
-        );
-    END IF;
-
--- !SECTION
-
--- SECTION Return
 
     RETURN jsonb_build_object(
         'status', 'Accepted',
@@ -171,8 +128,6 @@ BEGIN
             'data', jsonb_build_object()
         )
     );
-
-    -- !SECTION
 
 END;
 $BODY$
