@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
+from ....libs import tools_db, tools_qgis, tools_qt
 from ...utils import tools_gw
 from ..dialog import GwAction
 

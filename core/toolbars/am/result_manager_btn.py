@@ -120,7 +120,7 @@ class GwResultManagerButton(GwAction):
 
         self._value_result_type = {}
 
-        rows =  tools_db.get_rows("select id, idval from am.value_result_type")
+        rows = tools_db.get_rows("select id, idval from am.value_result_type")
 
         # Check rows
         if not rows:

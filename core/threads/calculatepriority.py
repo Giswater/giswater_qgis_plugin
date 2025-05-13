@@ -20,6 +20,7 @@ from .task import GwTask
 from ...libs import tools_db, tools_qt, lib_vars
 from typing import Optional
 
+
 def get_min_greater_than(iterable, value):
     result = None
     for item in iterable:
@@ -183,6 +184,11 @@ class GwCalculatePriority(GwTask):
         return float((value - min) * 10 / (max - min))
 
     def _get_arcs(self):
+        """ Get arcs """
+
+        columns = ""
+
+        # Set columns variable depending of the method
         if self.method == "SH":
             columns = """
                 a.arc_id,
@@ -210,7 +216,6 @@ class GwCalculatePriority(GwTask):
                 ai.strategic,
                 coalesce(ai.mandatory, false) mandatory
             """
-        else: columns = ""
 
         filter_list = []
         if self.features:
@@ -341,7 +346,6 @@ class GwCalculatePriority(GwTask):
             return
 
         last_leak_year = rows[0]
-
 
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
