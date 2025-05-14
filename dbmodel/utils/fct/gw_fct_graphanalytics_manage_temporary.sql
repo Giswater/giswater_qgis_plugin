@@ -46,6 +46,13 @@ BEGIN
 
     IF v_action = 'CREATE' THEN
         -- Create temporary tables
+        CREATE TEMP TABLE temp_pgr_mapzone (
+            mapzone_id SERIAL NOT NULL,
+            the_geom geometry(Polygon, SRID_VALUE),
+            CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (mapzone_id)
+        );
+
+
         CREATE TEMP TABLE temp_pgr_node (
             pgr_node_id SERIAL NOT NULL,
             node_id VARCHAR(16),
@@ -781,6 +788,7 @@ BEGIN
         v_return_message = 'The temporary tables/views have been created successfully';
     ELSIF v_action = 'DROP' THEN
         -- Drop temporary tables
+        DROP TABLE IF EXISTS temp_pgr_mapzone;
         DROP TABLE IF EXISTS temp_pgr_node;
         DROP TABLE IF EXISTS temp_pgr_arc;
         DROP TABLE IF EXISTS temp_pgr_connec;

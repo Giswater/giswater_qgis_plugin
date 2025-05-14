@@ -95,6 +95,7 @@ DECLARE
 	v_expl_id text;
 	v_expl_id_array text;
 	v_updatemapzgeom integer = 0;
+	v_concavehull float = 0.9;
 	v_geomparamupdate float;
     v_parameters json;
 	v_usepsector boolean;
@@ -644,32 +645,168 @@ BEGIN
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 	END IF;
 
+
+
+	-- generating zones
+	INSERT INTO temp_pgr_mapzone (mapzone_id)
+	SELECT DISTINCT mapzone_id FROM temp_pgr_node a
+	WHERE a.mapzone_id > 0;
+
+
+	RAISE NOTICE 'Creating geometry of mapzones';
+
+	-- update geometry of mapzones
+	IF v_updatemapzgeom = 0 THEN
+		-- do nothing
+
+	ELSIF  v_updatemapzgeom = 1 THEN
+
+		-- concave polygon
+		v_querytext = '	UPDATE temp_pgr_mapzone SET the_geom = ST_Multi(a.the_geom) 
+			FROM (
+				WITH polygon AS (
+					SELECT ST_Collect(the_geom) AS g, mapzone_id 
+					FROM temp_pgr_arc a
+					JOIN v_temp_arc USING (arc_id)
+					GROUP BY mapzone_id
+				) 
+			SELECT mapzone_id,
+			CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN 
+				ST_Buffer(ST_ConcaveHull(g, '||v_concavehull||'), 2)::geometry(Polygon,'||(v_srid)||')
+				ELSE ST_Expand(ST_Buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') 
+				END AS the_geom 
+			FROM polygon
+			)a 
+			WHERE a.mapzone_id = temp_pgr_mapzone.mapzone_id 
+			AND temp_pgr_mapzone.mapzone_id > 0';
+		RAISE NOTICE 'CONCAVE POLYGON v_querytext:: %', v_querytext;
+		EXECUTE v_querytext;
+
+	ELSIF  v_updatemapzgeom = 2 THEN
+
+		-- pipe buffer
+		v_querytext = '
+			UPDATE temp_pgr_mapzone SET the_geom = geom 
+			FROM (
+				SELECT mapzone_id, ST_Multi(ST_Buffer(ST_Collect(the_geom),'||v_geomparamupdate||')) AS geom 
+				FROM temp_pgr_arc a 
+				JOIN v_temp_arc USING (arc_id)
+				WHERE mapzone_id > 0
+				GROUP BY mapzone_id
+			) a 
+			WHERE a.mapzone_id = temp_pgr_mapzone.mapzone_id;';
+		RAISE NOTICE 'PIPE BUFFER v_querytext:: %', v_querytext;
+		EXECUTE v_querytext;
+
+	ELSIF  v_updatemapzgeom = 3 THEN
+
+		-- use plot and pipe buffer
+		v_querytext = '
+			UPDATE temp_pgr_mapzone set the_geom = geom FROM (
+				SELECT mapzone_id, ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom FROM (
+					SELECT mapzone_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a
+					JOIN v_temp_arc USING (arc_id) 
+					WHERE mapzone_id > 0
+					GROUP BY mapzone_id
+					UNION
+					SELECT mapzone_id, ST_Collect(ext_plot.the_geom) AS geom FROM ext_plot, temp_pgr_connec c
+					JOIN v_temp_connec USING (connec_id) 
+					WHERE mapzone_id > 0
+					AND ST_DWithin(c.the_geom, ext_plot.the_geom, 0.001)
+					GROUP BY mapzone_id	
+				) a 
+				GROUP BY mapzone_id 
+			) b 
+			WHERE b.mapzone_id= temp_pgr_mapzone.mapzone_id;';
+		RAISE NOTICE 'PLOT AND PIPE BUFFER v_querytext:: %', v_querytext;
+		EXECUTE v_querytext;
+
+	ELSIF  v_updatemapzgeom = 4 THEN
+
+		v_geomparamupdate_divide = v_geomparamupdate / 2;
+
+		-- use link and pipe buffer
+		v_querytext = '
+			UPDATE temp_pgr_mapzone SET the_geom = geom FROM (
+				SELECT mapzone_id, ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom FROM (
+					SELECT mapzone_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom 
+					FROM temp_pgr_arc a 
+					JOIN v_temp_arc USING (arc_id)
+					WHERE mapzone_id > 0
+					GROUP BY mapzone_id
+					UNION
+					SELECT mapzone_id, (ST_Buffer(ST_Collect(temp_t_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) AS geom 
+					FROM temp_pgr_link, temp_pgr_connec a
+					JOIN v_temp_link_connec USING (arc_id) 
+					WHERE mapzone_id > 0
+					GROUP BY mapzone_id
+				) c 
+				GROUP BY mapzone_id 
+			) b
+			WHERE b.mapzone_id= temp_pgr_mapzone.mapzone_id;';
+
+		/*
+		v_querytext = '
+			UPDATE temp_pgr_mapzone SET the_geom = geom FROM (
+				SELECT mapzone_id, ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom FROM (
+					SELECT mapzone_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom
+					FROM temp_pgr_arc a
+					JOIN v_temp_arc USING (arc_id)
+					WHERE mapzone_id > 0
+					GROUP BY mapzone_id
+					UNION
+					SELECT mapzone_id, (ST_Buffer(ST_Collect(temp_t_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) AS geom
+					FROM temp_pgr_link, temp_pgr_connec a
+					JOIN v_temp_link_connec USING (arc_id)
+					WHERE mapzone_id > 0
+					GROUP BY mapzone_id
+					UNION
+					SELECT mapzone_id, (ST_Buffer(ST_Collect(temp_t_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round''))
+					as geom FROM temp_pgr_link, temp_pgr_connec a
+					JOIN temp_pgr_node n ON a.arc_id IS NULL AND n.node_id=a.pgr_node_2
+					WHERE mapzone_id > 0
+					AND a.state > 0 AND temp_pgr_link.feature_id = connec_id AND temp_pgr_link.feature_type = ''CONNEC''
+					GROUP BY mapzone_id
+				) c
+				GROUP BY mapzone_id
+			) b
+			WHERE b.mapzone_id= temp_pgr_mapzone.mapzone_id;';
+		*/
+
+		RAISE NOTICE 'LINK AND PIPE BUFFER v_querytext:: %', v_querytext;
+		EXECUTE v_querytext;
+	END IF;
+
+
+
+
 	IF v_floodonlymapzone IS NULL THEN
 		v_result = NULL;
 		IF v_commitchanges IS TRUE THEN
 			-- disconnected and conflict arcs
-			EXECUTE 'SELECT jsonb_agg(features.feature) 
-			FROM (
-				SELECT jsonb_build_object(
-					''type'',       ''Feature'',
-					''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-					''properties'', to_jsonb(row) - ''the_geom''
-				) AS feature
+			EXECUTE '
+				SELECT jsonb_agg(features.feature) 
 				FROM (
-					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Disconnected''::text AS descript 
-					FROM temp_pgr_arc t
-					JOIN arc a USING (arc_id)
-					WHERE t.mapzone_id = 0
-					AND t.arc_id IS NOT NULL
-					UNION
-					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Conflict''::text AS descript 
-					FROM temp_pgr_arc t
-					JOIN arc a USING (arc_id)
-					WHERE t.mapzone_id = -1
-					AND t.arc_id IS NOT NULL
-				) row 
-			) features'
-			INTO v_result;
+					SELECT jsonb_build_object(
+						''type'',       ''Feature'',
+						''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+						''properties'', to_jsonb(row) - ''the_geom''
+					) AS feature
+					FROM (
+						SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Disconnected''::text AS descript 
+						FROM temp_pgr_arc t
+						JOIN arc a USING (arc_id)
+						WHERE t.mapzone_id = 0
+						AND t.arc_id IS NOT NULL
+						UNION
+						SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Conflict''::text AS descript 
+						FROM temp_pgr_arc t
+						JOIN arc a USING (arc_id)
+						WHERE t.mapzone_id = -1
+						AND t.arc_id IS NOT NULL
+					) row 
+				) features
+			' INTO v_result;
 
 			SELECT EXISTS (
 				SELECT 1
@@ -689,7 +826,8 @@ BEGIN
 		-- disconnected and conflict connecs
 		v_result = NULL;
 		-- TODO: add orphan connecs
-		EXECUTE 'SELECT jsonb_agg(features.feature)
+		EXECUTE '
+			SELECT jsonb_agg(features.feature)
 			FROM (
 				SELECT jsonb_build_object(
 					''type'',       ''Feature'',
@@ -707,8 +845,8 @@ BEGIN
 					JOIN connec c USING (connec_id)
 					WHERE t.mapzone_id = -1
 				) row
-			) features';
-			INTO v_result;
+			) features
+		' INTO v_result;
 
 		v_result := COALESCE(v_result, '{}');
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
@@ -718,7 +856,8 @@ BEGIN
 	IF v_commitchanges IS FALSE THEN
 		-- arc elements
 		IF v_floodonlymapzone IS NULL THEN
-			v_querytext = 'SELECT jsonb_agg(features.feature) 
+			v_querytext = '
+			SELECT jsonb_agg(features.feature) 
 			FROM (
 				SELECT jsonb_build_object(
 					''type'',       ''Feature'',
@@ -745,27 +884,29 @@ BEGIN
 					WHERE m.'|| v_mapzone_field ||'::integer > 0
 					AND t.arc_id IS NOT NULL
 				) row 
-			) features'
+			) features';
+			RAISE NOTICE 'v_querytext:: %', v_querytext;
 			EXECUTE v_querytext INTO v_result;
 
 		ELSE
-			EXECUTE 'SELECT jsonb_agg(features.feature) 
-			FROM (
-				SELECT jsonb_build_object(
-					''type'',       ''Feature'',
-					''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-					''properties'', to_jsonb(row) - ''the_geom''
-				) AS feature
+			EXECUTE '
+				SELECT jsonb_agg(features.feature) 
 				FROM (
-					SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, a.'||v_mapzone_field||'::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
-					FROM temp_pgr_arc t
-					JOIN arc a USING (arc_id)
-					JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
-					WHERE '|| v_mapzone_field ||'::integer IN ('||v_floodonlymapzone||')
-					AND t.arc_id IS NOT NULL
-				) row 
-			) features'
-			INTO v_result;
+					SELECT jsonb_build_object(
+						''type'',       ''Feature'',
+						''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+						''properties'', to_jsonb(row) - ''the_geom''
+					) AS feature
+					FROM (
+						SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, a.'||v_mapzone_field||'::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
+						FROM temp_pgr_arc t
+						JOIN arc a USING (arc_id)
+						JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
+						WHERE '|| v_mapzone_field ||'::integer IN ('||v_floodonlymapzone||')
+						AND t.arc_id IS NOT NULL
+					) row 
+				) features
+			' INTO v_result;
 		END IF;
 		v_result := COALESCE(v_result, '{}');
 		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
@@ -794,6 +935,33 @@ BEGIN
 		v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
 
 		v_visible_layer = NULL;
+
+	ELSIF v_commitchanges IS TRUE THEN
+		-- todo: update mapzone geometry
+
+		IF v_class = 'DMA' THEN
+			-- before inserted on om_waterbalance_dma_graph, remove obsolete nodes.
+			-- TODO: fill om_waterbalance_dma_graph
+
+
+		END IF;
+
+
+		v_querytext = 'UPDATE '||v_mapzone_name||' SET 
+			the_geom = t.the_geom, 
+			updated_at = now(), 
+			updated_by = current_user 
+		FROM temp_pgr_mapzone t 
+		WHERE t.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
+
+
+
+		-- todo: update parent tables
+
+
+
+
+
 	END IF;
 
 
