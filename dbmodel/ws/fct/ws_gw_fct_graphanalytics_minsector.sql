@@ -184,11 +184,11 @@ BEGIN
 
     -- Update feature temporary tables
     UPDATE temp_pgr_connec c SET zone_id = a.zone_id
-    FROM arc a
+    FROM temp_pgr_arc a
     WHERE c.arc_id = a.arc_id AND a.zone_id<>0;
 
     UPDATE temp_pgr_link l SET zone_id = c.zone_id
-    FROM connec c
+    FROM temp_pgr_connec c
     WHERE c.connec_id = l.feature_id AND c.zone_id<>0;
 
     -- Insert into minsector temporary table
@@ -247,6 +247,7 @@ BEGIN
     v_data := json_build_object(
         'data', json_build_object(
             'fid', v_fid,
+            'version', v_version,
             'updatemapzgeom', v_updatemapzgeom,
             'concavehull', v_concavehull,
             'geomparamupdate', v_geomparamupdate,

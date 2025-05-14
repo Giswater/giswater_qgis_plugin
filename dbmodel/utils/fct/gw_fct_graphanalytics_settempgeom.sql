@@ -24,6 +24,7 @@ DECLARE
 
     v_querytext TEXT;
     v_fid INTEGER;
+    v_version TEXT;
     v_updatemapzgeom INTEGER;
     v_geomparamupdate FLOAT;
     v_concavehull FLOAT;
@@ -38,6 +39,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     v_fid = (SELECT (p_data::json->>'data')::json->>'fid')::integer;
+    v_version = (SELECT (p_data::json->>'data')::json->>'version')::text;
     v_updatemapzgeom = (SELECT (p_data::json->>'data')::json->>'updatemapzgeom')::integer;
     v_concavehull = (SELECT (p_data::json->>'data')::json->>'concavehull')::float;
     v_geomparamupdate = (SELECT (p_data::json->>'data')::json->>'geomparamupdate')::float;
