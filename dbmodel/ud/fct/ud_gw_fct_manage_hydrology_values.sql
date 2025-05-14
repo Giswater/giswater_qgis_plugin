@@ -156,7 +156,9 @@ BEGIN
 
 					IF object_rec.table = 'subcatchment' THEN
 
-						v_querytext = 'INSERT INTO inp_subcatchment SELECT '||object_rec.column||', '||v_target||',the_geom, descript FROM inp_subcatchment WHERE hydrology_id = '||v_copyfrom||' AND sector_id = '||v_sector||
+						v_querytext = 'INSERT INTO inp_subcatchment ('||object_rec.column||', hydrology_id, the_geom, descript, nperv_pattern_id, dstore_pattern_id,
+						infil_pattern_id, minelev, muni_id) SELECT '||object_rec.column||', '||v_target||',the_geom, descript, nperv_pattern_id, dstore_pattern_id,
+						infil_pattern_id, minelev, muni_id FROM inp_subcatchment WHERE hydrology_id = '||v_copyfrom||' AND sector_id = '||v_sector||
 						' ON CONFLICT (hydrology_id, subc_id) DO NOTHING';
 						EXECUTE v_querytext;
 					ELSE

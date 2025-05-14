@@ -92,7 +92,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter",
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"length", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"width", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"heigth", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"height", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"max_volume", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"util_volume", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 
