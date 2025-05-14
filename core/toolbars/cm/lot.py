@@ -504,10 +504,10 @@ class AddNewLot:
 
         # Asignar valores a campos del formulario
         mapping = {
-            "tab_data_wo_type": row["workorder_type"],
-            "tab_data_action_type": row["workorder_class"],
-            "txt_ot_address": row["address"],
-            "txt_observ": row["observ"],
+            "tab_data_workorder_type": row["workorder_type"],
+            "tab_data_workorder_class": row["workorder_class"],
+            "tab_data_address": row["address"],
+            "tab_data_observ": row["observ"],
         }
 
         for name, val in mapping.items():
@@ -1208,6 +1208,7 @@ class AddNewLot:
                 if len(row) > 0:
                     standard_model.appendRow(item)
 
+
     def set_lot_headers(self):
         """Sets the headers for the relations table in the UI based on the selected feature type by retrieving
         the column names from the corresponding database view and applying them to a new QStandardItemModel."""
@@ -1231,76 +1232,51 @@ class AddNewLot:
         # Set headers
         standard_model.setHorizontalHeaderLabels(headers)
 
+
     def save_lot(self):
-        """Saves the current lot details to the database by handling both insertion (for new lots) and update
-        (for existing lots), constructs the necessary SQL queries, updates related relations and visit records,
-        and refreshes the map canvas upon successful completion."""
+        """Save lot using gw_fct_setlot (dynamic form logic)."""
+        fields = {}
 
-        lot = {}
-        index = self.dlg_lot.cmb_ot.currentIndex()
-        item = self.list_to_work[index]
-
-        lot['lot_id'] = tools_qt.get_text(self.dlg_lot, self.dlg_lot.lot_id, False, False)
-        lot['name'] = tools_qt.get_text(self.dlg_lot, self.dlg_lot.lot_name, False, False)
-        lot['startdate'] = tools_qt.get_text(self.dlg_lot, self.dlg_lot.startdate, False, False)
-        lot['enddate'] = tools_qt.get_text(self.dlg_lot, self.dlg_lot.enddate, False, False)
-        lot['campaign_id'] = tools_qt.get_text(self.dlg_lot, self.dlg_lot.lot_campaign_id, False, False)
-        lot['workorder_id'] = tools_qt.get_text(self.dlg_lot, self.dlg_lot.lot_workorder_id, False, False)
-        lot['active'] = tools_qt.get_text(self.dlg_lot, self.dlg_lot.chk_active_lot, False, False)
-        lot['team_id'] = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0, True)
-        lot['status'] = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_status, 0)
-        lot['class_id'] = item[0]
-        lot['address'] = item[3]
-        lot['serie'] = item[4]
-        lot['visitclass_id'] = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
-        lot['descript'] = tools_qt.get_text(self.dlg_lot, self.dlg_lot.descript, False, False)
-
-        keys = ""
-        values = ""
-        update = ""
-
-        for key, value in list(lot.items()):
-            keys += "" + key + ", "
-            if value not in ('', None):
-                if type(value) in (int, bool):
-                    values += "$$" + str(value) + "$$, "
-                    update += "" + str(key) + "=$$" + str(value) + "$$, "
-                else:
-                    values += "$$" + str(value) + "$$, "
-                    update += str(key) + "=$$" + str(value) + "$$, "
+        for field in self.fields_form:
+            column = field.get("columnname")
+            widget = self.dlg_lot.findChild(QWidget, field.get("widgetname"))
+            if not widget:
+                continue
+            if isinstance(widget, QComboBox):
+                value = widget.currentData()
+            elif isinstance(widget, QDateEdit):
+                value = widget.date().toString("yyyy-MM-dd") if widget.date().isValid() else None
             else:
-                values += "null, "
-                update += key + "=null, "
+                value = tools_qt.get_widget_value(self.dlg_lot, widget)
 
-        keys = keys[:-2]
-        values = values[:-2]
-        update = update[:-2]
+            fields[column] = value
 
-        if self.is_new_lot is True:
-            sql = ("INSERT INTO cm.om_campaign_lot("+str(keys)+") "
-                   " VALUES ("+str(values)+") RETURNING id")
-            row = tools_db.execute_returning(sql)
-            if row in (None, False):
-                return
-            lot_id = row[0]
-            sql = ("INSERT INTO cm.selector_lot "
-                   "(lot_id, cur_user) VALUES(" + str(lot_id) + ", current_user);")
-            tools_db.execute_sql(sql)
-            tools_qgis.refresh_map_canvas()
+        feature_id = fields.get("lot_id")
+
+        body = {
+            "feature": {
+                "tableName": "om_campaign_lot",
+                "idName": "lot_id",
+                "id": feature_id
+            },
+            "data": {
+                "fields": fields
+            }
+        }
+
+        result = tools_gw.execute_procedure("gw_fct_setlot", body, schema_name="cm")
+
+        if result and result.get("status") == "Accepted":
+            self.lot_id = result["body"]["feature"]["id"]
+            tools_gw.close_dialog(self.dlg_lot)
+            #tools_db.execute_sql(f"SELECT cm.gw_fct_lot_psector_geom({self.lot_id})")
+            #status = self.save_visits()
+            #if status:
+            #    self.iface.mapCanvas().refreshAllLayers()
+            #    self.manage_rejected()
         else:
-            lot_id = tools_qt.get_text(self.dlg_lot, 'lot_id', False, False)
-            sql = ("UPDATE cm.om_campaign_lot "
-                   " SET "+str(update)+""
-                   " WHERE id = '"+str(lot_id)+"'; \n")
-            tools_db.execute_sql(sql)
-        self.save_relations(lot, lot_id, lot['feature_type'])
-        sql = ("SELECT cm.gw_fct_lot_psector_geom(" + str(lot_id) + ")")
-        tools_db.execute_sql(sql)
-        status = self.save_visits()
+            tools_qgis.show_warning("Error saving lot.")
 
-        if status:
-            self.iface.mapCanvas().refreshAllLayers()
-            self.manage_rejected()
 
     def save_relations(self, lot, lot_id, feature_type):
         """Saves or updates the relationships between the lot and its associated features in the database.
