@@ -174,6 +174,11 @@ BEGIN
 		v_commitchanges = 'false';
 	END IF;
 
+	-- it's not allowed to commit changes when flood only mapzone is activated
+	IF v_floodonlymapzone IS NOT NULL THEN
+		v_commitchanges = 'false';
+	END IF;
+
 
 	IF v_class = 'PRESSZONE' THEN
 		v_fid=146;
