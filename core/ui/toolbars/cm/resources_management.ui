@@ -17,7 +17,7 @@
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
-      <widget class="QTabWidget" name="users">
+      <widget class="QTabWidget" name="tab_main">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -27,7 +27,7 @@
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="organizations">
+       <widget class="QWidget" name="tab_organizations">
         <attribute name="title">
          <string>Organizations</string>
         </attribute>
@@ -88,7 +88,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="teams">
+       <widget class="QWidget" name="tab_teams">
         <attribute name="title">
          <string>Teams</string>
         </attribute>
@@ -153,7 +153,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="tab_users">
         <attribute name="title">
          <string>Users</string>
         </attribute>
@@ -247,7 +247,7 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>users</tabstop>
+  <tabstop>tab_main</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
