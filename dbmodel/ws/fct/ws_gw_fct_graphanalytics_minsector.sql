@@ -103,42 +103,77 @@ BEGIN
     FROM node n
     JOIN cat_node cn ON cn.id = n.nodecat_id
     JOIN cat_feature_node cf ON cf.id = cn.node_type
-    WHERE t.node_id = n.node_id AND cf.graph_delimiter = 'MINSECTOR';
+    WHERE t.node_id = n.node_id 
+    AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR');
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
-
     UPDATE temp_pgr_node n set closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
     FROM man_valve v
     WHERE n.node_id = v.node_id AND n.graph_delimiter = 'minsector';
 
-    -- If we want to ignore open but broken valves
+    -- If we want to ignore open but broken valves (broken = TRUE cancel toArc if toArc IS NOT NULL and cannot be closed if toArc IS NULL)
     IF v_ignorebrokenvalves THEN
         UPDATE temp_pgr_node n SET modif = FALSE
         WHERE n.graph_delimiter = 'minsector' AND n.closed = FALSE AND n.broken = TRUE;
     END IF;
 
-    -- Arcs to be disconnected: one of the two arcs that reach the valve
+    -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
+    UPDATE amsa_pgr_node n SET modif = TRUE 
+    WHERE n.graph_delimiter = 'sector';
 
+    -- ARCS to be disconnected:
+    --one of the two arcs that reach the valve
     WITH
     arcs_selected AS (
-        SELECT DISTINCT ON (n.pgr_node_id)  a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
+        SELECT DISTINCT ON (n.pgr_node_id)  
+            a.pgr_arc_id, 
+            n.pgr_node_id, 
+            a.pgr_node_1, 
+            a.pgr_node_2
         FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-        WHERE n.modif = TRUE
-    )
-    UPDATE temp_pgr_arc a
-    SET
-        modif1 = s.modif1,
-        modif2 = s.modif2
-    FROM (
-        SELECT
-            pgr_arc_id,
-            bool_or(pgr_node_id = pgr_node_1) AS modif1,
-            bool_or( pgr_node_id = pgr_node_2) AS modif2
-        FROM arcs_selected
-        GROUP BY pgr_arc_id
-    ) s
-    WHERE a.pgr_arc_id = s.pgr_arc_id;
+        WHERE n.modif = TRUE AND n.graph_delimiter = 'minsector' 
+    ),
+	arcs_modif AS (
+		SELECT
+			pgr_arc_id,
+			bool_or(pgr_node_id = pgr_node_1) AS modif1,
+			bool_or( pgr_node_id = pgr_node_2) AS modif2
+		FROM arcs_selected
+		GROUP BY pgr_arc_id
+	)
+	UPDATE temp_pgr_arc t
+	SET modif1= s.modif1,
+		modif2= s.modif2
+	FROM arcs_modif s
+	WHERE t.pgr_arc_id= s.pgr_arc_id;
+
+    -- all the arcs that connect to nodes SECTOR
+    WITH
+    arcs_selected AS (
+        SELECT  
+            a.pgr_arc_id, 
+            n.pgr_node_id, 
+            a.pgr_node_1, 
+            a.pgr_node_2
+        FROM temp_pgr_node n
+        JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+        WHERE n.modif = 1 and n.graph_delimiter = 'sector'
+    ),
+	arcs_modif AS (
+		SELECT
+			pgr_arc_id,
+			bool_or(pgr_node_id = pgr_node_1) AS modif1,
+			bool_or( pgr_node_id = pgr_node_2) AS modif2
+		FROM arcs_selected
+		GROUP BY pgr_arc_id
+	)
+	UPDATE temp_pgr_arc t
+	SET modif1= s.modif1,
+		modif2= s.modif2
+	FROM arcs_modif s
+	WHERE t.pgr_arc_id= s.pgr_arc_id;
+
 
     -- Generate new arcs and disconnect arcs with modif1 = TRUE OR modif2 = TRUE
 	-- =======================
