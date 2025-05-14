@@ -57,7 +57,7 @@ SELECT fk_ok('inp_dscenario_virtualpump', 'energy_pattern_id', 'inp_pattern', 'p
 -- Check constraints
 SELECT col_not_null('inp_dscenario_virtualpump', 'dscenario_id', 'Column dscenario_id should be NOT NULL');
 SELECT col_not_null('inp_dscenario_virtualpump', 'arc_id', 'Column arc_id should be NOT NULL');
-SELECT col_default_is('inp_dscenario_virtualpump', 'pump_type', 'FLOWPUMP', 'Column pump_type should default to FLOWPUMP');
+SELECT col_default_is('inp_dscenario_virtualpump', 'pump_type', 'POWERPUMP', 'Column pump_type should default to POWERPUMP');
 
 SELECT * FROM finish();
 

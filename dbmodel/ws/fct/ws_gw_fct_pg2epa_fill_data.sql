@@ -206,7 +206,7 @@ BEGIN
 
 	-- update addparam for inp_virtualpump
 	UPDATE temp_t_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',p.pattern_id,'", "status":"',p.status,'",
-	"effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"FLOWPUMP"}')
+	"effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"POWERPUMP"}')
 	FROM inp_virtualpump p WHERE temp_t_arc.arc_id=p.arc_id;
 
 	-- update addparam for inp_shortpipe (step 1)

@@ -188,3 +188,6 @@ ALTER TABLE anl_arc ADD CONSTRAINT anl_arc_drainzone_id_fkey FOREIGN KEY (drainz
 
 ALTER TABLE inp_subcatchment ALTER COLUMN muni_id SET DEFAULT 0;
 ALTER TABLE inp_subcatchment ALTER COLUMN muni_id SET NOT NULL;
+
+-- 12/05/2025
+DROP TABLE IF EXISTS node_border_sector;
