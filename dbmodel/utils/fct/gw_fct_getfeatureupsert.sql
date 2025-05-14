@@ -69,6 +69,7 @@ count_aux integer;
 v_sector_id integer;
 v_macrosector_id integer;
 v_expl_id integer;
+v_macroexploitation_id integer;
 v_dma_id integer;
 v_macrodma_id integer;
 v_omzone_id integer;
@@ -382,14 +383,40 @@ BEGIN
 							v_macrominsector_id = v_noderecord1.macrominsector_id;
 						END IF;
 
-						-- getting supplyzone by heritage from nodes: TODO
-
+						-- getting supplyzone by heritage from nodes:
+						IF v_noderecord1.supplyzone_id = v_noderecord2.supplyzone_id THEN
+							v_supplyzone_id = v_noderecord1.supplyzone_id;
+						ELSIF v_noderecord1.supplyzone_id = 0 THEN
+							v_supplyzone_id = v_noderecord2.supplyzone_id;
+						ELSIF v_noderecord2.supplyzone_id = 0 THEN
+							v_supplyzone_id = v_noderecord1.supplyzone_id;
+						ELSIF v_noderecord1.supplyzone_id::text != v_noderecord2.supplyzone_id::text THEN
+							v_supplyzone_id = 0;
+						END IF;
 
 					ELSE
 
-						-- getting dwfzone by heritage from nodes: TODO
+						-- getting dwfzone by heritage from nodes:
+						IF v_noderecord1.dwfzone_id = v_noderecord2.dwfzone_id THEN
+							v_dwfzone_id = v_noderecord1.dwfzone_id;
+						ELSIF v_noderecord1.dwfzone_id = 0 THEN
+							v_dwfzone_id = v_noderecord2.dwfzone_id;
+						ELSIF v_noderecord2.dwfzone_id = 0 THEN
+							v_dwfzone_id = v_noderecord1.dwfzone_id;
+						ELSIF v_noderecord1.dwfzone_id::text != v_noderecord2.dwfzone_id::text THEN
+							v_dwfzone_id = 0;
+						END IF;
 
-						-- getting drainzone by heritage from nodes: TODO
+						-- getting drainzone by heritage from nodes:
+						IF v_noderecord1.drainzone_id = v_noderecord2.drainzone_id THEN
+							v_drainzone_id = v_noderecord1.drainzone_id;
+						ELSIF v_noderecord1.drainzone_id = 0 THEN
+							v_drainzone_id = v_noderecord2.drainzone_id;
+						ELSIF v_noderecord2.drainzone_id = 0 THEN
+							v_drainzone_id = v_noderecord1.drainzone_id;
+						ELSIF v_noderecord1.drainzone_id::text != v_noderecord2.drainzone_id::text THEN
+							v_drainzone_id = 0;
+						END IF;
 
 
 					END IF;
@@ -610,6 +637,9 @@ BEGIN
 		-- Macrosector
 		v_macrosector_id := (SELECT macrosector_id FROM sector WHERE sector_id=v_sector_id);
 
+		-- Macroexploitation
+		v_macroexploitation_id := (SELECT macroexpl_id FROM exploitation WHERE expl_id=v_expl_id);
+
 		-- Municipality
 		IF v_muni_id IS NULL THEN
 			v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) AND active IS TRUE LIMIT 1);
@@ -789,7 +819,7 @@ BEGIN
 	END IF;
 
 	IF p_tg_op != 'LAYER' THEN
-
+		RAISE NOTICE 'v_widgetvalues: %', v_fields_array;
 		-- looping the array setting values and widgetcontrols
 		FOREACH aux_json IN ARRAY v_fields_array
 		LOOP
@@ -854,6 +884,8 @@ BEGIN
 					field_value = v_macroomzone_id;
 				WHEN 'expl_id' THEN
 					field_value = v_expl_id;
+				WHEN 'macroexpl_id' THEN
+					field_value = v_macroexploitation_id;
 				WHEN 'muni_id' THEN
 					field_value = v_muni_id;
 				WHEN 'district_id' THEN
@@ -1038,6 +1070,10 @@ BEGIN
                         field_value = v_flwreg_type;
                     when 'flwreg_length' then
                         field_value = v_flwreg_length;
+					WHEN 'dwfzone_id' THEN
+						field_value = v_dwfzone_id;
+					WHEN 'drainzone_id' THEN
+						field_value = v_drainzone_id;
                     ELSE
                     END CASE;
                 END IF;
