@@ -553,8 +553,8 @@ BEGIN
 
 
 		IF v_man_table='man_tank' THEN
-			INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, automated, length, width, shape, fence_type, fence_length, to_arc)
-			VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax, NEW.automated, NEW.length, NEW.width, NEW.shape, NEW.fence_type, NEW.fence_length, NEW.to_arc);
+			INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, automated, length, width, shape, fence_type, fence_length, inlet_arc)
+			VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax, NEW.automated, NEW.length, NEW.width, NEW.shape, NEW.fence_type, NEW.fence_length, NEW.inlet_arc);
 
 		ELSIF v_man_table='man_hydrant' THEN
 			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, customer_code, hydrant_type, security_cover)
@@ -595,8 +595,8 @@ BEGIN
 			VALUES(NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code, NEW.automated, NEW.closed, NEW.to_arc);
 
 		ELSIF v_man_table='man_source' THEN
-				INSERT INTO man_source (node_id, name, source_type, source_code, aquifer_type, aquifer_name, wtp_id, registered_flow, auth_code, basin_id, subbasin_id, to_arc)
-				VALUES(NEW.node_id, NEW.name, NEW.source_type, NEW.source_code, NEW.aquifer_type, NEW.aquifer_name, NEW.wtp_id, NEW.registered_flow, NEW.auth_code, NEW.basin_id, NEW.subbasin_id, NEW.to_arc);
+				INSERT INTO man_source (node_id, name, source_type, source_code, aquifer_type, aquifer_name, wtp_id, registered_flow, auth_code, basin_id, subbasin_id, inlet_arc)
+				VALUES(NEW.node_id, NEW.name, NEW.source_type, NEW.source_code, NEW.aquifer_type, NEW.aquifer_name, NEW.wtp_id, NEW.registered_flow, NEW.auth_code, NEW.basin_id, NEW.subbasin_id, NEW.inlet_arc);
 
 		ELSIF v_man_table='man_waterwell' THEN
 			INSERT INTO man_waterwell (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -627,9 +627,9 @@ BEGIN
 
 		ELSIF v_man_table='man_wtp' THEN
 			INSERT INTO man_wtp (node_id, name, maxflow, opsflow, screening, desander, chemcond, oxidation, coagulation, floculation, presendiment, sediment,
-			filtration, disinfection, chemtreatment, storage, sludgeman, to_arc)
+			filtration, disinfection, chemtreatment, storage, sludgeman, inlet_arc)
 			VALUES (NEW.node_id, NEW.name, NEW.maxflow, NEW.opsflow, NEW.screening, NEW.desander, NEW.chemcond, NEW.oxidation, NEW.coagulation, NEW.floculation,
-			NEW.presendiment, NEW.sediment, NEW.filtration, NEW.disinfection, NEW.chemtreatment, NEW.storage, NEW.sludgeman, NEW.to_arc);
+			NEW.presendiment, NEW.sediment, NEW.filtration, NEW.disinfection, NEW.chemtreatment, NEW.storage, NEW.sludgeman, NEW.inlet_arc);
 
 		END IF;
 
@@ -954,7 +954,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_tank' THEN
 			UPDATE man_tank SET vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name,
-			hmax=NEW.hmax, automated=NEW.automated, length=NEW.length, width=NEW.width, shape=NEW.shape, fence_type=NEW.fence_type, fence_length=NEW.fence_length, to_arc=NEW.to_arc
+			hmax=NEW.hmax, automated=NEW.automated, length=NEW.length, width=NEW.width, shape=NEW.shape, fence_type=NEW.fence_type, fence_length=NEW.fence_length, inlet_arc=NEW.inlet_arc
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_pump' THEN
@@ -973,7 +973,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_source' THEN
 			UPDATE man_source SET name=NEW.name, source_type=NEW.source_type, source_code=NEW.source_code, aquifer_type=NEW.aquifer_type, aquifer_name=NEW.aquifer_name,
-			wtp_id=NEW.wtp_id, registered_flow=NEW.registered_flow, auth_code=NEW.auth_code, basin_id=NEW.basin_id, subbasin_id=NEW.subbasin_id, to_arc=NEW.to_arc
+			wtp_id=NEW.wtp_id, registered_flow=NEW.registered_flow, auth_code=NEW.auth_code, basin_id=NEW.basin_id, subbasin_id=NEW.subbasin_id, inlet_arc=NEW.inlet_arc
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_meter' THEN
@@ -1026,7 +1026,7 @@ BEGIN
 		ELSIF v_man_table ='man_wtp' THEN
 			UPDATE man_wtp SET name = NEW.name, maxflow = NEW.maxflow, opsflow = NEW.opsflow, screening = NEW.screening, desander = NEW.desander, chemcond = NEW.chemcond,
     		oxidation = NEW.oxidation, coagulation = NEW.coagulation, floculation = NEW.floculation, presendiment = NEW.presendiment, sediment = NEW.sediment,
-    		filtration = NEW.filtration, disinfection = NEW.disinfection, chemtreatment = NEW.chemtreatment, storage = NEW.storage, sludgeman = NEW.sludgeman, to_arc=NEW.to_arc
+    		filtration = NEW.filtration, disinfection = NEW.disinfection, chemtreatment = NEW.chemtreatment, storage = NEW.storage, sludgeman = NEW.sludgeman, inlet_arc=NEW.inlet_arc
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_filter' THEN

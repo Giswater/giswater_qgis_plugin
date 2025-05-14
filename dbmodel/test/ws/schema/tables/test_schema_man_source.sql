@@ -20,7 +20,7 @@ SELECT has_table('man_source'::name, 'Table man_source should exist');
 SELECT columns_are(
     'man_source',
     ARRAY[
-        'node_id', 'name', 'source_type', 'source_code', 'aquifer_type', 'aquifer_name', 'wtp_id', 'registered_flow', 'auth_code', 'basin_id', 'subbasin_id', 'to_arc'
+        'node_id', 'name', 'source_type', 'source_code', 'aquifer_type', 'aquifer_name', 'wtp_id', 'registered_flow', 'auth_code', 'basin_id', 'subbasin_id', 'inlet_arc'
     ],
     'Table man_source should have the correct columns'
 );
@@ -40,7 +40,7 @@ SELECT col_type_is('man_source', 'registered_flow', 'double precision', 'Column 
 SELECT col_type_is('man_source', 'auth_code', 'text', 'Column auth_code should be text');
 SELECT col_type_is('man_source', 'basin_id', 'integer', 'Column basin_id should be integer');
 SELECT col_type_is('man_source', 'subbasin_id', 'integer', 'Column subbasin_id should be integer');
-SELECT col_type_is('man_source', 'to_arc', 'integer[]', 'Column to_arc should be integer[]');
+SELECT col_type_is('man_source', 'inlet_arc', 'integer[]', 'Column inlet_arc should be integer[]');
 
 -- Check not null constraints
 SELECT col_not_null('man_source', 'node_id', 'Column node_id should be NOT NULL');

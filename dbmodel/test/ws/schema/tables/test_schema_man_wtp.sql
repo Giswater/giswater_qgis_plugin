@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'node_id', 'name', 'maxflow', 'opsflow', 'screening', 'desander', 'chemcond', 'oxidation',
         'coagulation', 'floculation', 'presendiment', 'sediment', 'filtration', 'disinfection',
-        'chemtreatment', 'storage', 'sludgeman', 'to_arc'
+        'chemtreatment', 'storage', 'sludgeman', 'inlet_arc'
     ],
     'Table man_wtp should have the correct columns'
 );
@@ -48,7 +48,7 @@ SELECT col_type_is('man_wtp', 'disinfection', 'integer', 'Column disinfection sh
 SELECT col_type_is('man_wtp', 'chemtreatment', 'integer', 'Column chemtreatment should be integer');
 SELECT col_type_is('man_wtp', 'storage', 'integer', 'Column storage should be integer');
 SELECT col_type_is('man_wtp', 'sludgeman', 'integer', 'Column sludgeman should be integer');
-SELECT col_type_is('man_wtp', 'to_arc', 'integer[]', 'Column to_arc should be integer[]');
+SELECT col_type_is('man_wtp', 'inlet_arc', 'integer[]', 'Column inlet_arc should be integer[]');
 
 -- Check foreign keys
 SELECT has_fk('man_wtp', 'Table man_wtp should have foreign keys');

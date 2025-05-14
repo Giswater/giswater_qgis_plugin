@@ -85,8 +85,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_
 ALTER TABLE man_pump DROP CONSTRAINT IF EXISTS man_pump_to_arc_fkey;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_pump", "column":"to_arc", "dataType":"int4"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"to_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"to_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"to_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"inlet_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"inlet_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"inlet_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"to_arc", "dataType":"int4", "isUtils":"False"}}$$);
 
