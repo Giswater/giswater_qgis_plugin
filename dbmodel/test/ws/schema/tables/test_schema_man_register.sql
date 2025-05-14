@@ -20,7 +20,7 @@ SELECT has_table('man_register'::name, 'Table man_register should exist');
 SELECT columns_are(
     'man_register',
     ARRAY[
-        'node_id'
+        'node_id', 'length', 'width', 'height', 'max_volume', 'util_volume'
     ],
     'Table man_register should have the correct columns'
 );
@@ -29,7 +29,12 @@ SELECT columns_are(
 SELECT col_is_pk('man_register', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_register', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_register', 'node_id', 'varchar(16)', 'Column node_id should be numeric(12,3)');
+SELECT col_type_is('man_register', 'length', 'numeric(12,3)', 'Column length should be numeric(12,3)');
+SELECT col_type_is('man_register', 'width', 'numeric(12,3)', 'Column width should be numeric(12,3)');
+SELECT col_type_is('man_register', 'height', 'numeric(12,3)', 'Column height should be numeric(12,3)');
+SELECT col_type_is('man_register', 'max_volume', 'numeric(12,3)', 'Column max_volume should be numeric(12,3)');
+SELECT col_type_is('man_register', 'util_volume', 'numeric(12,3)', 'Column util_volume should be numeric(12,3)');
 
 -- Check not null constraints
 SELECT col_not_null('man_register', 'node_id', 'Column node_id should be NOT NULL');

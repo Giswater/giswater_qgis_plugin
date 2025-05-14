@@ -605,7 +605,7 @@ BEGIN
 			INSERT INTO man_filter (node_id) VALUES(NEW.node_id);
 
 		ELSIF v_man_table='man_register' THEN
-			INSERT INTO man_register (node_id) VALUES (NEW.node_id);
+			INSERT INTO man_register (node_id, length, width, height, max_volume, util_volume) VALUES (NEW.node_id, NEW.length, NEW.width, NEW.height, NEW.max_volume, NEW.util_volume);
 
 		ELSIF v_man_table='man_netwjoin' THEN
 			INSERT INTO man_netwjoin (node_id, top_floor, customer_code)
@@ -999,7 +999,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_register' THEN
-			UPDATE man_register	SET node_id=NEW.node_id
+			UPDATE man_register	SET node_id=NEW.node_id, length=NEW.length, width=NEW.width, height=NEW.height, max_volume=NEW.max_volume, util_volume=NEW.util_volume
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_netwjoin' THEN
