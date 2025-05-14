@@ -118,7 +118,7 @@ BEGIN
     END IF;
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
-    UPDATE amsa_pgr_node n SET modif = TRUE 
+    UPDATE temp_pgr_node n SET modif = TRUE 
     WHERE n.graph_delimiter = 'sector';
 
     -- ARCS to be disconnected:
