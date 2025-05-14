@@ -191,3 +191,76 @@ ALTER TABLE inp_subcatchment ALTER COLUMN muni_id SET NOT NULL;
 
 -- 12/05/2025
 DROP TABLE IF EXISTS node_border_sector;
+
+
+-- 14/05/2025
+-- inp_subcatchment
+ALTER TABLE inp_subcatchment RENAME TO _inp_subcatchment;
+
+
+-- Drop foreign keys that reference inp_subcatchment
+ALTER TABLE inp_groundwater DROP CONSTRAINT inp_groundwater_subc_id_fkey;
+ALTER TABLE inp_coverage DROP CONSTRAINT inp_coverage_land_x_subc_subc_id_fkey;
+ALTER TABLE inp_loadings DROP CONSTRAINT inp_loadings_pol_x_subc_subc_id_fkey;
+
+-- Drop foreign keys from table inp_subcatchment
+
+ALTER TABLE _inp_subcatchment DROP CONSTRAINT subcatchment_hydrology_id_fkey;
+ALTER TABLE _inp_subcatchment DROP CONSTRAINT subcatchment_rg_id_fkey;
+ALTER TABLE _inp_subcatchment DROP CONSTRAINT subcatchment_sector_id_fkey;
+ALTER TABLE _inp_subcatchment DROP CONSTRAINT subcatchment_snow_id_fkey;
+
+-- Drop restrictions from table inp_subcatchment
+ALTER TABLE _inp_subcatchment DROP CONSTRAINT subcatchment_pkey;
+
+
+-- Drop indexes from table inp_subcatchment
+DROP INDEX IF EXISTS subcatchment_pkey;
+DROP INDEX IF EXISTS subcathment_index;
+
+
+-- New order to table inp_subcatchment
+CREATE TABLE inp_subcatchment (
+	hydrology_id int4 NOT NULL DEFAULT 1,
+    subc_id varchar(16) NOT NULL,
+    sector_id int4 NULL,
+    minelev float8 NULL,
+    outlet_id varchar(100) NULL,
+    rg_id varchar(16) NULL,
+    area numeric(16, 6) NULL,
+    imperv numeric(12, 4) NULL DEFAULT 90,
+    width numeric(12, 4) NULL,
+    slope numeric(12, 4) NULL,
+    clength numeric(12, 4) NULL,
+    snow_id varchar(16) NULL,
+    nimp numeric(12, 4) NULL DEFAULT 0.01,
+    nperv numeric(12, 4) NULL DEFAULT 0.1,
+    simp numeric(12, 4) NULL DEFAULT 0.05,
+    sperv numeric(12, 4) NULL DEFAULT 0.05,
+    zero numeric(12, 4) NULL DEFAULT 25,
+    routeto varchar(20) NULL,
+    rted numeric(12, 4) NULL DEFAULT 100,
+    maxrate numeric(12, 4) NULL,
+    minrate numeric(12, 4) NULL,
+    decay numeric(12, 4) NULL,
+    drytime numeric(12, 4) NULL,
+    maxinfil numeric(12, 4) NULL,
+    suction numeric(12, 4) NULL,
+    conduct numeric(12, 4) NULL,
+    initdef numeric(12, 4) NULL,
+    curveno numeric(12, 4) NULL,
+    conduct_2 numeric(12, 4) NULL DEFAULT 0,
+    drytime_2 numeric(12, 4) NULL DEFAULT 10,
+    nperv_pattern_id varchar(16) NULL,
+    dstore_pattern_id varchar(16) NULL,
+    infil_pattern_id varchar(16) NULL,
+    muni_id int4 NULL,
+    descript text NULL,
+    the_geom public.geometry(multipolygon, 25831) NULL,
+	CONSTRAINT subcatchment_pkey PRIMARY KEY (subc_id, hydrology_id),
+	CONSTRAINT subcatchment_hydrology_id_fkey FOREIGN KEY (hydrology_id) REFERENCES cat_hydrology(hydrology_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT subcatchment_rg_id_fkey FOREIGN KEY (rg_id) REFERENCES raingage(rg_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT subcatchment_sector_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT subcatchment_snow_id_fkey FOREIGN KEY (snow_id) REFERENCES inp_snowpack(snow_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX subcathment_index ON inp_subcatchment USING gist (the_geom);
