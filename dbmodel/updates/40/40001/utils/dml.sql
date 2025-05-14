@@ -870,3 +870,247 @@ UPDATE config_form_fields SET layoutorder = 25
 WHERE (formname, formtype, tabname) = ('inp_pattern_value', 'form_feature', 'tab_none')
   AND layoutorder IS NULL AND columnname = 'id';
 
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'builtdate';
+
+UPDATE config_form_fields SET layoutorder = 2
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'cabinet';
+
+UPDATE config_form_fields SET layoutorder = 3
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'code';
+
+UPDATE config_form_fields SET layoutorder = 4
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'district_id';
+
+UPDATE config_form_fields SET layoutorder = 5
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'enddate';
+
+UPDATE config_form_fields SET layoutorder = 6
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'feature_id';
+
+UPDATE config_form_fields SET layoutorder = 7
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'featurecat_id';
+
+UPDATE config_form_fields SET layoutorder = 8
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'lab_code';
+
+UPDATE config_form_fields SET layoutorder = 9
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'macrodma_id';
+
+UPDATE config_form_fields SET layoutorder = 10
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'muni_id';
+
+UPDATE config_form_fields SET layoutorder = 11
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'observations';
+
+UPDATE config_form_fields SET layoutorder = 12
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'place_name';
+
+UPDATE config_form_fields SET layoutorder = 13
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'postcode';
+
+UPDATE config_form_fields SET layoutorder = 14
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'postcomplement';
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'postcomplement2';
+
+UPDATE config_form_fields SET layoutorder = 16
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'postnumber';
+
+UPDATE config_form_fields SET layoutorder = 17
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'postnumber2';
+
+UPDATE config_form_fields SET layoutorder = 18
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'rotation';
+
+UPDATE config_form_fields SET layoutorder = 19
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'sample_id';
+
+UPDATE config_form_fields SET layoutorder = 20
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'streetname';
+
+UPDATE config_form_fields SET layoutorder = 21
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'streetname2';
+
+UPDATE config_form_fields SET layoutorder = 22
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'workcat_id';
+
+UPDATE config_form_fields SET layoutorder = 23
+WHERE (formname, formtype, tabname) = ('v_edit_samplepoint', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'workcat_id_end';
+
+
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'active';
+
+UPDATE config_form_fields SET layoutorder = 2
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'atlas_id';
+
+UPDATE config_form_fields SET layoutorder = 3
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'creation_date';
+
+UPDATE config_form_fields SET layoutorder = 4
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'ext_code';
+
+UPDATE config_form_fields SET layoutorder = 5
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'gexpenses';
+
+UPDATE config_form_fields SET layoutorder = 6
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'name';
+
+UPDATE config_form_fields SET layoutorder = 7
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'other';
+
+UPDATE config_form_fields SET layoutorder = 8
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'priority';
+
+UPDATE config_form_fields SET layoutorder = 9
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'psector_id';
+
+UPDATE config_form_fields SET layoutorder = 10
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'psector_type';
+
+UPDATE config_form_fields SET layoutorder = 11
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'rotation';
+
+UPDATE config_form_fields SET layoutorder = 12
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'scale';
+
+UPDATE config_form_fields SET layoutorder = 13
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'status';
+
+UPDATE config_form_fields SET layoutorder = 14
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'text1';
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'text2';
+
+UPDATE config_form_fields SET layoutorder = 16
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'text3';
+
+UPDATE config_form_fields SET layoutorder = 17
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'text4';
+
+UPDATE config_form_fields SET layoutorder = 18
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'text5';
+
+UPDATE config_form_fields SET layoutorder = 19
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'text6';
+
+UPDATE config_form_fields SET layoutorder = 20
+WHERE (formname, formtype, tabname) = ('v_edit_plan_psector', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'vat';
+
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'active';
+
+UPDATE config_form_fields SET layoutorder = 2
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'brand';
+
+UPDATE config_form_fields SET layoutorder = 3
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'connec_type';
+
+UPDATE config_form_fields SET layoutorder = 4
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'cost_m3';
+
+UPDATE config_form_fields SET layoutorder = 5
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'cost_ml';
+
+UPDATE config_form_fields SET layoutorder = 6
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'cost_ut';
+
+UPDATE config_form_fields SET layoutorder = 7
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'estimated_depth';
+
+UPDATE config_form_fields SET layoutorder = 8
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom_r';
+
+UPDATE config_form_fields SET layoutorder = 9
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom1';
+
+UPDATE config_form_fields SET layoutorder = 10
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom2';
+
+UPDATE config_form_fields SET layoutorder = 11
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom3';
+
+UPDATE config_form_fields SET layoutorder = 12
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom4';
+
+UPDATE config_form_fields SET layoutorder = 13
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'id';
+
+UPDATE config_form_fields SET layoutorder = 14
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'label';
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'matcat_id';
+
+UPDATE config_form_fields SET layoutorder = 16
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'model';
+
+UPDATE config_form_fields SET layoutorder = 17
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'shape';
+
+UPDATE config_form_fields SET layoutorder = 18
+WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'svg';

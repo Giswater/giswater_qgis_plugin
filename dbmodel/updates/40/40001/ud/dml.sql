@@ -1065,3 +1065,344 @@ SELECT subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, 
 drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript, nperv_pattern_id, dstore_pattern_id, infil_pattern_id,
 minelev, muni_id
 FROM _inp_subcatchment;
+
+UPDATE config_form_fields SET layoutorder = 0
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'stemp';
+
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'atiwt';
+
+UPDATE config_form_fields SET layoutorder = 2
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'dtlong';
+
+UPDATE config_form_fields SET layoutorder = 3
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'elev';
+
+UPDATE config_form_fields SET layoutorder = 4
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f0';
+
+UPDATE config_form_fields SET layoutorder = 5
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f1';
+
+UPDATE config_form_fields SET layoutorder = 6
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f2';
+
+UPDATE config_form_fields SET layoutorder = 7
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f3';
+
+UPDATE config_form_fields SET layoutorder = 8
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f4';
+
+UPDATE config_form_fields SET layoutorder = 9
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f5';
+
+UPDATE config_form_fields SET layoutorder = 10
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f6';
+
+UPDATE config_form_fields SET layoutorder = 11
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f7';
+
+UPDATE config_form_fields SET layoutorder = 12
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f8';
+
+UPDATE config_form_fields SET layoutorder = 13
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'i_f9';
+
+UPDATE config_form_fields SET layoutorder = 14
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'lat';
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f0';
+
+UPDATE config_form_fields SET layoutorder = 16
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f1';
+
+UPDATE config_form_fields SET layoutorder = 17
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f2';
+
+UPDATE config_form_fields SET layoutorder = 18
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f3';
+
+UPDATE config_form_fields SET layoutorder = 19
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f4';
+
+UPDATE config_form_fields SET layoutorder = 20
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f5';
+
+UPDATE config_form_fields SET layoutorder = 21
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f6';
+
+UPDATE config_form_fields SET layoutorder = 22
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f7';
+
+UPDATE config_form_fields SET layoutorder = 23
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f8';
+
+UPDATE config_form_fields SET layoutorder = 24
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'p_f9';
+
+UPDATE config_form_fields SET layoutorder = 25
+WHERE (formname, formtype, tabname) = ('inp_snowmelt', 'form_feature', 'tab_none')
+  AND layoutorder IS NULL AND columnname = 'rnm';
+
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'cd';
+
+UPDATE config_form_fields SET layoutorder = 2
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'cd2';
+
+UPDATE config_form_fields SET layoutorder = 3
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'coef_curve';
+
+UPDATE config_form_fields SET layoutorder = 4
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'ec';
+
+UPDATE config_form_fields SET layoutorder = 5
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'flap';
+
+UPDATE config_form_fields SET layoutorder = 6
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'flwreg_id';
+
+UPDATE config_form_fields SET layoutorder = 7
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'flwreg_length';
+
+UPDATE config_form_fields SET layoutorder = 8
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom1';
+
+UPDATE config_form_fields SET layoutorder = 9
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom2';
+
+UPDATE config_form_fields SET layoutorder = 10
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom3';
+
+UPDATE config_form_fields SET layoutorder = 11
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'geom4';
+
+UPDATE config_form_fields SET layoutorder = 12
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'id';
+
+UPDATE config_form_fields SET layoutorder = 13
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'node_id';
+
+UPDATE config_form_fields SET layoutorder = 14
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'offsetval';
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'order_id';
+
+UPDATE config_form_fields SET layoutorder = 16
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'road_surf';
+
+UPDATE config_form_fields SET layoutorder = 17
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'road_width';
+
+UPDATE config_form_fields SET layoutorder = 18
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'surcharge';
+
+UPDATE config_form_fields SET layoutorder = 19
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'to_arc';
+
+UPDATE config_form_fields SET layoutorder = 20
+WHERE (formname, formtype, tabname)=('inp_flwreg_weir', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'weir_type';
+
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'arc_id';
+
+UPDATE config_form_fields SET layoutorder = 2
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'arc_type';
+
+UPDATE config_form_fields SET layoutorder = 3
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'arccat_id';
+
+UPDATE config_form_fields SET layoutorder = 4
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'day_max';
+
+UPDATE config_form_fields SET layoutorder = 5
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'day_min';
+
+UPDATE config_form_fields SET layoutorder = 6
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'id';
+
+UPDATE config_form_fields SET layoutorder = 7
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_flow';
+
+UPDATE config_form_fields SET layoutorder = 8
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_hr';
+
+UPDATE config_form_fields SET layoutorder = 9
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_shear';
+
+UPDATE config_form_fields SET layoutorder = 10
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_slope';
+
+UPDATE config_form_fields SET layoutorder = 11
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_veloc';
+
+UPDATE config_form_fields SET layoutorder = 12
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'mfull_depth';
+
+UPDATE config_form_fields SET layoutorder = 13
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'mfull_flow';
+
+UPDATE config_form_fields SET layoutorder = 14
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'min_shear';
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'result_id';
+
+UPDATE config_form_fields SET layoutorder = 16
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'swarc_type';
+
+UPDATE config_form_fields SET layoutorder = 17
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'time_days';
+
+UPDATE config_form_fields SET layoutorder = 18
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'time_hour';
+
+UPDATE config_form_fields SET layoutorder = 19
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'time_max';
+
+UPDATE config_form_fields SET layoutorder = 20
+WHERE (formname, formtype, tabname)=('v_rpt_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'time_min';
+
+UPDATE config_form_fields SET layoutorder = 1
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'arc_id';
+
+UPDATE config_form_fields SET layoutorder = 2
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'arc_type';
+
+UPDATE config_form_fields SET layoutorder = 3
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'arccat_id';
+
+UPDATE config_form_fields SET layoutorder = 4
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'day_max';
+
+UPDATE config_form_fields SET layoutorder = 5
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'day_min';
+
+UPDATE config_form_fields SET layoutorder = 6
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'id';
+
+UPDATE config_form_fields SET layoutorder = 7
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_flow';
+
+UPDATE config_form_fields SET layoutorder = 8
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_hr';
+
+UPDATE config_form_fields SET layoutorder = 9
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_shear';
+
+UPDATE config_form_fields SET layoutorder = 10
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_slope';
+
+UPDATE config_form_fields SET layoutorder = 11
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'max_veloc';
+
+UPDATE config_form_fields SET layoutorder = 12
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'mfull_depth';
+
+UPDATE config_form_fields SET layoutorder = 13
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'mfull_flow';
+
+UPDATE config_form_fields SET layoutorder = 14
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'min_shear';
+
+UPDATE config_form_fields SET layoutorder = 15
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'result_id';
+
+UPDATE config_form_fields SET layoutorder = 16
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'time_days';
+
+UPDATE config_form_fields SET layoutorder = 17
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'time_hour';
+
+UPDATE config_form_fields SET layoutorder = 18
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'time_max';
+
+UPDATE config_form_fields SET layoutorder = 19
+WHERE (formname, formtype, tabname)=('v_rpt_comp_arcflow_sum', 'form_feature', 'tab_none')
+AND layoutorder IS NULL AND columnname = 'time_min';
+
