@@ -92,4 +92,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter",
 
 
 ALTER TABLE inp_pump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';
-ALTER TABLE inp_dscenaio_virtualpump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';
+ALTER TABLE inp_virtualpump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';
+ALTER TABLE inp_dscenario_virtualpump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';

@@ -52,7 +52,7 @@ BEGIN
     RAISE NOTICE 'Starting additional pumps process.';
 
 	--  Loop for pumping stations
-    FOR node_id_aux IN (SELECT DISTINCT a.node_id FROM inp_pump_additional a JOIN temp_t_arc ON concat(node_id,'_n2a')=arc_id JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'FLOWPUMP')
+    FOR node_id_aux IN (SELECT DISTINCT a.node_id FROM inp_pump_additional a JOIN temp_t_arc ON concat(node_id,'_n2a')=arc_id JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'POWERPUMP')
     LOOP
 		SELECT * INTO arc_rec FROM temp_t_arc WHERE arc_id=concat(node_id_aux,'_n2a');
 

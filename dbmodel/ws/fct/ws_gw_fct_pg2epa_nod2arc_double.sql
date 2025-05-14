@@ -32,7 +32,7 @@ BEGIN
 
 	-- pressure pumps
 	v_query_text = 'SELECT temp_t_arc.arc_id, temp_t_arc.node_1, the_geom, curve_id FROM temp_t_arc
-			JOIN inp_pump a ON concat(node_id,''_n2a'')=arc_id WHERE epa_type=''PUMP'' AND pump_type = ''PRESSPUMP''';
+			JOIN inp_pump a ON concat(node_id,''_n2a'')=arc_id WHERE epa_type=''PUMP'' AND pump_type = ''HEADPUMP''';
 
 	FOR v_arc_id, v_node_1, v_geom, v_curve IN EXECUTE v_query_text
 	LOOP
