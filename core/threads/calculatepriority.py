@@ -1155,12 +1155,12 @@ class GwCalculatePriority(GwTask):
         year_header = tools_qt.tr("Year:")
         current_network_cost_header = tools_qt.tr("Current network cost (€):")
         total_replacement_cost_header = tools_qt.tr("Total replacement cost (€):")
-        ivi_header = tools_qt.tr("IVI:")
+        ivi_header = tools_qt.tr("IVI (Horizon year):")
         replacement_rate_header = tools_qt.tr("Replacement rate (%/year):")
 
-        current_value = self._current_value(arcs, date.today().year)
+        current_value = self._current_value(arcs, self.target_year)
         replacement_cost = self._replacement_cost(arcs)
-        ivi = current_value / replacement_cost if replacement_cost > 0 else 0
+        ivi = self._calculate_ivi(arcs, self.target_year, True)
         replacement_rate = self.result_budget / replacement_cost * 100 if replacement_cost > 0 else 0
 
         columns = [
