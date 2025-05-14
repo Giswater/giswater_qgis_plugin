@@ -480,8 +480,8 @@ class GwPsector:
         """ Enable buttons and tabs when name is changed """
 
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name")
-        self.enable_buttons(psector_name != 'null')
-        self.set_tabs_enabled(psector_name != 'null')
+        self.enable_buttons(psector_name != 'null' and not self.check_name(psector_name))
+        self.set_tabs_enabled(psector_name != 'null' and not self.check_name(psector_name))
 
     def flags(self, index, model, editable_columns=None):
 
