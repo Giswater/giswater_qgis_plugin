@@ -75,6 +75,7 @@ BEGIN
 	RETURN gw_fct_graphanalytics_mapzones(v_data);
 
 	-- TODO: Remove tempory tables when failed
+END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
