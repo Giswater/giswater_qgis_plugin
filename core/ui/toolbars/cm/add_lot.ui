@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>474</width>
-    <height>792</height>
+    <width>470</width>
+    <height>372</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,75 +34,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout">
              <item row="0" column="0">
-              <layout class="QGridLayout" name="gridLayout_3">
-               <item row="0" column="2">
-                <widget class="QPushButton" name="btn_refresh_materialize_view">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1" colspan="2">
-                <widget class="QLineEdit" name="txt_ot_type"/>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="lbl_ot_type">
-                 <property name="text">
-                  <string>Tipus d'OT:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="lbl_performance_type">
-                 <property name="text">
-                  <string>Tipus d'actuacio:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QComboBox" name="cmb_ot">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="editable">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1" colspan="2">
-                <widget class="QLineEdit" name="txt_ot_address"/>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="lbl_ot">
-                 <property name="text">
-                  <string>OT:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="lbl_address">
-                 <property name="text">
-                  <string>Adreça:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1" colspan="2">
-                <widget class="QLineEdit" name="txt_wotype_id"/>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="lbl_observations">
-                 <property name="text">
-                  <string>Observacions:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1" colspan="2">
-                <widget class="QTextEdit" name="txt_observ"/>
-               </item>
-              </layout>
+              <layout class="QGridLayout" name="lyt_data_1"/>
              </item>
             </layout>
            </widget>
@@ -113,310 +45,8 @@
              <string>Lot:</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="8" column="0">
-              <layout class="QGridLayout" name="gridLayout_5">
-               <item row="5" column="0">
-                <widget class="QLabel" name="lbl_user">
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
-                  </font>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
-                 <property name="text">
-                  <string>Usuari:</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::AutoText</enum>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>false</bool>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="1">
-                <widget class="QComboBox" name="cmb_assigned_to">
-                 <property name="editable">
-                  <bool>true</bool>
-                 </property>
-                 <property name="sizeAdjustPolicy">
-                  <enum>QComboBox::AdjustToContents</enum>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="1">
-                <widget class="QLineEdit" name="user_name">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="frame">
-                  <bool>true</bool>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="lbl_real_end">
-                 <property name="text">
-                  <string>Fi real:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="real_enddate">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="enddate"/>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="lbl_plan_start">
-                 <property name="minimumSize">
-                  <size>
-                   <width>80</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>0</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
-                  </font>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
-                 <property name="text">
-                  <string>Inici planificat:</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::AutoText</enum>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>false</bool>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="7" column="0">
-                <widget class="QLabel" name="lbl_state">
-                 <property name="text">
-                  <string>Estat:</string>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="lot_id">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">background: rgb(242, 242, 242);
-                                                 color: rgb(100, 100, 100)</string>
-                 </property>
-                 <property name="frame">
-                  <bool>true</bool>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="lbl_plan_end">
-                 <property name="minimumSize">
-                  <size>
-                   <width>80</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>0</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
-                  </font>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
-                 <property name="text">
-                  <string>Final planificat:</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::AutoText</enum>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>false</bool>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="lbl_id">
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
-                  </font>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
-                 <property name="text">
-                  <string>Id:</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::AutoText</enum>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>false</bool>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="0">
-                <widget class="QLabel" name="lbl_team">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Equip:</string>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="startdate"/>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="lbl_real_start">
-                 <property name="text">
-                  <string>Inici real:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="7" column="1">
-                <widget class="QComboBox" name="cmb_status">
-                 <property name="editable">
-                  <bool>true</bool>
-                 </property>
-                 <property name="sizeAdjustPolicy">
-                  <enum>QComboBox::AdjustToContents</enum>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="real_startdate">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="8" column="0">
-                <widget class="QLabel" name="lbl_description">
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                  </font>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
-                 <property name="text">
-                  <string>Descripció:</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::AutoText</enum>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>false</bool>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="8" column="1">
-                <widget class="QTextEdit" name="descript"/>
-               </item>
-              </layout>
+             <item row="0" column="0">
+              <layout class="QGridLayout" name="lyt_data_2"/>
              </item>
             </layout>
            </widget>
@@ -440,7 +70,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
+                <normaloff>../../../../../../../../../../../../../.designer/icons/111.png</normaloff>../../../../../../../../../../../../../.designer/icons/111.png</iconset>
               </property>
              </widget>
             </item>
@@ -451,7 +81,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
+                <normaloff>../../../../../../../../../../../../../.designer/icons/112.png</normaloff>../../../../../../../../../../../../../.designer/icons/112.png</iconset>
               </property>
              </widget>
             </item>
@@ -462,7 +92,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
+                <normaloff>../../../../../../../../../../../../../.designer/icons/137.png</normaloff>../../../../../../../../../../../../../.designer/icons/137.png</iconset>
               </property>
              </widget>
             </item>
