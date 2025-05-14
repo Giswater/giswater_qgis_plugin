@@ -76,7 +76,7 @@ BEGIN
         $q$)
     )
     INSERT INTO temp_pgr_node (node_id)
-    SELECT DISTINCT c.node::text
+    SELECT c.node::text
     FROM connectedcomponents c
     WHERE EXISTS (
         SELECT 1
@@ -88,17 +88,62 @@ BEGIN
 
     EXECUTE v_querytext;
 
-    -- Dynamic column name for old_zone_id: %I_id -> dma_id, presszone_id, etc.
-    v_querytext = 'UPDATE temp_pgr_node n SET old_zone_id = t.' || v_mapzone_name || '_id FROM v_temp_node t WHERE n.node_id = t.node_id';
+    -- Dynamic column name for old_mapzone_id: %I_id -> dma_id, presszone_id, etc.
+    -- node because we need to inform old mapzone_id for this nodes that is_operative is false.
+    v_querytext = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM node t WHERE n.node_id = t.node_id';
     EXECUTE v_querytext;
 
-    v_querytext = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, old_zone_id)
+    v_querytext = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, old_mapzone_id)
          SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ' || v_mapzone_name || '_id
          FROM v_temp_arc a
          JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
          JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
 
     EXECUTE v_querytext;
+
+    v_querytext = '
+        INSERT INTO temp_pgr_connec (connec_id, arc_id, old_mapzone_id)
+        (
+            SELECT DISTINCT ON (c.connec_id) c.connec_id, a.pgr_arc_id, ' || v_mapzone_name || '_id
+            FROM v_temp_connec c
+            JOIN temp_pgr_arc a ON c.arc_id = a.arc_id
+        )';
+
+    EXECUTE v_querytext;
+
+    v_querytext = '
+        INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, old_mapzone_id)
+        (
+            SELECT DISTINCT ON (l.link_id) l.link_id, l.feature_id, l.feature_type, ' || v_mapzone_name || '_id
+            FROM v_temp_link l
+            JOIN temp_pgr_connec c ON l.feature_id=c.connec_id
+            WHERE l.feature_type = ''CONNEC''
+        )';
+
+    EXECUTE v_querytext;
+
+    IF v_project_type = 'UD' THEN
+        v_querytext = '
+            INSERT INTO temp_pgr_gully (gully_id, arc_id, old_mapzone_id)
+            (
+                SELECT DISTINCT ON (g.gully_id) g.gully_id, a.pgr_arc_id, ' || v_mapzone_name || '_id
+                FROM v_temp_gully g
+                JOIN temp_pgr_arc a ON g.arc_id = a.arc_id
+            )';
+
+        EXECUTE v_querytext;
+
+        v_querytext = '
+            INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, old_mapzone_id)
+            (
+                SELECT DISTINCT ON (l.link_id) l.link_id, l.feature_id, l.feature_type, ' || v_mapzone_name || '_id
+                FROM v_temp_link l
+                JOIN temp_pgr_gully g ON l.feature_id = g.gully_id
+                WHERE l.feature_type = ''GULLY''
+            )';
+
+        EXECUTE v_querytext;
+    END IF;
 
 
 

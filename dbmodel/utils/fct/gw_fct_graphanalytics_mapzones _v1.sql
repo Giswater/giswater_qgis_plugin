@@ -65,13 +65,13 @@ WITH
 temp_dma_graph AS (
 	SELECT
 		COALESCE (a.node_1, a.node_2) AS node_id,
-		n.zone_id AS dma_id,
+		n.mapzone_id AS dma_id,
 		CASE WHEN n.node_id IS NOT NULL THEN 1 ELSE -1 END AS flow_sign
 	FROM temp_pgr_node n
 	JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
 	WHERE n.graph_delimiter = 'dma'
 	AND a.graph_delimiter ='dma'
-	AND n.zone_id::int > 0
+	AND n.mapzone_id::int > 0
 	)
 SELECT DISTINCT ON (node_id, dma_id) node_id, dma_id, flow_sign
 FROM temp_dma_graph
@@ -264,11 +264,9 @@ BEGIN
 
 		-- closed valves
 		UPDATE temp_pgr_node t SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, modif = TRUE
-		FROM node n
+		FROM v_temp_node n
 		JOIN man_valve v ON n.node_id = v.node_id
-		JOIN cat_node cn ON cn.id = n.nodecat_id
-		JOIN cat_feature_node cf ON cf.id = cn.node_type
-		WHERE t.node_id = n.node_id AND cf.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
+		WHERE t.node_id = n.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
 
 		-- valves with to_arc NOT NULL
 		UPDATE temp_pgr_node n SET graph_delimiter = 'valve', to_arc = v.to_arc, broken = v.broken, modif = TRUE
@@ -285,7 +283,7 @@ BEGIN
 	-- NODES MAPZONES
 	-- Nodes that are the starting points of mapzones
     v_querytext =
-		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', zone_id = ' || v_mapzone_field || '
+		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = ' || v_mapzone_field || '
 		FROM (
 			SELECT ' || v_mapzone_field || ', (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' AS node_id
 			FROM ' || v_mapzone_name || ' 
@@ -472,37 +470,37 @@ BEGIN
 		VALUES (v_fid, 1, concat('INFO: ',v_class,' values for features and geometry of the mapzone has been modified by this process'));
 	END IF;
 
-	-- Update zone_id
+	-- Update mapzone_id
 	-- Update nodes with mapzone conflicts; nodes that are heads of mapzones in conflict with other mapzones are overwritten;
-	UPDATE temp_pgr_node n SET zone_id = -1
+	UPDATE temp_pgr_node n SET mapzone_id = -1
     FROM (
-		SELECT d.node, array_agg(DISTINCT n.zone_id)::int[] AS maps
+		SELECT d.node, array_agg(DISTINCT n.mapzone_id)::int[] AS maps
 		FROM temp_pgr_drivingdistance d
 		JOIN temp_pgr_node n ON d.start_vid = n.pgr_node_id
 		GROUP BY d.node
-		HAVING COUNT(DISTINCT n.zone_id) > 1
+		HAVING COUNT(DISTINCT n.mapzone_id) > 1
 	) AS s
     WHERE n.pgr_node_id = s.node;
 
 	-- Update nodes with a single mapzone
-    UPDATE temp_pgr_node n SET zone_id = s.zone_id
+    UPDATE temp_pgr_node n SET mapzone_id = s.mapzone_id
     FROM
     (
-		SELECT d.node, n.zone_id
+		SELECT d.node, n.mapzone_id
     	FROM temp_pgr_drivingdistance d
     	JOIN temp_pgr_node n ON d.start_vid = n.pgr_node_id
     ) AS s
-    WHERE n.pgr_node_id = s.node AND n.zone_id = 0;
+    WHERE n.pgr_node_id = s.node AND n.mapzone_id = 0;
 
 	-- Update arcs
-    UPDATE temp_pgr_arc a SET zone_id = n.zone_id
+    UPDATE temp_pgr_arc a SET mapzone_id = n.mapzone_id
     FROM temp_pgr_node n
     WHERE ((a.pgr_node_1 = n.pgr_node_id AND a.cost >= 0)
 	OR (a.pgr_node_2 = n.pgr_node_id AND reverse_cost >= 0))
-	AND n.zone_id <> 0;
+	AND n.mapzone_id <> 0;
 
-	-- Now set to 0 the nodes that connect arcs with different zone_id
-	-- Note: if a closed valve, for example, is between sector 2 and sector 3, it means it is a boundary, it will have '0' as zone_id; if it is between -1 and 2 it will also have 0;
+	-- Now set to 0 the nodes that connect arcs with different mapzone_id
+	-- Note: if a closed valve, for example, is between sector 2 and sector 3, it means it is a boundary, it will have '0' as mapzone_id; if it is between -1 and 2 it will also have 0;
 	-- However, if a closed valve is between arcs with the same sector, it retains it; if it is between 1 and 1, it retains 1, meaning it is not a boundary; if it is between -1 and -1, it does not change, it retains Conflict
 
 	-- Set to 0 the boundary nodes of mapzones
@@ -512,44 +510,44 @@ BEGIN
 		JOIN temp_pgr_node n1 on a.pgr_node_1 = n1.pgr_node_id
 		JOIN temp_pgr_node n2 on a.pgr_node_2 = n2.pgr_node_id
 		WHERE a.graph_delimiter = 'valve'
-		AND n1.zone_id <> 0 AND n2.zone_id <> 0
-		AND n1.zone_id <> n2.zone_id
+		AND n1.mapzone_id <> 0 AND n2.mapzone_id <> 0
+		AND n1.mapzone_id <> n2.mapzone_id
 		)
-	UPDATE temp_pgr_node n SET zone_id = 0
+	UPDATE temp_pgr_node n SET mapzone_id = 0
 	FROM boundary AS s
 	WHERE n.node_id =s.node_id AND n.graph_delimiter='valve';
 
-	-- The connecs take the zone_id of the arc they are associated with and the link takes the zone_id of the gully
-    -- UPDATE temp_pgr_connec c SET zone_id = a.zone_id
-    -- FROM temp_pgr_arc a
-    -- WHERE c.arc_id::int = a.pgr_arc_id
-	-- AND a.zone_id <> 0;
+	-- The connecs take the mapzone_id of the arc they are associated with and the link takes the mapzone_id of the gully
+    UPDATE temp_pgr_connec c SET mapzone_id = a.mapzone_id
+    FROM temp_pgr_arc a
+    WHERE c.arc_id::int = a.pgr_arc_id
+	AND a.mapzone_id <> 0;
 
-    -- UPDATE temp_pgr_link l SET zone_id = c.zone_id
-    -- FROM temp_pgr_connec c
-    -- WHERE l.feature_id = c.connec_id
-	-- AND l.feature_type = 'CONNEC'
-	-- AND c.zone_id <> 0;
+    UPDATE temp_pgr_link l SET mapzone_id = c.mapzone_id
+    FROM temp_pgr_connec c
+    WHERE l.feature_id = c.connec_id
+	AND l.feature_type = 'CONNEC'
+	AND c.mapzone_id <> 0;
 
-	-- For sanitation, the gully takes the zone_id of the arc they are associated with and the link takes the zone_id of the gully
-    -- IF v_project_type = 'UD' THEN
-    --     UPDATE temp_pgr_gully g SET zone_id = a.zone_id
-    --     FROM temp_pgr_arc a
-    --     WHERE g.arc_id::int = a.pgr_arc_id
-	-- 	AND a.zone_id <> 0;
+	-- For sanitation, the gully takes the mapzone_id of the arc they are associated with and the link takes the mapzone_id of the gully
+    IF v_project_type = 'UD' THEN
+        UPDATE temp_pgr_gully g SET mapzone_id = a.mapzone_id
+        FROM temp_pgr_arc a
+        WHERE g.arc_id::int = a.pgr_arc_id
+		AND a.mapzone_id <> 0;
 
-    --     UPDATE temp_pgr_link l SET zone_id = g.zone_id
-    --     FROM temp_pgr_gully g
-    --     WHERE l.feature_id = g.gully_id
-	-- 	AND l.feature_type = 'GULLY'
-	-- 	AND g.zone_id <> 0;
-    -- END IF;
+        UPDATE temp_pgr_link l SET mapzone_id = g.mapzone_id
+        FROM temp_pgr_gully g
+        WHERE l.feature_id = g.gully_id
+		AND l.feature_type = 'GULLY'
+		AND g.mapzone_id <> 0;
+    END IF;
 
 	-- CONFLICT COUNTS
 	IF v_floodonlymapzone IS NULL THEN
 		IF v_class != 'DRAINZONE' THEN
-				SELECT count(*) INTO v_arcs_count FROM temp_pgr_arc tpa WHERE zone_id = -1;
-				-- SELECT count(*) INTO v_connecs_count FROM temp_pgr_connec tpc WHERE zone_id = -1;
+				SELECT count(*) INTO v_arcs_count FROM temp_pgr_arc tpa WHERE mapzone_id = -1;
+				SELECT count(*) INTO v_connecs_count FROM temp_pgr_connec tpc WHERE mapzone_id = -1;
 
 				-- log
 				IF v_arcs_count > 0 OR v_connecs_count > 0 THEN
@@ -567,7 +565,7 @@ BEGIN
 		RAISE NOTICE 'Disconnected arcs';
 		SELECT COUNT(t.*) INTO v_arcs_count
 		FROM temp_pgr_arc t
-		WHERE t.zone_id = 0
+		WHERE t.mapzone_id = 0
 		and t.pgr_arc_id = t.arc_id::INT;
 
 		IF v_arcs_count > 0 THEN
@@ -578,49 +576,49 @@ BEGIN
 			VALUES (v_fid, 1, concat('INFO: 0 arc''s have been disconnected'));
 		END IF;
 
-		-- RAISE NOTICE 'Disconnected connecs';
-		-- IF v_arcs_count > 0 THEN
-		-- 	SELECT COUNT(tc.*) INTO v_connecs_count
-		-- 	FROM temp_pgr_connec tc
-		-- 	JOIN temp_pgr_arc t
-		-- 	ON tc.arc_id::INT = t.arc_id::INT
-		-- 	WHERE tc.zone_id = 0
-		-- 	and t.pgr_arc_id = t.arc_id::INT;
+		RAISE NOTICE 'Disconnected connecs';
+		IF v_arcs_count > 0 THEN
+			SELECT COUNT(tc.*) INTO v_connecs_count
+			FROM temp_pgr_connec tc
+			JOIN temp_pgr_arc t
+			ON tc.arc_id::INT = t.arc_id::INT
+			WHERE tc.mapzone_id = 0
+			and t.pgr_arc_id = t.arc_id::INT;
 
-		-- 	IF v_connecs_count > 0 THEN
-		-- 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-		-- 		VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
-		-- 	ELSE
-		-- 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-		-- 		VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
-		-- 	END IF;
-		-- ELSE
-		-- 	INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-		-- 	VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
-		-- END IF;
+			IF v_connecs_count > 0 THEN
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
+				VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
+			ELSE
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
+				VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
+			END IF;
+		ELSE
+			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
+			VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
+		END IF;
 
-		-- IF v_project_type='UD' THEN
-		-- 	RAISE NOTICE 'Disconnected gullies';
-		-- 	IF v_arcs_count > 0 THEN
-		-- 		SELECT COUNT(tg.*) INTO v_gullies_count
-		-- 		FROM temp_pgr_gully tg
-		-- 		JOIN temp_pgr_arc t
-		-- 		ON tg.arc_id::INT = t.arc_id::INT
-		-- 		WHERE tg.zone_id = 0
-		-- 		and t.pgr_arc_id = t.arc_id::INT;
+		IF v_project_type='UD' THEN
+			RAISE NOTICE 'Disconnected gullies';
+			IF v_arcs_count > 0 THEN
+				SELECT COUNT(tg.*) INTO v_gullies_count
+				FROM temp_pgr_gully tg
+				JOIN temp_pgr_arc t
+				ON tg.arc_id::INT = t.arc_id::INT
+				WHERE tg.mapzone_id = 0
+				and t.pgr_arc_id = t.arc_id::INT;
 
-		-- 		IF v_gullies_count > 0 THEN
-		-- 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-		-- 			VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_gullies_count ,' gullies have been disconnected'));
-		-- 		ELSE
-		-- 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-		-- 			VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
-		-- 		END IF;
-		-- 	ELSE
-		-- 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-		-- 		VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
-		-- 	END IF;
-		-- END IF;
+				IF v_gullies_count > 0 THEN
+					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
+					VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_gullies_count ,' gullies have been disconnected'));
+				ELSE
+					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
+					VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
+				END IF;
+			ELSE
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
+				VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
+			END IF;
+		END IF;
 	END IF;
 
 	-- insert spacer for warning and info
@@ -661,13 +659,13 @@ BEGIN
 					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Disconnected''::text AS descript 
 					FROM temp_pgr_arc t
 					JOIN arc a USING (arc_id)
-					WHERE t.zone_id = 0
+					WHERE t.mapzone_id = 0
 					AND t.arc_id IS NOT NULL
 					UNION
 					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc t
 					JOIN arc a USING (arc_id)
-					WHERE t.zone_id = -1
+					WHERE t.mapzone_id = -1
 					AND t.arc_id IS NOT NULL
 				) row 
 			) features'
@@ -679,7 +677,7 @@ BEGIN
 					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, 'Conflict'::text AS descript
 					FROM temp_pgr_arc t
 					JOIN arc a USING (arc_id)
-					WHERE t.zone_id = -1
+					WHERE t.mapzone_id = -1
 					AND t.arc_id IS NOT NULL
 				) s
 			) INTO v_has_conflicts;
@@ -691,26 +689,26 @@ BEGIN
 		-- disconnected and conflict connecs
 		v_result = NULL;
 		-- TODO: add orphan connecs
-		-- EXECUTE 'SELECT jsonb_agg(features.feature)
-		-- 	FROM (
-		-- 		SELECT jsonb_build_object(
-		-- 			''type'',       ''Feature'',
-		-- 			''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-		-- 			''properties'', to_jsonb(row) - ''the_geom''
-		-- 		) AS feature
-		-- 		FROM (
-		-- 			SELECT DISTINCT ON (t.connec_id) t.connec_id, c.conneccat_id, c.state, c.expl_id, NULL AS mapzone_id, c.the_geom, ''Disconnected''::text AS descript
-		-- 			FROM temp_pgr_connec t
-		-- 			JOIN connec c USING (connec_id)
-		-- 			WHERE t.zone_id = 0
-		-- 			UNION
-		-- 			SELECT DISTINCT ON (t.connec_id) t.connec_id, c.conneccat_id, c.state, c.expl_id, NULL AS mapzone_id, c.the_geom, ''Conflict''::text AS descript
-		-- 			FROM temp_pgr_connec t
-		-- 			JOIN connec c USING (connec_id)
-		-- 			WHERE t.zone_id = -1
-		-- 		) row
-		-- 	) features'
-		-- 	INTO v_result;
+		EXECUTE 'SELECT jsonb_agg(features.feature)
+			FROM (
+				SELECT jsonb_build_object(
+					''type'',       ''Feature'',
+					''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+					''properties'', to_jsonb(row) - ''the_geom''
+				) AS feature
+				FROM (
+					SELECT DISTINCT ON (t.connec_id) t.connec_id, c.conneccat_id, c.state, c.expl_id, NULL AS mapzone_id, c.the_geom, ''Disconnected''::text AS descript
+					FROM temp_pgr_connec t
+					JOIN connec c USING (connec_id)
+					WHERE t.mapzone_id = 0
+					UNION
+					SELECT DISTINCT ON (t.connec_id) t.connec_id, c.conneccat_id, c.state, c.expl_id, NULL AS mapzone_id, c.the_geom, ''Conflict''::text AS descript
+					FROM temp_pgr_connec t
+					JOIN connec c USING (connec_id)
+					WHERE t.mapzone_id = -1
+				) row
+			) features'
+			INTO v_result;
 
 		v_result := COALESCE(v_result, '{}');
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
@@ -731,19 +729,19 @@ BEGIN
 					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Disconnected''::text AS descript 
 					FROM temp_pgr_arc t
 					JOIN arc a USING (arc_id)
-					WHERE t.zone_id = 0
+					WHERE t.mapzone_id = 0
 					AND t.arc_id IS NOT NULL
 					UNION
 					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc t
 					JOIN arc a USING (arc_id)
-					WHERE t.zone_id = -1
+					WHERE t.mapzone_id = -1
 					AND t.arc_id IS NOT NULL
 					UNION
 					SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, a.'||v_mapzone_field||'::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
 					FROM temp_pgr_arc t
 					JOIN arc a USING (arc_id)
-					JOIN '|| v_mapzone_name ||' m ON t.zone_id = m.'|| v_mapzone_field ||'
+					JOIN '|| v_mapzone_name ||' m ON t.mapzone_id = m.'|| v_mapzone_field ||'
 					WHERE m.'|| v_mapzone_field ||'::integer > 0
 					AND t.arc_id IS NOT NULL
 				) row 

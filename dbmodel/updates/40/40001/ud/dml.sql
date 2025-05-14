@@ -91,6 +91,21 @@ CASE
 END AS link_type
 FROM _link;
 
+UPDATE link SET state_type = c.state_type
+FROM link l
+JOIN connec c ON l.feature_id = c.connec_id AND l.feature_type = 'CONNEC'
+WHERE l.state = 1;
+
+UPDATE link SET state_type = c.state_type
+FROM link l
+JOIN gully g ON l.feature_id = g.gully_id AND l.feature_type = 'GULLY'
+WHERE l.state = 1;
+
+UPDATE link SET state_type = (
+  SELECT (value::json->>'plan_statetype_planned')::int2 FROM config_param_system WHERE parameter = 'plan_statetype_vdefault'
+)
+WHERE state = 2;
+
 
 DO $func$
 DECLARE

@@ -33,10 +33,10 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     SELECT UPPER(project_type) INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-    IF v_project_type = 'UD' THEN v_reverse_cost = -1; 
+    IF v_project_type = 'UD' THEN v_cost = -1;
     END IF;
 
-    -- Disconnect arcs with modif = TRUE at nodes with modif1 = TRUE; a new arc N_new->N_original is created with the v_cost and v_reverse_cost 
+    -- Disconnect arcs with modif = TRUE at nodes with modif1 = TRUE; a new arc N_new->N_original is created with the v_cost and v_reverse_cost
     FOR v_record IN
 	    SELECT n.graph_delimiter AS n_graph_delimiter, a.graph_delimiter AS a_graph_delimiter, a.pgr_arc_id, a.pgr_node_1, a.node_1
 	    FROM temp_pgr_node n

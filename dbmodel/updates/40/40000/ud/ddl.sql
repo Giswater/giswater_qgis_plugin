@@ -1734,6 +1734,7 @@ CREATE TABLE link (
 	linkcat_id varchar(30) NOT NULL,
 	epa_type varchar(16) NULL,
 	state int2 NOT NULL,
+	state_type int2 NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,
