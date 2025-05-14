@@ -266,7 +266,7 @@ BEGIN
                         connec.arc_id,
                         NULL::integer AS link_id
                     FROM connec
-                    WHERE NOTEXISTS (
+                    WHERE NOT EXISTS (
                     SELECT 1
                     FROM connec_psector cp
                     WHERE cp.connec_id::text = connec.connec_id::text AND cp.p_state = 0
@@ -825,9 +825,6 @@ BEGIN
 
  -- TODO: TO BE REMOVED
     EXCEPTION WHEN OTHERS THEN
-
-    v_data := '{"data":{"action":"DROP", "fct_name":"'|| v_class ||'"}}';
-	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     RETURN jsonb_build_object(
         'status', 'Failed',

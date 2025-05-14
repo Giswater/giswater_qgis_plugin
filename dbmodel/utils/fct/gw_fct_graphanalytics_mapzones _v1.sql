@@ -707,7 +707,7 @@ BEGIN
 					JOIN connec c USING (connec_id)
 					WHERE t.mapzone_id = -1
 				) row
-			) features'
+			) features';
 			INTO v_result;
 
 		v_result := COALESCE(v_result, '{}');
