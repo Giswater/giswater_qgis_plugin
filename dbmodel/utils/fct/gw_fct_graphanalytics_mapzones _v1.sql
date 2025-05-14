@@ -168,6 +168,13 @@ BEGIN
 	IF v_floodonlymapzone = '' THEN v_floodonlymapzone = NULL; END IF;
     v_floodonlymapzone := TRIM(BOTH '[]' FROM v_floodonlymapzone);
 
+
+	-- it's not allowed to commit changes when psectors are used
+ 	IF v_usepsector = 'true' THEN
+		v_commitchanges = 'false';
+	END IF;
+
+
 	IF v_class = 'PRESSZONE' THEN
 		v_fid=146;
 	ELSIF v_class = 'DMA' THEN
