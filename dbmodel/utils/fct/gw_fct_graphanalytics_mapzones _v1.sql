@@ -270,7 +270,7 @@ BEGIN
 		WHERE t.node_id = n.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
 
 		-- valves with to_arc NOT NULL and with the property to_arc valid ( broken = FALSE, v.closed = FALSE ) 
-		UPDATE temp_pgr_node n SET graph_delimiter = 'valve', to_arc = v.to_arc, broken = v.broken, modif = TRUE
+		UPDATE temp_pgr_node n SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
 		FROM man_valve v
 		WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.closed = FALSE AND v.broken = FALSE;
 
@@ -366,7 +366,7 @@ BEGIN
 				a.pgr_node_2
 			FROM  temp_pgr_node n
 			JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
-			WHERE n.graph_delimiter ='valve' AND n.closed IS NULL AND a.arc_id <> n.to_arc
+			WHERE n.graph_delimiter ='valve' AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
 		),
 		arcs_modif AS (
 			SELECT
@@ -469,7 +469,7 @@ BEGIN
 			cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN 0 ELSE a.cost END -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
 		WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		AND a.graph_delimiter = 'valve' AND n.to_arc IS NOT NULL AND n.closed IS NULL;
+		AND a.graph_delimiter = 'valve' AND n.to_arc IS NOT NULL;
     END IF;
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
