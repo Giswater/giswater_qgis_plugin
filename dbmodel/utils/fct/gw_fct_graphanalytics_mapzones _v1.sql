@@ -332,44 +332,54 @@ BEGIN
 		-- for the closed valves (WHEN "closed" IS TRUE), one of the arcs that connect to the valve
 		WITH
 		arcs_selected AS (
-			SELECT DISTINCT ON (n.pgr_node_id)  a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
+			SELECT DISTINCT ON (n.pgr_node_id)  
+				a.pgr_arc_id, 
+				n.pgr_node_id, 
+				a.pgr_node_1, 
+				a.pgr_node_2
 			FROM temp_pgr_node n
 			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
 			WHERE n.graph_delimiter = 'valve' AND n.closed = TRUE
+		),
+		arcs_modif AS (
+			SELECT
+				pgr_arc_id,
+				bool_or(pgr_node_id = pgr_node_1) AS modif1,
+				bool_or( pgr_node_id = pgr_node_2) AS modif2
+			FROM arcs_selected
+			GROUP BY pgr_arc_id
 		)
 		UPDATE temp_pgr_arc t
 		SET
 			modif1 = s.modif1,
 			modif2 = s.modif2
-		FROM (
-			SELECT
-				pgr_arc_id,
-				bool_or(pgr_node_id = pgr_node_1) AS modif1,
-				bool_or( pgr_node_id = pgr_node_2) AS modif2
-			FROM arcs_selected
-			GROUP BY pgr_arc_id
-		) s
+		FROM arcs_modif s
 		WHERE t.pgr_arc_id = s.pgr_arc_id;
 
         -- for the valves with to_arc NOT NULL that are not closed ('valve'); the InletArc - the one that is not to_arc
   		WITH
 		arcs_selected AS (
-			SELECT a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
+			SELECT 
+				a.pgr_arc_id, 
+				n.pgr_node_id, 
+				a.pgr_node_1, 
+				a.pgr_node_2
 			FROM  temp_pgr_node n
 			JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
 			WHERE n.graph_delimiter ='valve' AND n.closed IS NULL AND a.arc_id <> n.to_arc
-		)
-		UPDATE temp_pgr_arc t
-		SET modif1= s.modif1,
-			modif2= s.modif2
-		FROM (
+		),
+		arcs_modif AS (
 			SELECT
 				pgr_arc_id,
 				bool_or(pgr_node_id = pgr_node_1) AS modif1,
 				bool_or( pgr_node_id = pgr_node_2) AS modif2
 			FROM arcs_selected
 			GROUP BY pgr_arc_id
-		) s
+		)
+		UPDATE temp_pgr_arc t
+		SET modif1= s.modif1,
+			modif2= s.modif2
+		FROM arcs_modif s
 		WHERE t.pgr_arc_id= s.pgr_arc_id;
 
 		-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
@@ -378,12 +388,13 @@ BEGIN
 	-- ARCS MAPZONES
 	-- Disconnect the InletArc (those that are not to_arc)
     v_querytext =
-		'UPDATE temp_pgr_arc t 
-		SET
-			modif1 = CASE WHEN s.pgr_node_id = s.pgr_node_1 THEN TRUE ELSE modif1 END,
-        	modif2 = CASE WHEN s.pgr_node_id = s.pgr_node_2 THEN TRUE ELSE modif2 END
-		FROM (
-			SELECT a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
+		'WITH 
+		arcs_selected AS (
+			SELECT 
+				a.pgr_arc_id, 
+				n.pgr_node_id, 
+				a.pgr_node_1, 
+				a.pgr_node_2
 			FROM temp_pgr_node n
 			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2) 
 			LEFT JOIN (
@@ -394,31 +405,47 @@ BEGIN
 			) sa ON sa.to_arc = a.arc_id
 			WHERE n.graph_delimiter = ''' || v_mapzone_name || '''
 			AND sa.to_arc IS NULL
-		) s
-		WHERE t.pgr_arc_id = s.pgr_arc_id';
+		),
+		arcs_modif AS (
+			SELECT
+				pgr_arc_id,
+				bool_or(pgr_node_id = pgr_node_1) AS modif1,
+				bool_or( pgr_node_id = pgr_node_2) AS modif2
+			FROM arcs_selected
+			GROUP BY pgr_arc_id
+		)
+		UPDATE temp_pgr_arc t
+		SET modif1= s.modif1,
+			modif2= s.modif2
+		FROM arcs_modif s
+		WHERE t.pgr_arc_id= s.pgr_arc_id';
 	EXECUTE v_querytext;
 
 	-- Arcs forceClosed - all arcs that are connected to forceClosed nodes
 	WITH
 		arcs_selected AS (
-			SELECT a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
+			SELECT 
+				a.pgr_arc_id, 
+				n.pgr_node_id, 
+				a.pgr_node_1, 
+				a.pgr_node_2
 			FROM temp_pgr_node n
 			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
 			WHERE n.graph_delimiter = 'forceClosed'
+		),
+		arcs_modif AS (
+			SELECT
+				pgr_arc_id,
+				bool_or(pgr_node_id = pgr_node_1) AS modif1,
+				bool_or( pgr_node_id = pgr_node_2) AS modif2
+			FROM arcs_selected
+			GROUP BY pgr_arc_id
 		)
-	UPDATE temp_pgr_arc a
-	SET
-		modif1 = s.modif1,
-		modif2 = s.modif2
-	FROM (
-		SELECT
-			pgr_arc_id,
-			bool_or(pgr_node_id = pgr_node_1) AS modif1,
-			bool_or( pgr_node_id = pgr_node_2) AS modif2
-		FROM arcs_selected
-		GROUP BY pgr_arc_id
-		) s
-	WHERE a.pgr_arc_id = s.pgr_arc_id;
+		UPDATE temp_pgr_arc t
+		SET modif1= s.modif1,
+			modif2= s.modif2
+		FROM arcs_modif s
+		WHERE t.pgr_arc_id= s.pgr_arc_id;
 
 	-- Generate new arcs and disconnect arcs with modif = TRUE
 	-- =======================
