@@ -263,16 +263,16 @@ BEGIN
 
 		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
 
-		-- closed valves
+		-- closed valves - with or without to_arc
 		UPDATE temp_pgr_node t SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, modif = TRUE
 		FROM v_temp_node n
 		JOIN man_valve v ON n.node_id = v.node_id
 		WHERE t.node_id = n.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
 
-		-- valves with to_arc NOT NULL
+		-- valves with to_arc NOT NULL and with the property to_arc valid ( broken = FALSE, v.closed = FALSE ) 
 		UPDATE temp_pgr_node n SET graph_delimiter = 'valve', to_arc = v.to_arc, broken = v.broken, modif = TRUE
 		FROM man_valve v
-		WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.broken = FALSE;
+		WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.closed = FALSE AND v.broken = FALSE;
 
 		-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 	END IF;
