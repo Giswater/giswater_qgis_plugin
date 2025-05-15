@@ -530,6 +530,12 @@ BEGIN
 		NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_visibility, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
 		NEW.label_quadrant, NEW.n_inhabitants, NEW.lock_level, NEW.block_code, NEW.n_hydrometer);
 
+		-- insert into connec_add table
+		INSERT INTO connec_add (connec_id, demand_base, demand_max,demand_min, demand_avg, press_max, press_min, press_avg, quality_max, quality_min, quality_avg,
+		flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, result_id)
+		VALUES ( NEW.connec_id, NEW.demand_base, NEW.demand_max, NEW.demand_min, NEW.demand_avg, NEW.press_max, NEW.press_min, NEW.press_avg, NEW.quality_max,
+		NEW.quality_min, NEW.quality_avg, NEW.flow_max, NEW.flow_min, NEW.flow_avg, NEW.vel_max, NEW.vel_min, NEW.vel_avg, NEW.result_id);
+
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
 		JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.conneccat_id;
 
@@ -876,6 +882,13 @@ BEGIN
 			crmzone_id=NEW.crmzone_id, expl_visibility=NEW.expl_visibility, plot_code=NEW.plot_code, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 			label_quadrant=NEW.label_quadrant, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_code=NEW.block_code, n_hydrometer=NEW.n_hydrometer
 			WHERE connec_id=OLD.connec_id;
+		
+		-- update connec_add table
+		UPDATE connec_add SET demand_base = NEW.demand_base, demand_max = NEW.demand_max, demand_min = NEW.demand_min, demand_avg = NEW.demand_avg, press_max = NEW.press_max,
+		press_min = NEW.press_min, press_avg = NEW.press_avg, quality_max = NEW.quality_max, quality_min = NEW.quality_min, quality_avg = NEW.quality_avg,
+		flow_max = NEW.flow_max, flow_min = NEW.flow_min, flow_avg = NEW.flow_avg, vel_max = NEW.vel_max, vel_min = NEW.vel_min, vel_avg = NEW.vel_avg,
+		result_id = NEW.result_id
+		WHERE connec_id = OLD.connec_id;
 
 		IF v_man_table ='man_greentap' THEN
 			UPDATE man_greentap SET linked_connec=NEW.linked_connec,

@@ -819,7 +819,6 @@ BEGIN
 	END IF;
 
 	IF p_tg_op != 'LAYER' THEN
-		RAISE NOTICE 'v_widgetvalues: %', v_fields_array;
 		-- looping the array setting values and widgetcontrols
 		FOREACH aux_json IN ARRAY v_fields_array
 		LOOP

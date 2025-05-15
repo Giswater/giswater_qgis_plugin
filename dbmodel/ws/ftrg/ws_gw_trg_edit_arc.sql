@@ -413,6 +413,12 @@ BEGIN
 					NEW.adate, NEW.adescript, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.pavcat_id, NEW.om_state, NEW.conserv_state,
 					NEW.parent_id, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.lock_level, NEW.is_scadamap);
 
+		-- Insert into arc_add table
+		INSERT INTO arc_add (arc_id, result_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, mincut_connecs, mincut_hydrometers,
+		mincut_length, mincut_watervol, mincut_criticity)
+		VALUES (NEW.arc_id, NEW.result_id, NEW.flow_max, NEW.flow_min, NEW.flow_avg, NEW.vel_max, NEW.vel_min, NEW.vel_avg,
+		NEW.tot_headloss_max, NEW.tot_headloss_min, NEW.mincut_connecs, NEW.mincut_hydrometers, NEW.mincut_length, NEW.mincut_watervol, NEW.mincut_criticity);
+
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
 		IF v_edit_enable_arc_nodes_update IS TRUE THEN
 			IF NEW.node_1 IS NOT NULL THEN
@@ -633,6 +639,12 @@ BEGIN
 				om_state=NEW.om_state, conserv_state=NEW.conserv_state, parent_id = NEW.parent_id,expl_visibility =NEW.expl_visibility, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 				label_quadrant=NEW.label_quadrant, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
 				WHERE arc_id=OLD.arc_id;
+
+		-- update arc_add table
+		UPDATE arc_add SET result_id = NEW.result_id, flow_max = NEW.flow_max, flow_min = NEW.flow_min, flow_avg = NEW.flow_avg, vel_max = NEW.vel_max,
+		vel_min = NEW.vel_min, vel_avg = NEW.vel_avg, tot_headloss_max = NEW.tot_headloss_max, tot_headloss_min = NEW.tot_headloss_min, mincut_connecs = NEW.mincut_connecs,
+		mincut_hydrometers = NEW.mincut_hydrometers, mincut_length = NEW.mincut_length, mincut_watervol = NEW.mincut_watervol, mincut_criticity = NEW.mincut_criticity
+		WHERE arc_id = OLD.arc_id;
 
 		-- childtable update
 		IF v_customfeature IS NOT NULL THEN

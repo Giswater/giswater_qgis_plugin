@@ -677,6 +677,17 @@ AS WITH
 	            WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
 	            ELSE NULL::character varying(16)
 	        END AS inp_type,
+            arc_add.result_id,
+            arc_add.max_flow,
+            arc_add.max_veloc,
+            arc_add.mfull_flow,
+            arc_add.mfull_depth,
+            arc_add.manning_veloc,
+            arc_add.manning_flow,
+            arc_add.dwf_minflow,
+            arc_add.dwf_maxflow,
+            arc_add.dwf_minvel,
+            arc_add.dwf_maxvel,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
 			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
 			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
@@ -704,7 +715,7 @@ AS WITH
 			LEFT JOIN omzone_table on omzone_table.omzone_id = arc.omzone_id
 			LEFT JOIN drainzone_table ON arc.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON arc.dwfzone_id = dwfzone_table.dwfzone_id
-            LEFT JOIN arc_add a ON a.arc_id::text = arc.arc_id::text
+            LEFT JOIN arc_add ON arc_add.arc_id::text = arc.arc_id::text
 		)
 	SELECT arc_selected.*
 	FROM arc_selected;
@@ -886,6 +897,11 @@ AS WITH
 			  WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
 			  ELSE NULL::character varying(16)
 			END AS inp_type,
+            node_add.result_id,
+            node_add.max_depth,
+            node_add.max_height,
+            node_add.flooding_rate,
+            node_add.flooding_vol,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
 			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
 			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
@@ -912,7 +928,7 @@ AS WITH
 			LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
 			LEFT JOIN drainzone_table ON node.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON node.dwfzone_id = dwfzone_table.dwfzone_id
-            LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
+            LEFT JOIN node_add ON node_add.node_id::text = node.node_id::text
     	),
     node_base AS
         (

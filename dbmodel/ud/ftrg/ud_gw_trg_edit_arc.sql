@@ -440,6 +440,10 @@ BEGIN
 			NEW.registration_date, NEW.meandering, NEW.conserv_state, NEW.om_state, NEW.last_visitdate, NEW.negative_offset, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id);
 		END IF;
 
+		INSERT INTO arc_add (arc_id, result_id, max_flow, max_veloc, mfull_flow, mfull_depth, manning_veloc, manning_flow, dwf_minflow, dwf_maxflow, dwf_minvel, dwf_maxvel)
+		VALUES ( NEW.arc_id, NEW.result_id, NEW.max_flow, NEW.max_veloc, NEW.mfull_flow, NEW.mfull_depth, NEW.manning_veloc, NEW.manning_flow, NEW.dwf_minflow,
+		NEW.dwf_maxflow, NEW.dwf_minvel, NEW.dwf_maxvel);
+
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
 		IF v_edit_enable_arc_nodes_update IS TRUE THEN
 			IF NEW.node_1 IS NOT NULL THEN
@@ -715,6 +719,12 @@ BEGIN
 			meandering=NEW.meandering, conserv_state=NEW.conserv_state, om_state=NEW.om_state, last_visitdate=NEW.last_visitdate, negative_offset=NEW.negative_offset, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id
 			WHERE arc_id=OLD.arc_id;
 		END IF;
+
+		-- Update arc_add table
+		UPDATE arc_add SET arc_id=NEW.arc_id, result_id = NEW.result_id, max_flow = NEW.max_flow, max_veloc = NEW.max_veloc, mfull_flow = NEW.mfull_flow, mfull_depth = NEW.mfull_depth,
+		manning_veloc = NEW.manning_veloc, manning_flow = NEW.manning_flow, dwf_minflow = NEW.dwf_minflow, dwf_maxflow = NEW.dwf_maxflow, dwf_minvel = NEW.dwf_minvel,
+		dwf_maxvel = NEW.dwf_maxvel
+		WHERE arc_id = OLD.arc_id;
 
 		-- child tables fields
 		IF v_man_table='man_conduit' THEN

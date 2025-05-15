@@ -209,12 +209,20 @@ AS WITH
         WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
         ELSE NULL::character varying(16)
       END AS inp_type,
-      e.flow_max,
-      e.flow_min,
-      e.flow_avg,
-      e.vel_max,
-      e.vel_min,
-      e.vel_avg,
+      arc_add.flow_max,
+      arc_add.flow_min,
+      arc_add.flow_avg,
+      arc_add.vel_max,
+      arc_add.vel_min,
+      arc_add.vel_avg,
+      arc_add.tot_headloss_max,
+      arc_add.tot_headloss_min,
+      arc_add.mincut_connecs,
+      arc_add.mincut_hydrometers,
+      arc_add.mincut_length,
+      arc_add.mincut_watervol,
+      arc_add.mincut_criticity,
+      arc_add.result_id,
       sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
       dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
       presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
@@ -239,7 +247,7 @@ AS WITH
       LEFT JOIN dqa_table ON dqa_table.dqa_id = arc.dqa_id
       LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = arc.supplyzone_id
       LEFT JOIN omzone_table ON omzone_table.omzone_id = arc.omzone_id
-      LEFT JOIN arc_add e ON e.arc_id::text = arc.arc_id::text
+      LEFT JOIN arc_add ON arc_add.arc_id::text = arc.arc_id::text
       LEFT JOIN value_state_type vst ON vst.id = arc.state_type
     )
   SELECT arc_selected.*
@@ -434,18 +442,19 @@ AS WITH
           WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
           ELSE NULL::character varying(16)
         END AS inp_type,
-        e.demand_max,
-        e.demand_min,
-        e.demand_avg,
-        e.press_max,
-        e.press_min,
-        e.press_avg,
-        e.head_max,
-        e.head_min,
-        e.head_avg,
-        e.quality_max,
-        e.quality_min,
-        e.quality_avg,
+        node_add.demand_max,
+        node_add.demand_min,
+        node_add.demand_avg,
+        node_add.press_max,
+        node_add.press_min,
+        node_add.press_avg,
+        node_add.head_max,
+        node_add.head_min,
+        node_add.head_avg,
+        node_add.quality_max,
+        node_add.quality_min,
+        node_add.quality_avg,
+        node_add.result_id,
         sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
         dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
         presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
@@ -477,7 +486,7 @@ AS WITH
         LEFT JOIN dqa_table ON dqa_table.dqa_id = node.dqa_id
         LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = node.supplyzone_id
         LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
-        LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
+        LEFT JOIN node_add ON node_add.node_id::text = node.node_id::text
         LEFT JOIN man_valve m ON m.node_id = node.node_id
       )
     SELECT n.*
@@ -942,16 +951,23 @@ AS WITH
             WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text THEN connec.epa_type::character varying
             ELSE NULL::character varying(16)
           END AS inp_type,
-          e.demand_base,
-          e.demand_max,
-          e.demand_min,
-          e.demand_avg,
-          e.press_max,
-          e.press_min,
-          e.press_avg,
-          e.quality_max,
-          e.quality_min,
-          e.quality_avg,
+          connec_add.demand_base,
+          connec_add.demand_max,
+          connec_add.demand_min,
+          connec_add.demand_avg,
+          connec_add.press_max,
+          connec_add.press_min,
+          connec_add.press_avg,
+          connec_add.quality_max,
+          connec_add.quality_min,
+          connec_add.quality_avg,
+          connec_add.flow_max,
+          connec_add.flow_min,
+          connec_add.flow_avg,
+          connec_add.vel_max,
+          connec_add.vel_min,
+          connec_add.vel_avg,
+          connec_add.result_id,
           sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
           dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
           presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
@@ -982,7 +998,7 @@ AS WITH
         LEFT JOIN omzone_table ON omzone_table.omzone_id = connec.omzone_id
         LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
         LEFT JOIN link_planned USING (link_id)
-        LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
+        LEFT JOIN connec_add ON connec_add.connec_id::text = connec.connec_id::text
         LEFT JOIN value_state_type vst ON vst.id = connec.state_type
         LEFT JOIN inp_network_mode ON true
       )

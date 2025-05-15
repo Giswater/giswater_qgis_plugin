@@ -615,6 +615,9 @@ BEGIN
 			NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id);
 		END IF;
 
+		-- insert into node_add
+		INSERT INTO node_add (node_id, result_id, max_depth, max_height, flooding_rate, flooding_vol) VALUES (NEW.node_id, NEW.result_id, NEW.max_depth, NEW.max_height, NEW.flooding_rate, NEW.flooding_vol);
+
 		--check if feature is double geom
 		SELECT feature_class INTO v_feature_class FROM cat_feature WHERE cat_feature.id=NEW.node_type;
 
@@ -909,6 +912,10 @@ BEGIN
 			lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id
 			WHERE node_id = OLD.node_id;
 		END IF;
+
+		-- update node_add table
+		UPDATE node_add SET node_id=NEW.node_id, result_id=NEW.result_id, max_depth=NEW.max_depth, max_height=NEW.max_height, flooding_rate=NEW.flooding_rate, flooding_vol=NEW.flooding_vol
+		WHERE node_id = OLD.node_id;
 
 		IF v_man_table ='man_junction' THEN
 			UPDATE man_junction SET node_id=NEW.node_id

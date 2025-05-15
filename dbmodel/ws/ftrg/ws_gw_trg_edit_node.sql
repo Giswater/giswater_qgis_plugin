@@ -533,6 +533,11 @@ BEGIN
 		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.pavcat_id, NEW.lock_level, NEW.is_scadamap);
 
 
+		-- Insert into node_add
+		INSERT INTO node_add (node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg, result_id)
+		VALUES (NEW.node_id, NEW.demand_max, NEW.demand_min, NEW.demand_avg, NEW.press_max, NEW.press_min, NEW.press_avg, NEW.head_max, NEW.head_min, NEW.head_avg, NEW.quality_max, NEW.quality_min, NEW.quality_avg, NEW.result_id);
+
+
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
 		JOIN cat_node ON cat_feature.id=node_type where cat_node.id=NEW.nodecat_id;
 
@@ -945,6 +950,12 @@ BEGIN
 		adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility, asset_id=NEW.asset_id,
 		om_state=NEW.om_state, conserv_state=NEW.conserv_state, access_type=NEW.access_type, placement_type=NEW.placement_type, expl_visibility=NEW.expl_visibility,
 		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
+		WHERE node_id = OLD.node_id;
+
+		-- Update node_add
+		UPDATE node_add SET node_id=NEW.node_id, demand_max = NEW.demand_max, demand_min = NEW.demand_min, demand_avg = NEW.demand_avg, press_max = NEW.press_max,press_min = NEW.press_min,
+		press_avg = NEW.press_avg, head_max = NEW.head_max, head_min = NEW.head_min, head_avg = NEW.head_avg, quality_max = NEW.quality_max, quality_min = NEW.quality_min,
+		quality_avg = NEW.quality_avg, result_id = NEW.result_id
 		WHERE node_id = OLD.node_id;
 
 

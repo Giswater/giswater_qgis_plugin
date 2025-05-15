@@ -178,3 +178,7 @@ CREATE TABLE minsector_mincut (
 	minsector_id integer PRIMARY KEY,
 	minsectors integer[]
 );
+
+-- 15/05/2025
+ALTER TABLE node_add ADD CONSTRAINT node_add_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE arc_add ADD CONSTRAINT arc_add_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE CASCADE ON UPDATE CASCADE;

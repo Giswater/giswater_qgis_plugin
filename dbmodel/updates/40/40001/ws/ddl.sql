@@ -99,3 +99,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_registe
 ALTER TABLE inp_pump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';
 ALTER TABLE inp_virtualpump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';
 ALTER TABLE inp_dscenario_virtualpump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';
+
+--15/05/2025
+ALTER TABLE connec_add ADD CONSTRAINT connec_add_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON DELETE CASCADE ON UPDATE CASCADE;

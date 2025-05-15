@@ -396,3 +396,5 @@ UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.ex
 UPDATE inp_typevalue SET idval='HEADPUMP',id='HEADPUMP' WHERE typevalue='inp_typevalue_pumptype' AND id='PRESSPUMP';
 UPDATE inp_typevalue SET idval='POWERPUMP',id='POWERPUMP' WHERE typevalue='inp_typevalue_pumptype' AND id='FLOWPUMP';
 
+--15/05/2025
+INSERT INTO connec_add (connec_id) SELECT connec_id FROM connec ON CONFLICT (connec_id) DO NOTHING;

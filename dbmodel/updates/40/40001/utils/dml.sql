@@ -1114,3 +1114,7 @@ AND layoutorder IS NULL AND columnname = 'shape';
 UPDATE config_form_fields SET layoutorder = 18
 WHERE (formname, formtype, tabname)=('cat_connec', 'form_feature', 'tab_none')
 AND layoutorder IS NULL AND columnname = 'svg';
+
+-- 15/05/2025
+INSERT INTO node_add (node_id) SELECT node_id FROM node ON CONFLICT (node_id) DO NOTHING;
+INSERT INTO arc_add (arc_id) SELECT arc_id FROM arc ON CONFLICT (arc_id) DO NOTHING;
