@@ -48,7 +48,7 @@ BEGIN
         -- Create temporary tables
         CREATE TEMP TABLE temp_pgr_mapzone (
             mapzone_id SERIAL NOT NULL,
-            the_geom geometry(Polygon, SRID_VALUE),
+            the_geom geometry(Geometry, SRID_VALUE),
             CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (mapzone_id)
         );
 
@@ -288,6 +288,8 @@ BEGIN
                 ), connec_selected AS (
                     SELECT DISTINCT ON (connec_id) connec.connec_id,
                         connec.arc_id,
+                        connec.top_elev,
+                        connec.depth,
                         connec.expl_id,
                         connec.sector_id,
                         connec.presszone_id,
