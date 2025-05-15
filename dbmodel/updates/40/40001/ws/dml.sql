@@ -53,10 +53,10 @@ CASE
 END AS depth2
 FROM _link;
 
-UPDATE link SET state_type = c.state_type
-FROM link l
-JOIN connec c ON l.feature_id = c.connec_id AND l.feature_type = 'CONNEC'
-WHERE l.state = 1;
+UPDATE link l
+SET state_type = c.state_type
+FROM connec c
+WHERE l.feature_id = c.connec_id AND l.feature_type = 'CONNEC' AND l.state = 1;
 
 UPDATE link SET state_type = (
   SELECT (value::json->>'plan_statetype_planned')::int2 FROM config_param_system WHERE parameter = 'plan_statetype_vdefault'
