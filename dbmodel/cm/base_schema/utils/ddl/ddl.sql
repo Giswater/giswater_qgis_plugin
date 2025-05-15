@@ -275,7 +275,6 @@ CREATE TABLE workorder
   address character varying(50),
   observ text,
   cost numeric,
-  ct text,
   CONSTRAINT workorder_pkey PRIMARY KEY (workorder_id),
   CONSTRAINT ext_workorder_workorder_type_fkey FOREIGN KEY (workorder_type)
     REFERENCES workorder_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -332,10 +331,6 @@ CREATE TABLE om_campaign
   duration text,
   status integer not NULL,
   the_geom geometry(MultiPolygon,25831),
-  rotation numeric(8,4),
-  exercise integer,
-  serie character varying(10),
-  address text,
   CONSTRAINT om_campaign_pkey PRIMARY KEY (campaign_id),
   CONSTRAINT om_campaign_check_type check (campaign_type in (1,2)),
   CONSTRAINT om_campaign_organization_id_fkey FOREIGN KEY (organization_id)
@@ -430,7 +425,7 @@ CREATE TABLE om_campaign_x_gully
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT oom_campaign_x_gully_pkey PRIMARY KEY (campaign_id, gully_id)
+  CONSTRAINT om_campaign_x_gully_pkey PRIMARY KEY (campaign_id, gully_id)
 );
 
 
@@ -450,8 +445,6 @@ CREATE TABLE om_campaign_lot
   duration text,
   status integer not NULL,
   the_geom geometry(MultiPolygon,25831),
-  rotation numeric(8,4),
-  address text,
   CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (lot_id),
   CONSTRAINT om_campaign_lot_campaign_id_fkey FOREIGN KEY (campaign_id)
     REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
