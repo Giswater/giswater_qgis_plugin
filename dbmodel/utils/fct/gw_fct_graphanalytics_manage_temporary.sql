@@ -301,7 +301,7 @@ BEGIN
                 )
                 SELECT * FROM connec_selected;
 
-                CREATE TEMPORARY VIEW v_temp_link AS
+                CREATE TEMPORARY VIEW v_temp_link_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), link_psector AS (
@@ -309,24 +309,33 @@ BEGIN
                         pp.connec_id AS feature_id,
                         pp.state AS p_state,
                         pp.psector_id,
-                        pp.link_id
+                        pp.link_id,
+                        pp.arc_id
                     FROM plan_psector_x_connec pp
                     WHERE (pp.psector_id IN (SELECT sel_ps.psector_id FROM sel_ps))
                     ORDER BY pp.connec_id, pp.state, pp.link_id DESC NULLS LAST
                 ), link_selector AS (
-                    SELECT l.link_id
+                    SELECT
+                        l.link_id,
+                        c.arc_id
                     FROM link l
+                    JOIN connec c ON l.feature_id = c.connec_id
                     WHERE NOT EXISTS (
                         SELECT 1
                         FROM link_psector lp
                         WHERE lp.link_id::text = l.link_id::text AND lp.p_state = 0
-                    ) AND l.state = 1
+                    )
+                    AND l.state = 1
+                    AND l.feature_type = 'CONNEC'
                     UNION ALL
-                    SELECT lp.link_id
+                    SELECT
+                        lp.link_id,
+                        lp.arc_id
                     FROM link_psector lp
                     WHERE lp.p_state = 1
                 ), link_selected AS (
                     SELECT l.link_id,
+                        link_selector.arc_id,
                         l.feature_id,
                         l.feature_type,
                         l.expl_id,
@@ -408,6 +417,7 @@ BEGIN
                     WHERE np.p_state = 1
                 ), node_selected AS (
                     SELECT DISTINCT ON (node_id) node.node_id,
+                    cf.graph_delimiter,
                     node.expl_id,
                     node.sector_id,
                     node.drainzone_id,
@@ -416,6 +426,8 @@ BEGIN
                     node.the_geom
                     FROM node_selector
                     JOIN node ON node.node_id::text = node_selector.node_id::text
+                    JOIN cat_node cn ON cn.id = node.nodecat_id
+                    JOIN cat_feature_node cf ON cf.id = cn.node_type
                     JOIN value_state_type vst ON vst.id = node.state_type
                     WHERE vst.is_operative = TRUE
                 )
@@ -550,9 +562,9 @@ BEGIN
                         l.feature_type,
                         l.expl_id,
                         l.sector_id,
-                        l.presszone_id,
-                        l.dma_id,
-                        l.dqa_id,
+                        l.drainzone_id,
+                        l.dwfzone_id,
+                        l.omzone_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -601,9 +613,9 @@ BEGIN
                         l.feature_type,
                         l.expl_id,
                         l.sector_id,
-                        l.presszone_id,
-                        l.dma_id,
-                        l.dqa_id,
+                        l.drainzone_id,
+                        l.dwfzone_id,
+                        l.omzone_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -639,6 +651,7 @@ BEGIN
                 CREATE TEMPORARY VIEW v_temp_node AS
                 SELECT
                     node_id,
+                    cf.graph_delimiter,
                     expl_id,
                     sector_id,
                     presszone_id,
@@ -647,6 +660,8 @@ BEGIN
                     the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
+                JOIN cat_node cn ON cn.id = n.nodecat_id
+                JOIN cat_feature_node cf ON cf.id = cn.node_type
                 WHERE n.state = 1 AND vst.is_operative = TRUE;
 
                 CREATE TEMPORARY VIEW v_temp_connec AS
@@ -702,6 +717,7 @@ BEGIN
                 CREATE TEMPORARY VIEW v_temp_node AS
                 SELECT
                     node_id,
+                    cf.graph_delimiter,
                     expl_id,
                     sector_id,
                     drainzone_id,
@@ -710,6 +726,8 @@ BEGIN
                     the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
+                JOIN cat_node cn ON cn.id = n.nodecat_id
+                JOIN cat_feature_node cf ON cf.id = cn.node_type
                 WHERE n.state = 1 AND vst.is_operative = TRUE;
 
                 CREATE TEMPORARY VIEW v_temp_connec AS
@@ -748,9 +766,9 @@ BEGIN
                     l.feature_type,
                     l.expl_id,
                     l.sector_id,
-                    drainzone_id,
-                    dwfzone_id,
-                    omzone_id,
+                    l.drainzone_id,
+                    l.dwfzone_id,
+                    l.omzone_id,
                     the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
@@ -767,9 +785,9 @@ BEGIN
                     l.feature_type,
                     l.expl_id,
                     l.sector_id,
-                    l.presszone_id,
-                    l.dma_id,
-                    l.dqa_id,
+                    l.drainzone_id,
+                    l.dwfzone_id,
+                    l.omzone_id,
                     l.the_geom
                 FROM link l
                 JOIN gully g ON l.feature_id = g.gully_id
@@ -813,7 +831,8 @@ BEGIN
         DROP VIEW IF EXISTS v_temp_arc;
         DROP VIEW IF EXISTS v_temp_connec;
         DROP VIEW IF EXISTS v_temp_gully;
-        DROP VIEW IF EXISTS v_temp_link;
+        DROP VIEW IF EXISTS v_temp_link_connec;
+        DROP VIEW IF EXISTS v_temp_link_gully;
 
         v_return_message = 'The temporary tables have been dropped successfully';
     END IF;

@@ -115,9 +115,8 @@ BEGIN
         INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, old_mapzone_id)
         (
             SELECT DISTINCT ON (l.link_id) l.link_id, l.feature_id, l.feature_type, ' || v_mapzone_name || '_id
-            FROM v_temp_link l
+            FROM v_temp_link_connec l
             JOIN temp_pgr_connec c ON l.feature_id=c.connec_id
-            WHERE l.feature_type = ''CONNEC''
         )';
 
     EXECUTE v_querytext;
@@ -137,9 +136,8 @@ BEGIN
             INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, old_mapzone_id)
             (
                 SELECT DISTINCT ON (l.link_id) l.link_id, l.feature_id, l.feature_type, ' || v_mapzone_name || '_id
-                FROM v_temp_link l
+                FROM v_temp_link_gully l
                 JOIN temp_pgr_gully g ON l.feature_id = g.gully_id
-                WHERE l.feature_type = ''GULLY''
             )';
 
         EXECUTE v_querytext;
