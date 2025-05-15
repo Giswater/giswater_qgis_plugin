@@ -16,3 +16,5 @@ class GwSelectionMode(Enum):
     PSECTOR = 2
     CAMPAIGN = 3
     EXPRESSION_CAMPAIGN = 4
+    LOT = 5
+    EXPRESSION_LOT = 6

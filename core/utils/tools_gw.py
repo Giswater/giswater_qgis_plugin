@@ -3272,11 +3272,14 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
-
-    if selection_mode not in (GwSelectionMode.EXPRESSION, GwSelectionMode.EXPRESSION_CAMPAIGN):
+    if selection_mode not in (GwSelectionMode.EXPRESSION, GwSelectionMode.EXPRESSION_CAMPAIGN, GwSelectionMode.EXPRESSION_LOT):
         tools_qgis.disconnect_signal_selection_changed()
     field_id = f"{class_object.feature_type}_id"
-    expected_table_name = f"tbl_{table_object}_x_{class_object.feature_type}"
+
+    if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+        expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.feature_type}"
+    else:
+        expected_table_name = f"tbl_{table_object}_x_{class_object.feature_type}"
 
     # Retrieve the correct table widget
     table_widget = dialog.findChild(QTableView, expected_table_name)
@@ -3333,6 +3336,9 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
         _insert_feature_campaign(dialog, class_object.feature_type, class_object.campaign_id, ids=class_object.list_ids[class_object.feature_type])
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
+    if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+        _insert_feature_lot(dialog, class_object.feature_type, class_object.lot_id, ids=class_object.list_ids[class_object.feature_type])
+        load_tableview_lot(dialog, class_object.feature_type, class_object.lot_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3506,6 +3512,11 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
         load_tableview_campaign(dialog, feature_type, class_object.campaign_id, class_object.layers)
+    if selection_mode == GwSelectionMode.LOT:
+        _insert_feature_lot(dialog, feature_type, class_object.lot_id, ids=selected_ids)
+        layers = remove_selection(True, class_object.layers)
+        class_object.layers = layers
+        load_tableview_lot(dialog, feature_type, class_object.lot_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3977,7 +3988,10 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     tools_qgis.disconnect_signal_selection_changed()
     feature_type = get_signal_change_tab(dialog)
     if type(table_object) is str:
-        widget_name = f"tbl_{table_object}_x_{feature_type}"
+        if selection_mode == GwSelectionMode.LOT:
+            widget_name = f"tbl_campaign_{table_object}_x_{feature_type}"
+        else:
+            widget_name = f"tbl_{table_object}_x_{feature_type}"
         widget = tools_qt.get_widget(dialog, widget_name)
         if not widget:
             msg = "Widget not found"
@@ -4059,6 +4073,12 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
             state = widget.model().record(selected_list[0].row()).value(extra_field)
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
+    if selection_mode == GwSelectionMode.LOT:
+        state = None
+        if extra_field is not None and len(selected_list) == 1:
+            state = widget.model().record(selected_list[0].row()).value(extra_field)
+        _delete_feature_lot(dialog, feature_type, list_id, class_object.lot_id, state)
+        load_tableview_lot(dialog, class_object.feature_type, class_object.lot_id, class_object.layers)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -4684,6 +4704,74 @@ def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=N
 
     sql = (f"DELETE FROM {tablename} "
            f"WHERE {feature_type}_id IN ({list_id}) AND campaign_id = '{campaign_id}'")
+    # Add state if needed
+    if state is not None:
+        sql += f""" AND "state" = '{state}'"""
+    tools_db.execute_sql(sql)
+
+
+def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
+    """ Insert features_id to table plan_@feature_type_x_campaign """
+
+    widget = tools_qt.get_widget(dialog, f"tbl_campaign_lot_x_{feature_type}")
+    tablename = widget.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
+
+    if not lot_id:
+        msg = "Lot ID is missing."
+        tools_qgis.show_warning(msg)
+        return
+
+    for feature_id in ids or []:
+        sql = f"""
+            INSERT INTO {tablename} (lot_id, {feature_type}_id)
+            VALUES ('{lot_id}', '{feature_id}')
+            ON CONFLICT DO NOTHING;
+        """
+        tools_db.execute_sql(sql)
+
+
+def load_tableview_lot(dialog, feature_type, lot_id, layers):
+    """Reload QTableView for campaign_lot_x_<feature_type> safely, avoiding recursive selectionChanged loop."""
+    if not lot_id:
+        tools_qgis.show_warning("Lot ID not found.")
+        return
+
+    class_object = dialog.parent()
+    if getattr(class_object, "signal_selectionChanged", False):
+        return  # Avoid recursion if triggered by selectionChanged
+    class_object.signal_selectionChanged = True
+
+    try:
+        expr = f"lot_id = '{lot_id}'"
+        qtable = tools_qt.get_widget(dialog, f'tbl_campaign_lot_x_{feature_type}')
+        tablename = qtable.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
+        message = tools_qt.fill_table(qtable, tablename, expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+
+        # Get ids from qtable (used for selection in snapping)
+        feature_id_column = f"{feature_type}_id"
+        feature_ids = get_ids_from_qtable(qtable, feature_id_column)
+
+        if feature_ids:
+            expr = QgsExpression(f"{feature_id_column} IN ({','.join(feature_ids)})")
+            tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+
+        if message:
+            tools_qgis.show_warning(message)
+
+        set_tablemodel_config(dialog, qtable, tablename)
+
+    finally:
+        class_object.signal_selectionChanged = False
+
+
+
+def _delete_feature_lot(dialog, feature_type, list_id, lot_id, state=None):
+    """ Delete features_id to table plan_@feature_type_x_psector"""
+    widget = tools_qt.get_widget(dialog, f"tbl_campaign_lot_x_{feature_type}")
+    tablename = widget.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
+
+    sql = (f"DELETE FROM {tablename} "
+           f"WHERE {feature_type}_id IN ({list_id}) AND lot_id = '{lot_id}'")
     # Add state if needed
     if state is not None:
         sql += f""" AND "state" = '{state}'"""

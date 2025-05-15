@@ -116,7 +116,7 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_4">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_campaign_x_arc">
+               <widget class="QTableView" name="tbl_campaign_lot_x_arc">
                 <property name="sortingEnabled">
                  <bool>true</bool>
                 </property>
@@ -130,7 +130,7 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_6">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_campaign_x_node">
+               <widget class="QTableView" name="tbl_campaign_lot_x_node">
                 <property name="sortingEnabled">
                  <bool>true</bool>
                 </property>
@@ -144,7 +144,7 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_7">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_campaign_x_connec">
+               <widget class="QTableView" name="tbl_campaign_lot_x_connec">
                 <property name="sortingEnabled">
                  <bool>true</bool>
                 </property>
@@ -158,7 +158,7 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_8">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_campaign_x_link">
+               <widget class="QTableView" name="tbl_campaign_lot_x_link">
                 <property name="sortingEnabled">
                  <bool>true</bool>
                 </property>
@@ -172,7 +172,7 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_9">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_campaign_x_gully">
+               <widget class="QTableView" name="tbl_campaign_lot_x_gully">
                 <property name="sortingEnabled">
                  <bool>true</bool>
                 </property>

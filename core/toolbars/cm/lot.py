@@ -31,6 +31,7 @@ from ...ui.ui_manager import TeamCreateUi, UserCreateUi, AddLotUi, LotSelectorUi
 from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log
 from ...utils import tools_gw
+from ...utils.selection_mode import GwSelectionMode
 
 
 class AddNewLot:
@@ -71,12 +72,19 @@ class AddNewLot:
 
         self.is_new_lot = is_new
         self.ids = []
+        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
         self.param_options = None
         self.signal_selectionChanged = False
         self.cmb_position = 17
         self.rb_list = []
         self.srid = lib_vars.data_epsg
         self.feature_type = 'arc'
+        self.excluded_layers = [
+            "v_edit_arc", "v_edit_node", "v_edit_connec",
+            "v_edit_gully", "v_edit_link"
+        ]
+        table_object = "lot"
+
 
         # Layers grouped by type (optional: used later for highlighting, selection, etc.)
         self.layers = {
@@ -88,25 +96,27 @@ class AddNewLot:
         if tools_gw.get_project_type() == 'ud':
             self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
-        # 1. Create dialog
+        # Create dialog
         self.dlg_lot = AddLotUi(self)
         tools_gw.load_settings(self.dlg_lot)
 
-        # 2. Load dynamic form fields using gw_fct_getlot
+        # Load dynamic form fields using gw_fct_getlot
         self.load_lot_dialog(lot_id)
 
-        # 3. Reference key widgets AFTER dynamic load
+        # Reference key widgets AFTER dynamic load
         self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
 
-        # 4. Set lot_id (new or existing)
-        new_lot_id = lot_id or self.get_next_id("om_campaign_lot", "lot_id")
-        tools_qt.set_widget_text(self.dlg_lot, self.lot_id, new_lot_id)
+        # Set the dynamic lot_id received from the backend
+        if self.lot_id_value:
+            widget = self.get_widget_by_columnname(self.dlg_lot, "lot_id")
+            if widget:
+                widget.setText(str(self.lot_id_value))
 
-        # 5. Fill base combo values (OT, team, status, etc.)
-        self.fill_fields(lot_id)
+        # Fill workorder part
+        self.fill_workorder_fields()
 
-        # 6. Load values if editing existing lot
+        # Load values if editing existing lot
         if lot_id:
             self.set_values(lot_id)
             self.update_id_list()
@@ -116,7 +126,6 @@ class AddNewLot:
             self.manage_cmb_status()
             self.populate_table_relations(lot_id)
 
-        # 7. UI polish
         if tools_gw.get_project_type() == 'ws':
             tools_qt.enable_tab_by_tab_name(self.dlg_lot.tab_widget, 'LoadsTab', False)
 
@@ -125,7 +134,7 @@ class AddNewLot:
         tools_gw.add_icon(self.dlg_lot.btn_snapping, '137')
         tools_gw.add_icon(self.dlg_lot.btn_expr_select, '178')
 
-        # 8. Connect signals
+        # Connect signals
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
@@ -145,10 +154,38 @@ class AddNewLot:
         #self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
         #self.dlg_lot.btn_refresh_materialize_view.clicked.connect(partial(self.refresh_materialize_view))
 
-        # Relation actions
-        self.dlg_lot.btn_insert.clicked.connect(partial(self.insert_row))
-        self.dlg_lot.btn_snapping.clicked.connect(partial(self.set_active_layer))
-        self.dlg_lot.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot))
+        # Related to Tab relations
+        name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")
+        if name_widget:
+            name_widget.textChanged.connect(self._check_enable_tab_relations)
+            self._check_enable_tab_relations()
+
+        # Hide gully tab if project_type is 'ws'
+        if tools_gw.get_project_type() == 'ws':
+            index = self.dlg_lot.tab_feature.indexOf(self.dlg_lot.tab_gully)
+            if index != -1:
+                self.dlg_lot.tab_feature.removeTab(index)
+
+        # save lot if tab change
+        self.dlg_lot.tab_widget.currentChanged.connect(self._on_tab_change)
+
+        # Tab relations
+        self.dlg_lot.tab_feature.currentChanged.connect(
+            partial(tools_gw.get_signal_change_tab, self.dlg_lot, self.excluded_layers))
+
+        self.dlg_lot.btn_insert.clicked.connect(
+            partial(tools_gw.insert_feature, self, self.dlg_lot, table_object, GwSelectionMode.LOT, False, None, None))
+
+        self.dlg_lot.btn_delete.clicked.connect(
+            partial(tools_gw.delete_records, self, self.dlg_lot, table_object, GwSelectionMode.LOT, None, None, None))
+
+        self.dlg_lot.btn_snapping.clicked.connect(
+            partial(tools_gw.selection_init, self, self.dlg_lot, table_object, GwSelectionMode.LOT))
+
+        self.dlg_lot.btn_expr_select.clicked.connect(
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_lot, table_object,
+                    selection_mode=GwSelectionMode.EXPRESSION_LOT),
+        )
 
         # Misc UI logic
         #tools_qt.check_date(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
@@ -181,6 +218,7 @@ class AddNewLot:
 
         form_fields = response["body"]["data"].get("fields", [])
         self.fields_form = form_fields
+        self.lot_id_value = response["body"].get("feature", {}).get("id")
 
         for field in form_fields:
             widget = self.create_widget_from_field(field)
@@ -257,7 +295,6 @@ class AddNewLot:
                 return widget
         return None
 
-
     def set_widget_value(self, widget, value):
         """Sets the widget value from JSON"""
 
@@ -276,6 +313,22 @@ class AddNewLot:
             index = widget.findData(value)
             if index >= 0:
                 widget.setCurrentIndex(index)
+
+
+    def _check_enable_tab_relations(self):
+        name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")
+        if not name_widget:
+            return
+
+        enable = bool(name_widget.text().strip())
+        self.dlg_lot.tab_widget.setTabEnabled(self.dlg_lot.tab_widget.indexOf(self.dlg_lot.RelationsTab), enable)
+
+
+    def _on_tab_change(self, index):
+        tab = self.dlg_lot.tab_widget.widget(index)
+        if tab.objectName() == "RelationsTab" and self.is_new_lot:
+            self.save_lot(from_change_tab=True)
+
 
     def manage_cmb_status(self):
         """ Control of status_lot and widgets according to the selected status_lot """
@@ -670,19 +723,8 @@ class AddNewLot:
                 rows.append(row)
         return rows
 
-    def fill_fields(self, lot_id):
+    def fill_workorder_fields(self):
         """ Fill combo boxes of the form """
-
-        # Visit tab
-        # Set current date and time
-        widget = self.get_widget_by_columnname(self.dlg_lot, "startdate")
-        if widget:
-            widget.setDate(QDate.currentDate())
-
-        # Set current user
-        sql = "SELECT current_user"
-        row = tools_db.get_rows(sql)
-        tools_qt.set_widget_text(self.dlg_lot, self.user_name, row[0])
 
         # Fill ComboBox cmb_assigned_to
         self.populate_cmb_team()
@@ -692,20 +734,6 @@ class AddNewLot:
         if cmb_ot:
             cmb_ot.currentIndexChanged.connect(self.update_workorder_fields)
             self.update_workorder_fields()  # call once immediately
-
-        # Fill ComboBox cmb_status
-        rows = tools_db.get_values_from_catalog('om_typevalue', 'lot_cat_status')
-        if rows:
-            tools_qt.fill_combo_values(self.dlg_lot.cmb_status, rows, 1, sort_combo=False)
-            tools_qt.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5', '6'], 0)
-            tools_qt.set_combo_value(self.dlg_lot.cmb_status, '1', 0)
-
-        # Relations tab
-        # fill feature_type
-        sql = ("SELECT id, id"
-               f" FROM {self.schema_name}.sys_feature_type"
-               " WHERE classlevel = 1 or classlevel = 2"
-               " ORDER BY id")
 
 
     def get_next_id(self, table_name, pk):
@@ -937,29 +965,6 @@ class AddNewLot:
         tools_gw.load_tablename(self.dlg_lot, self.tbl_relation, feature_type, expr_filter)
         self.hilight_features(self.rb_list, feature_type)
 
-    def insert_row(self):
-        """ Insert single row into QStandardItemModel """
-
-        standard_model = self.tbl_relation.model()
-        feature_id = tools_qt.get_text(self.dlg_lot, self.dlg_lot.feature_id)
-        lot_id = tools_qt.get_text(self.dlg_lot, self.lot_id)
-        layer_name = 'v_edit_' + tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
-        field_id = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.feature_type, 0).lower() + str('_id')
-        layer = tools_qgis.get_layer_by_tablename(layer_name)
-        feature = self.get_feature_by_id(layer, feature_id, field_id)
-
-        if feature is False:
-            return
-
-        state = feature.attribute('state')
-
-        if str(state) != "1":
-            return
-
-        if feature_id not in self.ids:
-            self.ids.append(feature_id)
-            self.reload_table_relations()
-        self.check_for_ids()
 
     def get_feature_by_id(self, layer, id_, field_id):
         """Retrieves a feature from the specified layer that matches the given ID by constructing a filter expression using the provided field name.
@@ -1029,23 +1034,6 @@ class AddNewLot:
         self.reload_table_visit()
         self.reload_table_visit()
 
-    def set_active_layer(self):
-        """Sets the active map layer based on the current visit class selection from the UI.
-        Retrieves the corresponding layer by its table name, makes it active on the interface, and ensures that it is visible."""
-
-        self.current_layer = self.iface.activeLayer()
-        layer_name = 'v_edit_' + visit_class.lower()
-
-        self.layer_lot = tools_qgis.get_layer_by_tablename(layer_name)
-        self.iface.setActiveLayer(self.layer_lot)
-        tools_qgis.set_layer_visible(self.layer_lot)
-
-    def selection_init(self, dialog):
-        """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
-        tools_qgis.disconnect_signal_selection_changed()
-        self.iface.actionSelect().trigger()
-        self.connect_signal_selection_changed(dialog)
 
     def connect_signal_selection_changed(self, dialog):
         """ Connect signal selectionChanged """
@@ -1233,15 +1221,22 @@ class AddNewLot:
         standard_model.setHorizontalHeaderLabels(headers)
 
 
-    def save_lot(self):
-        """Save lot using gw_fct_setlot (dynamic form logic)."""
+    def save_lot(self, from_change_tab=None):
+        """Save lot using gw_fct_setlot (dynamic form logic) with mandatory field validation."""
+
         fields = {}
+        list_mandatory = []
 
         for field in self.fields_form:
             column = field.get("columnname")
             widget = self.dlg_lot.findChild(QWidget, field.get("widgetname"))
             if not widget:
                 continue
+
+            # Reset border
+            widget.setStyleSheet("")
+
+            # Extract value depending on widget type
             if isinstance(widget, QComboBox):
                 value = widget.currentData()
             elif isinstance(widget, QDateEdit):
@@ -1250,6 +1245,19 @@ class AddNewLot:
                 value = tools_qt.get_widget_value(self.dlg_lot, widget)
 
             fields[column] = value
+
+            # Check if mandatory field is missing
+            if field.get("ismandatory", False) and not value:
+                widget.setStyleSheet("border: 1px solid red")
+                list_mandatory.append(field.get("widgetname"))
+
+        # Stop if any mandatory fields are missing
+        if list_mandatory:
+            tools_qgis.show_warning(
+                "Some mandatory fields are missing. Please fill the required fields (marked in red).",
+                dialog=self.dlg_lot
+            )
+            return False
 
         feature_id = fields.get("lot_id")
 
@@ -1268,7 +1276,8 @@ class AddNewLot:
 
         if result and result.get("status") == "Accepted":
             self.lot_id = result["body"]["feature"]["id"]
-            tools_gw.close_dialog(self.dlg_lot)
+            if not from_change_tab:
+                tools_gw.close_dialog(self.dlg_lot)
             #tools_db.execute_sql(f"SELECT cm.gw_fct_lot_psector_geom({self.lot_id})")
             #status = self.save_visits()
             #if status:
@@ -1525,11 +1534,11 @@ class AddNewLot:
                 ['enddate', 'Data final planificada']]
         tools_qt.fill_combo_values(self.dlg_lot_man.cmb_date_filter_type, rows, 1, sort_combo=False)
 
-        table_object = "v_ui_om_visit_lot"
+        table_object = "om_campaign_lot"
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
-        sql = 'SELECT MIN(startdate), MAX(startdate) FROM cm.om_visit_lot'
+        sql = 'SELECT MIN(startdate), MAX(startdate) FROM cm.om_campaign_lot'
         row = tools_db.get_rows(sql)
 
         # Ensure row contains valid data
