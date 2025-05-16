@@ -4764,7 +4764,6 @@ def load_tableview_lot(dialog, feature_type, lot_id, layers):
         class_object.signal_selectionChanged = False
 
 
-
 def _delete_feature_lot(dialog, feature_type, list_id, lot_id, state=None):
     """ Delete features_id to table plan_@feature_type_x_psector"""
     widget = tools_qt.get_widget(dialog, f"tbl_campaign_lot_x_{feature_type}")
