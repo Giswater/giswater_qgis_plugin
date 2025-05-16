@@ -260,24 +260,22 @@ BEGIN
     END IF;
 
 	-- NODES TO MODIFY
-	IF v_project_type = 'WS' THEN
-		-- NODES VALVES
+	-- NODES VALVES
 
-		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
+	-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
 
-		-- closed valves - with or without to_arc
-		UPDATE temp_pgr_node t SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, modif = TRUE
-		FROM v_temp_node n
-		JOIN man_valve v ON n.node_id = v.node_id
-		WHERE t.node_id = n.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
+	-- closed valves - with or without to_arc
+	UPDATE temp_pgr_node t SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, modif = TRUE
+	FROM v_temp_node n
+	JOIN man_valve v ON n.node_id = v.node_id
+	WHERE t.node_id = n.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
 
-		-- valves with to_arc NOT NULL and with the property to_arc valid ( broken = FALSE, v.closed = FALSE )
-		UPDATE temp_pgr_node n SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
-		FROM man_valve v
-		WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.closed = FALSE AND v.broken = FALSE;
+	-- valves with to_arc NOT NULL and with the property to_arc valid ( broken = FALSE, v.closed = FALSE )
+	UPDATE temp_pgr_node n SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
+	FROM man_valve v
+	WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.closed = FALSE AND v.broken = FALSE;
 
-		-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
-	END IF;
+	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 
 	-- get mapzone field name
     v_mapzone_field = v_mapzone_name || '_id';
@@ -329,63 +327,61 @@ BEGIN
 	WHERE n.node_id IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
 
 	-- ARCS TO MODIFY
-	IF v_project_type = 'WS' THEN
-		-- ARCS VALVES
-		-- for the closed valves (WHEN "closed" IS TRUE), one of the arcs that connect to the valve
-		WITH
-		arcs_selected AS (
-			SELECT DISTINCT ON (n.pgr_node_id)
-				a.pgr_arc_id,
-				n.pgr_node_id,
-				a.pgr_node_1,
-				a.pgr_node_2
-			FROM temp_pgr_node n
-			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-			WHERE n.graph_delimiter = 'valve' AND n.closed = TRUE
-		),
-		arcs_modif AS (
-			SELECT
-				pgr_arc_id,
-				bool_or(pgr_node_id = pgr_node_1) AS modif1,
-				bool_or( pgr_node_id = pgr_node_2) AS modif2
-			FROM arcs_selected
-			GROUP BY pgr_arc_id
-		)
-		UPDATE temp_pgr_arc t
-		SET
-			modif1 = s.modif1,
-			modif2 = s.modif2
-		FROM arcs_modif s
-		WHERE t.pgr_arc_id = s.pgr_arc_id;
+	-- ARCS VALVES
+	-- for the closed valves (WHEN "closed" IS TRUE), one of the arcs that connect to the valve
+	WITH
+	arcs_selected AS (
+		SELECT DISTINCT ON (n.pgr_node_id)
+			a.pgr_arc_id,
+			n.pgr_node_id,
+			a.pgr_node_1,
+			a.pgr_node_2
+		FROM temp_pgr_node n
+		JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+		WHERE n.graph_delimiter = 'valve' AND n.closed = TRUE
+	),
+	arcs_modif AS (
+		SELECT
+			pgr_arc_id,
+			bool_or(pgr_node_id = pgr_node_1) AS modif1,
+			bool_or( pgr_node_id = pgr_node_2) AS modif2
+		FROM arcs_selected
+		GROUP BY pgr_arc_id
+	)
+	UPDATE temp_pgr_arc t
+	SET
+		modif1 = s.modif1,
+		modif2 = s.modif2
+	FROM arcs_modif s
+	WHERE t.pgr_arc_id = s.pgr_arc_id;
 
-        -- for the valves with to_arc NOT NULL that are not closed ('valve'); the InletArc - the one that is not to_arc
-  		WITH
-		arcs_selected AS (
-			SELECT
-				a.pgr_arc_id,
-				n.pgr_node_id,
-				a.pgr_node_1,
-				a.pgr_node_2
-			FROM  temp_pgr_node n
-			JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
-			WHERE n.graph_delimiter ='valve' AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
-		),
-		arcs_modif AS (
-			SELECT
-				pgr_arc_id,
-				bool_or(pgr_node_id = pgr_node_1) AS modif1,
-				bool_or( pgr_node_id = pgr_node_2) AS modif2
-			FROM arcs_selected
-			GROUP BY pgr_arc_id
-		)
-		UPDATE temp_pgr_arc t
-		SET modif1= s.modif1,
-			modif2= s.modif2
-		FROM arcs_modif s
-		WHERE t.pgr_arc_id= s.pgr_arc_id;
+	-- for the valves with to_arc NOT NULL that are not closed ('valve'); the InletArc - the one that is not to_arc
+	WITH
+	arcs_selected AS (
+		SELECT
+			a.pgr_arc_id,
+			n.pgr_node_id,
+			a.pgr_node_1,
+			a.pgr_node_2
+		FROM  temp_pgr_node n
+		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
+		WHERE n.graph_delimiter ='valve' AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
+	),
+	arcs_modif AS (
+		SELECT
+			pgr_arc_id,
+			bool_or(pgr_node_id = pgr_node_1) AS modif1,
+			bool_or( pgr_node_id = pgr_node_2) AS modif2
+		FROM arcs_selected
+		GROUP BY pgr_arc_id
+	)
+	UPDATE temp_pgr_arc t
+	SET modif1= s.modif1,
+		modif2= s.modif2
+	FROM arcs_modif s
+	WHERE t.pgr_arc_id= s.pgr_arc_id;
 
-		-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
-	END IF;
+	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 
 	-- ARCS MAPZONES
 	-- Disconnect the InletArc (those that are not to_arc)
@@ -463,16 +459,14 @@ BEGIN
 	SET cost = -1, reverse_cost = -1
 	WHERE arc_id IS NULL;
 
-    IF v_project_type = 'WS' THEN
-		-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL
-		-- and graph_delimiter 'valve' (it wasn't changed for 'forceClosed' or 'ignore' for example)
-		UPDATE temp_pgr_arc a
-		SET reverse_cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN 0 ELSE a.reverse_cost END, -- for inundation process, better to be 0 instead of 1; these arcs don't exist
-			cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN 0 ELSE a.cost END -- for inundation process, better to be 0 instead of 1; these arcs don't exist
-		FROM temp_pgr_node n
-		WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		AND a.graph_delimiter = 'valve' AND n.to_arc IS NOT NULL;
-    END IF;
+	-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL
+	-- and graph_delimiter 'valve' (it wasn't changed for 'forceClosed' or 'ignore' for example)
+	UPDATE temp_pgr_arc a
+	SET reverse_cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN 0 ELSE a.reverse_cost END, -- for inundation process, better to be 0 instead of 1; these arcs don't exist
+		cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN 0 ELSE a.cost END -- for inundation process, better to be 0 instead of 1; these arcs don't exist
+	FROM temp_pgr_node n
+	WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+	AND a.graph_delimiter = 'valve' AND n.to_arc IS NOT NULL;
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
     INTO v_pgr_distance;
@@ -558,20 +552,6 @@ BEGIN
     WHERE l.feature_id = c.connec_id
 	AND l.feature_type = 'CONNEC'
 	AND c.mapzone_id <> 0;
-
-	-- For sanitation, the gully takes the mapzone_id of the arc they are associated with and the link takes the mapzone_id of the gully
-    IF v_project_type = 'UD' THEN
-        UPDATE temp_pgr_gully g SET mapzone_id = a.mapzone_id
-        FROM temp_pgr_arc a
-        WHERE g.arc_id::int = a.pgr_arc_id
-		AND a.mapzone_id <> 0;
-
-        UPDATE temp_pgr_link l SET mapzone_id = g.mapzone_id
-        FROM temp_pgr_gully g
-        WHERE l.feature_id = g.gully_id
-		AND l.feature_type = 'GULLY'
-		AND g.mapzone_id <> 0;
-    END IF;
 
 
 	-- SECTION: recalculate staticpressure (fid=147)
@@ -683,29 +663,6 @@ BEGIN
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
 		END IF;
-
-		IF v_project_type='UD' THEN
-			RAISE NOTICE 'Disconnected gullies';
-			IF v_arcs_count > 0 THEN
-				SELECT COUNT(tg.*) INTO v_gullies_count
-				FROM temp_pgr_gully tg
-				JOIN temp_pgr_arc t
-				ON tg.arc_id::INT = t.arc_id::INT
-				WHERE tg.mapzone_id = 0
-				and t.pgr_arc_id = t.arc_id::INT;
-
-				IF v_gullies_count > 0 THEN
-					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_gullies_count ,' gullies have been disconnected'));
-				ELSE
-					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
-				END IF;
-			ELSE
-				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-				VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
-			END IF;
-		END IF;
 	END IF;
 
 	-- insert spacer for warning and info
@@ -746,7 +703,8 @@ BEGIN
 	ELSIF  v_updatemapzgeom = 1 THEN
 
 		-- concave polygon
-		v_querytext = '	UPDATE temp_pgr_mapzone SET the_geom = ST_Multi(a.the_geom) 
+		v_querytext = '
+			UPDATE temp_pgr_mapzone SET the_geom = ST_Multi(a.the_geom) 
 			FROM (
 				WITH polygon AS (
 					SELECT ST_Collect(the_geom) AS g, mapzone_id 
@@ -1011,7 +969,7 @@ BEGIN
 				updated_by = current_user 
 			FROM temp_pgr_mapzone t 
 			WHERE t.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
-			RAISE NOTICE 'v_querytext:: %', v_querytext;
+			RAISE NOTICE 'v_querytext:: UPDATE '||v_mapzone_name||' %', v_querytext;
 			EXECUTE v_querytext;
 
 
@@ -1036,7 +994,7 @@ BEGIN
 			AND ta.arc_id IS NOT NULL
 			AND arc.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 			AND arc.'||quote_ident(v_mapzone_field)||' <> 0;';
-			RAISE NOTICE 'v_querytext:: %', v_querytext;
+			RAISE NOTICE 'v_querytext:: UPDATE arc %', v_querytext;
 			EXECUTE v_querytext;
 
 			v_querytext = 'UPDATE connec SET '||quote_ident(v_mapzone_field)||' = 0
@@ -1045,7 +1003,7 @@ BEGIN
 			AND tc.connec_id IS NOT NULL
 			AND connec.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 			AND connec.'||quote_ident(v_mapzone_field)||' <> 0;';
-			RAISE NOTICE 'v_querytext:: %', v_querytext;
+			RAISE NOTICE 'v_querytext:: UPDATE connec %', v_querytext;
 			EXECUTE v_querytext;
 
 			v_querytext = 'UPDATE node SET '||quote_ident(v_mapzone_field)||' = 0
@@ -1054,7 +1012,7 @@ BEGIN
 			AND tn.node_id IS NOT NULL
 			AND node.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 			AND node.'||quote_ident(v_mapzone_field)||' <> 0;';
-			RAISE NOTICE 'v_querytext:: %', v_querytext;
+			RAISE NOTICE 'v_querytext:: UPDATE node %', v_querytext;
 			EXECUTE v_querytext;
 
 			v_querytext = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = 0
@@ -1063,36 +1021,33 @@ BEGIN
 			AND tl.link_id IS NOT NULL
 			AND link.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 			AND link.'||quote_ident(v_mapzone_field)||' <> 0;';
-			RAISE NOTICE 'v_querytext:: %', v_querytext;
+			RAISE NOTICE 'v_querytext:: UPDATE link %', v_querytext;
 			EXECUTE v_querytext;
-
-			IF v_project_type = 'UD' THEN
-				v_querytext = 'UPDATE gully SET '||quote_ident(v_mapzone_field)||' = 0
-				FROM temp_pgr_gully tg
-				WHERE tg.mapzone_id <= 0
-				AND tg.gully_id IS NOT NULL
-				AND gully.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-				AND gully.'||quote_ident(v_mapzone_field)||' <> 0;';
-				RAISE NOTICE 'v_querytext:: %', v_querytext;
-				EXECUTE v_querytext;
-			END IF;
 
 
 			v_querytext = 'UPDATE arc SET '||quote_ident(v_mapzone_field)||' = a.'||quote_ident(v_mapzone_field)||', updated_by = a.updated_by, updated_at = a.updated_at 
 			FROM temp_pgr_mapzone a WHERE a.mapzone_id=arc.'||quote_ident(v_mapzone_field)||'
 			AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
+			RAISE NOTICE 'v_querytext:: UPDATE arc %', v_querytext;
+			EXECUTE v_querytext;
 
 			v_querytext = 'UPDATE node SET '||quote_ident(v_mapzone_field)||' = n.'||quote_ident(v_mapzone_field)||', updated_by = n.updated_by, updated_at = n.updated_at 
 			FROM temp_pgr_mapzone a WHERE a.mapzone_id=node.'||quote_ident(v_mapzone_field)||'
 			AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
+			RAISE NOTICE 'v_querytext:: UPDATE node %', v_querytext;
+			EXECUTE v_querytext;
 
 			v_querytext = 'UPDATE connec SET '||quote_ident(v_mapzone_field)||' = c.'||quote_ident(v_mapzone_field)||', updated_by = c.updated_by, updated_at = c.updated_at 
 			FROM temp_pgr_mapzone a WHERE a.mapzone_id=connec.'||quote_ident(v_mapzone_field)||'
 			AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
+			RAISE NOTICE 'v_querytext:: UPDATE connec %', v_querytext;
+			EXECUTE v_querytext;
 
 			v_querytext = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = l.'||quote_ident(v_mapzone_field)||', updated_by = l.updated_by, updated_at = l.updated_at 
 			FROM temp_pgr_mapzone a WHERE a.mapzone_id=link.'||quote_ident(v_mapzone_field)||'
 			AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
+			RAISE NOTICE 'v_querytext:: UPDATE link %', v_querytext;
+			EXECUTE v_querytext;
 
 			-- static pressure for
 			IF v_class = 'PRESSZONE' THEN
@@ -1106,15 +1061,6 @@ BEGIN
 				-- links
 				UPDATE link SET staticpressure = l.staticpressure FROM temp_t_link l WHERE l.link_id=link.link_id;
 			END IF;
-
-			IF v_project_type = 'UD' THEN
-				v_querytext = 'UPDATE gully SET '||quote_ident(v_mapzone_field)||' = g.'||quote_ident(v_mapzone_field)||', updated_by = g.updated_by, updated_at = g.updated_at 
-				FROM temp_pgr_mapzone a WHERE a.mapzone_id=gully.'||quote_ident(v_mapzone_field)||'
-				AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
-			END IF;
-
-			RAISE NOTICE 'v_querytext:: %', v_querytext;
-			EXECUTE v_querytext;
 
 		END IF;
 
