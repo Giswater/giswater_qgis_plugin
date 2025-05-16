@@ -22,10 +22,10 @@
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="3" column="0">
-         <widget class="QLabel" name="lbl_column_filter_dates">
+        <item row="1" column="0">
+         <widget class="QLabel" name="lbl_state">
           <property name="text">
-           <string>Columna filtre dates:</string>
+           <string>Estat:</string>
           </property>
          </widget>
         </item>
@@ -58,10 +58,10 @@
         <item row="3" column="1">
          <widget class="QComboBox" name="campaign_cmb_date_filter_type"/>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="lbl_state">
+        <item row="3" column="0">
+         <widget class="QLabel" name="lbl_column_filter_dates">
           <property name="text">
-           <string>Estat:</string>
+           <string>Columna filtre dates:</string>
           </property>
          </widget>
         </item>

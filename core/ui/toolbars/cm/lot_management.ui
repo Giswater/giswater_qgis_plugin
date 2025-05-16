@@ -22,21 +22,27 @@
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
+        <item row="1" column="0">
+         <widget class="QLineEdit" name="txt_lot_name">
+          <property name="maximumSize">
+           <size>
+            <width>100</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QComboBox" name="cmb_date_filter_type"/>
+        </item>
         <item row="0" column="0">
-         <widget class="QLabel" name="lbl_serie">
+         <widget class="QLabel" name="lbl_name">
           <property name="text">
-           <string>Serie:</string>
+           <string>Name:</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QLabel" name="lbl_state">
-          <property name="text">
-           <string>Estat:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="5">
+        <item row="1" column="4">
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -49,30 +55,17 @@
           </property>
          </spacer>
         </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="lbl_column_filter">
+          <property name="text">
+           <string>Columna filtre dates:</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="1">
          <widget class="QComboBox" name="cmb_actuacio"/>
         </item>
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="txt_address"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLineEdit" name="txt_codi_ot">
-          <property name="maximumSize">
-           <size>
-            <width>100</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="lbl_address">
-          <property name="text">
-           <string>Adreça:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="4">
+        <item row="1" column="3">
          <widget class="QCheckBox" name="chk_assignacio">
           <property name="text">
            <string>Feines pendents d'assignació a OT</string>
@@ -86,17 +79,13 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="6">
-         <widget class="QPushButton" name="btn_work_register">
-          <property name="text">
-           <string>Registre de treballs</string>
-          </property>
-         </widget>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="cmb_estat"/>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="lbl_column_filter">
+        <item row="0" column="2">
+         <widget class="QLabel" name="lbl_state">
           <property name="text">
-           <string>Columna filtre dates:</string>
+           <string>Estat:</string>
           </property>
          </widget>
         </item>
@@ -107,26 +96,6 @@
           </property>
           <property name="checked">
            <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QComboBox" name="cmb_estat"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="QComboBox" name="cmb_date_filter_type"/>
-        </item>
-        <item row="4" column="6">
-         <widget class="QPushButton" name="btn_manage_load">
-          <property name="text">
-           <string>Registre de residus</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="6">
-         <widget class="QPushButton" name="btn_lot_selector">
-          <property name="text">
-           <string>Selector de lots</string>
           </property>
          </widget>
         </item>
