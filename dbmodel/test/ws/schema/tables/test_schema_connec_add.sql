@@ -51,7 +51,8 @@ SELECT col_type_is('connec_add', 'vel_avg', 'numeric(12,2)', 'Column vel_avg sho
 SELECT col_type_is('connec_add', 'result_id', 'text', 'Column result_id should be text');
 
 -- Check foreign keys
-SELECT hasnt_fk('connec_add', 'Table connec_add should have no foreign keys');
+SELECT has_fk('connec_add', 'Table connec_add should have foreign keys');
+SELECT fk_ok('connec_add', 'connec_id', 'connec', 'connec_id', 'FK connec_id should reference connec.connec_id');
 
 -- Check triggers
 

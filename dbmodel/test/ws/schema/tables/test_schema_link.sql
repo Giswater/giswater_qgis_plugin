@@ -26,7 +26,7 @@ SELECT columns_are(
         'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
         'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'custom_length', 'datasource',
         'omzone_id', 'lock_level', 'annotation', 'comment', 'descript', 'link', 'location_type', 'num_value', 'observ',
-        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'state_type'
     ],
     'Table link should have the correct columns'
 );
@@ -64,6 +64,7 @@ SELECT col_type_is('link', 'comment', 'text', 'Column comment should be text');
 SELECT col_type_is('link', 'descript', 'varchar(254)', 'Column descript should be varchar(254)');
 SELECT col_type_is('link', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('link', 'num_value', 'numeric(12,3)', 'Column num_value should be numeric(12,3)');
+SELECT col_type_is('link', 'state_type', 'smallint', 'Column state_type should be smallint');
 
 -- Check not null constraints
 SELECT col_not_null('link', 'linkcat_id', 'Column linkcat_id should be NOT NULL');

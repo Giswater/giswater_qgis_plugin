@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table node_add
+-- Check table node_addv_edit_link
 SELECT has_table('node_add'::name, 'Table node_add should exist');
 
 -- Check columns
@@ -47,6 +47,10 @@ SELECT col_type_is('node_add', 'result_id', 'text', 'Column result_id should be 
 
 -- Check constraints
 SELECT col_not_null('node_add', 'node_id', 'Column node_id should be NOT NULL');
+
+-- Check foreign keys
+SELECT has_fk('node_add', 'Table node_add should have foreign keys');
+SELECT fk_ok('node_add', 'node_id', 'node', 'node_id', 'FK node_id should reference node.node_id');
 
 SELECT * FROM finish();
 

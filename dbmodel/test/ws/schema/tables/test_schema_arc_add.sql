@@ -49,8 +49,9 @@ SELECT col_type_is('arc_add', 'mincut_length', 'numeric(12,3)', 'Column mincut_l
 SELECT col_type_is('arc_add', 'mincut_watervol', 'numeric(12,3)', 'Column mincut_watervol should be numeric(12,3)');
 SELECT col_type_is('arc_add', 'mincut_criticity', 'numeric(12,3)', 'Column mincut_criticity should be numeric(12,3)');
 
--- No FKs
-SELECT hasnt_fk('arc_add', 'Table arc_add should have no foreign keys');
+-- Check foreign keys
+SELECT has_fk('arc_add', 'Table arc_add should have foreign keys');
+SELECT fk_ok('arc_add', 'arc_id', 'arc', 'arc_id', 'FK arc_id should reference arc.arc_id');
 
 SELECT * FROM finish();
 

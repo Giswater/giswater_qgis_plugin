@@ -90,8 +90,8 @@ BEGIN
 			END LOOP;
 
 			-- man values
-			UPDATE man_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
-			UPDATE man_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+			UPDATE man_pump SET to_arc = v_arc_id_new::int4 WHERE to_arc::text = v_arc_id_old AND node_id = v_node_id_old;
+			UPDATE man_valve SET to_arc = v_arc_id_new::int4 WHERE to_arc::text = v_arc_id_old AND node_id = v_node_id_old;
 
 		ELSIF _project_type = 'UD' THEN
 

@@ -603,6 +603,7 @@ AS WITH
         l.linkcat_id,
         l.epa_type,
         l.state,
+        l.state_type,
         l.expl_id,
         exploitation.macroexpl_id,
         l.muni_id,

@@ -654,11 +654,11 @@ BEGIN
 			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
 			fluid_type, omzone_id, dqa_id, presszone_id, minsector_id, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate,
 			uncertain, muni_id, verified, datasource, top_elev1, depth1, top_elev2, depth2, location_type, custom_length, annotation,
-			observ, comment, descript, link, num_value, dma_id)
+			observ, comment, descript, link, num_value, dma_id, state_type)
 			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector,
 			v_fluidtype, v_omzone, v_dqa, v_presszone, v_minsector, NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
 			NEW.uncertain, NEW.muni_id, NEW.verified, NEW.datasource, NEW.top_elev1, NEW.depth1, NEW.top_elev2, NEW.depth2, NEW.location_type,
-			NEW.custom_length, NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, v_dma);
+			NEW.custom_length, NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, v_dma, NEW.state_type);
 
 		ELSIF  v_projectype = 'UD' THEN
 			IF NEW.linkcat_id IS NULL THEN
@@ -868,7 +868,7 @@ BEGIN
 		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
 		enddate = NEW.enddate, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector, verified = NEW.verified, custom_length = NEW.custom_length,
 		datasource = NEW.datasource, location_type=NEW.location_type, epa_type=NEW.epa_type, annotation=NEW.annotation, observ=NEW.observ, comment=NEW.comment,
-		descript=NEW.descript, link=NEW.link, num_value=NEW.num_value
+		descript=NEW.descript, link=NEW.link, num_value=NEW.num_value, state_type=NEW.state_type
 		WHERE link_id=NEW.link_id;
 
 
