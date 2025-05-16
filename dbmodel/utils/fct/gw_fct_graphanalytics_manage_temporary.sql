@@ -60,6 +60,7 @@ BEGIN
             old_mapzone_id INTEGER,
             modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
             graph_delimiter VARCHAR(30) DEFAULT 'none',
+            staticpressure FLOAT DEFAULT 0,
             CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
         );
         CREATE INDEX temp_pgr_node_node_id ON temp_pgr_node USING btree (node_id);
@@ -94,6 +95,7 @@ BEGIN
             arc_id varchar(16),
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
+            staticpressure FLOAT DEFAULT 0,
             CONSTRAINT temp_pgr_connec_pkey PRIMARY KEY (connec_id)
         );
         CREATE INDEX temp_pgr_connec_connec_id ON temp_pgr_connec USING btree (connec_id);
@@ -106,6 +108,7 @@ BEGIN
             feature_type varchar(16),
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
+            staticpressure FLOAT DEFAULT 0,
             CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (link_id)
         );
         CREATE INDEX temp_pgr_link_link_id ON temp_pgr_link USING btree (link_id);
@@ -240,6 +243,8 @@ BEGIN
                 ), node_selected AS (
                     SELECT DISTINCT ON (node_id) node.node_id,
                     cf.graph_delimiter,
+                    node.top_elev,
+                    node.depth,
                     node.expl_id,
                     node.sector_id,
                     node.presszone_id,
@@ -654,6 +659,8 @@ BEGIN
                 SELECT
                     node_id,
                     cf.graph_delimiter,
+                    node.top_elev,
+                    node.depth,
                     expl_id,
                     sector_id,
                     presszone_id,
@@ -671,6 +678,8 @@ BEGIN
                     connec_id,
                     arc_id,
                     expl_id,
+                    top_elev,
+                    depth,
                     sector_id,
                     presszone_id,
                     dma_id,
