@@ -3333,10 +3333,10 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         remove_selection()
         load_tableview_psector(dialog, class_object.feature_type)
         set_model_signals(class_object)
-    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
+    elif selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
         _insert_feature_campaign(dialog, class_object.feature_type, class_object.campaign_id, ids=class_object.list_ids[class_object.feature_type])
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
-    if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+    elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
         _insert_feature_lot(dialog, class_object.feature_type, class_object.lot_id, ids=class_object.list_ids[class_object.feature_type])
         load_tableview_lot(dialog, class_object.feature_type, class_object.lot_id, class_object.layers)
     else:
@@ -3507,12 +3507,12 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         _insert_feature_psector(dialog, feature_type, ids=selected_ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
-    if selection_mode == GwSelectionMode.CAMPAIGN:
+    elif selection_mode == GwSelectionMode.CAMPAIGN:
         _insert_feature_campaign(dialog, feature_type, class_object.campaign_id, ids=selected_ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
         load_tableview_campaign(dialog, feature_type, class_object.campaign_id, class_object.layers)
-    if selection_mode == GwSelectionMode.LOT:
+    elif selection_mode == GwSelectionMode.LOT:
         _insert_feature_lot(dialog, feature_type, class_object.lot_id, ids=selected_ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
@@ -4067,13 +4067,13 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
             state = widget.model().record(selected_list[0].row()).value(extra_field)
         _delete_feature_psector(dialog, feature_type, list_id, state)
         load_tableview_psector(dialog, feature_type)
-    if selection_mode == GwSelectionMode.CAMPAIGN:
+    elif selection_mode == GwSelectionMode.CAMPAIGN:
         state = None
         if extra_field is not None and len(selected_list) == 1:
             state = widget.model().record(selected_list[0].row()).value(extra_field)
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
-    if selection_mode == GwSelectionMode.LOT:
+    elif selection_mode == GwSelectionMode.LOT:
         state = None
         if extra_field is not None and len(selected_list) == 1:
             state = widget.model().record(selected_list[0].row()).value(extra_field)
