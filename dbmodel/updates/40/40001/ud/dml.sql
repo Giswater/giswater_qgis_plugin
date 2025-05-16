@@ -880,7 +880,7 @@ UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_
 UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_gully' AND columnname='enddate';
 UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_gully' AND columnname='descript';
 
-UPDATE sys_table SET id='cat_gully', descript='Catalog of gullys.', sys_role='role_edit', criticity=2, context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=10, alias='Gully catalog', notify_action=NULL, isaudit=NULL, keepauditdays=NULL, "source"='core', addparam=NULL WHERE id='cat_grate';
+UPDATE sys_table SET id='cat_gully', descript='Catalog of gullys.', sys_role='role_edit', context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=10, alias='Gully catalog', notify_action=NULL, isaudit=NULL, keepauditdays=NULL, "source"='core', addparam=NULL WHERE id='cat_grate';
 
 -- 06/05/2025
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_ui_omzone', 'form_feature', 'tab_none', 'omzone_id', 'lyt_data_1', 1, 'integer', 'text', 'omzone_id', 'omzone_id', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"label":"color:red; font-weight:bold"}'::json, '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_omzone", "activated": true, "keyColumn": "omzone_id", "valueColumn": "name", "filterExpression": null}}'::json, NULL, NULL, false, NULL);

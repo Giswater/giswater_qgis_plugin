@@ -464,8 +464,8 @@ BEGIN
 
 				FOR rec_feature IN SELECT * FROM cat_feature
 				LOOP
-					INSERT INTO sys_table (id, descript, sys_role, criticity, context, alias)
-					VALUES (rec_feature.child_layer, concat('Custom edit view for ', rec_feature.child_layer), 'role_edit', 0, concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',
+					INSERT INTO sys_table (id, descript, sys_role, context, alias)
+					VALUES (rec_feature.child_layer, concat('Custom edit view for ', rec_feature.child_layer), 'role_edit', concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',
 					upper(rec_feature.feature_type),'"}'), rec_feature.id)
 					ON CONFLICT (id)
 					DO update set context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"', upper(rec_feature.feature_type),'"}');

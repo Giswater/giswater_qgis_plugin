@@ -20,7 +20,7 @@ SELECT has_table('sys_table'::name, 'Table sys_table should exist');
 SELECT columns_are(
     'sys_table',
     ARRAY[
-        'id', 'descript', 'sys_role', 'criticity', 'context', 'orderby', 'alias', 'notify_action', 
+        'id', 'descript', 'sys_role', 'project_template', 'context', 'orderby', 'alias', 'notify_action', 
         'isaudit', 'keepauditdays', 'source', 'addparam'
     ],
     'Table sys_table should have the correct columns'
@@ -33,7 +33,7 @@ SELECT col_is_pk('sys_table', ARRAY['id'], 'Column id should be primary key');
 SELECT col_type_is('sys_table', 'id', 'text', 'Column id should be text');
 SELECT col_type_is('sys_table', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('sys_table', 'sys_role', 'character varying(30)', 'Column sys_role should be character varying(30)');
-SELECT col_type_is('sys_table', 'criticity', 'smallint', 'Column criticity should be smallint');
+SELECT col_type_is('sys_table', 'project_template', 'integer[]', 'Column project_template should be integer[]');
 SELECT col_type_is('sys_table', 'context', 'character varying(500)', 'Column context should be character varying(500)');
 SELECT col_type_is('sys_table', 'orderby', 'smallint', 'Column orderby should be smallint');
 SELECT col_type_is('sys_table', 'alias', 'text', 'Column alias should be text');

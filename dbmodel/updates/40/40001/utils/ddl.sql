@@ -182,3 +182,11 @@ CREATE TABLE minsector_mincut (
 -- 15/05/2025
 ALTER TABLE node_add ADD CONSTRAINT node_add_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE arc_add ADD CONSTRAINT arc_add_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+--16/05/2025
+UPDATE sys_table SET criticity = NULL;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"criticity", "newName":"project_template"}}$$);
+ALTER TABLE sys_table ALTER COLUMN project_template TYPE integer[] USING ARRAY[project_template];
+UPDATE sys_table SET project_template = NULL;
