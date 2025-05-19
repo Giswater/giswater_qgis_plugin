@@ -966,5 +966,5 @@ WHERE id IN (
 	'cat_gully',
 	'v_edit_drainzone',
 	'v_edit_gully',
-	've_pol_gully',
+	've_pol_gully'
 );
