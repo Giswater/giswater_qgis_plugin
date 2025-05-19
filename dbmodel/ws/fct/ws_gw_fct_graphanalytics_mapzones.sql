@@ -104,6 +104,7 @@ DECLARE
 	v_valuefordisconnected integer;
 	v_floodonlymapzone text;
 	v_commitchanges boolean;
+	v_fromzero boolean;
 
 	v_dscenario_valve text;
 	v_checkdata text;  -- FULL / PARTIAL / NONE
@@ -165,6 +166,9 @@ BEGIN
 	v_dscenario_valve = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_valve');
 	v_netscenario = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'netscenario');
 
+	-- TODO: add new param to calculate mapzones from zero
+	v_fromzero = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'fromZero');
+
 	-- profilactic controls
 	IF v_dscenario_valve = '' THEN v_dscenario_valve = NULL; END IF;
 	IF v_netscenario = '' THEN v_netscenario = NULL; END IF;
@@ -203,11 +207,11 @@ BEGIN
 
     -- For user selected exploitations
     IF v_expl_id = '-901' THEN
-        SELECT string_agg(DISTINCT expl_id) INTO v_expl_id_array
+        SELECT string_agg(DISTINCT expl_id::text, ',') INTO v_expl_id_array
         FROM selector_expl;
     -- For all exploitations
     ELSIF v_expl_id = '-902' THEN
-        SELECT string_agg(expl_id) INTO v_expl_id_array
+        SELECT string_agg(DISTINCT expl_id::text, ',') INTO v_expl_id_array
         FROM exploitation
 		WHERE active;
     -- For a specific exploitation/s

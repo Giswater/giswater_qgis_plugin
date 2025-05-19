@@ -713,29 +713,29 @@ BEGIN
 
                 CREATE TEMPORARY VIEW v_temp_arc AS
                 SELECT
-                    arc_id,
-                    node_1,
-                    node_2,
-                    expl_id,
-                    sector_id,
-                    drainzone_id,
-                    dwfzone_id,
-                    omzone_id,
-                    the_geom
+                    a.arc_id,
+                    a.node_1,
+                    a.node_2,
+                    a.expl_id,
+                    a.sector_id,
+                    a.drainzone_id,
+                    a.dwfzone_id,
+                    a.omzone_id,
+                    a.the_geom
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
                 WHERE a.state = 1 AND vst.is_operative = TRUE;
 
                 CREATE TEMPORARY VIEW v_temp_node AS
                 SELECT
-                    node_id,
+                    n.node_id,
                     cf.graph_delimiter,
-                    expl_id,
-                    sector_id,
-                    drainzone_id,
-                    dwfzone_id,
-                    omzone_id,
-                    the_geom
+                    n.expl_id,
+                    n.sector_id,
+                    n.drainzone_id,
+                    n.dwfzone_id,
+                    n.omzone_id,
+                    n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
                 JOIN cat_node cn ON cn.id = n.nodecat_id
@@ -744,28 +744,28 @@ BEGIN
 
                 CREATE TEMPORARY VIEW v_temp_connec AS
                 SELECT
-                    connec_id,
-                    arc_id,
-                    expl_id,
-                    sector_id,
-                    drainzone_id,
-                    dwfzone_id,
-                    omzone_id,
-                    the_geom
+                    c.connec_id,
+                    c.arc_id,
+                    c.expl_id,
+                    c.sector_id,
+                    c.drainzone_id,
+                    c.dwfzone_id,
+                    c.omzone_id,
+                    c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
                 WHERE c.state = 1 AND vst.is_operative = TRUE;
 
                 CREATE TEMPORARY VIEW v_temp_gully AS
                 SELECT
-                    gully_id,
-                    arc_id,
-                    expl_id,
-                    sector_id,
-                    drainzone_id,
-                    dwfzone_id,
-                    omzone_id,
-                    the_geom
+                    g.gully_id,
+                    g.arc_id,
+                    g.expl_id,
+                    g.sector_id,
+                    g.drainzone_id,
+                    g.dwfzone_id,
+                    g.omzone_id,
+                    g.the_geom
                 FROM gully g
                 JOIN value_state_type vst ON vst.id = g.state_type
                 WHERE g.state = 1 AND vst.is_operative = TRUE;
@@ -781,7 +781,7 @@ BEGIN
                     l.drainzone_id,
                     l.dwfzone_id,
                     l.omzone_id,
-                    the_geom
+                    l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
                 JOIN value_state_type vst ON vst.id = l.state_type
