@@ -36,7 +36,7 @@ BEGIN
 	--insert new fields values into json
     v_new_data := to_jsonb(NEW);
 
-    FOR v_type IN SELECT unnest(ARRAY['function', 'category', 'fluid', 'location'])
+    FOR v_type IN SELECT unnest(ARRAY['function', 'category', 'location'])
 	LOOP
 		v_type_table := 'man_type_' || v_type;
         v_columname := v_type || '_type';

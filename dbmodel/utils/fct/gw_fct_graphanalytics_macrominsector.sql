@@ -1,9 +1,8 @@
 /*
 This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-
-The code of this inundation function have been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 */
 
 -- FUNCTION CODE: 3336
@@ -66,92 +65,92 @@ BEGIN
         ') c
     WHERE n.node_id::int = c.node;
 
-    WITH selected_arcs AS 
+    WITH selected_arcs AS
     (SELECT arc_id, node_1
-    FROM arc 
-    WHERE state = 1  
+    FROM arc
+    WHERE state = 1
     AND node_1 IS NOT NULL AND node_2 IS NOT NULL
     UNION ALL
     SELECT a.arc_id, a.node_1
-    FROM arc a 
-    JOIN plan_psector_x_arc pa ON pa.arc_id = a.arc_id 
-    JOIN plan_psector p ON p.psector_id = pa.psector_id 
+    FROM arc a
+    JOIN plan_psector_x_arc pa ON pa.arc_id = a.arc_id
+    JOIN plan_psector p ON p.psector_id = pa.psector_id
     WHERE p.active = TRUE AND a.state = 2
     AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL
     )
     UPDATE arc a SET macrominsector_id =n.macrominsector_id
-    FROM selected_arcs sa 
-    JOIN node n ON sa.node_1 = n.node_id 
+    FROM selected_arcs sa
+    JOIN node n ON sa.node_1 = n.node_id
     WHERE a.arc_id = sa.arc_id AND n.macrominsector_id <> 0
     ;
 
-    WITH selected_connec AS 
+    WITH selected_connec AS
     (SELECT connec_id, arc_id
-    FROM connec 
-    WHERE state = 1  
+    FROM connec
+    WHERE state = 1
     UNION ALL
     SELECT c.connec_id, c.arc_id
-    FROM connec c 
-    JOIN plan_psector_x_connec pc ON pc.connec_id = c.connec_id 
-    JOIN plan_psector p ON p.psector_id = pc.psector_id 
+    FROM connec c
+    JOIN plan_psector_x_connec pc ON pc.connec_id = c.connec_id
+    JOIN plan_psector p ON p.psector_id = pc.psector_id
     WHERE p.active = TRUE AND c.state = 2
     )
     UPDATE connec c SET macrominsector_id = a.macrominsector_id
-    FROM selected_connec sa 
+    FROM selected_connec sa
     JOIN arc a ON sa.arc_id = a.arc_id
     WHERE c.connec_id = sa.connec_id AND a.macrominsector_id <> 0
     ;
 
-    WITH selected_link AS 
+    WITH selected_link AS
     (SELECT l.link_id, c.arc_id
     FROM link l
-    JOIN connec c ON l.feature_id = c.connec_id 
-    WHERE l.state = 1 AND l.feature_type = 'CONNEC' 
+    JOIN connec c ON l.feature_id = c.connec_id
+    WHERE l.state = 1 AND l.feature_type = 'CONNEC'
     UNION ALL
     SELECT l.link_id, pc.arc_id
-    FROM link l 
-    JOIN plan_psector_x_connec pc ON pc.link_id = l.link_id 
-    JOIN plan_psector p ON p.psector_id = pc.psector_id 
+    FROM link l
+    JOIN plan_psector_x_connec pc ON pc.link_id = l.link_id
+    JOIN plan_psector p ON p.psector_id = pc.psector_id
     WHERE p.active = TRUE AND l.state = 2 AND l.feature_type = 'CONNEC'
     )
     UPDATE link l SET macrominsector_id = a.macrominsector_id
-    FROM selected_link sa 
+    FROM selected_link sa
     JOIN arc a ON sa.arc_id = a.arc_id
     WHERE l.link_id = sa.link_id AND a.macrominsector_id <> 0
     ;
 
     IF v_project_type = 'UD' THEN
-        WITH selected_gully AS 
+        WITH selected_gully AS
         (SELECT gully_id, arc_id
-        FROM gully 
-        WHERE state = 1  
+        FROM gully
+        WHERE state = 1
         UNION ALL
         SELECT c.gully_id, c.arc_id
-        FROM gully c 
-        JOIN plan_psector_x_gully pc ON pc.gully_id = c.gully_id 
-        JOIN plan_psector p ON p.psector_id = pc.psector_id 
+        FROM gully c
+        JOIN plan_psector_x_gully pc ON pc.gully_id = c.gully_id
+        JOIN plan_psector p ON p.psector_id = pc.psector_id
         WHERE p.active = TRUE AND c.state = 2
         )
         UPDATE gully c SET macrominsector_id = a.macrominsector_id
-        FROM selected_gully sa 
+        FROM selected_gully sa
         JOIN arc a ON sa.arc_id = a.arc_id
         WHERE c.gully_id = sa.gully_id AND a.macrominsector_id <> 0
         ;
 
-        WITH selected_link AS 
+        WITH selected_link AS
         (SELECT l.link_id, c.arc_id
         FROM link l
-        JOIN gully c ON l.feature_id = c.gully_id 
-        WHERE l.state = 1 AND l.feature_type = 'GULLY' 
+        JOIN gully c ON l.feature_id = c.gully_id
+        WHERE l.state = 1 AND l.feature_type = 'GULLY'
         UNION ALL
         SELECT l.link_id, pc.arc_id
-        FROM link l 
-        JOIN plan_psector_x_gully pc ON pc.link_id = l.link_id 
-        JOIN plan_psector p ON p.psector_id = pc.psector_id 
+        FROM link l
+        JOIN plan_psector_x_gully pc ON pc.link_id = l.link_id
+        JOIN plan_psector p ON p.psector_id = pc.psector_id
         WHERE p.active = TRUE AND l.state = 2 AND l.feature_type = 'GULLY'
         )
         UPDATE link l SET macrominsector_id = a.macrominsector_id
-        FROM selected_link sa 
+        FROM selected_link sa
         JOIN arc a ON sa.arc_id = a.arc_id
         WHERE l.link_id = sa.link_id AND a.macrominsector_id <> 0
         ;

@@ -1,57 +1,43 @@
-/*
-This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU
-General Public License as published by the Free Software Foundation, either version 3 of the License,
-or (at your option) any later version.
-*/
-
-
-CREATE OR REPLACE FUNCTION gw_fct_admin_forms_renum_layoutorder(p_data json)
-RETURNS json AS $$
-
-/*
-SELECT gw_fct_formfields_renumber_layoutorder ({data:{parameters{}}})
-*/
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_forms_renum_layoutorder(p_data json)
+RETURNS json
+LANGUAGE plpgsql
+AS $function$
 
 DECLARE
     rec RECORD;
-    current_layout TEXT;
-    new_order INTEGER;
-	v_step integer;
-	v_tablename text;
-
+    rec2 RECORD;
+    v_counter INTEGER;
 BEGIN
+    SET search_path = 'SCHEMA_NAME', public;
 
-	-- set search path
-	
-	
-	-- get input parameters
-	v_tablename = 'config_form_fields'; -- config_param_system, sys_param_user
-	v_step = 2; -- the number of steps for each.
-		
-	
-    -- loop for each layoutname
+    -- Buscar todos los grupos con layoutorder duplicado
     FOR rec IN
-        SELECT id, layoutname
+        SELECT formname, formtype, tabname, layoutname, layoutorder
         FROM config_form_fields
-        ORDER BY layoutname, layoutorder, id
+        GROUP BY formname, formtype, tabname, layoutname, layoutorder
+        HAVING COUNT(*) > 1
+        ORDER BY formname, formtype, tabname, layoutname, layoutorder
     LOOP
-        -- reinit counter for new layout
-        IF rec.layoutname IS DISTINCT FROM current_layout THEN
-            current_layout := rec.layoutname;
-            new_order := v_step;
-        END IF;
+        v_counter := 0;
 
-        -- update layoutorder
-        UPDATE config_form_fields
-        SET layoutorder = new_order
-        WHERE id = rec.id;
+        FOR rec2 IN
+            SELECT ctid, columnname
+            FROM config_form_fields
+            WHERE formname = rec.formname
+              AND formtype = rec.formtype
+              AND tabname = rec.tabname
+              AND ((layoutname IS NULL AND rec.layoutname IS NULL) OR (layoutname = rec.layoutname))
+              AND ((layoutorder IS NULL AND rec.layoutorder IS NULL) OR (layoutorder = rec.layoutorder))
+            ORDER BY columnname -- puedes ordenar por lo que prefieras
+        LOOP
+            UPDATE config_form_fields
+            SET layoutorder = v_counter
+            WHERE ctid = rec2.ctid;
 
-        -- Increment the counter
-        new_order := new_order + v_step;
+            v_counter := v_counter + 1;
+        END LOOP;
     END LOOP;
-	
-	RETURN '{}';
-	
+
+    RETURN '{}';
 END;
-$$ LANGUAGE plpgsql;;
+$function$;

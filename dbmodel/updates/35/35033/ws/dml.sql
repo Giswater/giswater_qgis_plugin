@@ -1,7 +1,8 @@
 /*
 This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later versio
-This version of Giswater is provided by Giswater Association
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 */
 
 
@@ -28,32 +29,32 @@ ON CONFLICT (id) DO NOTHING;
 
 
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder,
             datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
  WITH
   t1 AS
-(SELECT distinct child_layer, formtype, tabname, 'real_press_max' as columnname, 'lyt_data_2' as layoutname, max(layoutorder)+1 as layoutorder, 
-            'numeric' as datatype, 'text' as widgettype, 'real_press_max' as label, 'real_press_max' as tooltip,  false as ismandatory, 
+(SELECT distinct child_layer, formtype, tabname, 'real_press_max' as columnname, 'lyt_data_2' as layoutname, max(layoutorder)+1 as layoutorder,
+            'numeric' as datatype, 'text' as widgettype, 'real_press_max' as label, 'real_press_max' as tooltip,  false as ismandatory,
             false as isparent, true as iseditable, false as isautoupdate, true as hidden
-FROM config_form_fields, cat_feature 
+FROM config_form_fields, cat_feature
 WHERE system_id='METER' group by child_layer,formtype, tabname),
   t2 AS
-(SELECT distinct child_layer, formtype, tabname, 'real_press_min', 'lyt_data_2', max(layoutorder)+2, 
+(SELECT distinct child_layer, formtype, tabname, 'real_press_min', 'lyt_data_2', max(layoutorder)+2,
             'numeric', 'text', 'real_press_min', 'real_press_min',  false, false, true, false, true
-FROM config_form_fields, cat_feature 
+FROM config_form_fields, cat_feature
 WHERE system_id='METER' group by child_layer,formtype, tabname),
 t3 AS
-(SELECT distinct child_layer, formtype, tabname, 'real_press_avg', 'lyt_data_2', max(layoutorder)+3, 
+(SELECT distinct child_layer, formtype, tabname, 'real_press_avg', 'lyt_data_2', max(layoutorder)+3,
             'numeric', 'text', 'real_press_avg', 'real_press_avg',  false, false, true, false, true
-FROM config_form_fields, cat_feature 
+FROM config_form_fields, cat_feature
 WHERE system_id='METER' group by child_layer,formtype, tabname)
 select * from t1
   union select * from t2
-  union select * from t3 
+  union select * from t3
   order by child_layer, layoutorder ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
-INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active) VALUES(3198, 'Get address values from closest street number', '{"featureType":["node","connec"]}'::json, 
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active) VALUES(3198, 'Get address values from closest street number', '{"featureType":["node","connec"]}'::json,
 '[{"widgetname":"catFeature", "label":"Type:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
 "comboIds":["ALL NODES", "ALL CONNECS", "HYDRANT", "JUNCTION", "METER", "PUMP", "TANK", "VALVE", "WJOIN"], 
 "comboNames":["ALL NODES", "ALL CONNECS", "HYDRANT", "JUNCTION", "METER", "PUMP", "TANK", "VALVE", "WJOIN"]},

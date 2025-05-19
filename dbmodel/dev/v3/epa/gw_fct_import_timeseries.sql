@@ -1,7 +1,8 @@
 	/*
 	This file is part of Giswater
-	The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-	This version of Giswater is provided by Giswater Association
+	The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+	General Public License as published by the Free Software Foundation, either version 3 of the License,
+	or (at your option) any later version.
 	*/
 
 
@@ -25,7 +26,7 @@
 	IN CASE OF EPA
 	select * from SCHEMA_NAME.inp_pattern
 	select * from SCHEMA_NAME.inp_pattern_value
-	select * from SCHEMA_NAME.ext_rtc_scada_dma_period 
+	select * from SCHEMA_NAME.ext_rtc_scada_dma_period
 
 
 	-- INSTRUCTIONS
@@ -33,13 +34,13 @@
 	code; external code or internal identifier. An example of code could be CCCCCCCC-YYYYMMDDHHMMSS-15M-0000096. CCCCCCCC it means the name of the source. 15M tstepvalue, 96 tstep number
 	operator_id; to indetify different operators
 	tscatalog_id; imdp, t15, t85, fireindex, sworksindex, treeindex, qualhead, pressure, flow, inflow
-	tselement; {"type":"exploitation", 
+	tselement; {"type":"exploitation",
 			 "id":[1,2,3,4]} -- expl_id, muni_id, arc_id, node_id, dma_id, sector_id, dqa_id
 	param, {"isUnitary":false, it means if sumatory of all values of ts is 1 (true) or not
 		"units":"BAR"  in case of no units put any value you want (adimensional, nounits...). WARNING: use CMH or LPS in case of VOLUME patterns for EPANET
-	 	"epa":{"projectType":"WS", "class":"pattern", "id":"test1", "type":"UNITARY", "dmaRtcParameters":{"dmaId":"","periodId":""} 
+	 	"epa":{"projectType":"WS", "class":"pattern", "id":"test1", "type":"UNITARY", "dmaRtcParameters":{"dmaId":"","periodId":""}
 		"source":{"type":"flowmeter", "id":"V2323", "import":{"type":"file", "id":"test.csv"}},
-	period; {"type":"monthly", "id":201903", "start":"2019-01-01", "end":"2019-01-02"} 
+	period; {"type":"monthly", "id":201903", "start":"2019-01-01", "end":"2019-01-02"}
 	timestep; {"units":"minute", "value":"15", "number":2345}};
 	val; any rows any columns with values
 	descript; free text';
@@ -57,7 +58,7 @@
 
 	-- EXAMPLE
 	----------
-	code;201711150000V000 
+	code;201711150000V000
 	operator;1
 	catalog_id;flow
 	element;{"type":"node", "id":"n4"}
@@ -77,7 +78,7 @@
 	*/
 
 	DECLARE
-	        
+
 	v_array double precision[][];
 	v_x integer;
 	v_y integer;
@@ -114,9 +115,9 @@
 
 		-- project type
 		SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-		
+
 		-- Insert into audit table
-		/*INSERT INTO audit_log_csv2pg 
+		/*INSERT INTO audit_log_csv2pg
 		(fid, cur_user,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20)
 		SELECT fid, cur_user,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
 		FROM temp_csv WHERE fid = 117 order by id;
@@ -125,7 +126,7 @@
 		INSERT INTO ext_timeseries (code, operator_id, catalog_id, element, param, period, timestep, val)
 		SELECT code, operator::integer, catalog_id, element::json, param::json, period::json, timestep::json, val
 			FROM crosstab('SELECT fid,csv1, csv2 FROM temp_csv WHERE fid = 117'::text, ' VALUES (''code''),(''operator''),(''catalog_id''),(''element''),(''param''),(''period''),(''timestep'')'::text)
-					ct(id integer, code text, operator text, catalog_id text, element text, param text, period text, timestep text) 
+					ct(id integer, code text, operator text, catalog_id text, element text, param text, period text, timestep text)
 			JOIN (select 117 as id , (array_agg(value))::float[] as val from (
 				SELECT id, 2 as row, csv2 as value FROM temp_csv WHERE csv1='val' AND csv2 IS NOT NULL AND fid = 117 AND cur_user=current_user UNION
 				SELECT id, 3, csv3 FROM temp_csv WHERE csv1='val' AND csv3 IS NOT NULL AND fid = 117 AND cur_user=current_user UNION
@@ -157,33 +158,33 @@
 				SELECT id, 29, csv29 FROM temp_csv WHERE csv1='val' AND csv29 IS NOT NULL AND fid = 117 AND cur_user=current_user UNION
 				SELECT id, 30, csv30 FROM temp_csv WHERE csv1='val' AND csv30 IS NOT NULL AND fid = 117 AND cur_user=current_user UNION
 				SELECT id, 31, csv31 FROM temp_csv WHERE csv1='val' AND csv31 IS NOT NULL
-				ORDER BY 1,2) a ) b USING (id) 
+				ORDER BY 1,2) a ) b USING (id)
 				RETURNING id INTO v_id;
 
 
 		-- insert into epanet inp_pattern tables (if it needs)
 		v_tsprojecttype = (SELECT (param->>'epa')::json->>'projectType' FROM ext_timeseries WHERE id=v_id);
 
-		IF v_tsprojecttype=v_projecttype AND v_projecttype='WS' THEN 
+		IF v_tsprojecttype=v_projecttype AND v_projecttype='WS' THEN
 
 			-- control if pattern exists
 			IF (SELECT pattern_id FROM inp_pattern WHERE pattern_id=v_pattern) IS NOT NULL THEN
 				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3064", "function":"2738","parameters":null, "is_process":true}}$$);
 			END IF;
-		
+
 			-- inserting new pattern
 			v_pattern = (SELECT (param->>'epa')::json->>'id' FROM ext_timeseries WHERE id=v_id);
 			v_patterntype = (SELECT (param->>'epa')::json->>'type' FROM ext_timeseries WHERE id=v_id);
 			v_unitsvalue = (SELECT (param->>'units')FROM ext_timeseries WHERE id=v_id);
-		
+
 			INSERT INTO inp_pattern (pattern_id, pattern_type, tscode, tsparameters)
 			SELECT v_pattern, v_patterntype, code, concat('{"parameters":',param,',"period":', period, ',"timestep":',timestep,'}')::json FROM ext_timeseries WHERE id=v_id;
 
 			-- insert on inp_pattern_value
 
 			-- coefficient from volume (m3/tsep) to flow (l/s) 1 LPS = 3.6 CMH
-			IF v_unitsvalue = 'CMH' THEN  
+			IF v_unitsvalue = 'CMH' THEN
 				v_units:= 1/3.6;
 			END IF;
 
@@ -193,16 +194,16 @@
 				-- inserting row
 				SELECT array_agg(col) INTO v::float[] FROM (SELECT unnest(val::float[]) as col FROM ext_timeseries where id=v_id LIMIT 18 offset v_count)a;
 				raise notice ' % ', v;
-					
+
 				-- inserting row
 				INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6,
 				factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 				VALUES (v_pattern, v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17], v[18]);
-						
+
 				v_count = v_count + 18;
-					
+
 				EXIT WHEN v[18] IS NULL;
-									
+
 			END LOOP;
 
 			-- if it is dmaRtc pattern
@@ -214,12 +215,12 @@
 				IF (SELECT id FROM ext_rtc_scada_dma_period WHERE dma_id=v_dma and cat_period_id=v_period) IS NULL THEN
 					SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3066", "function":"2738","parameters":null, "is_process":true}}$$);
-				
+
 				ELSE
 					IF (SELECT pattern_id FROM ext_rtc_scada_dma_period WHERE dma_id=v_dma and cat_period_id=v_period) IS NOT NULL THEN
 						SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3068", "function":"2738","parameters":null, "is_process":true}}$$);
-					ELSE	
+					ELSE
 						UPDATE ext_rtc_scada_dma_period SET pattern_id=v_pattern WHERE dma_id=v_dma and cat_period_id=v_period;
 
 						-- normalize factor
@@ -245,7 +246,7 @@
 							SELECT min(factor_16) FROM inp_pattern_value WHERE pattern_id=v_pattern UNION
 							SELECT min(factor_17) FROM inp_pattern_value WHERE pattern_id=v_pattern UNION
 							SELECT min(factor_18) FROM inp_pattern_value WHERE pattern_id=v_pattern)a);
-		
+
 						-- get max value from pattern
 						v_max = (SELECT  max(max) FROM (SELECT max(factor_1) FROM inp_pattern_value WHERE pattern_id=v_pattern UNION
 							SELECT max(factor_2) FROM inp_pattern_value WHERE pattern_id=v_pattern UNION
@@ -274,26 +275,26 @@
 		END IF;
 
 		-- get log (fid: 244)
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 244) row;
-		v_result := COALESCE(v_result, '{}'); 
+		v_result := COALESCE(v_result, '{}');
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-				
+
 		-- Control nulls
-		v_version := COALESCE(v_version, '{}'); 
-		v_result_info := COALESCE(v_result_info, '{}'); 
-	 
+		v_version := COALESCE(v_version, '{}');
+		v_result_info := COALESCE(v_result_info, '{}');
+
 		-- Return
 		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"Process executed"}, "version":"'||v_version||'"'||
 	             ',"body":{"form":{}'||
 			     ',"data":{ "info":'||v_result_info||'}}'||
 		    '}')::json;
-		    
+
 		-- Exception handling
-		EXCEPTION WHEN OTHERS THEN 
+		EXCEPTION WHEN OTHERS THEN
 		RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'version', v_version, 'SQLSTATE', SQLSTATE)::json;
-		
-		
+
+
 	END;
 	$BODY$
 	  LANGUAGE plpgsql VOLATILE

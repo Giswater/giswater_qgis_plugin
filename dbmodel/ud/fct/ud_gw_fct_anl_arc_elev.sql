@@ -1,16 +1,17 @@
 	/*
 	This file is part of Giswater
-	The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-	This version of Giswater is provided by Giswater Association
+	The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+	General Public License as published by the Free Software Foundation, either version 3 of the License,
+	or (at your option) any later version.
 	*/
 
 	--FUNCTION CODE: 3066
 
-	CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_elev(p_data json) RETURNS json AS 
+	CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_elev(p_data json) RETURNS json AS
 	$BODY$
 	/*EXAMPLE
 	SELECT gw_fct_anl_arc_elev($${"client":{"device":4, "infoType":1, "lang":"ES"},
-	"form":{},"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+	"form":{},"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
 	"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 	"parameters":{}}}$$)::text
 
@@ -19,7 +20,7 @@
 	*/
 
 	DECLARE
-	    
+
 	v_id json;
 	v_selectionmode text;
 	v_worklayer text;
@@ -38,8 +39,8 @@
 
 		-- select version
 		SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-		
-		-- getting input data 	
+
+		-- getting input data
 		v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 		v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 		v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
@@ -48,8 +49,8 @@
 
 		-- Reset values
 		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=390;
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=390;	
-		
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=390;
+
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (390, null, 4, concat('ARC ELEVATION ANALYSIS'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (390, null, 4, '-------------------------------------------------------------');
 
@@ -158,8 +159,8 @@
 	  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
 	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=390) row) features;
 
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+		v_result := COALESCE(v_result, '{}');
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 		-- set selector
 		DELETE FROM selector_audit WHERE fid=390 AND cur_user=current_user;
@@ -175,20 +176,20 @@
 			VALUES (390,  concat ('There are ',v_count,' arcs with both values of y and elev inserted.'), v_count);
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			SELECT 390,  concat ('Arc_id: ',string_agg(distinct arc_id, ', '), '.' ), v_count 
+			SELECT 390,  concat ('Arc_id: ',string_agg(distinct arc_id, ', '), '.' ), v_count
 			FROM anl_arc WHERE cur_user="current_user"() AND fid=390;
 
 		END IF;
-		
+
 		-- info
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=390 order by  id asc) row;
-		v_result := COALESCE(v_result, '{}'); 
+		v_result := COALESCE(v_result, '{}');
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-		
+
 		--    Control nulls
-		v_result_info := COALESCE(v_result_info, '{}'); 
-		v_result_line := COALESCE(v_result_line, '{}'); 
+		v_result_info := COALESCE(v_result_info, '{}');
+		v_result_line := COALESCE(v_result_line, '{}');
 		--  Return
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
 	             ',"body":{"form":{}'||

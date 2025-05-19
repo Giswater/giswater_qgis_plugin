@@ -1,9 +1,8 @@
 /*
 This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-
-The code of this inundation function have been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 */
 
 -- FUNCTION CODE: 2706
@@ -103,7 +102,7 @@ BEGIN
     FROM node n
     JOIN cat_node cn ON cn.id = n.nodecat_id
     JOIN cat_feature_node cf ON cf.id = cn.node_type
-    WHERE t.node_id = n.node_id 
+    WHERE t.node_id = n.node_id
     AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR');
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
@@ -118,21 +117,21 @@ BEGIN
     END IF;
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
-    UPDATE temp_pgr_node n SET modif = TRUE 
+    UPDATE temp_pgr_node n SET modif = TRUE
     WHERE n.graph_delimiter = 'sector';
 
     -- ARCS to be disconnected:
     --one of the two arcs that reach the valve
     WITH
     arcs_selected AS (
-        SELECT DISTINCT ON (n.pgr_node_id)  
-            a.pgr_arc_id, 
-            n.pgr_node_id, 
-            a.pgr_node_1, 
+        SELECT DISTINCT ON (n.pgr_node_id)
+            a.pgr_arc_id,
+            n.pgr_node_id,
+            a.pgr_node_1,
             a.pgr_node_2
         FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-        WHERE n.modif = TRUE AND n.graph_delimiter = 'minsector' 
+        WHERE n.modif = TRUE AND n.graph_delimiter = 'minsector'
     ),
 	arcs_modif AS (
 		SELECT
@@ -151,10 +150,10 @@ BEGIN
     -- all the arcs that connect to nodes SECTOR
     WITH
     arcs_selected AS (
-        SELECT  
-            a.pgr_arc_id, 
-            n.pgr_node_id, 
-            a.pgr_node_1, 
+        SELECT
+            a.pgr_arc_id,
+            n.pgr_node_id,
+            a.pgr_node_1,
             a.pgr_node_2
         FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
