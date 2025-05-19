@@ -268,7 +268,7 @@ BEGIN
 	UPDATE temp_pgr_node t SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, modif = TRUE
 	FROM v_temp_node n
 	JOIN man_valve v ON n.node_id = v.node_id
-	WHERE t.node_id = n.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
+	WHERE t.node_id = n.node_id AND 'MINSECTOR' = ANY(n.graph_delimiter) AND v.closed = TRUE;
 
 	-- valves with to_arc NOT NULL and with the property to_arc valid ( broken = FALSE, v.closed = FALSE )
 	UPDATE temp_pgr_node n SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
@@ -365,7 +365,7 @@ BEGIN
 			a.pgr_node_2
 		FROM  temp_pgr_node n
 		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter ='valve' AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
+		WHERE n.graph_delimiter = 'valve' AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
 	),
 	arcs_modif AS (
 		SELECT
@@ -539,7 +539,7 @@ BEGIN
 		)
 	UPDATE temp_pgr_node n SET mapzone_id = 0
 	FROM boundary AS s
-	WHERE n.node_id =s.node_id AND n.graph_delimiter='valve';
+	WHERE n.node_id =s.node_id AND n.graph_delimiter = 'valve';
 
 	-- The connecs take the mapzone_id of the arc they are associated with and the link takes the mapzone_id of the gully
     UPDATE temp_pgr_connec c SET mapzone_id = a.mapzone_id
@@ -969,7 +969,6 @@ BEGIN
 				updated_by = current_user 
 			FROM temp_pgr_mapzone t 
 			WHERE t.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
-			RAISE NOTICE 'v_querytext:: UPDATE '||v_mapzone_name||' %', v_querytext;
 			EXECUTE v_querytext;
 
 

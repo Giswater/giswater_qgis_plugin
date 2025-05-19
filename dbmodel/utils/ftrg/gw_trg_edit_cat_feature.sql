@@ -60,9 +60,6 @@ BEGIN
 
 			IF v_project_type='ws' THEN
 
-				-- control nulls
-				IF NEW.graph_delimiter IS NULL THEN NEW.graph_delimiter='NONE'; END IF;
-
 				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere,
 				double_geom=NEW.double_geom::json, num_arcs=NEW.num_arcs, graph_delimiter=NEW.graph_delimiter  WHERE id=NEW.id;
 

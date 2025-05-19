@@ -657,16 +657,16 @@ BEGIN
 
                 CREATE TEMPORARY VIEW v_temp_node AS
                 SELECT
-                    node_id,
+                    n.node_id,
                     cf.graph_delimiter,
-                    node.top_elev,
-                    node.depth,
-                    expl_id,
-                    sector_id,
-                    presszone_id,
-                    dma_id,
-                    dqa_id,
-                    the_geom
+                    n.top_elev,
+                    n.depth,
+                    n.expl_id,
+                    n.sector_id,
+                    n.presszone_id,
+                    n.dma_id,
+                    n.dqa_id,
+                    n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
                 JOIN cat_node cn ON cn.id = n.nodecat_id

@@ -102,3 +102,9 @@ ALTER TABLE inp_dscenario_virtualpump ALTER COLUMN pump_type SET DEFAULT 'POWERP
 
 --15/05/2025
 ALTER TABLE connec_add ADD CONSTRAINT connec_add_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- 19/05/2025
+ALTER TABLE cat_feature_node ALTER COLUMN graph_delimiter DROP DEFAULT;
+DROP VIEW IF EXISTS v_edit_cat_feature_node;
+ALTER TABLE cat_feature_node DROP CONSTRAINT node_type_graph_delimiter_check;
+ALTER TABLE cat_feature_node ALTER COLUMN graph_delimiter TYPE _text USING ARRAY[graph_delimiter];

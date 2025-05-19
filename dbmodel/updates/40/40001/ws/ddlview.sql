@@ -6871,3 +6871,21 @@ SELECT p.element_id,
 	FROM inp_frpump p
      LEFT JOIN man_frelem USING (element_id)
      LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_frelem.node_id,'_FR', order_id);
+
+CREATE OR REPLACE VIEW v_edit_cat_feature_node
+AS SELECT cat_feature.id,
+    cat_feature.feature_class AS system_id,
+    cat_feature_node.epa_default,
+    cat_feature_node.isarcdivide,
+    cat_feature_node.isprofilesurface,
+    cat_feature_node.choose_hemisphere,
+    cat_feature.code_autofill,
+    cat_feature_node.double_geom::text AS double_geom,
+    cat_feature_node.num_arcs,
+    cat_feature_node.graph_delimiter,
+    cat_feature.shortcut_key,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_node USING (id);
