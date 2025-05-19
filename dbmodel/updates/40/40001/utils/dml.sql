@@ -565,3 +565,29 @@ WHERE formname='print' AND formtype='form_print' AND columnname='composer' AND t
 -- 15/05/2025
 INSERT INTO node_add (node_id) SELECT node_id FROM node ON CONFLICT (node_id) DO NOTHING;
 INSERT INTO arc_add (arc_id) SELECT arc_id FROM arc ON CONFLICT (arc_id) DO NOTHING;
+
+-- 19/05/2025
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_link', 'Shows editable information about links.', 'role_basic', '{1}', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', 1, 'Link (parent)', NULL, NULL, NULL, 'core', NULL);
+
+UPDATE sys_table SET project_template = '{1}' WHERE id IN (
+	'v_edit_cat_feature_node',
+	'v_edit_cat_feature_arc',
+	'v_edit_cat_feature_connec',
+	'cat_material',
+	'cat_node',
+	'cat_arc',
+	'cat_connec',
+	'v_edit_macrosector',
+	'v_edit_exploitation',
+	'v_edit_sector',
+	'v_edit_node',
+	'v_edit_connec',
+	'v_edit_arc',
+	've_pol_node',
+	've_pol_connec',
+	'v_edit_dimensions',
+	'v_ext_municipality',
+	'v_ext_address',
+	'v_ext_streetaxis',
+	'v_ext_plot'
+);

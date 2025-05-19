@@ -957,3 +957,14 @@ INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('va
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_dwf_drain_type', 'dwfzone', 'dwfzone_type', NULL, true);
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_dwf_drain_type', 'drainzone', 'drainzone_type', NULL, true);
 
+-- 19/05/2025
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_dwfzone', 'Shows editable information about dwfzone.', 'role_edit', '{1}', '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 1, 'DWFZONE', NULL, NULL, NULL, 'core', NULL);
+
+UPDATE sys_table SET project_template = '{1}'
+WHERE id IN (
+	'v_edit_cat_feature_gully',
+	'cat_gully',
+	'v_edit_drainzone',
+	'v_edit_gully',
+	've_pol_gully',
+);

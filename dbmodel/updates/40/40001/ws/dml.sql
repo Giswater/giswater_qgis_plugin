@@ -398,3 +398,14 @@ UPDATE inp_typevalue SET idval='POWERPUMP',id='POWERPUMP' WHERE typevalue='inp_t
 
 --15/05/2025
 INSERT INTO connec_add (connec_id) SELECT connec_id FROM connec ON CONFLICT (connec_id) DO NOTHING;
+
+-- 19/05/2025
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_supplyzone', 'Shows editable information about supplyzone.', 'role_basic', '{1}', '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 6, 'Supplyzone', NULL, NULL, NULL, 'core', NULL);
+
+UPDATE sys_table SET project_template = '{1}'
+WHERE id IN (
+	'v_edit_macrodma',
+	'v_edit_dma',
+	'v_edit_dqa',
+	'v_edit_presszone'
+);
