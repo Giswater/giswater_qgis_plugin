@@ -278,19 +278,12 @@ FROM (new.supplyzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('supplyz
 CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER INSERT ON node
 FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('node');
 
-CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, fluid_type, location_type ON node
-FOR EACH ROW WHEN ((((old.function_type)::TEXT IS DISTINCT
-FROM
-    (new.function_type)::TEXT)
-        OR ((old.category_type)::TEXT IS DISTINCT
-    FROM
-        (new.category_type)::TEXT)
-            OR ((old.fluid_type)::TEXT IS DISTINCT
-        FROM
-            (new.fluid_type)::TEXT)
-                OR ((old.location_type)::TEXT IS DISTINCT
-            FROM
-                (new.location_type)::TEXT))) EXECUTE FUNCTION gw_trg_mantypevalue_fk('node');
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, location_type ON node
+FOR EACH ROW
+WHEN ((((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
+OR ((old.category_type)::TEXT IS DISTINCT FROM (new.category_type)::TEXT)
+OR ((old.location_type)::TEXT IS DISTINCT FROM (new.location_type)::TEXT)))
+EXECUTE FUNCTION gw_trg_mantypevalue_fk('node');
 
 CREATE TRIGGER gw_trg_node_arc_divide AFTER INSERT ON node
 FOR EACH ROW EXECUTE FUNCTION gw_trg_node_arc_divide();
@@ -353,19 +346,13 @@ DELETE OR UPDATE ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('arc_
 CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER
 INSERT ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('arc');
 CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER
-UPDATE OF function_type, category_type, fluid_type, location_type ON arc FOR EACH ROW
-    WHEN ((((old.function_type)::TEXT IS DISTINCT
-FROM
-    (new.function_type)::TEXT)
-        OR ((old.category_type)::TEXT IS DISTINCT
-    FROM
-        (new.category_type)::TEXT)
-            OR ((old.fluid_type)::TEXT IS DISTINCT
-        FROM
-            (new.fluid_type)::TEXT)
-                OR ((old.location_type)::TEXT IS DISTINCT
-            FROM
-                (new.location_type)::TEXT))) EXECUTE FUNCTION gw_trg_mantypevalue_fk('arc');
+UPDATE OF function_type, category_type, location_type ON arc FOR EACH ROW
+FOR EACH ROW
+WHEN ((((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
+OR ((old.category_type)::TEXT IS DISTINCT FROM (new.category_type)::TEXT)
+OR ((old.location_type)::TEXT IS DISTINCT FROM (new.location_type)::TEXT)))
+EXECUTE FUNCTION gw_trg_mantypevalue_fk('arc');
+
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER
 INSERT ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('arc');
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER
@@ -394,20 +381,15 @@ CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('connec_id');
 CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER INSERT ON connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');
-CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, fluid_type, location_type ON connec
+
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, location_type ON connec
 FOR EACH ROW
-    WHEN ((((old.function_type)::TEXT IS DISTINCT
-FROM
-    (new.function_type)::TEXT)
-        OR ((old.category_type)::TEXT IS DISTINCT
-    FROM
-        (new.category_type)::TEXT)
-            OR ((old.fluid_type)::TEXT IS DISTINCT
-        FROM
-            (new.fluid_type)::TEXT)
-                OR ((old.location_type)::TEXT IS DISTINCT
-            FROM
-                (new.location_type)::TEXT))) EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');
+FOR EACH ROW
+WHEN ((((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
+OR ((old.category_type)::TEXT IS DISTINCT FROM (new.category_type)::TEXT)
+OR ((old.location_type)::TEXT IS DISTINCT FROM (new.location_type)::TEXT)))
+EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');
+
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('connec');
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF verified, datasource, lock_level ON connec
@@ -437,6 +419,16 @@ FROM
     OR (old.lock_level IS DISTINCT
 FROM
     new.lock_level))) EXECUTE FUNCTION gw_trg_typevalue_fk('element');
+
+CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER INSERT ON element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('element');
+
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, location_type ON element
+FOR EACH ROW
+WHEN ((((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
+OR ((old.category_type)::TEXT IS DISTINCT FROM (new.category_type)::TEXT)
+OR ((old.location_type)::TEXT IS DISTINCT FROM (new.location_type)::TEXT)))
+EXECUTE FUNCTION gw_trg_mantypevalue_fk('element');
 
 CREATE TRIGGER gw_trg_link_connecrotation_update AFTER
 INSERT

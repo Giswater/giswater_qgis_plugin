@@ -1497,7 +1497,6 @@ CREATE TABLE element (
 	the_geom public.geometry(point, SRID_VALUE) NULL,
 	CONSTRAINT element_pkey PRIMARY KEY (element_id),
 	CONSTRAINT element_brand_id FOREIGN KEY (brand_id) REFERENCES cat_brand(id),
-	CONSTRAINT element_category_type_feature_type_fkey FOREIGN KEY (category_type,feature_type) REFERENCES man_type_category(category_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_elementcat_id_fkey FOREIGN KEY (elementcat_id) REFERENCES cat_element(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_model_id FOREIGN KEY (model_id) REFERENCES cat_brand_model(id),
