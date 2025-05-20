@@ -209,6 +209,7 @@ AS WITH
         WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
         ELSE NULL::character varying(16)
       END AS inp_type,
+      arc_add.result_id,
       arc_add.flow_max,
       arc_add.flow_min,
       arc_add.flow_avg,
@@ -222,7 +223,7 @@ AS WITH
       arc_add.mincut_length,
       arc_add.mincut_watervol,
       arc_add.mincut_criticity,
-      arc_add.result_id,
+      arc_add.pipe_capacity,
       sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
       dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
       presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,

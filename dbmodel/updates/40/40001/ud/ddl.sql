@@ -264,3 +264,7 @@ CREATE TABLE inp_subcatchment (
 	CONSTRAINT subcatchment_snow_id_fkey FOREIGN KEY (snow_id) REFERENCES inp_snowpack(snow_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX subcathment_index ON inp_subcatchment USING gist (the_geom);
+
+
+-- 20/05/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"conduit_capacity", "dataType":"float", "isUtils":"False"}}$$);

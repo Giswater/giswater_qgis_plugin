@@ -689,6 +689,7 @@ AS WITH
             arc_add.dwf_maxflow,
             arc_add.dwf_minvel,
             arc_add.dwf_maxvel,
+            arc_add.conduit_capacity,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
 			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
 			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,

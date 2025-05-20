@@ -108,3 +108,7 @@ ALTER TABLE cat_feature_node ALTER COLUMN graph_delimiter DROP DEFAULT;
 DROP VIEW IF EXISTS v_edit_cat_feature_node;
 ALTER TABLE cat_feature_node DROP CONSTRAINT node_type_graph_delimiter_check;
 ALTER TABLE cat_feature_node ALTER COLUMN graph_delimiter TYPE _text USING ARRAY[graph_delimiter];
+
+
+-- 20/05/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"pipe_capacity", "dataType":"float", "isUtils":"False"}}$$);
