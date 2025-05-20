@@ -201,11 +201,11 @@ BEGIN
 
     -- For user selected exploitations
     IF v_expl_id = '-901' THEN
-        SELECT string_agg(DISTINCT expl_id::text, ',') INTO v_expl_id_array
-        FROM selector_expl;
+        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
+		FROM selector_expl;
     -- For all exploitations
     ELSIF v_expl_id = '-902' THEN
-        SELECT string_agg(DISTINCT expl_id::text, ',') INTO v_expl_id_array
+        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
         FROM exploitation
 		WHERE active;
     -- For a specific exploitation/s
@@ -232,7 +232,7 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
 
 	IF v_floodonlymapzone IS NOT NULL THEN
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Flood only mapzone have been ACTIVATED, ',v_field, ':',v_floodonlymapzone,'.'));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Flood only mapzone have been ACTIVATED, ',v_mapzone_field, ':',v_floodonlymapzone,'.'));
 	END IF;
 
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));

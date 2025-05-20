@@ -202,16 +202,21 @@ BEGIN
 		"data":{"message":"3090", "function":"2710","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 	END IF;
 
+	-- SECTION[epic=mapzones]: SET VARIABLES
+	v_mapzone_name = LOWER(v_class);
+    v_mapzone_field = v_mapzone_name || '_id';
+	v_visible_layer = 'v_edit_' || v_mapzone_name;
+
 
 	-- MANAGE EXPL ARR
 
     -- For user selected exploitations
     IF v_expl_id = '-901' THEN
-        SELECT string_agg(DISTINCT expl_id::text, ',') INTO v_expl_id_array
-        FROM selector_expl;
+        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
+		FROM selector_expl;
     -- For all exploitations
     ELSIF v_expl_id = '-902' THEN
-        SELECT string_agg(DISTINCT expl_id::text, ',') INTO v_expl_id_array
+        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
         FROM exploitation
 		WHERE active;
     -- For a specific exploitation/s
@@ -238,7 +243,7 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
 
 	IF v_floodonlymapzone IS NOT NULL THEN
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Flood only mapzone have been ACTIVATED, ',v_field, ':',v_floodonlymapzone,'.'));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Flood only mapzone have been ACTIVATED, ',v_mapzone_field, ':',v_floodonlymapzone,'.'));
 	END IF;
 
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
@@ -252,7 +257,7 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
 
-	v_mapzone_name = LOWER(v_class);
+
 
 	-- Initialize process
 	-- =======================
@@ -281,9 +286,7 @@ BEGIN
 
 	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 
-	-- get mapzone field name
-    v_mapzone_field = v_mapzone_name || '_id';
-	v_visible_layer = 'v_edit_' || v_mapzone_name;
+
 
 	-- NODES MAPZONES
 	-- Nodes that are the starting points of mapzones

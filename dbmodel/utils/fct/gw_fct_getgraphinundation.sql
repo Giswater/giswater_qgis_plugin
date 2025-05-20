@@ -54,19 +54,25 @@ BEGIN
             d1.agg_cost AS agg_cost1,
             d2.agg_cost AS agg_cost2,
             a.arc_id,
-            a.pgr_node_1,
-            a.pgr_node_2,
-            a.zone_id,
+            a.node_1,
+            a.node_2,
+            a.mapzone_id,
             a.cost,
             a.reverse_cost
             FROM temp_pgr_arc a
             JOIN temp_pgr_drivingdistance d1 ON a.pgr_node_1 = d1.node
             JOIN temp_pgr_drivingdistance d2 ON a.pgr_node_2 = d2.node
-            WHERE a.pgr_arc_id = a.arc_id::int
-            AND d1.start_vid = d2.start_vid
+            WHERE d1.start_vid = d2.start_vid
             AND (
                 a.cost >= 0 OR a.reverse_cost >= 0
             )
+        ), relation AS (
+            SELECT start_vid, start_vid_zone_id, start_vid_zone_name
+            FROM connected_arcs c
+            JOIN (
+                SELECT dma_id AS start_vid_zone_id, name AS start_vid_zone_name, (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' AS node_id
+                FROM dma WHERE graphconfig IS NOT NULL AND active IS TRUE
+            ) s ON c.node_1 = s.node_id
         )
         SELECT jsonb_build_object(
         ''type'', ''FeatureCollection'',
@@ -83,8 +89,8 @@ BEGIN
                 ''state'', a.state,
                 ''state_type'', a.state_type,
                 ''is_operative'', vst.is_operative,
-                ''mapzone_id'', s.start_vid_zone_id,
-                ''mapzone_name'', s.start_vid_zone_name,
+                ''mapzone_id'', s.start_vid_mapzone_id,
+                ''mapzone_name'', s.start_vid_mapzone_name,
                 ''timestep'', (concat(''2001-01-01 01:'', floor(c.agg_cost)::integer / 60, '':'', floor(c.agg_cost)::integer % 60))::timestamp
 
             )
@@ -94,10 +100,7 @@ BEGIN
     JOIN arc a on c.arc_id = a.arc_id
     JOIN cat_arc ca ON a.arccat_id::text = ca.id::text
     JOIN value_state_type vst ON vst.id = a.state_type
-    JOIN (
-        SELECT '||v_mapzone_field||' AS start_vid_zone_id, name AS start_vid_zone_name, (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' AS node_id
-        FROM '||v_mapzone||' WHERE graphconfig IS NOT NULL AND active IS TRUE
-    ) s ON c.start_vid = s.node_id::INT;
+    JOIN relation r ON c.start_vid = r.start_vid;
     ';
 
     EXECUTE v_querytext INTO geojson_result;
