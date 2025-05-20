@@ -22,6 +22,7 @@ DECLARE
 
 rec_function record;
 rec_cat_error record;
+rec_cat_label record;
 
 v_return_text text;
 v_level integer;
@@ -38,11 +39,11 @@ v_debug Boolean;
 v_isprocess boolean = false;
 v_fid text;
 v_result_id text;
-v_temp_table boolean;
-v_fid_onstart boolean;
+v_temp_table text;
 v_criticity integer;
 _key text;
 _value text;
+v_header_id integer;
 
 BEGIN
 
@@ -60,8 +61,9 @@ BEGIN
 
 	v_fid = lower(((p_data ->>'data')::json->>'fid')::text);
 	v_result_id = lower(((p_data ->>'data')::json->>'result_id')::text);
-	v_temp_table = ((p_data ->>'data')::json->>'v_temp_table')::boolean;
-	v_criticity = ((p_data ->>'data')::json->>'v_criticity')::integer;
+	v_temp_table = ((p_data ->>'data')::json->>'tempTable')::text;
+	v_criticity = ((p_data ->>'data')::json->>'criticity')::integer;
+	v_header_id = ((p_data ->>'data')::json->>'headerId')::text;
 
 	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -99,6 +101,24 @@ BEGIN
 			RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Error in message parameters'))::json;
 		END IF;
 	END IF;
+
+	-- add specified headers
+	IF v_header_id IS NOT NULL THEN
+		-- select label record
+		SELECT * INTO rec_cat_label FROM sys_label  WHERE sys_label.id=v_header_id;
+		IF rec_cat_label IS NULL THEN
+			RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Header does not exist'))::json;
+		END IF;
+		IF rec_cat_error.message_type = 'UI' OR rec_cat_error.message_type IS NULL THEN
+			-- add header to message if message type is UI
+			rec_cat_error.error_message = concat(rec_cat_label.idval, ': ', rec_cat_error.error_message);
+		ELSIF rec_cat_error.message_type = 'AUDIT' THEN
+			-- add header to message if message type is AUDIT
+			rec_cat_error.error_message = concat(rec_cat_label.idval, ' ', COALESCE(v_fid, ''), ': ', rec_cat_error.error_message);
+		END IF;
+	END IF;
+
+
 
 
 	-- There are three types of messages: 'UI', 'AUDIT', and 'DEBUG' (see edit_typevalue table).
@@ -212,13 +232,16 @@ BEGIN
 			rec_cat_error.log_level = v_criticity;
 		END IF;
 		IF v_temp_table IS NOT NULL THEN
-			IF v_temp_table IS TRUE THEN
+			IF v_temp_table = 't' THEN
 				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid::int2, v_result_id, rec_cat_error.log_level, rec_cat_error.error_message);
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			ELSIF v_temp_table = 'temp' THEN
+				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid::int2, v_result_id, rec_cat_error.log_level, rec_cat_error.error_message);
 			END IF;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid::int2, v_result_id, rec_cat_error.log_level, rec_cat_error.error_message);
 		END IF;
 
 
