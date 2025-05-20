@@ -45,6 +45,9 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg = None
         self.netscenario_id = None
 
+        # The -901 is transformed to user selected exploitation in the mapzones analysis
+        self.user_selected_exploitation = '-901'
+
     def manage_mapzones(self):
 
         # Create dialog
@@ -79,8 +82,8 @@ class GwMapzoneManager:
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
-        self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis, self.mapzone_mng_dlg))
+        self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_flood_from_node.clicked.connect(
             partial(self._open_flood_from_node_analysis, self.mapzone_mng_dlg))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
@@ -230,7 +233,7 @@ class GwMapzoneManager:
 
         # Execute toolbox function
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
-        dlg_functions = toolbox_btn.open_function_by_id(2768)
+        dlg_functions = toolbox_btn.open_function_by_id(2768, use_aux_conn=False)
 
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
@@ -241,27 +244,28 @@ class GwMapzoneManager:
         if run_button:
             run_button.clicked.connect(lambda: self.mapzone_mng_dlg.btn_flood.setEnabled(True))
 
-    def _open_flood_analysis(self, dialog):
+    def _open_flood_analysis(self, dialog, mapzone_name):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
 
         # Call gw_fct_getgraphinundation
-        body = tools_gw.create_body()
+        extras = f'"parameters":{{"mapzone": "{mapzone_name}"}}'
+        body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
         if not json_result or json_result.get('status') != 'Accepted':
             msg = "No valid data received from the SQL function."
             tools_qgis.show_warning(msg, dialog=dialog)
             return
-
         # Extract mapzone_ids with data from json_result
         valid_mapzone_ids = set()
         if 'body' in json_result and 'data' in json_result['body'] and 'line' in json_result['body']['data']:
             # Access the 'features' list in 'line'
             features = json_result['body']['data']['line'].get('features', [])
-            for feature in features:
-                properties = feature.get('properties', {})
-                mapzone_id = properties.get('mapzone_id')
-                if mapzone_id is not None:
-                    valid_mapzone_ids.add(mapzone_id)
+            if features is not None:
+                for feature in features:
+                    properties = feature.get('properties', {})
+                    mapzone_id = properties.get('mapzone_id')
+                    if mapzone_id is not None:
+                        valid_mapzone_ids.add(mapzone_id)
 
         # Get graphconfig for mapzone using gw_fct_getgraphconfig
         graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
@@ -503,20 +507,18 @@ class GwMapzoneManager:
 
         # Retrieve graphClass and exploitation from the dialog or set defaults
         graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
-        # TODO remove this when the function is made
-        exploitation = "1"
 
         # Run mapzones analysis function
-        self._run_mapzones_analysis(graph_class, exploitation)
+        self._run_mapzones_analysis(graph_class, self.user_selected_exploitation)
 
         # Call the existing flood analysis function
-        self._open_flood_analysis(dialog)
+        self._open_flood_analysis(dialog, graph_class)
 
         # Clear the selection after processing
         self.layer_node.removeSelection()
 
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal_selection_changed()
+        tools_qgis.disconnect_signal_selection_changed()
 
     def _on_dialog_closed(self):
         """Ensure snapping is deactivated and Pan tool is set when dialog closes."""
@@ -533,7 +535,7 @@ class GwMapzoneManager:
         body = tools_gw.create_body(
             extras=(
                 f'"parameters":{{"graphClass":"{graph_class_upper}", '
-                f'"exploitation":"{exploitation}", "updateFeature":"TRUE"}}'
+                f'"exploitation":"{exploitation}"}}'
             )
         )
 

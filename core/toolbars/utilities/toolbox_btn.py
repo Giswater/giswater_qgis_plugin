@@ -51,7 +51,7 @@ class GwToolBoxButton(GwAction):
 
         self._open_toolbox()
 
-    def open_function_by_id(self, func_id, connect_signal=None, aux_params="null"):
+    def open_function_by_id(self, func_id, connect_signal=None, aux_params="null", use_aux_conn=True):
 
         self.dlg_functions = GwToolboxManagerUi(self)
         tools_gw.load_settings(self.dlg_functions)
@@ -86,7 +86,8 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions.mainTab.currentChanged.connect(partial(self._manage_btn_run))
         self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
                                                            self.dlg_functions, self.dlg_functions.cmb_layers,
-                                                           json_result['body']['data'], aux_params=aux_params))
+                                                           json_result['body']['data'], aux_params=aux_params,
+                                                           use_aux_conn=use_aux_conn))
         self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
@@ -295,7 +296,7 @@ class GwToolBoxButton(GwAction):
             # Connect signals
             self.dlg_functions.mainTab.currentChanged.connect(partial(self._manage_btn_run))
             self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
-                self.dlg_functions, self.dlg_functions.cmb_layers, json_result['body']['data']))
+                self.dlg_functions, self.dlg_functions.cmb_layers, json_result['body']['data'], "null", True))
             self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
             self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
             self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
@@ -557,7 +558,7 @@ class GwToolBoxButton(GwAction):
         else:
             tools_qt.set_checked(dialog, 'rbt_layer', True)
 
-    def _execute_function(self, description, dialog, combo, result, aux_params="null"):
+    def _execute_function(self, description, dialog, combo, result, aux_params="null", use_aux_conn=True):
 
         # Manage if task is already running
         if hasattr(self, 'toolbox_task') and self.toolbox_task is not None:
@@ -584,6 +585,7 @@ class GwToolBoxButton(GwAction):
         self.timer.start(1000)
         # Set background task 'GwToolBoxTask'
         self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result, timer=self.timer, aux_params=aux_params)
+        self.toolbox_task.use_aux_conn = use_aux_conn
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
 

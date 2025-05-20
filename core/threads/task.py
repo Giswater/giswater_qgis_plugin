@@ -24,11 +24,15 @@ class GwTask(QgsTask, QObject):
         self.exception = None
         self.duration = duration
         self.aux_conn = None
+        self.use_aux_conn = True
 
     def run(self) -> bool:
 
         lib_vars.session_vars['threads'].append(self)
-        self.aux_conn = tools_db.dao.get_aux_conn()
+
+        if self.use_aux_conn:
+            self.aux_conn = tools_db.dao.get_aux_conn()
+
         tools_log.log_info(f"Started task {self.description()}")
         iface.actionOpenProject().setEnabled(False)
         iface.actionNewProject().setEnabled(False)

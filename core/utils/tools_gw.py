@@ -2877,7 +2877,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
                     if 'features' not in json_result['body']['data'][key]:
                         continue
-                    if len(json_result['body']['data'][key]['features']) == 0:
+                    if json_result['body']['data'][key]['features'] is None or len(json_result['body']['data'][key]['features']) == 0:
                         continue
 
                     # Get values for create and populate layer
