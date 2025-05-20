@@ -36,7 +36,7 @@ SELECT col_type_is('cat_feature_node', 'epa_default', 'character varying(30)', '
 SELECT col_type_is('cat_feature_node', 'num_arcs', 'integer', 'Column num_arcs should be integer');
 SELECT col_type_is('cat_feature_node', 'choose_hemisphere', 'boolean', 'Column choose_hemisphere should be boolean');
 SELECT col_type_is('cat_feature_node', 'isarcdivide', 'boolean', 'Column isarcdivide should be boolean');
-SELECT col_type_is('cat_feature_node', 'graph_delimiter', 'character varying(20)', 'Column graph_delimiter should be varchar(20)');
+SELECT col_type_is('cat_feature_node', 'graph_delimiter', 'text[]', 'Column graph_delimiter should be text[]');
 SELECT col_type_is('cat_feature_node', 'isprofilesurface', 'boolean', 'Column isprofilesurface should be boolean');
 SELECT col_type_is('cat_feature_node', 'double_geom', 'json', 'Column double_geom should be json');
 
@@ -52,7 +52,6 @@ SELECT fk_ok('cat_feature_node', 'id', 'cat_feature', 'id', 'Column id should re
 
 -- Check constraints
 SELECT col_has_check('cat_feature_node', 'epa_default', 'Column epa_default should have check constraint');
-SELECT col_has_check('cat_feature_node', 'graph_delimiter', 'Column graph_delimiter should have check constraint');
 SELECT col_has_default('cat_feature_node', 'choose_hemisphere', 'Column choose_hemisphere should have default value');
 SELECT col_has_default('cat_feature_node', 'isarcdivide', 'Column isarcdivide should have default value');
 SELECT col_has_default('cat_feature_node', 'graph_delimiter', 'Column graph_delimiter should have default value');

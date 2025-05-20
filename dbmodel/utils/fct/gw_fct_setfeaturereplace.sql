@@ -85,8 +85,8 @@ v_count integer;
 v_field_cat text;
 v_feature_type_new text;
 v_featurecat_id_new text;
-v_mapzone_old text;
-v_mapzone_new text;
+v_mapzone_old text[];
+v_mapzone_new text[];
 v_fid integer = 143;
 v_gully_proximity_value text;
 v_gully_proximity_active text;
@@ -94,9 +94,9 @@ v_category text;
 v_function text;
 v_fluid text;
 v_location text;
-v_node1_graph text;
+v_node1_graph text[];
 v_node_1 text;
-v_node2_graph  text;
+v_node2_graph  text[];
 v_node_2 text;
 rec_connec record;
 rec_link record;
@@ -681,13 +681,29 @@ BEGIN
 			IF v_feature_type = 'node' THEN
 
 				-- check if old / new nodes they are graphdelimiters
-				EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'',''CHECKVALVE'') THEN NULL ELSE lower(graph_delimiter) END AS graph 
-				FROM '||v_feature_type_table||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id='''||v_old_featuretype||''';'
-				INTO v_mapzone_old;
+				EXECUTE '
+					SELECT 
+						CASE 
+							WHEN array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''NONE'') IS NOT NULL
+							  OR array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''MINSECTOR'') IS NOT NULL
+							  OR array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''CHECKVALVE'') IS NOT NULL
+							THEN NULL
+							ELSE ARRAY(SELECT lower(unnest(graph_delimiter)))
+						END AS graph
+					FROM '||v_feature_type_table||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id='''||v_old_featuretype||''';
+				' INTO v_mapzone_old;
 
-				EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'',''CHECKVALVE'') THEN NULL ELSE lower(graph_delimiter) END AS graph 
-				FROM '||v_feature_type_table||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id='''||v_feature_type_new||''';'
-				INTO v_mapzone_new;
+				EXECUTE '
+					SELECT 
+						CASE 
+							WHEN array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''NONE'') IS NOT NULL
+							  OR array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''MINSECTOR'') IS NOT NULL
+							  OR array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''CHECKVALVE'') IS NOT NULL
+							THEN NULL
+							ELSE ARRAY(SELECT lower(unnest(graph_delimiter)))
+						END AS graph
+					FROM '||v_feature_type_table||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id='''||v_feature_type_new||''';
+				' INTO v_mapzone_new;
 
 				IF v_mapzone_old IS NOT NULL OR v_mapzone_new IS NOT NULL THEN
 					INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
@@ -721,16 +737,34 @@ BEGIN
 			ELSIF v_feature_type = 'arc' THEN
 
 					--check if final nodes of arc are graph delimiters
-					EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'',''CHECKVALVE'') THEN NULL ELSE lower(graph_delimiter) END AS graph, node_1 FROM v_edit_arc a 
-					JOIN v_edit_node n1 ON n1.node_id=node_1
-					JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
-					WHERE a.arc_id='''||v_id||''';'
+					EXECUTE '
+						SELECT 
+							CASE 
+								WHEN array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''NONE'') IS NOT NULL
+								  OR array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''MINSECTOR'') IS NOT NULL
+								  OR array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''CHECKVALVE'') IS NOT NULL
+								THEN NULL
+								ELSE ARRAY(SELECT lower(unnest(graph_delimiter)))
+							END AS graph, node_1 
+						FROM v_edit_arc a 
+						JOIN v_edit_node n1 ON n1.node_id = node_1
+						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
+						WHERE a.arc_id = '''||v_id||''';'
 					INTO v_node1_graph, v_node_1;
 
-					EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'',''CHECKVALVE'') THEN NULL ELSE lower(graph_delimiter) END AS graph,node_2 FROM v_edit_arc a 
-					JOIN v_edit_node n2 ON n2.node_id=node_2
-					JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
-					WHERE a.arc_id='''||v_id||''';'
+					EXECUTE '
+						SELECT 
+							CASE 
+								WHEN array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''NONE'') IS NOT NULL
+								  OR array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''MINSECTOR'') IS NOT NULL
+								  OR array_position(ARRAY(SELECT upper(unnest(graph_delimiter))), ''CHECKVALVE'') IS NOT NULL
+								THEN NULL
+								ELSE ARRAY(SELECT lower(unnest(graph_delimiter)))
+							END AS graph, node_2
+						FROM v_edit_arc a 
+						JOIN v_edit_node n2 ON n2.node_id=node_2
+						JOIN cat_feature_node cf2 ON n2.node_type = cf2.id
+						WHERE a.arc_id = '''||v_id||''';'
 					INTO v_node2_graph, v_node_2;
 
 					IF v_node1_graph IS NOT NULL THEN

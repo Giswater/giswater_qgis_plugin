@@ -503,7 +503,7 @@ BEGIN
 				IF v_projecttype = 'WS' THEN
 					IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = v_connect.dma_id; END IF;
 				END IF;
-				IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN
+				IF v_projecttype = 'WS' AND (v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null) THEN
 					v_fluidtype_value = v_arc.fluid_type;
 					IF v_fluidtype_value not in (SELECT fluid_type FROM man_type_fluid WHERE feature_type='CONNEC') AND v_fluidtype_value IS NOT NULL THEN
 						INSERT INTO man_type_fluid (fluid_type, feature_type) VALUES (v_fluidtype_value, 'CONNEC') ON CONFLICT (fluid_type, feature_type) DO NOTHING;

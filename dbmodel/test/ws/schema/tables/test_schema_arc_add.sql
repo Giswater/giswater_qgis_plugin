@@ -24,7 +24,8 @@ SELECT columns_are(
         'vel_max', 'vel_min', 'vel_avg',
         'tot_headloss_max', 'tot_headloss_min',
         'mincut_connecs', 'mincut_hydrometers',
-        'mincut_length', 'mincut_watervol', 'mincut_criticity'
+        'mincut_length', 'mincut_watervol', 'mincut_criticity',
+        'pipe_capacity'
     ],
     'Table arc_add should have the correct columns'
 );

@@ -313,8 +313,8 @@ BEGIN
 
 		--check if is delimiter
 		IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
-			IF (SELECT upper(graph_delimiter) FROM cat_feature_node JOIN cat_feature USING (id)
-				WHERE child_layer=v_tablename) IN ('DMA','PRESSZONE') THEN
+			IF (SELECT ARRAY(SELECT upper(unnest(graph_delimiter))) FROM cat_feature_node JOIN cat_feature USING (id)
+				WHERE child_layer=v_tablename) && ARRAY['DMA','PRESSZONE'] THEN
 				v_isgraphdelimiter = TRUE;
 			ELSIF (SELECT upper(epa_default) FROM cat_feature_node JOIN cat_feature USING (id)
 				WHERE child_layer=v_tablename) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
@@ -361,7 +361,7 @@ BEGIN
 					v_isarcdivide = TRUE;
 				END IF;
 				IF upper(v_project_type) = 'WS' THEN
-					IF ((SELECT upper(graph_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE')) THEN
+					IF (SELECT ARRAY(SELECT upper(unnest(graph_delimiter))) FROM cat_feature_node WHERE id = v_nodetype) && ARRAY['DMA','PRESSZONE'] THEN
 						v_isgraphdelimiter = TRUE;
 					ELSIF (SELECT upper(epa_type) FROM node WHERE node_id = v_id) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
 						v_isepatoarc = TRUE;

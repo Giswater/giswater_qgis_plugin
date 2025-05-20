@@ -185,29 +185,29 @@ BEGIN
 	-- check mapzones conflict
     IF v_check_conflictmapzones IS TRUE then
     	if nodeRecord1.sector_id != nodeRecord2.sector_id and nodeRecord1.sector_id > 0 and nodeRecord2.sector_id > 0 and
-    	(nodeRecord1.node_type not in (select id from cat_feature_node where graph_delimiter = 'SECTOR') and
-    	nodeRecord2.node_type not in (select id from cat_feature_node where graph_delimiter = 'SECTOR')) then
+    	(nodeRecord1.node_type not in (select id from cat_feature_node where 'SECTOR' = ANY(graph_delimiter)) and
+    	nodeRecord2.node_type not in (select id from cat_feature_node where 'SECTOR' = ANY(graph_delimiter))) then
     		v_msg  = true;
     		v_zone = 'SECTOR';
     	end if;
 
         if nodeRecord1.presszone_id != nodeRecord2.presszone_id and nodeRecord1.presszone_id::integer > 0 and nodeRecord2.presszone_id::integer > 0 and
-    	(nodeRecord1.node_type not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE') and
-    	nodeRecord2.node_type not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE')) then
+    	(nodeRecord1.node_type not in (select id from cat_feature_node where 'PRESSZONE' = ANY(graph_delimiter)) and
+    	nodeRecord2.node_type not in (select id from cat_feature_node where 'PRESSZONE' = ANY(graph_delimiter))) then
     		v_msg  = true;
     		v_zone = 'PRESSZONE';
     	end if;
 
         if nodeRecord1.dma_id != nodeRecord2.dma_id and nodeRecord1.dma_id > 0 and nodeRecord2.dma_id > 0 and
-    	(nodeRecord1.node_type not in (select id from cat_feature_node where graph_delimiter = 'DMA') and
-    	nodeRecord2.node_type not in (select id from cat_feature_node where graph_delimiter = 'DMA')) then
+    	(nodeRecord1.node_type not in (select id from cat_feature_node where 'DMA' = ANY(graph_delimiter)) and
+    	nodeRecord2.node_type not in (select id from cat_feature_node where 'DMA' = ANY(graph_delimiter))) then
     		v_msg  = true;
     		v_zone = 'DMA';
     	end if;
 
         if nodeRecord1.dqa_id != nodeRecord2.dqa_id and nodeRecord1.dqa_id > 0 and nodeRecord2.dqa_id > 0 and
-    	(nodeRecord1.node_type not in (select id from cat_feature_node where graph_delimiter = 'DQA') and
-    	nodeRecord2.node_type not in (select id from cat_feature_node where graph_delimiter = 'DQA')) then
+    	(nodeRecord1.node_type not in (select id from cat_feature_node where 'DQA' = ANY(graph_delimiter)) and
+    	nodeRecord2.node_type not in (select id from cat_feature_node where 'DQA' = ANY(graph_delimiter))) then
     		v_msg  = true;
     		v_zone = 'DQA';
     	end if;

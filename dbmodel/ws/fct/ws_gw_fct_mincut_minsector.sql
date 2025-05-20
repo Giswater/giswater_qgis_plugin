@@ -130,7 +130,7 @@ BEGIN
 	JOIN cat_node c ON nodecat_id = c.id
 	JOIN cat_feature_node f ON node_type = f.id
 	JOIN man_valve USING (node_id)
-	WHERE graph_delimiter = 'MINSECTOR' AND  macroexpl_id=v_macroexpl;
+	WHERE 'MINSECTOR' = ANY(graph_delimiter) AND  macroexpl_id=v_macroexpl;
 
 	UPDATE temp_om_mincut_valve SET unaccess = TRUE where node_id IN (SELECT node_id FROM om_mincut_valve_unaccess WHERE result_id = p_mincut_id);
 

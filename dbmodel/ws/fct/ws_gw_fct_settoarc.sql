@@ -33,7 +33,7 @@ v_feature_id text;
 v_arc_id text;
 v_feature_class text;
 v_epatype text;
-v_graphdelim text;
+v_graphdelim text[];
 v_config json;
 v_mapzone_id text;
 v_dma_id text;
@@ -64,8 +64,10 @@ BEGIN
 	v_presszone_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
 	v_dqa_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
 
-	SELECT upper(feature_class), upper(graph_delimiter) INTO v_feature_class, v_graphdelim FROM cat_feature_node
-	JOIN cat_feature ON cat_feature.id = cat_feature_node.id WHERE cat_feature_node.id = v_feature_type;
+	SELECT upper(feature_class), ARRAY(SELECT upper(unnest(graph_delimiter))) INTO v_feature_class, v_graphdelim
+	FROM cat_feature_node
+	JOIN cat_feature ON cat_feature.id = cat_feature_node.id
+	WHERE cat_feature_node.id = v_feature_type;
 	SELECT upper(epa_type) INTO v_epatype FROM node WHERE node_id = v_feature_id;
 
 	DELETE FROM audit_check_data WHERE fid=359 AND cur_user=current_user;
@@ -102,7 +104,7 @@ BEGIN
 	END IF;
 
 	-- graphconfig for mapzones
-	IF v_graphdelim IN ('SECTOR','PRESSZONE','DMA', 'DQA') THEN
+	IF v_graphdelim && ARRAY['SECTOR','PRESSZONE','DMA','DQA'] THEN
 
 		--define list of mapzones to be set
 		v_mapzone_array = ARRAY[lower(v_graphdelim)];

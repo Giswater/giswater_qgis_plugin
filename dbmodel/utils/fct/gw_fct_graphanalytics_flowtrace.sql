@@ -124,10 +124,10 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
 		v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 			node_1 IN('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.node_type 
-			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (graph_delimiter=''MINSECTOR'' AND closed=TRUE))
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (''MINSECTOR'' = ANY(graph_delimiter) AND closed=TRUE))
 			OR node_2 IN ('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.node_type 
-			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (graph_delimiter=''MINSECTOR'' AND closed=TRUE))';
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (''MINSECTOR'' = ANY(graph_delimiter) AND closed=TRUE))';
 
 		EXECUTE v_querytext;
 
