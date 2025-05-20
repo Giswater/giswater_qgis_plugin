@@ -206,9 +206,6 @@ BEGIN
 		WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
 		(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 		INTO v_fluid;
-	ELSE
-		-- TODO: remove fluid_type from featurereplace dialog on UD.
-		v_fluid = 0;
 	END IF;
 
 
@@ -307,7 +304,7 @@ BEGIN
 				INSERT INTO node (node_id, code, node_type, nodecat_id, epa_type, sector_id, omzone_id, expl_id, muni_id, state, state_type, workcat_id,
 				the_geom, category_type, function_type, fluid_type, location_type, drainzone_id, link)
 				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_omzone_id, v_expl_id, v_muni_id,
-				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, v_fluid, v_location, v_drainzone_id, v_link);
+				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, 0, v_location, v_drainzone_id, v_link);
 
 			END IF;
 
@@ -325,7 +322,7 @@ BEGIN
 				INSERT INTO arc (arc_id, code, arc_type, arccat_id, epa_type, sector_id, omzone_id, expl_id, muni_id, state, state_type, workcat_id, the_geom,
 				verified, category_type, function_type, fluid_type, location_type, drainzone_id, link)
 				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_omzone_id, v_expl_id, v_muni_id, 0, v_state_type, v_workcat_id_end,
-				v_the_geom, v_verified_id, v_category, v_function, v_fluid, v_location, v_drainzone_id, v_link);
+				v_the_geom, v_verified_id, v_category, v_function, 0, v_location, v_drainzone_id, v_link);
 			END IF;
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -342,7 +339,7 @@ BEGIN
 				INSERT INTO connec (connec_id, code, connec_type, conneccat_id,  sector_id, omzone_id, expl_id, muni_id, state, state_type, the_geom, workcat_id,
 				verified, inventory, category_type, function_type, fluid_type, location_type, drainzone_id, link)
 				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_omzone_id, v_expl_id, v_muni_id, 0, v_state_type, v_the_geom,v_workcat_id_end,
-				v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location, v_drainzone_id, v_link);
+				v_verified_id, v_inventory, v_category, v_function, 0, v_location, v_drainzone_id, v_link);
 			END IF;
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -353,7 +350,7 @@ BEGIN
 			INSERT INTO gully (gully_id, code, gully_type, gullycat_id, sector_id, omzone_id, expl_id, muni_id, state, state_type, the_geom,workcat_id, verified,
 			inventory, category_type, function_type, fluid_type, location_type,epa_type, drainzone_id, link)
 			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_omzone_id, v_expl_id, v_muni_id, 0, v_state_type, v_the_geom, v_workcat_id_end,
-			v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location, v_epa_type_new, v_drainzone_id, v_link);
+			v_verified_id, v_inventory, v_category, v_function, 0, v_location, v_epa_type_new, v_drainzone_id, v_link);
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into gully table.'));

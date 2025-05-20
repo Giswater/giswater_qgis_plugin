@@ -204,7 +204,6 @@ SELECT has_table('man_outfall') AS "Table 'man_outfall' exists";
 SELECT has_table('man_siphon') AS "Table 'man_siphon' exists";
 SELECT has_table('man_storage') AS "Table 'man_storage' exists";
 SELECT has_table('man_type_category') AS "Table 'man_type_category' exists";
-SELECT has_table('man_type_fluid') AS "Table 'man_type_fluid' exists";
 SELECT has_table('man_type_function') AS "Table 'man_type_function' exists";
 SELECT has_table('man_type_location') AS "Table 'man_type_location' exists";
 SELECT has_table('man_valve') AS "Table 'man_valve' exists";
