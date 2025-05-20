@@ -65,7 +65,7 @@ BEGIN
         	IF v_feature_type = 'ELEMENT' THEN
             	UPDATE sys_table st SET context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',feature_class,'"}'), alias = initcap(cf.id)
             	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
-           ELSE 
+           ELSE
            		UPDATE sys_table st SET context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',feature_type,'"}'), alias = initcap(cf.id)
             	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
            END IF;
@@ -111,10 +111,17 @@ BEGIN
 	END LOOP;
 
 	--update configuration of man_type fields setting featurecat related to the view
-	EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, '' OR '''||quote_literal(v_cat_feature)||''' = ANY(featurecat_id::text[])'')
-	WHERE formname = '''||v_view_name||'''
-	and (columnname =''location_type'' OR columnname =''fluid_type'' OR columnname =''function_type'' OR columnname =''category_type'')
-	AND dv_querytext NOT ILIKE ''% OR%'';';
+	IF v_project_type = 'WS' THEN
+		EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, '' OR '''||quote_literal(v_cat_feature)||''' = ANY(featurecat_id::text[])'')
+		WHERE formname = '''||v_view_name||'''
+		and (columnname =''location_type'' OR columnname =''fluid_type'' OR columnname =''function_type'' OR columnname =''category_type'')
+		AND dv_querytext NOT ILIKE ''% OR%'';';
+	ELSE
+		EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, '' OR '''||quote_literal(v_cat_feature)||''' = ANY(featurecat_id::text[])'')
+		WHERE formname = '''||v_view_name||'''
+		and (columnname =''location_type'' OR columnname =''function_type'' OR columnname =''category_type'')
+		AND dv_querytext NOT ILIKE ''% OR%'';';
+	END IF;
 
 	--select columns from man_* table without repeating the identifier
 	v_man_fields = 'SELECT DISTINCT column_name::text, data_type::text, numeric_precision, numeric_scale

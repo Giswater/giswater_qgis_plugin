@@ -127,15 +127,6 @@ INSERT INTO man_type_category VALUES (4, 'St. Category', 'ELEMENT', NULL, NULL, 
 INSERT INTO man_type_category VALUES (5, 'St. Category', 'GULLY', NULL, NULL, true);
 
 -- ----------------------------
--- Records of man_type_fluid
--- ----------------------------
-INSERT INTO man_type_fluid VALUES (1, 'St. Fluid', 'NODE', NULL, NULL, true);
-INSERT INTO man_type_fluid VALUES (2, 'St. Fluid', 'ARC', NULL, NULL, true);
-INSERT INTO man_type_fluid VALUES (3, 'St. Fluid', 'CONNEC', NULL, NULL, true);
-INSERT INTO man_type_fluid VALUES (4, 'St. Fluid', 'ELEMENT', NULL, NULL, true);
-INSERT INTO man_type_fluid VALUES (5, 'St. Fluid', 'GULLY', NULL, NULL, true);
-
--- ----------------------------
 -- Records of man_type_location
 -- ----------------------------
 INSERT INTO man_type_location VALUES (1, 'St. Location', 'NODE', NULL, NULL, true);

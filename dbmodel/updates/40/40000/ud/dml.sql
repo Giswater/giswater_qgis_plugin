@@ -2771,7 +2771,7 @@ DELETE FROM config_form_fields WHERE columnname='buildercat_id';
 -- todo: disable triggers
 
 INSERT INTO node (node_id, code, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev, node_type, nodecat_id, epa_type, sector_id, state, state_type,
-annotation, observ, "comment", omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
+annotation, observ, "comment", omzone_id, soilcat_id, function_type, category_type, _fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, link, verified, the_geom,
 label_x, label_y, label_rotation, publish, inventory, xyz_date, uncertain, unconnected, expl_id, num_value, feature_type, created_at, arc_id, updated_at,
 updated_by, created_by, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id, expl_visibility, adate, adescript, hemisphere, placement_type,
@@ -2787,7 +2787,7 @@ FROM _node;
 
 INSERT INTO arc (arc_id, code, sys_code, node_1, node_2, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, sys_elev1, sys_elev2, arc_type, arccat_id,
 matcat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", sys_slope, inverted_slope, custom_length, omzone_id, soilcat_id, function_type,
-category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
+category_type, _fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
 streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory, uncertain, expl_id,
 num_value, feature_type, created_at, updated_at, created_by, updated_by, district_id, workcat_id_plan, asset_id, pavcat_id, drainzone_id, nodetype_1,
 node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_visibility, adate, adescript, visitability, label_quadrant,
@@ -2804,7 +2804,7 @@ FROM _arc;
 
 INSERT INTO connec (connec_id, code, top_elev, y1, y2, connec_type, conneccat_id, sector_id, customer_code,
 demand, state, state_type, connec_depth, connec_length, arc_id, annotation, observ, "comment",
-omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate,
+omzone_id, soilcat_id, function_type, category_type, _fluid_type, location_type, workcat_id, workcat_id_end, builtdate,
 enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2,
 postcomplement2, descript, link, verified, rotation, the_geom, label_x, label_y, label_rotation, accessibility,
 diagonal, publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, pjoint_type, pjoint_id, updated_at,
@@ -2823,7 +2823,7 @@ FROM _connec;
 
 INSERT INTO gully (gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon,
 _connec_arccat_id, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
-"comment", omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
+"comment", omzone_id, soilcat_id, function_type, category_type, _fluid_type, location_type, workcat_id, workcat_id_end,
 builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
 postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, label_x, label_y, label_rotation,
 publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, pjoint_type, pjoint_id, updated_at,
@@ -2844,7 +2844,7 @@ FROM _gully;
 
 
 INSERT INTO element (element_id, code, sys_code, elementcat_id, serial_number, num_elements, state, state_type, observ,
-"comment", function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
+"comment", function_type, category_type, _fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory,
 expl_id, feature_type, created_at, updated_at, created_by, updated_by, top_elev, expl_visibility, trace_featuregeom,
 muni_id, sector_id, brand_id, model_id, asset_id)
@@ -2947,5 +2947,50 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'link_to_gully', 'tab_none', 'spacer_1', 'lyt_buttons', 0, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'link_to_gully', 'tab_none', 'tbl_ids', 'lyt_connect_link_3', 0, NULL, 'tableview', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'link_to_gully', 'tab_none', 'id', 'lyt_connect_link_2', 0, 'text', 'combo', 'Gully Id:', 'Gully Id', NULL, NULL, NULL, true, NULL, NULL, 'SELECT gully_id AS id, gully_id AS idval FROM gully WHERE gully_id IS NOT NULL', NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
-ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
+-- 19/05/2025
+INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam) VALUES('fluid_type', '0', 'NOT INFORMED', NULL, NULL);
+INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam) VALUES('fluid_type', '1', 'RAINWATER', NULL, NULL);
+INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam) VALUES('fluid_type', '2', 'DILUTED', NULL, NULL);
+INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam) VALUES('fluid_type', '3', 'FECAL', NULL, NULL);
+INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam) VALUES('fluid_type', '4', 'UNITARY', NULL, NULL);
+
+UPDATE config_form_fields
+SET	dv_querytext = 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type''',
+widgettype = 'combo'
+WHERE columnname = 'fluid_type';
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'archived_psector_gully_traceability', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'archived_psector_link_traceability', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'archived_psector_arc_traceability', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'archived_psector_connec_traceability', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'archived_psector_node_traceability', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'gully', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'link', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'element', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'arc', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'connec', 'fluid_type', NULL, true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'fluid_type', 'node', 'fluid_type', NULL, true);
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

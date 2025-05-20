@@ -541,7 +541,7 @@ VALUES
 UPDATE sys_param_user SET widgettype='text' WHERE id='qgis_composers_folderpath';
 
 -- 09/05/2025
-UPDATE config_form_fields SET dv_querytext =  'SELECT id, fluid_type AS idval FROM man_type_fluid WHERE id IS NOT NULL'
+UPDATE config_form_fields SET dv_querytext =  'SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type'''
 WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='fluid_type' AND tabname='tab_none';
 
 UPDATE config_form_fields SET dv_querytext =  'SELECT id, location_type AS idval FROM man_type_location WHERE id IS NOT NULL'

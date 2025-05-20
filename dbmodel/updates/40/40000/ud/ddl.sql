@@ -897,7 +897,8 @@ CREATE TABLE node (
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
 	location_type varchar(50) NULL,
-	fluid_type varchar(50) NULL,
+	_fluid_type varchar(50) NULL,
+	fluid_type int4 DEFAULT 0 NOT NULL,
 	annotation text NULL,
 	observ text NULL,
 	comment text NULL,
@@ -1109,7 +1110,8 @@ CREATE TABLE arc (
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
 	location_type varchar(50) NULL,
-	fluid_type varchar(50) NULL,
+	_fluid_type varchar(50) NULL,
+	fluid_type int4 DEFAULT 0 NOT NULL,
 	custom_length numeric(12, 2) NULL,
 	sys_slope numeric(12, 4) NULL,
 	descript text NULL,
@@ -1297,7 +1299,8 @@ CREATE TABLE connec (
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
 	location_type varchar(50) NULL,
-	fluid_type varchar(50) NULL,
+	_fluid_type varchar(50) NULL,
+	fluid_type int4 DEFAULT 0 NOT NULL,
 	n_hydrometer int4 NULL,
 	n_inhabitants int4 NULL,
 	demand numeric(12, 8) NULL,
@@ -1489,7 +1492,8 @@ CREATE TABLE gully (
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
 	location_type varchar(50) NULL,
-	fluid_type varchar(50) NULL,
+	_fluid_type varchar(50) NULL,
+	fluid_type int4 DEFAULT 0 NOT NULL,
 	descript text NULL,
 	annotation text NULL,
 	observ text NULL,
@@ -1592,7 +1596,7 @@ ALTER TABLE _element DROP CONSTRAINT element_category_type_feature_type_fkey;
 ALTER TABLE _element DROP CONSTRAINT element_elementcat_id_fkey;
 ALTER TABLE _element DROP CONSTRAINT element_buildercat_id_fkey;
 ALTER TABLE _element DROP CONSTRAINT element_feature_type_fkey;
-ALTER TABLE _element DROP CONSTRAINT element_fluid_type_feature_type_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_fluid_type_feature_type_fkey; -- Nico
 ALTER TABLE _element DROP CONSTRAINT element_function_type_feature_type_fkey;
 ALTER TABLE _element DROP CONSTRAINT element_location_type_feature_type_fkey;
 ALTER TABLE _element DROP CONSTRAINT element_muni_id;
@@ -1637,7 +1641,8 @@ CREATE TABLE element (
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
 	location_type varchar(50) NULL,
-	fluid_type varchar(50) NULL,
+	_fluid_type varchar(50) NULL,
+	fluid_type int4 DEFAULT 0 NOT NULL,
 	observ varchar(254) NULL,
 	"comment" varchar(254) NULL,
 	link varchar(512) NULL,
@@ -1670,7 +1675,7 @@ CREATE TABLE element (
 	CONSTRAINT element_category_type_feature_type_fkey FOREIGN KEY (category_type,feature_type) REFERENCES man_type_category(category_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_elementcat_id_fkey FOREIGN KEY (elementcat_id) REFERENCES cat_element(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT element_fluid_type_feature_type_fkey FOREIGN KEY (fluid_type,feature_type) REFERENCES man_type_fluid(fluid_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_fluid_type_feature_type_fkey FOREIGN KEY (_fluid_type,feature_type) REFERENCES man_type_fluid(fluid_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_function_type_feature_type_fkey FOREIGN KEY (function_type,feature_type) REFERENCES man_type_function(function_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_location_type_feature_type_fkey FOREIGN KEY (location_type,feature_type) REFERENCES man_type_location(location_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1745,7 +1750,8 @@ CREATE TABLE link (
 	dwfzone_outfall int4[] NULL,
 	macrominsector_id int4 DEFAULT 0 NULL,
 	location_type varchar(50) NULL,
-	fluid_type varchar(50) NULL,
+	_fluid_type varchar(50) NULL,
+	fluid_type int4 DEFAULT 0 NOT NULL,
 	custom_length numeric(12, 2) NULL,
 	sys_slope numeric (12,3),
 	annotation text NULL,
@@ -2073,3 +2079,5 @@ CREATE TABLE sector (
 CREATE INDEX sector_index ON sector USING gist (the_geom);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"samplepoint", "column":"dma_id", "newName":"omzone_id"}}$$);
+
+ALTER TABLE man_type_fluid RENAME TO _man_type_fluid;

@@ -200,10 +200,18 @@ BEGIN
 	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 	INTO v_function;
-	EXECUTE 'SELECT n.fluid_type FROM '||v_feature_layer||' n JOIN man_type_fluid m ON n.fluid_type=m.fluid_type
-	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
-	INTO v_fluid;
+
+	IF v_project_type = 'WS' THEN
+		EXECUTE 'SELECT n.fluid_type FROM '||v_feature_layer||' n JOIN man_type_fluid m ON n.fluid_type=m.fluid_type
+		WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+		(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
+		INTO v_fluid;
+	ELSE
+		-- TODO: remove fluid_type from featurereplace dialog on UD.
+		v_fluid = 0;
+	END IF;
+
+
 	EXECUTE 'SELECT n.location_type FROM '||v_feature_layer||' n JOIN man_type_location m ON n.location_type=m.location_type
 	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
