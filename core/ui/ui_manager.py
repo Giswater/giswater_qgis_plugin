@@ -887,6 +887,15 @@ class CampaignManagementUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
+
+UINAME = "check_project_cm"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class CheckProjectCmUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
 # endregion
 
 # region TOC
