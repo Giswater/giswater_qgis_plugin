@@ -2960,6 +2960,10 @@ SET	dv_querytext = 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid
 widgettype = 'combo'
 WHERE columnname = 'fluid_type';
 
+UPDATE sys_param_user
+SET	dv_querytext = 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type'''
+WHERE dv_querytext ILIKE '%man_type_fluid%';
+
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
 VALUES('om_typevalue', 'fluid_type', 'archived_psector_gully_traceability', 'fluid_type', NULL, true);
 
