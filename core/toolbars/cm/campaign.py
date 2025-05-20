@@ -37,10 +37,12 @@ class Campaign:
 
     def create_campaign(self, campaign_id=None, is_new=True, dialog_type="review"):
         """ Entry point for campaign creation or editing """
+
         self.load_campaign_dialog(campaign_id=campaign_id, mode=dialog_type)
 
     def campaign_manager(self):
         """ Opens the campaign management interface """
+
         self.manager_dialog = CampaignManagementUi(self)
         tools_gw.load_settings(self.manager_dialog)
         self.load_campaigns_into_manager()
@@ -74,9 +76,9 @@ class Campaign:
         self.manage_date_filter()
         tools_gw.open_dialog(self.manager_dialog, dlg_name="campaign_management")
 
-
     def open_campaign_selector(self):
         """ Open the campaign-specific selector when the button is clicked """
+
         # Set is_campaign flag to True to trigger the campaign logic
         campaignSelector = GwSelector()
 
@@ -201,7 +203,6 @@ class Campaign:
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
         self.dialog.tab_widget.currentChanged.connect(self._on_tab_change)
-
 
         # Enable tab relations if name has value
         name_widget = self.get_widget_by_columnname(self.dialog, "name")
@@ -541,7 +542,6 @@ class Campaign:
             LIMIT 100
         """
 
-        print(sql)
         result = tools_db.get_rows(sql)
         values = [row[id_column] for row in result if row.get(id_column)]
 
@@ -574,7 +574,6 @@ class Campaign:
         else:
             return
 
-        print("Features_type:", feature_types)
         self._manage_tabs_enabled(feature_types)
 
     def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int):
@@ -588,7 +587,6 @@ class Campaign:
                 ON r.object_id = f.id
             WHERE r.reviewclass_id = {reviewclass_id}
         """
-        print("sql subtype:", sql)
         rows = tools_db.get_rows(sql)
         return [r["object_id"] for r in rows if r.get("object_id")]
 
@@ -798,4 +796,3 @@ class Campaign:
         except (ValueError, TypeError):
             msg = "Invalid campaign ID."
             tools_qgis.show_warning(msg)
-

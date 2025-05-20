@@ -8,7 +8,7 @@ or (at your option) any later version.
 from .project_check_cm import GwProjectCheckCMTask
 from ..dialog import GwAction
 
-from qgis.PyQt.QtWidgets import QLabel, QTabWidget
+from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QCheckBox
 from qgis.core import QgsApplication
 
 from ...utils import tools_gw
@@ -119,7 +119,7 @@ class GwCheckCMProjectButton(GwAction):
         self.project_check_task = GwProjectCheckCMTask('check_project', params)
 
         # After `GwProjectCheckTask` completes, execute `gw_fct_setcheckdatabase`
-        #self._execute_checkdatabase()
+        # self._execute_checkdatabase()
 
         QgsApplication.taskManager().addTask(self.project_check_task)
         QgsApplication.taskManager().triggerTask(self.project_check_task)

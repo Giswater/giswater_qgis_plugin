@@ -8,6 +8,7 @@ or (at your option) any later version.
 from .campaign import Campaign
 from ..dialog import GwAction
 
+
 class GwSelectorCampaignButton(GwAction):
     """ Button 84: Add new campaign """
 
@@ -15,8 +16,6 @@ class GwSelectorCampaignButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.new_campaign = Campaign(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
         """ Open the correct campaign dialog based on user selection """
         self.new_campaign.open_campaign_selector()
-

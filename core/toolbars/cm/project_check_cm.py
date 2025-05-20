@@ -14,7 +14,6 @@ from qgis.PyQt.QtWidgets import QCheckBox
 from qgis.core import Qgis
 
 from ...threads.task import GwTask
-from .... import global_vars
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_qgis, tools_log, tools_qt, tools_os
 
