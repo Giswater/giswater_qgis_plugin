@@ -85,7 +85,6 @@ SELECT col_type_is('element', 'created_by', 'varchar(50)', 'Column created_by sh
 -- Check foreign keys
 SELECT has_fk('element', 'Table element should have foreign keys');
 SELECT fk_ok('element', 'brand_id', 'cat_brand', 'id', 'FK element_brand_id should exist');
-SELECT fk_ok('element', ARRAY['category_type','feature_type'], 'man_type_category', ARRAY['category_type','feature_type'], 'FK element_category_type_feature_type_fkey should exist');
 SELECT fk_ok('element', 'elementcat_id', 'cat_element', 'id', 'FK element_elementcat_id_fkey should exist');
 SELECT fk_ok('element', 'feature_type', 'sys_feature_type', 'id', 'FK element_feature_type_fkey should exist');
 SELECT fk_ok('element', 'model_id', 'cat_brand_model', 'id', 'FK element_model_id should exist');
@@ -101,6 +100,8 @@ SELECT fk_ok('element', 'workcat_id', 'cat_work', 'id', 'FK element_workcat_id_f
 SELECT has_trigger('element', 'gw_trg_edit_controls', 'Table should have gw_trg_edit_controls trigger');
 SELECT has_trigger('element', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('element', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
+SELECT has_trigger('element', 'gw_trg_mantypevalue_fk_insert', 'Table should have gw_trg_mantypevalue_fk_insert trigger');
+SELECT has_trigger('element', 'gw_trg_mantypevalue_fk_update', 'Table should have gw_trg_mantypevalue_fk_update trigger');
 
 -- Check rules
 

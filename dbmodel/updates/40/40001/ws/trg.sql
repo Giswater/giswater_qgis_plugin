@@ -345,8 +345,7 @@ CREATE TRIGGER gw_trg_edit_controls AFTER
 DELETE OR UPDATE ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('arc_id');
 CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER
 INSERT ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('arc');
-CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER
-UPDATE OF function_type, category_type, location_type ON arc FOR EACH ROW
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, location_type ON arc
 FOR EACH ROW
 WHEN ((((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
 OR ((old.category_type)::TEXT IS DISTINCT FROM (new.category_type)::TEXT)
@@ -383,7 +382,6 @@ CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER INSERT ON connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');
 
 CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, location_type ON connec
-FOR EACH ROW
 FOR EACH ROW
 WHEN ((((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
 OR ((old.category_type)::TEXT IS DISTINCT FROM (new.category_type)::TEXT)
