@@ -59,7 +59,7 @@ from .utilities.config_btn import GwConfigButton
 from .utilities.toolbox_btn import GwToolBoxButton
 from .utilities.utilities_manager.workspace_manager import GwWorkspaceManagerButton
 from .utilities.print_btn import GwPrintButton
-from .utilities.csv_btn import GwCSVButton
+from .utilities.file_transfer_btn import GwFileTransferButton
 from .utilities.project_check_btn import GwProjectCheckButton
 from .utilities.snapshot_view import GwSnapshotViewButton
 

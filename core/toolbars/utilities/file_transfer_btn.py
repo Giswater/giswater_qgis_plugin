@@ -19,8 +19,8 @@ from ...utils import tools_gw
 from ....libs import lib_vars, tools_qt, tools_log, tools_db, tools_qgis, tools_os
 
 
-class GwCSVButton(GwAction):
-    """ Button 66: Csv """
+class GwFileTransferButton(GwAction):
+    """ Button 66: File Transfer """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
