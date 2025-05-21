@@ -21,7 +21,7 @@ SELECT columns_are(
     'sys_function',
     ARRAY[
         'id', 'function_name', 'project_type', 'function_type', 'input_params', 'return_type',
-        'descript', 'sys_role', 'sample_query', 'source'
+        'descript', 'sys_role', 'sample_query', 'source', 'function_alias'
     ],
     'Table sys_function should have the correct columns'
 );
@@ -40,6 +40,7 @@ SELECT col_type_is('sys_function', 'descript', 'text', 'Column descript should b
 SELECT col_type_is('sys_function', 'sys_role', 'text', 'Column sys_role should be text');
 SELECT col_type_is('sys_function', 'sample_query', 'text', 'Column sample_query should be text');
 SELECT col_type_is('sys_function', 'source', 'text', 'Column source should be text');
+SELECT col_type_is('sys_function', 'function_alias', 'text', 'Column function_alias should be text');
 
 -- Check constraints
 SELECT col_not_null('sys_function', 'id', 'Column id should be NOT NULL');

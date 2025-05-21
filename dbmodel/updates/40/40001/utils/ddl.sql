@@ -190,3 +190,7 @@ UPDATE sys_table SET criticity = NULL;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"criticity", "newName":"project_template"}}$$);
 ALTER TABLE sys_table ALTER COLUMN project_template TYPE integer[] USING ARRAY[project_template];
 UPDATE sys_table SET project_template = NULL;
+
+
+-- 21/05/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_function", "column":"function_alias", "dataType":"text"}}$$);
