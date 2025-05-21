@@ -96,7 +96,6 @@ class GwCSVButton(GwAction):
     def _save_last_selection(self, menu, button_function):
         menu.setProperty("last_selection", button_function)
 
-
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
 
