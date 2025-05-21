@@ -10,7 +10,9 @@ import json
 import os
 from functools import partial
 
-from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
+from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QIcon
+from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtCore import QPoint
 from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
@@ -24,9 +26,76 @@ class GwCSVButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
+        # First add the menu before adding it to the toolbar
+        if toolbar is not None:
+            toolbar.removeAction(self.action)
+
+        self.menu = QMenu()
+        self.menu.setObjectName("GW_import_export_menu")
+        self._fill_import_export_menu()
+
+        self.menu.aboutToShow.connect(self._fill_import_export_menu)
+
+        if toolbar is not None:
+            self.action.setMenu(self.menu)
+            toolbar.addAction(self.action)
+
     def clicked_event(self):
 
-        self._open_csv()
+        if self.menu.property('last_selection') is not None:
+            getattr(self, self.menu.property('last_selection'))()
+            return
+        button = self.action.associatedWidgets()[1]
+        menu_point = button.mapToGlobal(QPoint(0, button.height()))
+        self.menu.popup(menu_point)
+
+    # region private functions
+
+    def _fill_import_export_menu(self):
+        """ Fill import/export menu with CSV actions """
+
+        # Clear existing menu items
+        actions = self.menu.actions()
+        for action in actions:
+            action.disconnect()
+            self.menu.removeAction(action)
+            del action
+            
+        action_group = self.action.property('action_group')
+
+        # Define menu actions
+        menu_actions = [
+            # Import section
+            {'name': tools_qt.tr('Import CSV'), 'function': '_open_csv', 'icon': f'{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}66_1.png'},
+        ]
+        # Add actions to menu
+        for item in menu_actions:
+            if item.get('separator'):
+                self.menu.addSeparator()
+                continue
+                
+            action_name = item['name']
+            action_function = item['function']
+            
+            # Create and configure action
+            if 'icon' in item:
+                action_icon = item['icon']
+                obj_action = QAction(QIcon(action_icon), str(tools_qt.tr(action_name)), action_group)
+
+            else:
+                obj_action = QAction(str(tools_qt.tr(action_name)), action_group)
+                
+            obj_action.setObjectName(action_name)
+            obj_action.setProperty('action_group', action_group)
+            
+            # Add action to menu and connect signals
+            self.menu.addAction(obj_action)
+            obj_action.triggered.connect(partial(getattr(self, action_function)))
+            obj_action.triggered.connect(partial(self._save_last_selection, self.menu, action_function))
+
+    def _save_last_selection(self, menu, button_function):
+        menu.setProperty("last_selection", button_function)
+
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
