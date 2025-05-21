@@ -955,26 +955,26 @@ INSERT INTO config_form_tabs VALUES ('incident_gully', 'tab_data', 'Data', 'Data
 INSERT INTO config_form_tabs VALUES ('incident_gully', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":false},"tabFiles":{"active":true, "feature":{"tableName":"om_visit_event_photo"}}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false},{"actionName":"actionDeleteFile", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "disabled":false}]', 2, '{5}');
 
 
-GRANT ALL ON TABLE ve_visit_arc_insp TO role_om;
-GRANT ALL ON TABLE ve_visit_connec_insp TO role_om;
-GRANT ALL ON TABLE ve_visit_node_insp TO role_om;
-GRANT ALL ON TABLE ve_visit_gully_insp TO role_om;
-GRANT ALL ON TABLE ve_visit_link_insp TO role_om;
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_arc_insp', 've_visit_arc_insp', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_connec_insp', 've_visit_connec_insp', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_node_insp', 've_visit_node_insp', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_gully_insp', 've_visit_gully_insp', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_link_insp', 've_visit_link_insp', 'role_om');
 
-GRANT ALL ON TABLE ve_visit_incid_arc TO role_om;
-GRANT ALL ON TABLE ve_visit_incid_node TO role_om;
-GRANT ALL ON TABLE ve_visit_incid_connec TO role_om;
-GRANT ALL ON TABLE ve_visit_incid_gully TO role_om;
-GRANT ALL ON TABLE ve_visit_incid_link TO role_om;
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_incid_arc', 've_visit_incid_arc', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_incid_node', 've_visit_incid_node', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_incid_connec', 've_visit_incid_connec', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_incid_gully', 've_visit_incid_gully', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_incid_link', 've_visit_incid_link', 'role_om');
 
-GRANT ALL ON TABLE v_ui_visit_arc_insp TO role_om;
-GRANT ALL ON TABLE v_ui_visit_connec_insp TO role_om;
-GRANT ALL ON TABLE v_ui_visit_node_insp TO role_om;
-GRANT ALL ON TABLE v_ui_visit_gully_insp TO role_om;
-GRANT ALL ON TABLE v_ui_visit_link_insp TO role_om;
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_arc_insp', 'v_ui_visit_arc_insp', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_connec_insp', 'v_ui_visit_connec_insp', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_node_insp', 'v_ui_visit_node_insp', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_gully_insp', 'v_ui_visit_gully_insp', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_link_insp', 'v_ui_visit_link_insp', 'role_om');
 
-GRANT ALL ON TABLE v_ui_visit_incid_arc TO role_om;
-GRANT ALL ON TABLE v_ui_visit_incid_node TO role_om;
-GRANT ALL ON TABLE v_ui_visit_incid_connec TO role_om;
-GRANT ALL ON TABLE v_ui_visit_incid_gully TO role_om;
-GRANT ALL ON TABLE v_ui_visit_incid_link TO role_om;
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_incid_arc', 'v_ui_visit_incid_arc', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_incid_node', 'v_ui_visit_incid_node', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_incid_connec', 'v_ui_visit_incid_connec', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_incid_gully', 'v_ui_visit_incid_gully', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_incid_link', 'v_ui_visit_incid_link', 'role_om');

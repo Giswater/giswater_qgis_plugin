@@ -468,16 +468,16 @@ INSERT INTO config_form_tabs VALUES ('visit_connec_leak', 'tab_file', 'Files', '
 INSERT INTO config_form_tabs VALUES ('incident_node', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":true}, "tabFiles":{"active":false}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]', 1, '{5}');
 INSERT INTO config_form_tabs VALUES ('incident_node', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":false},"tabFiles":{"active":true, "feature":{"tableName":"om_visit_event_photo"}}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false},{"actionName":"actionDeleteFile", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "disabled":false}]', 2, '{5}');
 
-GRANT ALL ON TABLE ve_visit_arc_leak TO role_om;
-GRANT ALL ON TABLE ve_visit_connec_leak TO role_om;
-GRANT ALL ON TABLE ve_visit_link_leak TO role_om;
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_arc_leak', 've_visit_arc_leak', 'role_om');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_connec_leak', 've_visit_connec_leak', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_link_leak', 've_visit_link_leak', 'role_edit');
 
-GRANT ALL ON TABLE ve_visit_node_insp TO role_om;
-GRANT ALL ON TABLE ve_visit_incid_node TO role_om;
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_node_insp', 've_visit_node_insp', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_incid_node', 've_visit_incid_node', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_arc_leak', 'v_ui_visit_arc_leak', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_connec_leak', 'v_ui_visit_connec_leak', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_link_leak', 'v_ui_visit_link_leak', 'role_edit');
 
-GRANT ALL ON TABLE v_ui_visit_arc_leak TO role_om;
-GRANT ALL ON TABLE v_ui_visit_connec_leak TO role_om;
-GRANT ALL ON TABLE v_ui_visit_link_leak TO role_om;
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_node_insp', 'v_ui_visit_node_insp', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_incid_node', 'v_ui_visit_incid_node', 'role_edit');
 
-GRANT ALL ON TABLE v_ui_visit_node_insp TO role_om;
-GRANT ALL ON TABLE v_ui_visit_incid_node TO role_om;
