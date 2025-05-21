@@ -220,73 +220,25 @@ BEGIN
 	
 			-- fill table cso_out_vol
 			update cso_out_vol
-				set vol_residual = rec_subc.demand * v_returncoeff * 600 / 1000 
+				set 
+				vol_residual = rec_subc.demand * v_returncoeff * 600 / 1000,
+				vol_max_epi = rec_subc.q_max * rec_rainfall.rf_length / 1000,
+				vol_res_epi = (rec_subc.demand * rec_rainfall.rf_length) / 1000, 
+				vol_rainfall = 1000 * rec_subc.kb * rec_rainfall.rf_volume * rec_subc.thyssen_plv_area/(1000*1000),
+				vol_total = vol_residual + vol_rainfall,
+				vol_runoff = vol_rainfall * rec_subc.imperv_area / rec_subc.thyssen_plv_area,
+				vol_infiltr = vol_rainfall - vol_runoff,
+				vol_circ = vol_runoff + vol_residual,
+				vol_circ_dep = case when vol_circ > rec_subc.vret then rec_subc.vret else vol_circ end,
+				vol_circ_red = case when vol_circ - vol_circ_dep < 0 then 0 else vol_circ - vol_circ_dep end,
+				vol_non_leaked = least(vol_circ_red, vol_max_epi),
+				vol_leaked = vol_circ_red - vol_non_leaked,
+				vol_wwtp = vol_non_leaked + vol_circ_dep,
+				vol_treated = vol_infiltr + vol_wwtp,
+				efficiency = vol_treated / vol_total
 				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
-			
-			update cso_out_vol
-				set vol_max_epi = rec_subc.q_max * rec_rainfall.rf_length / 1000
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
-				
-			update cso_out_vol
-				set vol_res_epi = (rec_subc.demand * rec_rainfall.rf_length) / 1000 
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
-	
-			update cso_out_vol
-				set vol_rainfall = 1000 * rec_subc.kb * rec_rainfall.rf_volume * rec_subc.thyssen_plv_area/(1000*1000)
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			update cso_out_vol
-				set vol_total = vol_residual + vol_rainfall 
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			update cso_out_vol
-				set vol_runoff = vol_rainfall * rec_subc.imperv_area / rec_subc.thyssen_plv_area
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-		
-			update cso_out_vol
-				set vol_infiltr = vol_rainfall - vol_runoff 
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
-			
-			update cso_out_vol
-				set vol_circ = vol_runoff + vol_residual
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			update cso_out_vol
-				set vol_circ_dep = case when vol_circ > rec_subc.vret then rec_subc.vret else vol_circ end 
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			update cso_out_vol
-				set vol_circ_red = case when vol_circ - vol_circ_dep < 0 then 0 else vol_circ - vol_circ_dep end
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			update cso_out_vol
-				set vol_non_leaked = least(vol_circ_red, vol_max_epi)
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			update cso_out_vol
-				set vol_leaked = vol_circ_red - vol_non_leaked
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			update cso_out_vol
-				set vol_wwtp = vol_non_leaked + vol_circ_dep 
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-		
-			update cso_out_vol
-				set vol_treated = vol_infiltr + vol_wwtp -- columna Z
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			-- efficiency
-			-- ===========
-			update cso_out_vol 
-				set efficiency = vol_treated / vol_total -- columna AA
-				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-	
-		
 		END LOOP;
-	
 	END LOOP;
-
 
 	-- clean temp tables
 	drop table if exists cso_inp_rainfall;
