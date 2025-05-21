@@ -40,8 +40,8 @@ BEGIN
 		
 	ELSIF TG_OP = 'UPDATE' THEN
 	    
-		UPDATE  ext_municipality
-		SET muni_id = NEW.muni_id, name= NEW.name, the_geom = NEW.the_geom, active = NEW.active;
+		UPDATE ext_municipality
+		SET name= NEW.name, the_geom = NEW.the_geom, active = NEW.active WHERE muni_id=OLD.muni_id;
 
 	RETURN NEW;
 				
