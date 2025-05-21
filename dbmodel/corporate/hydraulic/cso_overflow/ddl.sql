@@ -58,33 +58,5 @@ CREATE INDEX cso_out_vol_rf_tstep ON cso_out_vol (rf_tstep);
 
 
 
---bugs
------
--- hi havia un petit detall qu es calculava malament la eficiencia
-
--- mejoras hechas
------------------
--- increment bestial d'eficiència (feat(cso_overflow): Improve performance for function cso_overflow)
--- se recorren todos los resultados incluso aquellos que no tienen lluvia (es molt més lent, pero ens permet generar la timeseries corresponent)
--- noves vistes de resultats (mirar ddlview)
-
-
--- mejoras pendientes
----------------------
--- poner tres decimales en todos los resultados de la tabla cso_out_vol
--- en la tabla cso_inp_system_subc drainzone_id debe ser INTEGER
--- Algorisme s'ha de disparar per una macroexplotacio / macrosector en concret
--- insertar les variables que toca en el sistema (veure dml file)
-
-
--- traspaso to guk
-------------------
--- export-import les capes de thy.thy_final_cn i thy.thy_residuals
--- export-import de les taules cso_inp_system_subc i cso_out_vol 
--- arreglar els dos sobreixidors que estan malament
--- disparar algorisme només en els dos sobreixidors que estan malament (abans de disparar, mirar capacitat de disc. A WIN3 aquest procés ha estat de uns 3000 segons
--- generar les timeseries per a swmm a partir de vista v_cso_drainzone_rainfall_tstep
-
-
 
 
