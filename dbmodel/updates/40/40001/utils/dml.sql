@@ -591,3 +591,9 @@ UPDATE sys_table SET project_template = '{1}' WHERE id IN (
 	'v_ext_streetaxis',
 	'v_ext_plot'
 );
+UPDATE sys_label SET label_type = 'prefix';
+
+INSERT INTO sys_label (id, idval, label_type)
+VALUES (2030, '------------------------------', 'separator');
+
+UPDATE sys_function SET function_alias = 'CALCULATE THE REACH OF HYDRANTS' WHERE function_name = 'gw_fct_graphanalytics_hydrant';

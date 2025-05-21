@@ -39,11 +39,16 @@ v_debug Boolean;
 v_isprocess boolean = false;
 v_fid text;
 v_result_id text;
-v_temp_table text;
+v_temp_table text = '';
 v_criticity integer;
 _key text;
 _value text;
-v_header_id integer;
+v_prefix_id integer;
+v_header_separator_id integer = 2030; -- there are 30 dashes
+v_is_header boolean = false;
+v_function_alias text;
+v_querytext text;
+v_separator text;
 
 BEGIN
 
@@ -63,9 +68,35 @@ BEGIN
 	v_result_id = lower(((p_data ->>'data')::json->>'result_id')::text);
 	v_temp_table = ((p_data ->>'data')::json->>'tempTable')::text;
 	v_criticity = ((p_data ->>'data')::json->>'criticity')::integer;
-	v_header_id = ((p_data ->>'data')::json->>'headerId')::text;
+	v_is_header = ((p_data ->>'data')::json->>'is_header')::boolean;
+	v_prefix_id = ((p_data ->>'data')::json->>'prefix_id')::text;
 
 	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
+
+
+	IF v_is_header THEN
+
+        -- get label from sys_function, upper()
+        -- get separator from sys_label
+		SELECT function_alias INTO v_function_alias FROM sys_function WHERE id=v_function_id;
+
+		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
+		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||v_criticity||','||quote_literal(v_function_alias)||');';
+
+		EXECUTE v_querytext;
+
+		SELECT idval INTO v_separator FROM sys_label WHERE id = v_header_separator_id;
+
+		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
+		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||v_criticity||','||quote_literal(v_separator)||');';
+		
+		EXECUTE v_querytext;
+
+		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Message passed successfully"}, "version":"'||v_version||'"'||
+       ',"body":{"form":{}'||
+           ',"data":{"info":"" }}'||
+            '}')::json;
+    END IF;
 
 	-- get flow parameters
 	SELECT * INTO rec_cat_error FROM sys_message WHERE sys_message.id=v_message_id;
@@ -103,9 +134,9 @@ BEGIN
 	END IF;
 
 	-- add specified headers
-	IF v_header_id IS NOT NULL THEN
+	IF v_prefix_id IS NOT NULL THEN
 		-- select label record
-		SELECT * INTO rec_cat_label FROM sys_label  WHERE sys_label.id=v_header_id;
+		SELECT * INTO rec_cat_label FROM sys_label  WHERE sys_label.id=v_prefix_id;
 		IF rec_cat_label IS NULL THEN
 			RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Header does not exist'))::json;
 		END IF;
@@ -231,18 +262,11 @@ BEGIN
 		IF rec_cat_error.log_level = 0 AND v_criticity IS NOT NULL THEN
 			rec_cat_error.log_level = v_criticity;
 		END IF;
-		IF v_temp_table IS NOT NULL THEN
-			IF v_temp_table = 't' THEN
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid::int2, v_result_id, rec_cat_error.log_level, rec_cat_error.error_message);
-			ELSIF v_temp_table = 'temp' THEN
-				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid::int2, v_result_id, rec_cat_error.log_level, rec_cat_error.error_message);
-			END IF;
-		ELSE
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid::int2, v_result_id, rec_cat_error.log_level, rec_cat_error.error_message);
-		END IF;
+
+		v_querytext = 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
+		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||rec_cat_error.log_level||','||quote_literal(rec_cat_error.error_message)||');';
+		
+		EXECUTE v_querytext;
 
 
 	ELSIF rec_cat_error.message_type = 'DEBUG' THEN
