@@ -40,6 +40,7 @@ v_location text;
 v_feature_layer text;
 
 v_result_id text= 'Change feature type';
+
 v_result text;
 v_result_info text;
 v_error_context text;
@@ -59,8 +60,8 @@ BEGIN
 
 	-- manage log (fid: 143)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('REPLACE FEATURE'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3126", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "is_process":true, "is_header":"true"}}$$)';
 
 	-- get input parameters
 
@@ -134,7 +135,8 @@ BEGIN
 	IF v_audit_result is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
-		v_message = 'Replace feature done successfully';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"3288", "function":"3126", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
+
     ELSE
 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;

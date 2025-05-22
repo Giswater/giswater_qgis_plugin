@@ -597,3 +597,9 @@ INSERT INTO sys_label (id, idval, label_type)
 VALUES (2030, '------------------------------', 'separator');
 
 UPDATE sys_function SET function_alias = 'CALCULATE THE REACH OF HYDRANTS' WHERE function_name = 'gw_fct_graphanalytics_hydrant';
+
+-- 22/05/2025
+UPDATE sys_function SET function_alias = 'REPLACE FEATURE' WHERE function_name = 'gw_fct_setchangefeaturetype';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3288, 'Replace feature done successfull', null, 0, true, 'utils', 'core', 'UI');
