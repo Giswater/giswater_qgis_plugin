@@ -81,14 +81,14 @@ BEGIN
 		SELECT function_alias INTO v_function_alias FROM sys_function WHERE id=v_function_id;
 
 		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
-		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||v_criticity||','||quote_literal(v_function_alias)||');';
+		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_function_alias)||');';
 
 		EXECUTE v_querytext;
 
 		SELECT idval INTO v_separator FROM sys_label WHERE id = v_header_separator_id;
 
 		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
-		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||v_criticity||','||quote_literal(v_separator)||');';
+		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||');';
 		
 		EXECUTE v_querytext;
 
