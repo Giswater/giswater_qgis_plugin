@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: 3388
+--FUNCTION CODE: NEW CODE FOR THIS FUNCTION
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcampaign(p_data json)
   RETURNS json AS
@@ -89,7 +89,7 @@ BEGIN
 	-- If editing an existing campaign
 	IF v_id IS NOT NULL THEN
 		EXECUTE FORMAT(
-			'SELECT row_to_json(a) FROM (SELECT * FROM cm.%I WHERE %I = CAST($1 AS %s)) a',
+			'SELECT row_to_json(a) FROM (SELECT * FROM SCHEMA_NAME.%I WHERE %I = CAST($1 AS %s)) a',
 			v_tablename, v_idname, v_columntype
 		)
 		INTO v_values USING v_id;
@@ -99,9 +99,9 @@ BEGIN
 			v_fieldvalue := v_values ->> (aux_json ->> 'columnname');
 
 			IF (aux_json ->> 'widgettype') = 'combo' THEN
-				v_fields[array_index] := gw_fct_json_object_set_key(aux_json, 'selectedId', COALESCE(v_fieldvalue, ''));
+				v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'selectedId', COALESCE(v_fieldvalue, ''));
 			ELSE
-				v_fields[array_index] := gw_fct_json_object_set_key(aux_json, 'value', COALESCE(v_fieldvalue, ''));
+				v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'value', COALESCE(v_fieldvalue, ''));
 			END IF;
 		END LOOP;
 
@@ -114,7 +114,7 @@ BEGIN
 		FOR array_index IN array_lower(v_fields, 1)..array_upper(v_fields, 1) LOOP
 		    aux_json := v_fields[array_index];
 		    IF (aux_json ->> 'columnname') = 'campaign_id' THEN
-		        v_fields[array_index] := gw_fct_json_object_set_key(aux_json, 'value', v_id::text);
+		        v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'value', v_id::text);
 		    END IF;
 		END LOOP;
 

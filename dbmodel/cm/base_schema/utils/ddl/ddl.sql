@@ -265,7 +265,7 @@ CREATE TABLE workorder_class
 
 CREATE TABLE workorder
 (
-  workorder_id integer NOT NULL,
+  workorder_id serial4 NOT NULL,
   workorder_name character varying(50),
   workorder_type character varying(50), --fk workorder_type
   workorder_class character varying(200), --fk workorder_class

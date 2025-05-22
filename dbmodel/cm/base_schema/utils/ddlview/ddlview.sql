@@ -32,7 +32,6 @@ om_campaign.descript,
 cat_organization.orgname AS org_name,
 om_campaign.duration,
 sys_typevalue.idval AS status,
-om_campaign.address,
 om_campaign.active
 FROM om_campaign
 LEFT JOIN cat_organization ON cat_organization.organization_id = om_campaign.organization_id
@@ -51,7 +50,6 @@ cat_team.teamname AS team,
 om_campaign_lot.duration,
 sys_typevalue.idval AS status,
 workorder.workorder_name,
-om_campaign_lot.address,
 om_campaign_lot.active
 FROM om_campaign_lot
 LEFT JOIN workorder ON workorder.workorder_id = om_campaign_lot.workorder_id
@@ -82,11 +80,7 @@ WITH campaign_reviewvisit AS (SELECT ocr.campaign_id, omr.idval FROM om_campaign
 	c.organization_id,
 	c.duration,
 	c.status,
-	c.the_geom,
-	c.rotation,
-	c.exercise,
-	c.serie,
-	c.address
+	c.the_geom
 
 	FROM cm.om_campaign c
 	LEFT JOIN campaign_reviewvisit crv USING (campaign_id)

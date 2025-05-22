@@ -1,7 +1,16 @@
-CREATE OR REPLACE FUNCTION cm.gw_fct_getlot(p_data json)
-RETURNS json
-LANGUAGE plpgsql
-AS $function$
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+--FUNCTION CODE: NEW CODE FOR THIS FUNCTION
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getlot(p_data json)
+  RETURNS json AS
+$BODY$
+
 DECLARE
     v_version text;
     v_schemaname text := 'cm';
@@ -30,12 +39,14 @@ DECLARE
     -- Custom for lot types
     v_lot_mode text;
     v_formname text;
+    v_input json;
+    v_campaign_id text;
 BEGIN
     -- Set search path
-    SET search_path = "cm", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- Get version (similar to campaign version)
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM SCHEMA_NAME.config_param_system WHERE parameter=''admin_version'') row'
     INTO v_version;
 
     -- Clean JSON null formats
@@ -46,10 +57,13 @@ BEGIN
     -- Get client + feature inputs
     v_client := (p_data ->> 'client')::json;
     v_device := (v_client ->> 'device')::int;
-    v_id := (p_data -> 'feature' ->> 'id')::text;
-    v_idname := (p_data -> 'feature' ->> 'idName')::text;
-    v_tablename := (p_data -> 'feature' ->> 'tableName')::text;
+    v_input := (p_data -> 'feature')::json;
+    v_id := v_input ->> 'id';
+    v_idname := v_input ->> 'idName';
+    v_tablename := v_input ->> 'tableName';
+    v_campaign_id := v_input ->> 'lot_id';
     v_message := (p_data -> 'data' ->> 'message');
+    v_formname := 'lot';
 
     -- Start form tabs
     v_formtabs := '[';
@@ -71,7 +85,7 @@ BEGIN
     IF v_id IS NOT NULL THEN
         -- Use dynamic SQL to get the lot data
         EXECUTE FORMAT(
-            'SELECT row_to_json(a) FROM (SELECT * FROM cm.%I WHERE %I = CAST($1 AS %s)) a',
+            'SELECT row_to_json(a) FROM (SELECT * FROM SCHEMA_NAME.%I WHERE %I = CAST($1 AS %s)) a',
             v_tablename, v_idname, v_columntype
         )
         INTO v_values USING v_id;
@@ -93,13 +107,13 @@ BEGIN
 
     ELSE
         -- If creating a new lot
-        SELECT nextval('cm.om_campaign_lot_id_seq') INTO v_id;
+        SELECT nextval('SCHEMA_NAME.om_campaign_lot_lot_id_seq') INTO v_id;
 
-        -- Set campaign_id to new ID
+        -- Loop through the fields and assign campaign_id if passed
         FOR array_index IN array_lower(v_fields, 1)..array_upper(v_fields, 1) LOOP
             aux_json := v_fields[array_index];
-            IF (aux_json ->> 'columnname') = 'campaign_id' THEN
-                v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'value', v_id::text);
+            IF (aux_json ->> 'columnname') = 'campaign_id' AND v_campaign_id IS NOT NULL THEN
+                v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'value', v_campaign_id);
             END IF;
         END LOOP;
 
@@ -117,7 +131,7 @@ BEGIN
     v_formtabs := v_formtabs || v_tabaux::text || ']';
     v_forminfo := json_build_object('formName','Generic','template','info_generic');
 
-    -- Control NULL's
+    -- Control NULLs
     v_forminfo := COALESCE(v_forminfo, '{}');
     v_featureinfo := COALESCE(v_featureinfo, '{}');
     v_fields := COALESCE(v_fields, '{}');
@@ -134,5 +148,6 @@ BEGIN
     '}')::json, 3388, null, null, null);
 
 END;
-$function$
-;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

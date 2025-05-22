@@ -28,11 +28,11 @@ DECLARE
 
 BEGIN
     -- Set search path
-    SET search_path = cm, public;
-    v_schemaname = 'cm';
+    SET search_path = SCHEMA_NAME, public;
+    v_schemaname = 'SCHEMA_NAME';
 
     -- Get version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM SCHEMA_NAME.config_param_system WHERE parameter=''admin_version'') row'
     INTO v_version;
 
     -- Parse input
@@ -58,8 +58,7 @@ BEGIN
 	    -- INSERT
 	    v_querytext := 'INSERT INTO om_campaign (
 	        campaign_id, name, startdate, enddate, real_startdate, real_enddate, campaign_type,
-	        descript, active, organization_id, duration, status, rotation,
-	        exercise, serie, address
+	        descript, active, organization_id, duration, status
 	    ) VALUES (' ||
 	        v_id || ', ' ||
 	        quote_nullable(v_fields ->> 'name') || ', ' ||
@@ -72,11 +71,7 @@ BEGIN
 	        (v_fields ->> 'active')::bool || ', ' ||
 	        quote_nullable(v_fields ->> 'organization_id') || ', ' ||
 	        quote_nullable(v_fields ->> 'duration') || ', ' ||
-	        quote_nullable(v_fields ->> 'status') || ', ' ||
-	        quote_nullable(v_fields ->> 'rotation') || '::numeric, ' ||
-	        quote_nullable(v_fields ->> 'exercise') || ', ' ||
-	        quote_nullable(v_fields ->> 'serie') || ', ' ||
-	        quote_nullable(v_fields ->> 'address') || ') RETURNING campaign_id';
+	        quote_nullable(v_fields ->> 'status') || ') RETURNING campaign_id';
 	    EXECUTE v_querytext INTO v_newid;
 
 	    -- Insert into subtype table
@@ -101,11 +96,7 @@ BEGIN
 	        'active = ' || (v_fields ->> 'active')::bool || ', ' ||
 	        'organization_id = ' || quote_nullable(v_fields ->> 'organization_id') || ', ' ||
 	        'duration = ' || quote_nullable(v_fields ->> 'duration') || ', ' ||
-	        'status = ' || quote_nullable(v_fields ->> 'status') || ', ' ||
-	        'rotation = ' || quote_nullable(v_fields ->> 'rotation') || '::numeric, ' ||
-	        'exercise = ' || quote_nullable(v_fields ->> 'exercise') || ', ' ||
-	        'serie = ' || quote_nullable(v_fields ->> 'serie') || ', ' ||
-	        'address = ' || quote_nullable(v_fields ->> 'address') ||
+	        'status = ' || quote_nullable(v_fields ->> 'status') ||
 	        ' WHERE campaign_id = ' || v_id || ' RETURNING campaign_id';
 		RAISE NOTICE 'v_querytext de update % ', v_querytext;
 	    EXECUTE v_querytext INTO v_newid;
