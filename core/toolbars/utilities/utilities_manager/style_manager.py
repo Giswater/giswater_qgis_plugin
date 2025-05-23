@@ -354,7 +354,7 @@ class GwStyleManager:
             return
 
         msg = ("Are you sure you want to delete the style group '{0}'?\n\n"
-                "This will also delete all related entries in the sys_style table.",
+                "This will also delete all related entries in the sys_style table."
                 "Confirm Cascade Delete")
         msg_params = (selected_stylegroup_name,)
         confirm = tools_qt.show_question(msg, force_action=True, msg_params=msg_params)

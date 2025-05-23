@@ -24,10 +24,9 @@ class GwConnectLink(GwTask):
         super().run()
 
         try:
-            tools_log.log_info(
-                f"Task 'Connect link' execute function 'def _link_selected_features' with parameters: "
-                f"'{self.element_type}', 'selected_arc={self.selected_arc}'"
-            )
+            msg = "Task 'Connect link' execute function '{0}' with parameters: '{1}', '{2}'"
+            msg_params = ("_link_selected_features", self.element_type, f"selected_arc={self.selected_arc}",)
+            tools_log.log_info(msg, msg_params=msg_params)
             result = self._link_selected_features(self.element_type, self.selected_arc)
             self.connect_link_class.cancel_map_tool()
             return result
@@ -37,10 +36,9 @@ class GwConnectLink(GwTask):
 
     def finished(self, result):
         super().finished(result)
-        tools_log.log_info(
-            f"Task 'Connect link' execute function 'def manage_result' from 'connect_link_buttom.py' with parameters: "
-            f"'{self.element_type}'"
-        )
+        msg = "Task 'Connect link' execute function '{0}' from '{1}' with parameters: '{2}'"
+        msg_params = ("manage_result", "connect_link_buttom.py", self.element_type,)
+        tools_log.log_info(msg, msg_params=msg_params)
         self.connect_link_class.manage_result(self.json_result)
 
     def _link_selected_features(self, feature_type, selected_arc=None):
@@ -60,10 +58,9 @@ class GwConnectLink(GwTask):
         body = tools_gw.create_body(feature=feature_id, extras=extras)
 
         # Execute SQL function and show result to the user
-        tools_log.log_info(
-            f"Task 'Connect link' execute procedure 'gw_fct_setlinktonetwork' with parameters: \
-            '{body}', 'aux_conn={self.aux_conn}', 'is_thread=True'"
-        )
+        msg = "Task 'Connect link' execute procedure '{0}' with parameters: '{1}', '{2}', '{3}'"
+        msg_params = ("gw_fct_setlinktonetwork", body, f"aux_conn={self.aux_conn}", "is_thread=True",)
+        tools_log.log_info(msg, msg_params=msg_params)
         self.json_result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body, aux_conn=self.aux_conn, is_thread=True)
 
         return self.json_result is not None and self.json_result.get('status') == 'Accepted'

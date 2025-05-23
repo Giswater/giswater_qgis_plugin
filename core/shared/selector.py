@@ -198,7 +198,7 @@ class GwSelector:
             if 'typeaheadFilter' in form_tab:
                 label = QLabel()
                 label.setObjectName('lbl_filter')
-                label.setText('Filter:')
+                label.setText(tools_qt.tr('lbl_filter', 'selector', default='Filter:'))
                 if tools_qt.get_widget(dialog, 'txt_filter_' + str(tab_name)) is None:
                     widget = QLineEdit()
                     widget.setObjectName('txt_filter_' + str(tab_name))
@@ -224,16 +224,16 @@ class GwSelector:
                     if not tools_os.set_boolean(field.get('value'), default=False):
                         self.checkall = False
 
-                if tools_qt.get_widget(dialog, f"chk_all_{tab_name}") is None:
+                if tools_qt.get_widget(dialog, "chk_all_") is None:
                     widget = QCheckBox()
                     widget.setObjectName('chk_all_' + str(tab_name))
                     widget.toggled.connect(partial(self._manage_all, dialog, widget))
                     widget.setLayoutDirection(Qt.LeftToRight)
-                    chk_all_tooltip = "Shift+Click to uncheck all"
+                    chk_all_tooltip = tools_qt.tr("Shift+Click to uncheck all")
                     widget.setToolTip(chk_all_tooltip)
                 else:
-                    widget = tools_qt.get_widget(dialog, f"chk_all_{tab_name}")
-                widget.setText('Check all')
+                    widget = tools_qt.get_widget(dialog, "chk_all_")
+                widget.setText(tools_qt.tr('chk_all_', 'selector', default='Check all'))
                 if self.checkall is not None:
                     widget.blockSignals(True)
                     widget.setChecked(self.checkall)

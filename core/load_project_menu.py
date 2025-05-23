@@ -287,8 +287,9 @@ class GwMenuLoad(QObject):
         if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
             try:
                 if self.task_get_layers.isActive():
-                    msg = "ConfigLayerFields task is already active!"
-                    tools_qgis.show_warning(msg)
+                    msg = "{0} task is already active!"
+                    msg_params = ("ConfigLayerFields")
+                    tools_qgis.show_warning(msg, msg_params=msg_params)
                     return
             except RuntimeError:
                 pass

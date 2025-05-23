@@ -364,6 +364,8 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
     # Create btn_help
     add_btn_help(dlg)
 
+
+    # Show dialog
     dlg.show()
     # Open dialog
     if issubclass(type(dlg), GwDialog):

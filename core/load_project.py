@@ -174,7 +174,7 @@ class GwLoadProject(QObject):
             tools_log.log_info(msg)
         else:
             msg = ("Project read finished with different versions on plugin metadata ({0}) and "
-                       "PostgreSQL sys_version table ({1}).")
+                    "PostgreSQL sys_version table ({1}).")
             msg_params = (plugin_version, project_version,)
             tools_log.log_warning(msg, msg_params=msg_params)
             tools_qgis.show_warning(msg, msg_params=msg_params)
@@ -357,7 +357,9 @@ class GwLoadProject(QObject):
             buttons_to_hide = [int(x) for x in row.split(',')]
 
         except Exception as e:
-            tools_log.log_warning(f"{type(e).__name__}: {e}")
+            msg = "{0}: {1}"
+            msg_params = (type(e).__name__, str(e),)
+            tools_log.log_warning(msg, msg_params=msg_params)
         finally:
             return buttons_to_hide
 
@@ -367,14 +369,16 @@ class GwLoadProject(QObject):
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
         if toolbar_names in (None, 'None'):
-            msg = "Parameter 'toolbar_names' is None"
-            tools_log.log_info(msg)
+            msg = "Parameter '{0}' is None"
+            msg_params = ("toolbar_names",)
+            tools_log.log_info(msg, msg_params=msg_params)
             return
 
         toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         if toolbars_order in (None, 'None'):
-            msg = "Parameter 'toolbars_order' is None"
-            tools_log.log_info(msg)
+            msg = "Parameter '{0}' is None"
+            msg_params = ("toolbars_order",)
+            tools_log.log_info(msg, msg_params=msg_params)
             return
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
@@ -386,7 +390,7 @@ class GwLoadProject(QObject):
         icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}"
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
-            ag = QActionGroup(parent)
+            ag = QActionGroup(parent)   
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 successful = False
@@ -537,8 +541,9 @@ class GwLoadProject(QObject):
         if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
             try:
                 if self.task_get_layers.isActive():
-                    msg = "ConfigLayerFields task is already active!"
-                    tools_qgis.show_warning(msg)
+                    msg = "{0} task is already active!"
+                    msg_params = ("ConfigLayerFields")
+                    tools_qgis.show_warning(msg, msg_params=msg_params)
                     return
             except RuntimeError:
                 pass
@@ -579,8 +584,9 @@ class GwLoadProject(QObject):
                 if variables:
                     guided_map = variables.get('useGuideMap')
                     if guided_map:
-                        msg = "manage_guided_map"
-                        tools_log.log_info(msg)
+                        msg = "{0}"
+                        msg_params = ("manage_guided_map",)
+                        tools_log.log_info(msg, msg_params=msg_params)
                         self._manage_guided_map()
             except Exception as e:
                 tools_log.log_info(str(e))
@@ -615,8 +621,9 @@ class GwLoadProject(QObject):
         features = self.layer_muni.getSelectedFeatures()
         for feature in features:
             muni_id = feature["muni_id"]
-            msg = "Selected muni_id"
-            tools_log.log_info(msg, parameter=muni_id)
+            msg = "Selected {0}"
+            msg_params = ("muni_id",)
+            tools_log.log_info(msg, parameter=muni_id,msg_params=msg_params)
             break
 
         tools_gw.disconnect_signal('load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')

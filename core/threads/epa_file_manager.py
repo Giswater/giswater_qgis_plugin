@@ -73,23 +73,28 @@ class GwEpaFileManager(GwTask):
 
     def main_process(self) -> bool:
         status = True
-        if self.go2epa_export_inp or self.go2epa_execute_epa:
-            tools_log.log_info("Task 'Go2Epa' execute function 'def _exec_function_pg2epa'")
+        msg = "Task 'Go2Epa' execute function '{0}'"
+        if self.go2epa_export_inp or self.go2epa_execute_epa:   
+            msg_params = ("_exec_function_pg2epa",)
+            tools_log.log_info(msg, msg_params=msg_params)
             status = self._exec_function_pg2epa()
             if not status:
                 self.function_name = 'gw_fct_pg2epa_main'
                 return False
 
         if self.go2epa_export_inp:
-            tools_log.log_info("Task 'Go2Epa' execute function 'def _export_inp'")
+            msg_params = ("_export_inp",)
+            tools_log.log_info(msg, msg_params=msg_params)
             status = self._export_inp()
 
         if status and self.go2epa_execute_epa:
-            tools_log.log_info("Task 'Go2Epa' execute function 'def _execute_epa'")
+            msg_params = ("_execute_epa",)
+            tools_log.log_info(msg, msg_params=msg_params)
             status = self._execute_epa()
 
         if status and self.go2epa_import_result:
-            tools_log.log_info("Task 'Go2Epa' execute function 'def _import_rpt'")
+            msg_params = ("_import_rpt",)
+            tools_log.log_info(msg, msg_params=msg_params)
             self.function_name = 'gw_fct_rpt2pg_main'
             status = self._import_rpt()
 
@@ -111,16 +116,18 @@ class GwEpaFileManager(GwTask):
 
         # If PostgreSQL function returned null
         if (self.go2epa_export_inp or self.go2epa_export_inp) and self.complet_result is None:
-            msg = f"Database returned null. Check postgres function '{self.function_name}'"
-            tools_log.log_warning(msg)
+            msg = "Database returned null. Check postgres function '{0}'"
+            msg_params = (self.function_name,)
+            tools_log.log_warning(msg, msg_params=msg_params)
 
         elif result:
-
+            msg = "Task 'Go2Epa' execute function '{0}' from '{1}'"
             if self.go2epa_export_inp and self.complet_result:
                 if self.complet_result.get('status') == "Accepted":
                     if 'body' in self.complet_result:
                         if 'data' in self.complet_result['body']:
-                            tools_log.log_info("Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
+                            msg_params = ("add_layer_temp", "tools_gw.py",)
+                            tools_log.log_info(msg, msg_params=msg_params)
                             tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
                                                     None, True, True, 1, True, close=False,
                                                     call_set_tabs_enabled=False)
@@ -129,7 +136,8 @@ class GwEpaFileManager(GwTask):
                 if self.rpt_result.get('status') == "Accepted":
                     if 'body' in self.rpt_result:
                         if 'data' in self.rpt_result['body']:
-                            tools_log.log_info("Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
+                            msg_params = ("add_layer_temp", "tools_gw.py",)
+                            tools_log.log_info(msg, msg_params=msg_params)
 
                             tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
                                                     None, True, True, 1, True, close=False,
@@ -139,7 +147,8 @@ class GwEpaFileManager(GwTask):
             if self.body:
                 sql += f"{self.body}"
             sql += ");"
-            tools_log.log_info("Task 'Go2Epa' manage json response")
+            msg = "Task 'Go2Epa' manage json response"
+            tools_log.log_info(msg)
             tools_gw.manage_json_response(self.complet_result, sql, None)
 
             replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
@@ -158,7 +167,8 @@ class GwEpaFileManager(GwTask):
 
         if self.function_failed:
             if self.json_result is None or not self.json_result:
-                tools_log.log_warning("Function failed finished")
+                msg = "Function failed finished"
+                tools_log.log_warning(msg)
             if self.complet_result:
                 if self.complet_result.get('status') == "Failed":
                     tools_gw.manage_json_exception(self.complet_result)
@@ -217,7 +227,9 @@ class GwEpaFileManager(GwTask):
         main_json_result = None
         for step in range(1, 8):
             self.body = tools_gw.create_body(extras=(extras + f', "step": {step}'))
-            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {step}")
+            msg = "Task 'Go2Epa' execute procedure '{0}' step {1}}"
+            msg_params = ("gw_fct_pg2epa_main", step,)
+            tools_log.log_info(msg, msg_params=msg_params)
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             if step == 6:
@@ -251,19 +263,21 @@ class GwEpaFileManager(GwTask):
 
         if self.isCanceled():
             return False
-
-        tools_log.log_info("Export INP file into PostgreSQL")
+        
+        msg = "Export INP file into PostgreSQL"
+        tools_log.log_info(msg)
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
             return False
 
         if self.file_inp == "null":
-            message = "You have to set this parameter"
-            self.error_msg = f"{message}: INP file"
+            self.error_msg = "You have to set this parameter: INP file"
             return False
 
-        tools_log.log_info("Task 'Go2Epa' execute function 'def _fill_inp_file'")
+        msg = "Task 'Go2Epa' execute function '{0}'"
+        msg_params = ("_fill_inp_file",)
+        tools_log.log_info(msg, msg_params=msg_params)
         self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
         self.common_msg += "Export INP finished. "
@@ -272,7 +286,9 @@ class GwEpaFileManager(GwTask):
 
     def _fill_inp_file(self, folder_path=None, all_rows=None):
 
-        tools_log.log_info(f"Write inp file........: {folder_path}")
+        msg = "Write inp file........: {0}"
+        msg_params = (folder_path,)
+        tools_log.log_info(msg, msg_params=msg_params)
 
         # Generate generic INP file
         file_inp = open(folder_path, "w", errors='replace')
@@ -338,7 +354,8 @@ class GwEpaFileManager(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info("Execute EPA software")
+        msg = "Execute EPA software"
+        tools_log.log_info(msg)
         self.step_completed.emit({"message": {"level": 1, "text": "Execute EPA software......"}}, "")
 
         if self.file_rpt == "null":
@@ -378,18 +395,23 @@ class GwEpaFileManager(GwTask):
     def _import_rpt(self):
         """ Import result file """
 
-        tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
+        msg = "Import rpt file........: {0}"
+        msg_params = (self.file_rpt,)
+        tools_log.log_info(msg, msg_params=msg_params)
 
         self.rpt_result = None
         self.json_rpt = None
         status = False
         try:
             # Call import function
-            tools_log.log_info("Task 'Go2Epa' execute function 'def _read_rpt_file'")
+            msg = "Task 'Go2Epa' execute function '{0}'"
+            msg_params = ("_read_rpt_file",)
+            tools_log.log_info(msg, msg_params=msg_params)
             status = self._read_rpt_file(self.file_rpt)
             if not status:
                 return False
-            tools_log.log_info("Task 'Go2Epa' execute function 'def _exec_import_function'")
+            msg_params = ("_exec_import_function",)
+            tools_log.log_info(msg, msg_params=msg_params)
             status = self._exec_import_function()
         except Exception as e:
             self.error_msg = str(e)
@@ -461,24 +483,26 @@ class GwEpaFileManager(GwTask):
 
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         if not any(item in dirty_list for item in ['Version', 'VERSION', 'Input', 'INPUT']):
-                            error_near = f"Error near line {line_number + 1} -> {dirty_list}"
-                            tools_log.log_info(error_near)
-                            message = (f"The rpt file is not valid to import. "
-                                       f"Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
-                                       f"Please ckeck and fix it before continue. \n"
-                                       f"{error_near}")
+                            msg = "Error near line {0} -> {1}"
+                            msg_params = (line_number + 1, dirty_list,)
+                            tools_log.log_info(msg, msg_params=msg_params)
+                            message = ("The rpt file is not valid to import. "
+                                        "Because columns on rpt file are overlapped, it seems you need to improve your simulation. "
+                                        "Please check and fix it before continuing.\n"
+                                        + msg.format(*msg_params))
                             self.error_msg = message
                             self._close_file()
                             del full_file
                             return False
                     elif bool(re.search('>50', str(dirty_list[x]))):
-                        error_near = f"Error near line {line_number + 1} -> {dirty_list}"
-                        tools_log.log_info(error_near)
-                        message = (f"The rpt file is not valid to import. "
-                                   f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
-                                   f"Please ckeck and fix it before continue. \n"
-                                   f"Note: You can force the import by activating the variable 'force_import_velocity_higher_50ms' on the init.config file. \n"
-                                   f"{error_near}")
+                        msg = "Error near line {0} -> {1}"
+                        msg_params = (line_number + 1, dirty_list,)
+                        tools_log.log_info(msg, msg_params=msg_params)
+                        message = ("The rpt file is not valid to import. "
+                                    "Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
+                                    "Please ckeck and fix it before continue. \n"
+                                    "Note: You can force the import by activating the variable 'force_import_velocity_higher_50ms' on the init.config file. \n"
+                                    + msg.format(*msg_params))
                         self.error_msg = message
                         self._close_file()
                         del full_file

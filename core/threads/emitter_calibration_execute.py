@@ -78,16 +78,18 @@ class EmitterCalibrationExecute(QgsTask, QObject):
             self.timer.stop()
 
         if result:
-            tools_log.log_info(f"Task '{self.description()}' completed")
+            msg = "Task '{0}' completed"
+            msg_params = (self.description(),)
+            tools_log.log_info(msg, msg_params=msg_params)
         else:
             if self.exception is None:
-                tools_log.log_info(
-                    f"Task '{self.description()}' not successful but without exception"
-                )
+                msg = "Task '{0}' not successful but without exception"
+                msg_params = (self.description(),)
+                tools_log.log_info(msg, msg_params=msg_params)
             else:
-                tools_log.log_info(
-                    f"Task '{self.description()}' Exception: {self.exception}"
-                )
+                msg = "Task '{0}' Exception: {1}"
+                msg_params = (self.description(), self.exception,)
+                tools_log.log_info(msg, msg_params=msg_params)
 
     def _run_iterations(self):
 

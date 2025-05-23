@@ -62,18 +62,22 @@ class GwProjectLayersConfig(GwTask):
         if result:
             if self.exception:
                 if self.message:
-                    tools_log.log_warning(f"{self.message}")
+                    tools_log.log_warning(str(self.message))
             return
 
         # If sql function return null
         if result is False:
-            msg = f"Task failed: {self.description()}. This is probably a DB error, check postgres function" \
-                  f" 'gw_fct_getinfofromid'."
-            tools_log.log_warning(msg)
+            msg = "Task failed: {0}. This is probably a DB error, check postgres function '{1}'."
+            msg_params = (self.description(), "gw_fct_getinfofromid",)
+            tools_log.log_warning(msg, msg_params=msg_params)
 
         if self.exception:
-            tools_log.log_info(f"Task aborted: {self.description()}")
-            tools_log.log_warning(f"Exception: {self.exception}")
+            msg = "Task aborted: {0}."
+            msg_params = (self.description(),)
+            tools_log.log_info(msg, msg_params=msg_params)
+            msg = "Exception: {0}."
+            msg_params = (self.exception,)
+            tools_log.log_warning(msg, msg_params=msg_params)
 
     # region private functions
 
@@ -115,7 +119,9 @@ class GwProjectLayersConfig(GwTask):
         # Check only once if function 'gw_fct_getinfofromid' exists
         row = tools_db.check_function('gw_fct_getinfofromid', aux_conn=self.aux_conn, is_thread=True)
         if row in (None, ''):
-            tools_log.log_warning("Function not found in database: gw_fct_getinfofromid")
+            msg = "Function not found in database: {0}"
+            msg_params  = ("gw_fct_getinfofromid",)
+            tools_log.log_warning(msg, msg_params=msg_params)
             return False
 
         msg_failed = ""
@@ -145,10 +151,14 @@ class GwProjectLayersConfig(GwTask):
             if self.json_result['status'] == 'Failed':
                 continue
             if 'body' not in self.json_result:
-                tools_log.log_info("Not 'body'")
+                msg = "Not '{0}'"
+                msg_params = ("body")
+                tools_log.log_info(msg, msg_params=msg_params)
                 continue
             if 'data' not in self.json_result['body']:
-                tools_log.log_info("Not 'data'")
+                msg = "Not '{0}'"
+                msg_params = ("body")
+                ools_log.log_info(msg, msg_params=msg_params)
                 continue
 
             tools_gw.config_layer_attributes(self.json_result, layer, layer_name, thread=self)

@@ -266,13 +266,16 @@ class GwInfo(QObject):
                 return self.complet_result, dlg_add_element
 
             else:
-                tools_log.log_warning(f"template not managed: {template}")
+                msg = "Template not managed: {0}"
+                msg = (template,)
+                tools_log.log_warning(msg, msg_params=msg_params)
                 return False, None
 
         except Exception as e:
             msg = "Exception in info"
             tools_qgis.show_warning(msg, parameter=e)
-            tools_log.log_error(f"{traceback.format_exc()}")
+            msg = str(traceback.format_exc())
+            tools_log.log_error(msg)
             self._disconnect_signals()  # Disconnect signals
             tools_qgis.restore_cursor()  # Restore overridden cursor
             return False, None
@@ -1765,7 +1768,8 @@ class GwInfo(QObject):
                 status = self.layer_new_feature.commitChanges()
                 if status is False:
                     error = self.layer_new_feature.commitErrors()
-                    tools_log.log_warning(f"{error}")
+                    msg = str(error)
+                    tools_log.log_warning(msg)
                     return False
 
                 self.new_feature_id = None
@@ -3189,7 +3193,8 @@ class GwInfo(QObject):
             list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
             list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
-            tools_log.log_info("NO FEATURE TYPE DEFINED")
+            msg = "NO FEATURE TYPE DEFINED"
+            tools_log.log_info(msg)
 
         tools_gw.init_docker()
         global is_inserting  # noqa: F824
@@ -4104,7 +4109,9 @@ def open_selected_feature(**kwargs):
     info_feature = GwInfo('tab_data')
     complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type='tab_data')
     if not complet_result:
-        tools_log.log_info("FAIL open_selected_feature")
+        msg = "FAIL {0}"
+        msg_params = ("open_selected_feature",)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
 # endregion
@@ -4133,7 +4140,9 @@ def open_selected_hydro(**kwargs):
     complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id,
                                                     tab_type='tab_data')
     if not complet_result:
-        tools_log.log_info("FAIL open_selected_hydro")
+        msg = "FAIL {0}"
+        msg_params = ("open_selected_hydro",)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
 

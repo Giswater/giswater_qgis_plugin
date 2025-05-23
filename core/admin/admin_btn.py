@@ -1958,7 +1958,8 @@ class GwAdminButton:
                 if tools_os.set_boolean(status, False) is False:
                     self.error_count = self.error_count + 1
                     msg = "{0} error {1}"
-                    tools_log.log_info(f"_read_execute_file error {filepath}")
+                    msg_params = ("_read_execute_file", filepath,)
+                    tools_log.log_info(msg, msg_params=msg_params)
                     msg = "Message"
                     tools_log.log_info(msg, parameter=lib_vars.session_vars['last_error'])
                     self.message_infolog = f"_read_execute_file error {filepath}\nMessage: {lib_vars.session_vars['last_error']}"
@@ -1973,7 +1974,9 @@ class GwAdminButton:
 
         except Exception as e:
             self.error_count = self.error_count + 1
-            tools_log.log_info(f"_read_execute_file exception: {file}")
+            msg = "{0} exception: {1}"
+            msg_params = ("_read_execute_file", file,)
+            tools_log.log_info(msg, msg_params=msg_params)
             tools_log.log_info(str(e))
             self.message_infolog = f"_read_execute_file exception: {file}\n {str(e)}"
             if tools_os.set_boolean(self.dev_commit, False) is False:
@@ -1989,7 +1992,8 @@ class GwAdminButton:
 
     def _execute_cm_files(self, filedir, set_progress_bar=False, schema_option=None):
         if not os.path.exists(filedir):
-            tools_log.log_info(f"Folder not found: {filedir}")
+            msg = "Folder not found"
+            tools_log.log_info(msg, parameter=filedir)
             return True
 
         status = True
@@ -2072,10 +2076,12 @@ class GwAdminButton:
         """"""
 
         if not os.path.exists(filedir):
-            tools_log.log_info(f"Folder not found: {filedir}")
+            msg = "Folder not found"
+            tools_log.log_info(msg, parameter=filedir)
             return True
-
-        tools_log.log_info(f"Processing folder: {filedir}")
+        
+        msg = "Processing folder"
+        tools_log.log_info(msg, parameter=filedir)
 
         filelist = sorted(os.listdir(filedir))
         status = True
@@ -2132,7 +2138,9 @@ class GwAdminButton:
 
         except Exception as e:
             self.error_count = self.error_count + 1
-            tools_log.log_info(f"_read_execute_file exception: {filepath}")
+            msg = "{0} exception: {1}"
+            msg_params = ("_read_execute_file", filepath,)
+            tools_log.log_info(msg, msg_params=msg_params)
             tools_log.log_info(str(e))
             self.message_infolog = f"_read_execute_file exception: {filepath}\n {str(e)}"
             if tools_os.set_boolean(self.dev_commit, False) is False:
@@ -2151,7 +2159,9 @@ class GwAdminButton:
 
         f = None
         if "changelog.txt" not in filelist:
-            tools_log.log_warning(f"File 'changelog.txt' not found in: {filedir}")
+            msg = "File '{0}' not found in: {1}"
+            msg_params = ("changelog.txt", filedir,)
+            tools_log.log_warning(msg, msg_params=msg_params)
             return True
 
         try:
@@ -2163,7 +2173,9 @@ class GwAdminButton:
             else:
                 return False
         except Exception as e:
-            tools_log.log_warning(f"Error reading file 'changelog.txt': {e}")
+            msg = "Error reading file '{0}': {1}"
+            msg_params = ("changelog.txt", str(e),)
+            tools_log.log_warning(msg, msg_params=msg_params)
             return False
         finally:
             if f:
@@ -2353,7 +2365,9 @@ class GwAdminButton:
                             self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Another object has this name')
                             valid, all_valid = False, False
                     except Exception as e:
-                        tools_log.log_info(f"{type(e).__name__} --> {e}")
+                        msg = "{0} --> {1}"
+                        msg_params = (type(e).__name__, str(e,),)
+                        tools_log.log_info(msg, msg_params=msg_params)
             if valid:
                 news.append(new)
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'), style="")
@@ -2382,7 +2396,8 @@ class GwAdminButton:
                 with open(f"{self.file_inp}", 'w', encoding='utf-8') as file:
                     file.write(contents)
             except Exception as e:
-                tools_log.log_error(f"Exception when replacing inp strings: {e}")
+                msg = "Exception when replacing inp strings"
+                tools_log.log_error(msg, parameter=str(e))
             del contents
 
             # Close the dlg
@@ -2393,7 +2408,7 @@ class GwAdminButton:
 
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
                "all strings defined on the config/dev.config file. Be sure your config file is OK before continue")
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg)
         if result:
             # Get dev config file
             setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
@@ -2430,7 +2445,8 @@ class GwAdminButton:
             # Start read files
             qgis_files = sorted(os.listdir(self.folder_path))
             for file in qgis_files:
-                tools_log.log_info("Reading file", parameter=file)
+                msg = "Reading file"
+                tools_log.log_info(msg, parameter=file)
                 # Open file for read
                 f = open(self.folder_path + os.sep + file, 'r')
                 if f:
@@ -2442,7 +2458,8 @@ class GwAdminButton:
                         self.text_replace = tools_gw.get_config_parser('qgis_project_text_replace', text_replace,
                                                                        "project", "dev", False, force_reload=True)
                         self.text_replace = self.text_replace.split(',')
-                        tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
+                        msg = "Replacing template text"
+                        tools_log.log_info(msg, parameter=self.text_replace[1])
                         f_to_read = re.sub(str(self.text_replace[0]),
                                            str(self.text_replace[1]), f_to_read)
 
@@ -2451,7 +2468,8 @@ class GwAdminButton:
                         self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace, "project",
                                                                        "dev", False, force_reload=True)
                         self.text_replace = self.text_replace.split(',')
-                        tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
+                        msg = "Replacing template text"
+                        tools_log.log_info(msg, parameter=self.text_replace[1])
                         f_to_read = re.sub(str(self.text_replace[0]),
                                            str(self.text_replace[1]), f_to_read)
 
@@ -2492,7 +2510,9 @@ class GwAdminButton:
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
 
             if not tools_db.check_table('cat_feature', schema_name):
-                tools_log.log_warning("Table not found: 'cat_feature'")
+                msg = "Table not found: '{0}'"
+                msg_params = ("cat_feature",)
+                tools_log.log_warning(msg, msg_params=msg_params)
                 return
 
             sql = (f"SELECT cat_feature.id, cat_feature.id "
@@ -2520,23 +2540,27 @@ class GwAdminButton:
         is_multi_addfield = tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_add_fields_multi)
 
         window_title = ""
+        title_params = None
         if action == 'create':
             if is_multi_addfield:
                 window_title = 'Create multi field'
             else:
-                window_title = 'Create field on "' + str(form_name_fields) + '"'
+                window_title = 'Create field on "{0}"'
+                title_params = (str(form_name_fields),)
             self._manage_create_field(form_name_fields, is_multi_addfield)
         elif action == 'update':
             if is_multi_addfield:
                 window_title = 'Update multi field'
             else:
-                window_title = 'Update field on "' + str(form_name_fields) + '"'
+                window_title = 'Update field on "{0}"'
+                title_params = (str(form_name_fields),)
             self._manage_update_field(self.dlg_manage_fields, form_name_fields, is_multi_addfield, tableview='ve_config_addfields')
         elif action == 'delete':
             if is_multi_addfield:
                 window_title = 'Delete multi field'
             else:
-                window_title = 'Delete field on "' + str(form_name_fields) + '"'
+                window_title = 'Delete field on "{0}"'
+                title_params = (str(form_name_fields),)
             self._manage_delete_field(form_name_fields, is_multi_addfield)
 
         # Set listeners
@@ -2549,7 +2573,7 @@ class GwAdminButton:
             partial(self._update_selected_addfild, self.dlg_manage_fields.tbl_update, is_multi_addfield))
 
         tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='admin_addfields')
-        self.dlg_manage_fields.setWindowTitle(window_title)
+        self.dlg_manage_fields.setWindowTitle(tools_qt.tr(window_title, list_params=title_params))
 
     def _update_selected_addfild(self, widget, is_multi_addfield):
         """"""

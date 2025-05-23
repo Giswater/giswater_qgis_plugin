@@ -2334,7 +2334,8 @@ class GwMincut:
         """ Manage mincut layout """
 
         if layout is None:
-            tools_log.log_warning("Layout not found")
+            msg = "Layout not found"
+            tools_log.log_warning(msg)
             return
 
         title = self.dlg_comp.title.text()

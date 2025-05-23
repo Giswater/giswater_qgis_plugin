@@ -1918,7 +1918,7 @@ class GwPsector:
                 msg = ("You are trying to delete your current psector. "
                         "Please, change your current psector before delete.")
                 title = "Current psector"
-                tools_qt.show_exception_message(title, tools_qt.tr(msg))
+                tools_qt.show_exception_message(title, msg)
                 return
             inf_text += f'"{id_}", '
             list_id += f'"{id_}", '
@@ -2070,7 +2070,9 @@ class GwPsector:
             # Retrieve the psector ID for use in the extras configuration
             psector_id = result["body"]["data"]["psector_id"]
         except KeyError:
-            tools_log.log_warning("Error: 'name' or 'psector_id' field is missing in the result.")
+            msg = "Error: '{0}' or '{1}' field is missing in the result."
+            msg_params = ("name", "psector_id",)
+            tools_log.log_warning(msg, msg_params)
             return
         if psector_id is not None:
             # Define `extras` with the retrieved psector ID and other parameters

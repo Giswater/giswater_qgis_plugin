@@ -377,7 +377,9 @@ class GwVisit(QObject):
         if widget:
             widget.setModel(model)
         else:
-            tools_log.log_info("set_model_to_table: widget not found")
+            msg = "{0}: widget not found"
+            msg_params = ("set_model_to_table",)
+            tools_log.log_info(msg,  msg_params=msg_params)
         current_visit_class = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
         feature_key = tools_qgis.get_primary_key()
         feature_type = 'node'
@@ -610,7 +612,9 @@ class GwVisit(QObject):
         complet_result = tools_gw.execute_procedure('gw_fct_om_visit_multiplier', body)
         if complet_result is None:
             return
-        tools_log.log_info(f"execute_pgfunction: {complet_result}")
+        msg = "{0}: {1}"
+        msg_params = ("execute_pgfunction", complet_result,)
+        tools_log.log_info(msg, msg_params=msg_params)
 
     def _update_geom(self):
         """ Update geometry field """
@@ -636,7 +640,9 @@ class GwVisit(QObject):
             tools_gw.disconnect_signal('visit')
             self.layers = tools_gw.remove_selection(layers=self.layers)
         except Exception as e:
-            tools_log.log_info(f"manage_rejected: {e}")
+            msg = "{0}: {1}"
+            msg_params = ("manage_rejected", str(e),)
+            tools_log.log_info(msg, msg_params=msg_params)
 
     def _tab_index(self, tab_name):
         """ Get the index of a tab basing on objectName. """
@@ -799,13 +805,15 @@ class GwVisit(QObject):
         column_name = f"{feature_type}_id"
         widget = tools_qt.get_widget(self.dlg_add_visit, f"tbl_visit_x_{feature_type}")
         if not widget:
-            message = "Widget not found"
-            tools_log.log_info(message, parameter=f"tbl_visit_x_{feature_type}")
+            msg = "Widget not found"
+            tools_log.log_info(msg, parameter=f"tbl_visit_x_{feature_type}")
             return None
 
         # do nothing if model is None or no element is present
         if not widget.model():  # or not widget.rowCount():
-            tools_log.log_info(f"Widget model is none: tbl_visit_x_{feature_type}")
+            msg = "Widget model is none: {0}"
+            msg_params = (f"tbl_visit_x_{feature_type}",)
+            tools_log.log_info(msg, msg_params=msg_params)
             return
 
         db_record = None
@@ -897,7 +905,9 @@ class GwVisit(QObject):
             else:
                 self.dlg_add_visit.tab_feature.currentChanged.disconnect()
         except Exception as e:
-            tools_log.log_info(f"connect_signal_tab_feature_signal error: {e}")
+            msg = "{0} error: {1}"
+            msg_params = (f"connect_signal_tab_feature_signal", str(e),)
+            tools_log.log_info(msg, msg_params=msg_params)
 
     def _manage_tabs_enabled(self, enable_tabs=False):
         """ Enable/Disable tabs depending feature_type """
@@ -954,7 +964,9 @@ class GwVisit(QObject):
             self.dlg_add_visit.btn_feature_delete.clicked.disconnect()
             self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
         except Exception as e:
-            tools_log.log_info(f"manage_feature_type_selected exception: {e}")
+            msg = "{0} exception: {1}"
+            msg_params = (f"manage_feature_type_selected", str(e),)
+            tools_log.log_info(msg, msg_params=msg_params)
         finally:
             self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
                  self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT, False, None, None))
@@ -1820,7 +1832,9 @@ class GwVisit(QObject):
             self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
             self.dlg_add_visit.btn_expr_select.clicked.disconnect()
         except Exception as e:
-            tools_log.log_info(f"visit_tab_feature_changed exception: {e}")
+            msg = "{0} exception: {1}"
+            msg_params = (f"visit_tab_feature_changed", str(e),)
+            tools_log.log_info(msg, msg_params=msg_params)
         finally:
 
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
@@ -1899,6 +1913,6 @@ class GwVisit(QObject):
                 index = widget.findData(value)
                 if index >= 0:
                     widget.setCurrentIndex(index)
-                    continue
+                    continuems
 
     # endregion

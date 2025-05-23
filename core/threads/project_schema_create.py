@@ -53,12 +53,16 @@ class GwCreateSchemaTask(GwTask):
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
         self.admin.progress_value = 0
-        tools_log.log_info("Task 'Create schema' execute function 'def main_execution'")
+        msg = "Task 'Create schema' execute function '{0}'"
+        msg_params = ("main_execution",)
+        tools_log.log_info(msg, msg_params=msg_params)
         status = self.main_execution()
         if not tools_os.set_boolean(status, False):
-            tools_log.log_info("Function main_execution returned False")
+            message = "Function {0} returned False"
+            tools_log.log_info(message, msg_params=msg_params)
             return False
-        tools_log.log_info("Task 'Create schema' execute function 'def custom_execution'")
+        msg_params = ("custom_execution",)
+        tools_log.log_info(msg, msg_params=msg_params)
         self.custom_execution()
         return True
 
@@ -117,9 +121,13 @@ class GwCreateSchemaTask(GwTask):
         project_srid = self.params['project_srid']
 
         self.admin.progress_ratio = 0.8
-        tools_log.log_info("Task 'Create schema' execute function 'def calculate_number_of_files'")
+        msg = "Task 'Create schema' execute function '{0}'"
+        msg_params = ("calculate_number_of_files",)
+        tools_log.log_info(msg, msg_params=msg_params)
         self.admin.total_sql_files = self.calculate_number_of_files()
-        tools_log.log_info(f"Number of SQL files 'TOTAL': {self.admin.total_sql_files}")
+        msg = "Number of SQL files 'TOTAL': {0}"
+        msg_params = (self.admin.total_sql_files,)
+        tools_log.log_info(msg, msg_params=msg_params)
 
         status = self.admin.load_base(self.dict_folders_process['load_base'])
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
@@ -147,7 +155,9 @@ class GwCreateSchemaTask(GwTask):
 
         json_result = None
         if exec_last_process:
-            tools_log.log_info("Execute function 'gw_fct_admin_schema_lastprocess'")
+            msg = "Execute function '{0}'"
+            msg_params = ("gw_fct_admin_schema_lastprocess",)
+            tools_log.log_info(msg, msg_params=msg_params)
             json_result = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
                                                      project_locale, project_srid)
         if (not json_result or json_result['status'] == 'Failed' and tools_os.set_boolean(self.admin.dev_commit, False) is False) or self.isCanceled():
@@ -161,7 +171,9 @@ class GwCreateSchemaTask(GwTask):
         project_type = self.params['project_type']
         example_data = self.params['example_data']
 
-        tools_log.log_info("Execute 'custom_execution'")
+        msg = "Execute '{0}'"
+        msg_params = ("custom_execution",)
+        tools_log.log_info(msg, msg_params=msg_params)
         self.admin.current_sql_file = 85
         self.admin.total_sql_files = 100
         self.admin.progress_ratio = 1.0
@@ -187,7 +199,9 @@ class GwCreateSchemaTask(GwTask):
             # tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
             dict_folders, total = self.get_number_of_files_process(process_name)
             total_sql_files += total
-            tools_log.log_info(f"Number of SQL files '{process_name}': {total}")
+            msg = "Number of SQL files '{0}': {1}"
+            msg_params = (process_name, total,)
+            tools_log.log_info(msg, msg_params=msg_params)
             dict_process[process_name] = total
             self.dict_folders_process[process_name] = dict_folders
 

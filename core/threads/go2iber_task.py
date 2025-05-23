@@ -113,7 +113,8 @@ class GwGo2IberTask(GwTask):
 
         if self.function_failed:
             if self.json_result is None or not self.json_result:
-                tools_log.log_warning("Function failed finished")
+                msg = "Function failed finished"
+                tools_log.log_warning(msg)
             if self.complet_result:
                 if self.complet_result.get('status') == "Failed":
                     tools_gw.manage_json_exception(self.complet_result)

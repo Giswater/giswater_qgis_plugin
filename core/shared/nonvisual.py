@@ -29,6 +29,7 @@ from ..utils.matplotlib_widget import MplCanvas
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log, tools_os
 from ... import global_vars
+tr = tools_qt.tr
 
 
 class GwNonVisual:
@@ -42,11 +43,12 @@ class GwNonVisual:
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg: GwNonVisualManagerUi = None
-        self.dict_views = {'ws': {'cat_mat_roughness': 'aa', 'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
-                                  'v_edit_inp_controls': 'controls', 'v_edit_inp_rules': 'rules'},
-                           'ud': {'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
-                                  'v_edit_inp_timeseries': 'timeseries', 'v_edit_inp_controls': 'controls',
-                                  'inp_lid': 'lids'}}
+        self.dict_views = {'ws': {'cat_mat_roughness': f'{tr("Roughness")}', 'v_edit_inp_curve': f'{tr("curves")}',
+                                 'v_edit_inp_pattern': f'{tr("patterns")}', 'v_edit_inp_controls': f'{tr("controls")}',
+                                 'v_edit_inp_rules': f'{tr("rules")}'},
+                           'ud': {'v_edit_inp_curve': f'{tr("curves")}', 'v_edit_inp_pattern': f'{tr("patterns")}',
+                                 'v_edit_inp_timeseries': f'{tr("timeseries")}', 
+                                 'v_edit_inp_controls': f'{tr("controls")}', 'inp_lid': f'{tr("lids")}'}}
         self.dict_ids = {'cat_mat_roughness': 'id', 'v_edit_inp_curve': 'id', 'v_edit_inp_curve_value': 'curve_id',
                          'v_edit_inp_pattern': 'pattern_id', 'v_edit_inp_pattern_value': 'pattern_id',
                          'v_edit_inp_controls': 'id',
@@ -1224,7 +1226,9 @@ class GwNonVisual:
         elif global_vars.project_type == 'ud':
             self.dialog = GwNonVisualPatternUDUi(self)
         else:
-            tools_log.log_warning(f"get_patterns: project type '{global_vars.project_type}' not supported")
+            msg = "{0}: project type '{1}' not supported"
+            msg_params = ("get_patterns", global_vars.project_type,)
+            tools_log.log_warning(msg, msg_params=msg_params)
             return
         tools_gw.load_settings(self.dialog)
 

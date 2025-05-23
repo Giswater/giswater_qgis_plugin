@@ -33,7 +33,8 @@ class GwGisFileCreate:
 
         # If QGIS template locale folder not found, use English one
         if not os.path.exists(gis_locale_path):
-            tools_log.log_info("Locale gis folder not found", parameter=gis_locale_path)
+            msg = "Locale gis folder not found"
+            tools_log.log_info(msg, parameter=gis_locale_path)
             gis_locale_path = gis_folder + os.sep + "en_US"
 
         # Check if template_path and folder_path exists
@@ -63,7 +64,9 @@ class GwGisFileCreate:
                 return False, qgs_path
 
         # Create destination file from template file
-        tools_log.log_info(f"Creating GIS file... {qgs_path}")
+        msg = "Creating GIS file... {0}"
+        msg_params = (qgs_path)
+        tools_log.log_info(msg, msg_params=msg_params)
         shutil.copyfile(template_path, qgs_path)
 
         # Get database parameters from layer source
