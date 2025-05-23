@@ -129,8 +129,9 @@ BEGIN
 
 	-- manage log (fid: 143)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('REPLACE FEATURE'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------'));
+	--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('REPLACE FEATURE'));
+	--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"1", "is_process":true, "is_header":"true"}}$$)';
 
 	-- get input parameters
 
@@ -310,6 +311,9 @@ BEGIN
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into node table.'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3346", "function":"2714", "parameters":{"v_id":"'||v_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
 
 		ELSIF v_feature_type='arc' THEN
 
@@ -325,8 +329,10 @@ BEGIN
 				v_the_geom, v_verified_id, v_category, v_function, 0, v_location, v_drainzone_id, v_link);
 			END IF;
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into arc table.'));
+			--INSERT INTO audit_check_data (fid, result_id, error_message)
+			--VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into arc table.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3318", "function":"2714", "parameters":{"v_id":"'||v_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 		ELSIF v_feature_type ='connec' THEN
 
@@ -342,8 +348,10 @@ BEGIN
 				v_verified_id, v_inventory, v_category, v_function, 0, v_location, v_drainzone_id, v_link);
 			END IF;
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into connec table.'));
+			--INSERT INTO audit_check_data (fid, result_id, error_message)
+			--VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into connec table.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3308", "function":"2714", "parameters":{"v_id":"'||v_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 		ELSIF v_feature_type = 'gully' THEN
 
@@ -352,8 +360,10 @@ BEGIN
 			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_omzone_id, v_expl_id, v_muni_id, 0, v_state_type, v_the_geom, v_workcat_id_end,
 			v_verified_id, v_inventory, v_category, v_function, 0, v_location, v_epa_type_new, v_drainzone_id, v_link);
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into gully table.'));
+			--INSERT INTO audit_check_data (fid, result_id, error_message)
+			--VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into gully table.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3310", "function":"2714", "parameters":{"v_id":"'||v_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		IF v_feature_type  in ('arc', 'node') or (v_feature_type ='connec' and v_project_type = 'WS') THEN
@@ -463,17 +473,17 @@ BEGIN
 										'WHERE '||v_feature_childtable_name_old||'.'||v_id_column||' = '||quote_literal(v_old_id)||';';
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update;
-					INSERT INTO audit_check_data (fid, result_id, error_message)
-					VALUES (v_fid, v_result_id, concat('Assign old data from ',rec_addfields.column_name,' addfield to the new feature.'));
+					--INSERT INTO audit_check_data (fid, result_id, error_message)
+					--VALUES (v_fid, v_result_id, concat('Assign old data from ',rec_addfields.column_name,' addfield to the new feature.'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3312", "function":"2714", "parameters":{"rec_addfields.column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
 				END IF;
 
 			END LOOP;
 
 			EXECUTE 'DELETE FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||'='||quote_literal(v_old_id)||';';
 		END IF;
-
-
-
 
 		--Moving elements from old feature to new feature
 		IF v_keep_elements IS TRUE THEN
@@ -483,8 +493,11 @@ BEGIN
 			IF v_count > 0 THEN
 				v_element_table:=concat('element_x_',v_feature_type);
 				EXECUTE 'UPDATE '||v_element_table||' SET '||v_id_column||'='''||v_id||''' WHERE '||v_id_column||'='''||v_old_id||''';';
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Assign ',v_count,' elements to the new feature.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Assign ',v_count,' elements to the new feature.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3344", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
 			END IF;
 		END IF;
 
@@ -495,22 +508,30 @@ BEGIN
 			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_1=v_old_id
 			LOOP
 				UPDATE arc SET node_1=v_id where arc_id=rec_arc.arc_id;
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3314", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END LOOP;
 
 			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_2=v_old_id
 			LOOP
 				UPDATE arc SET node_2=v_id where arc_id=rec_arc.arc_id;
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3314", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                      
 			END LOOP;
 
 			FOR rec_connec IN SELECT connec_id FROM connec WHERE pjoint_id = v_old_id AND  pjoint_type = 'NODE'
 			LOOP
 				UPDATE connec SET pjoint_id=v_id where connec_id=rec_connec.connec_id;
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Reconnect connec ',rec_connec.connec_id,'.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Reconnect connec ',rec_connec.connec_id,'.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3316", "function":"2714", "parameters":{"rec_connec.connec_id":"'||rec_connec.connec_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
 			END LOOP;
 
 			FOR rec_link IN SELECT link_id FROM link WHERE exit_id = v_old_id AND exit_type = 'NODE'
@@ -533,26 +554,37 @@ BEGIN
 
 			UPDATE connec SET arc_id = v_id WHERE arc_id = v_old_id;
 			GET DIAGNOSTICS v_count = row_count;
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative connec(s) have been reconnected'));
+			--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative connec(s) have been reconnected'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3290", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 			UPDATE plan_psector_x_connec SET arc_id = v_id WHERE arc_id = v_old_id;
 			GET DIAGNOSTICS v_count = row_count;
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' planned connec(s) have been reconnected'));
+			--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' planned connec(s) have been reconnected'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3292", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 			IF v_project_type='UD' then
 				UPDATE gully SET arc_id = v_id WHERE arc_id = v_old_id;
 				GET DIAGNOSTICS v_count = row_count;
-				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative gully(s) have been reconnected'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative gully(s) have been reconnected'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3294", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 				UPDATE plan_psector_x_gully SET arc_id = v_id WHERE arc_id = v_old_id;
 				GET DIAGNOSTICS v_count = row_count;
-				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' planned gully(s) have been reconnected'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' planned gully(s) have been reconnected'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3296", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 
 		ELSIF v_feature_type='connec' or  v_feature_type='gully' THEN
 
 			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_id AND state > 0;
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative/planned links(s) have been reconnected'));
+			--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative/planned links(s) have been reconnected'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3298", "function":"2714", "parameters":{"v_count":"'||quote_nullable(v_count)||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+		
 
 		END IF;
 
@@ -564,8 +596,10 @@ BEGIN
 				UPDATE plan_psector_x_node SET node_id = v_id FROM plan_psector pp
 				WHERE pp.psector_id = plan_psector_x_node.psector_id AND status in (1,2) AND node_id = v_old_id;
 
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Replace node id in ',v_count,' psector.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Replace node id in ',v_count,' psector.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3300", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 		END IF;
 
@@ -580,8 +614,10 @@ BEGIN
 			state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_id||''';';
 		END IF;
 
-		INSERT INTO audit_check_data (fid, result_id, error_message)
-		VALUES (v_fid, v_result_id, concat('Downgraded old feature (',v_old_id,') SETTING state: 0, workcat_id_end: ',v_workcat_id_end,', enddate: ',v_enddate,'.'));
+		--INSERT INTO audit_check_data (fid, result_id, error_message)
+		--VALUES (v_fid, v_result_id, concat('Downgraded old feature (',v_old_id,') SETTING state: 0, workcat_id_end: ',v_workcat_id_end,', enddate: ',v_enddate,'.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3302", "function":"2714", "parameters":{"v_old_id":"'||v_old_id||'", "v_workcat_id_end":"'||v_workcat_id_end||'", "v_enddate":"'||v_enddate||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 		IF v_id IS NOT NULL THEN
 			IF v_workcat_id_end IS NOT NULL THEN
@@ -591,11 +627,17 @@ BEGIN
 				EXECUTE 'UPDATE '||v_feature_type||' SET state=1,builtdate='''||v_enddate||''', 
 				enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
 			END IF;
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('Update new feature, set state: 1, workcat_id: ',v_workcat_id_end,', builtdate: ',v_enddate,'.'));
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('Common values from old feature have been updated on new feature.'));
+			--INSERT INTO audit_check_data (fid, result_id, error_message)
+			--VALUES (v_fid, v_result_id, concat('Update new feature, set state: 1, workcat_id: ',v_workcat_id_end,', builtdate: ',v_enddate,'.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3304", "function":"2714", "parameters":{"v_workcat_id_end":"'||v_workcat_id_end||'", "v_enddate":"'||v_enddate||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
+			--INSERT INTO audit_check_data (fid, result_id, error_message)
+			--VALUES (v_fid, v_result_id, concat('Common values from old feature have been updated on new feature.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3306", "function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
 
 		END IF;
 
@@ -606,16 +648,22 @@ BEGIN
 			IF v_count > 0 THEN
 				UPDATE link SET feature_id = v_id WHERE feature_id = v_old_id and feature_type = upper(v_feature_type) and state=1;
 				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_id and exit_type = upper(v_feature_type) and state=1;
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3342", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
 			END IF;
 
 		ELSIF v_feature_type='node' THEN
 			SELECT count(link_id) INTO v_count FROM link WHERE exit_id = v_old_id and exit_type = upper(v_feature_type) and state=1;
 			IF v_count > 0 THEN
 				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_id and exit_type = upper(v_feature_type) and state=1;
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3342", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
 			END IF;
 		END IF;
 
@@ -659,16 +707,21 @@ BEGIN
 			loop
 				select node_type from v_edit_node where node_id=v_id::text into v_nodetype;
 				UPDATE arc SET nodetype_1=v_nodetype where arc_id=rec_arc.arc_id;
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3340", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END LOOP;
 
 			FOR rec_arc IN SELECT arc_id, nodetype_2 FROM arc WHERE node_2=v_id::text
 			loop
 				select node_type from v_edit_node where node_id=v_id::text into v_nodetype;
 				UPDATE arc SET nodetype_2=v_nodetype where arc_id=rec_arc.arc_id;
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+				--INSERT INTO audit_check_data (fid, result_id, error_message)
+				--VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3340", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
 			END LOOP;
 		end if;
 
@@ -703,31 +756,40 @@ BEGIN
 				' INTO v_mapzone_new;
 
 				IF v_mapzone_old IS NOT NULL OR v_mapzone_new IS NOT NULL THEN
-					INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
-					INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
+					--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
 
 					IF v_mapzone_old = v_mapzone_new and v_mapzone_new is not null THEN
 						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 						"client":{"device":4, "infoType":1,"lang":"ES"}, "data":{"parameters":{"nodeIdOld":"'||v_old_id||'",
 						"nodeIdNew":"'||v_id||'", "action":"updateNode"}}}$$);';
 
-						INSERT INTO audit_check_data (fid, result_id, error_message)
-						VALUES (v_fid, v_result_id, concat('New node and old node are delimiters of the same mapzone. Configuration will be updated.'));
+						--INSERT INTO audit_check_data (fid, result_id, error_message)
+						--VALUES (v_fid, v_result_id, concat('New node and old node are delimiters of the same mapzone. Configuration will be updated.'));
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3338", "function":"2714", "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 					ELSIF  v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
 
-						INSERT INTO audit_check_data (fid, result_id, error_message)
-						VALUES (v_fid, v_result_id, concat('New node is not a delimiter of a mapzone. Configuration for old node need to be removed.'));
+						--INSERT INTO audit_check_data (fid, result_id, error_message)
+						--VALUES (v_fid, v_result_id, concat('New node is not a delimiter of a mapzone. Configuration for old node need to be removed.'));
+										EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3336", "function":"2714", "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 					ELSIF  v_mapzone_old is null AND v_mapzone_new is not null THEN
-						INSERT INTO audit_check_data (fid, result_id, error_message)
-						VALUES (v_fid, v_result_id, concat('New node is a delimiter of a mapzone that needs to be configured.'));
+						--INSERT INTO audit_check_data (fid, result_id, error_message)
+						--VALUES (v_fid, v_result_id, concat('New node is a delimiter of a mapzone that needs to be configured.'));
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3334", "function":"2714", "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 					ELSIF v_mapzone_old!=v_mapzone_new AND  v_mapzone_old is not null AND v_mapzone_new is not null THEN
 
-						INSERT INTO audit_check_data (fid, result_id, error_message)
-						VALUES (v_fid, v_result_id,
-						concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter and old mapzone delimiter needs to be configured.'));
+					--	INSERT INTO audit_check_data (fid, result_id, error_message)
+						--VALUES (v_fid, v_result_id,
+						--concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter and old mapzone delimiter needs to be configured.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3332", "function":"2714", "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 					END IF;
 				END IF;
 
@@ -769,10 +831,13 @@ BEGIN
 						"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
 						"arcIdOld":'||v_old_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
 
-						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
-						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
-						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 1, concat('Node_1 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
+						--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
+						--INSERT INTO audit_check_data (fid, criticity, error_message)
+						--VALUES (v_fid, 1, concat('Node_1 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3322", "function":"2714", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 					END IF;
 
 					IF v_node2_graph IS NOT NULL THEN
@@ -781,10 +846,13 @@ BEGIN
 						"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 
 						"arcIdOld":'||v_old_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
 
-						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
-						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
-						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 1, concat('Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
+						--INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
+					--	INSERT INTO audit_check_data (fid, criticity, error_message)
+						--VALUES (v_fid, 1, concat('Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3320", "function":"2714", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 					END IF;
 			END IF;
 
@@ -804,7 +872,10 @@ BEGIN
 		IF v_audit_result is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
-		v_message = 'Replace feature done successfully';
+		--v_message = 'Replace feature done successfully';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3288", "function":"2714", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
+
 	    ELSE
 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;

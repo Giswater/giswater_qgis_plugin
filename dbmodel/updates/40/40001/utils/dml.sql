@@ -602,4 +602,92 @@ UPDATE sys_function SET function_alias = 'CALCULATE THE REACH OF HYDRANTS' WHERE
 UPDATE sys_function SET function_alias = 'REPLACE FEATURE' WHERE function_name = 'gw_fct_setchangefeaturetype';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3288, 'Replace feature done successfull', null, 0, true, 'utils', 'core', 'UI');
+VALUES(3290, '%v_count% operative connec(s) have been reconnected', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3292, '%v_count% planned connec(s) have been reconnected', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3294, '%v_count% operative gully(s) have been reconnected', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3296, '%v_count% planned gully(s) have been reconnected', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3298, '%v_count% operative/planned links(s) have been reconnected', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'REPLACE FEATURE' WHERE function_name = 'gw_fct_setfeaturereplace';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3300, 'Replace node id in %v_count% psector', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3302, 'Downgraded old feature %v_old_id% SETTING state: 0, workcat_id_end: %v_workcat_id_end%, enddate: %v_enddate%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3304, 'Update new feature, set state: 1, workcat_id: %v_workcat_id_end% builtdate: %v_enddate%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3306, 'Common values from old feature have been updated on new feature.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3308, 'New feature %v_id% inserted into connec table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3310, 'New feature %v_id% inserted into gully table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3312, 'Assign old data from %rec_addfields.column_name% addfield to the new feature.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3314, 'Reconnect arc %rec_arc.arc_id%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3316, 'Reconnect connec %rec_connec.connec_id%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3318, 'New feature %v_id% inserted into arc table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3288, 'Replace feature done successfully', null, 0, true, 'utils', 'core', 'UI');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3322, 'Node_1 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3320, 'Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.', null, 0, true, 'utils', 'core', 'UI');
+
+UPDATE sys_function SET function_alias = 'MAPZONES CONFIGURATION' WHERE function_name = 'gw_fct_setfeaturesreplace';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3332, 'New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter and old mapzone delimiter needs to be configured.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3334, 'New node is a delimiter of a mapzone that needs to be configured.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3336, 'New node is not a delimiter of a mapzone. Configuration for old node need to be removed.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3338, 'New node and old node are delimiters of the same mapzone. Configuration will be updated.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3340, 'Reconnect arc %rec_arc.arc_id%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3342, 'Reconnect %v_count% links.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3344, 'Assign %v_count% elements to the new feature.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3346, 'New feature (%v_id%) inserted into node table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
+
+
+
+
