@@ -140,7 +140,7 @@ BEGIN
     v_fields_json := COALESCE(v_fields_json, '{}');
 
     -- Create return JSON
-    RETURN abr25_ws.gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
+    RETURN PARENT_SCHEMA.gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
       ',"body":{"form":' || v_forminfo ||
          ', "feature":'|| v_featureinfo ||
           ',"data":{"fields":' || v_fields_json ||'}'||

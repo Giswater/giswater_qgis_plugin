@@ -10,7 +10,7 @@ or (at your option) any later version.
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_campaign_x_feature_validate_type();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_campaign_x_feature_validate_type()
-  RETURNS json AS
+ RETURNS trigger AS
 $BODY$
 
 DECLARE
@@ -21,11 +21,11 @@ DECLARE
     v_object_id TEXT;
     v_sql TEXT;
 
-      
+
 BEGIN
 
     -- Get allowed object_ids (feature_type list)
-    SELECT to_json(array_agg(object_id)) INTO v_feature_types_allowed 
+    SELECT to_json(array_agg(object_id)) INTO v_feature_types_allowed
     FROM SCHEMA_NAME.om_campaign oc 
     JOIN SCHEMA_NAME.om_campaign_review ocr ON oc.campaign_id = ocr.campaign_id 
     JOIN SCHEMA_NAME.om_reviewclass_x_object orxo ON ocr.reviewclass_id = orxo.reviewclass_id 
@@ -39,13 +39,13 @@ BEGIN
 
     -- Get the feature type (dynamic)
     v_sql := format(
-        'SELECT c.%I_type 
+        'SELECT c.%I_type
          FROM PARENT_SCHEMA.%I p 
          JOIN PARENT_SCHEMA.cat_%I c ON p.%Icat_id = c.id 
          WHERE p.%I_id = $1',
         v_feature, v_feature, v_feature, v_feature, v_feature
     );
-	
+
     EXECUTE v_sql
     INTO v_feature_type
     USING v_object_id;
@@ -69,5 +69,5 @@ BEGIN
     RETURN NEW;
 END;
 $BODY$
-LANGUAGE plpgsql VOLATILE
-COST 100;
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

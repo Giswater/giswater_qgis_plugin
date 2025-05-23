@@ -64,15 +64,6 @@ BEGIN
         EXECUTE v_update_stmt;
     END IF;
 
-    -- If workorder exists, update associated fields
-    IF v_record.workorder_id IS NOT NULL THEN
-        UPDATE SCHEMA_NAME.workorder
-        SET
-            observ = v_fields ->> 'observations',
-            address = v_fields ->> 'adress',
-            serie = v_fields ->> 'serie'
-        WHERE workorder_id = v_record.workorder_id;
-    END IF;
 
     -- Retrieve admin version if defined
     SELECT value INTO v_version

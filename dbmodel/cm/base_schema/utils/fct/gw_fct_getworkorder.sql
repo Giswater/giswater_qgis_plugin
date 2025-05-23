@@ -53,7 +53,7 @@ BEGIN
     v_tablename := (p_data -> 'feature' ->> 'tableName')::text;
     v_message   := (p_data -> 'data' ->> 'message')::json;
 
-    v_formname := 'workorder_form';
+    v_formname := 'workorder';
 
     SELECT SCHEMA_NAME.gw_fct_getformfieldscm(
         v_formname,
@@ -80,11 +80,11 @@ BEGIN
             v_fieldvalue := v_values ->> (aux_json ->> 'columnname');
 
             IF (aux_json ->> 'widgettype') = 'combo' THEN
-                v_fields[array_index] := abr25_ws.gw_fct_json_object_set_key(
+                v_fields[array_index] := gw_fct_json_object_set_key_cm(
                     aux_json, 'selectedId', COALESCE(v_fieldvalue,'')
                 );
             ELSE
-                v_fields[array_index] := abr25_ws.gw_fct_json_object_set_key(
+                v_fields[array_index] := gw_fct_json_object_set_key_cm(
                     aux_json, 'value', COALESCE(v_fieldvalue,'')
                 );
             END IF;
@@ -97,7 +97,7 @@ BEGIN
         FOR array_index IN array_lower(v_fields,1)..array_upper(v_fields,1) LOOP
             aux_json := v_fields[array_index];
             IF (aux_json ->> 'columnname') = v_idname THEN
-                v_fields[array_index] := abr25_ws.gw_fct_json_object_set_key(
+                v_fields[array_index] := gw_fct_json_object_set_key_cm(
                     aux_json, 'value', v_id::text
                 );
             END IF;
