@@ -87,7 +87,7 @@
           <item>
            <widget class="QTabWidget" name="tab_feature">
             <property name="currentIndex">
-             <number>4</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="tab_arc">
              <attribute name="title">

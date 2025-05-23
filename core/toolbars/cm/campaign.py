@@ -71,7 +71,6 @@ class Campaign:
         self.manager_dialog.tbl_campaign.doubleClicked.connect(self.open_campaign)
         self.manager_dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
         self.manager_dialog.campaign_btn_open.clicked.connect(self.open_campaign)
-        self.manager_dialog.btn_campaign_selector.clicked.connect(self.open_campaign_selector)
 
         self.manage_date_filter()
         tools_gw.open_dialog(self.manager_dialog, dlg_name="campaign_management")
@@ -126,7 +125,6 @@ class Campaign:
         if self.project_type == 'ud':
             self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
-
         self.excluded_layers = [
             "v_edit_arc", "v_edit_node", "v_edit_connec",
             "v_edit_gully", "v_edit_link"
@@ -164,6 +162,8 @@ class Campaign:
             if widget:
                 widget.setText(str(campaign_id))
                 widget.setProperty("columnname", "campaign_id")
+                widget.setObjectName("campaign_id")
+                self.campaign_id = campaign_id
 
         tools_gw.load_settings(self.dialog)
 
@@ -526,8 +526,7 @@ class Campaign:
             allowed_types = self.get_allowed_feature_subtypes(feature, reviewclass_id)
         elif self.campaign_type == 2:
             visitclass_id = tools_qt.get_combo_value(self.dialog, self.visitclass_combo)
-            allowed_types = self.get_allowed_feature_types_from_visitclass("om_visitclass", visitclass_id)
-
+            allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
         if not allowed_types:
             return
 
@@ -541,8 +540,10 @@ class Campaign:
             WHERE c.{feature}_type IN ({allowed_types_str})
             LIMIT 100
         """
-
         result = tools_db.get_rows(sql)
+        if not result:
+            return
+
         values = [row[id_column] for row in result if row.get(id_column)]
 
         completer = QCompleter(values)
@@ -576,6 +577,26 @@ class Campaign:
 
         self._manage_tabs_enabled(feature_types)
 
+    def get_allowed_feature_subtypes_visit(self, visitclass_id: int) -> list[str]:
+        """
+        Returns a list of feature_type strings from cm.om_visitclass
+        for the given visitclass_id.
+        """
+        # guard: ensure we have a valid integer
+        try:
+            vc_id = int(visitclass_id)
+        except (ValueError, TypeError):
+            return []
+
+        sql = f"""
+            SELECT feature_type
+              FROM cm.om_visitclass
+             WHERE id = {vc_id}
+        """
+        rows = tools_db.get_rows(sql)
+        # pull out non-null values
+        return [r["feature_type"] for r in rows if r.get("feature_type")]
+
     def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int):
         """
         Get allowed subtypes (e.g., TANK, PR_BREAK_VALVE) based on reviewclass_id and feature (node, arc, connec...).
@@ -606,10 +627,14 @@ class Campaign:
     def get_allowed_feature_types_from_visitclass(self, table_name: str, visitclass_id: int):
         """Function to get feature types directly from om_visitclass table."""
         sql = f"""
-            SELECT DISTINCT feature_type
-            FROM cm.{table_name}
-            WHERE id = {visitclass_id}
-        """
+                SELECT DISTINCT
+                    f.feature_type,
+                    f.feature_class
+                FROM cm.{table_name} v
+                JOIN {self.schema_parent}.cat_feature f
+                  ON v.feature_type = f.id
+                WHERE v.id = {visitclass_id}
+            """
         rows = tools_db.get_rows(sql)
         return [r["feature_type"].lower() for r in rows if r.get("feature_type")]
 

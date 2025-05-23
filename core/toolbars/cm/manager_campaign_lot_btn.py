@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from .campaign import Campaign
 from .lot import AddNewLot
+from .workorder import Workorder
 from ..dialog import GwAction
 from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
@@ -20,8 +21,9 @@ class GwManageCampaignLotButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.campaign_manager = Campaign(icon_path, action_name, text, toolbar, action_group)
         self.new_lot = AddNewLot(icon_path, action_name, text, toolbar, action_group)
+        self.workorder_manager = Workorder(icon_path, action_name, text, toolbar, action_group)
 
-        self.actions = [tools_qt.tr('Manage Campaign'), tools_qt.tr('Manage Lot')]
+        self.actions = [tools_qt.tr('Manage Campaign'), tools_qt.tr('Manage Lot'), tools_qt.tr('Manage Workorder')]
 
         # Create a menu and add all the actions
         self.menu = QMenu()
@@ -53,4 +55,6 @@ class GwManageCampaignLotButton(GwAction):
             self.campaign_manager.campaign_manager()
         elif selected_action == tools_qt.tr('Manage Lot'):
             self.new_lot.lot_manager()
+        elif selected_action == tools_qt.tr('Manage Workorder'):
+            self.workorder_manager.workorder_manager()
 

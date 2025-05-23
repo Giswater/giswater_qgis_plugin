@@ -22,26 +22,6 @@
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="1" column="0">
-         <widget class="QLabel" name="lbl_state">
-          <property name="text">
-           <string>Estat:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QComboBox" name="campaign_cmb_state"/>
-        </item>
-        <item row="3" column="3">
-         <widget class="QCheckBox" name="campaign_chk_show_nulls">
-          <property name="text">
-           <string>Mostrar valors buits</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="3">
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -58,17 +38,30 @@
         <item row="3" column="1">
          <widget class="QComboBox" name="campaign_cmb_date_filter_type"/>
         </item>
+        <item row="3" column="3">
+         <widget class="QCheckBox" name="campaign_chk_show_nulls">
+          <property name="text">
+           <string>Mostrar valors buits</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="campaign_cmb_state"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="lbl_state">
+          <property name="text">
+           <string>Estat:</string>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QLabel" name="lbl_column_filter_dates">
           <property name="text">
            <string>Columna filtre dates:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="4">
-         <widget class="QPushButton" name="btn_campaign_selector">
-          <property name="text">
-           <string>Selector de campanyes</string>
           </property>
          </widget>
         </item>
@@ -184,27 +177,6 @@
          <widget class="QPushButton" name="campaign_btn_delete">
           <property name="text">
            <string>Eliminar Campanya</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLineEdit" name="campaign_txt_path"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_path">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_export">
-          <property name="text">
-           <string>Exportar a csv</string>
           </property>
          </widget>
         </item>

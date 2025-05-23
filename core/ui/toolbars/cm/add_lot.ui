@@ -26,19 +26,7 @@
          <attribute name="title">
           <string>Lot</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
-          <item>
-           <widget class="QGroupBox" name="grb_ot">
-            <property name="title">
-             <string>Ordre de treball:</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="0">
-              <layout class="QGridLayout" name="lyt_data_1"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
           <item>
            <widget class="QGroupBox" name="grb_lot">
             <property name="title">

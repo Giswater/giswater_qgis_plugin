@@ -42,6 +42,7 @@ class AddNewLot:
         self.plugin_dir = lib_vars.plugin_dir
         self.schemaname = lib_vars.schema_name
         self.iface = global_vars.iface
+        self.dict_tables = None
 
     def manage_lot(self, lot_id=None, is_new=True):
         """Open the AddLot dialog and load dynamic fields from gw_fct_getlot."""
@@ -217,7 +218,7 @@ class AddNewLot:
                 result_relation.append(row[0])
         return widget
 
-    def _load_lot_relations(self, campaign_id):
+    def _load_lot_relations(self, lot_id):
         """
         Load related elements into lot relation tabs for the given ID.
         Includes 'gully' only if project type is UD.
@@ -240,8 +241,8 @@ class AddNewLot:
         for table_name, (db_table, col_id) in relation_tabs.items():
             view = getattr(self.dlg_lot, table_name, None)
             if view:
-                sql = f"SELECT * FROM cm.{db_table} WHERE lot_id = {campaign_id}"
-                self.populate_lots_manager(view, sql)
+                sql = f"SELECT * FROM cm.{db_table} WHERE lot_id = {lot_id}"
+                self.populate_manager_lot(view, sql)
 
     def get_widget_by_columnname(self, dialog, columnname):
         for widget in dialog.findChildren(QWidget):
@@ -422,7 +423,6 @@ class AddNewLot:
         if layer:
             layer.removeSelection()
         tools_gw.save_settings(self.dlg_lot)
-        self.save_user_values(self.dlg_lot)
         self.iface.actionPan().trigger()
         tools_gw.close_dialog(self.dlg_lot)
 
@@ -431,7 +431,6 @@ class AddNewLot:
 
         self.dlg_lot_man = LotManagementUi(self)
         tools_gw.load_settings(self.dlg_lot_man)
-        self.load_user_values(self.dlg_lot_man)
 
         self.dlg_lot_man.tbl_lots.setEditTriggers(QTableView.NoEditTriggers)
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QTableView.SelectRows)
@@ -468,9 +467,21 @@ class AddNewLot:
         if not hasattr(self.dlg_lot_man, "tbl_lots"):
             return
         query = "SELECT * FROM cm.om_campaign_lot ORDER BY lot_id DESC"
-        self.populate_lots_manager(self.dlg_lot_man.tbl_lots, query)
+        self.populate_manager_lot(self.dlg_lot_man.tbl_lots, query)
 
-    def populate_lots_manager(self, view: QTableView, query: str, columns: list[str] = None):
+    def init_filters(self):
+        current_date = QDate.currentDate()
+        sql = 'SELECT MIN(startdate), MAX(startdate) FROM cm.om_campaign_lot'
+        row = tools_db.get_rows(sql)
+
+        if row and row[0]:
+            self.dlg_lot_man.date_event_from.setDate(row[0][0] or current_date)
+            self.dlg_lot_man.date_event_to.setDate(row[0][1] or current_date)
+        else:
+            self.dlg_lot_man.date_event_from.setDate(current_date)
+            self.dlg_lot_man.date_event_to.setDate(current_date)
+
+    def populate_manager_lot(self, view: QTableView, query: str, columns: list[str] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
@@ -492,18 +503,6 @@ class AddNewLot:
 
         view.setModel(model)
         view.resizeColumnsToContents()
-
-    def init_filters(self):
-        current_date = QDate.currentDate()
-        sql = 'SELECT MIN(startdate), MAX(startdate) FROM cm.om_campaign_lot'
-        row = tools_db.get_rows(sql)
-
-        if row and row[0]:
-            self.dlg_lot_man.date_event_from.setDate(row[0][0] or current_date)
-            self.dlg_lot_man.date_event_to.setDate(row[0][1] or current_date)
-        else:
-            self.dlg_lot_man.date_event_from.setDate(current_date)
-            self.dlg_lot_man.date_event_to.setDate(current_date)
 
     def filter_lot(self):
         """Filter lot records based on date range and date type."""
@@ -550,7 +549,7 @@ class AddNewLot:
         if where_clause:
             query += f" WHERE {where_clause}"
         query += " ORDER BY lot_id DESC"
-        self.populate_lots_manager(self.dlg_lot_man.tbl_lots, query)
+        self.populate_manager_lot(self.dlg_lot_man.tbl_lots, query)
 
     def open_lot(self, index=None):
         """Open selected lot in edit mode, from button or double click."""
@@ -598,22 +597,6 @@ class AddNewLot:
 
         tools_qgis.show_info(f"{deleted} lot(s) deleted.", dialog=self.dlg_lot_man)
         self.filter_lot()
-
-    def save_user_values(self, dialog):
-        """Saves the current user-specific settings or preferences from the dialog to persistent storage,
-        ensuring that the user's configuration is maintained for future sessions."""
-
-        cur_user = tools_db.get_current_user()
-        csv_path = tools_qt.get_text(dialog, dialog.txt_path)
-        tools_gw.set_config_parser("lots", dialog.objectName() + cur_user, csv_path)
-
-    def load_user_values(self, dialog):
-        """Loads previously saved user-specific settings or preferences into the dialog,
-        restoring configuration and personalization from prior sessions."""
-
-        cur_user = tools_db.get_current_user()
-        csv_path = tools_qgis.get_plugin_settings_value(self.plugin_name, dialog.objectName() + cur_user)
-        tools_qt.set_widget_text(dialog, dialog.txt_path, str(csv_path))
 
     """ FUNCTIONS RELATED WITH TAB LOAD"""
 
