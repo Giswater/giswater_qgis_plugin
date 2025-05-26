@@ -14,7 +14,6 @@ class Workorder:
     """Handles workorder management and dynamic CRUD via JSON-driven forms"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        #self.cm_schema = lib_vars.project_vars['cm_schema'].strip("'")
         self.date_format = 'yyyy-MM-dd'
         self.manager_dialog = None
         self.fields_form = []
