@@ -161,8 +161,8 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=212 AND cur_user=current_user;
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (212, null, 4, 'ARC DIVIDE');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (212, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2114", "fid":"212", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- State control
 	IF v_state_arc=0 THEN
@@ -198,8 +198,8 @@ BEGIN
 			ORDER BY ST_Distance(v_node_geom, a.the_geom) LIMIT 1;
 
 			IF v_arc_id IS NOT NULL THEN
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (212, 1, concat('Divide arc ', v_arc_id,'.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3348", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 				-- Get arctype
 				v_sql := 'SELECT arc_type FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||'::text);';
@@ -319,8 +319,8 @@ BEGIN
 							"data":{"message":"3202", "function":"2114","parameters":{"arc_id":"'||rec_aux1.arc_id||'"}, "is_process":true}}$$);' INTO v_audit_result;
 						END IF;
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Insert new arcs into arc table.');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3350", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1, concat('Arc1: arc_id:', rec_aux1.arc_id,', code:',rec_aux1.code,' length:',
@@ -338,8 +338,9 @@ BEGIN
 						EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 						EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1, 'Insert new arcs into man and epa table.');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3352", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
+
 
 						-- update node_1 and node_2 because it's not possible to pass using parameters
 						UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
@@ -351,8 +352,8 @@ BEGIN
 							UPDATE arc SET link=rec_aux2.arc_id where arc_id=rec_aux2.arc_id;
 						END IF;
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Update values of arcs node_1 and node_2.');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3416", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
 
@@ -387,8 +388,10 @@ BEGIN
 
 							END LOOP;
 
-							INSERT INTO audit_check_data (fid, result_id, error_message)
-							VALUES (v_fid, v_result_id, concat('Copy values from old arc: ',v_arc_id,' to the new arcs: (',rec_aux1.arc_id,', ',rec_aux2.arc_id,').'));
+					   EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3354", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'", "rec_aux1.arc_id":"'||rec_aux1.arc_id||'", "rec_aux2.arc_id":"'||rec_aux2.arc_id||'"}, "fid":"212", "result_id":"arc divide", "is_process":true}}$$)';
+					
+
 						END IF;
 
 						-- update arc_id of disconnected nodes linked to old arc
@@ -398,8 +401,9 @@ BEGIN
 							v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1)
 							WHERE node_id=rec_node.node_id;
 
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3356", "function":"2114", "parameters":{"rec_node.node_id":"'||rec_node.node_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
+					
 						END LOOP;
 
 						IF v_project_type='UD' THEN
@@ -451,8 +455,10 @@ BEGIN
 								DELETE FROM element_x_arc WHERE arc_id=v_arc_id;
 							END LOOP;
 
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Copy ',v_count,' elements from old to new arcs.'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3358", "function":"2114", "parameters":{"v_count":"'||v_count||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
+
+
 						END IF;
 
 						-- Update documents from old arc to the new arcs
@@ -464,8 +470,8 @@ BEGIN
 								DELETE FROM doc_x_arc WHERE arc_id=v_arc_id;
 							END LOOP;
 
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Copy ',v_count,' documents from old to new arcs.'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3360", "function":"2114", "parameters":{"v_count":"'||v_count||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 
 						-- Update visits from old arc to the new arcs (only for state=1, state=1)
@@ -538,8 +544,8 @@ BEGIN
 								END IF;
 							END LOOP;
 
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Copy ',v_count,' visits from old to new arcs.'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3362", "function":"2114", "parameters":{"v_count":"'||v_count||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						END IF;
 
@@ -640,8 +646,9 @@ BEGIN
 
 							--reconfigure mapzones
 							IF v_new_node_graph IS NOT NULL THEN
-								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (212, 1, concat('New node is a delimiter of a mapzone that needs to be configured.'));
+								
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3364", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 							END IF;
 
 							IF v_node1_graph IS NOT NULL THEN
@@ -654,10 +661,12 @@ BEGIN
 								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 								"data":{"parameters":{"nodeIdOld":"'||v_node_1||'", "arcIdOld":"'||v_arc_id||'", "arcIdNew":"'||v_graph_arc_id||'", "action":"updateArc"}}}$$);';
 
-								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat(''));
-								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat('-----MAPZONES CONFIGURATION-----'));
-								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (212, 0, concat('Node_1 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2114", "fid":"212", "criticity":"0", "is_process":true, "is_header":"true"}}$$)';
+
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3366", "function":"2114", "fid":"212", "criticity":"0", "is_process":true}}$$)';
+
 							END IF;
 
 							IF v_node2_graph IS NOT NULL THEN
@@ -670,25 +679,27 @@ BEGIN
 								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 								"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", "arcIdOld":"'||v_arc_id||'", "arcIdNew":"'||v_graph_arc_id||'", "action":"updateArc"}}}$$);';
 
-								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat(''));
-								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat('-----MAPZONES CONFIGURATION-----'));
-								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (212, 0, concat('Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2114", "fid":"212", "criticity":"0", "is_process":true, "is_header":"true"}}$$)';
+						
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3368", "function":"2114", "fid":"212", "criticity":"0", "is_process":true}}$$)';
 							END IF;
 						END IF;
 
 						--set arc to obsolete or delete it
 						IF v_set_arc_obsolete IS TRUE THEN
 							UPDATE arc SET state=0, state_type=v_obsoletetype  WHERE arc_id=v_arc_id;
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Set old arc to obsolete: ',v_arc_id,'.'));
+			
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3370", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						ELSE
 							EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 							"feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_arc_id||'"}}$$);';
 
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3382", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 
 					ELSIF v_state_node = 2 THEN --is psector
@@ -702,8 +713,8 @@ BEGIN
 
 						IF v_state_arc = 1 THEN -- ficticius arc
 
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, 'Arc with state =1, node with state = 2.');
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3384", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 							rec_aux1.state=2;
 							rec_aux1.state_type=v_ficticius;
@@ -713,13 +724,14 @@ BEGIN
 
 						ELSIF v_state_arc = 2 THEN -- planned arc
 
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, 'Arc and node have both state = 2.');
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3386", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						END IF;
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Insert new arcs into arc table.');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3388", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
+
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1, concat('Arc1: arc_id:', rec_aux1.arc_id,', code:',rec_aux1.code,' length:',
@@ -733,8 +745,8 @@ BEGIN
 						INSERT INTO arc SELECT rec_aux1.*;
 						INSERT INTO arc SELECT rec_aux2.*;
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Insert new arcs into man and epa table.');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3390", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						-- Insert new records into man table
 						EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
@@ -747,8 +759,8 @@ BEGIN
 						-- restore temporary value for edit_disable_statetopocontrol variable
 						UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Update values of arcs node_1 and node_2.');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3392", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						-- update node_1 and node_2 because it's not possible to pass using parameters
 						UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
@@ -793,23 +805,22 @@ BEGIN
 
 							END LOOP;
 
-							INSERT INTO audit_check_data (fid, result_id, error_message)
-							VALUES (v_fid, v_result_id, concat('Copy values from old arc: ',v_arc_id,' to the new arcs: (',rec_aux1.arc_id,', ',rec_aux2.arc_id,').'));
-
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3394", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'", "rec_aux1.arc_id":"'||rec_aux1.arc_id||'", "rec_aux2.arc_id":"'||rec_aux2.arc_id||'" },"fid":"212", "result_id":"arc divide", "is_process":true}}$$)';
 						END IF;
 
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3396", "function":"2114","fid":"212", "criticity":"1", "is_process":true}}$$)';						
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Copy elements is not avaliable from old arc to new arc when node.state = 2');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3398", "function":"2114","fid":"212", "criticity":"1", "is_process":true}}$$)';
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Copy documents is not avaliable from old arc to new arcs when node.state = 2');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3400", "function":"2114","fid":"212", "criticity":"1", "is_process":true}}$$)';
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Copy visits is not avaliable from old arc to new arcs when node.state = 2');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3402", "function":"2114","fid":"212", "criticity":"1", "is_process":true}}$$)';
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Reconnect disconnected nodes on this alternative');
 
 						IF v_project_type='WS' THEN
 
@@ -820,13 +831,14 @@ BEGIN
 								v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1)
 								WHERE node_id=rec_node.node_id;
 
-								INSERT INTO audit_check_data (fid,  criticity, error_message)
-								VALUES (212, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3404", "function":"2114", "parameters":{"rec_node.node_id":"'||rec_node.node_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
+
 							END LOOP;
 						END IF;
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Update psector''s arc_id value for connec and gully setting null value to force trigger to get new arc_id as closest as possible');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3406", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						IF v_state_arc = 1 THEN -- ficticius arc
 
@@ -961,8 +973,9 @@ BEGIN
 								UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
 								UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
 
-								INSERT INTO audit_check_data (fid,  criticity, error_message)
-								VALUES (212, 1, 'Update psector_x_arc as doable for fictitious arcs.');
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3408", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
+
 							END IF;
 
 							-- reconnect planned connec links
@@ -1037,11 +1050,11 @@ BEGIN
 							UPDATE config_param_user SET value=v_force_delete WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 						END IF;
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,concat('Insert old arc as downgraded into current psector: ',v_psector,'.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3410", "function":"2114", "parameters":{"v_psector":"'||v_psector||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1,'Set values on plan_psector_x_arc addparam.');
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3412", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						-- Set addparam (parent/child)
 						UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"parent"}' WHERE  psector_id=v_psector AND arc_id=v_arc_id;
@@ -1080,7 +1093,6 @@ BEGIN
 
 					---- end of the place
 
-
 				END IF;
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -1098,7 +1110,6 @@ BEGIN
 		END IF;
 	END IF;
 
-
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
@@ -1108,7 +1119,10 @@ BEGIN
 	IF v_audit_result is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
-		v_message = 'Arc divide done successfully';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3414", "function":"2114", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
+
 	ELSE
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
