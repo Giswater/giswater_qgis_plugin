@@ -43,7 +43,7 @@ v_temp_table text = '';
 v_criticity integer;
 _key text;
 _value text;
-v_prefix_id integer;
+v_label_id integer;
 v_header_separator_id integer = 2030; -- there are 30 dashes
 v_is_header boolean = false;
 v_function_alias text;
@@ -69,23 +69,37 @@ BEGIN
 	v_temp_table = ((p_data ->>'data')::json->>'tempTable')::text;
 	v_criticity = ((p_data ->>'data')::json->>'criticity')::integer;
 	v_is_header = ((p_data ->>'data')::json->>'is_header')::boolean;
-	v_prefix_id = ((p_data ->>'data')::json->>'prefix_id')::text;
+	v_label_id = ((p_data ->>'data')::json->>'label_id')::text;
+	v_header_separator_id = ((p_data ->>'data')::json->>'separator_id')::integer;
 
 	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 
 	IF v_is_header THEN
 
-        -- get label from sys_function, upper()
-        -- get separator from sys_label
-		SELECT function_alias INTO v_function_alias FROM sys_function WHERE id=v_function_id;
+		IF v_label_id IS NOT NULL THEN
+			SELECT * INTO rec_cat_label FROM sys_label  WHERE sys_label.id=v_label_id;
 
-		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
-		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_function_alias)||');';
+		ELSE
+			-- get label from sys_function, upper()
+			-- get separator from sys_label
+
+			SELECT function_alias INTO v_function_alias FROM sys_function WHERE id=v_function_id;
+		END IF;
+
+		IF rec_cat_label IS NULL THEN
+
+			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(COALESCE(v_function_alias, ''))||');';
+		ELSE
+
+			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(rec_cat_label.idval)||');';
+		END IF;
 
 		EXECUTE v_querytext;
 
-		SELECT idval INTO v_separator FROM sys_label WHERE id = v_header_separator_id;
+		SELECT idval INTO v_separator FROM sys_label WHERE id = COALESCE(v_header_separator_id, 2030);
 
 		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
 		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||');';
