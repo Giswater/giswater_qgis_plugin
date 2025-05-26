@@ -195,8 +195,6 @@ BEGIN
 		v_fid=144;
 	ELSIF v_class = 'SECTOR' THEN
 		v_fid=130;
-	ELSIF v_class = 'DRAINZONE' THEN
-		v_fid=481;
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3090", "function":"2710","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
@@ -223,6 +221,11 @@ BEGIN
     ELSE
 		v_expl_id_array = string_to_array(v_expl_id, ',');
     END IF;
+
+	-- Delete temporary tables
+	-- =======================
+	v_data := '{"data":{"action":"DROP", "fct_name":"'|| v_class ||'"}}';
+	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
 	-- Create temporary tables
 	-- =======================
@@ -898,7 +901,7 @@ BEGIN
 					WHERE t.mapzone_id = -1
 					AND t.arc_id IS NOT NULL
 					UNION
-					SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, a.'||v_mapzone_field||'::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
+					SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, t.mapzone_id::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
 					FROM temp_pgr_arc t
 					JOIN arc a USING (arc_id)
 					JOIN '|| v_mapzone_name ||' m ON t.mapzone_id = m.'|| v_mapzone_field ||'
@@ -919,7 +922,7 @@ BEGIN
 						''properties'', to_jsonb(row) - ''the_geom''
 					) AS feature
 					FROM (
-						SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, a.'||v_mapzone_field||'::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
+						SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, t.mapzone_id::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
 						FROM temp_pgr_arc t
 						JOIN arc a USING (arc_id)
 						JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
@@ -943,7 +946,7 @@ BEGIN
 					''properties'', to_jsonb(row) - ''the_geom''
 				) AS feature
 				FROM (
-					SELECT n.'||v_mapzone_field||'::TEXT AS mapzone_id, m.name AS descript, '||v_fid||' AS fid, n.expl_id, n.the_geom
+					SELECT t.mapzone_id::TEXT AS mapzone_id, m.name AS descript, '||v_fid||' AS fid, n.expl_id, n.the_geom
 					FROM temp_pgr_node t
 					JOIN node n USING (node_id)
 					JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
@@ -980,14 +983,13 @@ BEGIN
 
 
 			-- old zone id array
-			SELECT jsonb_agg(a.old_mapzone_id) INTO v_old_mapzone_id_array
+			SELECT string_agg(a.old_mapzone_id::text, ',') INTO v_old_mapzone_id_array
 			FROM (
 				SELECT DISTINCT old_mapzone_id FROM temp_pgr_node
 				UNION
 				SELECT DISTINCT old_mapzone_id FROM temp_pgr_connec
 				UNION
 				SELECT DISTINCT old_mapzone_id FROM temp_pgr_arc
-
 			) a
 			WHERE a.old_mapzone_id IS NOT NULL
 			AND a.old_mapzone_id > 0;
@@ -998,8 +1000,8 @@ BEGIN
 			FROM temp_pgr_arc ta
 			WHERE ta.mapzone_id <= 0
 			AND ta.arc_id IS NOT NULL
-			AND arc.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-			AND arc.'||quote_ident(v_mapzone_field)||' <> 0;';
+			AND arc.'||quote_ident(v_mapzone_field)||' <> 0
+			' || CASE WHEN v_old_mapzone_id_array IS NULL THEN '' ELSE 'AND arc.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')' END || '';
 			RAISE NOTICE 'v_querytext:: UPDATE arc %', v_querytext;
 			EXECUTE v_querytext;
 
@@ -1007,8 +1009,8 @@ BEGIN
 			FROM temp_pgr_connec tc
 			WHERE tc.mapzone_id <= 0
 			AND tc.connec_id IS NOT NULL
-			AND connec.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-			AND connec.'||quote_ident(v_mapzone_field)||' <> 0;';
+			AND connec.'||quote_ident(v_mapzone_field)||' <> 0
+			' || CASE WHEN v_old_mapzone_id_array IS NULL THEN '' ELSE 'AND connec.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')' END || '';
 			RAISE NOTICE 'v_querytext:: UPDATE connec %', v_querytext;
 			EXECUTE v_querytext;
 
@@ -1016,8 +1018,8 @@ BEGIN
 			FROM temp_pgr_node tn
 			WHERE tn.mapzone_id <= 0
 			AND tn.node_id IS NOT NULL
-			AND node.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-			AND node.'||quote_ident(v_mapzone_field)||' <> 0;';
+			AND node.'||quote_ident(v_mapzone_field)||' <> 0
+			' || CASE WHEN v_old_mapzone_id_array IS NULL THEN '' ELSE 'AND node.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')' END || '';
 			RAISE NOTICE 'v_querytext:: UPDATE node %', v_querytext;
 			EXECUTE v_querytext;
 
@@ -1025,34 +1027,49 @@ BEGIN
 			FROM temp_pgr_link tl
 			WHERE tl.mapzone_id <= 0
 			AND tl.link_id IS NOT NULL
-			AND link.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-			AND link.'||quote_ident(v_mapzone_field)||' <> 0;';
+			AND link.'||quote_ident(v_mapzone_field)||' <> 0
+			' || CASE WHEN v_old_mapzone_id_array IS NULL THEN '' ELSE 'AND link.'||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')' END || '';
 			RAISE NOTICE 'v_querytext:: UPDATE link %', v_querytext;
 			EXECUTE v_querytext;
 
 
-			v_querytext = 'UPDATE arc SET '||quote_ident(v_mapzone_field)||' = a.'||quote_ident(v_mapzone_field)||', updated_by = a.updated_by, updated_at = a.updated_at 
-			FROM temp_pgr_mapzone a WHERE a.mapzone_id=arc.'||quote_ident(v_mapzone_field)||'
-			AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
-			RAISE NOTICE 'v_querytext:: UPDATE arc %', v_querytext;
+			v_querytext = 'UPDATE arc SET '||quote_ident(v_mapzone_field)||' = ta.mapzone_id
+			FROM temp_pgr_arc ta
+			WHERE ta.arc_id = arc.arc_id
+			AND ta.mapzone_id IS NOT NULL
+			AND ta.mapzone_id <> 0
+			AND arc.'||quote_ident(v_mapzone_field)||' = ta.old_mapzone_id;';
+			RAISE NOTICE 'v_querytext:: UPDATE arc dynamic mapzone %', v_querytext;
 			EXECUTE v_querytext;
 
-			v_querytext = 'UPDATE node SET '||quote_ident(v_mapzone_field)||' = n.'||quote_ident(v_mapzone_field)||', updated_by = n.updated_by, updated_at = n.updated_at 
-			FROM temp_pgr_mapzone a WHERE a.mapzone_id=node.'||quote_ident(v_mapzone_field)||'
-			AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
-			RAISE NOTICE 'v_querytext:: UPDATE node %', v_querytext;
+			v_querytext = 'UPDATE node SET '||quote_ident(v_mapzone_field)||' = ta.mapzone_id
+			FROM temp_pgr_node ta
+			WHERE ta.node_id = node.node_id
+			AND ta.mapzone_id IS NOT NULL
+			AND ta.mapzone_id <> 0
+			AND node.'||quote_ident(v_mapzone_field)||' = ta.old_mapzone_id;';
+			RAISE NOTICE 'v_querytext:: UPDATE node dynamic mapzone %', v_querytext;
 			EXECUTE v_querytext;
 
-			v_querytext = 'UPDATE connec SET '||quote_ident(v_mapzone_field)||' = c.'||quote_ident(v_mapzone_field)||', updated_by = c.updated_by, updated_at = c.updated_at 
-			FROM temp_pgr_mapzone a WHERE a.mapzone_id=connec.'||quote_ident(v_mapzone_field)||'
-			AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
-			RAISE NOTICE 'v_querytext:: UPDATE connec %', v_querytext;
+			v_querytext = 'UPDATE connec SET '||quote_ident(v_mapzone_field)||' = tpa.mapzone_id
+			FROM temp_pgr_connec tpc
+			JOIN temp_pgr_arc tpa ON tpc.arc_id = tpa.arc_id
+			WHERE tpc.connec_id = connec.connec_id
+			AND tpa.mapzone_id IS NOT NULL
+			AND tpa.mapzone_id <> 0
+			AND connec.'||quote_ident(v_mapzone_field)||' = tpa.old_mapzone_id;';
+			RAISE NOTICE 'v_querytext:: UPDATE connec dynamic mapzone %', v_querytext;
 			EXECUTE v_querytext;
 
-			v_querytext = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = l.'||quote_ident(v_mapzone_field)||', updated_by = l.updated_by, updated_at = l.updated_at 
-			FROM temp_pgr_mapzone a WHERE a.mapzone_id=link.'||quote_ident(v_mapzone_field)||'
-			AND a.'||quote_ident(v_mapzone_field)||'::integer <> 0;';
-			RAISE NOTICE 'v_querytext:: UPDATE link %', v_querytext;
+			v_querytext = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = tpa.mapzone_id
+			FROM temp_pgr_link tpl
+			JOIN v_temp_link_connec v ON v.link_id = tpl.link_id::int
+			JOIN temp_pgr_arc tpa ON tpa.arc_id = v.arc_id
+			WHERE tpl.link_id::int = link.link_id
+			AND tpa.mapzone_id IS NOT NULL
+			AND tpa.mapzone_id <> 0
+			AND link.'||quote_ident(v_mapzone_field)||' = tpa.old_mapzone_id;';
+			RAISE NOTICE 'v_querytext:: UPDATE link connec dynamic mapzone %', v_querytext;
 			EXECUTE v_querytext;
 
 			-- static pressure for
@@ -1072,10 +1089,6 @@ BEGIN
 
 	END IF;
 
-	-- Delete temporary tables
-	-- =======================
-	v_data := '{"data":{"action":"DROP", "fct_name":"'|| v_class ||'"}}';
-	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
         RETURN v_response;

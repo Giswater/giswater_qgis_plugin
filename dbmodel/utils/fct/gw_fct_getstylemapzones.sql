@@ -40,9 +40,13 @@ v_trapresszone text;
 v_tradma text;
 v_tradqa text;
 v_drainzone json;
+v_dwfzone json;
 v_modedrainzone text = 'Random';
+v_modedwfzone text = 'Random';
 v_coldrainzone text;
+v_coldwfzone text;
 v_tradrainzone text;
+v_traddwfzone text;
 v_netscenario_dma json;
 v_netscenario_presszone json;
 v_graphclass text;
@@ -131,15 +135,19 @@ BEGIN
 
 			-- get mode
 			v_modedrainzone := (SELECT (value::json->>'DRAINZONE')::json->>'mode' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+			v_modedwfzone := (SELECT (value::json->>'DWFZONE')::json->>'mode' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
 			-- get column to simbolize
 			v_coldrainzone := (SELECT (value::json->>'DRAINZONE')::json->>'column' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+			v_coldwfzone := (SELECT (value::json->>'DWFZONE')::json->>'column' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
 			-- get transparency
 			v_tradrainzone := (SELECT (value::json->>'DRAINZONE')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+			v_traddwfzone := (SELECT (value::json->>'DWFZONE')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
 			-- get mapzone values
 			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldrainzone||' as id, stylesheet::json FROM v_edit_drainzone WHERE drainzone_id > 0) row' INTO v_drainzone;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldwfzone||' as id, stylesheet::json FROM v_edit_dwfzone WHERE dwfzone_id > 0) row' INTO v_dwfzone;
 
 		END IF;
 
@@ -148,6 +156,7 @@ BEGIN
 		v_presszone := COALESCE(v_presszone, '{}');
 		v_dqa  := COALESCE(v_dqa, '{}');
 		v_drainzone  := COALESCE(v_drainzone, '{}');
+		v_dwfzone  := COALESCE(v_dwfzone, '{}');
 		v_netscenario_dma  := COALESCE(v_netscenario_dma, '{}');
 		v_netscenario_presszone  := COALESCE(v_netscenario_presszone, '{}');
 		v_colsector  := COALESCE(v_colsector, '{}');
@@ -155,11 +164,14 @@ BEGIN
 		v_coldma  := COALESCE(v_coldma, '{}');
 		v_coldqa  := COALESCE(v_coldqa, '{}');
 		v_coldrainzone  := COALESCE(v_coldrainzone, '{}');
+		v_coldwfzone  := COALESCE(v_coldwfzone, '{}');
 		v_trasector  := COALESCE(v_trasector, '0.5');
 		v_trapresszone := COALESCE(v_trapresszone, '0.5');
 		v_tradma := COALESCE(v_tradma, '0.5');
 		v_tradqa := COALESCE(v_tradqa, '0.5');
 		v_tradrainzone := COALESCE(v_tradrainzone, '0.5');
+		v_traddwfzone := COALESCE(v_traddwfzone, '0.5');
+
 
 		--    Return
 		RETURN ('{"status":"Accepted", "version":'||v_version||
@@ -172,6 +184,7 @@ BEGIN
 					',{"name":"netscenario_dma",  "mode": "'||v_modedma||'", "idname": "'||v_coldma||'", "layer":"v_edit_plan_netscenario_dma", "transparency":'||v_tradma||', "values":' || v_netscenario_dma ||'}'||
 					',{"name":"netscenario_presszone",  "mode": "'||v_modepresszone||'", "idname": "'||v_colpresszone||'", "layer":"v_edit_plan_netscenario_presszone", "transparency":'||v_trapresszone||', "values":' || v_netscenario_presszone ||'}'||
 					',{"name":"drainzone",  "mode": "'||v_modedrainzone||'", "idname": "'||v_coldrainzone||'", "layer":"v_edit_drainzone", "transparency":'||v_tradrainzone||', "values":' || v_drainzone ||'}'||
+					',{"name":"dwfzone",  "mode": "'||v_modedwfzone||'", "idname": "'||v_coldwfzone||'", "layer":"v_edit_dwfzone", "transparency":'||v_traddwfzone||', "values":' || v_dwfzone ||'}'||
 					']}}'||
 			'}')::json;
 	END IF;
