@@ -623,7 +623,7 @@ class GwLoadProject(QObject):
             muni_id = feature["muni_id"]
             msg = "Selected {0}"
             msg_params = ("muni_id",)
-            tools_log.log_info(msg, parameter=muni_id,msg_params=msg_params)
+            tools_log.log_info(msg, parameter=muni_id, msg_params=msg_params)
             break
 
         tools_gw.disconnect_signal('load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')
