@@ -224,6 +224,8 @@ AS WITH
       arc_add.mincut_watervol,
       arc_add.mincut_criticity,
       arc_add.pipe_capacity,
+      arc_add.mincut_impact,
+      arc_add.mincut_affectation,
       sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
       dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
       presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
