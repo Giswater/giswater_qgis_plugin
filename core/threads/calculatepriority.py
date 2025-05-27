@@ -18,7 +18,6 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ...libs import tools_db, tools_qt, lib_vars
-from typing import Optional
 
 
 def get_min_greater_than(iterable, value):
