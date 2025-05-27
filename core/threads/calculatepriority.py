@@ -133,7 +133,7 @@ class GwCalculatePriority(GwTask):
             return False
 
     def _calculate_ivi(self, arcs, year, replacements=False):
-        current_value = self._current_value(arcs, year, replacements, True)
+        current_value = self._current_value(arcs, year, replacements)
         replacement_cost = self._replacement_cost(arcs)
         return current_value / replacement_cost
 
@@ -149,7 +149,7 @@ class GwCalculatePriority(GwTask):
             """
         )
 
-    def _current_value(self, arcs, year, replacements=False, invalid_ivi: Optional[bool] = False):
+    def _current_value(self, arcs, year, replacements=False):
         current_value = 0
         for arc in arcs:
             if (
@@ -163,14 +163,12 @@ class GwCalculatePriority(GwTask):
                     arc["builtdate"], "year", None
                 ) or self.config_material.get_default_builtdate(arc["matcat_id"])
             residual_useful_life = builtdate + arc["total_expected_useful_life"] - year
-            current_value += (
-                arc["cost_constr"]
-                * residual_useful_life
-                / arc["total_expected_useful_life"]
-            )
 
-        if invalid_ivi:
-            current_value = current_value if current_value > 0 else 0
+            result = (
+                arc["cost_constr"]
+                * residual_useful_life / arc["total_expected_useful_life"])
+
+            current_value += result if result > 0 else 0
 
         return current_value
 
@@ -716,6 +714,10 @@ class GwCalculatePriority(GwTask):
             # Calculate the longevity value [real life/ expected useful life]
             arc["longevity"] = real_years / duration
 
+            # Calculate the current cost of construction
+            current_cost_constr = arc["cost_constr"] * (1 - arc["longevity"])
+            arc["current_cost_constr"] = current_cost_constr if current_cost_constr >= 0 else 0
+
             arc["nrw"] = nrw.get(arc["dma_id"], 0)
 
             arc["material_compliance"] = self.config_material.get_compliance(
@@ -892,6 +894,7 @@ class GwCalculatePriority(GwTask):
                 "cost_by_meter",
                 "length",
                 "cost_constr",
+                "current_cost_constr",
                 "val_1",
                 "val_2",
                 "cum_cost_constr",
@@ -1157,10 +1160,10 @@ class GwCalculatePriority(GwTask):
         total_replacement_cost_header = tools_qt.tr("Total replacement cost (€):")
         ivi_header = tools_qt.tr("IVI (Horizon year):")
         replacement_rate_header = tools_qt.tr("Replacement rate (%/year):")
-
-        current_value = self._current_value(arcs, self.target_year)
+        current_cost = sum(arc["current_cost_constr"] for arc in arcs)
         replacement_cost = self._replacement_cost(arcs)
         ivi = self._calculate_ivi(arcs, self.target_year, True)
+
         replacement_rate = self.result_budget / replacement_cost * 100 if replacement_cost > 0 else 0
 
         columns = [
@@ -1175,7 +1178,7 @@ class GwCalculatePriority(GwTask):
             [
                 f"{self.result_budget:.2f}",
                 f"{self.target_year}",
-                f"{current_value:.2f}",
+                f"{current_cost:.2f}",
                 f"{replacement_cost:.2f}",
                 f"{ivi:.3f}",
                 f"{replacement_rate:.2f}",
