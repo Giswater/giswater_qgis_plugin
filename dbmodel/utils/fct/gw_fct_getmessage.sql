@@ -49,6 +49,7 @@ v_is_header boolean = false;
 v_function_alias text;
 v_querytext text;
 v_separator text;
+v_prefix_id integer;
 
 BEGIN
 
