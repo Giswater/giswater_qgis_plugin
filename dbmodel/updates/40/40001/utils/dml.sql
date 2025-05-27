@@ -666,6 +666,15 @@ VALUES(3322, 'Node_1 is a delimiter of a mapzone if arc was defined as toArc it 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3320, 'Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.', null, 0, true, 'utils', 'core', 'UI');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3324, 'Some of the parameters on %trigger% are not valid', null, 2, true, 'utils', 'core', 'UI');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3326, 'Some values on %array_column% don''t exist in %id_table% . %id_column%', null, 2, true, 'utils', 'core', 'UI');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3328, 'Cannot delete register because it has reference on other tables', null, 2, true, 'utils', 'core', 'UI');
+
 UPDATE sys_function SET function_alias = 'MAPZONES CONFIGURATION' WHERE function_name = 'gw_fct_setfeaturesreplace';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
@@ -785,8 +794,3 @@ VALUES(3414, 'Arc divide done successfully', null, 0, true, 'utils', 'core', 'UI
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3416, 'Update values of arcs node_1 and node_2.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-
-
-
-
