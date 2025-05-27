@@ -8,7 +8,7 @@ or (at your option) any later version.
 
 --FUNCTION CODE: NEW CODE FOR THIS FUNCTIN
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_campaign_x_feature_validate_type();
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_campaign_x_feature_validate_type() CASCADE;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_campaign_x_feature_validate_type()
  RETURNS trigger AS
 $BODY$
