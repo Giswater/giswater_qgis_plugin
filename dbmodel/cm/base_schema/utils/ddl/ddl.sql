@@ -179,8 +179,10 @@ CREATE TABLE config_param_user (
 	cur_user varchar(50) NOT NULL,
 	CONSTRAINT config_param_user_pkey PRIMARY KEY (parameter, cur_user)
 );
-CREATE INDEX config_param_user_cur_user ON cm.config_param_user USING btree (cur_user);
-CREATE INDEX config_param_user_value ON cm.config_param_user USING btree (value);
+DROP INDEX IF EXISTS config_param_user_cur_user;
+CREATE INDEX config_param_user_cur_user ON SCHEMA_NAME.config_param_user USING btree (cur_user);
+DROP INDEX IF EXISTS config_param_user_value;
+CREATE INDEX config_param_user_value ON SCHEMA_NAME.config_param_user USING btree (value);
 
 
 CREATE TABLE sys_typevalue (

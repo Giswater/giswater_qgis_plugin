@@ -58,7 +58,7 @@ LEFT JOIN sys_typevalue ON sys_typevalue.id::integer = om_campaign_lot.status AN
 
 
 
-CREATE VIEW cm.v_ui_campaign AS
+CREATE VIEW v_ui_campaign AS
 
 WITH campaign_reviewvisit AS (SELECT ocr.campaign_id, omr.idval FROM om_campaign_review ocr
 	LEFT JOIN om_reviewclass omr ON ocr.reviewclass_id = omr.id
@@ -82,7 +82,7 @@ WITH campaign_reviewvisit AS (SELECT ocr.campaign_id, omr.idval FROM om_campaign
 	c.status,
 	c.the_geom
 
-	FROM cm.om_campaign c
+	FROM om_campaign c
 	LEFT JOIN campaign_reviewvisit crv USING (campaign_id)
 	LEFT JOIN sys_typevalue st ON st.id = c.campaign_type::TEXT
 	WHERE st.typevalue = 'campaign_type'

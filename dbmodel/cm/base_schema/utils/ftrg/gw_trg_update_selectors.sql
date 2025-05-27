@@ -32,9 +32,9 @@ BEGIN
 				WHERE ct.role_id IN ('role_admin', 'role_manager')
 				AND oc.id = NEW.id
 		    LOOP
-		        INSERT INTO cm.selector_campaign (id, campaign_id, cur_user)
+		        INSERT INTO SCHEMA_NAME.selector_campaign (id, campaign_id, cur_user)
 		        VALUES (
-		            nextval('cm.selector_campaign_id_seq'::regclass),
+		            nextval('SCHEMA_NAME.selector_campaign_id_seq'::regclass),
 		            NEW.id,
 		            rec.user_id
 		        );
@@ -45,7 +45,7 @@ BEGIN
 		ELSIF TG_OP = 'UPDATE' THEN
 
 			IF NEW.organization_id != OLD.organization_id THEN
-			    DELETE FROM cm.selector_campaign WHERE campaign_id = OLD.id;
+			    DELETE FROM SCHEMA_NAME.selector_campaign WHERE campaign_id = OLD.id;
 
 				FOR rec IN
 			        SELECT DISTINCT user_id
@@ -56,9 +56,9 @@ BEGIN
 					WHERE ct.role_id IN ('role_admin', 'role_manager')
 					AND oc.id = NEW.id
 			    LOOP
-			        INSERT INTO cm.selector_campaign (id, campaign_id, cur_user)
+			        INSERT INTO SCHEMA_NAME.selector_campaign (id, campaign_id, cur_user)
 			        VALUES (
-			            nextval('cm.selector_campaign_id_seq'::regclass),
+			            nextval('SCHEMA_NAME.selector_campaign_id_seq'::regclass),
 			            NEW.id,
 			            rec.user_id
 			        );
@@ -68,7 +68,7 @@ BEGIN
 			RETURN NEW;
 
 		ELSIF TG_OP = 'DELETE' THEN
-		    DELETE FROM cm.selector_campaign WHERE campaign_id = OLD.id;
+		    DELETE FROM SCHEMA_NAME.selector_campaign WHERE campaign_id = OLD.id;
 		   	RETURN NULL;
 
 		END IF;
@@ -86,9 +86,9 @@ BEGIN
 				WHERE ct.role_id IN ('role_admin', 'role_manager', 'role_field')
 				AND oc.id = NEW.id
 		    LOOP
-		        INSERT INTO cm.selector_campaign_lot (id, lot_id, cur_user)
+		        INSERT INTO SCHEMA_NAME.selector_campaign_lot (id, lot_id, cur_user)
 		        VALUES (
-		            nextval('cm.selector_campaign_lot_id_seq'::regclass),
+		            nextval('SCHEMA_NAME.selector_campaign_lot_id_seq'::regclass),
 		            NEW.lot_id,
 		            rec.user_id
 		        );
@@ -99,7 +99,7 @@ BEGIN
 		ELSIF TG_OP = 'UPDATE' THEN
 
 			IF NEW.campaign_id != OLD.campaign_id THEN
-			    DELETE FROM cm.selector_campaign_lot WHERE lot_id = OLD.lot_id AND user_id = rec.user_id;
+			    DELETE FROM SCHEMA_NAME.selector_campaign_lot WHERE lot_id = OLD.lot_id AND user_id = rec.user_id;
 
 				FOR rec IN
 			        SELECT DISTINCT user_id
@@ -110,9 +110,9 @@ BEGIN
 					WHERE ct.role_id IN ('role_admin', 'role_manager', 'role_field')
 					AND oc.id = NEW.id
 			    LOOP
-			        INSERT INTO cm.selector_campaign_lot (id, lot_id, cur_user)
+			        INSERT INTO SCHEMA_NAME.selector_campaign_lot (id, lot_id, cur_user)
 			        VALUES (
-			            nextval('cm.selector_campaign_lot_id_seq'::regclass),
+			            nextval('SCHEMA_NAME.selector_campaign_lot_id_seq'::regclass),
 			            NEW.lot_id,
 			            rec.user_id
 			        );
@@ -122,7 +122,7 @@ BEGIN
 			RETURN NEW;
 
 		ELSIF TG_OP = 'DELETE' THEN
-		   DELETE FROM cm.selector_campaign_lot WHERE lot_id = OLD.lot_id AND user_id = rec.user_id;
+		   DELETE FROM SCHEMA_NAME.selector_campaign_lot WHERE lot_id = OLD.lot_id AND user_id = rec.user_id;
 
 		   	RETURN NULL;
 
