@@ -307,7 +307,7 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Create cm schema")
         if status:
             tools_db.dao.commit()
-            self._close_dialog_admin(self.dlg_readsql_create_cm_project)
+            self.dlg_readsql_create_cm_project.lbl_schema_name.setText(self.cm_schema_name)
         else:
             tools_db.dao.rollback()
             # Reset count error variable to 0

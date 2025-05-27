@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import json
 from functools import partial
 
 from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils
@@ -233,6 +234,7 @@ class GwLoadProject(QObject):
         lib_vars.project_vars['info_type'] = tools_qgis.get_project_variable('gwInfoType')
         lib_vars.project_vars['add_schema'] = tools_qgis.get_project_variable('gwAddSchema')
         lib_vars.project_vars['main_schema'] = tools_qgis.get_project_variable('gwMainSchema')
+        lib_vars.project_vars['cm_schema'] = tools_qgis.get_project_variable('gwCmSchema')
         lib_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
         lib_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
         lib_vars.project_vars['store_credentials'] = tools_qgis.get_project_variable('gwStoreCredentials')
@@ -452,41 +454,77 @@ class GwLoadProject(QObject):
             self._hide_button(68)
 
     def _create_toolbar(self, toolbar_id):
+        """Create and register a toolbar, with special CM/AM schema checks."""
 
-        list_actions = tools_gw.get_config_parser('toolbars', str(toolbar_id), "project", "giswater")
+        # Load toolbar actions from your config
+        list_actions = tools_gw.get_config_parser(
+            'toolbars', str(toolbar_id), "project", "giswater"
+        )
         if list_actions in (None, 'None'):
             return
 
         list_actions = list_actions.replace(' ', '').split(',')
-        if type(list_actions) is not list:
+        if not isinstance(list_actions, list):
             list_actions = [list_actions]
 
+        # Prepare toolbar object
         toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = GwPluginToolbar(toolbar_id, toolbar_name, True)
 
+        # Special case: ToC lives in the Layers panel
         if toolbar_id == "toc":
-            # If the toolbar is ToC, add it to the Layers docker toolbar
-            plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
-        elif toolbar_id in ("cm", "am"):
-            # If the toolbar is cm or am, check if the schema exists and if it is actived
-            sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{toolbar_id}'"
-            rows = tools_db.get_rows(sql, commit=False)
-            schema_actived = tools_gw.get_config_parser('toolbars_add', f'{toolbar_id}_active', 'user', 'init', False)
-            schema_actived = tools_os.set_boolean(schema_actived, False)
+            plugin_toolbar.toolbar = (
+                self.iface
+                .mainWindow()
+                .findChild(QDockWidget, 'Layers')
+                .findChildren(QToolBar)[0]
+            )
 
-            if rows is not None and schema_actived is True:
-                if toolbar_id == "cm":
+        # CM & AM both need schema‐existence checks
+        elif toolbar_id in ("cm", "am"):
+            schema_to_check = toolbar_id
+
+            # If CM, read the JSON‐stored schema name
+            if toolbar_id == "cm":
+                rows = tools_db.get_rows(
+                    "SELECT (value::json)->> 'schema_name' AS schema_name "
+                    "FROM config_param_system "
+                    "WHERE parameter = 'admin_schema_cm'",
+                )
+                if rows and rows[0] and rows[0][0]:
+                    schema_to_check = rows[0][0].strip()
+                else:
+                    schema_to_check = None
+
+            # Only proceed if we got a non‐empty schema name
+            if schema_to_check:
+                # Check that schema exists in Postgres
+                exists = tools_db.get_rows(
+                    f"SELECT 1 FROM information_schema.schemata WHERE schema_name = '{schema_to_check}'")
+
+                flag = tools_gw.get_config_parser(
+                    'toolbars_add',
+                    f'{toolbar_id}_active',
+                    'user',
+                    'init',
+                    False
+                )
+                active = tools_os.set_boolean(flag, False)
+
+                if exists and active:
                     plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
-                elif global_vars.project_type == 'ws':
-                    plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+
+        # All other toolbars just get created normally
         else:
             plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
 
-        if hasattr(plugin_toolbar, 'toolbar') and plugin_toolbar.toolbar is not None:
+        # Finalize: register and optionally hide/disable immediately
+        if getattr(plugin_toolbar, 'toolbar', None):
             plugin_toolbar.toolbar.setObjectName(toolbar_name)
             plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
             plugin_toolbar.list_actions = list_actions
             self.plugin_toolbars[toolbar_id] = plugin_toolbar
+            self._enable_toolbar(toolbar_id)
 
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """
