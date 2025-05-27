@@ -21,6 +21,22 @@ VALUES(-999, 'ACT_09_F1', 1, 'Psector test -999', 1, '2', NULL, NULL, 'Action ca
 'SRID=25831;MULTIPOLYGON (((419057.982 4576702.77, 419057.982 4576647.495195547, 419013.7742227199 4576647.495195547, 419013.7742227199 4576702.77, 419057.982 4576702.77)))'::public.geometry,
 false, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-02-21 12:09:27.095', 'postgres', NULL, NULL);
 
+-- Create roles for testing
+CREATE USER plan_user;
+GRANT role_plan to plan_user;
+
+CREATE USER epa_user;
+GRANT role_epa to epa_user;
+
+CREATE USER edit_user;
+GRANT role_edit to edit_user;
+
+CREATE USER om_user;
+GRANT role_om to om_user;
+
+CREATE USER basic_user;
+GRANT role_basic to basic_user;
+
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_setdelete($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":["-999"],

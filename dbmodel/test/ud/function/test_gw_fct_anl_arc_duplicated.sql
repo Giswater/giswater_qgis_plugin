@@ -11,24 +11,87 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 2 test
-SELECT plan(14);
+-- Plan for 18 test
+SELECT plan(18);
 
 -- failed test v_edit_inp_virtual for both geometry and finalnodes.
 
+-- Create roles for testing
+CREATE USER plan_user;
+GRANT role_plan to plan_user;
+
+CREATE USER epa_user;
+GRANT role_epa to epa_user;
+
+CREATE USER edit_user;
+GRANT role_edit to edit_user;
+
+CREATE USER om_user;
+GRANT role_om to om_user;
+
+CREATE USER basic_user;
+GRANT role_basic to basic_user;
+
 -- Extract and test the "status" field from the function's JSON response
+
+SET role basic_user;
+
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+    "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
+    'Failed',
+    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_arc and checktype > finalnodes returns status "Failed" for basic_user'
+);
+
+SET role om_user;
+
+SELECT is(
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_arc and checktype > finalnodes returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_arc and checktype > finalnodes returns status "Accepted" for om_user'
+);
+
+SET role edit_user;
+
+SELECT is(
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+    "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_arc and checktype > finalnodes returns status "Accepted" for edit_user'
+);
+
+SET role epa_user;
+
+SELECT is(
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+    "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_arc and checktype > finalnodes returns status "Accepted" for epa_user'
+);
+
+SET role plan_user;
+
+SELECT is(
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+    "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_arc and checktype > finalnodes returns status "Accepted" for plan_user'
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_conduit", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_conduit", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -36,8 +99,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_orifice", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_orifice", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -45,8 +108,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_outlet", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_outlet", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -54,8 +117,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -64,8 +127,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_virtual", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_virtual", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -73,8 +136,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_weir", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_weir", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -82,8 +145,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -91,8 +154,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_conduit", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_conduit", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -100,8 +163,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_orifice", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_orifice", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -109,8 +172,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_outlet", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_outlet", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -119,8 +182,8 @@ SELECT is(
 
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -128,8 +191,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_virtual", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_virtual", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -137,8 +200,8 @@ SELECT is(
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_inp_weir", "featureType":"ARC", "id":[]}, 
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"v_edit_inp_weir", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',

@@ -14,6 +14,23 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Plan for 1 test
 SELECT plan(16);
 
+-- Create roles for testing
+CREATE USER plan_user;
+GRANT role_plan to plan_user;
+
+CREATE USER epa_user;
+GRANT role_epa to epa_user;
+
+CREATE USER edit_user;
+GRANT role_edit to edit_user;
+
+CREATE USER om_user;
+GRANT role_om to om_user;
+
+CREATE USER basic_user;
+GRANT role_basic to basic_user;
+
+-- Extract and test the "status" field from the function's JSON response
 
 -- insert messages
 INSERT INTO sys_message
@@ -111,7 +128,7 @@ SELECT is (
         'Checking gw_fct_getmessage when log_level is 3, is_process is true'
     );
 
-    
+
     -- Test message raised when log_level is 0
     SELECT is (
         (gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

@@ -11,18 +11,76 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 2 test
-SELECT plan(2);
+-- Plan for 6 test
+SELECT plan(6);
+
+-- Create roles for testing
+CREATE USER plan_user;
+GRANT role_plan to plan_user;
+
+CREATE USER epa_user;
+GRANT role_epa to epa_user;
+
+CREATE USER edit_user;
+GRANT role_edit to edit_user;
+
+CREATE USER om_user;
+GRANT role_om to om_user;
+
+CREATE USER basic_user;
+GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
+
+SET role basic_user;
+
+SELECT is (
+    (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
+    'Failed',
+    'Check if gw_fct_anl_arc_length -> previousSelection returns status "Failed" for basic user'
+);
+
+SET role om_user;
+
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
     "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
     "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted"'
+    'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for om user'
 );
 
+SET role edit_user;
+
+SELECT is (
+    (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for edit user'
+);
+
+SET role epa_user;
+
+SELECT is (
+    (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for epa user'
+);
+
+SET role plan_user;
+
+SELECT is (
+    (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for plan user'
+);
 
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},
