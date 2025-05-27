@@ -470,3 +470,29 @@ FROM (new.omzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('omzone');
 -- 19/05/2025
 CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_node
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('node');
+
+
+-- 22/05/2025
+CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_check_array_fk_id_table('arc_id', '{"man_source":"inlet_arc", "man_tank":"inlet_arc", "man_wtp":"inlet_arc", "man_valve":"to_arc", "man_pump":"to_arc", "man_meter":"to_arc"}');
+
+CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_check_array_fk_id_table('arc_id', '{"man_source":"inlet_arc", "man_tank":"inlet_arc", "man_wtp":"inlet_arc", "man_valve":"to_arc", "man_pump":"to_arc", "man_meter":"to_arc"}');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON man_source
+FOR EACH ROW EXECUTE FUNCTION gw_trg_check_array_fk_array_table('inlet_arc', 'arc', 'arc_id');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON man_tank
+FOR EACH ROW EXECUTE FUNCTION gw_trg_check_array_fk_array_table('inlet_arc', 'arc', 'arc_id');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON man_wtp
+FOR EACH ROW EXECUTE FUNCTION gw_trg_check_array_fk_array_table('inlet_arc', 'arc', 'arc_id');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON man_valve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_check_array_fk_array_table('to_arc', 'arc', 'arc_id');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON man_pump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_check_array_fk_array_table('to_arc', 'arc', 'arc_id');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON man_meter
+FOR EACH ROW EXECUTE FUNCTION gw_trg_check_array_fk_array_table('to_arc', 'arc', 'arc_id');
