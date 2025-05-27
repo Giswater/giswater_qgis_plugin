@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import json
 from functools import partial
 
 from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils
@@ -392,7 +391,7 @@ class GwLoadProject(QObject):
         icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}"
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
-            ag = QActionGroup(parent)   
+            ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 successful = False
