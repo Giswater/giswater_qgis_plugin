@@ -307,7 +307,6 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Create cm schema")
         if status:
             tools_db.dao.commit()
-            self.dlg_readsql_create_cm_project.lbl_schema_name.setText(self.cm_schema_name)
         else:
             tools_db.dao.rollback()
             # Reset count error variable to 0
@@ -317,6 +316,36 @@ class GwAdminButton:
             tools_qgis.show_info(msg)
             if self.dlg_readsql_create_cm_project:
                 tools_gw.close_dialog(self.dlg_readsql_create_cm_project)
+
+    def _get_cm_schema_name(self):
+        """
+        Return the name of the first schema whose sys_version table
+        exists and has project_type = 'cm', or None if no such schema.
+        """
+        # find all schemas that actually define a sys_version table
+        rows = tools_db.get_rows(
+            """
+            SELECT table_schema
+              FROM information_schema.tables
+             WHERE table_name = 'sys_version'
+            """
+        )
+        if not rows:
+            return None
+
+        # for each, check if its sys_version.project_type = 'cm'
+        for (schema,) in rows:
+            try:
+                match = tools_db.get_rows(
+                    f"SELECT 1 FROM {schema}.sys_version WHERE project_type = 'cm' LIMIT 1"
+                )
+            except Exception:
+                continue
+
+            if match:
+                return schema
+
+        return None
 
     def execute_last_process(self, new_project=False, schema_name=None, schema_type='', locale=False, srid=None):
         """ Execute last process function """
@@ -1767,6 +1796,30 @@ class GwAdminButton:
             partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False)
         )
 
+        # checks if we have an existing cm project
+        self.cm_schema = self._get_cm_schema_name()
+        if self.cm_schema:
+            self.dlg_readsql_create_cm_project.lbl_schema_name.setText(self.cm_schema)
+            self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
+
+            # checks if we have the parent linked to cm
+            schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+            if schema_name:
+
+                # Query the JSON->>'schema_name' value from config_param_system
+                rows = tools_db.get_rows(
+                    "SELECT (value::json)->> 'schema_name' "
+                    f"  FROM {schema_name}.config_param_system "
+                    " WHERE parameter = 'admin_schema_cm'"
+                )
+
+                linked_cm = None
+                if rows and rows[0] and rows[0][0]:
+                    linked_cm = rows[0][0].strip()
+
+                if linked_cm:
+                    self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
+
         self.dlg_readsql_create_cm_project.btn_base_schema.clicked.connect(self.on_btn_create_base_clicked)
         self.dlg_readsql_create_cm_project.btn_parent_schema.clicked.connect(self.on_btn_create_parent_clicked)
         self.dlg_readsql_create_cm_project.btn_example.clicked.connect(self.on_btn_create_example_clicked)
@@ -1815,6 +1868,10 @@ class GwAdminButton:
         self.base_schema_created = True
 
         self._run_create_cm_task(['load_base_schema'])
+
+        self.dlg_readsql_create_cm_project.lbl_schema_name.setText(name)
+        self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
+
         self.dlg_cm_base.accept()
 
     def on_btn_create_parent_clicked(self):
@@ -1830,6 +1887,7 @@ class GwAdminButton:
         self.parent_schema_created = True
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         self._run_create_cm_task(['load_parent_schema'])
+        self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
 
     def on_btn_create_example_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
