@@ -13,6 +13,22 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(4);
 
+-- Create roles for testing
+CREATE USER plan_user;
+GRANT role_plan to plan_user;
+
+CREATE USER epa_user;
+GRANT role_epa to epa_user;
+
+CREATE USER edit_user;
+GRANT role_edit to edit_user;
+
+CREATE USER om_user;
+GRANT role_om to om_user;
+
+CREATE USER basic_user;
+GRANT role_basic to basic_user;
+
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_anl_connec_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_connec"},

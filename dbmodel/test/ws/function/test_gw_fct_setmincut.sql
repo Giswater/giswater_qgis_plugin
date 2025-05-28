@@ -20,6 +20,22 @@ INSERT INTO om_mincut
 VALUES(-901, NULL, 0, 1, NULL, NULL, 1, 1, 1, NULL, NULL, NULL, NULL, '2024-08-26 12:54:48.514', 'postgres', NULL, '2108', 'ARC', 'SRID=25831;POINT (419337.2864432267 4576622.70708354)'::public.geometry, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"minsector_id":"2108","psectors":{"used":"f", "unselected":2}, "arcs":{"number":"31", "length":"1713.3", "volume":"16.51"}, "connecs":{"number":"90","hydrometers":{"total":"416","classified":[{"category":"business","number":"11"},{"category":"Domestic","number":"85"},{"category":"Industry","number":"123"},{"category":"Other","number":"126"},{"category":"Shops","number":"67"}]}}, "valve":{"proposed":"5","closed":"0"}}'::json, NULL, NULL, NULL, NULL);
 
 
+-- Create roles for testing
+CREATE USER plan_user;
+GRANT role_plan to plan_user;
+
+CREATE USER epa_user;
+GRANT role_epa to epa_user;
+
+CREATE USER edit_user;
+GRANT role_edit to edit_user;
+
+CREATE USER om_user;
+GRANT role_om to om_user;
+
+CREATE USER basic_user;
+GRANT role_basic to basic_user;
+
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_setmincut($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
