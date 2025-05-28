@@ -499,7 +499,7 @@ class GwLoadProject(QObject):
             if schema_to_check:
                 # Check that schema exists in Postgres
                 exists = tools_db.get_rows(
-                    f"SELECT 1 FROM information_schema.schemata WHERE schemaName = '{schema_to_check}'")
+                    f"SELECT 1 FROM information_schema.schemata WHERE schema_name = '{schema_to_check}'")
 
                 flag = tools_gw.get_config_parser(
                     'toolbars_add',
