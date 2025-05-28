@@ -1926,7 +1926,6 @@ class GwAdminButton:
         self._run_create_cm_task(['load_example'])
         self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
 
-
     def _open_rename(self):
         """"""
 
