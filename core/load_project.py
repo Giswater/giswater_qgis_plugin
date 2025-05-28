@@ -486,7 +486,7 @@ class GwLoadProject(QObject):
             # If CM, read the JSON‐stored schema name
             if toolbar_id == "cm":
                 rows = tools_db.get_rows(
-                    "SELECT (value::json)->> 'schema_name' AS schema_name "
+                    "SELECT (value::json)->> 'schemaName' AS schemaName "
                     "FROM config_param_system "
                     "WHERE parameter = 'admin_schema_cm'",
                 )
@@ -499,7 +499,7 @@ class GwLoadProject(QObject):
             if schema_to_check:
                 # Check that schema exists in Postgres
                 exists = tools_db.get_rows(
-                    f"SELECT 1 FROM information_schema.schemata WHERE schema_name = '{schema_to_check}'")
+                    f"SELECT 1 FROM information_schema.schemata WHERE schemaName = '{schema_to_check}'")
 
                 flag = tools_gw.get_config_parser(
                     'toolbars_add',

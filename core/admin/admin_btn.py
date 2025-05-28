@@ -1808,7 +1808,7 @@ class GwAdminButton:
 
                 # Query the JSON->>'schema_name' value from config_param_system
                 rows = tools_db.get_rows(
-                    "SELECT (value::json)->> 'schema_name' "
+                    "SELECT (value::json)->> 'schemaName' "
                     f"  FROM {schema_name}.config_param_system "
                     " WHERE parameter = 'admin_schema_cm'"
                 )
@@ -1819,6 +1819,26 @@ class GwAdminButton:
 
                 if linked_cm:
                     self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
+            # Check if cat_team has any rows
+            has_team = bool(
+                tools_db.get_rows(
+                    f"SELECT 1 FROM {self.cm_schema}.cat_team LIMIT 1"
+                )
+            )
+            # Check if cat_organization has any rows
+            has_org = bool(
+                tools_db.get_rows(
+                    f"SELECT 1 FROM {self.cm_schema}.cat_organization LIMIT 1"
+                )
+            )
+            # If both exist, disable the “Create example” button
+            if has_team and has_org:
+                self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+            else:
+                self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
+        else:
+            self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
+            self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
 
         self.dlg_readsql_create_cm_project.btn_base_schema.clicked.connect(self.on_btn_create_base_clicked)
         self.dlg_readsql_create_cm_project.btn_parent_schema.clicked.connect(self.on_btn_create_parent_clicked)
@@ -1871,6 +1891,8 @@ class GwAdminButton:
 
         self.dlg_readsql_create_cm_project.lbl_schema_name.setText(name)
         self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
+        self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
+        self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
 
         self.dlg_cm_base.accept()
 
@@ -1902,6 +1924,8 @@ class GwAdminButton:
         self.example_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         self.project_example_name = schema_name
         self._run_create_cm_task(['load_example'])
+        self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+
 
     def _open_rename(self):
         """"""
