@@ -795,5 +795,100 @@ VALUES(3414, 'Arc divide done successfully', null, 0, true, 'utils', 'core', 'UI
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3416, 'Update values of arcs node_1 and node_2.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+--26/05/2025
+
+UPDATE sys_function SET function_alias = 'END FEATURE' WHERE function_name = 'gw_fct_setendfeature';
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(3001, 'WARNINGS', 'header');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(2014, '--------------', 'separator');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3418, ' additional element(s) related to the downgraded node (%v_feature_id_value%) was/were also related to another operative feature(s) (element_id: %v_element_id%)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3420, '%v_count_feature% node(s) have been downgraded', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3422, '%v_count% additional element(s) related to the downgraded connec (%v_feature_id_value%) was/were also related to another operative feature(s) (element_id:%v_element_id%)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3424, '%v_count_feature% connec(s) have been downgraded', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3426, '%v_count_feature% additional element(s) related to the downgraded gully (%v_feature_id_value%) was/were also related to another operative feature(s) (element_id:%v_element_id%)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3428, '%v_count_feature% gully(s) have been downgraded', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3430, 'Process done successfully', null, 0, true, 'utils', 'core', 'UI');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3432, '%v_count% additional element(s) related to the downgraded arc (%v_feature_id_value%) was/were also related to another operative feature(s) (element_id: %v_element_id%)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3434, '%v_count_feature% arc(s) have been downgraded', null, 0, true, 'utils', 'core', 'AUDIT');
+
 -- 27/05/2025
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('admin_schema_cm', '{"schemaName":""}', 'System parameter which identifies existing schema cm linked to a parent schemas', NULL, NULL, NULL, true, NULL, 'utils', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+--28/05/2025
+
+UPDATE sys_function SET function_alias = 'DELETE FEATURE' WHERE function_name = 'gw_fct_setfeaturedelete';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3436, 'Number of disconnected elements: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3438, 'Number of disconnected visits: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3482, 'Number of disconnected documents: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3484, 'Number of removed scada connections: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3486, 'Number of removed links: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3488, 'Disconnected parent node: %v_related_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3490, 'Removed polygon: %v_related_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3492, 'Delete node: %v_feature_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3494, 'Disconnected arcs: %v_arc_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3496, 'Number of removed links related to connecs: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3498, 'Disconnected connecs: %v_related_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3500, 'Disconnected nodes: %v_related_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3502, 'Number of removed links related to gullies: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3504, 'Disconnected gullies: %v_related_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3506, 'Removed polygon: %v_related_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3508, 'Delete arc: %v_feature_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3510, 'Removed link: %v_related_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3512, 'Delete %v_feature_type%: %v_feature_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+

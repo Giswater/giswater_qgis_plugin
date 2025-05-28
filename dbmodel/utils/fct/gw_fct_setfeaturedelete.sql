@@ -74,8 +74,9 @@ BEGIN
 
 	-- manage log (fid: 152)
 	DELETE FROM audit_check_data WHERE fid = 152 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('DELETE FEATURE'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2736", "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
+
  	--get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
@@ -95,7 +96,8 @@ BEGIN
 
 	IF v_count > 0 THEN
 		EXECUTE 'DELETE FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of disconnected elements:',v_count));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3436", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	END IF;
 
 	--check and remove visits related to feature
@@ -104,7 +106,8 @@ BEGIN
 
 	IF v_count > 0 THEN
 		EXECUTE 'DELETE FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of disconnected visits: ',v_count));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3438", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	END IF;
 
 	--check and remove docs related to feature
@@ -113,7 +116,8 @@ BEGIN
 
 	IF v_count > 0 THEN
 		EXECUTE 'DELETE FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of disconnected documents: ',v_count));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3482", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	END IF;
 
 	--update position_id related to node
@@ -133,7 +137,8 @@ BEGIN
 
 			IF v_count > 0 THEN
 				EXECUTE 'DELETE FROM ext_rtc_scada where node_id = '''||v_feature_id||''';';
-				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed scada connections: ',v_count));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3484", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 		END IF;
 
@@ -143,7 +148,8 @@ BEGIN
 
 		IF v_count > 0 THEN
 			EXECUTE 'DELETE FROM v_edit_link WHERE exit_type=''NODE'' and exit_id = '''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed links:', v_count ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3486", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--remove parent related to node
@@ -153,7 +159,8 @@ BEGIN
 
 			IF v_related_id IS NOT NULL THEN
 				EXECUTE 'UPDATE node SET parent_id=NULL WHERE node_id = '''||v_feature_id||''';';
-				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Disconnected parent node:',v_related_id ));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3488", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 		END IF;
 
@@ -163,9 +170,8 @@ BEGIN
 
 		IF v_related_id IS NOT NULL THEN
 			 	EXECUTE 'DELETE FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';';
-
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (152, v_result_id, concat('Removed polygon:', v_related_id ));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3490", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 
 		--find if there is an arc related to node
@@ -178,8 +184,8 @@ BEGIN
 			--delete node
 			EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE node_id='''||v_feature_id||''';';
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (152, v_result_id, concat('Delete node: ', v_feature_id));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3492", "function":"2736", "parameters":{"v_feature_id":"'||v_feature_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		ELSE
 			--set final nodes to NULL and delete node
 			IF v_project_type = 'WS' THEN
@@ -191,10 +197,11 @@ BEGIN
 			END IF;
 			EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE node_id='''||v_feature_id||''';';
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (152, v_result_id, concat('Disconnected arcs: ',v_arc_id));
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (152, v_result_id, concat('Delete node: ', v_feature_id));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3494", "function":"2736", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+		
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3492", "function":"2736", "parameters":{"v_feature_id":"'||v_feature_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 
@@ -206,7 +213,8 @@ BEGIN
 
 		IF v_count > 0 THEN
 			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN (SELECT connec_id FROM connec  WHERE connec.arc_id='''||v_feature_id||''');';
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed links related to connecs: ',v_count ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3496", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--set arc_id to null if there are connecs related
@@ -215,7 +223,8 @@ BEGIN
 
 		IF v_related_id IS NOT NULL THEN
 			EXECUTE 'UPDATE connec SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Disconnected connecs:',v_related_id ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3498", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';			
 		END IF;
 
 		--set arc_id to null if there are nodes related
@@ -224,7 +233,8 @@ BEGIN
 
 		IF v_related_id IS NOT NULL THEN
 			EXECUTE 'UPDATE node SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Disconnected nodes:',v_related_id ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3500", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';	
 		END IF;
 
 		--set arc_id to null if there are gullies related
@@ -237,19 +247,22 @@ BEGIN
 
 			IF v_count > 0 THEN
 				EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''GULLY'' AND feature_id IN (SELECT gully_id FROM gully  WHERE gully.arc_id='''||v_feature_id||''');';
-				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed links related to gullies: ',v_count ));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3502", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';	
 			END IF;
 
 			EXECUTE 'SELECT string_agg(gully_id,'','') FROM gully WHERE arc_id='''||v_feature_id||''''
 			INTO v_related_id;
 
 			EXECUTE'UPDATE gully SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Disconnected gullies: ', v_related_id ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3504", "function":"2736", "parameters":{"v_related_id":"'||quote_nullable(v_related_id)||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';	
 		END IF;
 
 		--delete arc
 		EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE arc_id='''||v_feature_id||''';';
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Delete arc: ',v_feature_id ));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3508", "function":"2736", "parameters":{"v_feature_id":"'||v_feature_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 	ELSIF  v_feature_type='connec' OR v_feature_type='gully' THEN
 
@@ -260,8 +273,8 @@ BEGIN
 		IF v_related_id IS NOT NULL THEN
 			 	EXECUTE 'DELETE FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';';
 
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (152, v_result_id, concat('Removed polygon:', v_related_id ));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3506", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 
 		--remove links related to connec/gully
@@ -279,13 +292,17 @@ BEGIN
 			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND feature_id ='''||v_feature_id||''';';
 	  		EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND exit_id ='''||v_feature_id||''';';
 
-	  		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Removed link: ',v_related_id ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3510", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+
+
 		END IF;
 
 		--delete feature
 		EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE '||v_feature_type||'_id='''||v_feature_id||''';';
 
-	  	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Delete ',v_feature_type,': ',v_feature_id ));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3512", "function":"2736", "parameters":{"v_feature_type":"'||v_feature_type||'", "v_feature_id":"'||v_feature_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 	END IF;
 
