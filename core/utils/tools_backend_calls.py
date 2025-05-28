@@ -24,6 +24,8 @@ from ..shared.visit import GwVisit
 from ..shared.element import GwElement
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
+from .selection_mode import GwSelectionMode
+
 
 from ..shared.mincut_tools import filter_by_days, filter_by_dates
 
@@ -1127,6 +1129,12 @@ def manage_duplicate_dscenario_copyfrom(dialog):
         tools_qt.set_widget_text(dialog, 'type', row[2])
         tools_qt.set_widget_text(dialog, 'active', row[3])
         tools_qt.set_combo_value(dialog.findChild(QComboBox, 'expl'), f"{row[4]}", 0)
+
+def selection_init(**kwargs):
+    """
+    Initialize the selection of the element.
+    """
+    tools_gw.selection_init(kwargs.get('class'), kwargs.get('dialog'), kwargs.get('class').feature_type, GwSelectionMode.ELEMENT)
 
 # region unused functions atm
 

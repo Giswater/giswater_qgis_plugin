@@ -22,12 +22,12 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoub
     QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QMenu
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
-    QgsPointXY, QgsProject
+    QgsPointXY, QgsProject, QgsFeature
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
-from .catalog import GwCatalog
+#from .catalog import GwCatalog
 from .dimensioning import GwDimensioning
-from .element import GwElement
+#from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
 from .workcat import GwWorkcat
@@ -73,6 +73,20 @@ class GwInfo(QObject):
         self.conf_supp = None
         self.prev_action = None
 
+        # Setting lists
+        self.rel_ids = []
+        self.rel_list_ids = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
+        self.rel_layers = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
+        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
+        self.rel_layers['element'] = tools_gw.get_layers_from_feature_type('element')
+        if global_vars.project_type == 'ud':
+            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+        self.rel_feature_type = None
+        self.excluded_layers = []
+
     def get_info_from_coordinates(self, point, tab_type):
         return self.open_form(point=point, tab_type=tab_type)
 
@@ -87,12 +101,12 @@ class GwInfo(QObject):
         :param feature_id: id of feature to do info
         :return:
         """
-
         try:
             # Manage tab signal
             self.tab_epa_loaded = False
             self.tab_element_loaded = False
             self.tab_relations_loaded = False
+            self.tab_features_loaded = False
             self.tab_connections_loaded = False
             self.tab_hydrometer_loaded = False
             self.tab_hydrometer_val_loaded = False
@@ -138,15 +152,15 @@ class GwInfo(QObject):
 
             function_name = None
             body = None
-
             # Insert new feature
-            if point and feature_cat:
+            if (point and feature_cat) or new_feature_id:
                 self.feature_cat = feature_cat
                 self.new_feature_id = new_feature_id
                 self.layer_new_feature = layer_new_feature
                 self.iface.actionPan().trigger()
                 feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
-                extras += f', "coordinates":{{{point}}}'
+                if point:
+                    extras += f', "coordinates":{{{point}}}'                    
                 body = tools_gw.create_body(feature=feature, extras=extras)
                 function_name = 'gw_fct_getfeatureinsert'
 
@@ -283,7 +297,7 @@ class GwInfo(QObject):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
     def add_feature(self, feature_cat, action=None):
-        """ Button 21, 22: Add 'node' or 'arc' """
+        """ Button 21, 22: Add 'node', 'arc', 'connec' or 'element' """
 
         global is_inserting  # noqa: F824
         if is_inserting:
@@ -296,15 +310,39 @@ class GwInfo(QObject):
         keep_active = tools_os.set_boolean(keep_active, False)
         if not keep_active:
             self.prev_action = None
-
         tools_gw.connect_signal(self.iface.actionAddFeature().toggled, self._action_is_checked,
                                 'info', 'add_feature_actionAddFeature_toggled_action_is_checked')
-
         self.feature_cat = feature_cat
         # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
-        if self.info_layer:
+        # TODO: CHECK THIS
+        if self.info_layer and feature_cat.parent_layer == 've_genelem':
+
+            tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
+
+            config = self.info_layer.editFormConfig()
+            self.conf_supp = config.suppress()
+            config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
+            self.info_layer.setEditFormConfig(config)
+            self.iface.setActiveLayer(self.info_layer)
+            self.info_layer.startEditing()
+            #self.iface.actionAddFeature().trigger()
+            # Get last feature id
+            #sql = f"select nextval('urn_id_seq'::regclass)"
+            #row = tools_db.get_row(sql)
+            #feature_id = row[0] if row else 1
+
+            # Connect signal with feature_id
+            tools_gw.connect_signal(self.info_layer.featureAdded, self._open_new_feature, 
+                                    'info', 'add_feature_featureAdded_open_new_feature')
+            # Create a new feature with the given feature_id
+            feature = QgsFeature(self.info_layer.fields())
+            self.info_layer.addFeature(feature)
+
+
+
+        elif self.info_layer:
             # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
             # realizes that he has made a mistake and selects another feature, without this two features would
             # be inserted. This disconnect signal avoids it
@@ -388,7 +426,7 @@ class GwInfo(QObject):
             else:
                 if widget is None:
                     msg = "Widget {0} is not configured or have a bad config"
-                    msg_params = (field['columname'],)
+                    msg_params = (field['columnname'],)
                     tools_qgis.show_message(msg, dialog=dialog, msg_params=msg_params)
             if str(value) not in ('', None, -1, "None", "-1") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
@@ -707,6 +745,7 @@ class GwInfo(QObject):
 
         current_layout = ""
         for field in complet_result['body']['data']['fields']:
+            
             if field.get('hidden'):
                 continue
             if tab != field['tabname']:
@@ -1764,13 +1803,13 @@ class GwInfo(QObject):
                 if not self.layer_new_feature.isEditable():
                     self.layer_new_feature.startEditing()
                 self.layer_new_feature.updateFeature(new_feature)
-
-                status = self.layer_new_feature.commitChanges()
-                if status is False:
-                    error = self.layer_new_feature.commitErrors()
-                    msg = str(error)
-                    tools_log.log_warning(msg)
-                    return False
+                
+                #status = self.layer_new_feature.commitChanges()
+                #if status is False:
+                #    error = self.layer_new_feature.commitErrors()
+                #    msg = str(error)
+                #    tools_log.log_warning(msg)
+                #    return False
 
                 self.new_feature_id = None
                 self._enable_action(dialog, "actionCentered", True)
@@ -1820,14 +1859,14 @@ class GwInfo(QObject):
                 epa_type_changed = True
 
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
-            print(json_result)
             if not json_result:
                 return False
-
+            
             if clear_json:
                 _json.clear()
 
             if "Accepted" in json_result['status']:
+                status = self.layer_new_feature.commitChanges()
                 msg = json_result['message']['text']
                 if msg is None:
                     msg = 'Feature upserted'
@@ -1857,6 +1896,7 @@ class GwInfo(QObject):
                         QgsApplication.taskManager().triggerTask(self.valve_thread)
             elif "Failed" in json_result['status']:
                 # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
+                self.layer_new_feature.rollBack()
                 return False
 
         # Tab EPA
@@ -2662,6 +2702,12 @@ class GwInfo(QObject):
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_relations_loaded = True
+        # Tab 'Features'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_features' and not self.tab_features_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_features')
+            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields)
+            self.tab_features_loaded = True
         # Tab 'Connections'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_connections')
@@ -2760,7 +2806,7 @@ class GwInfo(QObject):
             if complet_list is False:
                 return False
             tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
-        return complet_list
+
 
     def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields, id_name=None):
         """ Put filter widgets into layout and set headers into QTableView """
@@ -3179,22 +3225,25 @@ class GwInfo(QObject):
         :return:
         """
 
-        self.info_layer.featureAdded.disconnect(self._open_new_feature)
+        tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
         geom = feature.geometry()
         list_points = None
-        if self.info_layer.geometryType() == 0:
-            points = geom.asPoint()
-            list_points = f'"x1":{points.x()}, "y1":{points.y()}'
-        elif self.info_layer.geometryType() in (1, 2):
-            points = geom.asPolyline()
-            init_point = points[0]
-            last_point = points[-1]
-            list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
-            list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
-        else:
-            msg = "NO FEATURE TYPE DEFINED"
-            tools_log.log_info(msg)
+        try:
+            if self.info_layer.geometryType() == 0:
+                points = geom.asPoint()
+                list_points = f'"x1":{points.x()}, "y1":{points.y()}'
+            elif self.info_layer.geometryType() in (1, 2):
+                points = geom.asPolyline()
+                init_point = points[0]
+                last_point = points[-1]
+                list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
+                list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
+            else:
+                msg = "NO FEATURE TYPE DEFINED"
+                tools_log.log_info(msg)
+        except Exception as e:
+            pass
 
         tools_gw.init_docker()
         global is_inserting  # noqa: F824
