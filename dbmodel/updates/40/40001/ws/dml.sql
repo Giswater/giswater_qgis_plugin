@@ -549,4 +549,6 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator
 
 INSERT INTO sys_label (id, idval, label_type) VALUES(3004, 'CRITICAL ERRORS', 'prefix');
 
+UPDATE sys_function SET function_alias = 'CHECK USER DATA' WHERE function_name = 'gw_fct_user_check_data';
+
 

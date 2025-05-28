@@ -91,17 +91,18 @@ BEGIN
 	DELETE FROM t_audit_check_data WHERE fid=251 AND cur_user=current_user;
 
 	-- Starting process
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 4, concat('CHECK USER DATA'));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 3, '----------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2998", "fid":"251", "criticity":"4", "tempTable":"t_", "is_process":true, "is_header":"true"}}$$)';
 
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 2, 'WARNINGS');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 2, '--------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2998", "fid":"251", "criticity":"3", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3004", "separator_id":"2022"}}$$)';
 
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, 'INFO');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, '-------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2998", "fid":"251", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2014"}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2998", "fid":"251", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2007"}}$$)';
 
 	-- save state & expl selector
 	IF v_selection_mode !='userSelectors' THEN
