@@ -47,6 +47,9 @@ BEGIN
 	TRUNCATE t_rpt_inp_raingage;
 	DELETE FROM rpt_inp_raingage WHERE result_id = result_id_var;
 	TRUNCATE temp_t_lid_usage;
+	
+	ALTER TABLE temp_t_lid_usage DROP constraint if exists  temp_t_lid_usage_subc_lidco;
+	ALTER TABLE temp_t_lid_usage ADD CONSTRAINT temp_t_lid_usage_subc_lidco unique (subc_id, lidco_id);
 
 	-- set all timeseries of raingage using user's value
 	v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
