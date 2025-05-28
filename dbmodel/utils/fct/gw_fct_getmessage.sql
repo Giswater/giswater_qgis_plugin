@@ -80,13 +80,24 @@ BEGIN
 
 		IF v_label_id IS NOT NULL THEN
 			SELECT * INTO rec_cat_label FROM sys_label  WHERE sys_label.id=v_label_id;
-
+			FOR _key, _value IN SELECT * FROM json_each_text(v_parameters)
+			LOOP
+				rec_cat_label.idval = concat(rec_cat_label.idval, ' ', _value);
+			END LOOP;
 		ELSE
 			-- get label from sys_function, upper()
 			-- get separator from sys_label
 
 			SELECT function_alias INTO v_function_alias FROM sys_function WHERE id=v_function_id;
+
+			FOR _key, _value IN
+				SELECT * FROM json_each_text(v_parameters)
+			LOOP
+				v_function_alias = concat(v_function_alias, ' ', _value);
+			END LOOP;
 		END IF;
+
+		
 
 		IF rec_cat_label IS NULL THEN
 
