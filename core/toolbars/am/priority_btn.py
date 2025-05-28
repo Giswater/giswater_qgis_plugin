@@ -452,11 +452,13 @@ class CalculatePriority:
         # Check if thread is finished wuih success
         if hasattr(self.thread, "df"):
             # Button OK behavior
-           tools_qt.set_widget_text(dlg, dlg.btn_again, tools_qt.tr("Next"))
-           dlg.btn_save2file.setEnabled(True)
+            msg = "Next"
+            tools_qt.set_widget_text(dlg, dlg.btn_again, msg)
+            dlg.btn_save2file.setEnabled(True)
         else:
             dlg.progressBar.setValue(100)
-            tools_qt.set_widget_text(dlg, dlg.btn_again, tools_qt.tr("Try again"))
+            msg = "Try again"
+            tools_qt.set_widget_text(dlg, dlg.btn_again, msg)
         dlg.executing = False
         self.timer.stop()
 

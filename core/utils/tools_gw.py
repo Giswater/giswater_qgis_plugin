@@ -1392,7 +1392,8 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
 
     btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
     if btn_cancel and change_btn_cancel:
-        tools_qt.set_widget_text(dialog, btn_accept, 'Close')
+        msg = "Close"
+        tools_qt.set_widget_text(dialog, btn_accept, msg)
 
 
 def set_style_mapzones():

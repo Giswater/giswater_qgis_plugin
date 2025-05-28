@@ -75,8 +75,10 @@ class GwI18NGenerator:
         """ Populate combo with languages values """
 
         self.dlg_qm.btn_translate.setEnabled(True)
-        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host}')
+        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host) 
+        msg = 'Connected to {0}'
+        msg_params = (host,)
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         sql = "SELECT id, idval FROM i18n.cat_language"
         rows = self._get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows)
@@ -99,11 +101,11 @@ class GwI18NGenerator:
         if py_msg:
             status_py_msg = self._create_py_files()
             if status_py_msg is True:
-                msg += "Python translation successful\n"
+                msg += f"{tools_qt.tr('Python translation successful')}\n"
             elif status_py_msg is False:
-                msg += "Python translation failed\n"
+                msg += f"{tools_qt.tr('Python translation failed')}\n"
             elif status_py_msg is None:
-                msg += "Python translation canceled\n"
+                msg += f"{tools_qt.tr('Python translation canceled')}\n"
 
         self._create_path_dic()
         for type_db_file in self.path_dic:
@@ -111,11 +113,11 @@ class GwI18NGenerator:
             if tools_qt.is_checked(self.dlg_qm, self.path_dic[type_db_file]['checkbox']):
                 status_all_db_msg, dbtable = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
                 if status_all_db_msg is True:
-                    msg += f"{type_db_file} translation successful\n"
+                    msg += f"{type_db_file} {tools_qt.tr('translation successful')}\n"
                 elif status_all_db_msg is False:
-                    msg += f"{type_db_file} translation failed in table: {dbtable}\n"
+                    msg += f"{type_db_file} {tools_qt.tr('translation failed in table')}: {dbtable}\n"
                 elif status_all_db_msg is None:
-                    msg += f"{type_db_file} translation canceled\n"
+                    msg += f"{type_db_file} {tools_qt.tr('translation canceled')}\n"
 
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
@@ -239,7 +241,7 @@ class GwI18NGenerator:
             if py_dlg[key_label] is None:  # Afegir aqui l'auto amb un if
                 if self.lower_lang != 'en_us':
                     py_dlg[key_label] = py_dlg[f'auto_{key_label}']
-                if py_tlb[key_label] is None:
+                if py_dlg[key_label] is None:
                     py_dlg[key_label] = py_dlg['lb_en_us']
 
             line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
@@ -328,8 +330,9 @@ class GwI18NGenerator:
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = f"Updating {table}..."
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
+        msg = "Updating {0}..."
+        msg_params = (table,)
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
         colums = []
         lang_colums = []

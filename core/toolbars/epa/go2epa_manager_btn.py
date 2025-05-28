@@ -223,7 +223,7 @@ class GwGo2EpaManagerButton(GwAction):
             inp_options = json.loads(f'{row[col_ind].data()}')
             if msg:
                 msg += " <br> "
-            msg += "<b>Inp Options: </b> <br>"
+            msg += f"<b>{tools_qt.tr('Inp Options')}: </b> <br>"
             for text in inp_options:
                 msg += f"{text} : {inp_options[text]} <br>"
         except Exception:

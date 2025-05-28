@@ -273,7 +273,8 @@ class GwVisit(QObject):
 
         if feature_type is None:
             # Set a model with selected filter. Attach that model to selected table
-            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, 'Filter by ext_code')
+            msg = "Filter by ext_code"
+            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, msg)
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
@@ -283,7 +284,8 @@ class GwVisit(QObject):
             tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
-            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, 'Filter by code')
+            msg = "Filter by code"
+            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, msg)
             filed_to_filter = "code"
             table_object = "v_ui_om_visitman_x_" + str(feature_type)
             expr_filter = f"{feature_type}_id = '{feature_id}'"
