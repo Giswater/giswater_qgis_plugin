@@ -120,7 +120,7 @@ class GwProjectLayersConfig(GwTask):
         row = tools_db.check_function('gw_fct_getinfofromid', aux_conn=self.aux_conn, is_thread=True)
         if row in (None, ''):
             msg = "Function not found in database: {0}"
-            msg_params  = ("gw_fct_getinfofromid",)
+            msg_params = ("gw_fct_getinfofromid",)
             tools_log.log_warning(msg, msg_params=msg_params)
             return False
 
@@ -158,7 +158,7 @@ class GwProjectLayersConfig(GwTask):
             if 'data' not in self.json_result['body']:
                 msg = "Not '{0}'"
                 msg_params = ("body")
-                ools_log.log_info(msg, msg_params=msg_params)
+                tools_log.log_info(msg, msg_params=msg_params)
                 continue
 
             tools_gw.config_layer_attributes(self.json_result, layer, layer_name, thread=self)

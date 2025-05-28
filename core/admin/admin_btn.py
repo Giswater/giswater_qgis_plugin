@@ -307,7 +307,6 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Create cm schema")
         if status:
             tools_db.dao.commit()
-            self._close_dialog_admin(self.dlg_readsql_create_cm_project)
         else:
             tools_db.dao.rollback()
             # Reset count error variable to 0
@@ -317,6 +316,36 @@ class GwAdminButton:
             tools_qgis.show_info(msg)
             if self.dlg_readsql_create_cm_project:
                 tools_gw.close_dialog(self.dlg_readsql_create_cm_project)
+
+    def _get_cm_schema_name(self):
+        """
+        Return the name of the first schema whose sys_version table
+        exists and has project_type = 'cm', or None if no such schema.
+        """
+        # find all schemas that actually define a sys_version table
+        rows = tools_db.get_rows(
+            """
+            SELECT table_schema
+              FROM information_schema.tables
+             WHERE table_name = 'sys_version'
+            """
+        )
+        if not rows:
+            return None
+
+        # for each, check if its sys_version.project_type = 'cm'
+        for (schema,) in rows:
+            try:
+                match = tools_db.get_rows(
+                    f"SELECT 1 FROM {schema}.sys_version WHERE project_type = 'cm' LIMIT 1"
+                )
+            except Exception:
+                continue
+
+            if match:
+                return schema
+
+        return None
 
     def execute_last_process(self, new_project=False, schema_name=None, schema_type='', locale=False, srid=None):
         """ Execute last process function """
@@ -919,8 +948,8 @@ class GwAdminButton:
 
         if self.is_service and connection_status is False:
             self.form_enabled = False
-            message = 'There is an error in the configuration of the pgservice file, ' \
-                      'please check it or consult your administrator'
+            message = ("There is an error in the configuration of the pgservice file, "
+                      "please check it or consult your administrator")
             ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
             tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
@@ -996,13 +1025,13 @@ class GwAdminButton:
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
             elif str(plugin_version) > str(project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         '(Schema version is lower than plugin version, please update schema)')
+                msg = '(Schema version is lower than plugin version, please update schema)'
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
                 self.dlg_readsql.btn_info.setEnabled(True)
             elif str(plugin_version) < str(project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         '(Schema version is higher than plugin version, please update plugin)')
+                msg = '(Schema version is higher than plugin version, please update plugin)'
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -1357,8 +1386,8 @@ class GwAdminButton:
         self.logged, credentials = tools_db.connect_to_database_credentials(credentials)
         if self.is_service and not self.logged:
             self.form_enabled = False
-            message = 'There is an error in the configuration of the pgservice file, ' \
-                      'please check it or consult your administrator'
+            message = ("There is an error in the configuration of the pgservice file, "
+                      "please check it or consult your administrator")
             tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
@@ -1393,13 +1422,13 @@ class GwAdminButton:
                 self.form_enabled = False
             elif str(plugin_version) > str(project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                '(Schema version is lower than plugin version, please update schema)')
+                msg = '(Schema version is lower than plugin version, please update schema)'
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
                 self.dlg_readsql.btn_info.setEnabled(True)
             elif str(plugin_version) < str(project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                '(Schema version is higher than plugin version, please update plugin)')
+                msg = '(Schema version is higher than plugin version, please update plugin)'
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -1673,22 +1702,22 @@ class GwAdminButton:
 
         elif str(plugin_version) > str(project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                     '(Schema version is lower than plugin version, please update schema)')
+            msg = '(Schema version is lower than plugin version, please update schema)'
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             self.dlg_readsql.btn_info.setEnabled(True)
 
         elif str(plugin_version) < str(project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                     '(Schema version is higher than plugin version, please update plugin)')
+            msg = '(Schema version is higher than plugin version, please update plugin)'
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             self.dlg_readsql.btn_info.setEnabled(False)
 
         elif self.postgresql_version is None or self.postgis_version is None or self.pgrouting_version is None:
             ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
             tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                      '(Unable to create one extension. Packages must be installed, consult your administrator)')
+            msg = '(Unable to create one extension. Packages must be installed, consult your administrator)'
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
 
         elif self.form_enabled:
@@ -1767,6 +1796,50 @@ class GwAdminButton:
             partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False)
         )
 
+        # checks if we have an existing cm project
+        self.cm_schema = self._get_cm_schema_name()
+        if self.cm_schema:
+            self.dlg_readsql_create_cm_project.lbl_schema_name.setText(self.cm_schema)
+            self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
+
+            # checks if we have the parent linked to cm
+            schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+            if schema_name:
+
+                # Query the JSON->>'schema_name' value from config_param_system
+                rows = tools_db.get_rows(
+                    "SELECT (value::json)->> 'schemaName' "
+                    f"  FROM {schema_name}.config_param_system "
+                    " WHERE parameter = 'admin_schema_cm'"
+                )
+
+                linked_cm = None
+                if rows and rows[0] and rows[0][0]:
+                    linked_cm = rows[0][0].strip()
+
+                if linked_cm:
+                    self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
+            # Check if cat_team has any rows
+            has_team = bool(
+                tools_db.get_rows(
+                    f"SELECT 1 FROM {self.cm_schema}.cat_team LIMIT 1"
+                )
+            )
+            # Check if cat_organization has any rows
+            has_org = bool(
+                tools_db.get_rows(
+                    f"SELECT 1 FROM {self.cm_schema}.cat_organization LIMIT 1"
+                )
+            )
+            # If both exist, disable the “Create example” button
+            if has_team and has_org:
+                self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+            else:
+                self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
+        else:
+            self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
+            self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+
         self.dlg_readsql_create_cm_project.btn_base_schema.clicked.connect(self.on_btn_create_base_clicked)
         self.dlg_readsql_create_cm_project.btn_parent_schema.clicked.connect(self.on_btn_create_parent_clicked)
         self.dlg_readsql_create_cm_project.btn_example.clicked.connect(self.on_btn_create_example_clicked)
@@ -1815,6 +1888,12 @@ class GwAdminButton:
         self.base_schema_created = True
 
         self._run_create_cm_task(['load_base_schema'])
+
+        self.dlg_readsql_create_cm_project.lbl_schema_name.setText(name)
+        self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
+        self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
+        self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
+
         self.dlg_cm_base.accept()
 
     def on_btn_create_parent_clicked(self):
@@ -1830,6 +1909,7 @@ class GwAdminButton:
         self.parent_schema_created = True
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         self._run_create_cm_task(['load_parent_schema'])
+        self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
 
     def on_btn_create_example_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -1844,6 +1924,7 @@ class GwAdminButton:
         self.example_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         self.project_example_name = schema_name
         self._run_create_cm_task(['load_example'])
+        self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
 
     def _open_rename(self):
         """"""
@@ -3100,7 +3181,8 @@ class GwAdminButton:
         sslmode_list = [['disable', 'disable'], ['allow', 'allow'], ['prefer', 'prefer'], ['require', 'require'],
                         ['verify - ca', 'verify - ca'], ['verify - full', 'verify - full']]
         tools_qt.fill_combo_values(self.dlg_credentials.cmb_sslmode, sslmode_list, 0)
-        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, 'prefer')
+        msg = 'prefer'
+        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, msg)
 
         tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials')
 

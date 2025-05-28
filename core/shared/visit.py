@@ -273,7 +273,8 @@ class GwVisit(QObject):
 
         if feature_type is None:
             # Set a model with selected filter. Attach that model to selected table
-            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, 'Filter by ext_code')
+            msg = "Filter by ext_code"
+            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, msg)
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
@@ -283,7 +284,8 @@ class GwVisit(QObject):
             tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
-            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, 'Filter by code')
+            msg = "Filter by code"
+            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, msg)
             filed_to_filter = "code"
             table_object = "v_ui_om_visitman_x_" + str(feature_type)
             expr_filter = f"{feature_type}_id = '{feature_id}'"
@@ -379,7 +381,7 @@ class GwVisit(QObject):
         else:
             msg = "{0}: widget not found"
             msg_params = ("set_model_to_table",)
-            tools_log.log_info(msg,  msg_params=msg_params)
+            tools_log.log_info(msg, msg_params=msg_params)
         current_visit_class = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
         feature_key = tools_qgis.get_primary_key()
         feature_type = 'node'
@@ -906,7 +908,7 @@ class GwVisit(QObject):
                 self.dlg_add_visit.tab_feature.currentChanged.disconnect()
         except Exception as e:
             msg = "{0} error: {1}"
-            msg_params = (f"connect_signal_tab_feature_signal", str(e),)
+            msg_params = ("connect_signal_tab_feature_signal", str(e),)
             tools_log.log_info(msg, msg_params=msg_params)
 
     def _manage_tabs_enabled(self, enable_tabs=False):
@@ -965,7 +967,7 @@ class GwVisit(QObject):
             self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
         except Exception as e:
             msg = "{0} exception: {1}"
-            msg_params = (f"manage_feature_type_selected", str(e),)
+            msg_params = ("manage_feature_type_selected", str(e),)
             tools_log.log_info(msg, msg_params=msg_params)
         finally:
             self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
@@ -1833,7 +1835,7 @@ class GwVisit(QObject):
             self.dlg_add_visit.btn_expr_select.clicked.disconnect()
         except Exception as e:
             msg = "{0} exception: {1}"
-            msg_params = (f"visit_tab_feature_changed", str(e),)
+            msg_params = ("visit_tab_feature_changed", str(e),)
             tools_log.log_info(msg, msg_params=msg_params)
         finally:
 
@@ -1913,6 +1915,6 @@ class GwVisit(QObject):
                 index = widget.findData(value)
                 if index >= 0:
                     widget.setCurrentIndex(index)
-                    continuems
+                    continue
 
     # endregion

@@ -6,10 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import re
 import psycopg2
 import psycopg2.extras
 from functools import partial
 from datetime import datetime, date
+from itertools import product
 
 
 from ..ui.ui_manager import GwSchemaI18NManagerUi
@@ -102,7 +104,9 @@ class GwSchemaI18NManager:
         else:
             self.dlg_qm.btn_search.setEnabled(True)
             self.dlg_qm.lbl_info.clear()
-            tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Successful connection to {db_i18n} database")
+            msg = "Successful connection to {0} database"
+            msg_params = (db_i18n,)
+            tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
             QApplication.processEvents()
 
         if not status_org:
@@ -395,7 +399,7 @@ class GwSchemaI18NManager:
 
                 elif 'dbfunction' in table_i18n:
                     query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, ds_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{row_org['project_type']}', '{row_org['id']}', 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', 
                                     {texts[0]}) 
                                     ON CONFLICT (source_code, project_type, context, source) 
                                     DO UPDATE SET ds_en_us = {texts[0]};\n"""
@@ -422,7 +426,7 @@ class GwSchemaI18NManager:
 
                 elif 'su_basic_tables' in table_i18n:
                     source = row_org["id"]
-                    if table_org == "value_state_type" or self.project_type == "am":
+                    if table_org in ["value_state_type", "sys_label"] or self.project_type == "am":
                         texts.append('null')
                     query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, na_en_us, ob_en_us) 
                                     VALUES ('giswater', '{table_org}', '{self.project_type}', '{source}', {texts[0]}, {texts[1]}) 
@@ -522,9 +526,9 @@ class GwSchemaI18NManager:
             if table_org == "value_state" and self.project_type in ["ud", "ws"]:
                 columns_org = ["id", "name", "observ"]
                 names = ["name", "observ"]
-            elif table_org == "doc_type":
-                columns_org = ["id", "comment"]
-                names = ["id", "comment"]
+            elif table_org == "sys_label":
+                columns_org = ["id", "idval"]
+                names = ["idval"]
             elif self.project_type == "am":
                 columns_org = ["id", "idval"]
                 names = ["idval"]
@@ -667,15 +671,16 @@ class GwSchemaI18NManager:
         try:
             self._detect_column_names(table)
         except Exception as e:
-            return f"Error deleting rows: {e}"
+            return f"Error detecting primary keys (Rename proj.type): {e}"
 
         # Step 2: Get the duplicated rows
         query = self._get_duplicates_rows(table)
+        print(query)
         try:
             self.cursor_i18n.execute(query)
             initial_rows = self.cursor_i18n.fetchall()
         except Exception as e:
-            return f"Error deleting rows: {e}"
+            return f"Error getting dupplicates (Rename proj.type): {e}"
 
         # Step 3: Create the rows with the correct project_type
         final_rows = []
@@ -697,7 +702,7 @@ class GwSchemaI18NManager:
             self.conn_i18n.commit()  # Commit the deletion
         except Exception as e:
             self.conn_i18n.rollback()  # Rollback in case of error
-            return f"Error deleting rows: {e}"
+            return f"Error deleting rows (Rename proj.type): {e}"
 
         # Step 5: Insert the unique final rows back into the table
         final_rows_tot = final_rows + final_rows_no_utils if final_rows_no_utils else final_rows
@@ -718,20 +723,22 @@ class GwSchemaI18NManager:
 
         query = """WITH duplicates AS (
                 SELECT """
-        query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
+        query += ", ".join([pk for pk in self.primary_keys if pk != 'project_type'])
         query += f""", COUNT(*) AS duplicate_count
-                FROM {table}
-                GROUP BY """
-        query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
-        query += f"""\nHAVING COUNT(*) > 1
-            )
-            SELECT t.*, d.duplicate_count
-            FROM {table} t
-            JOIN duplicates d
-            ON 
-        """
-        query += "AND ".join([f"""t.{primary_key} = d.{primary_key} """ for primary_key in self.primary_keys if primary_key != 'project_type'])
-        query += """ORDER BY duplicate_count DESC, (project_type = 'utils') DESC, project_type;"""
+                    FROM {table}
+                    GROUP BY """
+        query += ", ".join([pk for pk in self.primary_keys if pk != 'project_type'])
+        query += f"""
+                    HAVING COUNT(*) > 1
+                )
+                SELECT t.*, d.duplicate_count
+                FROM {table} t
+                JOIN duplicates d
+                ON """
+        
+        query += " AND ".join(f"t.{pk} = d.{pk}" for pk in self.primary_keys if pk != 'project_type')
+        query += """ ORDER BY duplicate_count DESC, (project_type = 'utils') DESC, project_type;"""
+        
         return query
 
     def _delete_duplicates_rows(self, table):
@@ -797,27 +804,26 @@ class GwSchemaI18NManager:
         files = self._find_py_files(path)
 
         messages = []
-        keys1 = ['message = "', 'message="', 'message ="', 'message= "',
-         'msg = "', 'msg="', 'msg ="', 'msg= "',
-         'title = "', 'title="', 'title ="', 'title= "']
+        fields = ['message', 'msg', 'title']
+        patterns = ['=', ' =', '= ', ' = ']
+        quotes = ['"', "'", '("', "('"]
 
-        # Replace double quotes with single quotes for each item in the list
-        keys2 = [key.replace('"', "'") for key in keys1]
+        # Generate all combinations
+        keys = [f"{field}{pattern}{quote}" for field, pattern, quote in product(fields, patterns, quotes)]
 
-        # Extend the original list with the new one
-        keys = keys1 + keys2
         for key in keys:
             for file in files:
                 coincidencias = self._search_lines(file, key)
                 if coincidencias:
                     for num_line, content in coincidencias:
-                        if content[len(key):-1] not in messages and content.startswith(key):
-                            messages.append(content[len(key):-1])
+                        match = re.search(rf'{re.escape(key)}(.*?){key[-1]}', content)
+                        if match:
+                            messages.append(match.group(1))
 
         text_error = ""
         for message in messages:
             message = message.replace("'", "''")
-            query = f"""INSERT INTO {self.schema_i18n}.pymessage (source_code, source, ms_en_us) VALUES ('giswater', '{message}', '{message}') ON CONFLICT DO NOTHING;\n"""
+            query = f"""INSERT INTO i18n_proves.pymessage (source_code, source, ms_en_us) VALUES ('giswater', '{message}', '{message}') ON CONFLICT DO NOTHING;\n"""
 
             try:
                 self.cursor_i18n.execute(query)
@@ -848,9 +854,23 @@ class GwSchemaI18NManager:
         found_lines = []
         try:
             with open(file, "r", encoding="utf-8") as f:
-                for num_line, line in enumerate(f, start=1):
-                    if key in line:
-                        found_lines.append((num_line, line.strip()))
+                lines = f.readlines()
+                num_line = 0  # Initialize the line number outside the loop
+                while num_line < len(lines):  # Continue until we go through all the lines
+                    line = lines[num_line].strip()
+                    if line.startswith(key):
+                        if "(" not in key:  # If no parenthesis in the key
+                            found_lines.append((num_line, line))
+                        else:  # If the key contains parenthesis
+                            full_text = line[0]
+                            while ")" not in line:  # Loop to find the closing parenthesis
+                                full_text += line[1:-1]  # Remove the parentheses
+                                num_line += 1
+                                line = lines[num_line].strip()  # Move to the next line
+                            full_text += line[1:-2] + key[-1] + ")" # Add the part before the closing parenthesis
+                            found_lines.append((num_line, full_text))
+                            print(full_text)
+                    num_line += 1  # Increment the line number after each iteration
         except Exception as e:
             print(f"No se pudo leer el archivo {file}: {e}")
         return found_lines
@@ -878,7 +898,7 @@ class GwSchemaI18NManager:
         message = "Checking any item will uncheck all other items."
         message = "This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector"
         message = "Pipes with invalid arccat_ids: {0}."
-        message = "Invalid arccat_ids: {1}."
+        message = "Invalid arccat_ids: {0}."
         message = "Do you want to proceed?"
         message = ("An arccat_id is considered invalid if it is not listed in the catalog configuration table. "
                     "As a result, these pipes will NOT be assigned a priority value.")
@@ -901,7 +921,55 @@ class GwSchemaI18NManager:
         message = "layoutorder not found."
         message = "widgetname not found. "
         message = "widgettype is wrongly configured. Needs to be in "
-
+        message = "Information about exception"
+        message = "Error type"
+        message = "Line number"
+        message = "Description"
+        message = "Schema name"
+        message = "SQL"
+        message = "SQL File"
+        message = "Python translation successful"
+        message = "Python translation failed"
+        message = "Python translation canceled"
+        message = "translation successful"
+        message = "translation failed in table"
+        message = "translation canceled"
+        message = ('Interpolate tool.\n'
+               'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable '
+               'edit_node_interpolate on table config_param_user')
+        message = "Inp Options"
+        message = "IMPORT INP"
+        message = ("This wizard will help with the process of importing a network from a {0} INP "
+                   "file into the Giswater database.")
+        message = "There are multple tabs in order to configure all the necessary catalogs."
+        message = ("The first tab is the 'Basic' tab, where you can select the exploitation, sector, "
+                   "municipality, and other basic information.")
+        message = ("The second tab is the 'Features' tab, where you can select the corresponding feature "
+                   "classes for each type of feature on the network.")
+        message = ("Here you can choose how the pumps and valves will be imported, either left as arcs "
+                   "(virual arcs) or converted to nodes.")
+        message = ("The third tab is the 'Materials' tab, where you can select the corresponding material "
+                   "for each roughness value.")
+        message = ("Here you can choose how the pumps, weirs, orifices, and outlets will be imported, either "
+                   "left as arcs (virual arcs) or converted to flwreg.")
+        message = ("The third tab is the 'Materials' tab, where you can select the corresponding roughness value "
+                   "for each material.")
+        message = ("The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node "
+                   "on the network.")
+        message = ("The fifth tab is the 'Arcs' tab, where you can select the catalog for each type of arc "
+                   "on the network.")
+        message = ("If you chose to import the flow regulators as flwreg objects, the sixth tab is where you "
+                   "can select the catalog for each flow regulator (pumps, weirs, orifices, outlets) on the network.")
+        message = "If not, you can ignore the tab."
+        message = ("Once you have configured all the necessary catalogs, you can click on the 'Accept' button to "
+                   "start the import process.")
+        message = "It will then show the log of the process in the last tab."
+        message = ("You can save the current configuration to a file and load it later, or load the last saved "
+                   "configuration.")
+        message = "If you have any questions, please contact the Giswater team via"
+        message = "GitHub Issues"
+        message = "or"
+        message = "our website"
     #endregion
     # region Global funcitons
     def _detect_schema(self, schema_name):
@@ -949,7 +1017,7 @@ class GwSchemaI18NManager:
                 if table_name == "su_feature":
                     tables_org = ["cat_feature"]
                 else:
-                    tables_org = ["value_state", "value_state_type"]
+                    tables_org = ["value_state", "value_state_type", "sys_label"]
         else:
             tables_org = [f"sys_{table_name[2:]}"]  # Prepend "sys_" and get everything after the first two characters
 
@@ -987,8 +1055,9 @@ class GwSchemaI18NManager:
     def _change_table_lyt(self, table):
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = f"From {self.project_type}, updating {table}..."
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
+        msg = "From {0}, updating {1}..."
+        msg_params = (self.project_type, table)
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
 
     def _detect_column_names(self, table):
@@ -1003,6 +1072,8 @@ class GwSchemaI18NManager:
         self.cursor_i18n.execute(query)
         results = self.cursor_i18n.fetchall()
         self.primary_keys = [row['column_name'] for row in results]
+        if "dbfunction" in table:
+            self.primary_keys.append("ds_en_us")
 
     def extract_and_update_strings(self, data):
         """Recursively extract and return list of dictionaries with translatable keys."""
@@ -1041,19 +1112,21 @@ class GwSchemaI18NManager:
     def tables_dic(self, schema_type):
         dbtables_dic = {
             "ws": {
-                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
-                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                 ],
+                # "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                #     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                #     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
+                #     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                #  ],
+                 "dbtables": [],
                  "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
-                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
-                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                 ],
+                # "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                #     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                #     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
+                #     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                #  ],
+                 "dbtables": [],
                  "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
@@ -1061,7 +1134,8 @@ class GwSchemaI18NManager:
                 "sutables": []
             },
             "cm": {
-                "dbtables": [],  # ["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
+                "dbtables": ["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
+                             "sys_typevalue", "dbconfig_form_fields_json"],
                 "sutables": []
             },
         }

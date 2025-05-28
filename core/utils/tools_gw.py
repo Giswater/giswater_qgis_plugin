@@ -364,7 +364,6 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
     # Create btn_help
     add_btn_help(dlg)
 
-
     # Show dialog
     dlg.show()
     # Open dialog
@@ -1393,7 +1392,8 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
 
     btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
     if btn_cancel and change_btn_cancel:
-        tools_qt.set_widget_text(dialog, btn_accept, 'Close')
+        msg = "Close"
+        tools_qt.set_widget_text(dialog, btn_accept, msg)
 
 
 def set_style_mapzones():

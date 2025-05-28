@@ -471,8 +471,10 @@ def combo_tweaks(**kwargs):
     if state_id == '':
         date_from.setEnabled(False)
         date_to.setEnabled(False)
-        tools_qt.set_widget_text(dialog, lbl_date_from, 'Date from:')
-        tools_qt.set_widget_text(dialog, lbl_date_to, 'Date to:')
+        msg = "Date from:"
+        tools_qt.set_widget_text(dialog, lbl_date_from, msg)
+        msg = "Date to:"
+        tools_qt.set_widget_text(dialog, lbl_date_to, msg)
     else:
         date_from.setEnabled(True)
         date_to.setEnabled(True)
@@ -481,5 +483,7 @@ def combo_tweaks(**kwargs):
             tools_qt.set_widget_text(dialog, lbl_date_from, options[int(state_id)]['widget_text_from'])
             tools_qt.set_widget_text(dialog, lbl_date_to, options[int(state_id)]['widget_text_to'])
         else:
-            tools_qt.set_widget_text(dialog, lbl_date_from, 'Date from:')
-            tools_qt.set_widget_text(dialog, lbl_date_to, 'Date to:')
+            msg = "Date from:"
+            tools_qt.set_widget_text(dialog, lbl_date_from, msg)
+            msg = "Date to:"
+            tools_qt.set_widget_text(dialog, lbl_date_to, msg)

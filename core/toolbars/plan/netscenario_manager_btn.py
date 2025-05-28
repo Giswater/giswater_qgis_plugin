@@ -552,11 +552,14 @@ class GwNetscenarioManagerButton(GwAction):
         if tab_name == 'plan_netscenario_valve':
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_active', False)
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', True)
-            tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', 'Node id:')
+            msg = "Node id:"
+            tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', msg)
         else:
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_active', True)
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', False)
-            tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', f'{self.selected_netscenario_type.capitalize()} id:')
+            msg = "{0} id:"
+            msg_params = (self.selected_netscenario_type.capitalize(),)
+            tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', msg, msg_params)
 
     def _manage_feature_type(self):
         """ Manages current tableview feature type (node, arc, nodarc, etc.) """

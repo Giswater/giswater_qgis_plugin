@@ -488,6 +488,9 @@
                  </item>
                  <item row="3" column="2">
                   <widget class="QPushButton" name="btn_reload_audit_triggers">
+                   <property name="toolTip">
+                    <string>Allow to start/end auditing tables updating the triggers </string>
+                   </property>
                    <property name="text">
                     <string>Refresh audit</string>
                    </property>
