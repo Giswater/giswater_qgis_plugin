@@ -794,3 +794,6 @@ VALUES(3414, 'Arc divide done successfully', null, 0, true, 'utils', 'core', 'UI
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3416, 'Update values of arcs node_1 and node_2.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+-- 27/05/2025
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('admin_schema_cm', '{"schemaName":""}', 'System parameter which identifies existing schema cm linked to a parent schemas', NULL, NULL, NULL, true, NULL, 'utils', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
