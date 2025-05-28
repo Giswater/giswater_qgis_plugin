@@ -95,18 +95,17 @@ BEGIN
 	END IF;
 
 	-- Starting process
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DATA QUALITY ANALYSIS ACORDING graph ANALYTICS RULES'));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2790", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_", "is_process":true, "is_header":"true"}}$$)';
 
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '----------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2790", "fid":"'||v_fid||'", "criticity":"3", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3004", "separator_id":"2022"}}$$)';
 
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '--------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2790", "fid":"'||v_fid||'", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2014"}}$$)';
 
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '-------');
-
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2790", "fid":"'||v_fid||'", "criticity":"1", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2007"}}$$)';
 
 	v_sql = '
 		SELECT * FROM sys_fprocess 
@@ -117,7 +116,6 @@ BEGIN
 		AND (parameters::text ILIKE ''%'||v_graphclass||'%'' OR parameters IS NULL)
 		AND active
 	';
-
 
 	FOR v_rec IN EXECUTE v_sql
 	LOOP
