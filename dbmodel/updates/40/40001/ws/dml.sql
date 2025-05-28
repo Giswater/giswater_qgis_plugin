@@ -533,3 +533,11 @@ DELETE FROM sys_table WHERE id = 'vu_macroexploitation';
 DELETE FROM sys_table WHERE id = 'vu_macrosector';
 DELETE FROM sys_table WHERE id = 'vu_node';
 DELETE FROM sys_table WHERE id = 'vu_om_mincut';
+
+--28/05/2025
+
+UPDATE sys_function SET function_alias = 'CALCULATE THE REACH OF HYDRANTS' WHERE function_name = 'gw_fct_graphanalytics_hydrant';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3514, 'Process executed for hydrant: %rec_hydrant%.', null, 0, true, 'utils', 'core', 'AUDIT');
+

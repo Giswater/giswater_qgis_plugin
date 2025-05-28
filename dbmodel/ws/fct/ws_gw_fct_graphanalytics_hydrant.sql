@@ -87,8 +87,8 @@ SET search_path = "SCHEMA_NAME", public;
 	CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 		
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CALCULATE THE REACH OF HYDRANTS'));
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3160", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"temp_", "is_process":true, "is_header":"true"}}$$)';
 
 	--store psector selector values
 	IF v_use_psector IS NOT TRUE THEN
@@ -278,7 +278,8 @@ SET search_path = "SCHEMA_NAME", public;
 			UPDATE temp_t_arc SET flag=null where result_id=v_fid::text;
 			DELETE FROM temp_anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid=v_fid_result);
 			-- log
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process executed for hydrant: ',rec_hydrant,'.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3514", "function":"3160", "parameters":{"rec_hydrant":"'||rec_hydrant||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"temp_", "is_process":true}}$$)';
 
 			p_data=p_data::jsonb||concat('{"nodeId":"',rec_hydrant,'","hydrantId":"',rec_hydrant,'"}')::jsonb;
 
@@ -363,7 +364,11 @@ SET search_path = "SCHEMA_NAME", public;
 		IF v_audit_result is null THEN
 			v_status = 'Accepted';
 			v_level = 3;
-			v_message = 'Process done successfully';
+			--v_message = 'Process done successfully';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3430", "function":"3160", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
+
+
 		ELSE
 
 			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
