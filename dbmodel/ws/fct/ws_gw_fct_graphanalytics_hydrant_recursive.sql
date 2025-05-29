@@ -7,8 +7,8 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3162
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_hydrant_recursive(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_hydrant_recursive(p_data json)
+RETURNS json AS
 $BODY$
 
 -- fid: 463, 464
@@ -16,7 +16,7 @@ $BODY$
 DECLARE
 
 v_exists_id character varying;
-v_node_id text;
+v_node_id integer;
 v_audit_result text;
 v_error_context text;
 v_level integer;
@@ -29,7 +29,7 @@ rec_table record;
 v_distance numeric;
 v_arclength numeric;
 v_percent numeric;
-v_checkstart text;
+v_checkstart integer;
 v_currentDistance numeric;
 v_target_node numeric;
 v_distance_left numeric;
@@ -38,7 +38,7 @@ v_query text;
 v_fid integer=463;
 v_fid_cross integer=464;
 v_schema text;
-v_hydrant text;
+v_hydrant integer;
 BEGIN
 
 	-- Search path
@@ -49,8 +49,8 @@ BEGIN
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	v_node_id = json_extract_path_text(p_data, 'nodeId')::text;
-	v_hydrant = json_extract_path_text(p_data, 'hydrantId')::text;
+	v_node_id = json_extract_path_text(p_data, 'nodeId')::integer;
+	v_hydrant = json_extract_path_text(p_data, 'hydrantId')::integer;
 	v_distance=json_extract_path_text(p_data, 'data','parameters','distance')::numeric;
 	v_currentDistance=json_extract_path_text(p_data, 'data','currentDistance')::numeric;
 	v_distance_left=json_extract_path_text(p_data, 'data','distanceLeft')::numeric;
@@ -72,7 +72,7 @@ BEGIN
 		-- Update value
 		INSERT INTO temp_anl_node (node_id, state, fid, the_geom)
 		SELECT node_id, 1, v_fid, the_geom FROM temp_t_node WHERE node_id = v_node_id;
-	
+
 		v_query='SELECT flag, arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' AND (flag IS false or flag IS null) and result_id='''||v_fid||''' UNION
 		SELECT flag,arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_2 = '||quote_literal(v_node_id)||' AND (flag IS false or flag IS null)  and result_id='''||v_fid||'''';
 
@@ -81,35 +81,35 @@ BEGIN
 
 			--check if node_id is one at the street crossing - recuperate the saved distance and remove the node if all street options where used
 			IF v_node_id in (SELECT node_id from temp_anl_node where fid=v_fid_cross) THEN
-				
+
 				SELECT total_distance into v_distance_left from temp_anl_node where fid=v_fid_cross AND node_id=v_node_id and cur_user="current_user"();
-				
+
 				EXECUTE 'SELECT count(distinct arc_id) FROM (
 				SELECT arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
 				SELECT arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
 				INTO v_count;
-				
+
 				IF v_count = 1 THEN
 					DELETE FROM temp_anl_node WHERE node_id=v_node_id AND fid=v_fid_cross and cur_user="current_user"();
 				END IF;
 			END IF;
-			
+
 			--check number of arcs that leave the node to save it as a road crossing if necessary
 			EXECUTE 'SELECT count(distinct arc_id) FROM (
 				SELECT arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
 				SELECT arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
 			INTO v_count;
-				
+
 			IF v_count  > 0 THEN
 					INSERT INTO temp_anl_node (fid, node_id, total_distance)
 					VALUES (v_fid_cross, v_node_id, v_distance_left);
 				END IF;
 
 			v_arclength = st_length(rec_table.the_geom);
-		
+
 			-- Insert arc into tables
-			--IF rec_table.arc_id NOT IN  (SELECT arc_id FROM anl_arc WHERE fid=v_fid) THEN 
-					INSERT INTO temp_anl_arc (arc_id, fid, the_geom,length, descript, expl_id, node_1) 
+			--IF rec_table.arc_id NOT IN  (SELECT arc_id FROM anl_arc WHERE fid=v_fid) THEN
+					INSERT INTO temp_anl_arc (arc_id, fid, the_geom,length, descript, expl_id, node_1)
 					SELECT rec_table.arc_id, v_fid, rec_table.the_geom, v_arclength, v_hydrant, expl_id, v_hydrant FROM exploitation
 					WHERE ST_DWithin(rec_table.the_geom, exploitation.the_geom,0.01);
 			--END IF;
@@ -119,11 +119,11 @@ BEGIN
 			UPDATE temp_anl_node set total_distance=v_currentDistance WHERE node_id=v_node_id AND fid=v_fid and cur_user="current_user"();
 
 			UPDATE temp_t_arc SET flag=true where arc_id=rec_table.arc_id;
-	
+
 			IF v_distance_left > v_arclength  THEN
 				v_distance_left=v_distance_left-v_arclength;
-				
-				--look for the 
+
+				--look for the
 				SELECT target_node INTO v_target_node FROM (
 				SELECT arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE arc_id = rec_table.arc_id AND result_id=v_fid::text UNION
 				SELECT arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE arc_id = rec_table.arc_id AND result_id=v_fid::text)a
@@ -140,7 +140,7 @@ BEGIN
 	 		ELSE
 
 	 			v_percent = v_distance_left/v_arclength;
-	 			IF v_percent >1 THEN	
+	 			IF v_percent >1 THEN
 	 				v_percent=1;
 	 			END IF;
 	 			--check the direction of newly created arc and reverse it if it doesnt start in the initial node
@@ -149,13 +149,13 @@ BEGIN
 				ORDER BY ST_Distance(n.the_geom, ST_startpoint(rec_table.the_geom)) LIMIT 1;
 
 				IF v_checkstart!=v_node_id then
-					
+
 					rec_table.the_geom=ST_Reverse(rec_table.the_geom);
 				end if;
 
 				RAISE NOTICE 'v_hydrant,% - arc, %',v_hydrant,rec_table.arc_id;
-				
-				IF v_percent > 0.001 	THEN 
+
+				IF v_percent > 0.001 	THEN
 					EXECUTE 'UPDATE temp_anl_arc SET the_geom=(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')), fid='||v_fid_cross||', 
 					length = st_length(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')) 
 					WHERE arc_id='||quote_literal(rec_table.arc_id)||' and fid='||v_fid||' and cur_user=current_user and descript='||quote_literal(v_hydrant)||';';
@@ -173,8 +173,8 @@ BEGIN
 					DELETE FROM temp_anl_node WHERE node_id=v_node_id AND fid=v_fid_cross and cur_user="current_user"();
 				END IF;
 
-				IF v_distance_left IS NULL THEN 
-					v_distance_left=0; 
+				IF v_distance_left IS NULL THEN
+					v_distance_left=0;
 				END IF;
 
 				EXECUTE 'SELECT gw_fct_graphanalytics_hydrant_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -193,7 +193,7 @@ BEGIN
 		v_message = 'Process done successfully';
 	ELSE
 
-		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 

@@ -7,22 +7,22 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3160;
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_hydrant(p_data json)  
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_hydrant(p_data json)
+RETURNS json AS
 
 $BODY$
 
 /*
 example:
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_hydrant($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
-"form":{}, "feature":{"tableName":"ve_node_hydrant", "featureType":"NODE", "id":["1054"]}, 
+"form":{}, "feature":{"tableName":"ve_node_hydrant", "featureType":"NODE", "id":["1054"]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{"distance":"50"}}}$$);
 
 -- fid: 463, 464
 
 */
 
-DECLARE 
+DECLARE
 
 v_result_json json;
 v_result json;
@@ -86,13 +86,13 @@ SET search_path = "SCHEMA_NAME", public;
 	CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
 	CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-		
+
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"3160", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"temp_", "is_process":true, "is_header":"true"}}$$)';
 
 	--store psector selector values
 	IF v_use_psector IS NOT TRUE THEN
-			-- save psector selector 
+			-- save psector selector
 			DELETE FROM temp_t_table WHERE fid=288 AND cur_user=current_user;
 			INSERT INTO temp_t_table (fid, text_column)
 			SELECT 288, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
@@ -102,13 +102,13 @@ SET search_path = "SCHEMA_NAME", public;
 	END IF;
 
 	--CREATE ARRAY OF HYDRANTS
-	select array_agg(a) into v_node_array from json_array_elements_text(v_node_json) a WHERE a IN (SELECT node_id FROM man_hydrant);
-	select string_agg(a,', ') into v_hidrant_array from json_array_elements_text(v_node_json) a WHERE a IN (SELECT node_id FROM man_hydrant);
+	select array_agg(a) into v_node_array from json_array_elements_text(v_node_json) a WHERE a::integer IN (SELECT node_id FROM man_hydrant);
+	select string_agg(a,', ') into v_hidrant_array from json_array_elements_text(v_node_json) a WHERE a::integer IN (SELECT node_id FROM man_hydrant);
 
 	IF v_node_array is null THEN
 		EXECUTE 'SELECT array_agg(a.node_id) from (SELECT node_id FROM '||v_tablename||' join man_hydrant using (node_id))a'
 		into v_node_array;
-		EXECUTE 'SELECT string_agg(a.node_id,'', '') from (SELECT n.node_id FROM '||v_tablename||' n join man_hydrant using (node_id))a'
+		EXECUTE 'SELECT array_agg(a.node_id) from (SELECT n.node_id FROM '||v_tablename||' n join man_hydrant using (node_id))a'
 		into v_hidrant_array;
 	END IF;
 
@@ -125,7 +125,7 @@ SET search_path = "SCHEMA_NAME", public;
 	IF v_node_array IS NOT NULL THEN
 
 			FOREACH rec_hydrant IN ARRAY(v_node_array) LOOP
-				--locate hydrant on the closest street 
+				--locate hydrant on the closest street
 				EXECUTE 'SELECT closest_street.id, dist
 				FROM '||v_tablename||' a
 				CROSS JOIN LATERAL
@@ -135,7 +135,7 @@ SET search_path = "SCHEMA_NAME", public;
 				ORDER BY a.the_geom <-> b.the_geom
 				LIMIT 1) AS closest_street  WHERE a.node_id='||quote_literal(rec_hydrant)||''
 				INTO v_closest_street, v_dist_street;
-						
+
 				IF v_dist_street < 50 THEN
 
 					SELECT (ST_Dump(the_geom)).geom INTO v_street_geom FROM om_streetaxis WHERE id=v_closest_street;
@@ -148,7 +148,7 @@ SET search_path = "SCHEMA_NAME", public;
 					--divide street on which hydrant is located and insert on temp table
 					EXECUTE 'SELECT ST_LineLocatePoint('||quote_literal(v_street_geom::text)||', temp_t_node.the_geom) FROM temp_t_node WHERE node_id='||quote_literal(rec_hydrant)||' and result_id='''||v_fid||''''
 					INTO v_intersect_loc;
-							
+
 					v_line1 := ST_LineSubstring(v_street_geom, 0.0, v_intersect_loc);
 					v_line2 := ST_LineSubstring(v_street_geom, v_intersect_loc, 1.0);
 
@@ -160,7 +160,7 @@ SET search_path = "SCHEMA_NAME", public;
 					END IF;
 
 					INSERT INTO temp_t_arc(result_id, arc_id,the_geom, annotation)
-					SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
+					SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM
 					(SELECT v_line1  as the_geom,v_closest_street as id
 					UNION SELECT v_line2  as the_geom,v_closest_street as id)a;
 				ELSE
@@ -170,11 +170,11 @@ SET search_path = "SCHEMA_NAME", public;
 
 			IF v_use_propsal IS TRUE THEN
 				EXECUTE 'SELECT array_agg(a.node_id::integer) from (SELECT node_id FROM anl_node where fid='||v_fid_proposal||' AND cur_user=current_user)a'
-				into v_proposal_array;	
+				into v_proposal_array;
 
 				IF v_proposal_array IS NOT NULL THEN
 					FOREACH rec_hydrant IN ARRAY(v_proposal_array) LOOP
-						--locate hydrant on the closest street 
+						--locate hydrant on the closest street
 						EXECUTE 'SELECT closest_street.id, dist
 						FROM anl_node a
 						CROSS JOIN LATERAL
@@ -198,7 +198,7 @@ SET search_path = "SCHEMA_NAME", public;
 						--divide street on which hydrant is located and insert on temp table
 						EXECUTE 'SELECT ST_LineLocatePoint('||quote_literal(v_street_geom::text)||', temp_t_node.the_geom) FROM temp_t_node WHERE node_id='||quote_literal(rec_hydrant)||' and result_id='''||v_fid||''''
 						INTO v_intersect_loc;
-							
+
 						v_line1 := ST_LineSubstring(v_street_geom, 0.0, v_intersect_loc);
 						v_line2 := ST_LineSubstring(v_street_geom, v_intersect_loc, 1.0);
 
@@ -208,9 +208,9 @@ SET search_path = "SCHEMA_NAME", public;
 						IF ST_GeometryType(v_line2) = 'ST_Point' THEN
 							v_line2=NULL;
 						END IF;
-						
+
 						INSERT INTO temp_t_arc(result_id, arc_id,the_geom, annotation)
-						SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
+						SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM
 						(SELECT v_line1  as the_geom,v_closest_street as id
 						UNION SELECT v_line2  as the_geom,v_closest_street as id)a;
 					ELSE
@@ -219,7 +219,7 @@ SET search_path = "SCHEMA_NAME", public;
 				END LOOP;
 			END IF;
 		END IF;
-					
+
 		--insert final street points on temp_t_node table
 		FOR rec_point IN (SELECT v_fid , ST_EndPoint((ST_Dump(s.the_geom)).geom) as the_geom, s.id
 		FROM om_streetaxis s WHERE s.the_geom is not null UNION
@@ -237,21 +237,21 @@ SET search_path = "SCHEMA_NAME", public;
 
 		--insert streets on temp_t_arc table
 		INSERT INTO temp_t_arc(result_id, arc_id,the_geom, annotation)
-		SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
+		SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM
 		(select (ST_Dump(the_geom)).geom as the_geom, id
 		FROM  om_streetaxis s where id not in (select annotation from temp_t_arc WHERE result_id= v_fid::text))a;
 
 		--update temp tables with new temporal ids
 		SELECT max(x) into v_max_hydr_id FROM unnest(v_node_array)as x;
-	
+
 		IF v_use_propsal IS TRUE THEN
 			SELECT max(x) into v_max_prop_hydr_id FROM unnest(v_proposal_array) as x;
 			IF v_max_prop_hydr_id is not null and v_max_prop_hydr_id > v_max_hydr_id THEN
 				v_max_hydr_id=v_max_prop_hydr_id;
 			END IF;
-		ELSE 
+		ELSE
 		END IF;
-	
+
 		UPDATE temp_t_node a SET node_id=b.row_id from (select v_max_hydr_id + row_number()over() as row_id, id from temp_t_node)b where a.id=b.id and node_id is null;
 		UPDATE temp_t_arc a SET arc_id=b.row_id from (select row_number()over() as row_id, id from temp_t_arc where result_id=v_fid::text)b where a.id=b.id and result_id=v_fid::text;
 
@@ -303,8 +303,8 @@ SET search_path = "SCHEMA_NAME", public;
 		FROM (SELECT ST_Union(the_geom) as the_geom, node_1 as hydrant_id
 		FROM  temp_anl_arc WHERE cur_user="current_user"() AND (fid=v_fid_result Or fid=v_fid) group by node_1) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 	IF v_use_propsal is true then
 		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id, expl_id,the_geom
@@ -326,13 +326,13 @@ SET search_path = "SCHEMA_NAME", public;
 		FROM ('||v_query||')row) features'
 	 INTO v_result;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result,'}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result,'}');
 
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- restore state selector (if it's needed)
@@ -346,7 +346,7 @@ SET search_path = "SCHEMA_NAME", public;
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
 	DELETE FROM audit_check_data WHERE (fid = v_fid) and cur_user="current_user"();
-	
+
 	INSERT INTO anl_node SELECT * FROM temp_anl_node;
 	INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
 	INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
@@ -371,16 +371,16 @@ SET search_path = "SCHEMA_NAME", public;
 
 		ELSE
 
-			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
 		END IF;
 
-		v_result_info := COALESCE(v_result, '{}'); 
+		v_result_info := COALESCE(v_result, '{}');
 		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 		v_result_polygon = '{"geometryType":"", "features":[]}';
-				
+
 		--return '{"status":"done"}';
 		--  Return
 		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
@@ -391,7 +391,7 @@ SET search_path = "SCHEMA_NAME", public;
 							  '"polygon":'||v_result_polygon||'}'||
 							 '}'
 					  '}')::json, 3160, null, null, null);
-	ELSE 
+	ELSE
 		RETURN v_result_json;
 	END IF;
 

@@ -60,23 +60,23 @@ BEGIN
 	END IF;
 
 	v_querytext = concat ('WITH mapzone_query as (select * from ',v_mapzone,')
-			SELECT n.node_id AS feature_id, ''nodeParent''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL::float  AS rotation, n.the_geom
+			SELECT n.node_id::text AS feature_id, ''nodeParent''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL::float  AS rotation, n.the_geom
 			FROM ( SELECT (json_array_elements_text((graphconfig::json ->> ''use''::text)::json)::json ->>''nodeParent'')::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 			JOIN node n USING (node_id)
 		UNION
-			SELECT n.node_id AS feature_id, ''forceClosed''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name,NULL AS rotation, n.the_geom
+			SELECT n.node_id::text AS feature_id, ''forceClosed''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name,NULL AS rotation, n.the_geom
 			FROM ( SELECT (json_array_elements_text((graphconfig::json ->> ''forceClosed''::text)::json))::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 			JOIN node n USING (node_id)
 		UNION
-			SELECT n.node_id AS feature_id,''forceOpen''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL AS rotation, n.the_geom
+			SELECT n.node_id::text AS feature_id,''forceOpen''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL AS rotation, n.the_geom
 			FROM ( SELECT (json_array_elements_text((graphconfig::json ->> ''forceOpen''::text)::json))::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 			JOIN node n USING (node_id)
 		UNION
 
-			SELECT node_id AS feature_id, ''closedValve''::text AS graph_type, ',v_mapzone_id,'::integer, ',v_mapzone_name,', NULL AS rotation, n.the_geom
+			SELECT node_id::text AS feature_id, ''closedValve''::text AS graph_type, ',v_mapzone_id,'::integer, ',v_mapzone_name,', NULL AS rotation, n.the_geom
 			FROM v_edit_node n JOIN ',v_mapzone ,' USING (',v_mapzone_id,') WHERE closed_valve IS TRUE
 		UNION
-			SELECT arc_id, ''toArc''::text AS graph_type, mp.',v_mapzone_id,'::integer, mp.',v_mapzone_name,',
+			SELECT arc_id::text AS feature_id, ''toArc''::text AS graph_type, mp.',v_mapzone_id,'::integer, mp.',v_mapzone_name,',
 			CASE WHEN node_1 IN (SELECT (json_array_elements_text((mp.graphconfig::json ->> ''use''::text)::json)::json ->> ''nodeParent'')::integer AS node_id) THEN
 				st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.01), st_lineinterpolatepoint(a.the_geom, 0.02))*400/6.28
 			else
@@ -97,13 +97,13 @@ BEGIN
 
 		v_querytext_add = concat ('
 					UNION
-						SELECT concat (''NS-'',v.node_id),''netscenOpenedValve''::text AS graph_type, nd.',v_mapzone_id,'::integer, nd.name, NULL AS rotation, v.the_geom
+						SELECT concat (''NS-'',v.node_id)::text AS feature_id,''netscenOpenedValve''::text AS graph_type, nd.',v_mapzone_id,'::integer, nd.name, NULL AS rotation, v.the_geom
 						FROM v_edit_plan_netscenario_valve v
 						left JOIN arc ON node_1 = node_id
 						left JOIN v_plan_netscenario_arc na USING (arc_id)
 						left JOIN ',v_mapzone,' nd ON nd.',v_mapzone_id,' = na.',v_mapzone_id,' WHERE v.closed IS FALSE
 					UNION
-						SELECT concat (''NS-'',v.node_id) ,''netscenClosedValve'' AS graph_type, 0, ''UNDEFINED'', NULL AS rotation, v.the_geom
+						SELECT concat (''NS-'',v.node_id)::text AS feature_id,''netscenClosedValve''::text AS graph_type, 0, ''UNDEFINED'', NULL AS rotation, v.the_geom
 						FROM v_edit_plan_netscenario_valve v  WHERE v.closed IS TRUE ');
 	END IF;
 
