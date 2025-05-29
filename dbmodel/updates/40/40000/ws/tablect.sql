@@ -569,3 +569,4 @@ ALTER TABLE review_audit_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE review_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE review_audit_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 
+ALTER TABLE ext_rtc_scada ALTER COLUMN node_id TYPE integer USING node_id::integer;
