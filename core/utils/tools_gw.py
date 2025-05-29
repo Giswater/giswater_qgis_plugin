@@ -1336,7 +1336,7 @@ def set_stylesheet(field, widget, wtype='label'):
     return widget
 
 
-def delete_selected_rows(widget, table_object):
+def delete_selected_rows(widget, table_object, field_object_id=None):
     """ Delete selected objects of the table (by object_id) """
 
     # Get selected rows
@@ -1348,12 +1348,8 @@ def delete_selected_rows(widget, table_object):
 
     inf_text = ""
     list_id = ""
-    field_object_id = "id"
-
-    if table_object == "v_edit_element":
-        field_object_id = "element_id"
-    elif "v_ui_om_visitman_x_" in table_object:
-        field_object_id = "visit_id"
+    if field_object_id is None:
+        field_object_id = "id"
 
     for i in range(0, len(selected_list)):
         row = selected_list[i].row()

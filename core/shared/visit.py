@@ -309,7 +309,7 @@ class GwVisit(QObject):
         self.dlg_visit_manager.btn_open.clicked.connect(
             partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object))
         self.dlg_visit_manager.btn_delete.clicked.connect(
-            partial(tools_gw.delete_selected_rows, self.dlg_visit_manager.tbl_visit, table_object))
+            partial(tools_gw.delete_selected_rows, self.dlg_visit_manager.tbl_visit, table_object, "visit_id"))
         self.dlg_visit_manager.txt_filter.textChanged.connect(partial(self._filter_visit, self.dlg_visit_manager,
             self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 

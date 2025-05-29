@@ -957,10 +957,11 @@ def delete_manager_item(**kwargs):
     params = kwargs['func_params']
     table_widget = params['targetwidget']
     table = params['sourcetable']
+    field_object_id = params['field_object_id']
 
     # Get QTableView, delete selected rows and reload the table
     table_widget = tools_qt.get_widget(dialog, f"{table_widget}")
-    tools_gw.delete_selected_rows(table_widget, table)
+    tools_gw.delete_selected_rows(table_widget, table, field_object_id)
     reload_table_manager(**kwargs)
 
 
