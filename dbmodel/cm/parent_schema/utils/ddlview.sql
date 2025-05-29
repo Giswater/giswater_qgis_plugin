@@ -63,25 +63,23 @@ JOIN PARENT_SCHEMA.connec ON connec.connec_id::text = om_campaign_x_connec.conne
 join PARENT_SCHEMA.cat_connec c on conneccat_id = c.id
 WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"()::text;
 
-/*
+
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_link AS
 SELECT
-om_campaign.id,
+om_campaign.campaign_id,
 link.link_id,
 link.code,
 c.link_type,
 link.linkcat_id,
-om_campaign_x_link.lot_id,
 om_campaign_x_link.status,
-om_campaign_x_link.observ,
+om_campaign_x_link.admin_observ,
+om_campaign_x_link.org_observ,
 link.the_geom
-FROM selector_lot, om_campaign
-JOIN om_campaign_x_link ON om_campaign_x_link.lot_id = om_campaign.id
+FROM selector_campaign sc, om_campaign
+JOIN om_campaign_x_link ON om_campaign_x_link.campaign_id = om_campaign.campaign_id
 JOIN PARENT_SCHEMA.link ON link.link_id::text = om_campaign_x_link.link_id::text
 join PARENT_SCHEMA.cat_link c on linkcat_id = c.id
-WHERE om_campaign.id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
-*/
-
+WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"()::text;
 
 
 -- LOT X FEATURE
@@ -157,10 +155,10 @@ join PARENT_SCHEMA.cat_connec c on conneccat_id = c.id
 WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
 
 
-/*
+
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_link AS
 SELECT
-om_campaign_lot.id,
+om_campaign_lot.lot_id,
 link.link_id,
 link.code,
 c.link_type,
@@ -172,12 +170,12 @@ om_campaign_lot_x_link.update_at,
 om_campaign_lot_x_link.update_by,
 om_campaign_lot_x_link.update_count,
 om_campaign_lot_x_link.update_log, 	
-qindex1,
-qindex2,
+om_campaign_lot_x_link.qindex1,
+om_campaign_lot_x_link.qindex2,
 link.the_geom
 FROM selector_lot, om_campaign_lot
-JOIN om_campaign_lot_x_link ON om_campaign_lot_x_link.lot_id = om_campaign_lot.id
+JOIN om_campaign_lot_x_link ON om_campaign_lot_x_link.lot_id = om_campaign_lot.lot_id
 JOIN PARENT_SCHEMA.link ON link.link_id::text = om_campaign_lot_x_link.link_id::text
 join PARENT_SCHEMA.cat_link c on linkcat_id = c.id
-WHERE om_campaign_lot.id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
-*/
+WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
+

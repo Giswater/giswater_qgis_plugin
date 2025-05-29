@@ -23,3 +23,27 @@ FOR EACH ROW EXECUTE FUNCTION SCHEMA_NAME.gw_trg_campaign_x_feature_validate_typ
 DROP TRIGGER IF EXISTS trg_validate_campaign_x_link_feature ON "SCHEMA_NAME".om_campaign_x_link;
 CREATE TRIGGER trg_validate_campaign_x_link_feature BEFORE INSERT ON "SCHEMA_NAME".om_campaign_x_link
 FOR EACH ROW EXECUTE FUNCTION SCHEMA_NAME.gw_trg_campaign_x_feature_validate_type('link');
+
+CREATE TRIGGER trg_edit_view_campaign_node INSTEAD OF INSERT OR UPDATE ON ve_PARENT_SCHEMA_camp_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_view_campaign('node');
+
+CREATE TRIGGER trg_edit_view_campaign_arc INSTEAD OF INSERT OR UPDATE ON ve_PARENT_SCHEMA_camp_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_view_campaign('arc');
+
+CREATE TRIGGER trg_edit_view_campaign_connec INSTEAD OF INSERT OR UPDATE ON ve_PARENT_SCHEMA_camp_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_view_campaign('connec');
+
+CREATE TRIGGER trg_edit_view_campaign_link INSTEAD OF INSERT OR UPDATE ON ve_PARENT_SCHEMA_camp_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_view_campaign('link');
+
+CREATE TRIGGER trg_edit_view_lot_node INSTEAD OF INSERT OR UPDATE ON ve_PARENT_SCHEMA_lot_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_view_campaign_lot('node');
+
+CREATE TRIGGER trg_edit_view_lot_arc INSTEAD OF INSERT OR UPDATE ON ve_PARENT_SCHEMA_lot_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_view_campaign_lot('arc');
+
+CREATE TRIGGER trg_edit_view_lot_connec INSTEAD OF INSERT OR UPDATE ON ve_PARENT_SCHEMA_lot_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_view_campaign_lot('connec');
+
+CREATE TRIGGER trg_edit_view_lot_link INSTEAD OF INSERT OR UPDATE ON ve_PARENT_SCHEMA_lot_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_view_campaign_lot('link');
