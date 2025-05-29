@@ -243,14 +243,19 @@ def delete_mincut(**kwargs):
     title = "Delete mincut"
 
     # Check for mincuts not allowed to be deleted
-    sql = (f"SELECT * FROM {table_name}"
-           f" WHERE {column_id} IN ({list_id}) AND (anl_user != current_user OR mincut_state != 0)")
-    rows = tools_db.execute_returning(sql, show_exception=False)
-    if rows:
-        msg = ("You can't delete these mincuts because they aren't planified \n"
-                  "or they were created by another user:")
-        tools_qt.show_info_box(msg, title, inf_text)
-        return
+    row = tools_gw.get_config_value('om_mincut_settings', table='config_param_system')
+    om_mincut_settings = row[0] if row else None
+    if om_mincut_settings:
+        om_mincut_settings = json.loads(om_mincut_settings)
+    if (om_mincut_settings is None or not om_mincut_settings.get('deleteUsers') or om_mincut_settings['deleteUsers'] == 'creator'):
+        sql = (f"SELECT * FROM {table_name}"
+            f" WHERE {column_id} IN ({list_id}) AND (anl_user != current_user OR mincut_state != 0)")
+        rows = tools_db.execute_returning(sql, show_exception=False)
+        if rows:
+            msg = ("You can't delete these mincuts because they aren't planified \n"
+                    "or they were created by another user:")
+            tools_qt.show_info_box(msg, title, inf_text)
+            return
 
     answer = tools_qt.show_question(msg, title, inf_text)
     if answer:
