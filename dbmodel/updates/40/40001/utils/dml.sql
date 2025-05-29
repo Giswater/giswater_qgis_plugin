@@ -701,7 +701,6 @@ VALUES(3344, 'Assign %v_count% elements to the new feature.', null, 0, true, 'ut
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3346, 'New feature (%v_id%) inserted into node table.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-<<<<<<< Updated upstream
 UPDATE sys_function SET function_alias = 'ARC DIVIDE' WHERE function_name = 'gw_fct_setarcdivide';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
@@ -899,7 +898,7 @@ UPDATE sys_function SET function_alias = 'ARC FUSION' WHERE function_name = 'gw_
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3372, 'Fusion arcs using node: %v_exists_node_id% .', null, 0, true, 'utils', 'core', 'AUDIT');
-		
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3374, 'Arcs related to selected node have been removed: %arc_id1% , %arc_id2% .', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -916,13 +915,12 @@ VALUES(3380, 'Reconnect: %v_count% nodes.', null, 0, true, 'utils', 'core', 'AUD
 --27-05-2025
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3440, 'Reconnect operative: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
-						
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3442, 'Reconnect operative: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3444, 'Reconnect planned: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
->>>>>>> Stashed changes
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3446, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
