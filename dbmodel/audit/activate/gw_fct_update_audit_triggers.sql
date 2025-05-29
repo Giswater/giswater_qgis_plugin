@@ -9,6 +9,7 @@ CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_fct_update_audit_triggers()
   RETURNS json AS
 $BODY$
 
+--FUNCTION CODE: 3408
 /*
 SELECT PARENT_SCHEMA.gw_fct_update_audit_triggers()
 */

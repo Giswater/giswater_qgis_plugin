@@ -548,3 +548,22 @@ UPDATE sys_function SET function_alias = 'DATA QUALITY ANALYSIS ACORDING graph A
 UPDATE sys_function SET function_alias = 'CHECK USER DATA' WHERE function_name = 'gw_fct_user_check_data';
 
 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES
+(3390, 'gw_fct_admin_forms_renum_layoutorder', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3392, 'gw_fct_audit_manager', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3394, 'gw_fct_check_fprocess', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3396, 'gw_fct_create_full_network_dscenario', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3398, 'gw_fct_execute_foreign_audit', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3400, 'gw_fct_graphanalytics_initnetwork', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3402, 'gw_fct_graphanalytics_manage_temporary', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3404, 'gw_fct_graphanalytics_mapzones_v1', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3406, 'gw_fct_manage_temp_tables', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3408, 'gw_fct_update_audit_triggers', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3410, 'gw_trg_array_fk_array_table', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3412, 'gw_trg_array_fk_id_table', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3414, 'gw_trg_audit', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3416, 'gw_trg_cat_manager', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3418, 'gw_trg_edit_macroomzone', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3420, 'gw_trg_edit_omzone', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+(3422, 'gw_trg_presszone_check_datatype', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL);
+

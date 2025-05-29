@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3406
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_manage_temp_tables(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_manage_temp_tables(p_data json)

@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: 1312
+--FUNCTION CODE: 3418
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_macroomzone()
   RETURNS trigger AS

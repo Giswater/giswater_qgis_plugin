@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+-- FUNCTION CODE: 3412
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_array_fk_id_table()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -34,7 +36,7 @@ BEGIN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3324", "function":"1320"}}$$);';
     END IF;
-	
+
     FOR _key, _value IN SELECT * FROM json_each_text(tables_to_search) LOOP
         table_name := _key;
         column_name := _value;
@@ -42,14 +44,14 @@ BEGIN
         EXECUTE 'SELECT data_type FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 AND column_name = $3'
 		USING TG_TABLE_SCHEMA, table_name, column_name
 		INTO v_data_type;
-        
+
         EXECUTE format('SELECT $1.%I, $2.%I', name_id_column, name_id_column)
         USING OLD, NEW
         INTO old_id, new_id;
 
         IF v_data_type = 'ARRAY' THEN
             IF TG_OP = 'UPDATE' THEN
-                
+
 
                 EXECUTE format('UPDATE %I SET %I = array_replace(%I, $1, $2) WHERE $1 = ANY(%I)', table_name, column_name, column_name, column_name)
                 USING old_id::int4, new_id::int4;

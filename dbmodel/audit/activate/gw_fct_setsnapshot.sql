@@ -18,7 +18,8 @@ v_schemaname text;
 v_child text;
 v_pk_name text;
 v_table_name text;
-v_date date := CURRENT_DATE;
+--v_date date := CURRENT_DATE;
+v_date date := '2025-01-01';
 v_tables text[];
 v_description text;
 

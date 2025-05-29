@@ -10,6 +10,8 @@ select gw_fct_check_fprocess($${"data":{"parameters":{"functionFid": '||v_fid||'
 "graphClass":"DMA"}}}$$)';
 */
 
+--FUNCTION CODE: 3394
+
 DECLARE
 	v_function_fid integer;
 	v_check_fid integer;
