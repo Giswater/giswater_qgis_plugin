@@ -547,7 +547,6 @@ UPDATE sys_function SET function_alias = 'DATA QUALITY ANALYSIS ACORDING graph A
 
 UPDATE sys_function SET function_alias = 'CHECK USER DATA' WHERE function_name = 'gw_fct_user_check_data';
 
-
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES
 (3390, 'gw_fct_admin_forms_renum_layoutorder', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
 (3392, 'gw_fct_audit_manager', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
@@ -567,3 +566,33 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 (3420, 'gw_trg_edit_omzone', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
 (3422, 'gw_trg_presszone_check_datatype', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL);
 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES
+('ve_genelem_egate', 'form_feature', 'tab_data', 'fluid_type', 'lyt_data_1', 12, 'string', 'combo', 'Fluid Type', 'Fluid Type', NULL, false, false, true, false, NULL, 'SELECT id, fluid_type as idval FROM man_type_fluid WHERE feature_type = ''ELEMENT'' OR ''EGATE'' = ANY(featurecat_id::text[])', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
+('ve_genelem_eiot_sensor', 'form_feature', 'tab_data', 'fluid_type', 'lyt_data_1', 12, 'string', 'combo', 'Fluid Type', 'Fluid Type', NULL, false, false, true, false, NULL, 'SELECT id, fluid_type as idval FROM man_type_fluid WHERE feature_type = ''ELEMENT'' OR ''EIOT_SENSOR'' = ANY(featurecat_id::text[])', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
+('ve_genelem_eprotector', 'form_feature', 'tab_data', 'fluid_type', 'lyt_data_1', 12, 'string', 'combo', 'Fluid Type', 'Fluid Type', NULL, false, false, true, false, NULL, 'SELECT id, fluid_type as idval FROM man_type_fluid WHERE feature_type = ''ELEMENT'' OR ''EPROTECTOR'' = ANY(featurecat_id::text[])', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
+('ve_genelem_estep', 'form_feature', 'tab_data', 'fluid_type', 'lyt_data_1', 12, 'string', 'combo', 'Fluid Type', 'Fluid Type', NULL, false, false, true, false, NULL, 'SELECT id, fluid_type as idval FROM man_type_fluid WHERE feature_type = ''ELEMENT'' OR ''ESTEP'' = ANY(featurecat_id::text[])', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
+('ve_genelem_ecover', 'form_feature', 'tab_data', 'fluid_type', 'lyt_data_1', 12, 'string', 'combo', 'Fluid Type', 'Fluid Type', NULL, false, false, true, false, NULL, 'SELECT id, fluid_type as idval FROM man_type_fluid WHERE feature_type = ''ELEMENT'' OR ''ECOVER'' = ANY(featurecat_id::text[])', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL)
+ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
+  layoutname = EXCLUDED.layoutname,
+  layoutorder = EXCLUDED.layoutorder,
+  datatype = EXCLUDED.datatype,
+  widgettype = EXCLUDED.widgettype,
+  label = EXCLUDED.label,
+  tooltip = EXCLUDED.tooltip,
+  placeholder = EXCLUDED.placeholder,
+  ismandatory = EXCLUDED.ismandatory,
+  isparent = EXCLUDED.isparent,
+  iseditable = EXCLUDED.iseditable,
+  isautoupdate = EXCLUDED.isautoupdate,
+  isfilter = EXCLUDED.isfilter,
+  dv_querytext = EXCLUDED.dv_querytext,
+  dv_orderby_id = EXCLUDED.dv_orderby_id,
+  dv_isnullvalue = EXCLUDED.dv_isnullvalue,
+  dv_parent_id = EXCLUDED.dv_parent_id,
+  stylesheet = EXCLUDED.stylesheet,
+  widgetcontrols = EXCLUDED.widgetcontrols,
+  widgetfunction = EXCLUDED.widgetfunction,
+  linkedobject = EXCLUDED.linkedobject,
+  hidden = EXCLUDED.hidden,
+  web_layoutorder = EXCLUDED.web_layoutorder;

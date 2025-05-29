@@ -509,6 +509,7 @@ BEGIN
 				END IF;
 
 			--- get Flowreg Defaults
+			-- TODO: Review if this is correct. Reference 'FLWREG' in this function
             ELSIF upper(v_catfeature.feature_type) = 'FLWREG' THEN
                 -- Get toarc
                 SELECT arc_id , the_geom into v_toarc, v_toarc_geom FROM v_edit_arc WHERE ST_DWithin(ST_endpoint(v_reduced_geometry), v_edit_arc.the_geom, 0.001) LIMIT 1;
@@ -783,7 +784,7 @@ BEGIN
 
 			EXECUTE v_querystring INTO v_pnom, v_dnom, v_matcat_id;
 
-		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type not in ('LINK', 'FLWREG') THEN
+		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type not in ('LINK', 'ELEMENT') THEN
 			IF (v_catfeature.feature_type) ='GULLY' THEN
 				v_querystring = concat('SELECT matcat_id FROM cat_gully WHERE id=',quote_nullable(v_catalog));
 

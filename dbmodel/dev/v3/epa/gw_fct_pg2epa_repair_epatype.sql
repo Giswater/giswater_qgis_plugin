@@ -58,7 +58,6 @@ union
 SELECT 'DIVIDER', count(*) FROM inp_divider join node using (node_id ) where state > 0 
 union
 SELECT 'OUTFALL', count(*) FROM inp_outfall join node using (node_id ) where state > 0  )b
->>>>>>> 48e1595f5... Update pg2epa_repair_epa_type function
 USING (epa_type)
 */
 

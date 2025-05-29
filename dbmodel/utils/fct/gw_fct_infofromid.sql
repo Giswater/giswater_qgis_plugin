@@ -173,7 +173,11 @@ BEGIN
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_epatype := (p_data ->> 'feature')::json->> 'epaType';
 	v_id := (p_data ->> 'feature')::json->> 'id';
-	v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
+	if (p_data ->> 'feature')::json->> 'inputGeometry' = '' then
+		v_inputgeometry := NULL;
+	else
+		v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
+	end if;
 	v_islayer := (p_data ->> 'feature')::json->> 'isLayer';
 	v_isepa := (p_data ->> 'feature')::json->> 'isEpa';
 	v_editable = (p_data ->> 'form')::json->> 'editable';
