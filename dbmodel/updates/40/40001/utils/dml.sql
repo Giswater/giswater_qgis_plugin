@@ -890,7 +890,7 @@ VALUES(3510, 'Removed link: %v_related_id%', null, 0, true, 'utils', 'core', 'AU
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3512, 'Delete %v_feature_type%: %v_feature_id%', null, 0, true, 'utils', 'core', 'AUDIT');
-=======
+
 --23-05-2025
 
 UPDATE sys_function SET function_alias = 'ARC FUSION' WHERE function_name = 'gw_fct_setarcfusion';
