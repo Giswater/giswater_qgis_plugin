@@ -14,7 +14,7 @@ $BODY$
 /* example
 
 -- directs
-feature:	
+feature:
 
 SELECT SCHEMA_NAME.gw_fct_setcatalog($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -84,17 +84,17 @@ BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
-	
+
 	--  get version
-	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;		
-      
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+
 	-- Get input parameters:
 	v_formname := json_extract_path_text (p_data,'form','formName')::text;
 	v_fields := json_extract_path_text (p_data,'data','fields')::json;
 	v_feature_table := json_extract_path_text (p_data,'feature','tableName')::text;
 	v_idname := json_extract_path_text (p_data,'feature','idName')::text;
 	v_id := json_extract_path_text (p_data,'feature','id')::text;
-	
+
 	--set cat table to upate
 	IF v_formname = 'new_workcat' THEN
 		v_catname = 'cat_work';
@@ -103,7 +103,7 @@ BEGIN
 		v_expl = json_extract_path_text(v_fields, 'expl_id')::integer;
 		v_dma_id := json_extract_path_text (v_fields,'dma_id')::integer;
 		v_presszone_id := json_extract_path_text (v_fields,'v_presszone_id')::text;
-		
+
 		IF v_catname IS NULL THEN
 			EXECUTE 'SELECT lower(graph_delimiter) FROM cat_feature JOIN cat_feature_node USING (id)
 			WHERE graph_delimiter NOT IN (''MINSECTOR'', ''NONE'', ''CHECKVALVE'') AND child_layer = '||quote_literal(v_feature_table)||';'
@@ -131,18 +131,18 @@ BEGIN
 	-- query text, step1
 	v_querytext := 'INSERT INTO ' || quote_ident(v_catname) ||' (';
 	raise notice 'v_querytext1,%',v_querytext;
-	
+
 	-- query text, step2
 	i=1;
 	v_first=FALSE;
-	FOREACH rec_text IN ARRAY v_text 
+	FOREACH rec_text IN ARRAY v_text
 	LOOP
 		SELECT v_text [i] into v_jsonfield;
 		v_field:= (SELECT (v_jsonfield ->> 'key')) ;
 		v_value := (SELECT (v_jsonfield ->> 'value')) ; -- getting v_value in order to prevent null values
-	
-		IF v_value !='null' OR v_value !='NULL' OR v_value IS NOT NULL THEN 
-			
+
+		IF v_value !='null' OR v_value !='NULL' OR v_value IS NOT NULL THEN
+
 			--building the query text
 			IF i=1 OR v_first IS FALSE THEN
 				v_querytext := concat (v_querytext, v_field);
@@ -150,9 +150,9 @@ BEGIN
 			ELSIF i>1 THEN
 				v_querytext := concat (v_querytext, ', ', quote_ident(v_field));
 			END IF;
-		
+
 		END IF;
-		i=i+1;	
+		i=i+1;
 	END LOOP;
 
 	-- query text, step3
@@ -161,7 +161,7 @@ BEGIN
 	-- query text, step4
 	i=1;
 	v_first=FALSE;
-	FOREACH rec_text IN ARRAY v_text 
+	FOREACH rec_text IN ARRAY v_text
 	LOOP
 		SELECT v_text [i] into v_jsonfield;
 		v_field:= (SELECT (v_jsonfield ->> 'key')) ;
@@ -169,7 +169,7 @@ BEGIN
 
 		IF v_field = v_pkey THEN
 			EXECUTE 'SELECT 1 FROM '||v_catname||' WHERE '||quote_literal(v_value)||' IN (SELECT '||v_pkey||'::text FROM  '||v_catname||')'
-			INTO v_checkpkey; 
+			INTO v_checkpkey;
 			IF v_checkpkey = 1 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3166", "function":"3010","parameters":{"value":"'||v_value||'"}, "is_process":true}}$$);'
@@ -185,10 +185,10 @@ BEGIN
 		IF v_columntype IS NULL THEN
 			v_columntype='text';
 		END IF;
-			
 
-		IF v_value !='null' OR v_value !='NULL' THEN 
-			
+
+		IF v_value !='null' OR v_value !='NULL' THEN
+
 			--building the query text
 			IF i=1 OR v_first IS FALSE THEN
 				v_querytext := concat (v_querytext, quote_literal(v_value),'::',v_columntype);
@@ -213,7 +213,7 @@ BEGIN
 		EXECUTE 'SELECT dv_querytext,columnname FROM config_form_fields WHERE dv_querytext ILIKE ''%FROM '||v_catname||'%'' 
 		AND formname = '||quote_literal(v_feature_table)||' AND columnname = ''workcat_id'''
 		INTO v_dvquery, v_columnname;
-	ELSE 
+	ELSE
 		--change mapzone id depending on expl_id
 		IF v_dma_id IS NOT NULL THEN
 			EXECUTE 'UPDATE '||v_catname||' SET '||v_pkey||' = '||v_dma_id||' WHERE '||v_pkey||' = '||v_newid||';';
@@ -221,7 +221,7 @@ BEGIN
 		ELSIF v_presszone_id IS NOT NULL THEN
 			EXECUTE 'UPDATE '||v_catname||' SET '||v_pkey||' = '||v_presszone_id||' WHERE '||v_pkey||' = '||v_newid||';';
 			v_newid = v_presszone_id;
-		ELSIF json_extract_path_text (v_mapzone_config,'idXExpl')::boolean IS TRUE THEN	
+		ELSIF json_extract_path_text (v_mapzone_config,'idXExpl')::boolean IS TRUE THEN
 			EXECUTE 'SELECT max('||v_pkey||'::integer) + 1  FROM '||v_catname||' WHERE expl_id='||v_expl||' and '||v_pkey||'!='||v_newid||'' INTO v_id_x_expl;
 			EXECUTE 'SELECT 1 FROM '||v_catname||' WHERE '||v_catname||'_id = '||v_id_x_expl||'' INTO v_checkpkey;
 			IF v_checkpkey IS NULL THEN
@@ -234,7 +234,7 @@ BEGIN
 			EXECUTE 'UPDATE '||v_feature_table||' SET '||json_extract_path_text(v_mapzone_config,'setUpdate')::text||' 
 			FROM '||v_catname||' WHERE '||v_catname||'.'||v_pkey||' = '||v_newid||' AND '||v_idname||'='||quote_literal(v_id)||';';
 		END IF;
-		
+
 		--find query that populates form combo
 		EXECUTE 'SELECT dv_querytext,columnname FROM config_form_fields WHERE dv_querytext ILIKE ''%FROM '||v_catname||'%'' 
 		AND formname = '||quote_literal(v_feature_table)||''
@@ -253,7 +253,7 @@ BEGIN
 		v_message = 'Process done successfully';
 	ELSE
 
-		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 

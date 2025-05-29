@@ -32,6 +32,7 @@ v_array text;
 v_version text;
 v_error_context text;
 v_count integer;
+v_msgerr json;
 
 BEGIN
 
@@ -110,7 +111,7 @@ BEGIN
 		VALUES (105,  concat ('There are ',v_count,' duplicated connecs.'), v_count);
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 105,  concat ('Connec_id: ',array_agg(connec_id), '.' ), v_count
+		SELECT 105,  concat ('Connec_id: ',string_agg(connec_id, ', '), '.' ), v_count
 		FROM anl_connec WHERE cur_user="current_user"() AND fid=105;
 
 	END IF;
@@ -132,6 +133,11 @@ BEGIN
 				'"point":'||v_result_point||
 			'}}'||
 	    '}')::json, 2106, null, null, null);
+
+
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;
 $BODY$

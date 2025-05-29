@@ -7,12 +7,12 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2108
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_duplicated(p_data json) RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_duplicated(p_data json) RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 SELECT gw_fct_anl_node_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"nodeTolerance":"3.0"}}}$$)::text
 
@@ -21,7 +21,7 @@ SELECT gw_fct_anl_node_duplicated($${"client":{"device":4, "infoType":1, "lang":
 */
 
 DECLARE
-    
+
 v_id json;
 v_selectionmode text;
 v_nodetolerance float;
@@ -33,6 +33,7 @@ v_array text;
 v_version text;
 v_error_context text;
 v_count integer;
+v_msgerr json;
 
 BEGIN
 
@@ -41,8 +42,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
@@ -52,8 +53,8 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=106;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=106;	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=106;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, concat('NODE DUPLICATED ANALYSIS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, '-------------------------------------------------------------');
 
@@ -89,8 +90,8 @@ BEGIN
   	FROM (SELECT id, node_id, nodecat_id, state, node_id_aux,nodecat_id_aux, state_aux, expl_id, descript, fid, the_geom
   	FROM  anl_node WHERE cur_user="current_user"() AND fid=106) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
 	SELECT count(*)/2 INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=106;
 
@@ -102,20 +103,20 @@ BEGIN
 		VALUES (106,  concat ('There are ',v_count,' duplicated nodes.'), v_count);
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 106,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
+		SELECT 106,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count
 		FROM anl_node WHERE cur_user="current_user"() AND fid=106;
 
 	END IF;
-	
+
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=106 order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
@@ -124,6 +125,11 @@ BEGIN
 				'"point":'||v_result_point||
 			'}}'||
 	    '}')::json, 2108, null, null, null);
+
+
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;
 $BODY$

@@ -23,7 +23,7 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_tcandidate($${
 */
 
 DECLARE
-      
+
 v_id json;
 v_selectionmode text;
 v_nodeproximity	float;
@@ -36,6 +36,7 @@ v_array text;
 v_error_context text;
 v_version text;
 v_count integer;
+v_msgerr json;
 
 BEGIN
 
@@ -46,18 +47,18 @@ BEGIN
   -- select version
   SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-  -- getting input data   
+  -- getting input data
   v_id :=  ((p_data ->>'feature')::json->>'id')::json;
   v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
   v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
   v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
-   
+
   select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
-   
+
   -- Reset values
   DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=432;
-  DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=432; 
-  
+  DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=432;
+
   INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (432, null, 4, concat('NODES T CANDIDATES ANALYSIS'));
   INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (432, null, 4, '-------------------------------------------------------------');
 
@@ -90,13 +91,13 @@ BEGIN
     INSERT INTO audit_check_data(fid,  error_message, fcount)
     VALUES (432,  concat ('There are ',v_count,' nodes T candidates.'), v_count);
   END IF;
-    
+
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=432 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
   	--points
@@ -111,10 +112,10 @@ BEGIN
     FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
     FROM  anl_node WHERE cur_user="current_user"() AND fid=432) row) features;
 
-  v_result := COALESCE(v_result, '{}'); 
-  v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+  v_result := COALESCE(v_result, '{}');
+  v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
-  IF v_saveondatabase IS FALSE THEN 
+  IF v_saveondatabase IS FALSE THEN
   	-- delete previous results
   	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=432;
   ELSE
@@ -122,10 +123,10 @@ BEGIN
   	DELETE FROM selector_audit WHERE fid=432 AND cur_user=current_user;
   	INSERT INTO selector_audit (fid,cur_user) VALUES (432, current_user);
   END IF;
- 
+
   --    Control nulls
-  v_result_info := COALESCE(v_result_info, '{}'); 
-  v_result_point := COALESCE(v_result_point, '{}'); 
+  v_result_info := COALESCE(v_result_info, '{}');
+  v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
@@ -135,10 +136,13 @@ BEGIN
   			'}}'||
   	    '}')::json, 2914, null, null, null);
 
-  	
+
+  EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
-  
+
