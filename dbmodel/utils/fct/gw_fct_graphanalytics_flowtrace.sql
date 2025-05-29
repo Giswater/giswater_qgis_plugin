@@ -80,10 +80,11 @@ BEGIN
 	END IF;
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('FLOWTRACE ANALYTICS - ', upper(v_class)));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2772", "parameters":{"param1":"'||upper(v_class)||'"}, "fid":"'||v_fid||'", "is_header":true, "is_process":true}}$$)';
+	
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2772", "fid":"'||v_fid||'", "is_header":true, "is_process":true, "label_id":"1001", "separator_id":"2014"}}$$)';
 
 
 	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
@@ -166,8 +167,8 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
 	EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT ON (arc_id) count(*) FROM temp_t_anlgraph GROUP BY arc_id HAVING max(water)'||v_sign||' 0 )a'
 		INTO v_count;
 
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, concat('Number of arcs identifed on the process: ', v_count));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3516", "criticity":"1", "function":"2772", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "is_process":true}}$$)';
 
 
 	-- get results

@@ -980,3 +980,9 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(2022, '--------------------
 INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator');
 
 INSERT INTO sys_label (id, idval, label_type) VALUES(3004, 'CRITICAL ERRORS', 'prefix');
+
+UPDATE sys_function SET function_alias = 'FLOWTRACE ANALYTICS' WHERE function_name = 'gw_fct_graphanalytics_flowtrace';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3516, 'Number of arcs identifed on the process: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
