@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_pipe', ARRAY['arc_id'], 'Column arc_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_pipe', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('man_pipe', 'arc_id', 'integer', 'Column arc_id should be integer');
 
 -- Check not null constraints
 SELECT col_not_null('man_pipe', 'arc_id', 'Column arc_id should be NOT NULL');
@@ -39,4 +39,4 @@ SELECT fk_ok('man_pipe', 'arc_id', 'arc', 'arc_id', 'FK arc_id should reference 
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

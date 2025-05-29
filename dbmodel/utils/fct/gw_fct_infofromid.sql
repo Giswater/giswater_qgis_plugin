@@ -61,6 +61,11 @@ SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${"client":{"device":4, "infoType":1
 
 DECLARE
 
+
+v_id text;
+v_id_integer integer;
+v_id_array text[];
+
 v_layouts text[];
 v_layout text;
 add_param_orientation json;
@@ -70,7 +75,7 @@ layout_orientation_exist boolean;
 v_tablename character varying;
 v_sourcetable character varying;
 v_tablename_original character varying;
-v_id character varying;
+
 v_inputgeometry public.geometry;
 v_editable boolean = true;
 v_device integer;
@@ -126,8 +131,6 @@ v_isepatoarc boolean  = false;
 v_nodetype text;
 v_isarcdivide boolean = false;
 v_querystring text;
-v_debug_vars json;
-v_debug json;
 v_msgerr json;
 v_pkeyfield text;
 v_featuredialog text;
@@ -145,7 +148,7 @@ v_table_epa text;
 v_epatype text;
 v_tablename_aux text;
 v_zone text;
-v_id_array text[];
+
 v_idname_array text[];
 column_type_id_array text[];
 i integer=1;
@@ -209,7 +212,7 @@ BEGIN
 	END IF;
 
 	-- Check if feature exist
-	IF v_id is not null or v_id != '' then
+	IF v_id is not null then
 
 		-- Manage primary key
 		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
@@ -284,9 +287,7 @@ BEGIN
 	-- looking for additional schema
 	IF (v_addschema IS NOT NULL OR v_addschema != 'NULL') AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
 		v_querystring = concat('SET search_path = ',v_addschema,', public');
-		v_debug_vars := json_build_object('v_addschema', v_addschema);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 10);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 		EXECUTE v_querystring;
 
 		SELECT gw_fct_infofromid(p_data) INTO v_return;
@@ -297,10 +298,6 @@ BEGIN
 
 	IF v_toolbar is NULL THEN
 		v_toolbar := 'basic';
-	END IF;
-
-	IF v_id = '' THEN
-		v_id = NULL;
 	END IF;
 
 	-- get project type
@@ -348,11 +345,8 @@ BEGIN
 
 			IF v_table_parent='v_edit_node' THEN
 
-				v_querystring = concat('SELECT node_type FROM ',v_table_parent,' WHERE node_id = ',quote_literal(v_id),';');
+				v_querystring = concat('SELECT node_type FROM ',v_table_parent,' WHERE node_id = ',v_id::integer,';');
 
-				v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_id', v_id);
-				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 20);
-				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 				EXECUTE v_querystring INTO v_nodetype;
 
 				SELECT child_layer INTO v_table_child FROM cat_feature WHERE id =v_nodetype;
@@ -363,7 +357,7 @@ BEGIN
 				IF upper(v_project_type) = 'WS' THEN
 					IF (SELECT ARRAY(SELECT upper(unnest(graph_delimiter))) FROM cat_feature_node WHERE id = v_nodetype) && ARRAY['DMA','PRESSZONE'] THEN
 						v_isgraphdelimiter = TRUE;
-					ELSIF (SELECT upper(epa_type) FROM node WHERE node_id = v_id) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
+					ELSIF (SELECT upper(epa_type) FROM node WHERE node_id = v_id::integer) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
 						v_isepatoarc = TRUE;
 					END IF;
 				END IF;
@@ -379,9 +373,7 @@ BEGIN
 	v_querystring = concat('SELECT to_json(array_agg(columnname)) FROM
 		(SELECT a.attname as columnname FROM pg_attribute a JOIN pg_class t on a.attrelid = t.oid JOIN pg_namespace s on t.relnamespace = s.oid
 		WHERE a.attnum > 0 AND NOT a.attisdropped AND t.relname = ',quote_nullable(v_table_parent),' AND s.nspname = ',quote_nullable(v_schemaname),'	ORDER BY a.attnum) a');
-	v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_schemaname', v_schemaname);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 30);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 	EXECUTE v_querystring INTO v_parentfields;
 
 	v_parentfields = replace (v_parentfields::text, '{', '[');
@@ -390,18 +382,14 @@ BEGIN
     -- to build json
 	v_querystring = concat('SELECT row_to_json(row) FROM (SELECT formtemplate AS template, headertext AS "headerText"
 				FROM config_info_layer WHERE layer_id = ',quote_nullable(v_tablename),' LIMIT 1) row');
-	v_debug_vars := json_build_object('v_tablename', v_tablename);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 40);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 	EXECUTE v_querystring INTO v_forminfo;
 
     -- IF v_forminfo is null and it's layer it's child layer --> parent form info is used
     IF v_forminfo IS NULL AND v_table_parent IS NOT NULL THEN
     	v_querystring = concat('SELECT row_to_json(row) FROM (SELECT formtemplate AS template , headertext AS "headerText"
     				FROM config_info_layer WHERE layer_id = ',quote_nullable(v_table_parent),' LIMIT 1) row');
-    	v_debug_vars := json_build_object('v_table_parent', v_table_parent);
-    	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 50);
-    	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
     	EXECUTE v_querystring INTO v_forminfo;
     END IF;
 
@@ -430,9 +418,7 @@ BEGIN
 
 	-- Get feature type
 	v_querystring = concat('SELECT lower(feature_type), lower(parent_layer) FROM cat_feature WHERE  (parent_layer = ',quote_nullable(v_tablename),' OR child_layer = ',quote_nullable(v_tablename),') LIMIT 1');
-	v_debug_vars := json_build_object('v_tablename', v_tablename);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 60);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 	EXECUTE v_querystring INTO v_featuretype, v_parent_layer;
 	v_featuretype := LOWER(v_featuretype);
 	v_featuretype := COALESCE(v_featuretype, '');
@@ -444,9 +430,7 @@ BEGIN
 	FOREACH v_value IN ARRAY list_values
 	LOOP
 		v_querystring = concat('SELECT value FROM config_param_user WHERE parameter = ',quote_literal(v_value),' AND cur_user = current_user');
-		v_debug_vars := json_build_object('v_value', v_value);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 70);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 		EXECUTE v_querystring INTO v_vdefault_values;
 		v_vdefault_array := gw_fct_json_object_set_key(v_vdefault_array, v_value, COALESCE(v_vdefault_values));
 	END LOOP;
@@ -556,13 +540,13 @@ BEGIN
 				select  row_to_json(c) INTO v_geometry from (SELECT st_x(st_centroid(st_envelope(the_geom))) as x, st_y(st_centroid(st_envelope(the_geom))) as y , St_AsText(the_geom) from
 				(select st_union(array_agg(the_geom))  as the_geom from (SELECT the_geom, element_id FROM arc JOIN element_x_arc USING (arc_id)
 						UNION SELECT the_geom, element_id FROM node JOIN element_x_node USING (node_id)
-						UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id)b)c;
+						UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id::integer)b)c;
 			ELSIF v_project_type = 'UD' THEN
 				select  row_to_json(c) INTO v_geometry from (SELECT st_x(st_centroid(st_envelope(the_geom))) as x, st_y(st_centroid(st_envelope(the_geom))) as y , St_AsText(the_geom) from
 				(select st_union(array_agg(the_geom))  as the_geom from (SELECT the_geom, element_id FROM arc JOIN element_x_arc USING (arc_id)
 						UNION SELECT the_geom, element_id FROM node JOIN element_x_node USING (node_id)
 						UNION SELECT the_geom, element_id FROM gully JOIN element_x_gully USING (gully_id)
-						UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id)b)c;
+						UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id::integer)b)c;
 			END IF;
 		END IF;
 	END IF;
@@ -636,9 +620,7 @@ BEGIN
 	WHERE rn = 1
 	ORDER BY orderby)a');
 		raise notice 'v_querystring -> %',v_querystring;
-	v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 170);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 	EXECUTE v_querystring INTO form_tabs;
 
 	if v_tablename_aux is not null then
@@ -651,26 +633,20 @@ BEGIN
 		parent_child_relation:=true;
 
 		-- get childtype
-		EXECUTE 'SELECT '||v_featuretype||'_type FROM '||v_parent_layer||' WHERE '||v_featuretype||'_id = '||quote_nullable(v_id) INTO v_childtype;
+		EXECUTE 'SELECT '||v_featuretype||'_type FROM '||v_parent_layer||' WHERE '||v_featuretype||'_id = '||v_id::integer INTO v_childtype;
 
 		-- Identify tableinfotype_id
 		v_querystring = concat(' SELECT tableinfotype_id FROM cat_feature
 			JOIN config_info_layer_x_type ON child_layer=tableinfo_id
-			WHERE cat_feature.id= (SELECT ',v_featuretype,'_type FROM ',quote_ident(v_tablename),' WHERE ',v_featuretype,'_id::text=',quote_nullable(v_id),')
+			WHERE cat_feature.id= (SELECT ',v_featuretype,'_type FROM ',quote_ident(v_tablename),' WHERE ',v_featuretype,'_id=',v_id::integer,')
 			AND infotype_id=',quote_nullable(v_infotype));
-		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_infotype', v_infotype);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 260);
-
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO v_tablename;
 
 	ELSE
 
 		-- get child type
 		v_querystring = concat('SELECT id FROM cat_feature WHERE child_layer = ',quote_nullable(v_tablename),' LIMIT 1');
-		v_debug_vars := json_build_object('v_tablename', v_tablename);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 320);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 		EXECUTE v_querystring INTO v_childtype;
 
 	END IF;
@@ -717,7 +693,7 @@ BEGIN
 
 		IF v_islayer THEN
 			v_tg_op = 'LAYER';
-		ELSIF  v_id IS NULL THEN
+		ELSIF v_id IS NULL THEN
 			v_tg_op = 'INSERT';
 		ELSE
 			v_tg_op = 'UPDATE';
@@ -728,9 +704,7 @@ BEGIN
 			v_editable := FALSE;
 		ELSE
 			v_querystring = concat('SELECT gw_fct_getpermissions($${"tableName":"',quote_ident(v_tablename),'"}$$::json)');
-			v_debug_vars := json_build_object('v_tablename', v_tablename);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 330);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 			EXECUTE v_querystring INTO v_permissions;
 
 			v_editable := v_permissions->>'isEditable';
@@ -758,12 +732,22 @@ BEGIN
 		IF v_islayer then
 
 			-- call info form function
-			v_querystring = concat('SELECT gw_fct_getfeatureinfo(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_configtabledefined),
-						', ',quote_nullable(v_idname),', ',quote_nullable(column_type),', ',quote_nullable(v_tg_op),');');
-			v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_device', v_device, 'v_infotype', v_infotype,
-							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type, 'v_tg_op', v_tg_op);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 350);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			v_querystring = 'SELECT gw_fct_getfeatureinfo($$' ||
+				json_build_object(
+					'data', json_build_object(
+						'parameters', json_build_object(
+							'table_id', v_tablename,
+							'id', v_id,
+							'device', v_device,
+							'info_type', v_infotype,
+							'configtable', v_configtabledefined,
+							'idname', v_idname,
+							'columntype', column_type,
+							'tgop', v_tg_op
+						)
+					)
+				)::text || '$$);';
+			RAISE NOTICE 'v_querystring:: %', v_querystring;
 			EXECUTE v_querystring INTO v_fields;
 
 		ELSIF v_editable THEN
@@ -785,9 +769,6 @@ BEGIN
                 SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM ve_frelem WHERE node_id = v_noderecord1.node_id ::text; -- afegir flwreg_type
                 -- Get flowreg_type
                 v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(v_tablename) ,' LIMIT 1');
-                v_debug_vars := json_build_object('v_tablename', v_tablename);
-                v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 70);
-                SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
                 EXECUTE v_querystring INTO v_flwreg_type;
                 -- Set nodarc_id
                 v_id = concat(v_noderecord1.node_id,upper(substring(v_flwreg_type FROM 1 FOR 2)), v_order_id);
@@ -797,25 +778,48 @@ BEGIN
 
 			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
 			-- call edit form function
-			v_querystring = concat('SELECT gw_fct_getfeatureupsert(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',
-			quote_nullable(v_inputgeometry::text),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_tg_op),', ',
-						quote_nullable(v_configtabledefined),', ',quote_nullable(v_idname),', ',quote_nullable(column_type),');');
-			v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_inputgeometry', v_inputgeometry, 'v_device', v_device, 'v_infotype', v_infotype, 'v_tg_op', v_tg_op,
-							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 340);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+			-- check null values
+
+			v_querystring = 'SELECT gw_fct_getfeatureupsert($$' ||
+				json_build_object(
+					'data', json_build_object(
+						'parameters', json_build_object(
+							'table_id', v_tablename,
+							'id', v_id,
+							'reduced_geometry', v_inputgeometry,
+							'device', v_device,
+							'info_type', v_infotype,
+							'tg_op', v_tg_op,
+							'configtable', v_configtabledefined,
+							'idname', v_idname,
+							'columntype', column_type
+						)
+					)
+				)::text || '$$);';
+
 			EXECUTE v_querystring INTO v_fields;
 
 		ELSIF v_editable = FALSE THEN
 
 			RAISE NOTICE 'User has NOT permissions to edit table % using id %', v_tablename, v_id;
 			-- call info form function
-			v_querystring = concat('SELECT gw_fct_getfeatureinfo(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_configtabledefined),
-						', ',quote_nullable(v_idname),', ',quote_nullable(column_type),', ',quote_nullable(v_tg_op),');');
-			v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_device', v_device, 'v_infotype', v_infotype,
-							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type, 'v_tg_op', v_tg_op);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 350);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+			v_querystring = 'SELECT gw_fct_getfeatureinfo($$' ||
+				json_build_object(
+					'data', json_build_object(
+						'parameters', json_build_object(
+							'table_id', v_tablename,
+							'id', v_id,
+							'device', v_device,
+							'info_type', v_infotype,
+							'configtable', v_configtabledefined,
+							'idname', v_idname,
+							'columntype', column_type
+						)
+					)
+				)::text || '$$);';
+
 			EXECUTE v_querystring INTO v_fields;
 		END IF;
 	END IF;
@@ -835,13 +839,26 @@ BEGIN
 	ELSIF v_sourcetable ='element' THEN
 		v_childtype = (SELECT (value::json->>'element')::json->>'childType' FROM config_param_system WHERE parameter='admin_formheader_field');
 		v_formheader_field = (SELECT (value::json->>'element')::json->>'column' FROM config_param_system WHERE parameter='admin_formheader_field');
-		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE element_id ='||quote_literal(v_id);
+		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE element_id ='||v_id::integer;
 	ELSE
-		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE '||concat(v_sourcetable,'_id')||'='||quote_literal(v_id);
+		raise notice 'v_sourcetable11:: %', v_sourcetable;
+		IF v_id ~ '^\d+$' THEN
+			v_querystring = 'SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE '||concat(v_sourcetable,'_id')||'='||v_id::integer;
+		ELSE
+			v_querystring = 'SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE '||concat(v_sourcetable,'_id')||'='||quote_literal(v_id);
+		END IF;
 	END IF;
+		raise notice 'FADSAFSDF:: %', v_sourcetable;
+		raise notice 'v_querystring:: %', v_querystring;
+		raise notice 'v_formheader_field:: %', v_formheader_field;
+		raise notice 'v_id:: %', v_id;
 
 	IF v_querystring IS NOT NULL THEN
+		raise notice 'ADSFASDFASD:: %', v_sourcetable;
+
 		EXECUTE v_querystring INTO v_formheader_value;
+		RAISE NOTICE 'v_formheader_value:: %', v_formheader_value;
+		RAISE NOTICE 'v_querystring:: %', v_querystring;
 
 		-- define v_headertext
 		IF v_formheader_value IS NOT NULL THEN

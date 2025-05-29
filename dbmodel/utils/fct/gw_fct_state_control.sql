@@ -6,15 +6,20 @@ or (at your option) any later version.
 */
 
 --FUNCTION CODE: 2130
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_state_control(feature_type_aux character varying,feature_id_aux character varying,
-state_aux integer, tg_op_aux character varying)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_state_control(feature_type_aux character varying,feature_id_aux character varying, state_aux integer, tg_op_aux character varying);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_state_control(p_data json)
 RETURNS integer AS
 $BODY$
 
 -- fid: 128
 
 DECLARE
+
+-- parameters
+feature_type_aux text;
+feature_id_aux integer;
+state_aux integer;
+tg_op_aux text;
 
 v_project_type text;
 v_old_state integer;
@@ -38,6 +43,11 @@ BEGIN
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_downgrade_force:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_downgrade_force' AND cur_user=current_user)::boolean;
 	v_connec_downgrade_force:= (SELECT "value" FROM config_param_system WHERE "parameter"='edit_connec_downgrade_force')::boolean;
+
+	feature_type_aux = ((p_data ->>'parameters')::json->>'feature_type_aux')::text;
+	feature_id_aux = ((p_data ->>'parameters')::json->>'feature_id_aux')::text;
+	state_aux = ((p_data ->>'parameters')::json->>'state_aux')::integer;
+	tg_op_aux = ((p_data ->>'parameters')::json->>'tg_op_aux')::text;
 
 	-- control for downgrade features to state(0)
 	IF tg_op_aux = 'UPDATE' THEN
@@ -68,7 +78,7 @@ BEGIN
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3140", "function":"2130","parameters":{"psector_list":"'||v_psector_list||'"}, "is_process":true}}$$);';
-					
+
 				END IF;
 
 				--link feature control
@@ -151,7 +161,7 @@ BEGIN
 					IF v_num_feature > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"1074", "function":"2130","parameters":{"arc_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
-					END IF;	
+					END IF;
 				END IF;
 			END IF;
 

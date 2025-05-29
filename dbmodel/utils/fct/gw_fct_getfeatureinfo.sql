@@ -9,24 +9,38 @@ or (at your option) any later version.
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeatureinfo(character varying, character varying, integer, integer, boolean);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeatureinfo(character varying, character varying, integer, integer, boolean, text, text, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeatureinfo(
-    p_table_id character varying,
-    p_id character varying,
-    p_device integer,
-    p_infotype integer,
-    p_configtable boolean,
-    p_idname text,
-    p_columntype text,
-    p_tgop text)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeatureinfo(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeatureinfo(p_data json)
   RETURNS json AS
 $BODY$
 
-/*example
-SELECT SCHEMA_NAME.gw_fct_getfeatureinfo('ve_arc_pipe', '2001', 3, 100, 'false')
-SELECT SCHEMA_NAME.gw_fct_getfeatureinfo('ve_arc_conduit', '2001', 3, 100, 'true', 'arc_id', 'varchar(16)')
+/* EXAMPLE
+
+SELECT SCHEMA_NAME.gw_fct_getfeatureinfo($${
+	"data":{
+		"parameters":{
+			"table_id":"ve_arc_pipe",
+			"id":"2001",
+			"device":3,
+			"info_type":100,
+			"configtable":false
+		}
+	}
+}$$);
+
 */
 
 DECLARE
+
+-- parameters
+v_table_id text;
+v_id text;
+v_device integer;
+v_infotype integer;
+v_configtable boolean;
+v_idname text;
+v_columntype text;
+v_tgop text;
 
 fields json;
 fields_array json[];
@@ -40,8 +54,6 @@ v_formtype text;
 v_tabname text = 'tab_data';
 v_errcontext text;
 v_querystring text;
-v_debug_vars json;
-v_debug json;
 v_msgerr json;
 
 vdefault_querytext text;
@@ -55,28 +67,35 @@ BEGIN
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
 
-	--    Get schema name
+	-- Get schema name
 	schemas_array := current_schemas(FALSE);
 
+	-- parameters
+	v_table_id = (((p_data->>'data')::json->>'parameters')::json->>'table_id');
+	v_id = (((p_data->>'data')::json->>'parameters')::json->>'id');
+	v_device = (((p_data->>'data')::json->>'parameters')::json->>'device');
+	v_infotype = (((p_data->>'data')::json->>'parameters')::json->>'info_type');
+	v_configtable = (((p_data->>'data')::json->>'parameters')::json->>'configtable');
+	v_idname = (((p_data->>'data')::json->>'parameters')::json->>'idname');
+	v_columntype = (((p_data->>'data')::json->>'parameters')::json->>'columntype');
+	v_tgop = (((p_data->>'data')::json->>'parameters')::json->>'tgop');
+
 	-- getting values from feature
-	if p_id is not null then
-        v_querystring = concat('SELECT (row_to_json(a)) FROM (SELECT * FROM ',quote_ident(p_table_id),' WHERE ',quote_ident(p_idname),' = CAST(',quote_nullable(p_id),' AS ',(p_columntype),'))a');
-        v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
-        v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureinfo', 'flag', 10);
-        SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	if v_id is not null then
+        v_querystring = concat('SELECT (row_to_json(a)) FROM (SELECT * FROM ',quote_ident(v_table_id),' WHERE ',quote_ident(v_idname),' = CAST(',quote_nullable(v_id),' AS ',(v_columntype),'))a');
         EXECUTE v_querystring INTO v_values_array;
     end if;
-	IF  p_configtable THEN
+	IF  v_configtable THEN
 
-		raise notice 'Configuration fields are defined on config_info_layer_field, calling gw_fct_getformfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
+		raise notice 'Configuration fields are defined on config_info_layer_field, calling gw_fct_getformfields with formname: % tablename: % id %', v_table_id, v_table_id, v_id;
 
 		-- Call the function of feature fields generation
 		v_formtype = 'form_feature';
-		SELECT gw_fct_getformfields( p_table_id, v_formtype, 'tab_data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
+		SELECT gw_fct_getformfields( v_table_id, v_formtype, 'tab_data', v_table_id, v_idname, v_id, null, 'SELECT',null, v_device, v_values_array) INTO fields_array;
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';
 
-		IF p_id IS NULL THEN
+		IF v_id IS NULL THEN
 			RETURN '{}'; -- returning null for those layers are not configured and id is null (first call on load project)
 
 		ELSE
@@ -104,19 +123,17 @@ BEGIN
 				JOIN pg_namespace s on t.relnamespace = s.oid
 				WHERE a.attnum > 0 
 				AND NOT a.attisdropped
-				AND t.relname = ',quote_nullable(p_table_id),' 
+				AND t.relname = ',quote_nullable(v_table_id),' 
 				AND s.nspname = ',quote_nullable(schemas_array[1]),'
 				AND a.attname !=''the_geom''
 				AND a.attname !=''geom''
 				ORDER BY a.attnum) a');
-			v_debug_vars := json_build_object('v_tabname', v_tabname, 'p_table_id', p_table_id, 'schemas_array[1]', schemas_array[1]);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureinfo', 'flag', 20);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 			EXECUTE v_querystring INTO fields_array;
 		END IF;
 	END IF;
 
-	IF p_tgop !='LAYER' THEN
+	IF v_tgop !='LAYER' THEN
 
 		-- Fill every value
 		FOREACH aux_json IN ARRAY fields_array
@@ -136,7 +153,7 @@ BEGIN
 								field_value = (aux_json->>'widgetcontrols')::json->>'vdefault_value';
 							END IF;
 						ELSEIF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
-							EXECUTE aux_json->>'widgetcontrols'::json->'vdefault_querytext'::text INTO vdefault_querytext; 
+							EXECUTE aux_json->>'widgetcontrols'::json->'vdefault_querytext'::text INTO vdefault_querytext;
 							IF vdefault_querytext in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
 								field_value = vdefault_querytext;
 							END iF;

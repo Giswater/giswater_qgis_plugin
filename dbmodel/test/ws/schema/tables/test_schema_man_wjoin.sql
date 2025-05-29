@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_wjoin', ARRAY['connec_id'], 'Column connec_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_wjoin', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
+SELECT col_type_is('man_wjoin', 'connec_id', 'integer', 'Column connec_id should be integer');
 SELECT col_type_is('man_wjoin', 'top_floor', 'integer', 'Column top_floor should be integer');
 SELECT col_type_is('man_wjoin', 'wjoin_type', 'text', 'Column wjoin_type should be text');
 
@@ -42,4 +42,4 @@ SELECT col_not_null('man_wjoin', 'connec_id', 'Column connec_id should be NOT NU
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

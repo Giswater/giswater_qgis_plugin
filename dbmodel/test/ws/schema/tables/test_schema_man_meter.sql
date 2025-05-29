@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_meter', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_meter', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_meter', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_meter', 'real_press_max', 'numeric(12,2)', 'Column real_press_max should be numeric(12,2)');
 SELECT col_type_is('man_meter', 'real_press_min', 'numeric(12,2)', 'Column real_press_min should be numeric(12,2)');
 SELECT col_type_is('man_meter', 'real_press_avg', 'numeric(12,2)', 'Column real_press_avg should be numeric(12,2)');
@@ -47,4 +47,4 @@ SELECT fk_ok('man_meter', 'node_id', 'node', 'node_id', 'FK node_id should refer
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

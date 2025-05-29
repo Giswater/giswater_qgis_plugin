@@ -29,13 +29,13 @@ SELECT columns_are(
 SELECT col_is_pk('man_source', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_source', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_source', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_source', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('man_source', 'source_type', 'integer', 'Column source_type should be integer');
 SELECT col_type_is('man_source', 'source_code', 'text', 'Column source_code should be text');
 SELECT col_type_is('man_source', 'aquifer_type', 'integer', 'Column aquifer_type should be integer');
 SELECT col_type_is('man_source', 'aquifer_name', 'text', 'Column aquifer_name should be text');
-SELECT col_type_is('man_source', 'wtp_id', 'varchar(16)', 'Column wtp_id should be varchar(16)');
+SELECT col_type_is('man_source', 'wtp_id', 'integer', 'Column wtp_id should be integer');
 SELECT col_type_is('man_source', 'registered_flow', 'double precision', 'Column registered_flow should be double precision');
 SELECT col_type_is('man_source', 'auth_code', 'text', 'Column auth_code should be text');
 SELECT col_type_is('man_source', 'basin_id', 'integer', 'Column basin_id should be integer');

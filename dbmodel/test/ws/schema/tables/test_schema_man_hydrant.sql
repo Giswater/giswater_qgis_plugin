@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_hydrant', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_hydrant', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_hydrant', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_hydrant', 'fire_code', 'varchar(30)', 'Column fire_code should be varchar(30)');
 SELECT col_type_is('man_hydrant', 'communication', 'varchar(254)', 'Column communication should be varchar(254)');
 SELECT col_type_is('man_hydrant', 'valve', 'varchar(100)', 'Column valve should be varchar(100)');

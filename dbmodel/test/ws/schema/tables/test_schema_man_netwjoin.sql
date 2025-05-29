@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_netwjoin', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_netwjoin', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_netwjoin', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_netwjoin', 'customer_code', 'varchar(30)', 'Column customer_code should be varchar(30)');
 SELECT col_type_is('man_netwjoin', 'top_floor', 'integer', 'Column top_floor should be integer');
 SELECT col_type_is('man_netwjoin', 'wjoin_type', 'text', 'Column wjoin_type should be text');
@@ -42,4 +42,4 @@ SELECT fk_ok('man_netwjoin', 'node_id', 'node', 'node_id', 'FK node_id should re
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

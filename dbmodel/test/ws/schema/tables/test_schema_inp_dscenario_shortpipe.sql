@@ -30,7 +30,7 @@ SELECT col_is_pk('inp_dscenario_shortpipe', ARRAY['node_id', 'dscenario_id'], 'C
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_shortpipe', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_shortpipe', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_shortpipe', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_dscenario_shortpipe', 'minorloss', 'numeric(12,6)', 'Column minorloss should be numeric(12,6)');
 SELECT col_type_is('inp_dscenario_shortpipe', 'status', 'varchar(12)', 'Column status should be varchar(12)');
 SELECT col_type_is('inp_dscenario_shortpipe', 'bulk_coeff', 'double precision', 'Column bulk_coeff should be double precision');

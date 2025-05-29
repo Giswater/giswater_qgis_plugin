@@ -884,8 +884,6 @@ ALTER TABLE man_source ALTER COLUMN basin_id SET NOT NULL;
 UPDATE man_source SET subbasin_id=0 WHERE subbasin_id IS NULL;
 ALTER TABLE man_source ALTER COLUMN subbasin_id SET NOT NULL;
 
-ALTER TABLE man_source ADD CONSTRAINT man_wtp_id_fkey FOREIGN KEY (wtp_id) REFERENCES man_wtp(node_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
 
 -- 03/03/2025
 
@@ -1062,15 +1060,15 @@ DROP INDEX IF EXISTS arc_streetname2;
 
 -- New order to table arc
 CREATE TABLE arc (
-	arc_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	arc_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
-	node_1 varchar(16) NULL,
+	node_1 int4 NULL,
 	nodetype_1 varchar(30) NULL,
 	elevation1 numeric(12, 4) NULL,
 	depth1 numeric(12, 4) NULL,
 	staticpress1 numeric(12, 3) NULL,
-	node_2 varchar(16) NULL,
+	node_2 int4 NULL,
 	nodetype_2 varchar(30) NULL,
 	elevation2 numeric(12, 4) NULL,
 	depth2 numeric(12, 4) NULL,
@@ -1080,7 +1078,7 @@ CREATE TABLE arc (
 	epa_type varchar(16) NOT NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,
-	parent_id varchar(16) NULL,
+	parent_id int4 NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,
@@ -1280,7 +1278,7 @@ DROP INDEX IF EXISTS connec_streetname2;
 
 -- New order to table connec
 CREATE TABLE connec (
-	connec_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	connec_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
@@ -1292,7 +1290,7 @@ CREATE TABLE connec (
 	epa_type text NOT NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,
-	arc_id varchar(16) NULL,
+	arc_id int4 NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,
@@ -1334,7 +1332,7 @@ CREATE TABLE connec (
 	builtdate date NULL,
 	enddate date NULL,
 	ownercat_id varchar(30) NULL,
-	pjoint_id varchar(16) NULL,
+	pjoint_id int4 NULL,
 	pjoint_type varchar(16) NULL,
 	om_state text NULL,
 	conserv_state text NULL,
@@ -1450,7 +1448,7 @@ DROP INDEX IF EXISTS element_sector;
 
 -- New order to table element
 CREATE TABLE element (
-	element_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	element_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
@@ -1616,7 +1614,7 @@ DROP INDEX IF EXISTS node_streetname2;
 
 
 CREATE TABLE node (
-	node_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	node_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
@@ -1627,8 +1625,8 @@ CREATE TABLE node (
 	epa_type varchar(16) NOT NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,
-	arc_id varchar(16) NULL,
-	parent_id varchar(16) NULL,
+	arc_id int4 NULL,
+	parent_id int4 NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,
@@ -1768,12 +1766,12 @@ CREATE TABLE link (
 	sys_code text NULL,
 	top_elev1 float8 NULL,
 	depth1 numeric(12, 4) NULL,
-	exit_id varchar(16) NULL,
+	exit_id int4 NULL,
 	exit_type varchar(16) NULL,
 	top_elev2 float8 NULL,
 	depth2 numeric(12, 4) NULL,
 	feature_type varchar(16) NULL,
-	feature_id varchar(16) NULL,
+	feature_id int4 NULL,
 	linkcat_id varchar(30) NOT NULL,
 	epa_type varchar(16) NULL,
 	state int2 NOT NULL,

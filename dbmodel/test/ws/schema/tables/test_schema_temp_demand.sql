@@ -30,7 +30,7 @@ SELECT col_is_pk('temp_demand', ARRAY['id'], 'Column id should be primary key');
 
 -- Check column types
 SELECT col_type_is('temp_demand', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('temp_demand', 'feature_id', 'character varying(16)', 'Column feature_id should be character varying(16)');
+SELECT col_type_is('temp_demand', 'feature_id', 'integer', 'Column feature_id should be integer');
 SELECT col_type_is('temp_demand', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
 SELECT col_type_is('temp_demand', 'pattern_id', 'character varying(16)', 'Column pattern_id should be character varying(16)');
 SELECT col_type_is('temp_demand', 'demand_type', 'character varying(18)', 'Column demand_type should be character varying(18)');
@@ -45,4 +45,4 @@ SELECT col_not_null('temp_demand', 'feature_id', 'Column feature_id should be NO
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

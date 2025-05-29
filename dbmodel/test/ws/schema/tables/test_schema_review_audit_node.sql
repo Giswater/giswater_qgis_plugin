@@ -21,7 +21,7 @@ SELECT columns_are(
     'review_audit_node',
     ARRAY[
         'id', 'node_id', 'old_top_elev', 'new_top_elev', 'old_depth', 'new_depth', 'old_nodecat_id', 'new_nodecat_id',
-        'old_annotation', 'new_annotation', 'old_observ', 'new_observ', 'review_obs', 'expl_id', 'the_geom', 
+        'old_annotation', 'new_annotation', 'old_observ', 'new_observ', 'review_obs', 'expl_id', 'the_geom',
         'review_status_id', 'field_date', 'field_user', 'is_validated'
     ],
     'Table review_audit_node should have the correct columns'
@@ -32,7 +32,7 @@ SELECT col_is_pk('review_audit_node', ARRAY['id'], 'Column id should be primary 
 
 -- Check column types
 SELECT col_type_is('review_audit_node', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('review_audit_node', 'node_id', 'character varying(16)', 'Column node_id should be character varying(16)');
+SELECT col_type_is('review_audit_node', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('review_audit_node', 'old_top_elev', 'numeric(12,3)', 'Column old_top_elev should be numeric(12,3)');
 SELECT col_type_is('review_audit_node', 'new_top_elev', 'numeric(12,3)', 'Column new_top_elev should be numeric(12,3)');
 SELECT col_type_is('review_audit_node', 'old_depth', 'numeric(12,3)', 'Column old_depth should be numeric(12,3)');
@@ -60,4 +60,4 @@ SELECT col_not_null('review_audit_node', 'node_id', 'Column node_id should be NO
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

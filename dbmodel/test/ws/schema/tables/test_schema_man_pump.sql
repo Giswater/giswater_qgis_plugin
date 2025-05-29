@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_pump', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_pump', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_pump', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_pump', 'max_flow', 'numeric(12,4)', 'Column max_flow should be numeric(12,4)');
 SELECT col_type_is('man_pump', 'min_flow', 'numeric(12,4)', 'Column min_flow should be numeric(12,4)');
 SELECT col_type_is('man_pump', 'nom_flow', 'numeric(12,4)', 'Column nom_flow should be numeric(12,4)');
@@ -49,4 +49,4 @@ SELECT fk_ok('man_pump', 'node_id', 'node', 'node_id', 'FK node_id should refere
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

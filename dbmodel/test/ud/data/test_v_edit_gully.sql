@@ -19,9 +19,9 @@ VALUES('-901', '-901', '-901', 36.7800, 34.5000, 77.6000, 0.8000, 0.0000, 'Concr
 SELECT is((SELECT count(*)::integer FROM v_edit_gully WHERE code = '-901'), 1, 'INSERT: v_edit_gully -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-901'), 1, 'INSERT: gully -901 was inserted');
 
-UPDATE v_edit_gully SET observ = 'updated observ' WHERE code = '-901';
-SELECT is((SELECT observ FROM v_edit_gully WHERE code = '-901'), 'updated observ', 'UPDATE: v_edit_gully -901 was updated');
-SELECT is((SELECT observ FROM gully WHERE code = '-901'), 'updated observ', 'UPDATE: gully -901 was updated');
+UPDATE v_edit_gully SET annotation = 'updated annotation' WHERE code = '-901';
+SELECT is((SELECT annotation FROM v_edit_gully WHERE code = '-901'), 'updated annotation', 'UPDATE: v_edit_gully -901 was updated');
+SELECT is((SELECT annotation FROM gully WHERE code = '-901'), 'updated annotation', 'UPDATE: gully -901 was updated');
 
 DELETE FROM v_edit_gully WHERE code = '-901';
 SELECT is((SELECT count(*)::integer FROM v_edit_gully WHERE code = '-901'), 0, 'DELETE: v_edit_gully -901 was deleted');

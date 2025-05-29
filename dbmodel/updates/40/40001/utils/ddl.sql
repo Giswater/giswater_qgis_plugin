@@ -69,16 +69,16 @@ ALTER TABLE link ADD CONSTRAINT link_linkcat_id_fkey FOREIGN KEY (linkcat_id) RE
 
 
 CREATE TABLE man_genelem (
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     CONSTRAINT man_genelem_pkey PRIMARY KEY (element_id),
 	CONSTRAINT man_genelem_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE man_frelem (
-    element_id varchar(16) NOT NULL,
-    node_id varchar NULL,
+    element_id int4 NOT NULL,
+    node_id int4 NULL,
     order_id numeric NULL,
-    to_arc varchar NULL,
+    to_arc int4 NULL,
     flwreg_length numeric NULL,
     CONSTRAINT man_frelem_pkey PRIMARY KEY (element_id),
 	CONSTRAINT man_frelem_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -138,7 +138,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_p
 -- 22/04/2025
 CREATE TABLE doc_x_element (
 	doc_id varchar(30) NOT NULL,
-	element_id varchar(16) NOT NULL,
+	element_id int4 NOT NULL,
 	CONSTRAINT doc_x_element_pkey PRIMARY KEY (doc_id, element_id),
 	CONSTRAINT doc_x_element_fkey_doc_id FOREIGN KEY (doc_id) REFERENCES doc(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT doc_x_element_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -180,7 +180,9 @@ CREATE TABLE minsector_mincut (
 );
 
 -- 15/05/2025
+ALTER TABLE node_add ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE node_add ADD CONSTRAINT node_add_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE arc_add ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE arc_add ADD CONSTRAINT arc_add_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 

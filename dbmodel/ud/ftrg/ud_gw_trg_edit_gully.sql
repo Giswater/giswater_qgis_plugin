@@ -141,7 +141,7 @@ BEGIN
 		END IF;
 
 		-- Gully ID
-		IF NEW.gully_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.gully_id IS NULL THEN
+		IF NEW.gully_id != (SELECT last_value FROM urn_id_seq) OR NEW.gully_id IS NULL THEN
 			NEW.gully_id = (SELECT nextval('urn_id_seq'));
 		END IF;
 
@@ -687,7 +687,7 @@ BEGIN
 		END IF;
 
 		-- Reconnect arc_id
-		IF (coalesce (NEW.arc_id,'') != coalesce(OLD.arc_id,'')) THEN
+		IF (coalesce (NEW.arc_id,0) != coalesce(OLD.arc_id,0)) THEN
 
 			-- when connec_id comes on psector_table
 			IF NEW.state = 1 AND (SELECT gully_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
@@ -771,7 +771,7 @@ BEGIN
 		-- Looking for state control and insert planified connecs to default psector
 		IF (NEW.state != OLD.state) THEN
 
-			PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);
+			PERFORM gw_fct_state_control(json_build_object('feature_type_aux', 'GULLY', 'feature_id_aux', NEW.gully_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP));
 
 			IF NEW.state = 2 AND OLD.state=1 THEN
 

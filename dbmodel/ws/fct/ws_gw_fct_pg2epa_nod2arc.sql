@@ -104,12 +104,12 @@ BEGIN
 
 
 	RAISE NOTICE 'new nodes when numarcs = 1 (1)';
-	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
+	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, code, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
 		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
 		WITH querytext AS (SELECT node_id, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
 		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
-		SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, top_elev, elev, ''NODE2ARC'',
+		SELECT c.result_id, n.node_id, concat(n.node_id, ''_n2a_1'') as code, top_elev, elev, ''NODE2ARC'',
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
@@ -118,12 +118,12 @@ BEGIN
 		WHERE n.num_arcs = 1';
 
 	RAISE NOTICE 'new nodes when numarcs = 1 (2)';
-	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
+	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, code, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
 		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
 		WITH querytext AS (SELECT node_id, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
 		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
-		SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, top_elev, elev, ''NODE2ARC'', 
+		SELECT c.result_id, n.node_id, concat(n.node_id, ''_n2a_2'') as code, top_elev, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
@@ -132,12 +132,12 @@ BEGIN
 		WHERE n.num_arcs = 1';
 
 	RAISE NOTICE 'new nodes when numarcs = 1 (3)';
-	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
+	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, code, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
 		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
 		WITH querytext AS (SELECT node_id, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
 		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
-		SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, top_elev, elev, ''NODE2ARC'', 
+		SELECT c.result_id, n.node_id, concat(n.node_id, ''_n2a_2'') as code, top_elev, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_startpoint(c.the_geom) AS the_geom,
 		n.node_id,
@@ -146,12 +146,12 @@ BEGIN
 		WHERE n.num_arcs = 1';
 
 	RAISE NOTICE 'new nodes when numarcs = 1 (4)';
-	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
+	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, code, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
 		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
 		WITH querytext AS (SELECT node_id, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
 		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
-		SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, top_elev, elev, ''NODE2ARC'', 
+		SELECT c.result_id, n.node_id, concat(n.node_id, ''_n2a_1'') as code, top_elev, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_endpoint(c.the_geom) AS the_geom,
 		n.node_id,
@@ -160,12 +160,12 @@ BEGIN
 		WHERE n.num_arcs = 1';
 
 	RAISE NOTICE 'new nodes when numarcs = 2 (1)';
-	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
+	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, code, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
 		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
 		WITH querytext AS (SELECT node_id, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
 		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
-		SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, top_elev, elev, ''NODE2ARC'',
+		SELECT c.result_id, n.node_id, concat(n.node_id, ''_n2a_1'') as code, top_elev, elev, ''NODE2ARC'',
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
@@ -174,12 +174,12 @@ BEGIN
 		WHERE n.num_arcs = 2';
 
 	RAISE NOTICE 'new nodes when numarcs = 2 (2)';
-	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
+	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, code, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
 		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
 		WITH querytext AS (SELECT node_id, num_arcs, top_elev, elev, nodecat_id, state, state_type, descript, 
 		arc_distance, minsector_id, the_geom FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
-		SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, top_elev, elev, ''NODE2ARC'', 
+		SELECT c.result_id, n.node_id, concat(n.node_id, ''_n2a_2'') as code, top_elev, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
@@ -188,14 +188,14 @@ BEGIN
 		WHERE n.num_arcs = 2 ';
 
 	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_1';
-	FOR v_node IN SELECT count(*), node_id FROM temp_t_node WHERE substring(reverse(node_id),0,2) = '1' group by node_id having count(*) > 1 order by 1 desc
+	FOR v_node IN SELECT count(*), node_id FROM temp_t_node WHERE substring(reverse(code),0,2) = '1' group by node_id having count(*) > 1 order by 1 desc
 	LOOP
 		UPDATE temp_t_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'2'), arcposition = 2
 		WHERE id IN (SELECT id FROM temp_t_node WHERE node_id = v_node.node_id LIMIT 1);
 	END LOOP;
 
 	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_2';
-	FOR v_node IN SELECT count(*), node_id FROM temp_t_node where substring(reverse(node_id),0,2) = '2' group by node_id having count(*) > 1 order by 1 desc
+	FOR v_node IN SELECT count(*), node_id FROM temp_t_node where substring(reverse(code),0,2) = '2' group by node_id having count(*) > 1 order by 1 desc
 	LOOP
 		UPDATE temp_t_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'1'), arcposition = 1
 		WHERE id IN (SELECT id FROM temp_t_node WHERE node_id = v_node.node_id LIMIT 1);
@@ -204,13 +204,14 @@ BEGIN
 	IF p_check IS FALSE THEN
 
 		RAISE NOTICE 'new arcs when numarcs = 1 (NODE2ARC-ENDPOINT)';
-		EXECUTE 'INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length,
+		EXECUTE 'INSERT INTO temp_t_arc (result_id, arc_id, code, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length,
 			status, the_geom, minorloss, addparam, dma_id, presszone_id, dqa_id, minsector_id)
 			
 				WITH result AS (SELECT * FROM temp_t_node)
 				SELECT DISTINCT ON (a.nodeparent)
 				a.result_id,
-				concat (a.nodeparent, ''_n2a'') as arc_id,
+				a.nodeparent,
+				concat (a.nodeparent, ''_n2a'') as code,
 				b.node_id,
 				a.node_id,
 				''NODE2ARC-ENDPOINT'', 
@@ -234,13 +235,14 @@ BEGIN
 					WHERE a.nodeparent = b.nodeparent AND a.arcposition = 3 AND b.arcposition = 4';
 
 		RAISE NOTICE 'new arcs when numarcs = 2 (NODE2ARC) with offset  % ', v_offset;
-		EXECUTE 'INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
+		EXECUTE 'INSERT INTO temp_t_arc (result_id, arc_id, code, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
 			status, the_geom, minorloss, addparam, dma_id, presszone_id, dqa_id, minsector_id)
 
 			WITH result AS (SELECT * FROM temp_t_node) 
 			SELECT DISTINCT ON (a.nodeparent)
 			a.result_id,
-			concat (a.nodeparent, ''_n2a'') as arc_id,
+			a.nodeparent,
+			concat (a.nodeparent, ''_n2a'') as code,
 			b.node_id,
 			a.node_id,
 			''NODE2ARC'', 
@@ -326,12 +328,12 @@ BEGIN
 	SELECT arc_id,node_2 FROM arc JOIN query ON query.node_id = node_2;
 
 	-- delete the nodarc not-used existing arcs
-	DELETE FROM temp_t_arc WHERE arc_id IN (SELECT concat(node_id,'_n2a') FROM t_arc_endpoint);
+	DELETE FROM temp_t_arc WHERE code IN (SELECT concat(node_id,'_n2a') FROM t_arc_endpoint);
 
 	-- delete the nodarc not-used existing nodes
-	DELETE FROM temp_t_node WHERE node_id IN (SELECT concat(node_id,'_n2a_1')
+	DELETE FROM temp_t_node WHERE code IN (SELECT concat(node_id,'_n2a_1')
 	FROM t_arc_endpoint) and node_id not in (select node_1 from temp_t_arc union select node_2 from temp_t_arc);
-	DELETE FROM temp_t_node WHERE node_id IN (SELECT concat(node_id,'_n2a_2')
+	DELETE FROM temp_t_node WHERE code IN (SELECT concat(node_id,'_n2a_2')
 	FROM t_arc_endpoint) and node_id not in (select node_1 from temp_t_arc union select node_2 from temp_t_arc);
 
 	DROP TABLE IF EXISTS t_arc_endpoint;

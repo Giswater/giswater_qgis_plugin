@@ -24,7 +24,7 @@ DECLARE
     v_version text;
     v_zone text;
     v_action text;
-    v_nodeparent text;
+    v_nodeparent integer;
     v_toarc text;
     v_config text;
     rec_arc text;
@@ -81,9 +81,9 @@ BEGIN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3242", "function":"3270","parameters":{"zone":"'||v_zone||'"}}}$$);' INTO v_audit_result;
             ELSE
                 IF v_netscenario_id IS NULL THEN
-                    EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_toarc||'''::json) a WHERE a IN (SELECT arc_id FROM arc WHERE state = 1 AND (node_1 ='||quote_literal(v_nodeparent)||' OR node_2 = '||quote_literal(v_nodeparent)||'))' INTO v_toarc;
+                    EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_toarc||'''::json) a WHERE a::integer IN (SELECT arc_id FROM arc WHERE state = 1 AND (node_1 ='||v_nodeparent||' OR node_2 = '||v_nodeparent||'))' INTO v_toarc;
                 ELSE
-                    EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_toarc||'''::json) a WHERE a IN (SELECT arc_id FROM arc WHERE state > 0 AND (node_1 ='||quote_literal(v_nodeparent)||' OR node_2 = '||quote_literal(v_nodeparent)||'))' INTO v_toarc;
+                    EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_toarc||'''::json) a WHERE a::integer IN (SELECT arc_id FROM arc WHERE state > 0 AND (node_1 ='||v_nodeparent||' OR node_2 = '||v_nodeparent||'))' INTO v_toarc;
                 END IF;
 
                 IF v_toarc IS NULL AND v_project_type = 'WS' THEN

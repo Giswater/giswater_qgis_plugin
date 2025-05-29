@@ -31,7 +31,7 @@ SELECT col_is_pk('inp_dscenario_junction', ARRAY['dscenario_id', 'node_id'], 'Co
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_junction', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_junction', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_junction', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_dscenario_junction', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
 SELECT col_type_is('inp_dscenario_junction', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 SELECT col_type_is('inp_dscenario_junction', 'peak_factor', 'numeric(12,4)', 'Column peak_factor should be numeric(12,4)');

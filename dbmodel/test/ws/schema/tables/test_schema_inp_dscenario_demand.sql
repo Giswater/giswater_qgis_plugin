@@ -31,7 +31,7 @@ SELECT col_is_pk('inp_dscenario_demand', ARRAY['id'], 'Column id should be prima
 -- Check column types
 SELECT col_type_is('inp_dscenario_demand', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
 SELECT col_type_is('inp_dscenario_demand', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('inp_dscenario_demand', 'feature_id', 'varchar(16)', 'Column feature_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_demand', 'feature_id', 'integer', 'Column feature_id should be integer');
 SELECT col_type_is('inp_dscenario_demand', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_type_is('inp_dscenario_demand', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
 SELECT col_type_is('inp_dscenario_demand', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');

@@ -29,8 +29,8 @@ fid:359
 DECLARE
 
 v_feature_type text;
-v_feature_id text;
-v_arc_id text;
+v_feature_id integer;
+v_arc_id integer;
 v_feature_class text;
 v_epatype text;
 v_graphdelim text[];
@@ -58,8 +58,8 @@ BEGIN
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_feature_type := json_extract_path_text (p_data,'feature','featureType')::text;
-	v_feature_id:= json_extract_path_text (p_data,'feature','id')::text;
-	v_arc_id:= json_extract_path_text (p_data,'data','arcId')::text;
+	v_feature_id:= json_extract_path_text (p_data,'feature','id')::integer;
+	v_arc_id:= json_extract_path_text (p_data,'data','arcId')::integer;
 	v_dma_id:= json_extract_path_text (p_data,'data','dmaId')::text;
 	v_presszone_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
 	v_dqa_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
@@ -124,7 +124,7 @@ BEGIN
 			END IF;
 
 			IF v_mapzone_id IS NULL THEN
-			    EXECUTE 'SELECT '||rec||'_id  FROM node WHERE node_id = '||quote_literal(v_feature_id)||''
+			    EXECUTE 'SELECT '||rec||'_id  FROM node WHERE node_id = '||v_feature_id||''
 			    INTO v_mapzone_id;
 			END IF;
 
@@ -136,15 +136,15 @@ BEGIN
 
 			    EXECUTE 'SELECT jsonb_build_object(''use'',ARRAY[a.feature], ''ignore'',''{}''::text[], ''forceClosed'',''{}''::text[]) FROM (
 			    SELECT jsonb_build_object(
-			    ''nodeParent'','||v_feature_id||'::text,
-			    ''toArc'',   ARRAY['||v_arc_id||'::text] ) AS feature)a'
+			    ''nodeParent'','||v_feature_id||',
+			    ''toArc'',   ARRAY['||v_arc_id||'] ) AS feature)a'
 			    INTO v_config;
 
 			    EXECUTE'UPDATE '||rec||' SET graphconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text;';
 			ELSE
 
 			    EXECUTE  'SELECT 1 FROM '||rec||' CROSS JOIN json_array_elements((graphconfig->>''use'')::json) elem 
-			    WHERE elem->>''nodeParent'' = '||quote_literal(v_feature_id)||' AND '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text LIMIT 1'
+			    WHERE elem->>''nodeParent'' = '||v_feature_id||' AND '||rec||'_id = '||v_mapzone_id||' LIMIT 1'
 			    INTO v_check_graphconfig;
 
 			    IF v_check_graphconfig = '1'  THEN
@@ -160,8 +160,8 @@ BEGIN
 			    ELSE
 				--Define graphconfig in case when there is definition for mapzone and node is not defined there
 				EXECUTE 'SELECT jsonb_build_object(
-				''nodeParent'','||v_feature_id||'::text,
-				''toArc'',   ARRAY['||v_arc_id||'::text] ) AS feature'
+				''nodeParent'','||v_feature_id||',
+				''toArc'',   ARRAY['||v_arc_id||'] ) AS feature'
 				INTO v_config;
 
 

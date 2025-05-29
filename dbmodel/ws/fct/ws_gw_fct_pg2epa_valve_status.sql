@@ -33,13 +33,13 @@ BEGIN
 		v_querytext = ' v_edit_inp_shortpipe v WHERE node_id IS NOT NULL';
 	END IF;
 
-	EXECUTE ' UPDATE temp_t_arc a SET status=v.status FROM '||v_querytext||' AND a.arc_id=concat(v.node_id,''_n2a'')';
+	EXECUTE ' UPDATE temp_t_arc a SET status=v.status FROM '||v_querytext||' AND a.code=concat(v.node_id,''_n2a'')';
 
 	-- all that not are closed are open
 	UPDATE temp_t_arc SET status='OPEN' WHERE status IS NULL AND epa_type = 'SHORTPIPE';
 
 	-- mandatory nodarcs
-	UPDATE temp_t_arc a SET status=v.status FROM v_edit_inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a');
+	UPDATE temp_t_arc a SET status=v.status FROM v_edit_inp_valve v WHERE a.code=concat(v.node_id,'_n2a');
 
 	RETURN 1;
 

@@ -29,8 +29,8 @@ SELECT columns_are(
 SELECT col_is_pk('man_greentap', ARRAY['connec_id'], 'Column connec_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_greentap', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
-SELECT col_type_is('man_greentap', 'linked_connec', 'varchar(16)', 'Column linked_connec should be varchar(16)');
+SELECT col_type_is('man_greentap', 'connec_id', 'integer', 'Column connec_id should be integer');
+SELECT col_type_is('man_greentap', 'linked_connec', 'integer', 'Column linked_connec should be integer');
 SELECT col_type_is('man_greentap', 'greentap_type', 'text', 'Column greentap_type should be text');
 
 -- Check not null constraints
@@ -42,4 +42,4 @@ SELECT fk_ok('man_greentap', 'linked_connec', 'connec', 'connec_id', 'FK linked_
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

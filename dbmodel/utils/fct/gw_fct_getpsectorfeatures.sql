@@ -65,7 +65,7 @@ BEGIN
                 JOIN node n ON n.node_id = pn.node_id
                 WHERE pn.psector_id = ANY(v_psector_id_aux)
                 UNION
-                SELECT pc.link_id::text AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
+                SELECT pc.link_id AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
                 FROM plan_psector_x_connec pc
                 JOIN connec c ON c.connec_id = pc.connec_id
                 WHERE pc.psector_id = ANY(v_psector_id_aux)
@@ -85,7 +85,7 @@ BEGIN
                 JOIN node n ON n.node_id = pn.node_id
                 WHERE pn.psector_id = ANY(v_psector_id_aux)
                 UNION
-                SELECT pc.link_id::text AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
+                SELECT pc.link_id AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
                 FROM plan_psector_x_connec pc
                 JOIN connec c ON c.connec_id = pc.connec_id
                 WHERE pc.psector_id = ANY(v_psector_id_aux)
@@ -116,7 +116,7 @@ BEGIN
             JOIN arc a ON a.arc_id = pa.arc_id
             WHERE pa.psector_id = ANY(v_psector_id_aux)
             UNION
-            SELECT ppxc.link_id::text AS feature_id, ppxc.psector_id, ppxc.state, 'LINK' AS feature_type, l.the_geom
+            SELECT ppxc.link_id AS feature_id, ppxc.psector_id, ppxc.state, 'LINK' AS feature_type, l.the_geom
             FROM plan_psector_x_connec ppxc
             JOIN link l ON l.link_id = ppxc.link_id
             WHERE ppxc.psector_id = ANY(v_psector_id_aux)

@@ -30,7 +30,7 @@ SELECT col_is_pk('inp_dscenario_valve', ARRAY['node_id', 'dscenario_id'], 'Colum
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_valve', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_valve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_valve', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_dscenario_valve', 'valve_type', 'varchar(18)', 'Column valve_type should be varchar(18)');
 SELECT col_type_is('inp_dscenario_valve', 'setting', 'numeric(12,4)', 'Column setting should be numeric(12,4)');
 SELECT col_type_is('inp_dscenario_valve', 'curve_id', 'varchar(16)', 'Column curve_id should be varchar(16)');

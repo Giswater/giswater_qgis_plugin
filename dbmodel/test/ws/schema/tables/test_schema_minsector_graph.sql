@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('minsector_graph', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('minsector_graph', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('minsector_graph', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('minsector_graph', 'nodecat_id', 'varchar(30)', 'Column nodecat_id should be varchar(30)');
 SELECT col_type_is('minsector_graph', 'minsector_1', 'integer', 'Column minsector_1 should be integer');
 SELECT col_type_is('minsector_graph', 'minsector_2', 'integer', 'Column minsector_2 should be integer');

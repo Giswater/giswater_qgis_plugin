@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_register', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_register', 'node_id', 'varchar(16)', 'Column node_id should be numeric(12,3)');
+SELECT col_type_is('man_register', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_register', 'length', 'numeric(12,3)', 'Column length should be numeric(12,3)');
 SELECT col_type_is('man_register', 'width', 'numeric(12,3)', 'Column width should be numeric(12,3)');
 SELECT col_type_is('man_register', 'height', 'numeric(12,3)', 'Column height should be numeric(12,3)');

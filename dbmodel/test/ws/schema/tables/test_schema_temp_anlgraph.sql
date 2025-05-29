@@ -31,9 +31,9 @@ SELECT col_is_pk('temp_anlgraph', ARRAY['id'], 'Column id should be primary key'
 
 -- Check column types
 SELECT col_type_is('temp_anlgraph', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('temp_anlgraph', 'arc_id', 'character varying(20)', 'Column arc_id should be character varying(20)');
-SELECT col_type_is('temp_anlgraph', 'node_1', 'character varying(20)', 'Column node_1 should be character varying(20)');
-SELECT col_type_is('temp_anlgraph', 'node_2', 'character varying(20)', 'Column node_2 should be character varying(20)');
+SELECT col_type_is('temp_anlgraph', 'arc_id', 'integer', 'Column arc_id should be integer');
+SELECT col_type_is('temp_anlgraph', 'node_1', 'integer', 'Column node_1 should be integer');
+SELECT col_type_is('temp_anlgraph', 'node_2', 'integer', 'Column node_2 should be integer');
 SELECT col_type_is('temp_anlgraph', 'water', 'smallint', 'Column water should be smallint');
 SELECT col_type_is('temp_anlgraph', 'flag', 'smallint', 'Column flag should be smallint');
 SELECT col_type_is('temp_anlgraph', 'checkf', 'smallint', 'Column checkf should be smallint');

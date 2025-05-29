@@ -20,8 +20,8 @@ SELECT has_table('review_audit_connec'::name, 'Table review_audit_connec should 
 SELECT columns_are(
     'review_audit_connec',
     ARRAY[
-        'id', 'connec_id', 'old_connecat_id', 'new_connecat_id', 'old_annotation', 'new_annotation', 
-        'old_observ', 'new_observ', 'review_obs', 'expl_id', 'the_geom', 'review_status_id', 
+        'id', 'connec_id', 'old_connecat_id', 'new_connecat_id', 'old_annotation', 'new_annotation',
+        'old_observ', 'new_observ', 'review_obs', 'expl_id', 'the_geom', 'review_status_id',
         'field_date', 'field_user', 'is_validated'
     ],
     'Table review_audit_connec should have the correct columns'
@@ -32,7 +32,7 @@ SELECT col_is_pk('review_audit_connec', ARRAY['id'], 'Column id should be primar
 
 -- Check column types
 SELECT col_type_is('review_audit_connec', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('review_audit_connec', 'connec_id', 'character varying(16)', 'Column connec_id should be character varying(16)');
+SELECT col_type_is('review_audit_connec', 'connec_id', 'integer', 'Column connec_id should be integer');
 SELECT col_type_is('review_audit_connec', 'old_connecat_id', 'character varying(30)', 'Column old_connecat_id should be character varying(30)');
 SELECT col_type_is('review_audit_connec', 'new_connecat_id', 'character varying(30)', 'Column new_connecat_id should be character varying(30)');
 SELECT col_type_is('review_audit_connec', 'old_annotation', 'text', 'Column old_annotation should be text');
@@ -56,4 +56,4 @@ SELECT col_not_null('review_audit_connec', 'connec_id', 'Column connec_id should
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

@@ -8,7 +8,7 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE TABLE inp_frvalve (
-	element_id varchar(16) NOT NULL,
+	element_id int4 NOT NULL,
 	valve_type varchar(18) NULL,
 	custom_dint numeric(12, 4) NULL,
 	setting numeric(12, 4) NULL,
@@ -24,7 +24,7 @@ CREATE TABLE inp_frvalve (
 
 CREATE TABLE inp_dscenario_frvalve (
     dscenario_id int4 NOT NULL,
-	element_id varchar(16) NOT NULL,
+	element_id int4 NOT NULL,
 	valve_type varchar(18) NULL,
 	custom_dint numeric(12, 4) NULL,
 	setting numeric(12, 4) NULL,
@@ -39,7 +39,7 @@ CREATE TABLE inp_dscenario_frvalve (
 );
 
 CREATE TABLE inp_frpump (
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     curve_id varchar(16) NOT NULL,
     status varchar(3) NULL,
     startup numeric(12, 4) NULL,
@@ -52,7 +52,7 @@ CREATE TABLE inp_frpump (
 
 CREATE TABLE inp_dscenario_frpump (
     dscenario_id int4 NOT NULL,
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     pump_type varchar(18) NOT NULL,
     curve_id varchar(16) NOT NULL,
     status varchar(3) NULL,
@@ -101,6 +101,7 @@ ALTER TABLE inp_virtualpump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';
 ALTER TABLE inp_dscenario_virtualpump ALTER COLUMN pump_type SET DEFAULT 'POWERPUMP';
 
 --15/05/2025
+ALTER TABLE connec_add ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE connec_add ADD CONSTRAINT connec_add_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- 19/05/2025

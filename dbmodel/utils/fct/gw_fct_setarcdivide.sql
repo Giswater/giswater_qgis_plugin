@@ -29,7 +29,7 @@ SELECT SCHEMA_NAME.gw_fct_setarcdivide(concat('{"feature":{"id":["',node_id,'"]}
 
 DECLARE
 v_node_geom public.geometry;
-v_arc_id varchar;
+v_arc_id integer;
 v_code varchar;
 v_arc_geom public.geometry;
 v_line1 public.geometry;
@@ -38,8 +38,8 @@ v_intersect_loc	double precision;
 v_project_type text;
 v_state_arc integer;
 v_state_node integer;
-v_gully_id 	varchar;
-v_connec_id varchar;
+v_gully_id 	integer;
+v_connec_id integer;
 v_return smallint;
 v_arc_divide_tolerance float =0.05;
 v_array_connec varchar [];
@@ -91,15 +91,15 @@ v_status text;
 v_message text;
 v_hide_form boolean;
 v_array_node_id json;
-v_node_id text;
+v_node_id integer;
 v_arc_closest text;
 v_set_arc_obsolete boolean;
 v_set_old_code boolean;
 v_obsoletetype integer;
 v_node1_graph text;
 v_node2_graph text;
-v_node_1 text;
-v_node_2 text;
+v_node_1 integer;
+v_node_2 integer;
 v_new_node_graph text;
 v_graph_arc_id TEXT;
 v_force_delete text;
@@ -125,10 +125,10 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	-- Get parameters from input json
-	v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
+	v_array_node_id = lower(((p_data ->>'feature')::json->>'id'));
 	v_skipinitendmessage = (((p_data ->>'data')::json->>'parameters')::json->>'skipInitEndMessage')::boolean;
 
-	v_node_id = (SELECT json_array_elements_text(v_array_node_id));
+	v_node_id = (SELECT json_array_elements_text(v_array_node_id)::integer);
 	-- Get project type
 	SELECT project_type, epsg, giswater INTO v_project_type, v_srid,v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -202,7 +202,7 @@ BEGIN
                        "data":{"message":"3348", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 				-- Get arctype
-				v_sql := 'SELECT arc_type FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||'::text);';
+				v_sql := 'SELECT arc_type FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||');';
 				EXECUTE v_sql
 				INTO v_arc_type;
 
@@ -295,7 +295,7 @@ BEGIN
 						v_manquerytext='';
 					END IF;
 					v_manquerytext1 = 'INSERT INTO '||v_mantable||' SELECT ';
-					v_manquerytext2 = v_manquerytext||' FROM '||v_mantable||' WHERE arc_id= '||v_arc_id||'::text';
+					v_manquerytext2 = v_manquerytext||' FROM '||v_mantable||' WHERE arc_id= '||v_arc_id||'';
 
 					-- building querytext for epa_table
 					v_epaquerytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') FROM (SELECT column_name FROM information_schema.columns
@@ -304,7 +304,7 @@ BEGIN
 						v_epaquerytext='';
 					END IF;
 					v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
-					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'::text';
+					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'';
 
 
 					-- In function of states and user's variables proceed.....
@@ -331,12 +331,12 @@ BEGIN
 						round(st_length(rec_aux2.the_geom)::numeric,2),'.'));
 
 						-- insert new records into man_table
-						EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
-						EXECUTE v_manquerytext1||rec_aux2.arc_id::text||v_manquerytext2;
+						EXECUTE v_manquerytext1||rec_aux1.arc_id||v_manquerytext2;
+						EXECUTE v_manquerytext1||rec_aux2.arc_id||v_manquerytext2;
 
 						-- insert new records into epa_table
-						EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
-						EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
+						EXECUTE v_epaquerytext1||rec_aux1.arc_id||v_epaquerytext2;
+						EXECUTE v_epaquerytext1||rec_aux2.arc_id||v_epaquerytext2;
 
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3352", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
@@ -749,12 +749,12 @@ BEGIN
                        "data":{"message":"3390", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						-- Insert new records into man table
-						EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
-						EXECUTE v_manquerytext1||rec_aux2.arc_id::text||v_manquerytext2;
+						EXECUTE v_manquerytext1||rec_aux1.arc_id||v_manquerytext2;
+						EXECUTE v_manquerytext1||rec_aux2.arc_id||v_manquerytext2;
 
 						-- Insert new records into epa table
-						EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
-						EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
+						EXECUTE v_epaquerytext1||rec_aux1.arc_id||v_epaquerytext2;
+						EXECUTE v_epaquerytext1||rec_aux2.arc_id||v_epaquerytext2;
 
 						-- restore temporary value for edit_disable_statetopocontrol variable
 						UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;

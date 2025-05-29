@@ -64,7 +64,7 @@ BEGIN
 		END IF;
 
 		-- Arc ID
-		IF NEW.arc_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.arc_id IS NULL THEN
+		IF NEW.arc_id != (SELECT last_value FROM urn_id_seq) OR NEW.arc_id IS NULL THEN
 			NEW.arc_id = (SELECT nextval('urn_id_seq'));
 		END IF;
 

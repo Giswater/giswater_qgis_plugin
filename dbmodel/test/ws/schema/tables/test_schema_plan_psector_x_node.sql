@@ -31,7 +31,7 @@ SELECT col_is_pk('plan_psector_x_node', ARRAY['id'], 'Column id should be primar
 
 -- Check column types
 SELECT col_type_is('plan_psector_x_node', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('plan_psector_x_node', 'node_id', 'character varying(16)', 'Column node_id should be character varying(16)');
+SELECT col_type_is('plan_psector_x_node', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('plan_psector_x_node', 'psector_id', 'integer', 'Column psector_id should be integer');
 SELECT col_type_is('plan_psector_x_node', 'state', 'smallint', 'Column state should be smallint');
 SELECT col_type_is('plan_psector_x_node', 'doable', 'boolean', 'Column doable should be boolean');

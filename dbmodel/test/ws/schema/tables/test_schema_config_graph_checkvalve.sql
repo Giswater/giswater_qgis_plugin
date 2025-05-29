@@ -29,8 +29,8 @@ SELECT columns_are(
 SELECT col_is_pk('config_graph_checkvalve', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('config_graph_checkvalve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
-SELECT col_type_is('config_graph_checkvalve', 'to_arc', 'varchar(16)', 'Column to_arc should be varchar(16)');
+SELECT col_type_is('config_graph_checkvalve', 'node_id', 'integer', 'Column node_id should be integer');
+SELECT col_type_is('config_graph_checkvalve', 'to_arc', 'integer', 'Column to_arc should be integer');
 SELECT col_type_is('config_graph_checkvalve', 'active', 'boolean', 'Column active should be boolean');
 
 -- Check foreign keys

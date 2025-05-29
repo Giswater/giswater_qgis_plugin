@@ -38,12 +38,12 @@ SELECT col_is_pk('link', ARRAY['link_id'], 'Column link_id should be primary key
 SELECT col_type_is('link', 'link_id', 'integer', 'Column link_id should be integer');
 SELECT col_type_is('link', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('link', 'sys_code', 'text', 'Column sys_code should be text');
-SELECT col_type_is('link', 'feature_id', 'varchar(16)', 'Column feature_id should be varchar(16)');
+SELECT col_type_is('link', 'feature_id', 'integer', 'Column feature_id should be integer');
 SELECT col_type_is('link', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_type_is('link', 'linkcat_id', 'varchar(30)', 'Column linkcat_id should be varchar(30)');
 SELECT col_type_is('link', 'top_elev1', 'double precision', 'Column top_elev1 should be double precision');
 SELECT col_type_is('link', 'depth1', 'numeric(12,4)', 'Column depth1 should be numeric(12,4)');
-SELECT col_type_is('link', 'exit_id', 'varchar(16)', 'Column exit_id should be varchar(16)');
+SELECT col_type_is('link', 'exit_id', 'integer', 'Column exit_id should be integer');
 SELECT col_type_is('link', 'exit_type', 'varchar(16)', 'Column exit_type should be varchar(16)');
 SELECT col_type_is('link', 'top_elev2', 'double precision', 'Column top_elev2 should be double precision');
 SELECT col_type_is('link', 'depth2', 'numeric(12,4)', 'Column depth2 should be numeric(12,4)');

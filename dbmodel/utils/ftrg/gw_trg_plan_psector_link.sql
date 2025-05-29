@@ -36,7 +36,6 @@ BEGIN
 	v_schemaname='SCHEMA_NAME';
 	v_projecttype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
-	IF NEW.arc_id='' THEN NEW.arc_id=NULL; END IF;
 
 	-- setting variables
 	v_id = NEW.id;
@@ -77,7 +76,7 @@ BEGIN
 		END IF;
 
 
-		IF NEW.state = 1 AND COALESCE(NEW.arc_id,'') != COALESCE(OLD.arc_id,'') AND COALESCE(NEW.link_id,0) = COALESCE(OLD.link_id,0) THEN
+		IF NEW.state = 1 AND COALESCE(NEW.arc_id,0) != COALESCE(OLD.arc_id,0) AND COALESCE(NEW.link_id,0) = COALESCE(OLD.link_id,0) THEN
 
 			IF NEW.arc_id IS NULL THEN
 

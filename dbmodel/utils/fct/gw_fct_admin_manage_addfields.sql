@@ -274,19 +274,12 @@ BEGIN
             	VALUES (218, null, 4, concat('Add column ', v_param_name, ' to table ', v_feature_childtable_name, '.'));
             ELSE
                 -- create child table with the new addfield column
-                IF UPPER(v_feature_type) = 'LINK' THEN -- TODO: remove this if when all ids are int4
-                    EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                        '|| v_feature_type|| '_id int4 PRIMARY KEY,
-                        ' || v_param_name || ' '||v_config_datatype||',
-                        CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE
-                    )';
-                ELSE
-                    EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                                '|| v_feature_type|| '_id varchar(16) PRIMARY KEY,
-                                ' || v_param_name || ' '||v_config_datatype||',
-                                CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE
-                            )';
-                END IF;
+
+                EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
+                            '|| v_feature_type|| '_id int4 PRIMARY KEY,
+                            ' || v_param_name || ' '||v_config_datatype||',
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE
+                        )';
 
                 EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| v_feature_type|| '_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| v_feature_type|| '_id)';
                 -- log
@@ -581,19 +574,11 @@ BEGIN
                     VALUES (218, null, 4, concat('Add column ', v_param_name, ' to table ', v_feature_childtable_name, '.'));
                 ELSE
                     -- create child table with the new addfield column
-                    IF UPPER(v_feature_type) = 'LINK' THEN -- TODO: remove this if when all ids are int4
-                        EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                            '|| v_feature_type|| '_id int4 PRIMARY KEY,
-                            ' || v_param_name || ' '||v_config_datatype||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE
-                        )';
-                    ELSE
-                        EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                                    '|| v_feature_type|| '_id varchar(16) PRIMARY KEY,
-                                    ' || v_param_name || ' '||v_config_datatype||',
-                                    CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE
-                                )';
-                    END IF;
+                    EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
+                                '|| v_feature_type|| '_id int4 PRIMARY KEY,
+                                ' || v_param_name || ' '||v_config_datatype||',
+                                CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE
+                            )';
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| v_feature_type|| '_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| v_feature_type|| '_id)';
 

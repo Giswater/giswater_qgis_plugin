@@ -125,7 +125,7 @@ BEGIN
 		END IF;
 
 		-- connec ID
-		IF NEW.connec_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.connec_id IS NULL THEN
+		IF NEW.connec_id != (SELECT last_value FROM urn_id_seq) OR NEW.connec_id IS NULL THEN
 			NEW.connec_id = (SELECT nextval('urn_id_seq'));
 		END IF;
 
@@ -699,7 +699,7 @@ BEGIN
 		END IF;
 
 		-- Reconnect arc_id
-		IF (coalesce (NEW.arc_id,'') != coalesce(OLD.arc_id,'')) THEN
+		IF (coalesce (NEW.arc_id,0) != coalesce(OLD.arc_id,0)) THEN
 
 			-- when connec_id comes from psector_table
 			IF NEW.state = 1 AND (SELECT connec_id FROM plan_psector_x_connec JOIN selector_psector USING (psector_id)
@@ -757,7 +757,7 @@ BEGIN
 		-- Looking for state control and insert planned connecs to default psector
 		IF (NEW.state != OLD.state) THEN
 
-			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);
+			PERFORM gw_fct_state_control(json_build_object('feature_type_aux', 'CONNEC', 'feature_id_aux', NEW.connec_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP));
 
 			IF NEW.state = 2 AND OLD.state=1 THEN
 
@@ -882,7 +882,7 @@ BEGIN
 			crmzone_id=NEW.crmzone_id, expl_visibility=NEW.expl_visibility, plot_code=NEW.plot_code, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 			label_quadrant=NEW.label_quadrant, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_code=NEW.block_code, n_hydrometer=NEW.n_hydrometer
 			WHERE connec_id=OLD.connec_id;
-		
+
 		-- update connec_add table
 		UPDATE connec_add SET demand_base = NEW.demand_base, demand_max = NEW.demand_max, demand_min = NEW.demand_min, demand_avg = NEW.demand_avg, press_max = NEW.press_max,
 		press_min = NEW.press_min, press_avg = NEW.press_avg, quality_max = NEW.quality_max, quality_min = NEW.quality_min, quality_avg = NEW.quality_avg,

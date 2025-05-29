@@ -30,7 +30,7 @@ SELECT * FROM anl_arc WHERE fid=194 AND cur_user=current_user
 DECLARE
 affected_rows numeric;
 v_count integer default 0;
-v_nodeid text;
+v_nodeid integer;
 v_sum integer = 0;
 v_class text;
 v_fid integer;
@@ -118,7 +118,7 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
 	-- set boundary conditions of graph table ONLY FOR WS (flag=1 it means water is disabled to flow)
 	IF v_projectype = 'WS' THEN
 
-		v_text = 'SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id from sector WHERE graphconfig IS NOT NULL';
+		v_text = 'SELECT ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id from sector WHERE graphconfig IS NOT NULL';
 
 		-- close boundary conditions setting flag=1 for all nodes that fits on graph delimiters and closed valves
 		v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
@@ -134,10 +134,10 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
 		-- open boundary conditions set flag=0 for graph delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
 		UPDATE temp_t_anlgraph SET flag=0 WHERE id IN (
 			SELECT id FROM temp_t_anlgraph JOIN (
-			SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id,
+			SELECT ((json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent')::integer AS node_id,
 			json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)
-			as to_arc from sector
-			where graphconfig is not null order by 1,2) a
+			AS to_arc FROM sector
+			WHERE graphconfig IS NOT NULL ORDER BY 1,2) a
 			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 	END IF;
 

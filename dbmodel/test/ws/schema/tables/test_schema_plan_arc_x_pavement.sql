@@ -30,7 +30,7 @@ SELECT col_is_pk('plan_arc_x_pavement', ARRAY['id'], 'Column id should be primar
 
 -- Check column types
 SELECT col_type_is('plan_arc_x_pavement', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('plan_arc_x_pavement', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('plan_arc_x_pavement', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('plan_arc_x_pavement', 'pavcat_id', 'varchar(16)', 'Column pavcat_id should be varchar(16)');
 SELECT col_type_is('plan_arc_x_pavement', 'percent', 'numeric(3,2)', 'Column percent should be numeric(3,2)');
 
@@ -46,4 +46,4 @@ SELECT col_not_null('plan_arc_x_pavement', 'percent', 'Column percent should be 
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

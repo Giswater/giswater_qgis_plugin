@@ -55,15 +55,15 @@ INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, u
 created_at, sector_id, omzone_id, _fluid_type, expl_visibility, epa_type, is_operative, created_by, updated_at,
 updated_by, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
 macrominsector_id, top_elev1, top_elev2, y2, link_type)
-SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
+SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id::integer, feature_type, exit_id::integer, exit_type, userdefined_geom, state, expl_id, the_geom,
 tstamp, sector_id, dma_id, fluid_type, ARRAY[expl_id2], epa_type, is_operative, insert_user, lastupdate, lastupdate_user,
 CASE
   WHEN conneccat_id IS NULL THEN
     CASE
       WHEN feature_type = 'GULLY' THEN
-        (SELECT _connec_arccat_id FROM gully WHERE gully_id = feature_id LIMIT 1)
+        (SELECT _connec_arccat_id FROM gully WHERE gully_id = feature_id::int4 LIMIT 1)
       WHEN feature_type = 'CONNEC' THEN
-        (SELECT conneccat_id FROM connec WHERE connec_id = feature_id LIMIT 1)
+        (SELECT conneccat_id FROM connec WHERE connec_id = feature_id::int4 LIMIT 1)
       ELSE
         'UPDATE_LINK_40'
     END
@@ -72,9 +72,9 @@ END AS conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_i
 macrominsector_id,
 CASE
   WHEN feature_type = 'GULLY' THEN
-    (SELECT g.top_elev FROM gully g WHERE g.gully_id=feature_id LIMIT 1)
+    (SELECT g.top_elev FROM gully g WHERE g.gully_id = feature_id::int4 LIMIT 1)
   WHEN feature_type = 'CONNEC' THEN
-    (SELECT c.top_elev FROM connec c WHERE c.connec_id = feature_id LIMIT 1)
+    (SELECT c.top_elev FROM connec c WHERE c.connec_id = feature_id::int4 LIMIT 1)
   ELSE NULL
 END AS top_elev1, exit_topelev,
 CASE
@@ -99,7 +99,7 @@ WHERE l.feature_id = c.connec_id AND l.feature_type = 'CONNEC' AND l.state = 1;
 UPDATE link l
 SET state_type = g.state_type
 FROM gully g
-WHERE l.feature_id = g.gully_id AND l.feature_type = 'CONNEC' AND l.state = 1;
+WHERE l.feature_id = g.gully_id AND l.feature_type = 'GULLY' AND l.state = 1;
 
 UPDATE link SET state_type = (
   SELECT (value::json->>'plan_statetype_planned')::int2 FROM config_param_system WHERE parameter = 'plan_statetype_vdefault'
@@ -349,47 +349,47 @@ END $func$;
 
 --- WEIR: insert man table
 INSERT INTO ve_frelem_eweir (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, epa_type, node_id, order_id, to_arc, flwreg_length )
-SELECT 'EWEIR-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'WEIR', node_id, order_id, to_arc, flwreg_length
+SELECT 'EWEIR-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'WEIR', n.node_id, order_id, to_arc::int4, flwreg_length
 FROM _inp_frweir
-JOIN node USING (node_id);
+JOIN node n ON n.node_id = _inp_frweir.node_id::int4;
 
 --- WEIR: insert epa table
 INSERT INTO inp_frweir
 SELECT element_id, weir_type, offsetval, cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve
-FROM _inp_frweir w JOIN ve_frelem_eweir r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
+FROM _inp_frweir w JOIN ve_frelem_eweir r ON w.node_id::int4=r.node_id AND w.to_arc::int4 = r.to_arc::int4 AND w.order_id = r.order_id;
 
 --- PUMP: insert man table
 INSERT INTO ve_frelem_epump (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, epa_type, node_id, order_id, to_arc, flwreg_length )
-SELECT 'EPUMP-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'PUMP', node_id, order_id, to_arc, flwreg_length
+SELECT 'EPUMP-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'PUMP', n.node_id, order_id, to_arc::int4, flwreg_length
 FROM _inp_frpump
-JOIN node USING (node_id);
+JOIN node n ON n.node_id = _inp_frpump.node_id::int4;
 
 --- PUMP: insert epa table
 INSERT INTO inp_frpump (element_id, curve_id, status, startup, shutoff)
 SELECT element_id, curve_id, status, startup, shutoff
-FROM _inp_frpump w JOIN ve_frelem_epump r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
+FROM _inp_frpump w JOIN ve_frelem_epump r ON w.node_id::int4=r.node_id AND w.to_arc::int4 = r.to_arc::int4 AND w.order_id = r.order_id;
 
 --- ORIFICE: insert man table
 INSERT INTO ve_frelem_eorifice (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, epa_type, node_id, order_id, to_arc, flwreg_length )
-SELECT 'EORIFICE-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'ORIFICE', node_id, order_id, to_arc, flwreg_length
+SELECT 'EORIFICE-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'ORIFICE', n.node_id, order_id, to_arc::int4, flwreg_length
 FROM _inp_frorifice
-JOIN node USING (node_id);
+JOIN node n ON n.node_id = _inp_frorifice.node_id::int4;
 
 --- ORIFICE: insert epa table
 INSERT INTO inp_frorifice
 SELECT element_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4
-FROM _inp_frorifice w JOIN ve_frelem_eorifice r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
+FROM _inp_frorifice w JOIN ve_frelem_eorifice r ON w.node_id::int4=r.node_id AND w.to_arc::int4 = r.to_arc::int4 AND w.order_id = r.order_id;
 
 --- OUTLET: insert man table
 INSERT INTO ve_frelem_eoutlet (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, epa_type, node_id, order_id, to_arc, flwreg_length )
-SELECT 'EOUTLET-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'OUTLET', node_id, order_id, to_arc, flwreg_length
+SELECT 'EOUTLET-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'OUTLET', n.node_id, order_id, to_arc::int4, flwreg_length
 FROM _inp_froutlet
-JOIN node USING (node_id);
+JOIN node n ON n.node_id = _inp_froutlet.node_id::int4;
 
 --- OUTLET: insert epa table
 INSERT INTO inp_froutlet
 SELECT element_id, outlet_type, offsetval, curve_id, cd1, cd2, flap
-FROM _inp_froutlet w JOIN ve_frelem_eoutlet r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
+FROM _inp_froutlet w JOIN ve_frelem_eoutlet r ON w.node_id::int4=r.node_id AND w.to_arc::int4 = r.to_arc::int4 AND w.order_id = r.order_id;
 
 INSERT INTO element_x_node
 SELECT element_id, node_id FROM man_frelem;
@@ -905,8 +905,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_ui_macroomzone', 'form_feature', 'tab_none', 'lock_level', 'lyt_data_1', 7, 'integer', 'combo', 'lock_level', 'lock_level', NULL, false, false, true, false, NULL, 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level'' AND id IS NOT NULL', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
 -- 06/05/2025
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active)
-VALUES(644, 'Gully which id is not an integer', 'ud', NULL, 'core', true, 'Check om-data', NULL, 3, 'gully which id is not an integer. Please, check your data before continue', NULL, NULL, 'SELECT CASE WHEN gully_id~E''^\\d+$'' THEN CAST (gully_id AS INTEGER)  ELSE 0 END  as feature_id, ''GULLY'' as type, gullycat_id, expl_id FROM t_gully', 'All gullies features with id integer.', '[gw_fct_om_check_data, gw_fct_admin_check_data]', true);
+-- TODO: revise if this is needed
+-- INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active)
+-- VALUES(644, 'Gully which id is not an integer', 'ud', NULL, 'core', true, 'Check om-data', NULL, 3, 'gully which id is not an integer. Please, check your data before continue', NULL, NULL, 'SELECT CASE WHEN gully_id~E''^\\d+$'' THEN CAST (gully_id AS INTEGER)  ELSE 0 END  as feature_id, ''GULLY'' as type, gullycat_id, expl_id FROM t_gully', 'All gullies features with id integer.', '[gw_fct_om_check_data, gw_fct_admin_check_data]', true);
 
 UPDATE config_form_fields SET widgetcontrols='{
   "setMultiline": false,
@@ -942,7 +943,7 @@ UPDATE config_csv SET descript='Function to assist the import of timeseries for 
 INSERT INTO inp_subcatchment (subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay,
 drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript, nperv_pattern_id, dstore_pattern_id, infil_pattern_id,
 minelev, muni_id)
-SELECT subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay,
+SELECT subc_id, outlet_id::int4, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay,
 drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript, nperv_pattern_id, dstore_pattern_id, infil_pattern_id,
 minelev, muni_id
 FROM _inp_subcatchment;

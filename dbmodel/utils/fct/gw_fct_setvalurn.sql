@@ -12,37 +12,39 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setvalurn()
   RETURNS int8 AS
 $BODY$
 
-DECLARE 
+DECLARE
 
 v_max int8;
 v_projecttype text;
 
-BEGIN 
+BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	--urn
 	IF v_projecttype='WS' THEN
 		SELECT GREATEST (
-		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
-		(SELECT max(arc_id::int8) FROM arc WHERE arc_id ~ '^\d+$'),
-		(SELECT max(connec_id::int8) FROM connec WHERE connec_id ~ '^\d+$'),
-		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
-		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
+		(SELECT max(node_id::int8) FROM node),
+		(SELECT max(arc_id::int8) FROM arc),
+		(SELECT max(connec_id::int8) FROM connec),
+		(SELECT max(link_id::int8) FROM link),
+		(SELECT max(element_id::int8) FROM element),
+		(SELECT max(pol_id::int8) FROM polygon)
 		) INTO v_max;
 	ELSIF v_projecttype='UD' THEN
 		SELECT GREATEST (
-		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
-		(SELECT max(arc_id::int8) FROM arc WHERE arc_id ~ '^\d+$'),
-		(SELECT max(connec_id::int8) FROM connec WHERE connec_id ~ '^\d+$'),
-		(SELECT max(gully_id::int8) FROM gully WHERE gully_id ~ '^\d+$'),
-		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
-		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
+		(SELECT max(node_id::int8) FROM node),
+		(SELECT max(arc_id::int8) FROM arc),
+		(SELECT max(connec_id::int8) FROM connec),
+		(SELECT max(link_id::int8) FROM link),
+		(SELECT max(gully_id::int8) FROM gully),
+		(SELECT max(element_id::int8) FROM element),
+		(SELECT max(pol_id::int8) FROM polygon)
 		) INTO v_max;
-	END IF;	
-	
+	END IF;
+
 return v_max;
 END;
 

@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_node_shutoff_valve', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_node_shutoff_valve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_node_shutoff_valve', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_node_shutoff_valve', 'shtvalve_param_1', 'text', 'Column shtvalve_param_1 should be text');
 SELECT col_type_is('man_node_shutoff_valve', 'shtvalve_param_2', 'text', 'Column shtvalve_param_2 should be text');
 

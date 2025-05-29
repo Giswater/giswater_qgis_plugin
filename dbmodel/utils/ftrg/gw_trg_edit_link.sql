@@ -53,7 +53,7 @@ v_vnode record;
 v_link_searchbuffer double precision = 0.01;
 v_count integer;
 v_node_id integer;
-v_arc_id text;
+v_arc_id integer;
 v_userdefined_geom boolean;
 v_end_state integer;
 v_init_state integer;

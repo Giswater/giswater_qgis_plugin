@@ -25,10 +25,10 @@ SELECT SCHEMA_NAME.gw_fct_setmapzoneconfig($${"client":{"device":4, "infoType":1
 
 DECLARE
 
-v_node_id_old text;
-v_node_id_new text;
-v_arc_id_old text;
-v_arc_id_new text;
+v_node_id_old integer;
+v_node_id_new integer;
+v_arc_id_old integer;
+v_arc_id_new integer;
 v_version  text;
 v_mapzone_old text;
 v_mapzone_new text;
@@ -90,8 +90,8 @@ BEGIN
 			END LOOP;
 
 			-- man values
-			UPDATE man_pump SET to_arc = v_arc_id_new::int4 WHERE to_arc::text = v_arc_id_old AND node_id = v_node_id_old;
-			UPDATE man_valve SET to_arc = v_arc_id_new::int4 WHERE to_arc::text = v_arc_id_old AND node_id = v_node_id_old;
+			UPDATE man_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+			UPDATE man_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 
 		ELSIF _project_type = 'UD' THEN
 

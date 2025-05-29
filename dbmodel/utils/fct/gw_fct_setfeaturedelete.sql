@@ -43,8 +43,8 @@ DECLARE
 
 v_version json;
 v_feature_type text;
-v_feature_id text;
-v_arc_id TEXT;
+v_feature_id integer;
+v_arc_id text;
 v_project_type text;
 v_result_id text= 'delete feature';
 v_result_info text;
@@ -79,9 +79,9 @@ BEGIN
 
  	--get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
-	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
+	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::integer;
 
-	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''''
+	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_featurecat;
 	v_feature_childview_name := 've_' || v_feature_type || '_' || lower(v_featurecat);
 
@@ -91,37 +91,37 @@ BEGIN
 	END IF;
 
 	--check and remove elements related to feature
-	EXECUTE 'SELECT count(*) FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''''
+	EXECUTE 'SELECT count(*) FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_count;
 
 	IF v_count > 0 THEN
-		EXECUTE 'DELETE FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
+		EXECUTE 'DELETE FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||';';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3436", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	END IF;
 
 	--check and remove visits related to feature
-	EXECUTE 'SELECT count(*) FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''''
+	EXECUTE 'SELECT count(*) FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_count;
 
 	IF v_count > 0 THEN
-		EXECUTE 'DELETE FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
+		EXECUTE 'DELETE FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||';';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3438", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	END IF;
 
 	--check and remove docs related to feature
-	EXECUTE 'SELECT count(*) FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''''
+	EXECUTE 'SELECT count(*) FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_count;
 
 	IF v_count > 0 THEN
-		EXECUTE 'DELETE FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
+		EXECUTE 'DELETE FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||';';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3482", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	END IF;
 
 	--update position_id related to node
-	EXECUTE 'SELECT count(*) FROM om_visit_event where position_id = '''||v_feature_id||''''
+	EXECUTE 'SELECT count(*) FROM om_visit_event where position_id = '''||v_feature_id||''';'
 	INTO v_count;
 
 	IF v_count > 0 THEN
@@ -132,74 +132,74 @@ BEGIN
 
 		IF v_project_type = 'WS' THEN
 			--remove scada related to node
-			EXECUTE 'SELECT count(*) FROM ext_rtc_scada where node_id = '''||v_feature_id||''''
+			EXECUTE 'SELECT count(*) FROM ext_rtc_scada where node_id = '||v_feature_id||''
 			INTO v_count;
 
 			IF v_count > 0 THEN
-				EXECUTE 'DELETE FROM ext_rtc_scada where node_id = '''||v_feature_id||''';';
+				EXECUTE 'DELETE FROM ext_rtc_scada where node_id = '||v_feature_id||';';
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3484", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 		END IF;
 
 		--remove link related to node
-		EXECUTE 'SELECT count(*) FROM v_edit_link where exit_type=''NODE'' and exit_id = '''||v_feature_id||''''
+		EXECUTE 'SELECT count(*) FROM v_edit_link where exit_type=''NODE'' and exit_id = '||v_feature_id||''
 		INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE 'DELETE FROM v_edit_link WHERE exit_type=''NODE'' and exit_id = '''||v_feature_id||''';';
+			EXECUTE 'DELETE FROM v_edit_link WHERE exit_type=''NODE'' and exit_id = '||v_feature_id||';';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3486", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--remove parent related to node
 		IF v_project_type = 'WS' THEN
-			EXECUTE 'SELECT parent_id FROM node where parent_id IS NOT NULL AND node_id = '''||v_feature_id||''''
+			EXECUTE 'SELECT parent_id FROM node where parent_id IS NOT NULL AND node_id = '||v_feature_id||''
 			into v_related_id;
 
 			IF v_related_id IS NOT NULL THEN
-				EXECUTE 'UPDATE node SET parent_id=NULL WHERE node_id = '''||v_feature_id||''';';
+				EXECUTE 'UPDATE node SET parent_id=NULL WHERE node_id = '||v_feature_id||';';
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3488", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 		END IF;
 
 		--delete related polygon
-		EXECUTE 'SELECT pol_id FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';'
+		EXECUTE 'SELECT pol_id FROM polygon WHERE feature_id = '||v_feature_id||' AND featurecat_id = '''||v_featurecat||''';'
 		into v_related_id;
 
 		IF v_related_id IS NOT NULL THEN
-			 	EXECUTE 'DELETE FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';';
+			 	EXECUTE 'DELETE FROM polygon WHERE feature_id = '||v_feature_id||' AND featurecat_id = '''||v_featurecat||''';';
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3490", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 
 		--find if there is an arc related to node
-		SELECT string_agg(arc.arc_id,',')  INTO v_arc_id FROM arc
-		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
-     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text
+		SELECT array_agg(arc.arc_id)  INTO v_arc_id FROM arc
+		LEFT JOIN node a ON a.node_id = arc.node_1
+     	LEFT JOIN node b ON b.node_id = arc.node_2
      	WHERE  (node_1 = v_feature_id OR node_2 = v_feature_id);
 
 		IF v_arc_id IS NULL THEN
 			--delete node
-			EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE node_id='''||v_feature_id||''';';
+			EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE node_id='||v_feature_id||';';
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3492", "function":"2736", "parameters":{"v_feature_id":"'||v_feature_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		ELSE
 			--set final nodes to NULL and delete node
 			IF v_project_type = 'WS' THEN
-				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, elevation1=NULL, depth1=NULL, staticpress1 = NULL WHERE node_1='''||v_feature_id||''';';
-				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, elevation2=NULL, depth2=NULL, staticpress2 = NULL WHERE node_2='''||v_feature_id||''';';
+				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, elevation1=NULL, depth1=NULL, staticpress1 = NULL WHERE node_1='||v_feature_id||';';
+				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, elevation2=NULL, depth2=NULL, staticpress2 = NULL WHERE node_2='||v_feature_id||';';
 			ELSE
-				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, node_sys_top_elev_1=NULL, node_sys_elev_1=NULL WHERE node_1='''||v_feature_id||''';';
-				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, node_sys_top_elev_2=NULL, node_sys_elev_2=NULL WHERE node_2='''||v_feature_id||''';';
+				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, node_sys_top_elev_1=NULL, node_sys_elev_1=NULL WHERE node_1='||v_feature_id||';';
+				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, node_sys_top_elev_2=NULL, node_sys_elev_2=NULL WHERE node_2='||v_feature_id||';';
 			END IF;
-			EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE node_id='''||v_feature_id||''';';
+			EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE node_id='||v_feature_id||';';
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3494", "function":"2736", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
-		
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3492", "function":"2736", "parameters":{"v_feature_id":"'||v_feature_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
@@ -208,33 +208,33 @@ BEGIN
 	ELSIF v_feature_type='arc' THEN
 		--remove links related to arc
 		EXECUTE 'SELECT count(*) FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN 
-		(SELECT connec_id FROM connec  WHERE connec.arc_id='''||v_feature_id||''');'
+		(SELECT connec_id FROM connec  WHERE connec.arc_id='||v_feature_id||');'
 		INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN (SELECT connec_id FROM connec  WHERE connec.arc_id='''||v_feature_id||''');';
+			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN (SELECT connec_id FROM connec  WHERE connec.arc_id='||v_feature_id||');';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3496", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--set arc_id to null if there are connecs related
-		EXECUTE 'SELECT string_agg(connec_id,'','') FROM connec WHERE arc_id='''||v_feature_id||''''
+		EXECUTE 'SELECT string_agg(connec_id,'','') FROM connec WHERE arc_id='||v_feature_id||''
 		INTO v_related_id;
 
 		IF v_related_id IS NOT NULL THEN
-			EXECUTE 'UPDATE connec SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
+			EXECUTE 'UPDATE connec SET arc_id=NULL WHERE arc_id='||v_feature_id||';';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3498", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';			
+                       "data":{"message":"3498", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--set arc_id to null if there are nodes related
-		EXECUTE 'SELECT string_agg(node_id,'','') FROM node WHERE arc_id='''||v_feature_id||''''
+		EXECUTE 'SELECT string_agg(node_id,'','') FROM node WHERE arc_id='||v_feature_id||''
 		INTO v_related_id;
 
 		IF v_related_id IS NOT NULL THEN
-			EXECUTE 'UPDATE node SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
+			EXECUTE 'UPDATE node SET arc_id=NULL WHERE arc_id='||v_feature_id||';';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3500", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';	
+                       "data":{"message":"3500", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--set arc_id to null if there are gullies related
@@ -242,36 +242,36 @@ BEGIN
 
 			--remove links related to arc
 			EXECUTE 'SELECT count(*) FROM v_edit_link WHERE feature_type=''GULLY'' AND feature_id IN 
-			(SELECT gully_id FROM gully  WHERE gully.arc_id='''||v_feature_id||''');'
+			(SELECT gully_id FROM gully  WHERE gully.arc_id='||v_feature_id||');'
 			INTO v_count;
 
 			IF v_count > 0 THEN
-				EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''GULLY'' AND feature_id IN (SELECT gully_id FROM gully  WHERE gully.arc_id='''||v_feature_id||''');';
+				EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''GULLY'' AND feature_id IN (SELECT gully_id FROM gully  WHERE gully.arc_id='||v_feature_id||');';
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3502", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';	
+                       "data":{"message":"3502", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 
-			EXECUTE 'SELECT string_agg(gully_id,'','') FROM gully WHERE arc_id='''||v_feature_id||''''
+			EXECUTE 'SELECT string_agg(gully_id,'','') FROM gully WHERE arc_id='||v_feature_id||''
 			INTO v_related_id;
 
-			EXECUTE'UPDATE gully SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
+			EXECUTE'UPDATE gully SET arc_id=NULL WHERE arc_id='||v_feature_id||';';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3504", "function":"2736", "parameters":{"v_related_id":"'||quote_nullable(v_related_id)||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';	
+                       "data":{"message":"3504", "function":"2736", "parameters":{"v_related_id":"'||quote_nullable(v_related_id)||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--delete arc
-		EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE arc_id='''||v_feature_id||''';';
+		EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE arc_id='||v_feature_id||';';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3508", "function":"2736", "parameters":{"v_feature_id":"'||v_feature_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 	ELSIF  v_feature_type='connec' OR v_feature_type='gully' THEN
 
 		--check related polygon
-		EXECUTE 'SELECT pol_id FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';'
+		EXECUTE 'SELECT pol_id FROM polygon WHERE feature_id = '||v_feature_id||' AND featurecat_id = '''||v_featurecat||''';'
 		into v_related_id;
 
 		IF v_related_id IS NOT NULL THEN
-			 	EXECUTE 'DELETE FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';';
+			 	EXECUTE 'DELETE FROM polygon WHERE feature_id = '||v_feature_id||' AND featurecat_id = '''||v_featurecat||''';';
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3506", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
@@ -279,18 +279,18 @@ BEGIN
 
 		--remove links related to connec/gully
 		IF v_feature_type='connec' THEN
-			EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where (exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text)
-			OR  (feature_type=''CONNEC''  AND  feature_id = '''||v_feature_id||'''::text)'
+			EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where (exit_type=''CONNEC''  AND  exit_id = '||v_feature_id||')
+			OR  (feature_type=''CONNEC''  AND  feature_id = '||v_feature_id||')'
 			INTO v_related_id;
 		ELSIF v_feature_type = 'gully' THEN
-			EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '''||v_feature_id||'''::text
-			OR  (feature_type=''GULLY''  AND  feature_id = '''||v_feature_id||'''::text)'
+			EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '||v_feature_id||'
+			OR  (feature_type=''GULLY''  AND  feature_id = '||v_feature_id||')'
 			INTO v_related_id;
 		END IF;
 
 		IF v_related_id IS NOT NULL THEN
-			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND feature_id ='''||v_feature_id||''';';
-	  		EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND exit_id ='''||v_feature_id||''';';
+			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND feature_id ='||v_feature_id||';';
+	  		EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND exit_id ='||v_feature_id||';';
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3510", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
@@ -299,7 +299,7 @@ BEGIN
 		END IF;
 
 		--delete feature
-		EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE '||v_feature_type||'_id='''||v_feature_id||''';';
+		EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE '||v_feature_type||'_id='||v_feature_id||';';
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3512", "function":"2736", "parameters":{"v_feature_type":"'||v_feature_type||'", "v_feature_id":"'||v_feature_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
@@ -310,7 +310,7 @@ BEGIN
 	v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_featurecat);
 
 	IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN
-        EXECUTE 'DELETE FROM '||v_feature_childtable_name||' WHERE '||concat(v_feature_type,'_id')||'='||quote_literal(v_feature_id)||';';
+        EXECUTE 'DELETE FROM '||v_feature_childtable_name||' WHERE '||concat(v_feature_type,'_id')||'='||v_feature_id||';';
     END IF;
 
  	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;

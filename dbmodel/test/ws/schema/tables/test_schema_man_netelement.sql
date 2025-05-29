@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_netelement', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_netelement', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_netelement', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_netelement', 'automated', 'boolean', 'Column automated should be boolean');
 SELECT col_type_is('man_netelement', 'fence_type', 'integer', 'Column fence_type should be integer');
 

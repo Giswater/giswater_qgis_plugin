@@ -20,14 +20,14 @@ SELECT has_table('plan_rec_result_arc'::name, 'Table plan_rec_result_arc should 
 SELECT columns_are(
     'plan_rec_result_arc',
     ARRAY[
-        'result_id', 'arc_id', 'node_1', 'node_2', 'arc_type', 'arccat_id', 'epa_type', 'sector_id', 
-        'state', 'annotation', 'soilcat_id', 'y1', 'y2', 'mean_y', 'z1', 'z2', 'thickness', 
-        'width', 'b', 'bulk', 'geom1', 'area', 'y_param', 'total_y', 'rec_y', 'geom1_ext', 
-        'calculed_y', 'm3mlexc', 'm2mltrenchl', 'm2mlbottom', 'm2mlpav', 'm3mlprotec', 'm3mlfill', 
-        'm3mlexcess', 'm3exc_cost', 'm2trenchl_cost', 'm2bottom_cost', 'm2pav_cost', 'm3protec_cost', 
-        'm3fill_cost', 'm3excess_cost', 'cost_unit', 'pav_cost', 'exc_cost', 'trenchl_cost', 
-        'base_cost', 'protec_cost', 'fill_cost', 'excess_cost', 'arc_cost', 'cost', 'length', 
-        'budget', 'other_budget', 'total_budget', 'the_geom', 'expl_id', 'builtcost', 'builtdate', 
+        'result_id', 'arc_id', 'node_1', 'node_2', 'arc_type', 'arccat_id', 'epa_type', 'sector_id',
+        'state', 'annotation', 'soilcat_id', 'y1', 'y2', 'mean_y', 'z1', 'z2', 'thickness',
+        'width', 'b', 'bulk', 'geom1', 'area', 'y_param', 'total_y', 'rec_y', 'geom1_ext',
+        'calculed_y', 'm3mlexc', 'm2mltrenchl', 'm2mlbottom', 'm2mlpav', 'm3mlprotec', 'm3mlfill',
+        'm3mlexcess', 'm3exc_cost', 'm2trenchl_cost', 'm2bottom_cost', 'm2pav_cost', 'm3protec_cost',
+        'm3fill_cost', 'm3excess_cost', 'cost_unit', 'pav_cost', 'exc_cost', 'trenchl_cost',
+        'base_cost', 'protec_cost', 'fill_cost', 'excess_cost', 'arc_cost', 'cost', 'length',
+        'budget', 'other_budget', 'total_budget', 'the_geom', 'expl_id', 'builtcost', 'builtdate',
         'age', 'acoeff', 'aperiod', 'arate', 'amortized', 'pending'
     ],
     'Table plan_rec_result_arc should have the correct columns'
@@ -38,9 +38,9 @@ SELECT col_is_pk('plan_rec_result_arc', ARRAY['arc_id', 'result_id'], 'Columns a
 
 -- Check column types (a representative sample)
 SELECT col_type_is('plan_rec_result_arc', 'result_id', 'integer', 'Column result_id should be integer');
-SELECT col_type_is('plan_rec_result_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
-SELECT col_type_is('plan_rec_result_arc', 'node_1', 'character varying(16)', 'Column node_1 should be character varying(16)');
-SELECT col_type_is('plan_rec_result_arc', 'node_2', 'character varying(16)', 'Column node_2 should be character varying(16)');
+SELECT col_type_is('plan_rec_result_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
+SELECT col_type_is('plan_rec_result_arc', 'node_1', 'integer', 'Column node_1 should be integer');
+SELECT col_type_is('plan_rec_result_arc', 'node_2', 'integer', 'Column node_2 should be integer');
 SELECT col_type_is('plan_rec_result_arc', 'arc_type', 'character varying(18)', 'Column arc_type should be character varying(18)');
 SELECT col_type_is('plan_rec_result_arc', 'arccat_id', 'character varying(30)', 'Column arccat_id should be character varying(30)');
 SELECT col_type_is('plan_rec_result_arc', 'cost', 'numeric(12,2)', 'Column cost should be numeric(12,2)');
@@ -60,4 +60,4 @@ SELECT col_not_null('plan_rec_result_arc', 'arc_id', 'Column arc_id should be NO
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

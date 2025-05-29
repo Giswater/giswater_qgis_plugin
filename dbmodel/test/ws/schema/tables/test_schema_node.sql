@@ -41,7 +41,7 @@ SELECT columns_are(
 SELECT col_is_pk('node', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types and defaults
-SELECT col_type_is('node', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('node', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_has_default('node', 'node_id', 'Column node_id should have a default value');
 SELECT col_type_is('node', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_default_is('node', 'feature_type', 'NODE', 'Column feature_type should default to NODE');

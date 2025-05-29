@@ -21,9 +21,9 @@ SELECT SCHEMA_NAME.gw_fct_setfeaturereplaceplan($${"client":{"device":4, "infoTy
 DECLARE
 v_version text;
 v_feature text;
-v_id text;
+v_id integer;
 v_catalog text;
-v_arc text;
+v_arc integer;
 
 rec record;
 
@@ -37,7 +37,7 @@ v_count integer ;
 v_result text;
 v_result_info text;
 v_feature_text text;
-v_feature_array text[];
+v_feature_array integer[];
 i integer = 0;
 v_project_type text;
 v_arc_type text;
@@ -69,10 +69,10 @@ BEGIN
 
 	-- get values from feature array
 	IF v_feature_text ILIKE '[%]' THEN
-		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json));
+		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json)::integer);
 	ELSE
 		EXECUTE v_feature_text INTO v_feature_text;
-		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json));
+		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json)::integer);
 	END IF;
 
 

@@ -30,7 +30,7 @@ SELECT col_is_pk('plan_netscenario_connec', ARRAY['netscenario_id', 'connec_id']
 
 -- Check column types
 SELECT col_type_is('plan_netscenario_connec', 'netscenario_id', 'integer', 'Column netscenario_id should be integer');
-SELECT col_type_is('plan_netscenario_connec', 'connec_id', 'character varying(16)', 'Column connec_id should be character varying(16)');
+SELECT col_type_is('plan_netscenario_connec', 'connec_id', 'integer', 'Column connec_id should be integer');
 SELECT col_type_is('plan_netscenario_connec', 'presszone_id', 'integer', 'Column presszone_id should be integer');
 SELECT col_type_is('plan_netscenario_connec', 'staticpressure', 'numeric(12,3)', 'Column staticpressure should be numeric(12,3)');
 SELECT col_type_is('plan_netscenario_connec', 'dma_id', 'integer', 'Column dma_id should be integer');
@@ -53,4 +53,4 @@ SELECT has_index('plan_netscenario_connec', 'plan_netscenario_connec_presszone_i
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

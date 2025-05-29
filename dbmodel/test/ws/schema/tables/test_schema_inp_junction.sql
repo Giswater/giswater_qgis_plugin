@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('inp_junction', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('inp_junction', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_junction', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_junction', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
 SELECT col_type_is('inp_junction', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 SELECT col_type_is('inp_junction', 'peak_factor', 'numeric(12,4)', 'Column peak_factor should be numeric(12,4)');

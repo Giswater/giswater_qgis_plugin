@@ -29,8 +29,8 @@ SELECT columns_are(
 SELECT col_is_pk('element_x_node', ARRAY['element_id', 'node_id'], 'Columns element_id and node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('element_x_node', 'element_id', 'varchar(16)', 'Column element_id should be varchar(16)');
-SELECT col_type_is('element_x_node', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('element_x_node', 'element_id', 'integer', 'Column element_id should be integer');
+SELECT col_type_is('element_x_node', 'node_id', 'integer', 'Column node_id should be integer');
 
 -- Check foreign keys
 SELECT has_fk('element_x_node', 'Table element_x_node should have foreign keys');

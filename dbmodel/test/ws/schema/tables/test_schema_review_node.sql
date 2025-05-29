@@ -20,7 +20,7 @@ SELECT has_table('review_node'::name, 'Table review_node should exist');
 SELECT columns_are(
     'review_node',
     ARRAY[
-        'node_id', 'top_elev', 'depth', 'nodecat_id', 'annotation', 'observ', 'review_obs', 
+        'node_id', 'top_elev', 'depth', 'nodecat_id', 'annotation', 'observ', 'review_obs',
         'expl_id', 'the_geom', 'field_checked', 'is_validated', 'field_date'
     ],
     'Table review_node should have the correct columns'
@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('review_node', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('review_node', 'node_id', 'character varying(16)', 'Column node_id should be character varying(16)');
+SELECT col_type_is('review_node', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('review_node', 'top_elev', 'numeric(12,3)', 'Column top_elev should be numeric(12,3)');
 SELECT col_type_is('review_node', 'depth', 'numeric(12,3)', 'Column depth should be numeric(12,3)');
 SELECT col_type_is('review_node', 'nodecat_id', 'character varying(30)', 'Column nodecat_id should be character varying(30)');
@@ -48,4 +48,4 @@ SELECT col_not_null('review_node', 'node_id', 'Column node_id should be NOT NULL
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

@@ -16,10 +16,7 @@ DECLARE
 
 rec_virtual record;
 rec_arc record;
-arc_id_aux varchar;
-node_id1_aux varchar;
-node_id2_aux varchar;
-fusion_node_aux varchar;
+fusion_node_aux integer;
 add_length_bool boolean;
 length_aux float;
 pointArray1 geometry[];
@@ -41,7 +38,7 @@ BEGIN
 		SELECT fusion_node, add_length INTO fusion_node_aux, add_length_bool FROM inp_virtual WHERE arc_id=rec_virtual.arc_id;
 
 		IF fusion_node_aux IS NULL THEN
-			fusion_node_aux:=(SELECT node_id FROM temp_t_node WHERE (node_id=rec_virtual.node_1 AND node_type='JUNCTION') 
+			fusion_node_aux:=(SELECT node_id FROM temp_t_node WHERE (node_id=rec_virtual.node_1 AND node_type='JUNCTION')
 							  OR (node_id=rec_virtual.node_2 AND node_type='JUNCTION') LIMIT 1);
 		END IF;
 
@@ -55,14 +52,14 @@ BEGIN
 			ELSE
 				length_aux=0;
 			END IF;
-	
+
 			-- Making new geometry
 			pointArray1 := ARRAY(SELECT (ST_DumpPoints(rec_virtual.the_geom)).geom);
 			pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(rec_arc.the_geom)).geom));
 			new_arc_geom := ST_MakeLine(pointArray2);
-	
-		
-			-- Deleting features 
+
+
+			-- Deleting features
 			DELETE FROM temp_t_node WHERE node_id=rec_virtual.node_2;
 			DELETE FROM temp_t_arc WHERE arc_id=rec_virtual.arc_id;
 
@@ -70,24 +67,24 @@ BEGIN
 			UPDATE temp_t_arc SET node_1=rec_virtual.node_1, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id;
 
 		END LOOP;
-		
+
 		-- Taking values from the fusion node (as node2)
 		FOR rec_arc IN SELECT * FROM temp_t_arc WHERE node_2=rec_virtual.node_1 AND node_2=fusion_node_aux
 		LOOP
-	
+
 			-- Looking for add or not the length of virtual arc to the destination arc
 			IF add_length_bool IS TRUE THEN
 				length_aux=st_length2d(rec_virtual.the_geom);
 			ELSE
 				length_aux=0;
 			END IF;
-	
+
 			-- Making new geometry
 			pointArray1 := ARRAY(SELECT (ST_DumpPoints(rec_virtual.the_geom)).geom);
 			pointArray2 := array_cat(ARRAY(SELECT (ST_DumpPoints(rec_arc.the_geom)).geom),pointArray1);
 			new_arc_geom := ST_MakeLine(pointArray2);
-	
-			-- Deleting features 
+
+			-- Deleting features
 			DELETE FROM temp_t_node WHERE node_id=rec_virtual.node_1;
 			DELETE FROM temp_t_arc WHERE arc_id=rec_virtual.arc_id;
 
@@ -99,7 +96,7 @@ BEGIN
 	END LOOP;
 
     RETURN 1;
-		
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

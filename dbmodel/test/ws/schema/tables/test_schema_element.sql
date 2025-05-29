@@ -35,7 +35,7 @@ SELECT columns_are(
 SELECT col_is_pk('element', ARRAY['element_id'], 'Column element_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('element', 'element_id', 'varchar(16)', 'Column element_id should be varchar(16)');
+SELECT col_type_is('element', 'element_id', 'integer', 'Column element_id should be integer');
 SELECT col_type_is('element', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('element', 'sys_code', 'text', 'Column sys_code should be text');
 SELECT col_type_is('element', 'elementcat_id', 'varchar(30)', 'Column elementcat_id should be varchar(30)');

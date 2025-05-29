@@ -20,7 +20,7 @@ SELECT has_table('review_arc'::name, 'Table review_arc should exist');
 SELECT columns_are(
     'review_arc',
     ARRAY[
-        'arc_id', 'arccat_id', 'annotation', 'observ', 'review_obs', 'expl_id', 
+        'arc_id', 'arccat_id', 'annotation', 'observ', 'review_obs', 'expl_id',
         'the_geom', 'field_checked', 'is_validated', 'field_date'
     ],
     'Table review_arc should have the correct columns'
@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('review_arc', ARRAY['arc_id'], 'Column arc_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('review_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
+SELECT col_type_is('review_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('review_arc', 'arccat_id', 'character varying(30)', 'Column arccat_id should be character varying(30)');
 SELECT col_type_is('review_arc', 'annotation', 'text', 'Column annotation should be text');
 SELECT col_type_is('review_arc', 'observ', 'text', 'Column observ should be text');
@@ -46,4 +46,4 @@ SELECT col_not_null('review_arc', 'arc_id', 'Column arc_id should be NOT NULL');
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

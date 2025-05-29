@@ -30,7 +30,7 @@ SELECT col_is_pk('rtc_hydrometer_x_node', ARRAY['hydrometer_id'], 'Column hydrom
 
 -- Check column types
 SELECT col_type_is('rtc_hydrometer_x_node', 'hydrometer_id', 'character varying(16)', 'Column hydrometer_id should be character varying(16)');
-SELECT col_type_is('rtc_hydrometer_x_node', 'node_id', 'character varying(16)', 'Column node_id should be character varying(16)');
+SELECT col_type_is('rtc_hydrometer_x_node', 'node_id', 'integer', 'Column node_id should be integer');
 
 -- Check constraints
 SELECT col_not_null('rtc_hydrometer_x_node', 'hydrometer_id', 'Column hydrometer_id should be NOT NULL');
@@ -46,4 +46,4 @@ SELECT has_index('rtc_hydrometer_x_node', 'rtc_hydrometer_x_node_index_node_id',
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

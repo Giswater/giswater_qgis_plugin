@@ -27,7 +27,7 @@ v_node text;
 v_feature_type text;
 v_childlayer text;
 v_project_type text;
-v_id text;
+v_id integer;
 v_presszone text;
 
 BEGIN
@@ -69,8 +69,8 @@ BEGIN
 
 		-- building querytext
 		v_querytext := (v_record::json->>'query');
-		v_querytext := v_querytext ||' WHERE t.'||v_feature_type ||'_id = '||v_id||'::text
-		AND s.'||v_feature_type ||'_id = '||v_id||'::text';
+		v_querytext := v_querytext ||' WHERE t.'||v_feature_type ||'_id = '||v_id||'
+		AND s.'||v_feature_type ||'_id = '||v_id||'';
 
 		EXECUTE v_querytext;
 	END IF;
@@ -92,7 +92,7 @@ BEGIN
 
 		-- building querytext
 		v_querytext := (v_record::json->>'query');
-		v_querytext := v_querytext ||' WHERE t.presszone_id = '||v_presszone||' AND node_id::integer = '||v_id;
+		v_querytext := v_querytext ||' WHERE t.presszone_id = '||v_presszone||' AND node_id = '||v_id;
 
 		EXECUTE v_querytext;
 	END IF;

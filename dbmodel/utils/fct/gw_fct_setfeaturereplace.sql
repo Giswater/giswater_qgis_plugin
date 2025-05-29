@@ -52,7 +52,7 @@ v_epa_table varchar;
 v_epa_table_new varchar;
 v_code text;
 v_id int8;
-v_old_id varchar;
+v_old_id integer;
 v_workcat_id_end varchar;
 v_enddate date;
 v_keep_elements boolean;
@@ -135,7 +135,7 @@ BEGIN
 	-- get input parameters
 
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
-	v_old_id = ((p_data ->>'data')::json->>'old_feature_id')::text;
+	v_old_id = ((p_data ->>'data')::json->>'old_feature_id')::integer;
 	v_workcat_id_end = ((p_data ->>'data')::json->>'workcat_id_end')::text;
 	v_enddate = ((p_data ->>'data')::json->>'enddate')::text;
 	v_keep_elements = ((p_data ->>'data')::json->>'keep_elements')::text;
@@ -513,7 +513,7 @@ BEGIN
 				
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3314", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
-                      
+
 			END LOOP;
 
 			FOR rec_connec IN SELECT connec_id FROM connec WHERE pjoint_id = v_old_id AND  pjoint_type = 'NODE'
@@ -575,7 +575,7 @@ BEGIN
 			
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3298", "function":"2714", "parameters":{"v_count":"'||quote_nullable(v_count)||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
-		
+
 
 		END IF;
 
@@ -663,7 +663,7 @@ BEGIN
 		INSERT INTO audit_log_data (fid, feature_type,feature_id, log_message)
 		SELECT v_fid, 'ARC', arc_id, concat('{"description":"Pipe replacement", "workcat":"'||quote_nullable(v_workcat_id_end)||'", "sector":"',name,'", "length":',
 		(st_length(arc.the_geom))::numeric(12,2),', "newCatalog":"',v_featurecat_id_new,'", "oldCatalog":"',v_old_featurecat,'"}')
-		FROM arc JOIN sector USING (sector_id) WHERE arc_id = v_id::text;
+		FROM arc JOIN sector USING (sector_id) WHERE arc_id = v_id;
 
 		-- update catalog of new feature
 		IF v_featurecat_id_new IS NOT NULL AND v_feature_type_new IS NOT NULL THEN
@@ -682,17 +682,17 @@ BEGIN
 		-- update nodetype on arc
 		IF v_feature_type='node' then
 
-			FOR rec_arc IN SELECT arc_id, nodetype_1 FROM arc WHERE node_1=v_id::text
+			FOR rec_arc IN SELECT arc_id, nodetype_1 FROM arc WHERE node_1=v_id
 			loop
-				select node_type from v_edit_node where node_id=v_id::text into v_nodetype;
+				select node_type from v_edit_node where node_id=v_id into v_nodetype;
 				UPDATE arc SET nodetype_1=v_nodetype where arc_id=rec_arc.arc_id;
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3340", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END LOOP;
 
-			FOR rec_arc IN SELECT arc_id, nodetype_2 FROM arc WHERE node_2=v_id::text
+			FOR rec_arc IN SELECT arc_id, nodetype_2 FROM arc WHERE node_2=v_id
 			loop
-				select node_type from v_edit_node where node_id=v_id::text into v_nodetype;
+				select node_type from v_edit_node where node_id=v_id into v_nodetype;
 				UPDATE arc SET nodetype_2=v_nodetype where arc_id=rec_arc.arc_id;
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3340", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';

@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_expansiontank', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_expansiontank', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_expansiontank', 'node_id', 'integer', 'Column node_id should be integer');
 
 -- Check not null constraints
 SELECT col_not_null('man_expansiontank', 'node_id', 'Column node_id should be NOT NULL');
@@ -39,4 +39,4 @@ SELECT fk_ok('man_expansiontank', 'node_id', 'node', 'node_id', 'FK node_id shou
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

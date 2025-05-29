@@ -349,7 +349,7 @@ DROP INDEX IF EXISTS temp_node_result_id;
 CREATE TABLE temp_node (
 	id serial4 NOT NULL,
 	result_id varchar(30) NULL,
-	node_id varchar(16) NOT NULL,
+	node_id int4 NOT NULL,
 	top_elev numeric(12, 3) NULL,
 	ymax numeric(12, 3) NULL,
 	elev numeric(12, 3) NULL,
@@ -401,9 +401,9 @@ DROP INDEX IF EXISTS temp_arc_result_id;
 CREATE TABLE temp_arc (
 	id serial4 NOT NULL,
 	result_id varchar(30) NULL,
-	arc_id varchar(16) NOT NULL,
-	node_1 varchar(16) NULL,
-	node_2 varchar(16) NULL,
+	arc_id int4 NOT NULL,
+	node_1 int4 NULL,
+	node_2 int4 NULL,
 	elevmax1 numeric(12, 3) NULL,
 	elevmax2 numeric(12, 3) NULL,
 	arc_type varchar(30) NULL,
@@ -451,11 +451,11 @@ ALTER TABLE temp_gully RENAME TO _temp_gully;
 ALTER TABLE _temp_gully RENAME CONSTRAINT temp_gully_pkey TO _temp_gully_pkey;
 
 CREATE TABLE temp_gully (
-	gully_id varchar(16) NOT NULL,
+	gully_id int4 NOT NULL,
 	gully_type varchar(30) NULL,
 	gullycat_id varchar(30) NULL,
-	arc_id varchar(16) NULL,
-	node_id varchar(16) NULL,
+	arc_id int4 NULL,
+	node_id int4 NULL,
 	sector_id int4 NULL,
 	state int2 NULL,
 	state_type int2 NULL,
@@ -492,7 +492,7 @@ ALTER TABLE _man_manhole DROP CONSTRAINT IF EXISTS man_manhole_pkey;
 ALTER TABLE _man_manhole DROP CONSTRAINT IF EXISTS man_manhole_node_id_fkey;
 
 CREATE TABLE man_manhole (
-	node_id varchar(16) NOT NULL,
+	node_id int4 NOT NULL,
 	length numeric(12, 3) DEFAULT 0 NULL,
 	width numeric(12, 3) DEFAULT 0 NULL,
 	sander_depth numeric(12, 3) NULL,
@@ -502,8 +502,7 @@ CREATE TABLE man_manhole (
 	accessibility varchar(16) NULL,
 	bottom_mat text NULL,
 	height numeric(12,4),
-	CONSTRAINT man_manhole_pkey PRIMARY KEY (node_id),
-	CONSTRAINT man_manhole_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT man_manhole_pkey PRIMARY KEY (node_id)
 );
 
 
@@ -511,7 +510,7 @@ ALTER TABLE review_node RENAME TO _review_node;
 ALTER TABLE _review_node DROP CONSTRAINT IF EXISTS review_node_pkey;
 
 CREATE TABLE review_node (
-	node_id varchar(16) NOT NULL,
+	node_id int4 NOT NULL,
 	top_elev numeric(12, 3) NULL,
 	ymax numeric(12, 3) NULL,
 	node_type varchar(18) NULL,
@@ -533,7 +532,7 @@ ALTER TABLE _review_audit_node DROP CONSTRAINT IF EXISTS review_audit_node_pkey;
 
 CREATE TABLE review_audit_node (
 	id serial4 NOT NULL,
-	node_id varchar(16) NOT NULL,
+	node_id int4 NOT NULL,
 	old_top_elev numeric(12, 3) NULL,
 	new_top_elev numeric(12, 3) NULL,
 	old_ymax numeric(12, 3) NULL,
@@ -590,7 +589,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"sect
 
 -- 10/02/2025
 CREATE TABLE arc_add (
-	arc_id varchar(16) NOT NULL,
+	arc_id int4 NOT NULL,
 	result_id text NULL,
 	max_flow numeric(12, 2) NULL,
 	max_veloc numeric(12, 2) NULL,
@@ -606,7 +605,7 @@ CREATE TABLE arc_add (
 );
 
 CREATE TABLE node_add (
-	node_id varchar(16) NOT NULL,
+	node_id int4 NOT NULL,
 	result_id text NULL,
 	max_depth  numeric(12, 2) NULL,
 	max_height  numeric(12, 2) NULL,
@@ -765,7 +764,6 @@ ALTER TABLE node RENAME TO _node;
 -- Drop foreign keys that reference node
 ALTER TABLE inp_dwf_pol_x_node DROP CONSTRAINT inp_dwf_pol_x_node_node_id_fkey;
 ALTER TABLE element_x_node DROP CONSTRAINT element_x_node_node_id_fkey;
-ALTER TABLE man_manhole DROP CONSTRAINT man_manhole_node_id_fkey;
 ALTER TABLE arc DROP CONSTRAINT arc_node_1_fkey;
 ALTER TABLE arc DROP CONSTRAINT arc_node_2_fkey;
 ALTER TABLE arc DROP CONSTRAINT arc_parent_id_fkey;
@@ -863,7 +861,7 @@ DROP INDEX IF EXISTS node_streetname2;
 
 -- New order to table node
 CREATE TABLE node (
-	node_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	node_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
 	top_elev numeric(12, 3) NULL,
@@ -879,8 +877,8 @@ CREATE TABLE node (
 	epa_type varchar(16) NOT NULL,
 	state int2 NOT NULL,
 	state_type int2 NULL,
-	arc_id varchar(16) NULL,
-	parent_id varchar(16) NULL,
+	arc_id int4 NULL,
+	parent_id int4 NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,
@@ -1065,10 +1063,10 @@ DROP INDEX IF EXISTS gully_streetname2;
 
 -- New order to table arc
 CREATE TABLE arc (
-	arc_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	arc_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
-	node_1 varchar(16) NULL,
+	node_1 int4 NULL,
 	nodetype_1 varchar(30) NULL,
 	node_sys_top_elev_1 numeric(12, 3) NULL,
 	node_sys_elev_1 numeric(12, 3) NULL,
@@ -1077,7 +1075,7 @@ CREATE TABLE arc (
 	sys_elev1 numeric(12, 3) NULL,
 	y1 numeric(12, 3) NULL,
 	custom_y1 numeric(12, 3) NULL,
-	node_2 varchar(16) NULL,
+	node_2 int4 NULL,
 	nodetype_2 varchar(30) NULL,
 	node_sys_top_elev_2 numeric(12, 3) NULL,
 	node_sys_elev_2 numeric(12, 3) NULL,
@@ -1093,7 +1091,7 @@ CREATE TABLE arc (
 	epa_type varchar(16) NOT NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,
-	parent_id varchar(16) NULL,
+	parent_id int4 NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,
@@ -1268,7 +1266,7 @@ DROP INDEX IF EXISTS connec_streetname2;
 
 -- New order to table connec
 CREATE TABLE connec (
-	connec_id varchar(30) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	connec_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
@@ -1283,7 +1281,7 @@ CREATE TABLE connec (
 	connec_length numeric(12, 3) NULL,
 	state int2 NOT NULL,
 	state_type int2 NULL,
-	arc_id varchar(16) NULL,
+	arc_id int4 NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,
@@ -1326,7 +1324,7 @@ CREATE TABLE connec (
 	builtdate date NULL,
 	enddate date NULL,
 	ownercat_id varchar(30) NULL,
-	pjoint_id varchar(16) NULL,
+	pjoint_id integer NULL,
 	pjoint_type varchar(16) NULL,
 	access_type text NULL,
 	placement_type varchar(50) NULL,
@@ -1449,7 +1447,7 @@ DROP INDEX IF EXISTS gully_street2;
 
 -- New order to table gully
 CREATE TABLE gully (
-	gully_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	gully_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
@@ -1473,7 +1471,7 @@ CREATE TABLE gully (
 	connec_length numeric(12, 3) NULL,
 	connec_depth numeric(12, 3) NULL,
 	connec_y2 numeric(12, 3) NULL,
-	arc_id varchar(16) NULL,
+	arc_id int4 NULL,
 	epa_type varchar(16) NOT NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,
@@ -1514,7 +1512,7 @@ CREATE TABLE gully (
 	builtdate date NULL,
 	enddate date NULL,
 	ownercat_id varchar(30) NULL,
-	pjoint_id varchar(16) NULL,
+	pjoint_id integer NULL,
 	pjoint_type varchar(16) NULL,
 	placement_type varchar(50) NULL,
 	access_type text NULL,
@@ -1624,7 +1622,7 @@ DROP INDEX IF EXISTS element_sector;
 
 -- New order to table element
 CREATE TABLE element (
-	element_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	element_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
 	sys_code text NULL,
 	top_elev numeric(12, 3) NULL,
@@ -1725,18 +1723,19 @@ CREATE TABLE link (
 	sys_code text NULL,
 	top_elev1 float8 NULL,
 	y1 numeric(12, 4) NULL,
-	exit_id varchar(16) NULL,
+	exit_id int4 NULL,
 	exit_type varchar(16) NULL,
 	top_elev2 float8 NULL,
 	y2 numeric(12, 4) NULL,
 	feature_type varchar(16) NULL,
-	feature_id varchar(16) NULL,
+	feature_id int4 NULL,
 	link_type varchar(30) NOT NULL,
 	linkcat_id varchar(30) NOT NULL,
 	epa_type varchar(16) NULL,
 	state int2 NOT NULL,
 	state_type int2 NULL,
 	expl_id int4 DEFAULT 0 NOT NULL,
+	expl_id2 int4 DEFAULT 0 NOT NULL,
 	muni_id int4 DEFAULT 0 NOT NULL,
 	sector_id int4 DEFAULT 0 NOT NULL,
 	drainzone_id int4 DEFAULT 0 NULL,

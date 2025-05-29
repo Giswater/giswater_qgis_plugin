@@ -87,7 +87,7 @@ BEGIN
     ELSE
 
 		-- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
-		PERFORM gw_fct_state_control('NODE', NEW.node_id, NEW.state, TG_OP);
+		PERFORM gw_fct_state_control(json_build_object('feature_type_aux', 'NODE', 'feature_id_aux', NEW.node_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP));
 
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 

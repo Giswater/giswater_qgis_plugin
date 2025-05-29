@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_tank', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_tank', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_tank', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_tank', 'vmax', 'numeric(12,4)', 'Column vmax should be numeric(12,4)');
 SELECT col_type_is('man_tank', 'vutil', 'numeric(12,4)', 'Column vutil should be numeric(12,4)');
 SELECT col_type_is('man_tank', 'area', 'numeric(12,4)', 'Column area should be numeric(12,4)');

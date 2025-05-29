@@ -31,7 +31,7 @@ SELECT col_is_pk('inp_dscenario_connec', ARRAY['dscenario_id', 'connec_id'], 'Co
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_connec', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_connec', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_connec', 'connec_id', 'integer', 'Column connec_id should be integer');
 SELECT col_type_is('inp_dscenario_connec', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
 SELECT col_type_is('inp_dscenario_connec', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 SELECT col_type_is('inp_dscenario_connec', 'peak_factor', 'numeric(12,4)', 'Column peak_factor should be numeric(12,4)');

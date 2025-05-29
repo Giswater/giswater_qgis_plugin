@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_waterwell', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_waterwell', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_waterwell', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_waterwell', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 
 -- Check foreign keys
@@ -41,4 +41,4 @@ SELECT col_not_null('man_waterwell', 'node_id', 'Column node_id should be NOT NU
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

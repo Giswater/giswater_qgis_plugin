@@ -8,8 +8,8 @@ or (at your option) any later version.
 --FUNCTION CODE: 2302
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_anl_node_topological_consistency(p_data json) ;
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_topological_consistency(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_topological_consistency(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -48,12 +48,12 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fid=108;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=108;	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=108;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (108, null, 4, concat('NODE TOPOLOGICAL CONSISTENCY ANALYSIS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (108, null, 4, '-------------------------------------------------------------');
 
-	-- getting input data 	
+	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
@@ -125,7 +125,7 @@ BEGIN
 				HAVING COUNT(*) != 1;';
 	END IF;
 
-	-- set selector	
+	-- set selector
 	DELETE FROM selector_audit WHERE fid=108 AND cur_user=current_user;
 	INSERT INTO selector_audit (fid,cur_user) VALUES (108, current_user);
 
@@ -143,8 +143,8 @@ BEGIN
     FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom,num_arcs
     FROM  anl_node WHERE cur_user="current_user"() AND fid=108) row) features;
 
-  	v_result := COALESCE(v_result, '{}'); 
-  	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+  	v_result := COALESCE(v_result, '{}');
+  	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
 	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=108;
 
@@ -156,20 +156,20 @@ BEGIN
 		VALUES (108,  concat ('There are ',v_count,' nodes with topological inconsistency.'), v_count);
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 108,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
+		SELECT 108,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count
 		FROM anl_node WHERE cur_user="current_user"() AND fid=108;
 
 	END IF;
-	
+
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=108 order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

@@ -37,7 +37,7 @@ SELECT is(
         "form":{},
         "feature":{},
         "data":{"filterFields":{}, "pageInfo":{},
-        "parameters":{"expl":"0", "material":"N/I", "price":"S_REP", "observ":"observ"},
+        "parameters":{"expl":"0", "material":"N/I", "price":"S_REP", "observ":"-901"},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',

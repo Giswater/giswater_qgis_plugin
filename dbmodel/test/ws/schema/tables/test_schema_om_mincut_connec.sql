@@ -31,7 +31,7 @@ SELECT col_is_pk('om_mincut_connec', ARRAY['id'], 'Column id should be primary k
 -- Check column types
 SELECT col_type_is('om_mincut_connec', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('om_mincut_connec', 'result_id', 'integer', 'Column result_id should be integer');
-SELECT col_type_is('om_mincut_connec', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
+SELECT col_type_is('om_mincut_connec', 'connec_id', 'integer', 'Column connec_id should be integer');
 SELECT col_type_is('om_mincut_connec', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
 SELECT col_type_is('om_mincut_connec', 'customer_code', 'varchar(30)', 'Column customer_code should be varchar(30)');
 
@@ -49,4 +49,4 @@ SELECT col_not_null('om_mincut_connec', 'connec_id', 'Column connec_id should be
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

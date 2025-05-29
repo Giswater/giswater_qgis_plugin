@@ -31,7 +31,7 @@ SELECT col_is_pk('om_mincut_node', ARRAY['id'], 'Column id should be primary key
 -- Check column types
 SELECT col_type_is('om_mincut_node', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('om_mincut_node', 'result_id', 'integer', 'Column result_id should be integer');
-SELECT col_type_is('om_mincut_node', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('om_mincut_node', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('om_mincut_node', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
 SELECT col_type_is('om_mincut_node', 'node_type', 'varchar(30)', 'Column node_type should be varchar(30)');
 SELECT col_type_is('om_mincut_node', 'minsector_id', 'integer', 'Column minsector_id should be integer');
@@ -53,4 +53,4 @@ SELECT has_index('om_mincut_node', 'mincut_node_index', 'Table should have mincu
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

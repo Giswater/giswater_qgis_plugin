@@ -34,7 +34,7 @@ SELECT columns_are(
 SELECT col_is_pk('arc_add', 'arc_id', 'Column arc_id should be primary key');
 
 -- Types
-SELECT col_type_is('arc_add', 'arc_id', 'character varying(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('arc_add', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('arc_add', 'result_id', 'text', 'Column result_id should be text');
 SELECT col_type_is('arc_add', 'flow_max', 'numeric(12,2)', 'Column flow_max should be numeric(12,2)');
 SELECT col_type_is('arc_add', 'flow_min', 'numeric(12,2)', 'Column flow_min should be numeric(12,2)');

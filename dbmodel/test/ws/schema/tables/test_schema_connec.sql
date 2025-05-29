@@ -41,7 +41,7 @@ SELECT columns_are(
 SELECT col_is_pk('connec', ARRAY['connec_id'], 'Column connec_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('connec', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
+SELECT col_type_is('connec', 'connec_id', 'integer', 'Column connec_id should be integer');
 SELECT col_type_is('connec', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('connec', 'sys_code', 'text', 'Column sys_code should be text');
 SELECT col_type_is('connec', 'top_elev', 'numeric(12,4)', 'Column top_elev should be numeric(12,4)');
@@ -51,7 +51,7 @@ SELECT col_type_is('connec', 'sector_id', 'int4', 'Column sector_id should be in
 SELECT col_type_is('connec', 'customer_code', 'varchar(30)', 'Column customer_code should be varchar(30)');
 SELECT col_type_is('connec', 'state', 'int2', 'Column state should be int2');
 SELECT col_type_is('connec', 'state_type', 'int2', 'Column state_type should be int2');
-SELECT col_type_is('connec', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('connec', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('connec', 'connec_length', 'numeric(12,3)', 'Column connec_length should be numeric(12,3)');
 SELECT col_type_is('connec', 'annotation', 'text', 'Column annotation should be text');
 SELECT col_type_is('connec', 'observ', 'text', 'Column observ should be text');
@@ -89,7 +89,7 @@ SELECT col_type_is('connec', 'expl_id', 'int4', 'Column expl_id should be int4')
 SELECT col_type_is('connec', 'num_value', 'numeric(12,3)', 'Column num_value should be numeric(12,3)');
 SELECT col_type_is('connec', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_type_is('connec', 'pjoint_type', 'varchar(16)', 'Column pjoint_type should be varchar(16)');
-SELECT col_type_is('connec', 'pjoint_id', 'varchar(16)', 'Column pjoint_id should be varchar(16)');
+SELECT col_type_is('connec', 'pjoint_id', 'integer', 'Column pjoint_id should be integer');
 SELECT col_type_is('connec', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('connec', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('connec', 'staticpressure', 'numeric(12,3)', 'Column staticpressure should be numeric(12,3)');

@@ -17,12 +17,12 @@ AS $function$
 fid = 518
 
 
-	SELECT SCHEMA_NAME.gw_fct_setendfeature($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+	SELECT SCHEMA_NAME.gw_fct_setendfeature($${"client":{"device":4, "infoType":1, "lang":"ES"},
 	"form":{}, "feature":{["featureType":"arc", "featureId":["113935", "2076", "2215"]],
-			      ["featureType":"node", "featureId":["113935", "2076", "2215"]], 
+			      ["featureType":"node", "featureId":["113935", "2076", "2215"]],
 			      ["featureType":"connec", "featureId":["113935", "2076", "2215"]],
-			      ["featureType":"gully", "featureId":["113935", "2076", "2215"]]}, 
-	"data":{"filterFields":{}, "pageInfo":{}, "state_type":"1", "workcat_id_end":"work1", 
+			      ["featureType":"gully", "featureId":["113935", "2076", "2215"]]},
+	"data":{"filterFields":{}, "pageInfo":{}, "state_type":"1", "workcat_id_end":"work1",
 	"enddate":"2020/12/04", "workcat_date":"2017/12/06", "description":"Description work1"}}$$);
 */
 
@@ -134,7 +134,7 @@ BEGIN
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
-				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
+				EXECUTE ' SELECT array_agg(element_id) FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded arc (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
@@ -279,7 +279,7 @@ BEGIN
 
 				-- perform state control for connects
 				IF v_feature_type='connec' or v_feature_type='gully' then
-					PERFORM gw_fct_state_control(upper(v_feature_type::varchar), v_feature_id_value::varchar, 0, 'UPDATE');
+					PERFORM gw_fct_state_control(json_build_object('feature_type_aux', upper(v_feature_type::text), 'feature_id_aux', v_feature_id_value, 'state_aux', 0, 'tg_op_aux', 'UPDATE'));
 				END IF;
 				v_querytext = 'UPDATE '||v_feature_type||' SET state = 0, enddate = '||quote_literal(v_enddate)||' ';
 				IF v_workcat_id_end IS NOT NULL then

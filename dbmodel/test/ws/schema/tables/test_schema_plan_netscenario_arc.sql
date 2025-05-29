@@ -30,7 +30,7 @@ SELECT col_is_pk('plan_netscenario_arc', ARRAY['netscenario_id', 'arc_id'], 'Col
 
 -- Check column types
 SELECT col_type_is('plan_netscenario_arc', 'netscenario_id', 'integer', 'Column netscenario_id should be integer');
-SELECT col_type_is('plan_netscenario_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
+SELECT col_type_is('plan_netscenario_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('plan_netscenario_arc', 'presszone_id', 'integer', 'Column presszone_id should be integer');
 SELECT col_type_is('plan_netscenario_arc', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('plan_netscenario_arc', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');

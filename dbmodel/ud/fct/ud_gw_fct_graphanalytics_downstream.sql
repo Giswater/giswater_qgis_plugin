@@ -67,7 +67,7 @@ v_mainstream text;
 v_diverted_flow text;
 v_context text;
 
-v_symbology int; 
+v_symbology int;
 
 BEGIN
 
@@ -142,9 +142,9 @@ BEGIN
 	INSERT INTO anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
 	SELECT n.node_id, v_fid, n.node_type, n.state, n.expl_id, n.drainzone_id, v_diverted_flow, n.the_geom
 	FROM (
-		SELECT node::varchar
+		SELECT node
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
-	) p 
+	) p
 	JOIN v_edit_node n ON n.node_id =p.node;
 
 	-- mainstream
@@ -167,18 +167,18 @@ BEGIN
 
 	UPDATE anl_node n set addparam = v_mainstream
 	FROM (
-		SELECT node::varchar
+		SELECT node
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
-	) p 
+	) p
 	WHERE n.cur_user="current_user"() AND n.fid = v_fid
 	AND n.node_id = p.node;
 
 	INSERT INTO anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
 	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
 	FROM v_edit_arc a
-	JOIN anl_node n1 ON a.node_1 = n1.node_id 
+	JOIN anl_node n1 ON a.node_1 = n1.node_id
 	JOIN anl_node n2 ON a.node_2 = n2.node_id
-	WHERE n1.cur_user="current_user"() AND n1.fid = v_fid 
+	WHERE n1.cur_user="current_user"() AND n1.fid = v_fid
 	AND n2.cur_user="current_user"() AND n2.fid = v_fid;
 
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -207,15 +207,15 @@ BEGIN
 	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
 	UNION
 	SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' as feature_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
-	FROM anl_arc a JOIN v_edit_connec c using (arc_id) 
+	FROM anl_arc a JOIN v_edit_connec c using (arc_id)
 	WHERE cur_user="current_user"() AND fid=v_fid
-	AND c.state > 0 
+	AND c.state > 0
 	AND c.is_operative = TRUE
 	UNION
 	SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' as feature_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
-	FROM anl_arc a JOIN v_edit_gully g using (arc_id) 
+	FROM anl_arc a JOIN v_edit_gully g using (arc_id)
 	WHERE cur_user="current_user"() AND fid=v_fid
-	AND g.state > 0 
+	AND g.state > 0
 	AND g.is_operative = TRUE) row) features;
 
 	v_result := COALESCE(v_result, '{}');

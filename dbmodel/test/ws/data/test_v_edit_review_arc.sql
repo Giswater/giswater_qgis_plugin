@@ -13,20 +13,20 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_review_arc (arc_id, arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated) 
-VALUES('-901', '', '', '', '', 0, null, null, false, 0);
-SELECT is((SELECT count(*)::integer FROM v_edit_review_arc WHERE arc_id = '-901'), 1, 'INSERT: v_edit_review_arc -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM review_arc WHERE arc_id = '-901'), 1, 'INSERT: review_arc -901 was inserted');
+INSERT INTO v_edit_review_arc (arc_id, arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated)
+VALUES(-901, '', '', '', '', 0, null, null, false, 0);
+SELECT is((SELECT count(*)::integer FROM v_edit_review_arc WHERE arc_id = -901), 1, 'INSERT: v_edit_review_arc -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM review_arc WHERE arc_id = -901), 1, 'INSERT: review_arc -901 was inserted');
 
 
-UPDATE v_edit_review_arc SET observ = 'updated observ' WHERE arc_id = '-901';
-SELECT is((SELECT observ FROM v_edit_review_arc WHERE arc_id = '-901'), 'updated observ', 'UPDATE: v_edit_review_arc -901 was updated');
-SELECT is((SELECT observ FROM review_arc WHERE arc_id = '-901'), 'updated observ', 'UPDATE: review_arc -901 was updated');
+UPDATE v_edit_review_arc SET annotation = 'updated annotation' WHERE arc_id = -901;
+SELECT is((SELECT annotation FROM v_edit_review_arc WHERE arc_id = -901), 'updated annotation', 'UPDATE: v_edit_review_arc -901 was updated');
+SELECT is((SELECT annotation FROM review_arc WHERE arc_id = -901), 'updated annotation', 'UPDATE: review_arc -901 was updated');
 
 
-DELETE FROM v_edit_review_arc WHERE arc_id = '-901';
-SELECT is((SELECT count(*)::integer FROM v_edit_review_arc WHERE arc_id = '-901'), 0, 'DELETE: v_edit_review_arc -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM review_arc WHERE arc_id = '-901'), 0, 'DELETE: review_arc -901 was deleted');
+DELETE FROM v_edit_review_arc WHERE arc_id = -901;
+SELECT is((SELECT count(*)::integer FROM v_edit_review_arc WHERE arc_id = -901), 0, 'DELETE: v_edit_review_arc -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM review_arc WHERE arc_id = -901), 0, 'DELETE: review_arc -901 was deleted');
 
 
 SELECT * FROM finish();

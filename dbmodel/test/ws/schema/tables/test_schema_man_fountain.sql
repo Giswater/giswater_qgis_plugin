@@ -30,8 +30,8 @@ SELECT columns_are(
 SELECT col_is_pk('man_fountain', ARRAY['connec_id'], 'Column connec_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_fountain', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
-SELECT col_type_is('man_fountain', 'linked_connec', 'varchar(16)', 'Column linked_connec should be varchar(16)');
+SELECT col_type_is('man_fountain', 'connec_id', 'integer', 'Column connec_id should be integer');
+SELECT col_type_is('man_fountain', 'linked_connec', 'integer', 'Column linked_connec should be integer');
 SELECT col_type_is('man_fountain', 'vmax', 'numeric(12,3)', 'Column vmax should be numeric(12,3)');
 SELECT col_type_is('man_fountain', 'vtotal', 'numeric(12,3)', 'Column vtotal should be numeric(12,3)');
 SELECT col_type_is('man_fountain', 'container_number', 'integer', 'Column container_number should be integer');
@@ -51,4 +51,4 @@ SELECT fk_ok('man_fountain', 'linked_connec', 'connec', 'connec_id', 'FK linked_
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

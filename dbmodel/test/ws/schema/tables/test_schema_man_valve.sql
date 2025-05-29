@@ -32,7 +32,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_valve', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_valve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_valve', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_valve', 'closed', 'boolean', 'Column closed should be boolean');
 SELECT col_type_is('man_valve', 'broken', 'boolean', 'Column broken should be boolean');
 SELECT col_type_is('man_valve', 'buried', 'varchar(16)', 'Column buried should be varchar(16)');

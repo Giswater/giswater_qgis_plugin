@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('config_graph_mincut', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('config_graph_mincut', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('config_graph_mincut', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('config_graph_mincut', 'parameters', 'json', 'Column parameters should be json');
 SELECT col_type_is('config_graph_mincut', 'active', 'boolean', 'Column active should be boolean');
 

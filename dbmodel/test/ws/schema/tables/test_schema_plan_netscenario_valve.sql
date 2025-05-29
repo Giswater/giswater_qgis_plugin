@@ -30,7 +30,7 @@ SELECT col_is_pk('plan_netscenario_valve', ARRAY['netscenario_id', 'node_id'], '
 
 -- Check column types
 SELECT col_type_is('plan_netscenario_valve', 'netscenario_id', 'integer', 'Column netscenario_id should be integer');
-SELECT col_type_is('plan_netscenario_valve', 'node_id', 'character varying(16)', 'Column node_id should be character varying(16)');
+SELECT col_type_is('plan_netscenario_valve', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('plan_netscenario_valve', 'closed', 'boolean', 'Column closed should be boolean');
 
 -- Check default values
@@ -47,4 +47,4 @@ SELECT col_not_null('plan_netscenario_valve', 'node_id', 'Column node_id should 
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

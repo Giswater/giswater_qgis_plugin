@@ -819,15 +819,15 @@ BEGIN
 		union
 		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id
 		from config_param_user where parameter = 'inp_report_nodes' and cur_user=current_user)a
-		join temp_t_node n on n.node_id = a.node_id::text		
+		join temp_t_node n on n.node_id = a.node_id::int4
 		UNION
 		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id
 		from config_param_user where parameter = 'inp_report_nodes_2' and cur_user=current_user)a
-		join temp_t_node n on n.node_id = a.node_id::text
+		join temp_t_node n on n.node_id = a.node_id::int4
 		union
 		select 'LINKS', replace(replace(replace(array_agg(a.arc_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as arc_id
 		from config_param_user where parameter = 'inp_report_link' and cur_user=current_user)a
-		join temp_t_arc n on n.arc_id = a.arc_id::text)a
+		join temp_t_arc n on n.arc_id = a.arc_id::int4)a
 		where value is not null
 		ORDER BY 1;
 
@@ -1017,7 +1017,7 @@ BEGIN
 	   FROM temp_t_arc
 	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
 	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-	  WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
+	  WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id
 		   FROM temp_t_arc_flowregulator))
 	UNION
 	 SELECT temp_t_arc.arc_id,
@@ -1031,7 +1031,7 @@ BEGIN
 	   FROM temp_t_arc
 	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
 	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-	  WHERE (cat_arc_shape.epa::text <> ALL (ARRAY['CUSTOM'::text, 'IRREGULAR'::text])) AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
+	  WHERE (cat_arc_shape.epa::text <> ALL (ARRAY['CUSTOM'::text, 'IRREGULAR'::text])) AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id
 		   FROM temp_t_arc_flowregulator))
 	UNION
 	 SELECT temp_t_arc.arc_id,
@@ -1045,7 +1045,7 @@ BEGIN
 	   FROM temp_t_arc
 	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
 	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-	  WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
+	  WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id
 		   FROM temp_t_arc_flowregulator))
 	UNION
 	 SELECT temp_t_arc_flowregulator.arc_id,

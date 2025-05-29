@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('inp_valve', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('inp_valve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_valve', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_valve', 'valve_type', 'varchar(18)', 'Column valve_type should be varchar(18)');
 SELECT col_type_is('inp_valve', 'custom_dint', 'numeric(12,4)', 'Column custom_dint should be numeric(12,4)');
 SELECT col_type_is('inp_valve', 'setting', 'numeric(12,4)', 'Column setting should be numeric(12,4)');

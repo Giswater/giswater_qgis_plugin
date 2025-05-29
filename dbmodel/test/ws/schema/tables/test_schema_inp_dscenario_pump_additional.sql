@@ -32,7 +32,7 @@ SELECT col_is_pk('inp_dscenario_pump_additional', ARRAY['id'], 'Column id should
 -- Check column types
 SELECT col_type_is('inp_dscenario_pump_additional', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('inp_dscenario_pump_additional', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_pump_additional', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_pump_additional', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_dscenario_pump_additional', 'order_id', 'smallint', 'Column order_id should be smallint');
 SELECT col_type_is('inp_dscenario_pump_additional', 'power', 'varchar', 'Column power should be varchar');
 SELECT col_type_is('inp_dscenario_pump_additional', 'curve_id', 'varchar', 'Column curve_id should be varchar');

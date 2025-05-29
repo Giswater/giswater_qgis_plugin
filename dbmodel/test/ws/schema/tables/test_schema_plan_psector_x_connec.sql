@@ -31,8 +31,8 @@ SELECT col_is_pk('plan_psector_x_connec', ARRAY['id'], 'Column id should be prim
 
 -- Check column types
 SELECT col_type_is('plan_psector_x_connec', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('plan_psector_x_connec', 'connec_id', 'character varying(16)', 'Column connec_id should be character varying(16)');
-SELECT col_type_is('plan_psector_x_connec', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
+SELECT col_type_is('plan_psector_x_connec', 'connec_id', 'integer', 'Column connec_id should be integer');
+SELECT col_type_is('plan_psector_x_connec', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('plan_psector_x_connec', 'psector_id', 'integer', 'Column psector_id should be integer');
 SELECT col_type_is('plan_psector_x_connec', 'state', 'smallint', 'Column state should be smallint');
 SELECT col_type_is('plan_psector_x_connec', 'doable', 'boolean', 'Column doable should be boolean');

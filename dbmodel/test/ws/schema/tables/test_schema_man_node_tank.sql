@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_node_tank', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_node_tank', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_node_tank', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_node_tank', 'tank_param_1', 'integer', 'Column tank_param_1 should be integer');
 SELECT col_type_is('man_node_tank', 'tank_param_2', 'date', 'Column tank_param_2 should be date');
 
@@ -44,4 +44,4 @@ SELECT has_index('man_node_tank', 'man_node_tank_node_id_index', 'Should have in
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

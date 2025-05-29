@@ -208,7 +208,7 @@ BEGIN
 			--IF v_value !='null' OR v_value !='NULL' THEN
 
 				IF v_field='state' THEN
-					PERFORM gw_fct_state_control(v_featuretype, v_id, v_value::integer, 'UPDATE');
+					PERFORM gw_fct_state_control(json_build_object('feature_type_aux', v_featuretype, 'feature_id_aux', v_id, 'state_aux', v_value::integer, 'tg_op_aux', 'UPDATE'));
 				END IF;
 
 				IF v_field in ('geom', 'the_geom') THEN

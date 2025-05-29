@@ -206,7 +206,7 @@ BEGIN
 	LOOP
 		IF v_checkvalve.to_arc IN (SELECT arc_id FROM om_mincut_arc WHERE result_id = v_mincutid) AND v_isrecursive IS NOT TRUE THEN  -- checkvalve is proposed valve and to_arc is wet
 
-			v_arc = (SELECT distinct(arc_id) FROM temp_anlgraph WHERE (node_1::text = v_checkvalve.node_id OR  node_2::text = v_checkvalve.node_id) AND arc_id::text != v_checkvalve.to_arc::text);
+			v_arc = (SELECT distinct(arc_id) FROM temp_anlgraph WHERE (node_1 = v_checkvalve.node_id OR  node_2 = v_checkvalve.node_id) AND arc_id != v_checkvalve.to_arc);
 
 			-- mincut must continue
 			PERFORM gw_fct_graphanalytics_mincut(concat('{"data":{"arc":"',v_arc,'", "step":1, "parameters":{"isRecursive":true, "id":',v_mincutid,'}}}')::json);

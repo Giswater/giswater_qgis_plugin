@@ -38,7 +38,7 @@ SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
 DECLARE
 
 v_feature_type text;
-v_feature_id text;
+v_feature_id integer;
 v_workcat_id_end text;
 v_enddate text;
 v_descript text;
@@ -78,7 +78,7 @@ BEGIN
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
 
-	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''''
+	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_featurecat;
 
 	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id = '''||v_featurecat||''';'
@@ -86,14 +86,14 @@ BEGIN
 
 	IF v_feature_type='arc' THEN
 		--check connec& gully related to arc
-		SELECT string_agg(feature_id,',') INTO v_connect_connec FROM v_ui_arc_x_relations
+		SELECT array_agg(feature_id) INTO v_connect_connec FROM v_ui_arc_x_relations
 		JOIN sys_feature_class ON sys_feature_class.id=v_ui_arc_x_relations.sys_type WHERE type='CONNEC' AND  arc_id = v_feature_id;
 
 		IF v_connect_connec IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Connecs connected with the feature :',v_connect_connec ));
 		END IF;
 
-		SELECT string_agg(feature_id,',') INTO v_connect_gully FROM v_ui_arc_x_relations
+		SELECT array_agg(feature_id) INTO v_connect_gully FROM v_ui_arc_x_relations
 		JOIN sys_feature_class ON sys_feature_class.id=v_ui_arc_x_relations.sys_type WHERE type='GULLY' AND  arc_id = v_feature_id;
 
 		IF v_connect_gully IS NOT NULL THEN
@@ -116,7 +116,7 @@ BEGIN
 		--check nodes childs related to node
 
 		IF v_project_type = 'WS' THEN
-		 	SELECT string_agg(child_id,',') INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
+		 	SELECT array_agg(child_id) INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
 
 			IF v_connect_node IS NOT NULL THEN
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
@@ -124,7 +124,7 @@ BEGIN
 		END IF;
 
 		--check arcs related to node (on service)
-		SELECT string_agg(arc.arc_id,',')  INTO v_connect_arc FROM arc
+		SELECT array_agg(arc.arc_id)  INTO v_connect_arc FROM arc
 		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
      	LEFT JOIN node b ON b.node_id::text = arc.node_2::text
      	WHERE (node_1 = v_feature_id OR node_2 = v_feature_id) AND arc.state=1;
@@ -134,7 +134,7 @@ BEGIN
 		END IF;
 
 		--check arcs related to node (obsolete)
-		SELECT string_agg(arc.arc_id,',')  INTO v_connect_arc FROM arc
+		SELECT array_agg(arc.arc_id)  INTO v_connect_arc FROM arc
 		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
      	LEFT JOIN node b ON b.node_id::text = arc.node_2::text
      	WHERE  (node_1 = v_feature_id OR node_2 = v_feature_id) AND arc.state=0;
@@ -144,7 +144,7 @@ BEGIN
 		END IF;
 
 		--check related polygon
-		EXECUTE 'SELECT pol_id FROM polygon where feature_id= '''||v_feature_id||''';'
+		EXECUTE 'SELECT pol_id FROM polygon where feature_id= '||v_feature_id||';'
 		INTO v_connect_pol;
 
 		IF v_connect_pol IS NOT NULL THEN
@@ -152,16 +152,16 @@ BEGIN
 		END IF;
 
 	ELSIF v_feature_type='connec' OR v_feature_type='gully' THEN
-		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where (exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text)
-		OR  (feature_type=''CONNEC''  AND  feature_id = '''||v_feature_id||'''::text)'
+		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where (exit_type=''CONNEC''  AND  exit_id = '||v_feature_id||')
+		OR  (feature_type=''CONNEC''  AND  feature_id = '||v_feature_id||')'
 		INTO v_connect_connec;
 
 		IF v_connect_connec IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Links connected with the feature :',v_connect_connec ));
 		END IF;
 
-		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '''||v_feature_id||'''::text
-		OR  (feature_type=''GULLY''  AND  feature_id = '''||v_feature_id||'''::text)'
+		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '||v_feature_id||'
+		OR  (feature_type=''GULLY''  AND  feature_id = '||v_feature_id||')'
 		INTO v_connect_gully;
 
 		IF v_connect_gully IS NOT NULL THEN
@@ -169,7 +169,7 @@ BEGIN
 		END IF;
 
 		--check related polygon
-		EXECUTE 'SELECT pol_id FROM polygon where feature_id= '''||v_feature_id||''';'
+		EXECUTE 'SELECT pol_id FROM polygon where feature_id= '||v_feature_id||';'
 		INTO v_connect_pol;
 
 		IF v_connect_pol IS NOT NULL THEN
@@ -179,14 +179,14 @@ BEGIN
 	END IF;
 
 	--check elements related to feature
-	EXECUTE 'SELECT string_agg(element_id,'','') FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
+	EXECUTE 'SELECT array_agg(element_id) FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_element;
 
 	IF v_element IS NOT NULL THEN
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Elements connected with the feature: ',v_element ));
 	END IF;
 	--check visits related to feature
-	EXECUTE 'SELECT string_agg(visit_id::text,'','') FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
+	EXECUTE 'SELECT string_agg(visit_id::text,'','') FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_visit;
 
 	IF v_visit IS NOT NULL THEN
@@ -194,7 +194,7 @@ BEGIN
 	END IF;
 
 	--check documents related to feature
-	EXECUTE 'SELECT string_agg(doc_id,'','') FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
+	EXECUTE 'SELECT string_agg(doc_id,'','') FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_doc;
 
 	IF v_doc IS NOT NULL THEN
@@ -205,17 +205,17 @@ BEGIN
 	IF v_feature_type='node' THEN
 		EXECUTE 'SELECT string_agg(distinct a.name, '', '') FROM (
 		SELECT name FROM plan_psector_x_node
-		JOIN plan_psector USING (psector_id) where node_id = '''||v_feature_id||'''::text 
+		JOIN plan_psector USING (psector_id) where node_id = '||v_feature_id||' 
 		UNION 
 		SELECT name FROM plan_psector_x_arc
 		JOIN plan_psector USING (psector_id) 
 		JOIN arc using (arc_id) 
-		where node_1 =  '''||v_feature_id||'''::text or node_2= '''||v_feature_id||'''::text  and arc.state=2)a'
+		where node_1 =  '||v_feature_id||' or node_2= '||v_feature_id||'  and arc.state=2)a'
 		INTO v_psector;
 	ELSE
 
 		EXECUTE 'SELECT string_agg(name,'', '') FROM plan_psector_x_'||v_feature_type||' 
-		JOIN plan_psector USING (psector_id) where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
+		JOIN plan_psector USING (psector_id) where '||v_feature_type||'_id = '||v_feature_id||''
 		INTO v_psector;
 	END IF;
 

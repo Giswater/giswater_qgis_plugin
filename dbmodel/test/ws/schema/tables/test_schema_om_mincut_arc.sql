@@ -31,7 +31,7 @@ SELECT col_is_pk('om_mincut_arc', ARRAY['id'], 'Column id should be primary key'
 -- Check column types
 SELECT col_type_is('om_mincut_arc', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('om_mincut_arc', 'result_id', 'integer', 'Column result_id should be integer');
-SELECT col_type_is('om_mincut_arc', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('om_mincut_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('om_mincut_arc', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');
 SELECT col_type_is('om_mincut_arc', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 
@@ -52,4 +52,4 @@ SELECT has_index('om_mincut_arc', 'mincut_arc_index', 'Table should have mincut_
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

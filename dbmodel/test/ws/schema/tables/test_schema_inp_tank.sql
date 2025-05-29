@@ -31,7 +31,7 @@ SELECT columns_are(
 SELECT col_is_pk('inp_tank', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('inp_tank', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_tank', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_tank', 'initlevel', 'numeric(12,4)', 'Column initlevel should be numeric(12,4)');
 SELECT col_type_is('inp_tank', 'minlevel', 'numeric(12,4)', 'Column minlevel should be numeric(12,4)');
 SELECT col_type_is('inp_tank', 'maxlevel', 'numeric(12,4)', 'Column maxlevel should be numeric(12,4)');

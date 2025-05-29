@@ -20,8 +20,8 @@ SELECT has_table('plan_rec_result_node'::name, 'Table plan_rec_result_node shoul
 SELECT columns_are(
     'plan_rec_result_node',
     ARRAY[
-        'result_id', 'node_id', 'node_type', 'nodecat_id', 'top_elev', 'elev', 'epa_type', 'sector_id', 
-        'state', 'annotation', 'the_geom', 'cost_unit', 'descript', 'measurement', 'cost', 'budget', 
+        'result_id', 'node_id', 'node_type', 'nodecat_id', 'top_elev', 'elev', 'epa_type', 'sector_id',
+        'state', 'annotation', 'the_geom', 'cost_unit', 'descript', 'measurement', 'cost', 'budget',
         'expl_id', 'builtcost', 'builtdate', 'age', 'acoeff', 'aperiod', 'arate', 'amortized', 'pending'
     ],
     'Table plan_rec_result_node should have the correct columns'
@@ -32,7 +32,7 @@ SELECT col_is_pk('plan_rec_result_node', ARRAY['node_id', 'result_id'], 'Columns
 
 -- Check column types (a representative sample)
 SELECT col_type_is('plan_rec_result_node', 'result_id', 'integer', 'Column result_id should be integer');
-SELECT col_type_is('plan_rec_result_node', 'node_id', 'character varying(16)', 'Column node_id should be character varying(16)');
+SELECT col_type_is('plan_rec_result_node', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('plan_rec_result_node', 'node_type', 'character varying(18)', 'Column node_type should be character varying(18)');
 SELECT col_type_is('plan_rec_result_node', 'nodecat_id', 'character varying(30)', 'Column nodecat_id should be character varying(30)');
 SELECT col_type_is('plan_rec_result_node', 'top_elev', 'numeric(12,3)', 'Column top_elev should be numeric(12,3)');
@@ -54,4 +54,4 @@ SELECT col_not_null('plan_rec_result_node', 'node_id', 'Column node_id should be
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

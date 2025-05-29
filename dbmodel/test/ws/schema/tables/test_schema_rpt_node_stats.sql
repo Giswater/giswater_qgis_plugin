@@ -20,7 +20,7 @@ SELECT has_table('rpt_node_stats'::name, 'Table rpt_node_stats should exist');
 SELECT columns_are(
     'rpt_node_stats',
     ARRAY[
-        'node_id', 'result_id', 'node_type', 'sector_id', 'nodecat_id', 'top_elev', 'demand_max', 'demand_min', 'demand_avg', 
+        'node_id', 'result_id', 'node_type', 'sector_id', 'nodecat_id', 'top_elev', 'demand_max', 'demand_min', 'demand_avg',
         'head_max', 'head_min', 'head_avg', 'press_max', 'press_min', 'press_avg', 'quality_max', 'quality_min', 'quality_avg', 'the_geom'
     ],
     'Table rpt_node_stats should have the correct columns'
@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('rpt_node_stats', ARRAY['node_id', 'result_id'], 'Columns node_id, result_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('rpt_node_stats', 'node_id', 'character varying(16)', 'Column node_id should be character varying(16)');
+SELECT col_type_is('rpt_node_stats', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('rpt_node_stats', 'result_id', 'character varying(30)', 'Column result_id should be character varying(30)');
 SELECT col_type_is('rpt_node_stats', 'node_type', 'character varying(30)', 'Column node_type should be character varying(30)');
 SELECT col_type_is('rpt_node_stats', 'sector_id', 'integer', 'Column sector_id should be integer');
@@ -75,4 +75,4 @@ SELECT has_index('rpt_node_stats', 'rpt_node_stats_quality_min', 'Index rpt_node
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

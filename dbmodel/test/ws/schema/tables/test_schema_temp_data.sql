@@ -20,7 +20,7 @@ SELECT has_table('temp_data'::name, 'Table temp_data should exist');
 SELECT columns_are(
     'temp_data',
     ARRAY[
-        'id', 'fid', 'feature_type', 'feature_id', 'enabled', 'log_message', 'tstamp', 
+        'id', 'fid', 'feature_type', 'feature_id', 'enabled', 'log_message', 'tstamp',
         'cur_user', 'addparam', 'float_value', 'int_value', 'flag', 'date_value', 'text_value'
     ],
     'Table temp_data should have the correct columns'
@@ -33,7 +33,7 @@ SELECT col_is_pk('temp_data', ARRAY['id'], 'Column id should be primary key');
 SELECT col_type_is('temp_data', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('temp_data', 'fid', 'smallint', 'Column fid should be smallint');
 SELECT col_type_is('temp_data', 'feature_type', 'character varying(16)', 'Column feature_type should be character varying(16)');
-SELECT col_type_is('temp_data', 'feature_id', 'character varying(16)', 'Column feature_id should be character varying(16)');
+SELECT col_type_is('temp_data', 'feature_id', 'integer', 'Column feature_id should be integer');
 SELECT col_type_is('temp_data', 'enabled', 'boolean', 'Column enabled should be boolean');
 SELECT col_type_is('temp_data', 'log_message', 'text', 'Column log_message should be text');
 SELECT col_type_is('temp_data', 'tstamp', 'timestamp without time zone', 'Column tstamp should be timestamp without time zone');
@@ -56,4 +56,4 @@ SELECT has_index('temp_data', 'temp_data_feature_type', 'Index temp_data_feature
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

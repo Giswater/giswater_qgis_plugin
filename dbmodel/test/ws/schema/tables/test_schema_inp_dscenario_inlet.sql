@@ -32,7 +32,7 @@ SELECT col_is_pk('inp_dscenario_inlet', ARRAY['node_id', 'dscenario_id'], 'Colum
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_inlet', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_inlet', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_inlet', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_dscenario_inlet', 'initlevel', 'numeric(12,4)', 'Column initlevel should be numeric(12,4)');
 SELECT col_type_is('inp_dscenario_inlet', 'minlevel', 'numeric(12,4)', 'Column minlevel should be numeric(12,4)');
 SELECT col_type_is('inp_dscenario_inlet', 'maxlevel', 'numeric(12,4)', 'Column maxlevel should be numeric(12,4)');

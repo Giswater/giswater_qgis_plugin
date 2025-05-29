@@ -31,7 +31,7 @@ SELECT col_is_pk('inp_dscenario_pump', ARRAY['node_id', 'dscenario_id'], 'Column
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_pump', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_pump', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_pump', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_dscenario_pump', 'power', 'varchar', 'Column power should be varchar');
 SELECT col_type_is('inp_dscenario_pump', 'curve_id', 'varchar', 'Column curve_id should be varchar');
 SELECT col_type_is('inp_dscenario_pump', 'speed', 'numeric(12,6)', 'Column speed should be numeric(12,6)');

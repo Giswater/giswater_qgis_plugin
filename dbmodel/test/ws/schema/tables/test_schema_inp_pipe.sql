@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('inp_pipe', ARRAY['arc_id'], 'Column arc_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('inp_pipe', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('inp_pipe', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('inp_pipe', 'minorloss', 'numeric(12,6)', 'Column minorloss should be numeric(12,6)');
 SELECT col_type_is('inp_pipe', 'status', 'varchar(12)', 'Column status should be varchar(12)');
 SELECT col_type_is('inp_pipe', 'custom_roughness', 'numeric(12,4)', 'Column custom_roughness should be numeric(12,4)');

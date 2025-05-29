@@ -2514,17 +2514,17 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 ]'::json, 0, '{4,5}');
 
 INSERT INTO temp_node (id, result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, omzone_id, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node, age)
-SELECT id, result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, NULL, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node, age
+SELECT id, result_id, node_id::integer, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, NULL, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node, age
 FROM _temp_node;
 
 INSERT INTO temp_arc (id, result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, omzone_id, length, n, the_geom, expl_id,
 addparam, arcparent, q0, qmax, barrels, slope, flag, culvert, kentry, kexit, kavg, flap, seepage, age)
-SELECT id, result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, NULL, length, n, the_geom, expl_id,
+SELECT id, result_id, arc_id::integer, node_1::integer, node_2::integer, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, NULL, length, n, the_geom, expl_id,
 addparam, arcparent, q0, qmax, barrels, slope, flag, culvert, kentry, kexit, kavg, flap, seepage, age
 FROM _temp_arc;
 
 INSERT INTO temp_gully (gully_id, gully_type, gullycat_id, arc_id, node_id, sector_id, state, state_type, top_elev, units, units_placement, outlet_type, width, length, "depth", "method", weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom)
-SELECT gully_id, gully_type, gratecat_id, arc_id, node_id, sector_id, state, state_type, top_elev, units, units_placement, outlet_type, width, length, "depth", "method", weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom
+SELECT gully_id::integer, gully_type, gratecat_id, arc_id::integer, node_id::integer, sector_id, state, state_type, top_elev, units, units_placement, outlet_type, width, length, "depth", "method", weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom
 FROM _temp_gully;
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_edit_link', 'form_feature', 'tab_none', 'verified', 'lyt_data_1', 29, 'integer', 'combo', 'Verified', 'Verified', NULL, false, false, true, false, NULL, 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_verified''', true, false, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, true, NULL);
@@ -2535,18 +2535,18 @@ dv_orderby_id = true, dv_isnullvalue = true, widgetcontrols = '{"setMultiline": 
 
 -- 30/01/2025
 INSERT INTO man_manhole (node_id, length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat)
-SELECT node_id, length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat
+SELECT node_id::integer, length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat
 FROM _man_manhole;
 
 INSERT INTO review_node (node_id, top_elev, ymax, node_type, matcat_id, nodecat_id, annotation, observ, review_obs, expl_id, the_geom,
 field_checked, is_validated, field_date)
-SELECT node_id, top_elev, ymax, node_type, matcat_id, nodecat_id, annotation, observ, review_obs, expl_id, the_geom,
+SELECT node_id::integer, top_elev, ymax, node_type, matcat_id, nodecat_id, annotation, observ, review_obs, expl_id, the_geom,
 field_checked, is_validated, field_date
 FROM _review_node;
 
 INSERT INTO review_audit_node (id, node_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_node_type, new_node_type, old_matcat_id, new_matcat_id, old_nodecat_id, new_nodecat_id,
 old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user, is_validated)
-SELECT id, node_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_node_type, new_node_type, old_matcat_id, new_matcat_id, old_nodecat_id, new_nodecat_id,
+SELECT id, node_id::integer, old_top_elev, new_top_elev, old_ymax, new_ymax, old_node_type, new_node_type, old_matcat_id, new_matcat_id, old_nodecat_id, new_nodecat_id,
 old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user, is_validated
 FROM _review_audit_node;
 
@@ -2621,11 +2621,11 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 
 -- 10/02/2025
 INSERT INTO arc_add (arc_id, result_id, max_flow, max_veloc, mfull_flow, mfull_depth)
-SELECT arc_id, result_id, max_flow, max_veloc, mfull_flow, mfull_depth
+SELECT arc_id::integer, result_id, max_flow, max_veloc, mfull_flow, mfull_depth
 FROM rpt_arcflow_sum;
 
 INSERT INTO node_add (node_id, result_id, max_depth, max_height, flooding_rate, flooding_vol)
-SELECT d.node_id, result_id, max_depth, max_height, f.max_rate, f.tot_flood
+SELECT d.node_id::integer, result_id, max_depth, max_height, f.max_rate, f.tot_flood
 FROM rpt_nodedepth_sum d
 JOIN rpt_nodesurcharge_sum c USING (result_id)
 JOIN rpt_nodeflooding_sum f USING (result_id);
@@ -2776,11 +2776,11 @@ ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, stree
 label_x, label_y, label_rotation, publish, inventory, xyz_date, uncertain, unconnected, expl_id, num_value, feature_type, created_at, arc_id, updated_at,
 updated_by, created_by, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id, expl_visibility, adate, adescript, hemisphere, placement_type,
 access_type, label_quadrant, minsector_id, macrominsector_id, brand_id, model_id, serial_number)
-SELECT node_id, code, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev, node_type, nodecat_id, epa_type, sector_id, state, state_type,
+SELECT node_id::integer, code, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev, node_type, nodecat_id, epa_type, sector_id, state, state_type,
 annotation, observ, "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, link, verified::integer, the_geom,
-label_x, label_y, label_rotation, publish, inventory, xyz_date, uncertain, unconnected, expl_id, num_value, feature_type, tstamp, arc_id, lastupdate,
-lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id, ARRAY[expl_id2], adate, adescript, hemisphere, placement_type,
+label_x, label_y, label_rotation, publish, inventory, xyz_date, uncertain, unconnected, expl_id, num_value, feature_type, tstamp, arc_id::integer, lastupdate,
+lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id::integer, ARRAY[expl_id2], adate, adescript, hemisphere, placement_type,
 access_type, label_quadrant, minsector_id, macrominsector_id, brand_id, model_id, serial_number
 FROM _node;
 
@@ -2792,12 +2792,12 @@ streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom
 num_value, feature_type, created_at, updated_at, created_by, updated_by, district_id, workcat_id_plan, asset_id, pavcat_id, drainzone_id, nodetype_1,
 node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_visibility, adate, adescript, visitability, label_quadrant,
 minsector_id, macrominsector_id, brand_id, model_id, serial_number)
-SELECT arc_id, code, code, node_1, node_2, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, sys_elev1, sys_elev2, arc_type, arccat_id,
+SELECT arc_id::integer, code, code, node_1::integer, node_2::integer, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, sys_elev1, sys_elev2, arc_type, arccat_id,
 matcat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", sys_slope, inverted_slope, custom_length, dma_id, soilcat_id, function_type,
 category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
 streetaxis2_id, postnumber2, postcomplement2, descript, link, verified::integer, the_geom, label_x, label_y, label_rotation, publish, inventory, uncertain, expl_id,
 num_value, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, district_id, workcat_id_plan, asset_id, pavcat_id, drainzone_id, nodetype_1,
-node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, ARRAY[expl_id2], adate, adescript, visitability, label_quadrant,
+node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id::integer, ARRAY[expl_id2], adate, adescript, visitability, label_quadrant,
 minsector_id, macrominsector_id, brand_id, model_id, serial_number
 FROM _arc;
 
@@ -2810,12 +2810,12 @@ postcomplement2, descript, link, verified, rotation, the_geom, label_x, label_y,
 diagonal, publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, pjoint_type, pjoint_id, updated_at,
 created_by, updated_by, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, expl_visibility, adate, adescript,
 plot_code, placement_type, access_type, label_quadrant, n_hydrometer, minsector_id, macrominsector_id)
-SELECT connec_id, code, top_elev, y1, y2, connec_type, conneccat_id, sector_id, customer_code,
-demand, state, state_type, connec_depth, connec_length, arc_id, annotation, observ, "comment",
+SELECT connec_id::integer, code, top_elev, y1, y2, connec_type, conneccat_id, sector_id, customer_code,
+demand, state, state_type, connec_depth, connec_length, arc_id::integer, annotation, observ, "comment",
 dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate,
 enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2,
 postcomplement2, descript, link, verified::integer, rotation, the_geom, label_x, label_y, label_rotation, accessibility,
-diagonal, publish, inventory, uncertain, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id, lastupdate,
+diagonal, publish, inventory, uncertain, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id::integer, lastupdate,
 lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, ARRAY[expl_id2], adate, adescript,
 plot_code, placement_type, access_type, label_quadrant, n_hydrometer, minsector_id, macrominsector_id
 FROM _connec;
@@ -2830,12 +2830,12 @@ publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, pjo
 created_by, updated_by, district_id, workcat_id_plan, asset_id, _connec_matcat_id, connec_y2, _gratecat2_id,
 epa_type, groove_height, groove_length, units_placement, drainzone_id, expl_visibility, adate, adescript, siphon_type,
 odorflap, placement_type, access_type, label_quadrant, minsector_id, macrominsector_id)
-SELECT gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon,
-connec_arccat_id, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
+SELECT gully_id::integer, code, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon,
+connec_arccat_id, arc_id::integer, "_pol_id_", sector_id, state, state_type, annotation, observ,
 "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
 builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
 postnumber2, postcomplement2, descript, link, verified::integer, rotation, the_geom, label_x, label_y, label_rotation,
-publish, inventory, uncertain, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id, lastupdate,
+publish, inventory, uncertain, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id::integer, lastupdate,
 lastupdate_user, insert_user, district_id, workcat_id_plan, asset_id, connec_matcat_id, connec_y2, gullycat2_id,
 epa_type, groove_height, groove_length, units_placement, drainzone_id, ARRAY[expl_id2], adate, adescript, siphon_type,
 odorflap, placement_type, access_type, label_quadrant, minsector_id, macrominsector_id
@@ -2848,7 +2848,7 @@ INSERT INTO element (element_id, code, sys_code, elementcat_id, serial_number, n
 ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory,
 expl_id, feature_type, created_at, updated_at, created_by, updated_by, top_elev, expl_visibility, trace_featuregeom,
 muni_id, sector_id, brand_id, model_id, asset_id)
-SELECT element_id, code, code, elementcat_id, serial_number, num_elements, state, state_type, observ,
+SELECT element_id::integer, code, code, elementcat_id, serial_number, num_elements, state, state_type, observ,
 "comment", function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, rotation, link, verified::integer, the_geom, label_x, label_y, label_rotation, publish, inventory,
 expl_id, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, top_elev, ARRAY[expl_id2], trace_featuregeom,

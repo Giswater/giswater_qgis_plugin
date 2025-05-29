@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_varc', ARRAY['arc_id'], 'Column arc_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_varc', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('man_varc', 'arc_id', 'integer', 'Column arc_id should be integer');
 
 -- Check foreign keys
 SELECT has_fk('man_varc', 'Table man_varc should have foreign keys');
@@ -40,4 +40,4 @@ SELECT col_not_null('man_varc', 'arc_id', 'Column arc_id should be NOT NULL');
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

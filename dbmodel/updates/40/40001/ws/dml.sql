@@ -31,20 +31,20 @@ INSERT INTO cat_link (id, link_type) VALUES ('UPDATE_LINK_40','SERVCONNECTION');
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, created_at, sector_id,
 dma_id, fluid_type, presszone_id, dqa_id, minsector_id, expl_visibility, epa_type, is_operative, created_by, updated_at, updated_by, staticpressure, linkcat_id,
 workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, top_elev1, depth1, top_elev2, depth2)
-SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, sector_id,
+SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id::int4, feature_type, exit_id::int4, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, sector_id,
 dma_id, fluid_type, presszone_id, dqa_id, minsector_id, ARRAY[expl_id2], epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure,
 CASE
   WHEN conneccat_id IS NULL THEN
     CASE
       WHEN feature_type = 'CONNEC' THEN
-        (SELECT conneccat_id FROM connec WHERE connec_id = feature_id LIMIT 1)
+        (SELECT conneccat_id FROM connec WHERE connec_id = feature_id::int4 LIMIT 1)
       ELSE
         'UPDATE_LINK_40'
     END
   ELSE conneccat_id
 END	AS conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id,
-(SELECT c.top_elev FROM connec c WHERE c.connec_id=feature_id LIMIT 1) AS top_elev1,
-(SELECT c.depth FROM connec c WHERE c.connec_id = feature_id LIMIT 1) AS depth1,
+(SELECT c.top_elev FROM connec c WHERE c.connec_id=feature_id::int4 LIMIT 1) AS top_elev1,
+(SELECT c.depth FROM connec c WHERE c.connec_id = feature_id::int4 LIMIT 1) AS depth1,
 exit_topelev,
 CASE
   WHEN exit_topelev IS NOT NULL AND exit_elev IS NOT NULL THEN
@@ -390,8 +390,8 @@ This function could be automatic triggered by valve status (open or closed) by c
 -- 09/05/2025
 UPDATE config_form_fields SET dv_querytext =  'SELECT id, matcat_id as idval FROM cat_mat_roughness'
 WHERE formname='generic' AND formtype='nvo_roughness' AND columnname='matcat_id' AND tabname='tab_none';
-UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_valve JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = to_arc::text WHERE node_id NOT IN (node_1, node_2)' WHERE fid=170;
-UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_pump JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = to_arc::text WHERE node_id NOT IN (node_1, node_2)' WHERE fid=171;
+UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_valve JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = to_arc WHERE node_id NOT IN (node_1, node_2)' WHERE fid=170;
+UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_pump JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = to_arc WHERE node_id NOT IN (node_1, node_2)' WHERE fid=171;
 
 UPDATE inp_typevalue SET idval='HEADPUMP',id='HEADPUMP' WHERE typevalue='inp_typevalue_pumptype' AND id='PRESSPUMP';
 UPDATE inp_typevalue SET idval='POWERPUMP',id='POWERPUMP' WHERE typevalue='inp_typevalue_pumptype' AND id='FLOWPUMP';
@@ -543,11 +543,7 @@ VALUES(3514, 'Process executed for hydrant: %rec_hydrant%.', null, 0, true, 'uti
 
 UPDATE sys_function SET function_alias = 'DATA QUALITY ANALYSIS ACORDING graph ANALYTICS RULES' WHERE function_name = 'gw_fct_graphanalytics_check_data';
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(2022, '----------------------', 'separator');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator');
-
-INSERT INTO sys_label (id, idval, label_type) VALUES(3004, 'CRITICAL ERRORS', 'prefix');
 
 UPDATE sys_function SET function_alias = 'CHECK USER DATA' WHERE function_name = 'gw_fct_user_check_data';
 

@@ -7,12 +7,12 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3052
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_length(p_data json) RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_length(p_data json) RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+"form":{},"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"arcLength":"3"}}}$$)::JSON
 -- fid: v_fid
@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, 
 */
 
 DECLARE
-    
+
 v_id json;
 v_selectionmode text;
 v_worklayer text;
@@ -41,8 +41,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
@@ -52,8 +52,8 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('ARC LENGTH ANALYSIS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
@@ -85,8 +85,8 @@ BEGIN
 	  	FROM (SELECT id, arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, st_length(the_geom) as length, the_geom
 	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 	
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
 	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
 
@@ -98,20 +98,20 @@ BEGIN
 		VALUES (v_fid,  concat ('There are ',v_count,' arcs shorter than ',v_arclength ,' meters.'), v_count);
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT v_fid,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count 
+		SELECT v_fid,  concat ('Arc_id: ',array_agg(arc_id), '.' ), v_count
 		FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
 
 	END IF;
-	
+
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
@@ -120,11 +120,11 @@ BEGIN
 			'"line":'||v_result_line||
 		'}}'||
 	    '}')::json, 3052, null, null, null);
-		
+
 	-- Exception control
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM,  'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE,  
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM,  'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE,
 	'SQLCONTEXT', v_error_context)::json;
 
 

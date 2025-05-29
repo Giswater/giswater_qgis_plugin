@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('node_add', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('node_add', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('node_add', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('node_add', 'demand_max', 'numeric(12,2)', 'Column demand_max should be numeric(12,2)');
 SELECT col_type_is('node_add', 'demand_min', 'numeric(12,2)', 'Column demand_min should be numeric(12,2)');
 SELECT col_type_is('node_add', 'demand_avg', 'numeric(12,2)', 'Column demand_avg should be numeric(12,2)');
@@ -54,4 +54,4 @@ SELECT fk_ok('node_add', 'node_id', 'node', 'node_id', 'FK node_id should refere
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

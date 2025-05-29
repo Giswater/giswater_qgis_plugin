@@ -36,7 +36,7 @@ SELECT col_type_is('polygon', 'text', 'text', 'Column text should be text');
 SELECT col_type_is('polygon', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('polygon', 'tstamp', 'timestamp without time zone', 'Column tstamp should be timestamp without time zone');
 SELECT col_type_is('polygon', 'featurecat_id', 'character varying(50)', 'Column featurecat_id should be character varying(50)');
-SELECT col_type_is('polygon', 'feature_id', 'character varying(16)', 'Column feature_id should be character varying(16)');
+SELECT col_type_is('polygon', 'feature_id', 'integer', 'Column feature_id should be integer');
 SELECT col_type_is('polygon', 'state', 'smallint', 'Column state should be smallint');
 SELECT col_type_is('polygon', 'trace_featuregeom', 'boolean', 'Column trace_featuregeom should be boolean');
 SELECT col_type_is('element', 'lock_level', 'integer', 'Column lock_level should be integer');

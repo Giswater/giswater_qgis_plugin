@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_genelem', ARRAY['element_id'], 'Column element_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_genelem', 'element_id', 'varchar(16)', 'Column element_id should be varchar(16)');
+SELECT col_type_is('man_genelem', 'element_id', 'integer', 'Column element_id should be integer');
 
 -- Check not null constraints
 SELECT col_not_null('man_genelem', 'element_id', 'Column element_id should be NOT NULL');

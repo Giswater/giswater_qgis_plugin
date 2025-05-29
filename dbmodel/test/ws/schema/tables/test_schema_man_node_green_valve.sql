@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_node_green_valve', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_node_green_valve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_node_green_valve', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_node_green_valve', 'greenvalve_param_1', 'boolean', 'Column greenvalve_param_1 should be boolean');
 SELECT col_type_is('man_node_green_valve', 'greenvalve_param_2', 'text', 'Column greenvalve_param_2 should be text');
 
@@ -44,4 +44,4 @@ SELECT has_index('man_node_green_valve', 'man_node_green_valve_node_id_index', '
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

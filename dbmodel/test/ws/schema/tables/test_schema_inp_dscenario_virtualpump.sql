@@ -31,7 +31,7 @@ SELECT col_is_pk('inp_dscenario_virtualpump', ARRAY['dscenario_id', 'arc_id'], '
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_virtualpump', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_virtualpump', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_virtualpump', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('inp_dscenario_virtualpump', 'power', 'varchar', 'Column power should be varchar');
 SELECT col_type_is('inp_dscenario_virtualpump', 'curve_id', 'varchar', 'Column curve_id should be varchar');
 SELECT col_type_is('inp_dscenario_virtualpump', 'speed', 'numeric(12,6)', 'Column speed should be numeric(12,6)');

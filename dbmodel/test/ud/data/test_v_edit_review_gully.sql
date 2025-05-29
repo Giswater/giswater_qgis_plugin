@@ -22,9 +22,9 @@ VALUES('-901', 0, 0, 0, '', '', '', 0, false, false, '', '', '', '', 0, null, nu
 SELECT is((SELECT count(*)::integer FROM v_edit_review_gully  WHERE gully_id = '-901'), 1, 'INSERT: v_edit_review_gully  -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM review_gully WHERE gully_id = '-901'), 1, 'INSERT: review_gully -901 was inserted');
 
-UPDATE v_edit_review_gully  SET observ = 'updated observ' WHERE gully_id = '-901';
-SELECT is((SELECT observ FROM v_edit_review_gully  WHERE gully_id = '-901'), 'updated observ', 'UPDATE: v_edit_review_gully  -901 was updated');
-SELECT is((SELECT observ FROM review_gully WHERE gully_id = '-901'), 'updated observ', 'UPDATE: review_gully -901 was updated');
+UPDATE v_edit_review_gully SET annotation = 'updated annotation' WHERE gully_id = '-901';
+SELECT is((SELECT annotation FROM v_edit_review_gully  WHERE gully_id = '-901'), 'updated annotation', 'UPDATE: v_edit_review_gully  -901 was updated');
+SELECT is((SELECT annotation FROM review_gully WHERE gully_id = '-901'), 'updated annotation', 'UPDATE: review_gully -901 was updated');
 
 DELETE FROM v_edit_review_gully  WHERE gully_id = '-901';
 SELECT is((SELECT count(*)::integer FROM v_edit_review_gully  WHERE gully_id = '-901'), 0, 'DELETE: v_edit_review_gully  -901 was deleted');

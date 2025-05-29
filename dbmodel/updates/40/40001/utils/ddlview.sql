@@ -30,60 +30,31 @@ DROP VIEW IF EXISTS v_edit_flwreg CASCADE;
 DROP VIEW IF EXISTS v_edit_inp_frpump CASCADE;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_frpump CASCADE;
 
-DROP VIEW IF EXISTS vi_controls;
-DROP VIEW IF EXISTS vi_coordinates;
-DROP VIEW IF EXISTS vi_curves;
-DROP VIEW IF EXISTS vi_demands;
-DROP VIEW IF EXISTS vi_emitters;
-DROP VIEW IF EXISTS vi_junctions;
-DROP VIEW IF EXISTS vi_labels;
-DROP VIEW IF EXISTS vi_mixing;
-DROP VIEW IF EXISTS vi_patterns;
-DROP VIEW IF EXISTS vi_pipes;
-DROP VIEW IF EXISTS vi_pumps;
-DROP VIEW IF EXISTS vi_reservoirs;
-DROP VIEW IF EXISTS vi_rules;
-DROP VIEW IF EXISTS vi_sources;
-DROP VIEW IF EXISTS vi_status;
-DROP VIEW IF EXISTS vi_tags;
-DROP VIEW IF EXISTS vi_tanks;
-DROP VIEW IF EXISTS vi_title;
-DROP VIEW IF EXISTS vi_valves;
-DROP VIEW IF EXISTS vi_vertices;
-
-DROP VIEW IF EXISTS vi_adjustments;
-DROP VIEW IF EXISTS vi_aquifers;
-DROP VIEW IF EXISTS vi_buildup;
-DROP VIEW IF EXISTS vi_evaporation;
-DROP VIEW IF EXISTS vi_files;
-DROP VIEW IF EXISTS vi_gully;
-DROP VIEW IF EXISTS vi_hydrographs;
-DROP VIEW IF EXISTS vi_inflows;
-DROP VIEW IF EXISTS vi_landuses;
-DROP VIEW IF EXISTS vi_lid_controls;
-DROP VIEW IF EXISTS vi_map;
--- DROP VIEW IF EXISTS vi_pollutants; -- TODO: refactor gw_fct_rpt2pg_import_rpt
-DROP VIEW IF EXISTS vi_polygons;
-DROP VIEW IF EXISTS vi_raingages;
-DROP VIEW IF EXISTS vi_rdii;
-DROP VIEW IF EXISTS vi_snowpacks;
-DROP VIEW IF EXISTS vi_symbols;
-DROP VIEW IF EXISTS vi_temperature;
-DROP VIEW IF EXISTS vi_transects;
-DROP VIEW IF EXISTS vi_treatment;
-DROP VIEW IF EXISTS vi_washoff;
-
 DROP VIEW IF EXISTS vu_dma;
 DROP VIEW IF EXISTS vu_link;
 DROP VIEW IF EXISTS vu_arc;
 DROP VIEW IF EXISTS vu_node;
 DROP VIEW IF EXISTS vu_connec;
 
-DROP VIEW IF EXISTS v_sector_node;
-
 DROP VIEW IF EXISTS v_edit_plan_psector;;
 DROP VIEW IF EXISTS v_ui_plan_psector;
 
+CREATE OR REPLACE VIEW v_edit_plan_psector_x_other
+AS SELECT plan_psector_x_other.id,
+    plan_psector_x_other.psector_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    rpad(v_price_compost.descript::text, 125) AS price_descript,
+    v_price_compost.price,
+    plan_psector_x_other.measurement,
+    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
+    plan_psector_x_other.observ,
+    plan_psector.atlas_id,
+    plan_psector_x_other.the_geom
+   FROM plan_psector_x_other
+     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
+  ORDER BY plan_psector_x_other.psector_id;
 
 CREATE OR REPLACE VIEW v_edit_cat_feature_link
 AS SELECT cat_feature.id,
@@ -887,3 +858,39 @@ AS SELECT plan_psector.psector_id,
      LEFT JOIN plan_typevalue s ON s.id::text = plan_psector.status::text AND s.typevalue = 'psector_status'::text
      LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
   WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW vcv_emitters AS
+  SELECT DISTINCT node_id, sum(length/10000) as coef
+    FROM selector_inp_result r,rpt_inp_arc a
+    JOIN rpt_inp_node n USING(result_id)
+    WHERE (a.node_1 = n.node_id OR a.node_2 = n.node_id) and r.result_id = n.result_id
+    AND r.cur_user = "current_user"()::text
+    GROUP BY node_id;
+
+
+CREATE OR REPLACE VIEW v_edit_dimensions
+AS SELECT dimensions.id,
+    dimensions.distance,
+    dimensions.depth,
+    dimensions.the_geom,
+    dimensions.x_label,
+    dimensions.y_label,
+    dimensions.rotation_label,
+    dimensions.offset_label,
+    dimensions.direction_arrow,
+    dimensions.x_symbol,
+    dimensions.y_symbol,
+    dimensions.feature_id,
+    dimensions.feature_type,
+    dimensions.state,
+    dimensions.expl_id,
+    dimensions.observ,
+    dimensions.comment,
+    dimensions.sector_id,
+    dimensions.muni_id
+   FROM selector_expl,
+    dimensions
+     JOIN v_state_dimensions ON dimensions.id = v_state_dimensions.id
+     LEFT JOIN selector_municipality m USING (muni_id)
+     JOIN selector_sector s USING (sector_id)
+  WHERE (m.cur_user = CURRENT_USER::text OR dimensions.muni_id IS NULL) AND s.cur_user = CURRENT_USER::text AND dimensions.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;

@@ -13,9 +13,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_statecontrol()
   RETURNS trigger AS
 $BODY$
-DECLARE 
+DECLARE
 v_state_control_disable boolean;
-  
+
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -26,12 +26,12 @@ BEGIN
 
 		-- this trigger must act separate from toponcontrol_node simply it not works. It must work before the downgrade, because if not after downgrade it's not possible...
 		-- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
-		PERFORM gw_fct_state_control('NODE', NEW.node_id, NEW.state, TG_OP);
+		PERFORM gw_fct_state_control(json_build_object('feature_type_aux', 'NODE', 'feature_id_aux', NEW.node_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP));
 	END IF;
-	
+
 	RETURN NEW;
-    
-END; 
+
+END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

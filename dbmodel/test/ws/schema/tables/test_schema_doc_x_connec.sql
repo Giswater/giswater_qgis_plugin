@@ -30,7 +30,7 @@ SELECT col_is_pk('doc_x_connec', ARRAY['doc_id', 'connec_id'], 'Columns doc_id a
 
 -- Check column types
 SELECT col_type_is('doc_x_connec', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
-SELECT col_type_is('doc_x_connec', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
+SELECT col_type_is('doc_x_connec', 'connec_id', 'integer', 'Column connec_id should be integer');
 
 -- Check foreign keys
 SELECT has_fk('doc_x_connec', 'Table doc_x_connec should have foreign keys');

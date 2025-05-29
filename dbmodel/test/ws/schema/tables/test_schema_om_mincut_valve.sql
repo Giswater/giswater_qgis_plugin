@@ -31,7 +31,7 @@ SELECT col_is_pk('om_mincut_valve', ARRAY['id'], 'Column id should be primary ke
 -- Check column types
 SELECT col_type_is('om_mincut_valve', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('om_mincut_valve', 'result_id', 'integer', 'Column result_id should be integer');
-SELECT col_type_is('om_mincut_valve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('om_mincut_valve', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('om_mincut_valve', 'closed', 'boolean', 'Column closed should be boolean');
 SELECT col_type_is('om_mincut_valve', 'broken', 'boolean', 'Column broken should be boolean');
 SELECT col_type_is('om_mincut_valve', 'unaccess', 'boolean', 'Column unaccess should be boolean');
@@ -56,4 +56,4 @@ SELECT has_index('om_mincut_valve', 'mincut_valve_index', 'Table should have min
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

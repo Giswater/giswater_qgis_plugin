@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setchangevalvestatus(p_data json) 
 DECLARE
 
 v_mincut_id integer;
-v_node text;
+v_node integer;
 v_error_context text;
 v_level integer;
 v_status text;
@@ -38,7 +38,7 @@ BEGIN
 
 	-- get input parameters
 	v_mincut_id := ((p_data ->>'data')::json->>'mincutId')::integer;
-	v_node := ((p_data ->>'data')::json->>'nodeId')::text;
+	v_node := ((p_data ->>'data')::json->>'nodeId')::integer;
 	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::text;
 
 	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';

@@ -14,8 +14,6 @@ DROP VIEW IF EXISTS v_rpt_comp_arc_hourly;
 DROP VIEW IF EXISTS v_edit_inp_pattern;
 DROP VIEW IF EXISTS v_edit_inp_pattern_value;
 
-DROP VIEW IF EXISTS v_edit_review_node;
-
 DROP VIEW IF EXISTS v_price_x_arc;
 
 
@@ -206,8 +204,8 @@ AS WITH
       vst.is_operative,
       arc.is_scadamap,
       CASE
-        WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
-        ELSE NULL::character varying(16)
+        WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::text THEN arc.epa_type
+        ELSE NULL::text
       END AS inp_type,
       arc_add.result_id,
       arc_add.flow_max,
@@ -239,7 +237,7 @@ AS WITH
       arc.updated_by,
       arc.the_geom
       FROM arc_selector
-      JOIN arc ON arc.arc_id::text = arc_selector.arc_id::text
+      JOIN arc ON arc.arc_id = arc_selector.arc_id
       JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
       JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
       JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -250,7 +248,7 @@ AS WITH
       LEFT JOIN dqa_table ON dqa_table.dqa_id = arc.dqa_id
       LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = arc.supplyzone_id
       LEFT JOIN omzone_table ON omzone_table.omzone_id = arc.omzone_id
-      LEFT JOIN arc_add ON arc_add.arc_id::text = arc.arc_id::text
+      LEFT JOIN arc_add ON arc_add.arc_id = arc.arc_id
       LEFT JOIN value_state_type vst ON vst.id = arc.state_type
     )
   SELECT arc_selected.*
@@ -442,8 +440,8 @@ AS WITH
         vst.is_operative,
         node.is_scadamap,
         CASE
-          WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
-          ELSE NULL::character varying(16)
+          WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::text THEN node.epa_type
+          ELSE NULL::text
         END AS inp_type,
         node_add.demand_max,
         node_add.demand_min,
@@ -489,7 +487,7 @@ AS WITH
         LEFT JOIN dqa_table ON dqa_table.dqa_id = node.dqa_id
         LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = node.supplyzone_id
         LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
-        LEFT JOIN node_add ON node_add.node_id::text = node.node_id::text
+        LEFT JOIN node_add ON node_add.node_id = node.node_id
         LEFT JOIN man_valve m ON m.node_id = node.node_id
       )
     SELECT n.*
@@ -650,9 +648,9 @@ AS WITH
         l.datasource,
         l.is_operative,
         CASE
-          WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text
-          THEN l.epa_type::character varying
-          ELSE NULL::character varying(16)
+          WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::text AND inp_network_mode.value = '4'::text
+          THEN l.epa_type::text
+          ELSE NULL::text
         END AS inp_type,
         l.lock_level,
         l.expl_visibility,
@@ -751,7 +749,7 @@ AS WITH
       ),
     connec_selector AS
       (
-        SELECT connec.connec_id, arc_id::varchar(16), null::integer as link_id
+        SELECT connec.connec_id, arc_id, null::integer AS link_id
         FROM connec
         JOIN selector_state s ON s.cur_user = CURRENT_USER AND connec.state = s.state_id
         LEFT JOIN (
@@ -774,7 +772,7 @@ AS WITH
           AND sm.muni_id = connec.muni_id
         )
         UNION ALL
-        SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
+        SELECT connec_id, connec_psector.arc_id, link_id FROM connec_psector
         WHERE p_state = 1
       ),
     connec_selected AS
@@ -952,8 +950,8 @@ AS WITH
           connec.publish,
           vst.is_operative,
           CASE
-            WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text THEN connec.epa_type::character varying
-            ELSE NULL::character varying(16)
+            WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::text AND inp_network_mode.value = '4'::text THEN connec.epa_type::character varying
+            ELSE NULL::text
           END AS inp_type,
           connec_add.demand_base,
           connec_add.demand_max,
@@ -1002,7 +1000,7 @@ AS WITH
         LEFT JOIN omzone_table ON omzone_table.omzone_id = connec.omzone_id
         LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
         LEFT JOIN link_planned USING (link_id)
-        LEFT JOIN connec_add ON connec_add.connec_id::text = connec.connec_id::text
+        LEFT JOIN connec_add ON connec_add.connec_id = connec.connec_id
         LEFT JOIN value_state_type vst ON vst.id = connec.state_type
         LEFT JOIN inp_network_mode ON true
       )
@@ -1295,7 +1293,7 @@ AS SELECT d.arc_id,
                            FROM v_edit_arc
                              LEFT JOIN v_price_x_catarc ON v_edit_arc.arccat_id::text = v_price_x_catarc.id::text
                              LEFT JOIN v_price_x_catsoil ON v_edit_arc.soilcat_id::text = v_price_x_catsoil.id::text
-                             LEFT JOIN v_plan_aux_arc_pavement ON v_plan_aux_arc_pavement.arc_id::text = v_edit_arc.arc_id::text
+                             LEFT JOIN v_plan_aux_arc_pavement ON v_plan_aux_arc_pavement.arc_id = v_edit_arc.arc_id
                           WHERE v_plan_aux_arc_pavement.arc_id IS NOT NULL
                         )
                  SELECT v_plan_aux_arc_ml.arc_id,
@@ -1435,7 +1433,7 @@ AS SELECT d.arc_id,
                 END::numeric(14,2) AS total_budget,
             v_plan_aux_arc_cost.the_geom
            FROM v_plan_aux_arc_cost
-             JOIN arc ON arc.arc_id::text = v_plan_aux_arc_cost.arc_id::text
+             JOIN arc ON arc.arc_id = v_plan_aux_arc_cost.arc_id
              LEFT JOIN ( SELECT DISTINCT ON (c.arc_id) c.arc_id,
                     (p.price * count(*)::numeric)::numeric(12,2) AS connec_total_cost
                    FROM v_edit_connec c
@@ -1443,9 +1441,8 @@ AS SELECT d.arc_id,
                      JOIN cat_arc ON cat_arc.id::text = arc_1.arccat_id::text
                      LEFT JOIN v_price_compost p ON cat_arc.connect_cost = p.id::text
                   WHERE c.arc_id IS NOT NULL
-                  GROUP BY c.arc_id, p.price) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d
+                  GROUP BY c.arc_id, p.price) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id = v_plan_aux_arc_cost.arc_id) d
   WHERE d.arc_id IS NOT NULL;
-
 
 CREATE OR REPLACE VIEW v_ext_raster_dem
 AS SELECT DISTINCT ON (r.id) r.id,
@@ -1488,7 +1485,7 @@ AS SELECT
     element.updated_at,
     element.updated_by
    FROM element_x_arc
-     JOIN element ON element.element_id::text = element_x_arc.element_id::text
+     JOIN element ON element.element_id = element_x_arc.element_id
      JOIN value_state ON element.state = value_state.id
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
@@ -1520,7 +1517,7 @@ AS SELECT
     element.updated_at,
     element.updated_by
    FROM element_x_connec
-     JOIN element ON element.element_id::text = element_x_connec.element_id::text
+     JOIN element ON element.element_id = element_x_connec.element_id
      JOIN value_state ON element.state = value_state.id
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
@@ -1551,7 +1548,7 @@ AS SELECT
     element.updated_at,
     element.updated_by
    FROM element_x_node
-     JOIN element ON element.element_id::text = element_x_node.element_id::text
+     JOIN element ON element.element_id = element_x_node.element_id
      JOIN value_state ON element.state = value_state.id
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
@@ -1582,7 +1579,7 @@ AS SELECT
     element.updated_at,
     element.updated_by
    FROM element_x_link
-     JOIN element ON element.element_id::text = element_x_link.element_id::text
+     JOIN element ON element.element_id = element_x_link.element_id
      JOIN value_state ON element.state = value_state.id
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
@@ -1597,7 +1594,7 @@ AS WITH links_node AS (
             l.state AS l_state,
             n.state AS n_state
            FROM node n
-             JOIN link l ON n.node_id::text = l.exit_id::text
+             JOIN link l ON n.node_id = l.exit_id
           WHERE l.state = 1
         )
  SELECT row_number() OVER () + 1000000 AS rid,
@@ -1615,8 +1612,8 @@ AS WITH links_node AS (
     l.exit_id AS proceed_from_id,
     'v_edit_connec'::text AS sys_table_id
    FROM v_edit_connec
-     JOIN link l ON v_edit_connec.connec_id::text = l.feature_id::text
-     JOIN arc a ON a.arc_id::text = v_edit_connec.arc_id::text
+     JOIN link l ON v_edit_connec.connec_id = l.feature_id
+     JOIN arc a ON a.arc_id = v_edit_connec.arc_id
   WHERE v_edit_connec.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND l.state = 1 AND a.state = 1
 UNION
  SELECT DISTINCT ON (c.connec_id) row_number() OVER () + 2000000 AS rid,
@@ -1634,8 +1631,8 @@ UNION
     n.proceed_from_id,
     'v_edit_connec'::text AS sys_table_id
    FROM arc a
-     JOIN links_node n ON a.node_1::text = n.node_id::text
-     JOIN v_edit_connec c ON c.connec_id::text = n.feature_id::text;
+     JOIN links_node n ON a.node_1 = n.node_id
+     JOIN v_edit_connec c ON c.connec_id = n.feature_id;
 
 CREATE OR REPLACE VIEW v_ui_arc_x_node
 AS SELECT v_edit_arc.arc_id,
@@ -1646,8 +1643,8 @@ AS SELECT v_edit_arc.arc_id,
     st_x(b.the_geom) AS x2,
     st_y(b.the_geom) AS y2
    FROM v_edit_arc
-     LEFT JOIN node a ON a.node_id::text = v_edit_arc.node_1::text
-     LEFT JOIN node b ON b.node_id::text = v_edit_arc.node_2::text;
+     LEFT JOIN node a ON a.node_id = v_edit_arc.node_1
+     LEFT JOIN node b ON b.node_id = v_edit_arc.node_2;
 
 CREATE OR REPLACE VIEW v_ui_node_x_relations AS
 SELECT row_number() OVER (ORDER BY v_edit_node.node_id) AS rid,
@@ -1664,7 +1661,7 @@ SELECT row_number() OVER (ORDER BY v_edit_node.node_id) AS rid,
 CREATE OR REPLACE VIEW v_rtc_period_hydrometer
 AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     v_edit_connec.connec_id,
-    NULL::character varying(16) AS pjoint_id,
+    NULL::int4 AS pjoint_id,
     temp_arc.node_1,
     temp_arc.node_2,
     ext_cat_period.id AS period_id,
@@ -1686,8 +1683,8 @@ AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
      JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_arc ON v_edit_connec.arc_id::text = temp_arc.arc_id::text
+     JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
+     JOIN temp_arc ON v_edit_connec.arc_id = temp_arc.arc_id
      JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_edit_connec.dma_id
   WHERE ext_cat_period.id::text = (( SELECT config_param_user.value
            FROM config_param_user
@@ -1696,8 +1693,8 @@ UNION
  SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     v_edit_connec.connec_id,
     temp_node.node_id AS pjoint_id,
-    NULL::character varying AS node_1,
-    NULL::character varying AS node_2,
+    NULL::int4 AS node_1,
+    NULL::int4 AS node_2,
     ext_cat_period.id AS period_id,
     ext_cat_period.period_seconds,
     c.dma_id,
@@ -1717,7 +1714,7 @@ UNION
      JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
      JOIN temp_node ON concat('VN', v_edit_connec.pjoint_id) = temp_node.node_id::text
      JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
   WHERE v_edit_connec.pjoint_type::text = 'VNODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
@@ -1727,8 +1724,8 @@ UNION
  SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     v_edit_connec.connec_id,
     temp_node.node_id AS pjoint_id,
-    NULL::character varying AS node_1,
-    NULL::character varying AS node_2,
+    NULL::int4 AS node_1,
+    NULL::int4 AS node_2,
     ext_cat_period.id AS period_id,
     ext_cat_period.period_seconds,
     c.dma_id,
@@ -1748,8 +1745,8 @@ UNION
      JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_node ON v_edit_connec.pjoint_id::text = temp_node.node_id::text
+     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
+     JOIN temp_node ON v_edit_connec.pjoint_id = temp_node.node_id
      JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
   WHERE v_edit_connec.pjoint_type::text = 'NODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
            FROM config_param_user
@@ -1835,8 +1832,8 @@ AS SELECT a.node_id,
             v_edit_node.the_geom
            FROM v_edit_node
              LEFT JOIN v_price_x_catnode ON v_edit_node.nodecat_id::text = v_price_x_catnode.id::text
-             LEFT JOIN man_tank ON man_tank.node_id::text = v_edit_node.node_id::text
-             LEFT JOIN man_pump ON man_pump.node_id::text = v_edit_node.node_id::text
+             LEFT JOIN man_tank ON man_tank.node_id = v_edit_node.node_id
+             LEFT JOIN man_pump ON man_pump.node_id = v_edit_node.node_id
              LEFT JOIN cat_node ON cat_node.id::text = v_edit_node.nodecat_id::text
              LEFT JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text) a;
 
@@ -1855,7 +1852,7 @@ AS SELECT node.node_id,
    FROM node
      JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN v_price_compost ON cat_node.cost::text = v_price_compost.id::text
-     JOIN v_plan_node ON node.node_id::text = v_plan_node.node_id::text;
+     JOIN v_plan_node ON node.node_id = v_plan_node.node_id;
 
 CREATE OR REPLACE VIEW v_plan_result_node
 AS SELECT plan_rec_result_node.node_id,
@@ -2050,7 +2047,7 @@ AS SELECT rpt_node.id,
     node.the_geom
    FROM selector_rpt_main,
     rpt_inp_node node
-     JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+     JOIN rpt_node ON rpt_node.node_id = node.node_id
   WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = CURRENT_USER AND node.result_id::text = selector_rpt_main.result_id::text
   ORDER BY rpt_node.press, node.node_id;
 
@@ -2100,7 +2097,7 @@ AS SELECT rpt_arc.id,
     arc.the_geom
    FROM selector_rpt_main,
    rpt_inp_arc arc
-   JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+   JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
    WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = CURRENT_USER AND arc.result_id::text = selector_rpt_main.result_id::text
    ORDER BY rpt_arc.setting, arc.arc_id;
 
@@ -2216,7 +2213,7 @@ AS SELECT inp_connec.connec_id,
     v_rpt_node_stats.quality_min AS qualmin,
     v_rpt_node_stats.quality_avg AS qualavg
    FROM inp_connec
-     LEFT JOIN v_rpt_node_stats ON inp_connec.connec_id::text = v_rpt_node_stats.node_id::text;
+     LEFT JOIN v_rpt_node_stats ON inp_connec.connec_id = v_rpt_node_stats.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_inlet
 AS SELECT inp_inlet.node_id,
@@ -2287,7 +2284,7 @@ AS SELECT inp_pump.node_id,
     v_rpt_arc_stats.ffactor_min
    FROM inp_pump
      LEFT JOIN v_rpt_arc_stats ON concat(inp_pump.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
-     LEFT JOIN man_pump p ON p.node_id::text = inp_pump.node_id::text;
+     LEFT JOIN man_pump p ON p.node_id = inp_pump.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_pump_additional
 AS SELECT inp_pump_additional.id,
@@ -2359,7 +2356,7 @@ AS SELECT inp_valve.node_id,
      JOIN inp_valve USING (node_id)
       LEFT JOIN cat_node ON cat_node.id = node.nodecat_id
      LEFT JOIN v_rpt_arc_stats ON concat(inp_valve.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
-     LEFT JOIN man_valve v ON v.node_id::text = inp_valve.node_id::text;
+     LEFT JOIN man_valve v ON v.node_id = inp_valve.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_shortpipe
 AS SELECT inp_shortpipe.node_id,
@@ -2395,7 +2392,7 @@ AS SELECT inp_shortpipe.node_id,
     LEFT JOIN cat_node ON cat_node.id = node.nodecat_id
      JOIN inp_shortpipe USING (node_id)
      LEFT JOIN v_rpt_arc_stats ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
-     LEFT JOIN man_valve v ON v.node_id::text = inp_shortpipe.node_id::text;
+     LEFT JOIN man_valve v ON v.node_id = inp_shortpipe.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_pipe AS
  SELECT inp_pipe.arc_id,
@@ -2458,7 +2455,7 @@ AS SELECT inp_dscenario_demand.id,
     node.dma_id,
     node.the_geom
    FROM inp_dscenario_demand
-     JOIN node ON node.node_id::text = inp_dscenario_demand.feature_id::text
+     JOIN node ON node.node_id = inp_dscenario_demand.feature_id
      JOIN selector_sector s ON s.sector_id = node.sector_id
      JOIN selector_inp_dscenario d USING (dscenario_id)
   WHERE s.cur_user = CURRENT_USER AND d.cur_user = CURRENT_USER
@@ -2477,7 +2474,7 @@ UNION
     connec.dma_id,
     connec.the_geom
    FROM inp_dscenario_demand
-     JOIN connec ON connec.connec_id::text = inp_dscenario_demand.feature_id::text
+     JOIN connec ON connec.connec_id = inp_dscenario_demand.feature_id
      JOIN selector_sector s ON s.sector_id = connec.sector_id
      JOIN selector_inp_dscenario d USING (dscenario_id)
   WHERE s.cur_user = CURRENT_USER AND d.cur_user = CURRENT_USER;
@@ -2816,7 +2813,7 @@ AS SELECT n.node_id,
     n.the_geom
     FROM v_edit_node n
     JOIN inp_shortpipe using (node_id)
-    LEFT JOIN man_valve v ON v.node_id::text = n.node_id::text
+    LEFT JOIN man_valve v ON v.node_id = n.node_id
 	WHERE n.is_operative IS TRUE;
 
 
@@ -3259,7 +3256,7 @@ UNION
     a.m2pav_cost AS total_cost,
     p.length
    FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, act_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, thickness_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
-     JOIN v_plan_aux_arc_pavement a ON a.arc_id::text = p.arc_id::text
+     JOIN v_plan_aux_arc_pavement a ON a.arc_id = p.arc_id
      JOIN cat_pavement c ON a.pavcat_id::text = c.id::text
      LEFT JOIN v_price_compost r ON a.price_id::text = c.m2_cost::text
 UNION
@@ -3654,7 +3651,7 @@ AS SELECT plan_psector.psector_id,
                     plan_psector_x_arc.descript,
                     plan_psector_x_arc.addparam
                    FROM v_plan_arc
-                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id = v_plan_arc.arc_id
                      JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_arc.psector_id
                   WHERE plan_psector_x_arc.doable IS TRUE
                   ORDER BY plan_psector_x_arc.psector_id) v_plan_psector_x_arc(rid, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arc_id_1, psector_id, state_1, doable, descript, addparam)
@@ -3685,7 +3682,7 @@ AS SELECT plan_psector.psector_id,
                     plan_psector_x_node.doable,
                     plan_psector_x_node.descript
                    FROM v_plan_node
-                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id = v_plan_node.node_id
                      JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_node.psector_id
                   WHERE plan_psector_x_node.doable IS TRUE
                   ORDER BY plan_psector_x_node.psector_id) v_plan_psector_x_node(rid, node_id, nodecat_id, node_type, top_elev, elev, epa_type, state, sector_id, expl_id, annotation, cost_unit, descript, cost, measurement, budget, the_geom, id, node_id_1, psector_id, state_1, doable, descript_1)
@@ -3848,7 +3845,7 @@ AS SELECT plan_psector.psector_id,
                     plan_psector_x_arc.descript,
                     plan_psector_x_arc.addparam
                    FROM v_plan_arc
-                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id = v_plan_arc.arc_id
                      JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_arc.psector_id
                   ORDER BY plan_psector_x_arc.psector_id) v_plan_psector_x_arc(rid, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arc_id_1, psector_id, state_1, doable, descript, addparam)
           GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
@@ -3878,7 +3875,7 @@ AS SELECT plan_psector.psector_id,
                     plan_psector_x_node.doable,
                     plan_psector_x_node.descript
                    FROM v_plan_node
-                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id = v_plan_node.node_id
                      JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_node.psector_id
                   ORDER BY plan_psector_x_node.psector_id) v_plan_psector_x_node(rid, node_id, nodecat_id, node_type, top_elev, elev, epa_type, state, sector_id, expl_id, annotation, cost_unit, descript, cost, measurement, budget, the_geom, id, node_id_1, psector_id, state_1, doable, descript_1)
           GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
@@ -4050,7 +4047,7 @@ AS SELECT plan_psector.psector_id,
                     plan_psector_x_arc.descript,
                     plan_psector_x_arc.addparam
                    FROM v_plan_arc
-                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id = v_plan_arc.arc_id
                      JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_arc.psector_id
                   ORDER BY plan_psector_x_arc.psector_id) v_plan_psector_x_arc(rid, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arc_id_1, psector_id, state_1, doable, descript, addparam)
           GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
@@ -4080,7 +4077,7 @@ AS SELECT plan_psector.psector_id,
                     plan_psector_x_node.doable,
                     plan_psector_x_node.descript
                    FROM v_plan_node
-                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id = v_plan_node.node_id
                      JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_node.psector_id
                   ORDER BY plan_psector_x_node.psector_id) v_plan_psector_x_node(rid, node_id, nodecat_id, node_type, top_elev, elev, epa_type, state, sector_id, expl_id, annotation, cost_unit, descript, cost, measurement, budget, the_geom, id, node_id_1, psector_id, state_1, doable, descript_1)
           GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
@@ -4159,7 +4156,7 @@ AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
     (v_plan_arc.total_budget / v_plan_arc.length)::numeric(14,2) AS unitary_cost,
     v_plan_arc.total_budget
    FROM v_plan_arc
-     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id = v_plan_arc.arc_id
   WHERE plan_psector_x_arc.doable = true
 UNION
  SELECT row_number() OVER (ORDER BY v_plan_node.node_id) + 9999 AS rid,
@@ -4171,14 +4168,14 @@ UNION
     v_plan_node.budget AS unitary_cost,
     v_plan_node.budget AS total_budget
    FROM v_plan_node
-     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+     JOIN plan_psector_x_node ON plan_psector_x_node.node_id = v_plan_node.node_id
   WHERE plan_psector_x_node.doable = true
 UNION
  SELECT row_number() OVER (ORDER BY v_edit_plan_psector_x_other.id) + 19999 AS rid,
     v_edit_plan_psector_x_other.psector_id,
     'other'::text AS feature_type,
     v_edit_plan_psector_x_other.price_id AS featurecat_id,
-    v_edit_plan_psector_x_other.observ AS feature_id,
+    NULL AS feature_id,
     v_edit_plan_psector_x_other.measurement AS length,
     v_edit_plan_psector_x_other.price AS unitary_cost,
     v_edit_plan_psector_x_other.total_budget
@@ -4204,7 +4201,7 @@ AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
     plan_psector.priority,
     v_plan_arc.the_geom
    FROM v_plan_arc
-     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id = v_plan_arc.arc_id
      JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
   WHERE plan_psector_x_arc.doable = true
   ORDER BY plan_psector_x_arc.psector_id;
@@ -4236,7 +4233,7 @@ AS SELECT v_plan_arc.arc_id,
     v_plan_arc.budget AS other_budget,
     v_plan_arc.total_budget
    FROM v_plan_arc
-     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id = v_plan_arc.arc_id
   WHERE plan_psector_x_arc.doable = true
   ORDER BY plan_psector_x_arc.psector_id, v_plan_arc.soilcat_id, v_plan_arc.arccat_id;
 
@@ -4409,7 +4406,7 @@ CREATE OR REPLACE VIEW vcv_emitters_log
    FROM selector_inp_result r,
     rpt_inp_arc a
      JOIN rpt_inp_node n USING (result_id)
-  WHERE (a.node_1::text = n.node_id::text OR a.node_2::text = n.node_id::text) AND r.result_id::text = n.result_id::text AND r.cur_user = CURRENT_USER
+  WHERE (a.node_1 = n.node_id OR a.node_2 = n.node_id) AND r.result_id::text = n.result_id::text AND r.cur_user = CURRENT_USER
   GROUP BY n.node_id, n.dma_id;
 
 CREATE OR REPLACE VIEW vcv_dma_log
@@ -4420,7 +4417,7 @@ CREATE OR REPLACE VIEW vcv_dma_log
    FROM selector_inp_result r,
     rpt_inp_arc a
      JOIN rpt_inp_node n USING (result_id)
-  WHERE (a.node_1::text = n.node_id::text OR a.node_2::text = n.node_id::text) AND r.result_id::text = n.result_id::text AND r.cur_user = CURRENT_USER
+  WHERE (a.node_1 = n.node_id OR a.node_2 = n.node_id) AND r.result_id::text = n.result_id::text AND r.cur_user = CURRENT_USER
   GROUP BY n.node_id, n.dma_id;
 
 -- 21/11/24
@@ -4657,7 +4654,7 @@ CREATE OR REPLACE VIEW v_rpt_comp_node_hourly  AS
     FROM selector_rpt_main,
          selector_rpt_main_tstep,
          rpt_inp_node node
-         JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+         JOIN rpt_node ON rpt_node.node_id = node.node_id
    WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text
      AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text
      AND selector_rpt_main.cur_user = CURRENT_USER
@@ -4679,7 +4676,7 @@ compare AS (
     FROM selector_rpt_compare,
          selector_rpt_compare_tstep,
          rpt_inp_node node
-         JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+         JOIN rpt_node ON rpt_node.node_id = node.node_id
    WHERE rpt_node.result_id::text = selector_rpt_compare.result_id::text
      AND rpt_node."time"::text = selector_rpt_compare_tstep.timestep::text
      AND selector_rpt_compare.cur_user = CURRENT_USER
@@ -4728,7 +4725,7 @@ WITH main AS (
     FROM selector_rpt_main,
          selector_rpt_main_tstep,
          rpt_inp_arc arc
-         JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+         JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
    WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text
      AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text
      AND selector_rpt_main.cur_user = CURRENT_USER
@@ -4750,7 +4747,7 @@ compare AS (
     FROM selector_rpt_compare,
          selector_rpt_compare_tstep,
          rpt_inp_arc arc
-         JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+         JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
    WHERE rpt_arc.result_id::text = selector_rpt_compare.result_id::text
      AND rpt_arc."time"::text = selector_rpt_compare_tstep.timestep::text
      AND selector_rpt_compare.cur_user = CURRENT_USER
@@ -4837,7 +4834,7 @@ AS SELECT om_mincut_hydrometer.id,
     om_mincut_hydrometer
      JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id::text = ext_rtc_hydrometer.id::text
      JOIN rtc_hydrometer_x_connec ON om_mincut_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
-     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id = connec.connec_id
      JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
   WHERE selector_mincut_result.result_id::text = om_mincut_hydrometer.result_id::text AND selector_mincut_result.cur_user = CURRENT_USER;
 
@@ -5008,7 +5005,7 @@ AS SELECT p.arc_id,
    FROM config_param_user c,
     selector_inp_result r,
     rpt_inp_arc rpt
-     JOIN inp_dscenario_pipe p ON rpt.arc_id::text = p.arc_id::text
+     JOIN inp_dscenario_pipe p ON rpt.arc_id = p.arc_id
   WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = p.dscenario_id::text AND c.cur_user::text = CURRENT_USER AND r.result_id::text = rpt.result_id::text AND r.cur_user = CURRENT_USER;
 
 CREATE OR REPLACE VIEW vcv_demands
@@ -5021,34 +5018,18 @@ AS SELECT inp.feature_id,
     inp_dscenario_demand inp
   WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = inp.dscenario_id::text AND c.cur_user::text = CURRENT_USER;
 
-CREATE OR REPLACE VIEW v_edit_review_node
-AS SELECT review_node.node_id,
-    review_node.top_elev,
-    review_node.depth,
-    review_node.nodecat_id,
-    review_node.annotation,
-    review_node.observ,
-    review_node.review_obs,
-    review_node.expl_id,
-    review_node.the_geom,
-    review_node.field_date,
-    review_node.field_checked,
-    review_node.is_validated
-   FROM review_node,
-    selector_expl
-  WHERE selector_expl.cur_user = CURRENT_USER AND review_node.expl_id = selector_expl.expl_id;
 
 CREATE OR REPLACE VIEW v_rtc_hydrometer
 AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
         CASE
-            WHEN connec.connec_id IS NULL THEN 'XXXX'::character varying
+            WHEN connec.connec_id IS NULL THEN NULL::int4
             ELSE connec.connec_id
         END AS feature_id,
     'CONNEC'::text AS feature_type,
         CASE
-            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
-            ELSE ext_rtc_hydrometer.connec_id::text
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id
         END AS customer_code,
     ext_rtc_hydrometer_state.name AS state,
     ext_municipality.name AS muni_name,
@@ -5087,7 +5068,7 @@ AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     rtc_hydrometer
      LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
      JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id
      LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
   WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = CURRENT_USER AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = CURRENT_USER
@@ -5095,13 +5076,13 @@ UNION
  SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
         CASE
-            WHEN node.node_id IS NULL THEN 'XXXX'::character varying
+            WHEN node.node_id IS NULL THEN NULL::int4
             ELSE node.node_id
         END AS feature_id,
     'NODE'::text AS feature_type,
         CASE
-            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
-            ELSE ext_rtc_hydrometer.connec_id::text
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id
         END AS customer_code,
     ext_rtc_hydrometer_state.name AS state,
     ext_municipality.name AS muni_name,
@@ -5141,7 +5122,7 @@ UNION
      LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
      JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
      JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
-     JOIN node ON node.node_id::text = man_netwjoin.node_id::text
+     JOIN node ON node.node_id = man_netwjoin.node_id
      LEFT JOIN ext_municipality ON ext_municipality.muni_id = node.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
   WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = CURRENT_USER AND selector_expl.expl_id = node.expl_id AND selector_expl.cur_user = CURRENT_USER;
@@ -5151,12 +5132,12 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node
 AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
         CASE
-            WHEN node.node_id IS NULL THEN 'XXXX'::character varying
+            WHEN node.node_id IS NULL THEN NULL::int4
             ELSE node.node_id
         END AS node_id,
         CASE
-            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
-            ELSE ext_rtc_hydrometer.connec_id::text
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id
         END AS node_customer_code,
     ext_rtc_hydrometer_state.name AS state,
     ext_municipality.name AS muni_name,
@@ -5196,7 +5177,7 @@ AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
      LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
      JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
      JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
-     JOIN node ON node.node_id::text = man_netwjoin.node_id::text
+     JOIN node ON node.node_id = man_netwjoin.node_id
      LEFT JOIN ext_municipality ON ext_municipality.muni_id = node.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
   WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = CURRENT_USER AND selector_expl.expl_id = node.expl_id AND selector_expl.cur_user = CURRENT_USER;
@@ -5304,7 +5285,7 @@ CREATE OR REPLACE VIEW v_ui_hydroval
      JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
      LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
      JOIN rtc_hydrometer_x_node ON rtc_hydrometer_x_node.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
-     JOIN node ON rtc_hydrometer_x_node.node_id::text = node.node_id::text
+     JOIN node ON rtc_hydrometer_x_node.node_id = node.node_id
      LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
      LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
      LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
@@ -5327,7 +5308,7 @@ UNION
      JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
      LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
-     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id = connec.connec_id
      LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
      LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
      LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
@@ -5482,7 +5463,7 @@ AS SELECT om_visit_event.id AS event_id,
      JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
      JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
      LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
-     JOIN arc ON arc.arc_id::text = om_visit_x_arc.arc_id::text
+     JOIN arc ON arc.arc_id = om_visit_x_arc.arc_id
      LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
            FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
@@ -5523,7 +5504,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_arc AS
      JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
      JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
      LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
-     JOIN arc ON arc.arc_id::text = om_visit_x_arc.arc_id::text
+     JOIN arc ON arc.arc_id = om_visit_x_arc.arc_id
      LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
            FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
@@ -5564,7 +5545,7 @@ AS SELECT om_visit_event.id AS event_id,
      JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
      JOIN om_visit_x_link ON om_visit_x_link.visit_id = om_visit.id
      LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
-     JOIN link ON link.link_id::text = om_visit_x_link.link_id::text
+     JOIN link ON link.link_id = om_visit_x_link.link_id
      LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
            FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
@@ -5605,7 +5586,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_link AS
      JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
      JOIN om_visit_x_link ON om_visit_x_link.visit_id = om_visit.id
      LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
-     JOIN link ON link.link_id::text = om_visit_x_link.link_id::text
+     JOIN link ON link.link_id = om_visit_x_link.link_id
      LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
            FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
@@ -5623,7 +5604,7 @@ AS SELECT row_number() OVER (ORDER BY a.pattern_id, idrow) AS id,
     idrow,
         CASE
             WHEN pjoint_type::text = 'VNODE'::text THEN concat('VN', pattern_id)::character varying
-            ELSE pattern_id
+            ELSE pattern_id::text
         END AS pattern_id,
     pjoint_type,
     sum(factor_1)::numeric(10,8) AS factor_1,
@@ -5876,7 +5857,7 @@ AS SELECT row_number() OVER () AS rid,
     connec
      JOIN plan_psector_x_connec USING (connec_id)
      JOIN plan_psector USING (psector_id)
-     JOIN link ON link.feature_id::text = connec.connec_id::text
+     JOIN link ON link.feature_id = connec.connec_id
   WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = CURRENT_USER;
 
 
@@ -5884,12 +5865,12 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec
 AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
         CASE
-            WHEN connec.connec_id IS NULL THEN 'XXXX'::character varying
+            WHEN connec.connec_id IS NULL THEN NULL::int4
             ELSE connec.connec_id
         END AS connec_id,
         CASE
-            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
-            ELSE ext_rtc_hydrometer.connec_id::text
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id
         END AS connec_customer_code,
     ext_rtc_hydrometer_state.name AS state,
     ext_municipality.name AS muni_name,
@@ -5928,7 +5909,7 @@ AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     rtc_hydrometer
      LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
      JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id
      LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
   WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = CURRENT_USER AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = CURRENT_USER;
@@ -5952,7 +5933,7 @@ AS SELECT ext_rtc_hydrometer_x_data.id,
      JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
      LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
-     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id = connec.connec_id
      LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
      LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
      LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
@@ -5992,7 +5973,7 @@ AS SELECT om_visit_event.id AS event_id,
      JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
      JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
      JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
-     LEFT JOIN connec ON connec.connec_id::text = om_visit_x_connec.connec_id::text
+     LEFT JOIN connec ON connec.connec_id = om_visit_x_connec.connec_id
      LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
            FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
@@ -6033,7 +6014,7 @@ AS SELECT om_visit_event.id AS event_id,
      JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
      JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
      JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
-     LEFT JOIN connec ON connec.connec_id::text = om_visit_x_connec.connec_id::text
+     LEFT JOIN connec ON connec.connec_id = om_visit_x_connec.connec_id
      LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
            FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
@@ -6051,7 +6032,7 @@ AS SELECT om_mincut_hydrometer.id,
    FROM om_mincut_hydrometer
      JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id::text = ext_rtc_hydrometer.id::text
      JOIN rtc_hydrometer_x_connec ON om_mincut_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
-     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id = connec.connec_id
      JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
   WHERE om_mincut.mincut_state = 1;
 
@@ -6766,7 +6747,7 @@ AS SELECT
     p.shutoff,
     f.the_geom
     FROM ve_frelem f
-    JOIN inp_frpump p ON f.element_id::text = p.element_id::text;
+    JOIN inp_frpump p ON f.element_id = p.element_id;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_frpump
 AS SELECT s.dscenario_id,
@@ -6797,7 +6778,7 @@ as select f.element_id,
     init_quality,
     f.the_geom
     FROM ve_frelem f
-    JOIN inp_frvalve v ON f.element_id::text = v.element_id::text;
+    JOIN inp_frvalve v ON f.element_id = v.element_id;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_frvalve
@@ -6845,7 +6826,7 @@ SELECT v.element_id,
 	ffactor_min
 	FROM inp_frvalve v
   LEFT JOIN man_frelem USING (element_id)
-  LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_frelem.node_id,'_FR', order_id);
+  LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = concat (man_frelem.node_id,'_FR', order_id);  -- TODO: revise this case
 
 
 CREATE OR REPLACE VIEW ve_epa_frpump as
@@ -6873,7 +6854,7 @@ SELECT p.element_id,
 	ffactor_min
 	FROM inp_frpump p
      LEFT JOIN man_frelem USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_frelem.node_id,'_FR', order_id);
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = concat (man_frelem.node_id,'_FR', order_id); -- TODO: revise this case
 
 CREATE OR REPLACE VIEW v_edit_cat_feature_node
 AS SELECT cat_feature.id,
@@ -6892,3 +6873,1491 @@ AS SELECT cat_feature.id,
     cat_feature.active
    FROM cat_feature
      JOIN cat_feature_node USING (id);
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node
+AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN node.node_id IS NULL THEN NULL::int4
+            ELSE node.node_id
+        END AS node_id,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id
+        END AS node_customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    node.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+   FROM selector_hydrometer,
+    selector_expl,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id
+     JOIN node ON node.node_id = man_netwjoin.node_id
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = node.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = node.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec
+AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN connec.connec_id IS NULL THEN NULL::int4
+            ELSE connec.connec_id
+        END AS connec_id,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id
+        END AS connec_customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    connec.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+   FROM selector_hydrometer,
+    selector_expl,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_ui_hydrometer
+AS SELECT v_rtc_hydrometer_x_connec.hydrometer_id,
+    v_rtc_hydrometer_x_connec.connec_id AS feature_id,
+    v_rtc_hydrometer_x_connec.hydrometer_customer_code,
+    v_rtc_hydrometer_x_connec.connec_customer_code AS feature_customer_code,
+    v_rtc_hydrometer_x_connec.state,
+    v_rtc_hydrometer_x_connec.expl_name,
+    v_rtc_hydrometer_x_connec.hydrometer_link
+   FROM v_rtc_hydrometer_x_connec
+UNION
+ SELECT v_rtc_hydrometer_x_node.hydrometer_id,
+    v_rtc_hydrometer_x_node.node_id AS feature_id,
+    v_rtc_hydrometer_x_node.hydrometer_customer_code,
+    v_rtc_hydrometer_x_node.node_customer_code AS feature_customer_code,
+    v_rtc_hydrometer_x_node.state,
+    v_rtc_hydrometer_x_node.expl_name,
+    v_rtc_hydrometer_x_node.hydrometer_link
+   FROM v_rtc_hydrometer_x_node;
+
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer
+AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN connec.connec_id IS NULL THEN NULL::int4
+            ELSE connec.connec_id
+        END AS feature_id,
+    'CONNEC'::text AS feature_type,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id
+        END AS customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    connec.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+   FROM selector_hydrometer,
+    selector_expl,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = "current_user"()::text
+UNION
+ SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN node.node_id IS NULL THEN NULL::int4
+            ELSE node.node_id
+        END AS feature_id,
+    'NODE'::text AS feature_type,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id
+        END AS customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    node.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+   FROM selector_hydrometer,
+    selector_expl,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id
+     JOIN node ON node.node_id = man_netwjoin.node_id
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = node.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = node.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_edit_plan_netscenario_valve
+AS SELECT v.netscenario_id,
+    v.node_id,
+    v.closed,
+    node.the_geom
+   FROM config_param_user,
+    plan_netscenario_valve v
+     JOIN node USING (node_id)
+  WHERE config_param_user.cur_user::text = CURRENT_USER AND config_param_user.parameter::text = 'plan_netscenario_current'::text AND config_param_user.value::integer = v.netscenario_id;
+
+
+CREATE OR REPLACE VIEW v_ui_om_visit_x_node
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_node.node_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document,
+    om_visit.class_id
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_node ON om_visit_x_node.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_node.node_id;
+
+CREATE OR REPLACE VIEW v_ui_om_visitman_x_node
+AS SELECT DISTINCT ON (v_ui_om_visit_x_node.visit_id) v_ui_om_visit_x_node.visit_id,
+    v_ui_om_visit_x_node.code,
+    om_visit_cat.name AS visitcat_name,
+    v_ui_om_visit_x_node.node_id,
+    date_trunc('second'::text, v_ui_om_visit_x_node.visit_start) AS visit_start,
+    date_trunc('second'::text, v_ui_om_visit_x_node.visit_end) AS visit_end,
+    v_ui_om_visit_x_node.user_name,
+    v_ui_om_visit_x_node.is_done,
+    v_ui_om_visit_x_node.feature_type,
+    v_ui_om_visit_x_node.form_type
+   FROM v_ui_om_visit_x_node
+     LEFT JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_node.visitcat_id;
+
+CREATE OR REPLACE VIEW ve_visit_node_singlevent
+AS SELECT om_visit_x_node.visit_id,
+    om_visit_x_node.node_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    "left"(date_trunc('second'::text, om_visit.startdate)::text, 19)::timestamp without time zone AS startdate,
+    "left"(date_trunc('second'::text, om_visit.enddate)::text, 19)::timestamp without time zone AS enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    om_visit_event.event_code,
+    om_visit_event.position_id,
+    om_visit_event.position_value,
+    om_visit_event.parameter_id,
+    om_visit_event.value,
+    om_visit_event.value1,
+    om_visit_event.value2,
+    om_visit_event.geom1,
+    om_visit_event.geom2,
+    om_visit_event.geom3,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.tstamp,
+    om_visit_event.text,
+    om_visit_event.index_val,
+    om_visit_event.is_last
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_node ON om_visit.id = om_visit_x_node.visit_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+  WHERE config_visit_class.ismultievent = false;
+
+CREATE OR REPLACE VIEW v_om_visit AS
+ SELECT DISTINCT ON (a.visit_id) a.visit_id,
+    a.code,
+    a.visitcat_id,
+    a.name,
+    a.visit_start,
+    a.visit_end,
+    a.user_name,
+    a.is_done,
+    a.feature_id,
+    a.feature_type,
+    a.the_geom::geometry(POINT, SRID_VALUE)
+   FROM ( SELECT om_visit.id AS visit_id,
+            om_visit.ext_code AS code,
+            om_visit.visitcat_id,
+            om_visit_cat.name,
+            om_visit.startdate AS visit_start,
+            om_visit.enddate AS visit_end,
+            om_visit.user_name,
+            om_visit.is_done,
+            om_visit_x_node.node_id AS feature_id,
+            'NODE'::text AS feature_type,
+                CASE
+                    WHEN om_visit.the_geom IS NULL THEN node.the_geom
+                    ELSE om_visit.the_geom
+                END AS the_geom
+           FROM selector_state, om_visit
+             JOIN om_visit_x_node ON om_visit_x_node.visit_id = om_visit.id
+             JOIN node ON node.node_id = om_visit_x_node.node_id
+             JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+          WHERE selector_state.state_id = node.state AND selector_state.cur_user = "current_user"()::text
+        UNION
+         SELECT om_visit.id AS visit_id,
+            om_visit.ext_code AS code,
+            om_visit.visitcat_id,
+            om_visit_cat.name,
+            om_visit.startdate AS visit_start,
+            om_visit.enddate AS visit_end,
+            om_visit.user_name,
+            om_visit.is_done,
+            om_visit_x_arc.arc_id AS feature_id,
+            'ARC'::text AS feature_type,
+                CASE
+                    WHEN om_visit.the_geom IS NULL THEN st_lineinterpolatepoint(arc.the_geom, 0.5::double precision)
+                    ELSE om_visit.the_geom
+                END AS the_geom
+           FROM selector_state, om_visit
+             JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
+             JOIN arc ON arc.arc_id = om_visit_x_arc.arc_id
+             JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+          WHERE selector_state.state_id = arc.state AND selector_state.cur_user = "current_user"()::text
+        UNION
+         SELECT om_visit.id AS visit_id,
+            om_visit.ext_code AS code,
+            om_visit.visitcat_id,
+            om_visit_cat.name,
+            om_visit.startdate AS visit_start,
+            om_visit.enddate AS visit_end,
+            om_visit.user_name,
+            om_visit.is_done,
+            om_visit_x_connec.connec_id AS feature_id,
+            'CONNEC'::text AS feature_type,
+                CASE
+                    WHEN om_visit.the_geom IS NULL THEN connec.the_geom
+                    ELSE om_visit.the_geom
+                END AS the_geom
+           FROM selector_state, om_visit
+             JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
+             JOIN connec ON connec.connec_id = om_visit_x_connec.connec_id
+             JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+          WHERE selector_state.state_id = connec.state AND selector_state.cur_user = "current_user"()::text) a;
+
+CREATE OR REPLACE VIEW v_ui_event_x_node
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit.class_id AS visit_class,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_node.node_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_node ON om_visit_x_node.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_node.node_id;
+
+
+CREATE OR REPLACE VIEW v_ui_hydroval
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    rtc_hydrometer_x_node.node_id AS feature_id,
+    node.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN rtc_hydrometer_x_node ON rtc_hydrometer_x_node.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
+     JOIN node ON rtc_hydrometer_x_node.node_id = node.node_id
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
+UNION
+ SELECT ext_rtc_hydrometer_x_data.id,
+    rtc_hydrometer_x_connec.connec_id AS feature_id,
+    connec.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id = connec.connec_id
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
+  ORDER BY 1;
+
+CREATE OR REPLACE VIEW v_ui_hydroval_x_connec
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    rtc_hydrometer_x_connec.connec_id,
+    connec.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id = connec.connec_id
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
+  ORDER BY ext_rtc_hydrometer_x_data.id;
+
+
+CREATE OR REPLACE VIEW v_ui_om_visit_x_arc
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_arc.arc_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document,
+    om_visit.class_id
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     JOIN arc ON arc.arc_id = om_visit_x_arc.arc_id
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_arc.arc_id;
+
+CREATE OR REPLACE VIEW v_ui_om_visitman_x_arc
+AS SELECT DISTINCT ON (v_ui_om_visit_x_arc.visit_id) v_ui_om_visit_x_arc.visit_id,
+    v_ui_om_visit_x_arc.code,
+    om_visit_cat.name AS visitcat_name,
+    v_ui_om_visit_x_arc.arc_id,
+    date_trunc('second'::text, v_ui_om_visit_x_arc.visit_start) AS visit_start,
+    date_trunc('second'::text, v_ui_om_visit_x_arc.visit_end) AS visit_end,
+    v_ui_om_visit_x_arc.user_name,
+    v_ui_om_visit_x_arc.is_done,
+    v_ui_om_visit_x_arc.feature_type,
+    v_ui_om_visit_x_arc.form_type
+   FROM v_ui_om_visit_x_arc
+     LEFT JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_arc.visitcat_id;
+
+CREATE OR REPLACE VIEW ve_visit_arc_singlevent
+AS SELECT om_visit_x_arc.visit_id,
+    om_visit_x_arc.arc_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    "left"(date_trunc('second'::text, om_visit.startdate)::text, 19)::timestamp without time zone AS startdate,
+    "left"(date_trunc('second'::text, om_visit.enddate)::text, 19)::timestamp without time zone AS enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    om_visit_event.id AS event_id,
+    om_visit_event.event_code,
+    om_visit_event.position_id,
+    om_visit_event.position_value,
+    om_visit_event.parameter_id,
+    om_visit_event.value,
+    om_visit_event.value1,
+    om_visit_event.value2,
+    om_visit_event.geom1,
+    om_visit_event.geom2,
+    om_visit_event.geom3,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.tstamp,
+    om_visit_event.text,
+    om_visit_event.index_val,
+    om_visit_event.is_last
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_arc ON om_visit.id = om_visit_x_arc.visit_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+  WHERE config_visit_class.ismultievent = false;
+
+CREATE OR REPLACE VIEW v_ui_event_x_arc
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit.class_id AS visit_class,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_arc.arc_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     JOIN arc ON arc.arc_id = om_visit_x_arc.arc_id
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_arc.arc_id;
+
+CREATE OR REPLACE VIEW v_ui_om_visitman_x_connec
+AS SELECT DISTINCT ON (v_ui_om_visit_x_connec.visit_id) v_ui_om_visit_x_connec.visit_id,
+    v_ui_om_visit_x_connec.code,
+    om_visit_cat.name AS visitcat_name,
+    v_ui_om_visit_x_connec.connec_id,
+    date_trunc('second'::text, v_ui_om_visit_x_connec.visit_start) AS visit_start,
+    date_trunc('second'::text, v_ui_om_visit_x_connec.visit_end) AS visit_end,
+    v_ui_om_visit_x_connec.user_name,
+    v_ui_om_visit_x_connec.is_done,
+    v_ui_om_visit_x_connec.feature_type,
+    v_ui_om_visit_x_connec.form_type
+   FROM v_ui_om_visit_x_connec
+     LEFT JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_connec.visitcat_id;
+
+CREATE OR REPLACE VIEW ve_visit_connec_singlevent
+AS SELECT om_visit_x_connec.visit_id,
+    om_visit_x_connec.connec_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    "left"(date_trunc('second'::text, om_visit.startdate)::text, 19)::timestamp without time zone AS startdate,
+    "left"(date_trunc('second'::text, om_visit.enddate)::text, 19)::timestamp without time zone AS enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    om_visit_event.event_code,
+    om_visit_event.position_id,
+    om_visit_event.position_value,
+    om_visit_event.parameter_id,
+    om_visit_event.value,
+    om_visit_event.value1,
+    om_visit_event.value2,
+    om_visit_event.geom1,
+    om_visit_event.geom2,
+    om_visit_event.geom3,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.tstamp,
+    om_visit_event.text,
+    om_visit_event.index_val,
+    om_visit_event.is_last
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_connec ON om_visit.id = om_visit_x_connec.visit_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+  WHERE config_visit_class.ismultievent = false;
+
+
+CREATE OR REPLACE VIEW v_ui_event_x_connec
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit.class_id AS visit_class,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_connec.connec_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
+     JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     LEFT JOIN connec ON connec.connec_id = om_visit_x_connec.connec_id
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_connec.connec_id;
+
+CREATE OR REPLACE VIEW v_edit_rtc_hydro_data_x_connec
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    rtc_hydrometer_x_connec.connec_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.code,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_cat_period.code AS cat_period_code,
+    ext_rtc_hydrometer_x_data.value_date,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::bigint = ext_rtc_hydrometer.catalog_id::bigint
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer_x_data.hydrometer_id::bigint
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+  ORDER BY ext_rtc_hydrometer_x_data.hydrometer_id, ext_rtc_hydrometer_x_data.cat_period_id DESC;
+
+CREATE OR REPLACE VIEW v_ui_mincut_hydrometer
+AS SELECT om_mincut_hydrometer.id,
+    om_mincut_hydrometer.hydrometer_id,
+    rtc_hydrometer_x_connec.connec_id,
+    om_mincut_hydrometer.result_id,
+    om_mincut.work_order,
+    om_mincut.mincut_state,
+    om_mincut.mincut_class,
+    om_mincut.mincut_type,
+    om_mincut.received_date,
+    om_mincut.anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_appropiate,
+        CASE
+            WHEN om_mincut.mincut_state = 0 THEN om_mincut.forecast_start::timestamp with time zone
+            WHEN om_mincut.mincut_state = 1 THEN now()
+            WHEN om_mincut.mincut_state = 2 THEN om_mincut.exec_start::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS start_date,
+        CASE
+            WHEN om_mincut.mincut_state = 0 THEN om_mincut.forecast_end::timestamp with time zone
+            WHEN om_mincut.mincut_state = 1 THEN now()
+            WHEN om_mincut.mincut_state = 2 THEN om_mincut.exec_end::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS end_date
+   FROM om_mincut_hydrometer
+     JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = om_mincut_hydrometer.hydrometer_id::bigint;
+
+CREATE OR REPLACE VIEW v_om_mincut_current_hydrometer
+AS SELECT om_mincut_hydrometer.id,
+    om_mincut_hydrometer.result_id,
+    om_mincut.work_order,
+    om_mincut_hydrometer.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    rtc_hydrometer_x_connec.connec_id,
+    connec.code AS connec_code
+   FROM om_mincut_hydrometer
+     JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id::text = ext_rtc_hydrometer.id::text
+     JOIN rtc_hydrometer_x_connec ON om_mincut_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id = connec.connec_id
+     JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
+  WHERE om_mincut.mincut_state = 1;
+
+CREATE OR REPLACE VIEW v_polygon
+AS SELECT p.pol_id,
+    p.state,
+    p.feature_id,
+    p.sys_type,
+    p.featurecat_id,
+    p.the_geom
+   FROM selector_state s,
+    polygon p
+  WHERE s.state_id = p.state AND s.cur_user = CURRENT_USER;
+
+CREATE OR REPLACE VIEW v_rpt_compare_node
+AS SELECT r.node_id,
+    r.result_id,
+    r.node_type,
+    r.sector_id,
+    r.nodecat_id,
+    r.top_elev AS elevation,
+    r.demand_max,
+    r.demand_min,
+    r.demand_avg,
+    r.head_max,
+    r.head_min,
+    r.head_avg,
+    r.press_max,
+    r.press_min,
+    r.press_avg,
+    r.quality_max,
+    r.quality_min,
+    r.quality_avg,
+    r.the_geom
+   FROM rpt_node_stats r,
+    selector_rpt_compare s
+     JOIN selector_rpt_compare USING (result_id);
+
+CREATE OR REPLACE VIEW v_rpt_arc_hourly
+AS SELECT rpt_arc.id,
+    arc.arc_id,
+    arc.sector_id,
+    selector_rpt_main.result_id,
+    rpt_arc.flow,
+    rpt_arc.vel,
+    rpt_arc.headloss,
+    rpt_arc.setting,
+    rpt_arc.ffactor,
+    rpt_arc."time",
+    arc.the_geom
+   FROM selector_rpt_main,
+    selector_rpt_main_tstep,
+    rpt_inp_arc arc
+     JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+  WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = "current_user"()::text AND selector_rpt_main_tstep.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
+  ORDER BY rpt_arc."time", arc.arc_id;
+
+
+CREATE OR REPLACE VIEW v_rpt_comp_arc_hourly
+AS WITH main AS (
+         SELECT rpt_arc.id,
+            arc.arc_id,
+            arc.sector_id,
+            selector_rpt_main.result_id,
+            rpt_arc.flow,
+            rpt_arc.vel,
+            rpt_arc.headloss,
+            rpt_arc.setting,
+            rpt_arc.ffactor,
+            rpt_arc."time",
+            arc.the_geom
+           FROM selector_rpt_main,
+            selector_rpt_main_tstep,
+            rpt_inp_arc arc
+             JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+          WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = CURRENT_USER AND selector_rpt_main_tstep.cur_user = CURRENT_USER AND arc.result_id::text = selector_rpt_main.result_id::text
+        ), compare AS (
+         SELECT rpt_arc.id,
+            arc.arc_id,
+            arc.sector_id,
+            selector_rpt_compare.result_id,
+            rpt_arc.flow,
+            rpt_arc.vel,
+            rpt_arc.headloss,
+            rpt_arc.setting,
+            rpt_arc.ffactor,
+            rpt_arc."time",
+            arc.the_geom
+           FROM selector_rpt_compare,
+            selector_rpt_compare_tstep,
+            rpt_inp_arc arc
+             JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+          WHERE rpt_arc.result_id::text = selector_rpt_compare.result_id::text AND rpt_arc."time"::text = selector_rpt_compare_tstep.timestep::text AND selector_rpt_compare.cur_user = CURRENT_USER AND selector_rpt_compare_tstep.cur_user = CURRENT_USER AND arc.result_id::text = selector_rpt_compare.result_id::text
+        )
+ SELECT main.arc_id,
+    main.sector_id,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main."time" AS time_main,
+    compare."time" AS time_compare,
+    main.flow AS flow_main,
+    compare.flow AS flow_compare,
+    main.flow - compare.flow AS flow_diff,
+    main.vel AS vel_main,
+    compare.vel AS vel_compare,
+    main.vel - compare.vel AS vel_diff,
+    main.headloss AS headloss_main,
+    compare.headloss AS headloss_compare,
+    main.headloss - compare.headloss AS headloss_diff,
+    main.setting AS setting_main,
+    compare.setting AS setting_compare,
+    main.setting - compare.setting AS setting_diff,
+    main.ffactor AS ffactor_main,
+    compare.ffactor AS ffactor_compare,
+    main.ffactor - compare.ffactor AS ffactor_diff,
+    main.the_geom
+   FROM main
+     JOIN compare ON main.arc_id = compare.arc_id;
+
+
+CREATE OR REPLACE VIEW v_rpt_comp_arc
+AS WITH main AS (
+         SELECT r.arc_id,
+            r.result_id,
+            r.arc_type,
+            r.sector_id,
+            r.arccat_id,
+            r.flow_max,
+            r.flow_min,
+            r.flow_avg,
+            r.vel_max,
+            r.vel_min,
+            r.vel_avg,
+            r.headloss_max,
+            r.headloss_min,
+            r.setting_max,
+            r.setting_min,
+            r.reaction_max,
+            r.reaction_min,
+            r.ffactor_max,
+            r.ffactor_min,
+            r.the_geom
+           FROM rpt_arc_stats r,
+            selector_rpt_main s
+          WHERE r.result_id::text = s.result_id::text AND s.cur_user = CURRENT_USER
+        ), compare AS (
+         SELECT r.arc_id,
+            r.result_id,
+            r.arc_type,
+            r.sector_id,
+            r.arccat_id,
+            r.flow_max,
+            r.flow_min,
+            r.flow_avg,
+            r.vel_max,
+            r.vel_min,
+            r.vel_avg,
+            r.headloss_max,
+            r.headloss_min,
+            r.setting_max,
+            r.setting_min,
+            r.reaction_max,
+            r.reaction_min,
+            r.ffactor_max,
+            r.ffactor_min,
+            r.the_geom
+           FROM rpt_arc_stats r,
+            selector_rpt_compare s
+          WHERE r.result_id::text = s.result_id::text AND s.cur_user = CURRENT_USER
+        )
+ SELECT main.arc_id,
+    main.arc_type,
+    main.sector_id,
+    main.arccat_id,
+    main.result_id AS main_result,
+    compare.result_id AS compare_result,
+    main.flow_max AS flow_max_main,
+    compare.flow_max AS flow_max_compare,
+    main.flow_max - compare.flow_max AS flow_max_diff,
+    main.flow_min AS flow_min_main,
+    compare.flow_min AS flow_min_compare,
+    main.flow_min - compare.flow_min AS flow_min_diff,
+    main.flow_avg AS flow_avg_main,
+    compare.flow_avg AS flow_avg_compare,
+    main.flow_avg - compare.flow_avg AS flow_avg_diff,
+    main.vel_max AS vel_max_main,
+    compare.vel_max AS vel_max_compare,
+    main.vel_max - compare.vel_max AS vel_max_diff,
+    main.vel_min AS vel_min_main,
+    compare.vel_min AS vel_min_compare,
+    main.vel_min - compare.vel_min AS vel_min_diff,
+    main.vel_avg AS vel_avg_main,
+    compare.vel_avg AS vel_avg_compare,
+    main.vel_avg - compare.vel_avg AS vel_avg_diff,
+    main.headloss_max AS headloss_max_main,
+    compare.headloss_max AS headloss_max_compare,
+    main.headloss_max - compare.headloss_max AS headloss_max_diff,
+    main.headloss_min AS headloss_min_main,
+    compare.headloss_min AS headloss_min_compare,
+    main.headloss_min - compare.headloss_min AS headloss_min_diff,
+    main.setting_max AS setting_max_main,
+    compare.setting_max AS setting_max_compare,
+    main.setting_max - compare.setting_max AS setting_max_diff,
+    main.setting_min AS setting_min_main,
+    compare.setting_min AS setting_min_compare,
+    main.setting_min - compare.setting_min AS setting_min_diff,
+    main.reaction_max AS reaction_max_main,
+    compare.reaction_max AS reaction_max_compare,
+    main.reaction_max - compare.reaction_max AS reaction_max_diff,
+    main.reaction_min AS reaction_min_main,
+    compare.reaction_min AS reaction_min_compare,
+    main.reaction_min - compare.reaction_min AS reaction_min_diff,
+    main.ffactor_max AS ffactor_max_main,
+    compare.ffactor_max AS ffactor_max_compare,
+    main.ffactor_max - compare.ffactor_max AS ffactor_max_diff,
+    main.ffactor_min AS ffactor_min_main,
+    compare.ffactor_min AS ffactor_min_compare,
+    main.ffactor_min - compare.ffactor_min AS ffactor_min_diff,
+    main.the_geom
+   FROM main
+     JOIN compare ON main.arc_id = compare.arc_id;
+
+
+CREATE OR REPLACE VIEW v_rpt_comp_node_hourly
+AS WITH main AS (
+         SELECT rpt_node.id,
+            node.node_id,
+            node.sector_id,
+            selector_rpt_main.result_id,
+            rpt_node.top_elev,
+            rpt_node.demand,
+            rpt_node.head,
+            rpt_node.press,
+            rpt_node.quality,
+            rpt_node."time",
+            node.the_geom
+           FROM selector_rpt_main,
+            selector_rpt_main_tstep,
+            rpt_inp_node node
+             JOIN rpt_node ON rpt_node.node_id = node.node_id
+          WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = CURRENT_USER AND selector_rpt_main_tstep.cur_user = CURRENT_USER AND node.result_id::text = selector_rpt_main.result_id::text
+        ), compare AS (
+         SELECT rpt_node.id,
+            node.node_id,
+            node.sector_id,
+            selector_rpt_compare.result_id,
+            rpt_node.top_elev,
+            rpt_node.demand,
+            rpt_node.head,
+            rpt_node.press,
+            rpt_node.quality,
+            rpt_node."time",
+            node.the_geom
+           FROM selector_rpt_compare,
+            selector_rpt_compare_tstep,
+            rpt_inp_node node
+             JOIN rpt_node ON rpt_node.node_id = node.node_id
+          WHERE rpt_node.result_id::text = selector_rpt_compare.result_id::text AND rpt_node."time"::text = selector_rpt_compare_tstep.timestep::text AND selector_rpt_compare.cur_user = CURRENT_USER AND selector_rpt_compare_tstep.cur_user = CURRENT_USER AND node.result_id::text = selector_rpt_compare.result_id::text
+        )
+ SELECT main.node_id,
+    main.sector_id,
+    main.top_elev,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main."time" AS time_main,
+    compare."time" AS time_compare,
+    main.demand AS demand_main,
+    compare.demand AS demand_compare,
+    main.demand - compare.demand AS demand_diff,
+    main.head AS head_main,
+    compare.head AS head_compare,
+    main.head - compare.head AS head_diff,
+    main.press AS press_main,
+    compare.press AS press_compare,
+    main.press - compare.press AS press_diff,
+    main.quality AS quality_main,
+    compare.quality AS quality_compare,
+    main.quality - compare.quality AS quality_diff,
+    main.the_geom
+   FROM main
+     JOIN compare ON main.node_id = compare.node_id;
+
+
+CREATE OR REPLACE VIEW v_rpt_comp_node
+AS WITH main AS (
+         SELECT r.node_id,
+            r.result_id,
+            r.node_type,
+            r.sector_id,
+            r.nodecat_id,
+            r.top_elev,
+            r.demand_max,
+            r.demand_min,
+            r.demand_avg,
+            r.head_max,
+            r.head_min,
+            r.head_avg,
+            r.press_max,
+            r.press_min,
+            r.press_avg,
+            r.quality_max,
+            r.quality_min,
+            r.quality_avg,
+            r.the_geom
+           FROM rpt_node_stats r,
+            selector_rpt_main s
+          WHERE r.result_id::text = s.result_id::text AND s.cur_user = CURRENT_USER
+        ), compare AS (
+         SELECT r.node_id,
+            r.result_id,
+            r.node_type,
+            r.sector_id,
+            r.nodecat_id,
+            r.top_elev,
+            r.demand_max,
+            r.demand_min,
+            r.demand_avg,
+            r.head_max,
+            r.head_min,
+            r.head_avg,
+            r.press_max,
+            r.press_min,
+            r.press_avg,
+            r.quality_max,
+            r.quality_min,
+            r.quality_avg,
+            r.the_geom
+           FROM rpt_node_stats r,
+            selector_rpt_compare s
+          WHERE r.result_id::text = s.result_id::text AND s.cur_user = CURRENT_USER
+        )
+ SELECT main.node_id,
+    main.node_type,
+    main.sector_id,
+    main.nodecat_id,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.top_elev,
+    main.demand_max AS demand_max_main,
+    compare.demand_max AS demand_max_compare,
+    main.demand_max - compare.demand_max AS demand_max_diff,
+    main.demand_min AS demand_min_main,
+    compare.demand_min AS demand_min_compare,
+    main.demand_min - compare.demand_min AS demand_min_diff,
+    main.demand_avg AS demand_avg_main,
+    compare.demand_avg AS demand_avg_compare,
+    main.demand_avg - compare.demand_avg AS demand_avg_diff,
+    main.head_max AS head_max_main,
+    compare.head_max AS head_max_compare,
+    main.head_max - compare.head_max AS head_max_diff,
+    main.head_min AS head_min_main,
+    compare.head_min AS head_min_compare,
+    main.head_min - compare.head_min AS head_min_diff,
+    main.head_avg AS head_avg_main,
+    compare.head_avg AS head_avg_compare,
+    main.head_avg - compare.head_avg AS head_avg_diff,
+    main.press_max AS press_max_main,
+    compare.press_max AS press_max_compare,
+    main.press_max - compare.press_max AS press_max_diff,
+    main.press_min AS press_min_main,
+    compare.press_min AS press_min_compare,
+    main.press_min - compare.press_min AS press_min_diff,
+    main.press_avg AS press_avg_main,
+    compare.press_avg AS press_avg_compare,
+    main.press_avg - compare.press_avg AS press_avg_diff,
+    main.quality_max AS quality_max_main,
+    compare.quality_max AS quality_max_compare,
+    main.quality_max - compare.quality_max AS quality_max_diff,
+    main.quality_min AS quality_min_main,
+    compare.quality_min AS quality_min_compare,
+    main.quality_min - compare.quality_min AS quality_min_diff,
+    main.quality_avg AS quality_avg_main,
+    compare.quality_avg AS quality_avg_compare,
+    main.quality_avg - compare.quality_avg AS quality_avg_diff,
+    main.the_geom
+   FROM main
+     JOIN compare ON main.node_id = compare.node_id;
+
+CREATE OR REPLACE VIEW v_rpt_node_hourly
+AS SELECT rpt_node.id,
+    node.node_id,
+    node.sector_id,
+    selector_rpt_main.result_id,
+    rpt_node.top_elev AS elevation,
+    rpt_node.demand,
+    rpt_node.head,
+    rpt_node.press,
+    rpt_node.quality,
+    rpt_node."time",
+    node.the_geom
+   FROM selector_rpt_main,
+    selector_rpt_main_tstep,
+    rpt_inp_node node
+     JOIN rpt_node ON rpt_node.node_id = node.node_id
+  WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = "current_user"()::text AND selector_rpt_main_tstep.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_main.result_id::text
+  ORDER BY rpt_node."time", node.node_id;
+
+CREATE OR REPLACE VIEW v_om_mincut_arc
+AS SELECT om_mincut_arc.id,
+    om_mincut_arc.result_id,
+    om_mincut.work_order,
+    om_mincut_arc.arc_id,
+    om_mincut_arc.the_geom
+   FROM selector_mincut_result,
+    om_mincut_arc
+     JOIN om_mincut ON om_mincut_arc.result_id = om_mincut.id
+  WHERE selector_mincut_result.result_id::text = om_mincut_arc.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text
+  ORDER BY om_mincut_arc.arc_id;
+
+CREATE OR REPLACE VIEW v_om_mincut_planned_arc
+AS SELECT om_mincut_arc.id,
+    om_mincut_arc.result_id,
+    om_mincut_arc.arc_id,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut_arc.the_geom
+   FROM om_mincut_arc
+     JOIN om_mincut ON om_mincut.id = om_mincut_arc.result_id
+  WHERE om_mincut.mincut_state < 2;
+
+CREATE OR REPLACE VIEW v_om_mincut_current_arc
+AS SELECT om_mincut_arc.id,
+    om_mincut_arc.result_id,
+    om_mincut.work_order,
+    om_mincut_arc.arc_id,
+    om_mincut_arc.the_geom
+   FROM om_mincut_arc
+     JOIN om_mincut ON om_mincut_arc.result_id = om_mincut.id
+  WHERE om_mincut.mincut_state = 1;
+
+CREATE OR REPLACE VIEW v_om_mincut_node
+AS SELECT om_mincut_node.id,
+    om_mincut_node.result_id,
+    om_mincut.work_order,
+    om_mincut_node.node_id,
+    om_mincut_node.node_type,
+    om_mincut_node.the_geom
+   FROM selector_mincut_result,
+    om_mincut_node
+     JOIN om_mincut ON om_mincut_node.result_id = om_mincut.id
+  WHERE selector_mincut_result.result_id::text = om_mincut_node.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_om_mincut_current_node
+AS SELECT om_mincut_node.id,
+    om_mincut_node.result_id,
+    om_mincut.work_order,
+    om_mincut_node.node_id,
+    om_mincut_node.node_type,
+    om_mincut_node.the_geom
+   FROM om_mincut_node
+     JOIN om_mincut ON om_mincut_node.result_id = om_mincut.id
+  WHERE om_mincut.mincut_state = 1;
+
+CREATE OR REPLACE VIEW v_om_mincut_connec
+AS SELECT om_mincut_connec.id,
+    om_mincut_connec.result_id,
+    om_mincut.work_order,
+    om_mincut_connec.connec_id,
+    om_mincut_connec.customer_code,
+    om_mincut_connec.the_geom
+   FROM selector_mincut_result,
+    om_mincut_connec
+     JOIN om_mincut ON om_mincut_connec.result_id = om_mincut.id
+  WHERE selector_mincut_result.result_id::text = om_mincut_connec.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_om_mincut_current_connec
+AS SELECT om_mincut_connec.id,
+    om_mincut_connec.result_id,
+    om_mincut.work_order,
+    om_mincut_connec.connec_id,
+    om_mincut_connec.customer_code,
+    om_mincut_connec.the_geom
+   FROM om_mincut_connec
+     JOIN om_mincut ON om_mincut_connec.result_id = om_mincut.id
+  WHERE om_mincut.mincut_state = 1;
+
+CREATE OR REPLACE VIEW v_ui_mincut_connec
+AS SELECT om_mincut_connec.id,
+    om_mincut_connec.connec_id,
+    om_mincut_connec.result_id,
+    om_mincut.work_order,
+    om_mincut.mincut_state,
+    om_mincut.mincut_class,
+    om_mincut.mincut_type,
+    om_mincut_cat_type.virtual,
+    om_mincut.received_date,
+    om_mincut.anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_appropiate,
+        CASE
+            WHEN om_mincut.mincut_state = 0 THEN om_mincut.forecast_start::timestamp with time zone
+            WHEN om_mincut.mincut_state = 1 THEN now()
+            WHEN om_mincut.mincut_state = 2 THEN om_mincut.exec_start::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS start_date,
+        CASE
+            WHEN om_mincut.mincut_state = 0 THEN om_mincut.forecast_end::timestamp with time zone
+            WHEN om_mincut.mincut_state = 1 THEN now()
+            WHEN om_mincut.mincut_state = 2 THEN om_mincut.exec_end::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS end_date
+   FROM om_mincut_connec
+     JOIN om_mincut ON om_mincut_connec.result_id = om_mincut.id
+     JOIN om_mincut_cat_type ON om_mincut.mincut_type::text = om_mincut_cat_type.id::text;
+
+CREATE OR REPLACE VIEW v_om_mincut_planned_valve
+AS SELECT om_mincut_valve.id,
+    om_mincut_valve.result_id,
+    om_mincut_valve.node_id,
+    om_mincut_valve.closed,
+    om_mincut_valve.unaccess,
+    om_mincut_valve.proposed,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut_valve.the_geom
+   FROM om_mincut_valve
+     JOIN om_mincut ON om_mincut.id = om_mincut_valve.result_id
+  WHERE om_mincut.mincut_state < 2 AND om_mincut_valve.proposed = true;
+
+CREATE OR REPLACE VIEW v_om_mincut_valve
+AS SELECT om_mincut_valve.id,
+    om_mincut_valve.result_id,
+    om_mincut.work_order,
+    om_mincut_valve.node_id,
+    om_mincut_valve.closed,
+    om_mincut_valve.broken,
+    om_mincut_valve.unaccess,
+    om_mincut_valve.proposed,
+    om_mincut_valve.the_geom
+   FROM selector_mincut_result,
+    om_mincut_valve
+     JOIN om_mincut ON om_mincut_valve.result_id = om_mincut.id
+  WHERE selector_mincut_result.result_id::text = om_mincut_valve.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_om_mincut_planned_valve
+AS SELECT om_mincut_valve.id,
+    om_mincut_valve.result_id,
+    om_mincut_valve.node_id,
+    om_mincut_valve.closed,
+    om_mincut_valve.unaccess,
+    om_mincut_valve.proposed,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut_valve.the_geom
+   FROM om_mincut_valve
+     JOIN om_mincut ON om_mincut.id = om_mincut_valve.result_id
+  WHERE om_mincut.mincut_state < 2 AND om_mincut_valve.proposed = true;
+
+
+CREATE OR REPLACE VIEW v_edit_review_audit_node
+AS SELECT review_audit_node.id,
+    review_audit_node.node_id,
+    review_audit_node.old_top_elev AS old_elevation,
+    review_audit_node.new_top_elev AS new_elevation,
+    review_audit_node.old_depth,
+    review_audit_node.new_depth,
+    review_audit_node.old_nodecat_id,
+    review_audit_node.new_nodecat_id,
+    review_audit_node.old_annotation,
+    review_audit_node.new_annotation,
+    review_audit_node.old_observ,
+    review_audit_node.new_observ,
+    review_audit_node.review_obs,
+    review_audit_node.expl_id,
+    review_audit_node.the_geom,
+    review_audit_node.review_status_id,
+    review_audit_node.field_date,
+    review_audit_node.field_user,
+    review_audit_node.is_validated
+   FROM review_audit_node,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_node.expl_id = selector_expl.expl_id AND review_audit_node.review_status_id <> 0 AND review_audit_node.is_validated IS NULL;
+
+CREATE OR REPLACE VIEW v_edit_review_audit_arc
+AS SELECT review_audit_arc.id,
+    review_audit_arc.arc_id,
+    review_audit_arc.old_arccat_id,
+    review_audit_arc.new_arccat_id,
+    review_audit_arc.old_annotation,
+    review_audit_arc.new_annotation,
+    review_audit_arc.old_observ,
+    review_audit_arc.new_observ,
+    review_audit_arc.review_obs,
+    review_audit_arc.expl_id,
+    review_audit_arc.the_geom,
+    review_audit_arc.review_status_id,
+    review_audit_arc.field_date,
+    review_audit_arc.field_user,
+    review_audit_arc.is_validated
+   FROM review_audit_arc,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_arc.expl_id = selector_expl.expl_id AND review_audit_arc.review_status_id <> 0 AND review_audit_arc.is_validated IS NULL;
+
+CREATE OR REPLACE VIEW v_edit_review_audit_connec
+AS SELECT review_audit_connec.id,
+    review_audit_connec.connec_id,
+    review_audit_connec.old_connecat_id,
+    review_audit_connec.new_connecat_id,
+    review_audit_connec.old_annotation,
+    review_audit_connec.new_annotation,
+    review_audit_connec.old_observ,
+    review_audit_connec.new_observ,
+    review_audit_connec.review_obs,
+    review_audit_connec.expl_id,
+    review_audit_connec.the_geom,
+    review_audit_connec.review_status_id,
+    review_audit_connec.field_date,
+    review_audit_connec.field_user,
+    review_audit_connec.is_validated
+   FROM review_audit_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_connec.expl_id = selector_expl.expl_id AND review_audit_connec.review_status_id <> 0 AND review_audit_connec.is_validated IS NULL;
+
+CREATE OR REPLACE VIEW v_edit_review_node
+AS SELECT review_node.node_id,
+    review_node.top_elev,
+    review_node.depth,
+    review_node.nodecat_id,
+    review_node.annotation,
+    review_node.observ,
+    review_node.review_obs,
+    review_node.expl_id,
+    review_node.the_geom,
+    review_node.field_date,
+    review_node.field_checked,
+    review_node.is_validated
+   FROM review_node,
+    selector_expl
+  WHERE selector_expl.cur_user = CURRENT_USER AND review_node.expl_id = selector_expl.expl_id;
+
+CREATE OR REPLACE VIEW v_edit_review_arc
+AS SELECT review_arc.arc_id,
+    review_arc.arccat_id,
+    review_arc.annotation,
+    review_arc.observ,
+    review_arc.review_obs,
+    review_arc.expl_id,
+    review_arc.the_geom,
+    review_arc.field_date,
+    review_arc.field_checked,
+    review_arc.is_validated
+   FROM review_arc,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_arc.expl_id = selector_expl.expl_id;
+
+CREATE OR REPLACE VIEW v_edit_review_connec
+AS SELECT review_connec.connec_id,
+    review_connec.conneccat_id,
+    review_connec.annotation,
+    review_connec.observ,
+    review_connec.review_obs,
+    review_connec.expl_id,
+    review_connec.the_geom,
+    review_connec.field_date,
+    review_connec.field_checked,
+    review_connec.is_validated
+   FROM review_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = CURRENT_USER AND review_connec.expl_id = selector_expl.expl_id;

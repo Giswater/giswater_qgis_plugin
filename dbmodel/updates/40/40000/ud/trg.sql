@@ -45,7 +45,18 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macroomzone_id');
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE ON macrosector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrosector_id');
 
-drop trigger if exists gw_trg_edit_element on inp_frweir;
-drop trigger if exists gw_trg_edit_element on inp_frorifice;
-drop trigger if exists gw_trg_edit_element on inp_froutlet;
-drop trigger if exists gw_trg_edit_element on inp_frpump;
+DROP TRIGGER IF EXISTS gw_trg_edit_element ON inp_frweir;
+DROP TRIGGER IF EXISTS gw_trg_edit_element ON inp_frorifice;
+DROP TRIGGER IF EXISTS gw_trg_edit_element ON inp_froutlet;
+DROP TRIGGER IF EXISTS gw_trg_edit_element ON inp_frpump;
+
+CREATE TRIGGER gw_trg_visit_event_update_xy AFTER INSERT OR UPDATE OF position_id, position_value ON om_visit_event
+FOR EACH ROW EXECUTE FUNCTION gw_trg_visit_event_update_xy();
+
+CREATE TRIGGER gw_trg_plan_psector_x_node BEFORE
+INSERT
+    OR
+UPDATE
+    OF node_id,
+    state ON
+    plan_psector_x_node FOR EACH ROW EXECUTE FUNCTION gw_trg_plan_psector_x_node();

@@ -30,7 +30,7 @@ SELECT col_is_pk('inp_dscenario_reservoir', ARRAY['node_id', 'dscenario_id'], 'C
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_reservoir', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_reservoir', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_reservoir', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_dscenario_reservoir', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 SELECT col_type_is('inp_dscenario_reservoir', 'head', 'double precision', 'Column head should be double precision');
 SELECT col_type_is('inp_dscenario_reservoir', 'init_quality', 'double precision', 'Column init_quality should be double precision');

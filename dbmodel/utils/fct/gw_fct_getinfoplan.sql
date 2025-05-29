@@ -53,7 +53,7 @@ BEGIN
 
 	--  get system currency
 	v_currency :=(SELECT value::json->>'symbol' FROM config_param_system WHERE parameter='admin_currency');
-   
+
 	-- Create tabs array
 	formTabs := '[';
 
@@ -75,52 +75,52 @@ BEGIN
 	-- Add resumen values
 	FOREACH aux_json IN ARRAY fields_array
 	LOOP
-		IF (aux_json->>'columnname')  = 'initial_cost' THEN 
+		IF (aux_json->>'columnname')  = 'initial_cost' THEN
 
 			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
-			      v_cost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency,'/ml') FROM v_ui_plan_arc_cost WHERE arc_id = (p_data ->>'feature')::json->>'id');
+			      v_cost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency,'/ml') FROM v_ui_plan_arc_cost WHERE arc_id = ((p_data ->>'feature')::json->>'id')::integer);
 			ELSIF ((p_data ->>'feature')::json->>'featureType')::text='node' THEN
-				v_cost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency,'/ut') FROM v_ui_plan_node_cost WHERE node_id = (p_data ->>'feature')::json->>'id');
+				v_cost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency,'/ut') FROM v_ui_plan_node_cost WHERE node_id = ((p_data ->>'feature')::json->>'id')::integer);
 			END IF;
-						
+
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_cost::TEXT);
 
-		ELSIF (aux_json->>'columnname')  = 'length' THEN 
+		ELSIF (aux_json->>'columnname')  = 'length' THEN
 
 			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
-			      v_dim := (SELECT concat(st_length(the_geom)::numeric(12,2),' ml') FROM arc WHERE arc_id = (p_data ->>'feature')::json->>'id');
+			      v_dim := (SELECT concat(st_length(the_geom)::numeric(12,2),' ml') FROM arc WHERE arc_id = ((p_data ->>'feature')::json->>'id')::integer);
 			ELSIF ((p_data ->>'feature')::json->>'featureType')::text='node' THEN
 				v_dim := '1.00 ut';
 			END IF;
 
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'label', 'Units'::TEXT);						
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'label', 'Units'::TEXT);
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_dim::TEXT);
 
-		ELSIF (aux_json->>'columnname')  = 'total_cost' THEN 
+		ELSIF (aux_json->>'columnname')  = 'total_cost' THEN
 
 			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
-			      v_totalcost := (SELECT concat((sum(total_cost*st_length(the_geom))::numeric(12,2)),' ',v_currency) FROM v_ui_plan_arc_cost JOIN arc USING (arc_id) WHERE arc_id = (p_data ->>'feature')::json->>'id');
+			      v_totalcost := (SELECT concat((sum(total_cost*st_length(the_geom))::numeric(12,2)),' ',v_currency) FROM v_ui_plan_arc_cost JOIN arc USING (arc_id) WHERE arc_id = ((p_data ->>'feature')::json->>'id')::integer);
 			ELSIF ((p_data ->>'feature')::json->>'featureType')::text='node' THEN
-				v_totalcost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency) FROM v_ui_plan_node_cost WHERE node_id = (p_data ->>'feature')::json->>'id');
+				v_totalcost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency) FROM v_ui_plan_node_cost WHERE node_id = ((p_data ->>'feature')::json->>'id')::integer);
 			END IF;
-						
+
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_totalcost::TEXT);
 
 		END IF;
 
-	END LOOP;  
+	END LOOP;
 
 	-- Convert to json
 	fields := array_to_json(fields_array);
-    
+
 	--fields := ('{"fields":' || fields || '}')::json;
 	formTabs := formTabs || fields::text;
-       
+
 	-- Finish the construction of formtabs
-	formTabs := formtabs ||']';	
-	
+	formTabs := formtabs ||']';
+
 	--  Check null
-	formTabs := COALESCE(formTabs, '[]');    
+	formTabs := COALESCE(formTabs, '[]');
 
 	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
@@ -130,9 +130,9 @@ BEGIN
 			',"data":{"fields":' || fields ||
 				'}}'||
 	    '}')::json;
-      
+
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
     RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 
 

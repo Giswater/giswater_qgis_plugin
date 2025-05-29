@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('inp_reservoir', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('inp_reservoir', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('inp_reservoir', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('inp_reservoir', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 SELECT col_type_is('inp_reservoir', 'head', 'double precision', 'Column head should be double precision');
 SELECT col_type_is('inp_reservoir', 'init_quality', 'double precision', 'Column init_quality should be double precision');

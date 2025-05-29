@@ -113,9 +113,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_outlet');
 CREATE TRIGGER gw_trg_edit_inp_arc_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_pump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_pump');
 
-CREATE TRIGGER gw_trg_edit_inp_arc_virtual INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_virtual
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_virtual');
-
 CREATE TRIGGER gw_trg_edit_inp_arc_weir INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_weir
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_weir');
 
@@ -142,12 +139,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('EDIT');
 
 CREATE TRIGGER gw_trg_v_edit_dwfzone INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_edit_dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dwfzone('EDIT');
-
-CREATE TRIGGER gw_trg_edit_review_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_gully
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_gully();
-
-CREATE TRIGGER gw_trg_edit_review_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_connec
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_connec();
 
 -- 30/10/2024
 DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON arc;
@@ -192,10 +183,6 @@ CREATE TRIGGER gw_trg_edit_ve_epa_orifice INSTEAD OF INSERT OR DELETE OR UPDATE 
 -- 04/12/2024
 CREATE TRIGGER gw_trg_edit_inp_dwf INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_dwf
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dwf('cat_dwf');
-
--- 09/12/2024
-CREATE TRIGGER gw_trg_edit_ve_epa_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_storage
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('storage');
 
 -- 12/12/2024
 CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_gully
@@ -297,8 +284,6 @@ CREATE TRIGGER gw_trg_v_edit_macrosector INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_edit_macrosector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('EDIT');
 
-CREATE TRIGGER gw_trg_edit_review_node instead OF INSERT OR DELETE OR UPDATE
-ON v_edit_review_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_node();
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT
 ON dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('dwfzone');
 
@@ -531,3 +516,178 @@ UPDATE
 
 CREATE TRIGGER gw_trg_edit_exploitation INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_exploitation
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_exploitation();
+
+
+
+CREATE TRIGGER gw_trg_edit_review_audit_arc INSTEAD OF DELETE OR UPDATE ON v_edit_review_audit_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_audit_arc();
+
+CREATE TRIGGER gw_trg_edit_review_audit_connec INSTEAD OF DELETE OR UPDATE ON v_edit_review_audit_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_audit_connec();
+
+CREATE TRIGGER gw_trg_edit_review_audit_gully INSTEAD OF DELETE OR UPDATE ON v_edit_review_audit_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_audit_gully();
+
+CREATE TRIGGER gw_trg_edit_review_audit_node INSTEAD OF DELETE OR UPDATE ON v_edit_review_audit_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_audit_node();
+
+CREATE TRIGGER gw_trg_edit_review_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_node();
+
+CREATE TRIGGER gw_trg_edit_review_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_arc();
+
+CREATE TRIGGER gw_trg_edit_review_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_gully();
+
+CREATE TRIGGER gw_trg_edit_review_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_connec();
+
+CREATE TRIGGER gw_trg_om_visit_singlevent INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_visit_node_singlevent
+FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_singlevent('node');
+
+CREATE TRIGGER gw_trg_om_visit_singlevent INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_visit_arc_singlevent
+FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_singlevent('arc');
+
+CREATE TRIGGER gw_trg_om_visit_singlevent INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_visit_connec_singlevent
+FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_singlevent('connec');
+
+CREATE TRIGGER gw_trg_om_visit_singlevent INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_visit_gully_singlevent
+FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_singlevent('gully');
+
+CREATE TRIGGER gw_trg_edit_visitman_x_gully INSTEAD OF DELETE ON v_ui_om_visitman_x_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_visitman();
+
+CREATE TRIGGER gw_trg_ui_event_x_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_event_x_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_event('om_visit_event');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_netgully INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    ve_epa_netgully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('netgully');
+
+
+
+CREATE TRIGGER gw_trg_edit_ve_epa_outfall INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    ve_epa_outfall FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('outfall');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_conduit INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    ve_epa_conduit FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('conduit');
+
+
+
+CREATE TRIGGER gw_trg_edit_ve_epa_outlet INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    ve_epa_outlet FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('outlet');
+
+
+
+CREATE TRIGGER gw_trg_edit_ve_epa_weir INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    ve_epa_weir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('weir');
+
+
+CREATE TRIGGER gw_trg_edit_ve_epa_gully INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    ve_epa_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('gully');
+
+CREATE TRIGGER gw_trg_plan_psector_x_arc BEFORE
+INSERT
+    OR
+UPDATE
+    OF arc_id,
+    state ON
+    plan_psector_x_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_plan_psector_x_arc();
+
+CREATE TRIGGER gw_trg_plan_psector_link AFTER
+INSERT
+    OR
+UPDATE
+    OF arc_id ON
+    plan_psector_x_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_plan_psector_link('connec');
+
+CREATE TRIGGER gw_trg_plan_psector_x_connec BEFORE
+INSERT
+    OR
+UPDATE
+    OF connec_id,
+    state ON
+    plan_psector_x_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_plan_psector_x_connec();
+
+CREATE TRIGGER gw_trg_plan_psector_link AFTER
+INSERT
+    OR
+UPDATE
+    OF arc_id ON
+    plan_psector_x_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_plan_psector_link('gully');
+
+CREATE TRIGGER gw_trg_plan_psector_x_gully BEFORE
+INSERT
+    OR
+UPDATE
+    OF gully_id,
+    state ON
+    plan_psector_x_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_plan_psector_x_gully();
+
+CREATE TRIGGER gw_trg_edit_plan_psector_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_plan_psector_x_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_psector_x_connect('plan_psector_x_gully');
+
+
+CREATE TRIGGER gw_trg_edit_ve_epa_storage INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    ve_epa_storage FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('storage');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_virtual INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    ve_epa_virtual FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtual');
+
+
+CREATE TRIGGER gw_trg_edit_inp_arc_virtual INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    v_edit_inp_virtual FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_virtual');

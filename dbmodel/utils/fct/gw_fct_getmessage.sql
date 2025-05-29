@@ -97,7 +97,7 @@ BEGIN
 			END LOOP;
 		END IF;
 
-		
+
 
 		IF rec_cat_label IS NULL THEN
 
@@ -115,7 +115,7 @@ BEGIN
 
 		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
 		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||');';
-		
+
 		EXECUTE v_querytext;
 
 		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Message passed successfully"}, "version":"'||v_version||'"'||
@@ -126,7 +126,7 @@ BEGIN
 
 	-- get flow parameters
 	SELECT * INTO rec_cat_error FROM sys_message WHERE sys_message.id=v_message_id;
-	
+
 	IF NOT FOUND THEN
 		RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'The process has returned an error code, but this error code is not present on the sys_message table. Please contact with your system administrator in order to update your sys_message table'))::json;
 	END IF;
@@ -291,7 +291,7 @@ BEGIN
 
 		v_querytext = 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
 		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||rec_cat_error.log_level||','||quote_literal(rec_cat_error.error_message)||');';
-		
+
 		EXECUTE v_querytext;
 
 

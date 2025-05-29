@@ -31,7 +31,7 @@ SELECT columns_are(
 SELECT col_is_pk('connec_add', ARRAY['connec_id'], 'Column connec_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('connec_add', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
+SELECT col_type_is('connec_add', 'connec_id', 'integer', 'Column connec_id should be integer');
 SELECT col_type_is('connec_add', 'demand_base', 'numeric(12,2)', 'Column demand_base should be numeric(12,2)');
 SELECT col_type_is('connec_add', 'demand_max', 'numeric(12,2)', 'Column demand_max should be numeric(12,2)');
 SELECT col_type_is('connec_add', 'demand_min', 'numeric(12,2)', 'Column demand_min should be numeric(12,2)');

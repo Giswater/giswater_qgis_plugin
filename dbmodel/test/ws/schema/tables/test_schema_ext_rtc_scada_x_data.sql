@@ -30,7 +30,7 @@ SELECT col_is_pk('ext_rtc_scada_x_data', ARRAY['scada_id', 'value_date'], 'Colum
 
 -- Check column types
 SELECT col_type_is('ext_rtc_scada_x_data', 'scada_id', 'text', 'Column scada_id should be text');
-SELECT col_type_is('ext_rtc_scada_x_data', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('ext_rtc_scada_x_data', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('ext_rtc_scada_x_data', 'value_date', 'date', 'Column value_date should be date');
 SELECT col_type_is('ext_rtc_scada_x_data', 'value', 'double precision', 'Column value should be double precision');
 SELECT col_type_is('ext_rtc_scada_x_data', 'value_status', 'integer', 'Column value_status should be integer');

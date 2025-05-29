@@ -468,37 +468,36 @@ BEGIN
 		-- fill the graph table
 		IF v_class = 'DRAINZONE' THEN
 			EXECUTE 'INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
-			SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
+			SELECT arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
 			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE';
 		ELSE
 			EXECUTE 'INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
-			SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
+			SELECT arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
 			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE
 			UNION
-			SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
+			SELECT arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
 			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE';
 		END IF;
 
 		IF v_netscenario IS NOT NULL THEN
 			-- close custom nodes acording config parameters
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) FROM plan_netscenario_'
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::integer FROM plan_netscenario_'
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE AND netscenario_id = '||v_netscenario||')';
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) FROM plan_netscenario_'
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::integer FROM plan_netscenario_'
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE AND netscenario_id = '||v_netscenario||')';
 
 			-- set header node for mapzones
-			v_text = 'SELECT node_id::integer  FROM( SELECT ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'') as node_id 
-			FROM plan_netscenario_'||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE AND netscenario_id = '||v_netscenario||')a WHERE node_id ~ ''^[0-9]+$''';
+			v_text = 'SELECT node_id FROM ( SELECT ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::integer AS node_id 
+			FROM plan_netscenario_'||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE AND netscenario_id = '||v_netscenario||')a';
 		ELSE
 			-- close custom nodes acording config parameters
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) FROM '
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::integer FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) FROM '
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::integer FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
 
 			-- set header node for mapzones
-			v_text = 'SELECT node_id::integer  FROM( SELECT ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'') as node_id 
-			FROM '||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)a WHERE node_id ~ ''^[0-9]+$''';
+			v_text = 'SELECT ((elem)::json->>''nodeParent'')::integer AS node_id FROM '||quote_ident(v_table)||', LATERAL json_array_elements_text((graphconfig->>''use'')::json) AS elem WHERE graphconfig IS NOT NULL AND active IS TRUE AND trim((elem)::json->>''nodeParent'') ~ ''^\d+$''';
 		END IF;
 
 		-- close boundary conditions acording closed column (flag=1)
@@ -552,24 +551,24 @@ BEGIN
 
 		IF v_netscenario IS NOT NULL THEN
 			-- open custom nodes acording config parameters
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM plan_netscenario_'
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''forceOpen'')::json))::integer FROM plan_netscenario_'
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE AND netscenario_id = '||v_netscenario||') ';
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM plan_netscenario_'
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''forceOpen'')::json))::integer FROM plan_netscenario_'
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE AND netscenario_id = '||v_netscenario||')';
 
 			-- close customized stoppers acording on graphconfig column on mapzone table
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM plan_netscenario_'||quote_ident(v_table)||' WHERE netscenario_id = '||v_netscenario||')';
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM plan_netscenario_'||quote_ident(v_table)||' WHERE netscenario_id = '||v_netscenario||')';
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json))::integer AS node_id FROM plan_netscenario_'||quote_ident(v_table)||' WHERE netscenario_id = '||v_netscenario||')';
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json))::integer AS node_id FROM plan_netscenario_'||quote_ident(v_table)||' WHERE netscenario_id = '||v_netscenario||')';
 		ELSE
 			-- open custom nodes acording config parameters
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM '
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''forceOpen'')::json))::integer FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM '
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''forceOpen'')::json))::integer FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
 
 			-- close customized stoppers acording on graphconfig column on mapzone table
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
-			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json))::integer AS node_id FROM '||quote_ident(v_table)||')';
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json))::integer AS node_id FROM '||quote_ident(v_table)||')';
 		END IF;
 
 		-- close checkvalves on the opposite sense where they are working
@@ -581,12 +580,12 @@ BEGIN
 		END IF;
 
 		-- close custom nodes acording init parameters
-		UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
-		UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
+		UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::integer);
+		UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::integer);
 
 		-- open custom nodes acording init parameters
-		UPDATE temp_t_anlgraph SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
-		UPDATE temp_t_anlgraph SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
+		UPDATE temp_t_anlgraph SET flag = 0 WHERE node_1 IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::integer);
+		UPDATE temp_t_anlgraph SET flag = 0 WHERE node_2 IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::integer);
 
 		-- Close mapzone headers
 		v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE node_1::integer IN ('||v_text||')';
@@ -602,8 +601,8 @@ BEGIN
 			-- sector (sector.graphconfig)
 			UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
 			SELECT id FROM temp_t_anlgraph JOIN (
-			SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id,
-			json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)
+			SELECT ((json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent')::integer AS node_id,
+			json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)::integer
 			as to_arc from sector
 			where graphconfig is not null and active is true order by 1,2) a
 			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
@@ -613,8 +612,8 @@ BEGIN
 				-- dma (dma.graphconfig)
 				EXECUTE 'UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
 				SELECT id FROM temp_t_anlgraph JOIN (
-				SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
-				json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json) 
+				SELECT ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::integer AS node_id, 
+				json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json)::integer
 				as to_arc from plan_netscenario_dma 
 				where graphconfig is not null and active is true AND netscenario_id = '||v_netscenario::integer||' order by 1,2) a
 				ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);';
@@ -622,8 +621,8 @@ BEGIN
 				-- dma (dma.graphconfig)
 				UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
 				SELECT id FROM temp_t_anlgraph JOIN (
-				SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id,
-				json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)
+				SELECT ((json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent')::integer AS node_id,
+				json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)::integer
 				as to_arc from dma
 				where graphconfig is not null and active is true order by 1,2) a
 				ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
@@ -633,8 +632,8 @@ BEGIN
 			-- dqa (dqa.graphconfig)
 			UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
 			SELECT id FROM temp_t_anlgraph JOIN (
-			SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id,
-			json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)
+			SELECT ((json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent')::integer AS node_id,
+			json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)::integer
 			as to_arc from dqa
 			where graphconfig is not null and active is true order by 1,2) a
 			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
@@ -644,8 +643,8 @@ BEGIN
 				-- presszone (presszone.graphconfig)
 				EXECUTE 'UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
 				SELECT id FROM temp_t_anlgraph JOIN (
-				SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
-				json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json) 
+				SELECT ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::integer AS node_id, 
+				json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json)::integer
 				as to_arc from plan_netscenario_presszone
 				where graphconfig is not null and active is true AND netscenario_id = '||v_netscenario::integer||' order by 1,2) a
 				ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);';
@@ -653,8 +652,8 @@ BEGIN
 				-- presszone (presszone.graphconfig)
 				UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
 				SELECT id FROM temp_t_anlgraph JOIN (
-				SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id,
-				json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)
+				SELECT ((json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent')::integer AS node_id,
+				json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json)::integer
 				as to_arc from presszone
 				where graphconfig is not null and active is true order by 1,2) a
 				ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
@@ -667,13 +666,34 @@ BEGIN
 			IF v_netscenario IS NOT NULL THEN
 				IF v_floodonlymapzone IS NULL THEN
 					v_querytext = 'UPDATE temp_t_anlgraph SET water=1, trace = '||v_fieldmp||'::integer 
-					FROM plan_netscenario_'||v_table||' WHERE graphconfig is not null and active is true AND flag=0 AND netscenario_id = '||v_netscenario||' 
-					AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id) ';
+					FROM plan_netscenario_'||v_table||' 
+					WHERE graphconfig is not null 
+						AND active is true 
+						AND flag=0 
+						AND netscenario_id = '||v_netscenario||' 
+						AND node_1 IN (
+							SELECT node_id FROM (
+								SELECT nullif(trim(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')), '''')::integer as node_id
+								FROM plan_netscenario_'||v_table||'
+								WHERE graphconfig is not null and active is true AND netscenario_id = '||v_netscenario||'
+							) t WHERE node_id IS NOT NULL
+						)';
 					EXECUTE v_querytext;
 				ELSE
 					v_querytext = 'UPDATE temp_t_anlgraph SET water=1, trace = '||v_fieldmp||'::integer 
-					FROM plan_netscenario_'||v_table||' WHERE graphconfig is not null and active is true AND '||v_fieldmp||'::integer IN ('||v_floodonlymapzone||') AND flag=0 AND netscenario_id = '||v_netscenario||'
-					AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
+					FROM plan_netscenario_'||v_table||' 
+					WHERE graphconfig is not null 
+						AND active is true 
+						AND '||v_fieldmp||'::integer IN ('||v_floodonlymapzone||') 
+						AND flag=0 
+						AND netscenario_id = '||v_netscenario||'
+						AND node_1 IN (
+							SELECT node_id FROM (
+								SELECT nullif(trim(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')), '''')::integer as node_id
+								FROM plan_netscenario_'||v_table||'
+								WHERE graphconfig is not null and active is true AND netscenario_id = '||v_netscenario||'
+							) t WHERE node_id IS NOT NULL
+						)';
 					EXECUTE v_querytext;
 				END IF;
 			ELSE
@@ -681,12 +701,24 @@ BEGIN
 				IF v_floodonlymapzone IS NULL THEN
 					v_querytext = 'UPDATE temp_t_anlgraph SET water=1, trace = '||v_fieldmp||'::integer 
 					FROM '||v_table||' WHERE graphconfig is not null and active is true AND flag=0 
-					AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
+					AND node_1 IN (
+						SELECT node_id FROM (
+							SELECT nullif(trim(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')), '''')::integer as node_id
+							FROM '||v_table||'
+							WHERE graphconfig is not null and active is true
+						) t WHERE node_id IS NOT NULL
+					)';
 					EXECUTE v_querytext;
 				ELSE
 					v_querytext = 'UPDATE temp_t_anlgraph SET water=1, trace = '||v_fieldmp||'::integer 
 					FROM '||v_table||' WHERE graphconfig is not null and active is true AND '||v_fieldmp||'::integer IN ('||v_floodonlymapzone||') AND flag=0 
-					AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
+					AND node_1 IN (
+						SELECT node_id FROM (
+							SELECT nullif(trim(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')), '''')::integer as node_id
+							FROM '||v_table||'
+							WHERE graphconfig is not null and active is true
+						) t WHERE node_id IS NOT NULL
+					)';
 					EXECUTE v_querytext;
 				END IF;
 			END IF;
@@ -695,12 +727,24 @@ BEGIN
 			IF v_floodonlymapzone IS NULL THEN
 				v_querytext = 'UPDATE temp_t_anlgraph SET water=1, flag=0, trace = '||v_fieldmp||'::integer 
 				FROM '||v_table||' WHERE graphconfig is not null and active is true
-				AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
+				AND node_1 IN (
+					SELECT node_id FROM (
+						SELECT nullif(trim(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')), '''')::integer as node_id
+						FROM '||v_table||'
+						WHERE graphconfig is not null and active is true
+					) t WHERE node_id IS NOT NULL
+				)';
 				EXECUTE v_querytext;
 			ELSE
 				v_querytext = 'UPDATE temp_t_anlgraph SET water=1, flag=0, trace = '||v_fieldmp||'::integer 
 				FROM '||v_table||' WHERE graphconfig is not null and active is true AND '||v_fieldmp||'::integer IN ('||v_floodonlymapzone||')
-				AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
+				AND node_1 IN (
+					SELECT node_id FROM (
+						SELECT nullif(trim(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')), '''')::integer as node_id
+						FROM '||v_table||'
+						WHERE graphconfig is not null and active is true
+					) t WHERE node_id IS NOT NULL
+				)';
 				EXECUTE v_querytext;
 			END IF;
 		END IF;

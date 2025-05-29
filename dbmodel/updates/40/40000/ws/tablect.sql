@@ -116,23 +116,6 @@ CREATE RULE sector_undefined AS
 
 
 
-CREATE RULE insert_plan_psector_x_arc AS
-    ON INSERT TO arc
-   WHERE (new.state = 2) DO  INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
-  VALUES (new.arc_id, ( SELECT (config_param_user.value)::integer AS value
-           FROM config_param_user
-          WHERE (((config_param_user.parameter)::text = 'plan_psector_current'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
-         LIMIT 1), 1, true);
-
-CREATE RULE insert_plan_psector_x_node AS
-    ON INSERT TO node
-   WHERE (new.state = 2) DO  INSERT INTO plan_psector_x_node (node_id, psector_id, state, doable)
-  VALUES (new.node_id, ( SELECT (config_param_user.value)::integer AS value
-           FROM config_param_user
-          WHERE (((config_param_user.parameter)::text = 'plan_psector_current'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
-         LIMIT 1), 1, true);
-
-
 
 --30/01/2025
 
@@ -156,40 +139,104 @@ CREATE RULE supplyzone_undefined AS
 ALTER TABLE arc ADD CONSTRAINT arc_node_1_fkey FOREIGN KEY (node_1) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE arc ADD CONSTRAINT arc_node_2_fkey FOREIGN KEY (node_2) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE arc ADD CONSTRAINT arc_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE config_graph_mincut ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE config_graph_mincut ADD CONSTRAINT config_graph_inlet_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE doc_x_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE doc_x_node ADD CONSTRAINT doc_x_node_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE element_x_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE element_x_node ADD CONSTRAINT element_x_node_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE inp_dscenario_pump_additional ADD CONSTRAINT inp_dscenario_pump_additional_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_inlet DROP CONSTRAINT inp_dscenario_inlet_node_id_fkey;
+ALTER TABLE inp_inlet ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_inlet ADD CONSTRAINT inp_inlet_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_inlet ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE inp_dscenario_inlet ADD CONSTRAINT inp_dscenario_inlet_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_inlet(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_junction DROP CONSTRAINT inp_dscenario_junction_node_id_fkey;
+ALTER TABLE inp_junction ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_junction ADD CONSTRAINT inp_junction_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_junction ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE inp_dscenario_junction ADD CONSTRAINT inp_dscenario_junction_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_junction(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_label ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_label ADD CONSTRAINT inp_label_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_pump_additional DROP CONSTRAINT inp_dscenario_pump_additional_pump_id_fkey;
+ALTER TABLE inp_pump_additional ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_pump_additional ADD CONSTRAINT inp_pump_additional_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_pump DROP CONSTRAINT inp_dscenario_pump_node_id_fkey;
+ALTER TABLE inp_pump ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_pump ADD CONSTRAINT inp_pump_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_pump ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE inp_dscenario_pump ADD CONSTRAINT inp_dscenario_pump_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_pump(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_pump_additional ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE inp_dscenario_pump_additional ADD CONSTRAINT inp_dscenario_pump_additional_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_pump_additional ADD CONSTRAINT inp_dscenario_pump_additional_pump_id_fkey FOREIGN KEY (node_id, order_id) REFERENCES inp_pump_additional(node_id,order_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_reservoir DROP CONSTRAINT inp_dscenario_reservoir_node_id_fkey;
+ALTER TABLE inp_reservoir ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_reservoir ADD CONSTRAINT inp_reservoir_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_reservoir ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE inp_dscenario_reservoir ADD CONSTRAINT inp_dscenario_reservoir_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_reservoir(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_shortpipe DROP CONSTRAINT inp_dscenario_shortpipe_node_id_fkey;
+ALTER TABLE inp_shortpipe ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_shortpipe ADD CONSTRAINT inp_shortpipe_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_shortpipe ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE inp_dscenario_shortpipe ADD CONSTRAINT inp_dscenario_shortpipe_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_shortpipe(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_tank DROP CONSTRAINT inp_dscenario_tank_node_id_fkey;
+ALTER TABLE inp_tank ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_tank ADD CONSTRAINT inp_tank_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_tank ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE inp_dscenario_tank ADD CONSTRAINT inp_dscenario_tank_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_tank(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_valve DROP CONSTRAINT inp_dscenario_valve_node_id_fkey;
+ALTER TABLE inp_valve ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE inp_valve ADD CONSTRAINT inp_valve_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_valve ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE inp_dscenario_valve ADD CONSTRAINT inp_dscenario_valve_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_valve(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_expansiontank ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_expansiontank ADD CONSTRAINT man_expansiontank_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_filter ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_filter ADD CONSTRAINT man_filter_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_flexunion ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_flexunion ADD CONSTRAINT man_flexunion_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_hydrant ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_hydrant ADD CONSTRAINT man_hydrant_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_junction ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_junction ADD CONSTRAINT man_junction_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_manhole ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_manhole ADD CONSTRAINT man_manhole_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_meter ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_meter ADD CONSTRAINT man_meter_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_netelement ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_netelement ADD CONSTRAINT man_netelement_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_netsamplepoint ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_netsamplepoint ADD CONSTRAINT man_netsamplepoint_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_netwjoin ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_netwjoin ADD CONSTRAINT man_netwjoin_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_pump ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_pump ADD CONSTRAINT man_pump_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_reduction ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_reduction ADD CONSTRAINT man_reduction_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_register ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_register ADD CONSTRAINT man_register_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_source ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_source ADD CONSTRAINT man_source_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_tank ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_tank ADD CONSTRAINT man_tank_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE plan_netscenario_valve DROP CONSTRAINT plan_netscenario_valve_node_id_fkey;
+ALTER TABLE man_valve ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_valve ADD CONSTRAINT man_valve_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE plan_netscenario_valve ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE plan_netscenario_valve ADD CONSTRAINT plan_netscenario_valve_node_id_fkey FOREIGN KEY (node_id) REFERENCES man_valve(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_waterwell ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_waterwell ADD CONSTRAINT man_waterwell_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_wtp ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE man_wtp ADD CONSTRAINT man_wtp_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE man_source ALTER COLUMN wtp_id TYPE int4 USING wtp_id::int4;
+ALTER TABLE man_source ADD CONSTRAINT man_source_wtp_id_fkey FOREIGN KEY (wtp_id) REFERENCES man_wtp(node_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE om_visit_x_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE om_visit_x_node ADD CONSTRAINT om_visit_x_node_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+DROP TRIGGER IF EXISTS gw_trg_plan_psector_x_node ON plan_psector_x_node;
+ALTER TABLE plan_psector_x_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE plan_psector_x_node ADD CONSTRAINT plan_psector_x_node_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE rtc_hydrometer_x_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE rtc_hydrometer_x_node ADD CONSTRAINT rtc_hydrometer_x_node_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ext_rtc_scada_x_data ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE ext_rtc_scada_x_data ADD CONSTRAINT ext_rtc_scada_x_data_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
@@ -238,38 +285,86 @@ DROP TABLE cat_builder;
 
 -- 14/03/2025
 
+ALTER TABLE config_graph_checkvalve ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE config_graph_checkvalve ADD CONSTRAINT config_graph_checkvalve_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE config_graph_checkvalve ALTER COLUMN to_arc TYPE int4 USING to_arc::int4;
 ALTER TABLE config_graph_checkvalve ADD CONSTRAINT config_graph_checkvalve_to_arc_fkey FOREIGN KEY (to_arc) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE connec ADD CONSTRAINT connec_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE doc_x_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE doc_x_arc ADD CONSTRAINT doc_x_arc_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE element_x_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE element_x_arc ADD CONSTRAINT element_x_arc_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_dscenario_pipe DROP CONSTRAINT inp_dscenario_pipe_arc_id_fkey;
+ALTER TABLE inp_pipe ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE inp_pipe ADD CONSTRAINT inp_pipe_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_dscenario_pipe ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE inp_dscenario_pipe ADD CONSTRAINT inp_dscenario_pipe_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES inp_pipe(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_dscenario_virtualvalve DROP CONSTRAINT inp_dscenario_virtualvalve_arc_id_fkey;
+ALTER TABLE inp_virtualvalve ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE inp_virtualvalve ADD CONSTRAINT inp_virtualvalve_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_dscenario_virtualvalve ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE inp_dscenario_virtualvalve ADD CONSTRAINT inp_dscenario_virtualvalve_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES inp_virtualvalve(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_virtualpump ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE inp_virtualpump ADD CONSTRAINT inp_virtualpump_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_virtualpump ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE inp_dscenario_virtualpump ADD CONSTRAINT inp_dscenario_virtualpump_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES inp_virtualpump(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_pipe ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE man_pipe ADD CONSTRAINT man_pipe_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_pump ALTER COLUMN to_arc TYPE int4 USING to_arc::int4;
 ALTER TABLE man_pump ADD CONSTRAINT man_pump_to_arc_fkey FOREIGN KEY (to_arc) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_valve ALTER COLUMN to_arc TYPE int4 USING to_arc::int4;
 ALTER TABLE man_valve ADD CONSTRAINT man_valve_to_arc_fky FOREIGN KEY (to_arc) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_varc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE man_varc ADD CONSTRAINT man_varc_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE om_visit_x_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE om_visit_x_arc ADD CONSTRAINT om_visit_x_arc_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE plan_arc_x_pavement ADD CONSTRAINT plan_arc_x_pavement_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+DROP TRIGGER IF EXISTS gw_trg_plan_psector_x_arc ON plan_psector_x_arc;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE plan_psector_x_arc ADD CONSTRAINT plan_psector_x_arc_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE CASCADE;
+DROP TRIGGER IF EXISTS gw_trg_plan_psector_x_connec ON plan_psector_x_connec;
+DROP TRIGGER IF EXISTS gw_trg_plan_psector_link ON plan_psector_x_connec;
+ALTER TABLE plan_psector_x_connec ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
+ALTER TABLE doc_x_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE doc_x_connec ADD CONSTRAINT doc_x_connec_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE element_x_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE element_x_connec ADD CONSTRAINT element_x_connec_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_dscenario_connec DROP CONSTRAINT inp_dscenario_connec_connec_id_fkey;
+ALTER TABLE inp_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE inp_connec ADD CONSTRAINT inp_connec_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_dscenario_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+ALTER TABLE inp_dscenario_connec ADD CONSTRAINT inp_dscenario_connec_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES inp_connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_fountain ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+ALTER TABLE man_fountain ALTER COLUMN linked_connec TYPE int4 USING linked_connec::int4;
 ALTER TABLE man_fountain ADD CONSTRAINT man_fountain_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_fountain ADD CONSTRAINT man_fountain_linked_connec_fkey FOREIGN KEY (linked_connec) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_greentap ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+ALTER TABLE man_greentap ALTER COLUMN linked_connec TYPE int4 USING linked_connec::int4;
 ALTER TABLE man_greentap ADD CONSTRAINT man_greentap_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_greentap ADD CONSTRAINT man_greentap_linked_connec_fkey FOREIGN KEY (linked_connec) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_tap ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+ALTER TABLE man_tap ALTER COLUMN linked_connec TYPE int4 USING linked_connec::int4;
 ALTER TABLE man_tap ADD CONSTRAINT man_tap_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_tap ADD CONSTRAINT man_tap_linked_connec_fkey FOREIGN KEY (linked_connec) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_wjoin ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE man_wjoin ADD CONSTRAINT man_wjoin_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE om_visit_x_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE om_visit_x_connec ADD CONSTRAINT om_visit_x_connec_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE plan_psector_x_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rtc_hydrometer_x_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 ALTER TABLE rtc_hydrometer_x_connec ADD CONSTRAINT rtc_hydrometer_x_connec_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+ALTER TABLE element_x_node ALTER COLUMN element_id TYPE int4 USING element_id::int4;
 ALTER TABLE element_x_node ADD CONSTRAINT element_x_node_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE element_x_arc ALTER COLUMN element_id TYPE int4 USING element_id::int4;
 ALTER TABLE element_x_arc ADD CONSTRAINT element_x_arc_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE element_x_connec ALTER COLUMN element_id TYPE int4 USING element_id::int4;
 ALTER TABLE element_x_connec ADD CONSTRAINT element_x_connec_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE element_x_link ALTER COLUMN element_id TYPE int4 USING element_id::int4;
 ALTER TABLE element_x_link ADD CONSTRAINT element_x_link_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -380,3 +475,97 @@ ALTER TABLE arc ADD CONSTRAINT arc_omzone_id_fkey FOREIGN KEY (omzone_id) REFERE
 ALTER TABLE connec ADD CONSTRAINT connec_omzone_id_fkey FOREIGN KEY (omzone_id) REFERENCES omzone(omzone_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE node ADD CONSTRAINT node_omzone_id_fkey FOREIGN KEY (omzone_id) REFERENCES omzone(omzone_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE link ADD CONSTRAINT link_omzone_id_fkey FOREIGN KEY (omzone_id) REFERENCES omzone(omzone_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+
+CREATE RULE insert_plan_psector_x_arc AS
+    ON INSERT TO arc
+   WHERE (new.state = 2) DO  INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
+  VALUES (new.arc_id, ( SELECT (config_param_user.value)::integer AS value
+           FROM config_param_user
+          WHERE (((config_param_user.parameter)::text = 'plan_psector_current'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
+         LIMIT 1), 1, true);
+
+CREATE RULE insert_plan_psector_x_node AS
+    ON INSERT TO node
+   WHERE (new.state = 2) DO  INSERT INTO plan_psector_x_node (node_id, psector_id, state, doable)
+  VALUES (new.node_id, ( SELECT (config_param_user.value)::integer AS value
+           FROM config_param_user
+          WHERE (((config_param_user.parameter)::text = 'plan_psector_current'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
+         LIMIT 1), 1, true);
+
+ALTER TABLE polygon ALTER COLUMN feature_id TYPE int4 USING feature_id::int4;
+ALTER TABLE minsector_graph ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE rpt_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE rpt_node_stats ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE archived_rpt_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE archived_rpt_node_stats ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE rpt_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE rpt_arc_stats ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE archived_rpt_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE archived_rpt_arc_stats ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE rpt_inp_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE rpt_inp_node ALTER COLUMN nodeparent TYPE int4 USING nodeparent::int4;
+ALTER TABLE rpt_inp_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE rpt_inp_arc ALTER COLUMN arcparent TYPE int4 USING arcparent::int4;
+ALTER TABLE rpt_inp_arc ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
+ALTER TABLE rpt_inp_arc ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
+ALTER TABLE plan_netscenario_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE plan_netscenario_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE plan_netscenario_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+
+ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+
+ALTER TABLE temp_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE temp_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE temp_arc ALTER COLUMN arcparent TYPE int4 USING arcparent::int4;
+ALTER TABLE temp_arc ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
+ALTER TABLE temp_arc ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
+
+ALTER TABLE inp_dscenario_demand ALTER COLUMN feature_id TYPE int4 USING feature_id::int4;
+
+ALTER TABLE plan_rec_result_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE plan_rec_result_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE plan_rec_result_arc ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
+ALTER TABLE plan_rec_result_arc ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
+
+
+ALTER TABLE anl_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE anl_node ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE anl_node ALTER COLUMN node_id_aux TYPE int4 USING node_id_aux::int4;
+ALTER TABLE anl_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE anl_connec ALTER COLUMN connec_id_aux TYPE int4 USING connec_id_aux::int4;
+ALTER TABLE anl_arc ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
+ALTER TABLE anl_arc ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
+ALTER TABLE anl_arc ALTER COLUMN arc_id_aux TYPE int4 USING arc_id_aux::int4;
+ALTER TABLE anl_arc_x_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE anl_arc_x_node ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+
+ALTER TABLE anl_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+
+ALTER TABLE temp_anlgraph ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE temp_anlgraph ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
+ALTER TABLE temp_anlgraph ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
+ALTER TABLE temp_data ALTER COLUMN feature_id TYPE int4 USING feature_id::int4;
+
+ALTER TABLE om_mincut_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE om_mincut_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE om_mincut_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+
+ALTER TABLE om_mincut_valve_unaccess ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE om_mincut_valve ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+
+
+ALTER TABLE temp_node ADD COLUMN code text;
+ALTER TABLE temp_node ALTER COLUMN nodeparent TYPE int4 USING nodeparent::int4;
+ALTER TABLE temp_arc ADD COLUMN code text;
+
+ALTER TABLE temp_demand ALTER COLUMN feature_id TYPE int4 USING feature_id::int4;
+
+ALTER TABLE review_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE review_audit_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+ALTER TABLE review_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE review_audit_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
+ALTER TABLE review_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+ALTER TABLE review_audit_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
+

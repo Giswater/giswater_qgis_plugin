@@ -58,8 +58,8 @@ v_depth2 float;
 
 p_x float;
 p_y float;
-p_node1 text;
-p_node2 text;
+p_node1 integer;
+p_node2 integer;
 
 v_result text;
 v_result_info json;
@@ -81,7 +81,7 @@ v_col_top text;
 v_col_ymax text;
 v_col_elev text;
 
-v_node text;
+v_node integer;
 v_querytext text;
 
 
@@ -98,8 +98,8 @@ BEGIN
 	-- get parameters
 	p_x = (((p_data ->>'data')::json->>'parameters')::json->>'x')::float;
 	p_y = (((p_data ->>'data')::json->>'parameters')::json->>'y')::float;
-	p_node1 = (((p_data ->>'data')::json->>'parameters')::json->>'node1')::text;
-	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'node2')::text;
+	p_node1 = (((p_data ->>'data')::json->>'parameters')::json->>'node1')::integer;
+	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'node2')::integer;
 	p_action = (((p_data ->>'data')::json->>'parameters')::json->>'action');
 	v_node  = (((p_data ->>'data')::json->>'parameters')::json->>'TargetNode');
 
@@ -127,7 +127,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('NODE ',upper(p_action),' TOOL'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('--------------------------------'));
 
-	if v_node is not null and v_node !='' then
+	if v_node is not null then
 		v_geom0:= (select the_geom from node where node_id = v_node);
 	else
 		-- Make geom point

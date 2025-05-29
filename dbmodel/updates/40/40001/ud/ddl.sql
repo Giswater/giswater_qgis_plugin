@@ -26,7 +26,7 @@ CREATE TABLE man_inletpipe (
 );
 
 CREATE TABLE inp_froutlet (
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     outlet_type character varying(16) NOT NULL,
     offsetval numeric(12,4),
     curve_id character varying(16),
@@ -38,7 +38,7 @@ CREATE TABLE inp_froutlet (
 );
 
 CREATE TABLE inp_frorifice(
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     orifice_type varchar(18) NOT NULL,
     offsetval numeric(12, 4) NULL,
     cd numeric(12, 4) NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE inp_frorifice(
 );
 
 CREATE TABLE inp_frweir(
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     weir_type varchar(18) NOT NULL,
     offsetval numeric(12, 4) NULL,
     cd numeric(12, 4) NULL,
@@ -77,7 +77,7 @@ CREATE TABLE inp_frweir(
 );
 
 CREATE TABLE inp_frpump (
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     curve_id varchar(16) NOT NULL,
     status varchar(3) NULL,
     startup numeric(12, 4) NULL,
@@ -90,7 +90,7 @@ CREATE TABLE inp_frpump (
 
 CREATE TABLE inp_dscenario_frpump (
     dscenario_id int4 NOT NULL,
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     pump_type varchar(18) NOT NULL,
     curve_id varchar(16) NOT NULL,
     status varchar(3) NULL,
@@ -103,7 +103,7 @@ CREATE TABLE inp_dscenario_frpump (
 
 CREATE TABLE inp_dscenario_froutlet (
     dscenario_id int4 NOT NULL,
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     outlet_type character varying(16) NOT NULL,
     offsetval numeric(12,4),
     curve_id character varying(16),
@@ -117,7 +117,7 @@ CREATE TABLE inp_dscenario_froutlet (
 
 CREATE TABLE inp_dscenario_frorifice (
     dscenario_id int4 NOT NULL,
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     orifice_type varchar(18) NOT NULL,
     offsetval numeric(12, 4) NULL,
     cd numeric(12, 4) NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE inp_dscenario_frorifice (
 
 CREATE TABLE inp_dscenario_frweir (
     dscenario_id int4 NOT NULL,
-    element_id varchar(16) NOT NULL,
+    element_id int4 NOT NULL,
     weir_type varchar(18) NOT NULL,
     offsetval numeric(12, 4) NULL,
     cd numeric(12, 4) NULL,

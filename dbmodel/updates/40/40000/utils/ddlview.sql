@@ -23,6 +23,7 @@ DROP VIEW IF EXISTS v_plan_result_arc;
 DROP VIEW IF EXISTS v_plan_netscenario_arc;
 DROP VIEW IF EXISTS v_plan_netscenario_node;
 DROP VIEW IF EXISTS v_plan_netscenario_connec;
+DROP VIEW IF EXISTS v_edit_plan_netscenario_valve;
 DROP VIEW IF EXISTS v_ui_plan_arc_cost;
 
 DROP VIEW IF EXISTS v_ui_workcat_x_feature;
@@ -149,6 +150,13 @@ DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
 DROP VIEW IF EXISTS v_edit_inp_virtualpump;
 DROP VIEW IF EXISTS v_edit_inp_pipe;
 
+DROP VIEW IF EXISTS v_edit_review_audit_node;
+DROP VIEW IF EXISTS v_edit_review_audit_arc;
+DROP VIEW IF EXISTS v_edit_review_audit_connec;
+DROP VIEW IF EXISTS v_edit_review_audit_gully;
+
+DROP VIEW IF EXISTS v_edit_review_node;
+DROP VIEW IF EXISTS v_edit_review_arc;
 DROP VIEW IF EXISTS v_edit_review_connec;
 DROP VIEW IF EXISTS v_edit_review_gully;
 
@@ -264,6 +272,59 @@ DROP VIEW IF EXISTS vi_times;
 DROP VIEW IF EXISTS vi_timeseries;
 DROP VIEW IF EXISTS vi_reactions;
 DROP VIEW IF EXISTS vi_energy;
+DROP VIEW IF EXISTS vi_quality;
+DROP VIEW IF EXISTS vi_controls;
+DROP VIEW IF EXISTS vi_coordinates;
+DROP VIEW IF EXISTS vi_curves;
+DROP VIEW IF EXISTS vi_demands;
+DROP VIEW IF EXISTS vi_emitters;
+DROP VIEW IF EXISTS vi_junctions;
+DROP VIEW IF EXISTS vi_labels;
+DROP VIEW IF EXISTS vi_mixing;
+DROP VIEW IF EXISTS vi_patterns;
+DROP VIEW IF EXISTS vi_pipes;
+DROP VIEW IF EXISTS vi_pumps;
+DROP VIEW IF EXISTS vi_reservoirs;
+DROP VIEW IF EXISTS vi_rules;
+DROP VIEW IF EXISTS vi_sources;
+DROP VIEW IF EXISTS vi_status;
+DROP VIEW IF EXISTS vi_tags;
+DROP VIEW IF EXISTS vi_tanks;
+DROP VIEW IF EXISTS vi_title;
+DROP VIEW IF EXISTS vi_valves;
+DROP VIEW IF EXISTS vi_vertices;
+
+DROP VIEW IF EXISTS vi_adjustments;
+DROP VIEW IF EXISTS vi_aquifers;
+DROP VIEW IF EXISTS vi_buildup;
+DROP VIEW IF EXISTS vi_evaporation;
+DROP VIEW IF EXISTS vi_files;
+DROP VIEW IF EXISTS vi_gully;
+DROP VIEW IF EXISTS vi_hydrographs;
+DROP VIEW IF EXISTS vi_inflows;
+DROP VIEW IF EXISTS vi_landuses;
+DROP VIEW IF EXISTS vi_lid_controls;
+DROP VIEW IF EXISTS vi_map;
+-- DROP VIEW IF EXISTS vi_pollutants; -- TODO: refactor gw_fct_rpt2pg_import_rpt
+DROP VIEW IF EXISTS vi_polygons;
+DROP VIEW IF EXISTS vi_conduits;
+DROP VIEW IF EXISTS vi_dividers;
+DROP VIEW IF EXISTS vi_losses;
+DROP VIEW IF EXISTS vi_orifices;
+DROP VIEW IF EXISTS vi_outfalls;
+DROP VIEW IF EXISTS vi_outlets;
+DROP VIEW IF EXISTS vi_storage;
+DROP VIEW IF EXISTS vi_weirs;
+DROP VIEW IF EXISTS vi_xsections;
+DROP VIEW IF EXISTS vi_quality;
+DROP VIEW IF EXISTS vi_raingages;
+DROP VIEW IF EXISTS vi_rdii;
+DROP VIEW IF EXISTS vi_snowpacks;
+DROP VIEW IF EXISTS vi_symbols;
+DROP VIEW IF EXISTS vi_temperature;
+DROP VIEW IF EXISTS vi_transects;
+DROP VIEW IF EXISTS vi_treatment;
+DROP VIEW IF EXISTS vi_washoff;
 DROP VIEW IF EXISTS vcp_pipes;
 DROP VIEW IF EXISTS vcp_demands;
 
@@ -285,6 +346,121 @@ DROP VIEW IF EXISTS vu_drainzone;
 DROP VIEW IF EXISTS v_edit_inp_timeseries;
 DROP VIEW IF EXISTS v_edit_inp_timeseries_value;
 
+DROP VIEW IF EXISTS v_ui_hydrometer;
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_node;
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
+DROP VIEW IF EXISTS v_rtc_hydrometer;
+
+DROP VIEW IF EXISTS v_ui_om_event;
+DROP VIEW IF EXISTS v_ui_om_visitman_x_node;
+DROP VIEW IF EXISTS v_ui_om_visit_x_node;
+DROP VIEW IF EXISTS v_ui_om_visitman_x_arc;
+DROP VIEW IF EXISTS v_ui_om_visit_x_arc;
+DROP VIEW IF EXISTS v_ui_om_visitman_x_connec;
+DROP VIEW IF EXISTS v_ui_om_visit_x_connec;
+DROP VIEW IF EXISTS v_ui_om_visitman_x_gully;
+DROP VIEW IF EXISTS v_ui_om_visit_x_gully;
+DROP VIEW IF EXISTS ve_visit_node_singlevent;
+DROP VIEW IF EXISTS ve_visit_arc_singlevent;
+DROP VIEW IF EXISTS ve_visit_connec_singlevent;
+DROP VIEW IF EXISTS ve_visit_gully_singlevent;
+DROP VIEW IF EXISTS v_om_visit;
+DROP VIEW IF EXISTS v_ui_event_x_node;
+DROP VIEW IF EXISTS v_ui_event_x_arc;
+DROP VIEW IF EXISTS v_ui_event_x_connec;
+DROP VIEW IF EXISTS v_ui_event_x_gully;
+
+DROP VIEW IF EXISTS v_ui_hydroval_x_connec;
+DROP VIEW IF EXISTS v_ui_hydroval;
+
+DROP VIEW IF EXISTS v_price_x_arc;
+
+DROP VIEW IF EXISTS v_edit_plan_psector_x_connec;
+DROP VIEW IF EXISTS v_edit_plan_psector_x_gully;
+
+DROP VIEW IF EXISTS v_inp_pjointpattern;
+
+DROP VIEW IF EXISTS v_edit_rtc_hydro_data_x_connec;
+
+DROP VIEW IF EXISTS v_ui_mincut_hydrometer;
+DROP VIEW IF EXISTS v_om_mincut_current_hydrometer;
+
+DROP VIEW IF EXISTS v_om_mincut_planned_valve;
+DROP VIEW IF EXISTS v_om_mincut_valve;
+DROP VIEW IF EXISTS v_om_mincut_arc;
+DROP VIEW IF EXISTS v_om_mincut_planned_arc;
+DROP VIEW IF EXISTS v_om_mincut_current_arc;
+DROP VIEW IF EXISTS v_om_mincut_connec;
+DROP VIEW IF EXISTS v_om_mincut_current_connec;
+DROP VIEW IF EXISTS v_ui_mincut_connec;
+DROP VIEW IF EXISTS v_om_mincut_node;
+DROP VIEW IF EXISTS v_om_mincut_current_node;
+
+DROP VIEW IF EXISTS v_polygon;
+
+DROP VIEW IF EXISTS v_rpt_compare_node;
+DROP VIEW IF EXISTS v_rpt_arc_hourly;
+DROP VIEW IF EXISTS v_rpt_comp_node_hourly;
+DROP VIEW IF EXISTS v_rpt_comp_arc_hourly;
+DROP VIEW IF EXISTS v_rpt_comp_arc;
+DROP VIEW IF EXISTS v_rpt_comp_node;
+DROP VIEW IF EXISTS v_rpt_node_hourly;
+
+DROP VIEW IF EXISTS v_expl_connec;
+
+DROP VIEW IF EXISTS ve_epa_netgully;
+DROP VIEW IF EXISTS ve_epa_outfall;
+DROP VIEW IF EXISTS ve_epa_conduit;
+DROP VIEW IF EXISTS ve_epa_outlet;
+DROP VIEW IF EXISTS ve_epa_weir;
+DROP VIEW IF EXISTS ve_epa_gully;
+DROP VIEW IF EXISTS ve_epa_virtual;
+DROP VIEW IF EXISTS ve_epa_storage;
+
+DROP VIEW IF EXISTS v_sector_node;
+
+DROP VIEW IF EXISTS v_state_gully;
+DROP VIEW IF EXISTS v_state_link_connec;
+DROP VIEW IF EXISTS v_state_link_gully;
+
+DROP VIEW IF EXISTS v_rpt_arc_compare_all;
+DROP VIEW IF EXISTS v_rpt_arc_compare_timestep;
+DROP VIEW IF EXISTS v_rpt_arc_timestep;
+DROP VIEW IF EXISTS v_rpt_comp_arcflow_sum;
+DROP VIEW IF EXISTS v_rpt_arcflow_sum;
+DROP VIEW IF EXISTS v_rpt_arcpolload_sum;
+DROP VIEW IF EXISTS v_rpt_comp_condsurcharge_sum;
+DROP VIEW IF EXISTS v_rpt_condsurcharge_sum;
+DROP VIEW IF EXISTS v_rpt_comp_flowclass_sum;
+DROP VIEW IF EXISTS v_rpt_flowclass_sum;
+DROP VIEW IF EXISTS v_rpt_comp_pumping_sum;
+DROP VIEW IF EXISTS v_rpt_pumping_sum;
+DROP VIEW IF EXISTS v_rpt_comp_nodedepth_sum;
+DROP VIEW IF EXISTS v_rpt_nodedepth_sum;
+DROP VIEW IF EXISTS v_rpt_comp_nodeflooding_sum;
+DROP VIEW IF EXISTS v_rpt_nodeflooding_sum;
+DROP VIEW IF EXISTS v_rpt_comp_nodeinflow_sum;
+DROP VIEW IF EXISTS v_rpt_nodeinflow_sum;
+DROP VIEW IF EXISTS v_rpt_comp_nodesurcharge_sum;
+DROP VIEW IF EXISTS v_rpt_nodesurcharge_sum;
+DROP VIEW IF EXISTS v_rpt_comp_outfallflow_sum;
+DROP VIEW IF EXISTS v_rpt_outfallflow_sum;
+DROP VIEW IF EXISTS v_rpt_comp_outfallload_sum;
+DROP VIEW IF EXISTS v_rpt_outfallload_sum;
+DROP VIEW IF EXISTS v_rpt_node_compare_timestep;
+DROP VIEW IF EXISTS v_rpt_node_timestep;
+DROP VIEW IF EXISTS v_rpt_storagevol_sum;
+DROP VIEW IF EXISTS v_rpt_node_compare_all;
+DROP VIEW IF EXISTS v_rpt_comp_storagevol_sum;
+
+DROP VIEW IF EXISTS v_edit_dimensions;
+
+DROP VIEW IF EXISTS v_expl_gully;
+DROP VIEW IF EXISTS v_man_gully;
+
+DROP VIEW IF EXISTS ve_epa_virtual;
+DROP VIEW IF EXISTS v_edit_inp_virtual;
+
 -- 30/10/2024
 
 CREATE OR REPLACE VIEW vcv_times AS
@@ -301,13 +477,6 @@ CREATE OR REPLACE VIEW vcv_dma AS
     ext_rtc_dma_period.pattern_id
    FROM ext_rtc_dma_period;
 
-CREATE OR REPLACE VIEW vcv_emitters AS
-  SELECT DISTINCT node_id, sum(length/10000) as coef
-    FROM selector_inp_result r,rpt_inp_arc a
-    JOIN rpt_inp_node n USING(result_id)
-    WHERE (a.node_1 = n.node_id OR a.node_2 = n.node_id) and r.result_id = n.result_id
-    AND r.cur_user = "current_user"()::text
-    GROUP BY node_id;
 
 -- 12/11/2024
 CREATE OR REPLACE VIEW ve_config_addfields
@@ -431,22 +600,6 @@ AS SELECT ext_streetaxis.id,
     ext_streetaxis
   WHERE ext_streetaxis.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text;
 
-CREATE OR REPLACE VIEW v_edit_plan_psector_x_other
-AS SELECT plan_psector_x_other.id,
-    plan_psector_x_other.psector_id,
-    v_price_compost.id AS price_id,
-    v_price_compost.unit,
-    rpad(v_price_compost.descript::text, 125) AS price_descript,
-    v_price_compost.price,
-    plan_psector_x_other.measurement,
-    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
-    plan_psector_x_other.observ,
-    plan_psector.atlas_id,
-    plan_psector_x_other.the_geom
-   FROM plan_psector_x_other
-     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
-     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
-  ORDER BY plan_psector_x_other.psector_id;
 
 CREATE OR REPLACE VIEW v_edit_plan_psector
 AS SELECT plan_psector.psector_id,

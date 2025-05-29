@@ -126,9 +126,6 @@ ON dma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dma_id');
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrodma_id');
 
-CREATE TRIGGER gw_trg_edit_psector_x_other INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_plan_psector_x_other FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_psector_x_other('plan');
-
 -- 11/03/2025
 DROP TRIGGER gw_trg_cat_manager ON cat_manager;
 

@@ -31,7 +31,7 @@ SELECT col_is_pk('om_visit_x_arc', ARRAY['id'], 'Column id should be primary key
 -- Check column types
 SELECT col_type_is('om_visit_x_arc', 'id', 'bigint', 'Column id should be bigint');
 SELECT col_type_is('om_visit_x_arc', 'visit_id', 'bigint', 'Column visit_id should be bigint');
-SELECT col_type_is('om_visit_x_arc', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('om_visit_x_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('om_visit_x_arc', 'is_last', 'boolean', 'Column is_last should be boolean');
 
 -- Check default values
@@ -55,4 +55,4 @@ SELECT has_trigger('om_visit_x_arc', 'gw_trg_om_visit', 'Table should have gw_tr
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

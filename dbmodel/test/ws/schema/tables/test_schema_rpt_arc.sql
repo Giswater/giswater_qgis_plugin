@@ -20,7 +20,7 @@ SELECT has_table('rpt_arc'::name, 'Table rpt_arc should exist');
 SELECT columns_are(
     'rpt_arc',
     ARRAY[
-        'id', 'result_id', 'arc_id', 'length', 'diameter', 'flow', 'vel', 'headloss', 
+        'id', 'result_id', 'arc_id', 'length', 'diameter', 'flow', 'vel', 'headloss',
         'setting', 'reaction', 'ffactor', 'other', 'time', 'status'
     ],
     'Table rpt_arc should have the correct columns'
@@ -32,7 +32,7 @@ SELECT col_is_pk('rpt_arc', ARRAY['id'], 'Column id should be primary key');
 -- Check column types
 SELECT col_type_is('rpt_arc', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('rpt_arc', 'result_id', 'character varying(30)', 'Column result_id should be character varying(30)');
-SELECT col_type_is('rpt_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
+SELECT col_type_is('rpt_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('rpt_arc', 'length', 'numeric', 'Column length should be numeric');
 SELECT col_type_is('rpt_arc', 'diameter', 'numeric', 'Column diameter should be numeric');
 SELECT col_type_is('rpt_arc', 'flow', 'numeric', 'Column flow should be numeric');
@@ -62,4 +62,4 @@ SELECT has_index('rpt_arc', 'rpt_arc_result_id', 'Table should have index on res
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

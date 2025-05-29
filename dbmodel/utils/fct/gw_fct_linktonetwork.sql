@@ -71,13 +71,13 @@ v_connect record; -- Record to store the value for the used connect
 v_link record; -- Record to store the value for the used link
 v_link_point public.geometry;
 v_arc record; -- Record to store the value for the used arc
-v_connect_id  varchar; -- id for the used connect
+v_connect_id  integer; -- id for the used connect
 v_point_aux public.geometry; -- Variable to store the geometry of the end of the link
-v_feature_array text[]; -- Transforming v_feature_ids on real array
+v_feature_array integer[]; -- Transforming v_feature_ids on real array
 
 v_endfeature_geom public.geometry; -- Variable to store the geometry of the end object, as well as node, connec, gully or arc
 v_pjointtype text; -- Type for the destination feature (ARC, NODE, CONNEC, GULLY)
-v_pjointid text; -- Id for the destination feature
+v_pjointid integer; -- Id for the destination feature
 
 v_count integer; -- Counter
 v_count2 integer; -- Counter
@@ -173,10 +173,10 @@ BEGIN
 
 	-- get values from feature array
 	IF v_feature_ids ILIKE '[%]' THEN
-		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_ids::json));
+		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_ids::json)::integer);
 	ELSE
 		EXECUTE v_feature_ids INTO v_feature_ids;
-		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_ids::json));
+		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_ids::json)::integer);
 	END IF;
 
 	-- delete old values on result table

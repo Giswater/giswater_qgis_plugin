@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_netsamplepoint', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_netsamplepoint', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_netsamplepoint', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_netsamplepoint', 'lab_code', 'varchar(30)', 'Column lab_code should be varchar(30)');
 
 -- Check not null constraints
@@ -40,4 +40,4 @@ SELECT fk_ok('man_netsamplepoint', 'node_id', 'node', 'node_id', 'FK node_id sho
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

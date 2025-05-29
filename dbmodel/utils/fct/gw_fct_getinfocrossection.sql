@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfocrossection($${
 
 DECLARE
 
-v_id character varying;
+v_id integer;
 v_version json;
 v_fields json;
 v_currency_symbol varchar;
@@ -37,9 +37,9 @@ BEGIN
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_version;
 
-	-- getting input data 
-	v_id :=  ((p_data ->>'feature')::json->>'id')::text;
-	
+	-- getting input data
+	v_id :=  ((p_data ->>'feature')::json->>'id')::integer;
+
 	--  get system currency
 	v_currency_symbol :=((SELECT value FROM config_param_system WHERE parameter='admin_currency')::json->>'symbol');
 
@@ -72,10 +72,10 @@ BEGIN
 	v_array[18] := json_build_object('columnname', 'rec_y', 'widgettype', 'text', 'datatype', 'string', 'iseditable', FALSE, 'layoutorder', 1, 'value', v_record.rec_y);
 
 	v_fields = array_to_json(v_array[0:18]);
-      
+
 	-- Check null
-	v_shape := COALESCE(v_shape, '[]'); 
-	v_fields := COALESCE(v_fields, '[]'); 
+	v_shape := COALESCE(v_shape, '[]');
+	v_fields := COALESCE(v_fields, '[]');
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{}, "version":'||v_version||
@@ -86,7 +86,7 @@ BEGIN
 	    '}')::json;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
     RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 
 END;

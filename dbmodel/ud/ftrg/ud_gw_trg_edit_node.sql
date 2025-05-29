@@ -212,7 +212,7 @@ BEGIN
 		END IF;
 
 		-- Node ID
-		IF NEW.node_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.node_id IS NULL THEN
+		IF NEW.node_id != (SELECT last_value FROM urn_id_seq) OR NEW.node_id IS NULL THEN
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 

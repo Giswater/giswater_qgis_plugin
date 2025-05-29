@@ -20,9 +20,9 @@ VALUES('-901', 0, 0, '', '', '', '', '', '', 0, null, null, false, 0);
 SELECT is((SELECT count(*)::integer FROM v_edit_review_node  WHERE node_id = '-901'), 1, 'INSERT: v_edit_review_node  -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM review_node WHERE node_id = '-901'), 1, 'INSERT: review_node -901 was inserted');
 
-UPDATE v_edit_review_node  SET observ = 'updated observ' WHERE node_id = '-901';
-SELECT is((SELECT observ FROM v_edit_review_node  WHERE node_id = '-901'), 'updated observ', 'UPDATE: v_edit_review_node  -901 was updated');
-SELECT is((SELECT observ FROM review_node WHERE node_id = '-901'), 'updated observ', 'UPDATE: review_node -901 was updated');
+UPDATE v_edit_review_node SET annotation = 'updated annotation' WHERE node_id = '-901';
+SELECT is((SELECT annotation FROM v_edit_review_node  WHERE node_id = '-901'), 'updated annotation', 'UPDATE: v_edit_review_node  -901 was updated');
+SELECT is((SELECT annotation FROM review_node WHERE node_id = '-901'), 'updated annotation', 'UPDATE: review_node -901 was updated');
 
 DELETE FROM v_edit_review_node  WHERE node_id = '-901';
 SELECT is((SELECT count(*)::integer FROM v_edit_review_node  WHERE node_id = '-901'), 0, 'DELETE: v_edit_review_node  -901 was deleted');

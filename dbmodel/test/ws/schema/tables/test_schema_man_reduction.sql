@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('man_reduction', ARRAY['node_id'], 'Column node_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('man_reduction', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('man_reduction', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_reduction', 'diam1', 'numeric(12,3)', 'Column diam1 should be numeric(12,3)');
 SELECT col_type_is('man_reduction', 'diam2', 'numeric(12,3)', 'Column diam2 should be numeric(12,3)');
 
@@ -41,4 +41,4 @@ SELECT fk_ok('man_reduction', 'node_id', 'node', 'node_id', 'FK node_id should r
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

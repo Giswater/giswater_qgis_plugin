@@ -31,7 +31,7 @@ SELECT col_is_pk('om_mincut_valve_unaccess', ARRAY['id'], 'Column id should be p
 -- Check column types
 SELECT col_type_is('om_mincut_valve_unaccess', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('om_mincut_valve_unaccess', 'result_id', 'integer', 'Column result_id should be integer');
-SELECT col_type_is('om_mincut_valve_unaccess', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('om_mincut_valve_unaccess', 'node_id', 'integer', 'Column node_id should be integer');
 
 -- Check foreign keys
 SELECT has_fk('om_mincut_valve_unaccess', 'Table om_mincut_valve_unaccess should have foreign keys');
@@ -44,4 +44,4 @@ SELECT col_not_null('om_mincut_valve_unaccess', 'node_id', 'Column node_id shoul
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

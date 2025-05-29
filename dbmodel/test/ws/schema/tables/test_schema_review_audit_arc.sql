@@ -20,8 +20,8 @@ SELECT has_table('review_audit_arc'::name, 'Table review_audit_arc should exist'
 SELECT columns_are(
     'review_audit_arc',
     ARRAY[
-        'id', 'arc_id', 'old_arccat_id', 'new_arccat_id', 'old_annotation', 'new_annotation', 
-        'old_observ', 'new_observ', 'review_obs', 'expl_id', 'the_geom', 'review_status_id', 
+        'id', 'arc_id', 'old_arccat_id', 'new_arccat_id', 'old_annotation', 'new_annotation',
+        'old_observ', 'new_observ', 'review_obs', 'expl_id', 'the_geom', 'review_status_id',
         'field_date', 'field_user', 'is_validated'
     ],
     'Table review_audit_arc should have the correct columns'
@@ -32,7 +32,7 @@ SELECT col_is_pk('review_audit_arc', ARRAY['id'], 'Column id should be primary k
 
 -- Check column types
 SELECT col_type_is('review_audit_arc', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('review_audit_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
+SELECT col_type_is('review_audit_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('review_audit_arc', 'old_arccat_id', 'character varying(30)', 'Column old_arccat_id should be character varying(30)');
 SELECT col_type_is('review_audit_arc', 'new_arccat_id', 'character varying(30)', 'Column new_arccat_id should be character varying(30)');
 SELECT col_type_is('review_audit_arc', 'old_annotation', 'text', 'Column old_annotation should be text');
@@ -56,4 +56,4 @@ SELECT col_not_null('review_audit_arc', 'arc_id', 'Column arc_id should be NOT N
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

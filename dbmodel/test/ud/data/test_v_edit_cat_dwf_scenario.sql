@@ -20,9 +20,9 @@ VALUES(-901, 'Test', NULL, NULL, NULL, NULL, true, NULL);
 SELECT is((SELECT count(*)::integer FROM v_edit_cat_dwf WHERE id = -901), 1, 'INSERT: v_edit_cat_dwf -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM cat_dwf WHERE id = -901), 1, 'INSERT: cat_dwf -901 was inserted');
 
-UPDATE v_edit_cat_dwf SET observ = 'updated observ' WHERE id = -901;
-SELECT is((SELECT observ FROM v_edit_cat_dwf WHERE id = -901), 'updated observ', 'UPDATE: v_edit_cat_dwf -901 was updated');
-SELECT is((SELECT observ FROM cat_dwf WHERE id = -901), 'updated observ', 'UPDATE: cat_dwf -901 was updated');
+UPDATE v_edit_cat_dwf SET active = false WHERE id = -901;
+SELECT is((SELECT active FROM v_edit_cat_dwf WHERE id = -901), false, 'UPDATE: v_edit_cat_dwf -901 was updated');
+SELECT is((SELECT active FROM cat_dwf WHERE id = -901), false, 'UPDATE: cat_dwf -901 was updated');
 
 DELETE FROM v_edit_cat_dwf WHERE id = -901;
 SELECT is((SELECT count(*)::integer FROM v_edit_cat_dwf WHERE id = -901), 0, 'DELETE: v_edit_cat_dwf -901 was deleted');

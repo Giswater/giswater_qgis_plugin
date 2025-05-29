@@ -70,7 +70,7 @@ BEGIN
             SELECT start_vid, start_vid_zone_id, start_vid_zone_name
             FROM connected_arcs c
             JOIN (
-                SELECT dma_id AS start_vid_zone_id, name AS start_vid_zone_name, (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' AS node_id
+                SELECT dma_id AS start_vid_zone_id, name AS start_vid_zone_name, ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::integer AS node_id
                 FROM dma WHERE graphconfig IS NOT NULL AND active IS TRUE
             ) s ON c.node_1 = s.node_id
         )

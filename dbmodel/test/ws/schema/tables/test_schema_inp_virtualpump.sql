@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('inp_virtualpump', ARRAY['arc_id'], 'Column arc_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('inp_virtualpump', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('inp_virtualpump', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('inp_virtualpump', 'power', 'varchar', 'Column power should be varchar');
 SELECT col_type_is('inp_virtualpump', 'curve_id', 'varchar', 'Column curve_id should be varchar');
 SELECT col_type_is('inp_virtualpump', 'speed', 'numeric(12,6)', 'Column speed should be numeric(12,6)');
@@ -59,4 +59,4 @@ SELECT col_has_default('inp_virtualpump', 'pump_type', 'Column pump_type should 
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

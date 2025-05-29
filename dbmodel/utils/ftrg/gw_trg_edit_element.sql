@@ -134,7 +134,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- element_id
-		IF NEW.element_id != (SELECT last_value::text FROM urn_id_seq) THEN
+		IF NEW.element_id != (SELECT last_value FROM urn_id_seq) THEN
 			NEW.element_id = (SELECT nextval('urn_id_seq'));
 		END IF;
 
