@@ -111,7 +111,7 @@ BEGIN
 		VALUES (105,  concat ('There are ',v_count,' duplicated connecs.'), v_count);
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 105,  concat ('Connec_id: ',string_agg(connec_id, ', '), '.' ), v_count
+		SELECT 105,  concat ('Connec_id: ',array_agg(connec_id), '.' ), v_count
 		FROM anl_connec WHERE cur_user="current_user"() AND fid=105;
 
 	END IF;
