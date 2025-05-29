@@ -36,7 +36,7 @@ from .i18n_generator import GwI18NGenerator
 from .schema_i18n_update import GwSchemaI18NUpdate
 from .i18n_manager import GwSchemaI18NManager
 from .import_osm import GwImportOsm
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os, tools_pgdao
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_asset_create import GwCreateSchemaAssetTask
@@ -46,7 +46,7 @@ from ..threads.project_schema_cm_create import GwCreateSchemaCmTask
 from ..threads.project_schema_update import GwUpdateSchemaTask
 from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
-
+from ..threads.project_schema_vacuum import GwVacuumSchemaTask
 
 class GwAdminButton:
 
@@ -218,6 +218,7 @@ class GwAdminButton:
         self.task_create_schema = GwCreateSchemaTask(self, description, params, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
+        self.task_create_schema.task_finished.connect(partial(self.execute_vacuum, verbose=False))
 
     def create_process(self, process_name=""):
         self.error_count = 0
@@ -381,6 +382,33 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
 
         return result
+    
+    def _vacuum_project_data_schema(self, verbose=False):
+        """ Execute task to vacuum schema """
+        description = "Vacuum schema"
+        params = {'schema_name': self.schema_name, 'logs': True, 'verbose': verbose}
+
+        self.task_vacuum_schema = GwVacuumSchemaTask(description, params)
+        QgsApplication.taskManager().addTask(self.task_vacuum_schema)
+        QgsApplication.taskManager().triggerTask(self.task_vacuum_schema)
+        
+    
+    def execute_vacuum(self, ask_confirm=False, verbose=False):
+        """ Ask confirmation to execute vacuum using a separate database connection """
+
+        if ask_confirm:
+            msg = "Are you sure to execute vacuum on selected schema?"
+            title = "Warning"
+            result = tools_qt.show_question(msg, title)
+            if result is True:
+                self._vacuum_project_data_schema(verbose=verbose)
+                return True
+            else:
+                return False
+        else:
+            self._vacuum_project_data_schema(verbose=verbose)
+
+        return True
 
     def cancel_task(self, task_name: str):
         if hasattr(self, task_name):
@@ -450,6 +478,11 @@ class GwAdminButton:
             self._manage_result_message(status, parameter="Load updates")
             if status:
                 tools_db.dao.commit()
+                msg = "Schema updated successfully. Do you want to execute vacuum on the schema?"
+                title = "Vacuum schema"
+                answer = tools_qt.show_question(msg, title=title)
+                if answer is True:
+                    pass
             else:
                 tools_db.dao.rollback()
 
@@ -809,6 +842,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
             partial(self._load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
         self.dlg_readsql.btn_reload_fct_ftrg.clicked.connect(partial(self._reload_fct_ftrg))
+        self.dlg_readsql.btn_vacuum.clicked.connect(partial(self.execute_vacuum, True, True))
         self.dlg_readsql.btn_info.clicked.connect(partial(self._open_update_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._set_info_project))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._update_manage_ui))
@@ -1671,6 +1705,7 @@ class GwAdminButton:
 
             # Set label schema name
             self.lbl_schema_name.setText(str(schema_name))
+            self.schema_name = schema_name
 
         # Update windowTitle
         window_title = f'Giswater ({self.plugin_version})'
@@ -1831,7 +1866,7 @@ class GwAdminButton:
                     f"SELECT 1 FROM {self.cm_schema}.cat_organization LIMIT 1"
                 )
             )
-            # If both exist, disable the “Create example” button
+            # If both exist, disable the "Create example" button
             if has_team and has_org:
                 self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
             else:

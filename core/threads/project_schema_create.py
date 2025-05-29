@@ -105,6 +105,9 @@ class GwCreateSchemaTask(GwTask):
         self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                              is_test=self.is_test)
         self.setProgress(100)
+        
+        # Emit task_finished signal with empty list
+        self.task_finished.emit([])
 
     def set_progress(self, value):
 
