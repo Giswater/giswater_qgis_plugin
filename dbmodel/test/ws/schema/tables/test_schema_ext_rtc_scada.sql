@@ -33,7 +33,7 @@ SELECT col_is_pk('ext_rtc_scada', ARRAY['scada_id'], 'Column scada_id should be 
 SELECT col_type_is('ext_rtc_scada', 'scada_id', 'varchar(30)', 'Column scada_id should be varchar(30)');
 SELECT col_type_is('ext_rtc_scada', 'source', 'varchar(30)', 'Column source should be varchar(30)');
 SELECT col_type_is('ext_rtc_scada', 'source_id', 'varchar(30)', 'Column source_id should be varchar(30)');
-SELECT col_type_is('ext_rtc_scada', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('ext_rtc_scada', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('ext_rtc_scada', 'code', 'varchar(50)', 'Column code should be varchar(50)');
 SELECT col_type_is('ext_rtc_scada', 'type_id', 'varchar(50)', 'Column type_id should be varchar(50)');
 SELECT col_type_is('ext_rtc_scada', 'class_id', 'varchar(50)', 'Column class_id should be varchar(50)');
