@@ -318,9 +318,9 @@ BEGIN
 							IF v_query_string_update IS NOT NULL THEN
 								EXECUTE v_query_string_update;
 
-							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3378", "function":"2114", "parameters":{"column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'",  "is_process":true}}$$)';
-
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       				"data":{"message":"3378", "function":"2114", "parameters":{"column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'",  "is_process":true}}$$)';
+							END IF;
 						ELSE
 							v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = 
 													( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record1.arc_id)||' ) 
