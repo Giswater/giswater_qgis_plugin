@@ -62,13 +62,14 @@ BEGIN
 	SELECT value INTO v_slopedirection FROM config_param_system WHERE parameter = 'edit_slope_direction';
 
 	-- starting function
-	INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('ARC REVERSE FUNCTION'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3008", "fid":"357", "is_process":true, "is_header":"true"}}$$)';
 
 	IF v_selectionmode = 'previousSelection' THEN
 
 		IF v_array ='()' THEN
-			INSERT INTO audit_check_data (fid, error_message) VALUES (357, 'ERROR-357: No arcs have been selected');
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3562", "function":"3008", "fid":"357", "is_process":true}}$$)';
 		ELSE
 			-- execute
 			EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
@@ -84,12 +85,17 @@ BEGIN
 			END IF;
 
 			SELECT count(*) INTO v_count FROM anl_arc WHERE fid=357 AND cur_user=current_user;
-			INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Direction of ',v_count,' arcs has been changed.'));
+			--INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Direction of ',v_count,' arcs has been changed.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3566", "function":"3008", "parameters":{"v_count":"'||v_count||'"}, "fid":"357", "is_process":true}}$$)';
 
-			INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Reversed arcs:',v_array));
+			--INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Reversed arcs:',v_array));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3568", "function":"3008", "parameters":{"v_array":"'||v_array||'"}, "fid":"357", "is_process":true}}$$)';
 		END IF;
 	ELSE 
-		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Selection mode ''Whole selection'' is not enabled in this function'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3564", "function":"3008", "fid":"357", "is_process":true}}$$)';
 	END IF;
 		
 	-- get results

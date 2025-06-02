@@ -1537,3 +1537,19 @@ UPDATE sys_table SET addparam='{
 UPDATE sys_table SET addparam='{
   "pkey": "element_id"
 }'::json WHERE id='ve_genelem_ecover';
+
+-- 02/06/2025
+
+UPDATE sys_function SET function_alias = 'ARC REVERSE FUNCTION' WHERE function_name = 'gw_fct_setarcreverse';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3562, 'ERROR-357: No arcs have been selected', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3564, 'Selection mode ''Whole selection'' is not enabled in this function', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3566, 'Direction of %v_count% arcs has been changed.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3568, 'Reversed arcs: %v_array%', null, 0, true, 'utils', 'core', 'AUDIT');
