@@ -85,8 +85,8 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=486;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=486;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (486, null, 4, concat('GET ADDRESS VALUES FROM CLOSEST STREET NUMBER'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (486, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3198", "fid":"486", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	v_expl= (select string_agg(expl_id::text,',') from selector_expl where cur_user = current_user);
 	v_expl= concat(' AND a.expl_id IN (', v_expl,')');
@@ -180,8 +180,8 @@ BEGIN
 	   	GET DIAGNOSTICS affected_rows=row_count;
 	END IF;
 
-	INSERT INTO audit_check_data(fid,  error_message, fcount)
-	VALUES (486,  concat ('There are ',affected_rows,' ',v_feature_type,' address values updated.'), affected_rows);
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3612", "function":"3198", "parameters":{"affected_rows":"'||affected_rows||'","v_feature_type":"'||v_feature_type||'"}, "fcount":"'||affected_rows||'", "fid":"486", "is_process":true}}$$)';
 
 	--info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
