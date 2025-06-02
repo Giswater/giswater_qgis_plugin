@@ -59,8 +59,9 @@ BEGIN
   DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=432;
   DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=432;
 
-  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (432, null, 4, concat('NODES T CANDIDATES ANALYSIS'));
-  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (432, null, 4, '-------------------------------------------------------------');
+  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3172", "fid":"432", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
 
 
   -- Computing process
@@ -85,11 +86,11 @@ BEGIN
   SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=432;
 
   IF v_count = 0 THEN
-    INSERT INTO audit_check_data(fid,  error_message, fcount)
-    VALUES (432,  'There are no nodes T candidates.', v_count);
+    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3610", "function":"3172", "fid":"432", "fcount":"'||v_count||'", "is_process":true}}$$)';
   ELSE
-    INSERT INTO audit_check_data(fid,  error_message, fcount)
-    VALUES (432,  concat ('There are ',v_count,' nodes T candidates.'), v_count);
+    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3612", "function":"3172", "parameters":{"v_count":"'||v_count||'"}, "fid":"432", "fcount":"'||v_count||'", "is_process":true}}$$)';
   END IF;
 
 

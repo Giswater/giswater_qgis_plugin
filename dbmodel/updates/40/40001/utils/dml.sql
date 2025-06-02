@@ -1609,3 +1609,32 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3600, 'There are %v_count% duplicated nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_link_link', 'form_feature', 'tab_data', 'state_type', 'lyt_bot_1', 7, 'integer', 'combo', 'State type', 'state_type - The state type of the element. It allows to obtain more detail of the state. To select from those available depending on the chosen state', NULL, false, false, true, false, NULL, 'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL', true, false, 'state', ' AND value_state_type.state', NULL, '{"setMultiline":false, "labelPosition": "top"}'::json, NULL, NULL, false, NULL);
+UPDATE sys_function SET function_alias = 'NODE ORPHAN (OM) ANALYSIS' WHERE function_name = 'gw_fct_anl_node_orphan';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3602, 'There are no orphan nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(3006, 'ARC DIVIDE = TRUE', 'header');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(3008, 'ARC DIVIDE = FALSE', 'header');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(2025, '-------------------------', 'separator');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3604, 'There are %v_count1% orphan nodes with isarcdivide=TRUE.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3606, 'There are %v_count2% orphan nodes with isarcdivide=FALSE.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3608, 'There are no orphan nodes with isarcdivide=FALSE.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'NODES T CANDIDATES ANALYSIS' WHERE function_name = 'gw_fct_anl_node_tcandidate';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3610, 'There are no nodes T candidates.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3612, 'There are %v_count% nodes T candidates.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+

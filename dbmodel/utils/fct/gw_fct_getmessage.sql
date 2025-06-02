@@ -124,6 +124,15 @@ BEGIN
             '}')::json;
     END IF;
 
+	IF v_header_separator_id IS NOT NULL THEN
+        SELECT idval INTO v_separator FROM sys_label WHERE id = COALESCE(v_header_separator_id, 2030);
+
+        v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
+        VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||');';
+
+        EXECUTE v_querytext;
+    END IF;
+
 	-- get flow parameters
 	SELECT * INTO rec_cat_error FROM sys_message WHERE sys_message.id=v_message_id;
 
