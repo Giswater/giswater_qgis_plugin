@@ -14,7 +14,7 @@ INSERT INTO config_param_system (parameter, value, descript, isenabled, project_
 INSERT INTO SCHEMA_NAME.cat_pschema (name) VALUES ('PARENT_SCHEMA');
 
 UPDATE PARENT_SCHEMA.config_param_system
-   SET value = '{"schema_name":"SCHEMA_NAME"}'
+   SET value = '{"schemaName":"SCHEMA_NAME"}'
  WHERE parameter = 'admin_schema_cm';
 
 UPDATE SCHEMA_NAME.sys_version AS dst
