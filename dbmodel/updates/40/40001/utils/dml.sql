@@ -1569,3 +1569,13 @@ VALUES(3574, 'There are no duplicated arcs.', null, 0, true, 'utils', 'core', 'A
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3576, 'There are %v_count% duplicated arcs.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'ARC WITH SAME START - END NODE ANALYSIS' WHERE function_name = 'gw_fct_anl_arc_same_startend';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3578, 'There are no arcs with same start - end node.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3580, 'There are %v_count% arcs with same start - end nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+

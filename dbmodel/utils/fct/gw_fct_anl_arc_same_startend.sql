@@ -52,8 +52,8 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 104;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=104;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (104, null, 4, concat('ARC WITH SAME START - END NODE ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (104, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2104", "fid":"104", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
@@ -89,11 +89,12 @@ BEGIN
 	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=104;
 
 	IF v_count = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (104,  'There are no arcs with same start - end node.', v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3578", "function":"2104", "fid":"104", "fcount":"'||v_count||'", "is_process":true}}$$)';
+
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (104,  concat ('There are ',v_count,' arcs with same start - end nodes.'), v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3580", "function":"2104", "fid":"104", "parameters":{"v_count":"'||v_count||'"}, "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 104,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count 
@@ -105,7 +106,6 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=104 order by  id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
