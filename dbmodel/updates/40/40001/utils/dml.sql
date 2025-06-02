@@ -1578,4 +1578,18 @@ VALUES(3578, 'There are no arcs with same start - end node.', null, 0, true, 'ut
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3580, 'There are %v_count% arcs with same start - end nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'ARC WITHOUT END NODES ANALYSIS' WHERE function_name = 'gw_fct_anl_arc_no_startend_node';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3582, 'There are no arcs without final nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3584, 'Value of search nodes automatically set to %v_arcsearchnodes%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3586, 'There are %v_count_state1% arcs with state 1 without final nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3588, 'There are %v_count_state2% arcs with state 2 without final nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+
 

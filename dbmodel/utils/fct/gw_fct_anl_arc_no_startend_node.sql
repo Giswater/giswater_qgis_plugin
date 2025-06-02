@@ -62,8 +62,9 @@ BEGIN
     DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=103;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (103, null, 4, concat('ARC WITHOUT END NODES ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (103, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2102", "fid":"103", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
 
 	-- Init counter
 	EXECUTE 'SELECT count(*) FROM '||v_worklayer
@@ -71,8 +72,9 @@ BEGIN
 	
 	IF v_arcsearchnodes IS NULL THEN 
 		SELECT (value::json ->>'value')::numeric into v_arcsearchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
-		INSERT INTO audit_check_data(fid,  error_message)
-		VALUES (103,  concat('Value of search nodes automatically set to ',v_arcsearchnodes));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3584", "function":"2102", "fid":"103", "parameters":{"v_arcsearchnodes":"'||v_arcsearchnodes||'"}, "is_process":true}}$$)';
+
 	END IF;
 	
 	-- Computing process
@@ -159,12 +161,13 @@ BEGIN
 	SELECT count(*) INTO v_count_state2 FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103 AND state = 2;
 
 	IF v_count_state1 = 0 AND v_count_state2 = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (103,  'There are no arcs without final nodes.', 0);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3582", "function":"2102", "fid":"103", "fcount":"0", "is_process":true}}$$)';
 	ELSE
 		IF v_count_state1 > 0 THEN
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (103,  concat ('There are ',v_count_state1,' arcs with state 1 without final nodes.'), v_count_state1);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3586", "function":"2102", "fid":"103", "parameters":{"v_count_state1":"'||v_count_state1||'"}, "fcount":"'||v_count_state1||'", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 103,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count_state1 
@@ -172,8 +175,8 @@ BEGIN
 		END IF;
 
 		IF v_count_state2 > 0 THEN
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (103,  concat ('There are ',v_count_state2,' arcs  with state 2 without final nodes.'), v_count_state2);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3588", "function":"2102", "fid":"103", "parameters":{"v_count_state2":"'||v_count_state2||'"}, "fcount":"'||v_count_state2||'", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 103,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count_state2 
