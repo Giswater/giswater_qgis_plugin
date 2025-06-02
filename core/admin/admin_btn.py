@@ -219,7 +219,6 @@ class GwAdminButton:
         self.task_create_schema = GwCreateSchemaTask(self, description, params, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
-        self.task_create_schema.task_finished.connect(partial(self.execute_vacuum, verbose=False))
 
     def create_process(self, process_name=""):
         self.error_count = 0
@@ -395,7 +394,6 @@ class GwAdminButton:
 
     def execute_vacuum(self, ask_confirm=False, verbose=False):
         """ Ask confirmation to execute vacuum using a separate database connection """
-
         if ask_confirm:
             msg = "Are you sure to execute vacuum on selected schema?"
             title = "Warning"
@@ -478,11 +476,6 @@ class GwAdminButton:
             self._manage_result_message(status, parameter="Load updates")
             if status:
                 tools_db.dao.commit()
-                msg = "Schema updated successfully. Do you want to execute vacuum on the schema?"
-                title = "Vacuum schema"
-                answer = tools_qt.show_question(msg, title=title)
-                if answer is True:
-                    pass
             else:
                 tools_db.dao.rollback()
 
