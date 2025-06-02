@@ -1553,3 +1553,13 @@ VALUES(3566, 'Direction of %v_count% arcs has been changed.', null, 0, true, 'ut
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3568, 'Reversed arcs: %v_array%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'ARC LENGTH ANALYSIS' WHERE function_name = 'gw_fct_anl_arc_length';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3570, 'There are no arcs shorter than %v_arclength% meters.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3572, 'There are %v_count% arcs shorter than %v_arclength% meters.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
