@@ -1600,3 +1600,11 @@ VALUES(3590, 'There are no duplicated connecs.', null, 0, true, 'utils', 'core',
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3592, 'There are %v_count% duplicated connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'NODE DUPLICATED ANALYSIS' WHERE function_name = 'gw_fct_anl_node_duplicated';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3598, 'There are no duplicated nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3600, 'There are %v_count% duplicated nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+

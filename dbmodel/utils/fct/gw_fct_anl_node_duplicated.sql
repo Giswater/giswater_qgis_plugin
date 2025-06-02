@@ -55,8 +55,8 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=106;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=106;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, concat('NODE DUPLICATED ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2108", "fid":"106", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
@@ -96,11 +96,12 @@ BEGIN
 	SELECT count(*)/2 INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=106;
 
 	IF v_count = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (106,  'There are no duplicated nodes.', v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3598", "function":"2108", "fid":"106", "fcount":"'||v_count||'", "is_process":true}}$$)';
+
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (106,  concat ('There are ',v_count,' duplicated nodes.'), v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3600", "function":"2108", "parameters":{"v_count":"'||v_count||'"}, "fid":"106", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 106,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count
