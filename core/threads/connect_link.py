@@ -18,6 +18,7 @@ class GwConnectLink(GwTask):
         self.connect_link_class = connect_link_class
         self.element_type = element_type
         self.selected_arc = selected_arc
+        self.json_result = None
 
     def run(self):
 
