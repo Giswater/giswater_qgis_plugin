@@ -50,8 +50,8 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fid=108;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=108;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (108, null, 4, concat('NODE TOPOLOGICAL CONSISTENCY ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (108, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2302", "fid":"108", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -149,11 +149,13 @@ BEGIN
 	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=108;
 
 	IF v_count = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (108,  'There are no nodes with topological inconsistency.', v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3596", "function":"2302", "fid":"108", "fcount":"'||v_count||'", "is_process":true}}$$)';
+
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (108,  concat ('There are ',v_count,' nodes with topological inconsistency.'), v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3594", "function":"2302", "parameters":{"v_count":"'||v_count||'"}, "fid":"108", "fcount":"'||v_count||'", "is_process":true}}$$)';
+
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 108,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count

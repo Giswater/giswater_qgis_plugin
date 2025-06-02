@@ -65,8 +65,8 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid in (442,443);
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid in (442,443);
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, concat('NODE ORPHAN (OM) ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- built partial query
 	IF v_projectype = 'WS' THEN
@@ -158,26 +158,28 @@ BEGIN
 	SELECT count(*) INTO v_count2 FROM anl_node WHERE cur_user="current_user"() AND fid=443;
 
 	IF v_count1 = 0 and v_count2=0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (442,  'There are no orphan nodes.', 0);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3602", "function":"2110", "fid":"442", "fcount":"0", "is_process":true}}$$)';
 	ELSE
-		IF v_count1 > 0 and v_count2 > 0 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, concat('ARC DIVIDE = TRUE'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
+		IF v_count1 > 0 and v_count2 > 0 THEN			
+		 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3006", "separator_id":"2025"}}$$)';
 
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (442,  concat ('There are ',v_count1,' orphan nodes with isarcdivide=TRUE.'), v_count1);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3604", "function":"2110", "parameters":{"v_count1":"'||v_count1||'"}, "fcount":"'||v_count1||'", "fid":"442", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 442,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count1
 			FROM anl_node WHERE cur_user="current_user"() AND fid=442;
 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, concat('ARC DIVIDE = FALSE'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "separator_id":"2025"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3008", "separator_id":"2025"}}$$)';
 
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (443,  concat ('There are ',v_count2,' orphan nodes with isarcdivide=FALSE.'), v_count2);
+	
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3606", "function":"2110", "parameters":{"v_count1":"'||v_count2||'"}, "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 443,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count2
@@ -185,37 +187,40 @@ BEGIN
 
 		ELSIF v_count1 > 0 and v_count2 = 0 THEN
 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, concat('ARC DIVIDE = TRUE'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3006", "separator_id":"2025"}}$$)';
 
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (442,  concat ('There are ',v_count1,' orphan nodes with isarcdivide=TRUE.'), v_count1);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3604", "function":"2110", "parameters":{"v_count1":"'||v_count1||'"}, "fcount":"'||v_count1||'", "fid":"442", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 442,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count1
 			FROM anl_node WHERE cur_user="current_user"() AND fid=442;
 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, concat('ARC DIVIDE = FALSE'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "separator_id":"2025"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3008", "separator_id":"2025"}}$$)';
 
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (443,  concat ('There are no orphan nodes with isarcdivide=FALSE.'), v_count2);
+
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3608", "function":"2110", "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
 
 		ELSIF v_count1 = 0 and v_count2 > 0 THEN
 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, concat('ARC DIVIDE = TRUE'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3006", "separator_id":"2025"}}$$)';
 
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (442,  concat ('There are no orphan nodes with isarcdivide=TRUE.'), v_count1);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3610", "function":"2110", "fcount":"'||v_count1||'", "fid":"442", "is_process":true}}$$)';
 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, concat('ARC DIVIDE = FALSE'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (442, null, 4, '-------------------------');
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "separator_id":"2025"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3008", "separator_id":"2025"}}$$)';
 
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (443,  concat ('There are ',v_count2,' orphan nodes with isarcdivide=FALSE.'), v_count2);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3606", "function":"2110", "parameters":{"v_count1":"'||v_count2||'"}, "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 443,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count2

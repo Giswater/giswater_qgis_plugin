@@ -55,8 +55,9 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('ARC DUPLICATED ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3040", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
 
 	IF v_checktype='geometry' THEN
 		-- Computing process
@@ -128,11 +129,12 @@ BEGIN
 
 
 	IF v_count = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (v_fid,  'There are no duplicated arcs.', v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3574", "function":"3040", "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
+
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (v_fid,  concat ('There are ',v_count,' duplicated arcs.'), v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3576", "function":"3040", "fid":"'||v_fid||'", "parameters":{"v_count":"'||v_count||'"}, "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT v_fid,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count

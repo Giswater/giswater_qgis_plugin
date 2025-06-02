@@ -252,7 +252,7 @@ FROM (
     ('inp_times_report_timestep', 'Report timestep:', 'Default value of report timestep, which sets the time interval between which output results are reported'),
     ('inp_options_buildup_mode', 'Buildup mode:', 'Mode to built up epanet assuming certain simplifications in order to make the first model as fast as possible (default management of null elevations, only transformations from tanks to reservoirs and status of valves and pumps)'),
     ('edit_node_interpolate', 'Values to manage node interpolate tool:', 'Values to use with tool node interpolate'),
-    ('feat_servconnection_vdefault', 'Default catalog for servconnection', 'Value default catalog for servconnection cat_feature'),
+    ('feat_link_vdefault', 'Default catalog for link', 'Value default catalog for link cat_feature'),
     ('feat_cover_vdefault', 'Default catalog for cover', 'Value default catalog for cover cat_feature'),
     ('feat_frpump_vdefault', 'Default catalog for frpump', 'Value default catalog for frpump cat_feature'),
     ('edit_addfield_p22_vdefault', 'pipe_param_1:', 'Default value of addfield pipe_param_1 for PIPE'),
@@ -4359,7 +4359,7 @@ UPDATE config_form_tabs AS t
 SET label = v.label, tooltip = v.tooltip
 FROM (
     VALUES
-    ('ve_link_servconnection', 'tab_elements', 'Elements', 'List of related elements'),
+    ('ve_link_link', 'tab_elements', 'Elements', 'List of related elements'),
     ('dscenario', 'tab_virtualpump', 'Virtualpump', 'Virtualpump'),
     ('nvo_manager', 'tab_rules', 'Rules', 'Rules'),
     ('dscenario', 'tab_virtualvalve', 'Virtualvalve', 'Virtualvalve'),

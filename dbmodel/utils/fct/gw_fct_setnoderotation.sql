@@ -52,10 +52,14 @@ BEGIN
 	update config_param_user set value ='false' where parameter = 'edit_noderotation_update_dsbl' and cur_user = current_user;
 
 	-- starting function
-	INSERT INTO audit_check_data (fid, error_message) VALUES (516, concat('MASSIVE NODE ROTATION VALUES UPDATE'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (516, concat('-----------------------------------------------------'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (516, 'This process works capturing compass values from arc in order to propagate to nodes.');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (516, 'In case of arcs with different compass an average value is calculated.');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3280", "fid":"516", "is_process":true, "is_header":"true"}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3614", "function":"3280", "fid":"516", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3616", "function":"3280", "fid":"516", "is_process":true}}$$)';
 
 	-- dissabling triggers
 	-- trigger arc_link_update does not make sense to disable because trigger only is triggered if the_geom changes and this update does not make any change on the_geom!!!
@@ -75,7 +79,8 @@ BEGIN
 	GET DIAGNOSTICS v_affectedrow = row_count;
 
 	-- insert log message
-	INSERT INTO audit_check_data (fid, error_message) VALUES (516, concat(v_affectedrow, ' arcs have been analized and their compass values have been progagated to node rotation'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3618", "function":"3280", "parameters":{"v_affectedrow":"'||v_affectedrow||'"}, "fid":"516", "is_process":true}}$$)';
 
 	-- enabling triggers
 	update config_param_user set value ='false' where parameter = 'edit_disable_arctopocontrol' and cur_user = current_user; -- topocontrol
