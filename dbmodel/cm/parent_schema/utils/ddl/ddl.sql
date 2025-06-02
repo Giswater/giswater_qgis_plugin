@@ -15,17 +15,21 @@ DECLARE
   rec        RECORD;
   tbl_name   text;
   view_name  text;
+  feature_col text;
+  constraint_name text;
 BEGIN
 
   -- Create one empty table per feature, cloning structure of the view/table
-  FOR rec IN
-    SELECT id, child_layer
+    FOR rec IN
+    SELECT id, child_layer, feature_type
       FROM   PARENT_SCHEMA.cat_feature
-  LOOP
+    LOOP
     tbl_name := format('%I.%I_%s',
                        new_s,
                        parent_s,
                        lower(rec.id));
+    feature_col := lower(rec.feature_type) || '_id';
+    constraint_name := tbl_name || '_pkey';
 
     EXECUTE format(
       'CREATE TABLE IF NOT EXISTS %s (
@@ -34,13 +38,18 @@ BEGIN
       tbl_name,
       parent_s, rec.child_layer
     );
-  END LOOP;
+
+    EXECUTE format(
+      'ALTER TABLE %s ADD CONSTRAINT %I PRIMARY KEY (lot_id, %I);',
+      tbl_name, constraint_name, feature_col
+    );
+    END LOOP;
 
   -- Create corresponding empty views named ve_<PARENT>_lot_<feature_id>
-  FOR rec IN
+    FOR rec IN
     SELECT id
       FROM   PARENT_SCHEMA.cat_feature
-  LOOP
+    LOOP
     view_name := format('%I.ve_%s_lot_%s',
                         new_s,
                         parent_s,
@@ -54,11 +63,12 @@ BEGIN
     EXECUTE format(
       'CREATE OR REPLACE VIEW %s AS
          SELECT * FROM %s
-        WHERE false;',
+        join selector_lot sl using (lot_id)
+           WHERE sl.cur_user = current_user;',
       view_name,
       tbl_name
     );
-  END LOOP;
+    END LOOP;
 
 END
 $$;
