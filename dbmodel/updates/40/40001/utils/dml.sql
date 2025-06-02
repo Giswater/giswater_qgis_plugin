@@ -1562,4 +1562,10 @@ VALUES(3570, 'There are no arcs shorter than %v_arclength% meters.', null, 0, tr
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3572, 'There are %v_count% arcs shorter than %v_arclength% meters.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'ARC DUPLICATED ANALYSIS' WHERE function_name = 'gw_fct_anl_arc_duplicated';
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3574, 'There are no duplicated arcs.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3576, 'There are %v_count% duplicated arcs.', null, 0, true, 'utils', 'core', 'AUDIT');
