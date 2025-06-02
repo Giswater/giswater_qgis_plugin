@@ -1874,10 +1874,12 @@ class GwAdminButton:
         else:
             self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
             self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+            self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
         self.dlg_readsql_create_cm_project.btn_base_schema.clicked.connect(self.on_btn_create_base_clicked)
         self.dlg_readsql_create_cm_project.btn_parent_schema.clicked.connect(self.on_btn_create_parent_clicked)
         self.dlg_readsql_create_cm_project.btn_example.clicked.connect(self.on_btn_create_example_clicked)
+        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.clicked.connect(self.on_btn_pschema_qgis_file_clicked)
 
         self.dlg_readsql_create_cm_project.setWindowTitle("Create CM Project")
         tools_gw.open_dialog(self.dlg_readsql_create_cm_project, dlg_name='admin_cmdbproject')
@@ -1960,6 +1962,21 @@ class GwAdminButton:
         self.project_example_name = schema_name
         self._run_create_cm_task(['load_example'])
         self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+
+    def on_btn_pschema_qgis_file_clicked(self):
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        msg = "You are about to load some CM layers to the following file: {0}\n\nAre you sure you want to continue?"
+        msg_params = (schema_name,)
+        title = "Add layers to schema"
+        answer = tools_qt.show_question(msg, title, msg_params=msg_params)
+
+        if not answer:
+            return
+
+        self.example_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        self.project_example_name = schema_name
+        self._run_create_cm_task(['load_layers'])
+        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
     def _open_rename(self):
         """"""
