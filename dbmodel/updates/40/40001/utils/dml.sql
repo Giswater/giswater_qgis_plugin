@@ -1592,4 +1592,11 @@ VALUES(3586, 'There are %v_count_state1% arcs with state 1 without final nodes.'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3588, 'There are %v_count_state2% arcs with state 2 without final nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'CONNEC DUPLICATED ANALYSIS' WHERE function_name = 'gw_fct_anl_connec_duplicated';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3590, 'There are no duplicated connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3592, 'There are %v_count$ duplicated connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
 
