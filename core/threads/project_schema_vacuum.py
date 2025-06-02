@@ -5,11 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...libs import tools_qt, tools_db, tools_log
-from sip import isdeleted
+from ...libs import tools_db, tools_log
 
 
 class GwVacuumSchemaTask(GwTask):
@@ -23,15 +22,12 @@ class GwVacuumSchemaTask(GwTask):
         self.status = False
         self.output = []
 
-
     def run(self):
         super().run()        
         
         schema_name = self.params.get('schema_name')
         logs = self.params.get('logs', False)
         verbose = self.params.get('verbose', False)
-
-        
 
         tools_log.log_info("Starting execute_vacuum method")
         sql = (f"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema_name}' AND table_type = 'BASE TABLE' ORDER BY table_name")
@@ -49,8 +45,7 @@ class GwVacuumSchemaTask(GwTask):
             if tables is not None:
                 msg = "Executing vacuum"
                 tools_log.log_info(msg)
-                
-                
+
                 for table in tables:
                     try:
                         aux_conn.autocommit = True
@@ -70,7 +65,6 @@ class GwVacuumSchemaTask(GwTask):
                                                 commit=False, aux_conn=aux_conn)
                             if logs:
                                 tools_log.log_info(f"Vacuum executed: {schema_name}.{table[0].strip()}")
-
 
                     except Exception as e:
                         msg = f"Error executing vacuum: {e}"

@@ -36,7 +36,7 @@ from .i18n_generator import GwI18NGenerator
 from .schema_i18n_update import GwSchemaI18NUpdate
 from .i18n_manager import GwSchemaI18NManager
 from .import_osm import GwImportOsm
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os, tools_pgdao
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_asset_create import GwCreateSchemaAssetTask
@@ -47,6 +47,7 @@ from ..threads.project_schema_update import GwUpdateSchemaTask
 from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
 from ..threads.project_schema_vacuum import GwVacuumSchemaTask
+
 
 class GwAdminButton:
 
@@ -391,8 +392,7 @@ class GwAdminButton:
         self.task_vacuum_schema = GwVacuumSchemaTask(description, params)
         QgsApplication.taskManager().addTask(self.task_vacuum_schema)
         QgsApplication.taskManager().triggerTask(self.task_vacuum_schema)
-        
-    
+
     def execute_vacuum(self, ask_confirm=False, verbose=False):
         """ Ask confirmation to execute vacuum using a separate database connection """
 
