@@ -1598,5 +1598,5 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3590, 'There are no duplicated connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3592, 'There are %v_count$ duplicated connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3592, 'There are %v_count% duplicated connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
 

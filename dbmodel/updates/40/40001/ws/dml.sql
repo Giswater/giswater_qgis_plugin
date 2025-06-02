@@ -596,3 +596,14 @@ ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   linkedobject = EXCLUDED.linkedobject,
   hidden = EXCLUDED.hidden,
   web_layoutorder = EXCLUDED.web_layoutorder;
+
+-- 02/06/2025
+
+UPDATE sys_function SET function_alias = 'NODE TOPOLOGICAL CONSISTENCY ANALYSIS' WHERE function_name = 'gw_fct_anl_node_topological_consistency';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3594, 'There are %v_count% nodes with topological inconsistency.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3596, 'There are no nodes with topological inconsistency.', null, 0, true, 'utils', 'core', 'AUDIT');
+
