@@ -78,6 +78,7 @@ v_fluidtype_autoupdate boolean;
 v_dma_autoupdate boolean;
 v_check_arcdnom_status boolean;
 v_check_arcdnom integer;
+v_sql varchar;
 
 BEGIN
 
@@ -108,14 +109,6 @@ BEGIN
 			IF (NEW.state IS NULL) THEN
 				NEW.state := 1;
 			END IF;
-		END IF;
-
-
-		-- Inserts to man tables
-		IF (NEW.link_type = 'SERVCONNECTION') THEN
-			INSERT INTO man_servconnection VALUES (NEW.link_id);
-		ELSEIF(NEW.link_type='INLETPIPE') THEN
-			INSERT INTO man_inletpipe VALUES (NEW.link_id);
 		END IF;
 
 	END IF;
@@ -633,6 +626,32 @@ BEGIN
 		NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	END IF;
 
+	-- State_type
+		IF (NEW.state=0) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_0_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=1) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_1_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=2) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_2_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		END IF;
+
+			--check relation state - state_type
+		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			IF NEW.state IS NOT NULL THEN
+				v_sql = NEW.state;
+			ELSE
+				v_sql = 'null';
+			END IF;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3036", "function":"1318","parameters":{"state_id":"'||v_sql::text||'"}}}$$);';
+		END IF;
+
 	-- upsert process
 	IF TG_OP ='INSERT' THEN
 
@@ -685,21 +704,17 @@ BEGIN
 				END IF;
 			END IF;
 
-
-			IF NEW.feature_type ='GULLY' THEN
-				NEW.link_type = 'INLETPIPE';
-			ELSEIF NEW.feature_type ='CONNEC' THEN
-				NEW.link_type = 'SERVCONNECTION';
-			END IF;
-
 			INSERT INTO link (link_id, code, sys_code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, omzone_id,
 			linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, verified, custom_length, datasource, top_elev1, y1, top_elev2, y2, link_type, location_type, epa_type,
 			annotation, observ, comment, descript, link, num_value, drainzone_outfall, dwfzone_outfall)
 			VALUES (NEW.link_id, NEW.code, NEW.sys_code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_omzone,
 			NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource,
-			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, NEW.link_type, NEW.location_type, NEW.epa_type,
+			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, 'LINK', NEW.location_type, NEW.epa_type,
 			NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, NEW.drainzone_outfall, NEW.dwfzone_outfall);
 		END IF;
+
+		-- Inserts to man tables
+		INSERT INTO man_link VALUES (NEW.link_id);
 
 		-- update feature
 		IF NEW.state = 0 THEN

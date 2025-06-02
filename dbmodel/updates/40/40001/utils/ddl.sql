@@ -10,10 +10,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DROP TABLE IF EXISTS flwreg CASCADE;
 DROP TABLE IF EXISTS cat_flwreg CASCADE;
 
-CREATE TABLE man_servconnection (
+CREATE TABLE man_link (
 	link_id int4 NOT NULL,
-	CONSTRAINT man_servconnection_pkey PRIMARY KEY (link_id),
-	CONSTRAINT man_servconnection_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT man_link_pkey PRIMARY KEY (link_id),
+	CONSTRAINT man_link_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
@@ -109,7 +109,7 @@ SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype=
 WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
 UPDATE config_form_fields
 SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype='combo', "label"='Doc type:', tooltip=NULL, placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=true, dv_querytext='SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''', dv_orderby_id=NULL, dv_isnullvalue=true, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"labelPosition": "top"}'::json, widgetfunction='{"functionName": "filter_table", "parameters":{}}'::json, linkedobject='tbl_doc_x_link', hidden=false, web_layoutorder=3
-WHERE formname='ve_link_servconnection' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
+WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
 UPDATE config_form_fields
 SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype='combo', "label"='Doc type:', tooltip='Doc type:', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=true, dv_querytext='SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''', dv_orderby_id=NULL, dv_isnullvalue=true, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"labelPosition": "top"}'::json, widgetfunction='{"functionName": "filter_table", "parameters":{}}'::json, linkedobject='tbl_doc_x_arc', hidden=false, web_layoutorder=3
 WHERE formname='arc' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';

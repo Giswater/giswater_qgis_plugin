@@ -18,13 +18,6 @@ ALTER TABLE inp_dscenario_froutlet RENAME TO _inp_dscenario_froutlet;
 ALTER TABLE inp_dscenario_frorifice RENAME TO _inp_dscenario_frorifice;
 ALTER TABLE inp_dscenario_frweir RENAME TO _inp_dscenario_frweir;
 
-
-CREATE TABLE man_inletpipe (
-	link_id int4 NOT NULL,
-	CONSTRAINT man_inletpipe_pkey PRIMARY KEY (link_id),
-	CONSTRAINT man_inletpipe_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 CREATE TABLE inp_froutlet (
     element_id int4 NOT NULL,
     outlet_type character varying(16) NOT NULL,
@@ -159,10 +152,6 @@ CREATE TABLE inp_dscenario_frweir (
 );
 
 DROP TABLE IF EXISTS ext_rtc_dma_period CASCADE;
-
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"cat_link", "column":"link_type"}}$$);
-ALTER TABLE cat_link DROP CONSTRAINT IF EXISTS cat_link_linktype_fkey;
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_gully_traceability", "column":"expl_visibility", "dataType":"int[]"}}$$);
