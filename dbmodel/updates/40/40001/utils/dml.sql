@@ -1640,7 +1640,7 @@ VALUES(3612, 'There are %v_count% nodes T candidates.', null, 0, true, 'utils', 
 UPDATE sys_function SET function_alias = 'GET ADDRESS VALUES FROM CLOSEST STREET NUMBER' WHERE function_name = 'gw_fct_setclosestaddress';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3612, 'There are %affected_rows% %v_feature_type% address values updated.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3613, 'There are %affected_rows% %v_feature_type% address values updated.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 UPDATE sys_function SET function_alias = 'MASSIVE NODE ROTATION VALUES UPDATE' WHERE function_name = 'gw_fct_setnoderotation';
 
