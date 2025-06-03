@@ -73,8 +73,9 @@ BEGIN
 	--Execute the process only if admin_raster_dem is true
 	IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS FALSE THEN
 
-		INSERT INTO audit_check_data(fid,result_id, error_message)
-		VALUES (168,'elevation from raster','It is impossible to carry out the process. Your config_param_system variable for Raster DEM is in FALSE.');
+		
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message": "3630", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true}})$$)';
 
 	ELSIF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE THEN
 
@@ -118,8 +119,12 @@ BEGIN
 				EXECUTE v_query INTO v_check_null_elevation;
 
 				IF v_check_null_elevation IS NUll THEN
-					INSERT INTO audit_check_data(fid,result_id, error_message)
-					VALUES (168,'elevation from raster','There are no features with NULL elevation');
+
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "separator_id":"2025"}}$$)';
+					
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3628", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true}}$$)';
 				END IF;
 
 			--loop over selected nodes, intersect node with raster
@@ -134,9 +139,10 @@ BEGIN
 
 				--if node is out of raster, add warning, if it's inside update value of node layer
 				IF v_elevation = -9999 OR v_elevation IS NULL THEN
-					INSERT INTO audit_check_data(fid,result_id, error_message)
-					VALUES (168,'elevation from raster',concat('WARNING-168: Intersection with feature ',rec.feature_id,
-					' has returned NULL value. Could be out of raster or some problem with algorithm'));
+
+					--TODO
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message": "3626", "function":"2760", "fid":"168", "result_id":"elevation from raster", "prefix_id":"1002", "is_process":true, "parameters":{"feature_id":"'||rec.feature_id||'"}}})$$)';
 				ELSE
 					IF v_feature_type = 'vnode' THEN
 						EXECUTE 'UPDATE vnode SET top_elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
@@ -148,8 +154,8 @@ BEGIN
 					INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, descript)
 					VALUES (rec.feature_id::text, rec.state::integer, rec.expl_id, 168,rec.the_geom, upper(v_feature_type));
 
-					INSERT INTO audit_check_data(fid,result_id, error_message)
-					VALUES (168,'elevation from raster',concat('ELEVATION UPDATED - FEATURE TYPE:',upper(v_feature_type),', ID: ', rec.feature_id));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message": "3624", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true, "parameters":{"feature_type":"'||upper(v_feature_type)||'", "feature_id":"'||rec.feature_id||'"}}})$$)';
 				END IF;
 
 			END LOOP;
@@ -160,9 +166,15 @@ BEGIN
 
 	--count updated elements
 	select count(*) from audit_check_data where fid = 168 and error_message like 'ELEVATION UPDATED%' and tstamp = now() into v_count;
-	insert into audit_check_data (fid, error_message) values (168, '--------------------------------------------------------------');
-	insert into audit_check_data (fid, error_message) values (168, concat(v_count, ' ', upper(v_feature_type), 'S have been updated, which are the following:'));
-	insert into audit_check_data (fid, error_message) values (168, '--------------------------------------------------------------');
+	
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+    	"data":{"function":"2760", "fid":"168", "is_process":true, "separator_id":"2030"}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message": "3622", "function":"2760", "fid":"168", "is_process":true, "parameters":{"count":"'||v_count||'", "feature_type":"'||upper(v_feature_type)||'"}}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+    	"data":{"function":"2760", "fid":"168", "is_process":true, "separator_id":"2030"}}$$)';
 
 	-- get results
 	-- info

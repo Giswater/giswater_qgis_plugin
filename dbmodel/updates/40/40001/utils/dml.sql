@@ -1640,15 +1640,29 @@ VALUES(3612, 'There are %v_count% nodes T candidates.', null, 0, true, 'utils', 
 UPDATE sys_function SET function_alias = 'GET ADDRESS VALUES FROM CLOSEST STREET NUMBER' WHERE function_name = 'gw_fct_setclosestaddress';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3613, 'There are %affected_rows% %v_feature_type% address values updated.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3614, 'There are %affected_rows% %v_feature_type% address values updated.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 UPDATE sys_function SET function_alias = 'MASSIVE NODE ROTATION VALUES UPDATE' WHERE function_name = 'gw_fct_setnoderotation';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3614, 'This process works capturing compass values from arc in order to propagate to nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3616, 'This process works capturing compass values from arc in order to propagate to nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3616, 'In case of arcs with different compass an average value is calculated.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3618, 'In case of arcs with different compass an average value is calculated.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3618, '%v_affectedrow% arcs have been analized and their compass values have been progagated to node rotation', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3620, '%v_affectedrow% arcs have been analized and their compass values have been progagated to node rotation', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3622, '%count% %feature_type%S have been updated, which are the following:', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3624, 'ELEVATION UPDATED - FEATURE TYPE:%feature_type% ID: %feature_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3626, 'Intersection with feature %feature_id% has returned NULL value. Could be out of raster or some problem with algorithm', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3628, 'There are no features with NULL elevation', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3630, 'It is impossible to carry out the process. Your config_param_system variable for Raster DEM is in FALSE.', null, 0, true, 'utils', 'core', 'AUDIT');
