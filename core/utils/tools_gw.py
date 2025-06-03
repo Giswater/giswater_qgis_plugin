@@ -3935,7 +3935,8 @@ def load_tableview_element(dialog, feature_id, rel_feature_type):
     message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange)
     if message:
         tools_qgis.show_warning(message)
-    set_tablemodel_config(dialog, qtable, f"{tablename}")
+    tableview = f'tbl_element_x_{rel_feature_type}'
+    set_tablemodel_config(dialog, qtable, f"{tableview}")
     tools_qgis.refresh_map_canvas()
 
 
