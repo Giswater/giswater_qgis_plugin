@@ -181,7 +181,7 @@ BEGIN
 	END IF;
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3612", "function":"3198", "parameters":{"affected_rows":"'||affected_rows||'","v_feature_type":"'||v_feature_type||'"}, "fcount":"'||affected_rows||'", "fid":"486", "is_process":true}}$$)';
+                       "data":{"message":"3614", "function":"3198", "parameters":{"affected_rows":"'||affected_rows||'","v_feature_type":"'||v_feature_type||'"}, "fcount":"'||affected_rows||'", "fid":"486", "is_process":true}}$$)';
 
 	--info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result

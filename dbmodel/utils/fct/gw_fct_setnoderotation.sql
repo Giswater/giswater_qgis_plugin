@@ -56,10 +56,10 @@ BEGIN
                        "data":{"function":"3280", "fid":"516", "is_process":true, "is_header":"true"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3614", "function":"3280", "fid":"516", "is_process":true}}$$)';
+                       "data":{"message":"3616", "function":"3280", "fid":"516", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3616", "function":"3280", "fid":"516", "is_process":true}}$$)';
+                       "data":{"message":"3618", "function":"3280", "fid":"516", "is_process":true}}$$)';
 
 	-- dissabling triggers
 	-- trigger arc_link_update does not make sense to disable because trigger only is triggered if the_geom changes and this update does not make any change on the_geom!!!
@@ -80,7 +80,7 @@ BEGIN
 
 	-- insert log message
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3618", "function":"3280", "parameters":{"v_affectedrow":"'||v_affectedrow||'"}, "fid":"516", "is_process":true}}$$)';
+                       "data":{"message":"3620", "function":"3280", "parameters":{"v_affectedrow":"'||v_affectedrow||'"}, "fid":"516", "is_process":true}}$$)';
 
 	-- enabling triggers
 	update config_param_user set value ='false' where parameter = 'edit_disable_arctopocontrol' and cur_user = current_user; -- topocontrol

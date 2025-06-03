@@ -1722,6 +1722,7 @@ VALUES(3618, 'In case of arcs with different compass an average value is calcula
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3620, '%v_affectedrow% arcs have been analized and their compass values have been progagated to node rotation', null, 0, true, 'utils', 'core', 'AUDIT');
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3622, '%count% %feature_type%S have been updated, which are the following:', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -1746,3 +1747,40 @@ UPDATE config_form_fields SET widgetfunction='{
     "field_object_id": "element_id"
   }
 }'::json WHERE formname='element_manager' AND formtype='form_element' AND columnname='delete' AND tabname='tab_none';
+-- 03/06/2025
+
+UPDATE sys_function SET function_alias = 'REPAIR NODES DUPLICATED' WHERE function_name = 'gw_fct_repair_node_duplicated';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3640, 'ERROR: Process failed', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3642, 'HINT: Check your nodes id''s because there is no duplicated scenario.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3644, 'INFO: Value for target node is optative, If null system will try to check closest node.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3646, 'Removing node %v_node% -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3648, 'Duplicated node %v_targetnode% exists using system node tolerance %v_nodetolerance%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3650, 'Transfer topology to node %v_targetnode% -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3652, 'Downgrade node %v_node% to state 0 -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3654, 'Moving node %v_node% -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3656, 'Keeping topology -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3658, 'Transfer topology from node %v_targetnode% -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+

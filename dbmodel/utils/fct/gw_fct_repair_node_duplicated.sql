@@ -57,8 +57,8 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('REPAIR NODES DUPLICATED'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3080", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- get target node in case of null
 	IF v_targetnode IS NULL THEN
@@ -72,9 +72,12 @@ BEGIN
 	-- starting process
 	IF (SELECT node_id FROM node WHERE node_id = v_node) IS NULL OR (SELECT node_id FROM node WHERE node_id = v_targetnode) IS NULL THEN
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('ERROR: Process failed'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('HINT: Check your nodes id''s because there is no duplicated scenario.'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: Value for target node is optative, If null system will try to check closest node.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3640", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3642", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3644", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	ELSE
 		IF v_action = 'DELETE' THEN
@@ -87,10 +90,12 @@ BEGIN
 			DELETE FROM node WHERE node_id = v_node;
 
 			-- log
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Removing node ',v_node,' -> Done'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Duplicated node ',v_targetnode,' exists using system node tolerance ',v_nodetolerance));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Transfer topology to node ',v_targetnode,' -> Done'));
-
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3646", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3648", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3650", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 		ELSIF v_action = 'DOWNGRADE' THEN
 
@@ -102,9 +107,12 @@ BEGIN
 			UPDATE node SET state = 0 WHERE node_id = v_node;
 
 			-- log
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Downgrade node ',v_node,' to state 0 -> Done'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Duplicated node ',v_targetnode,' exists using system node tolerance ',v_nodetolerance));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Transfer topology to node ',v_targetnode,' -> Done'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3652", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3648", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3650", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 
 		ELSIF v_action = 'MOVE-LOSE-TOPO' THEN
@@ -119,9 +127,12 @@ BEGIN
 			UPDATE node SET the_geom = st_setsrid(st_makepoint(v_dx, v_dy), v_epsg) WHERE node_id = v_node;
 
 			-- log
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Moving node ',v_node,' -> Done'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Duplicated node ',v_targetnode,' exists using system node tolerance ',v_nodetolerance));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Transfer topology to node ',v_targetnode,' -> Done'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3654", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3648", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3650", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 		ELSIF v_action = 'MOVE-KEEP-TOPO' THEN
 
@@ -131,9 +142,12 @@ BEGIN
 			UPDATE node SET the_geom = st_setsrid(st_makepoint(v_dx, v_dy), v_epsg) WHERE node_id = v_node;
 
 			-- log
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Moving node ',v_node,' -> Done'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Duplicated node ',v_targetnode,' exists using system node tolerance ',v_nodetolerance));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Keeping topology -> Done'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3654", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3648", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3656", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 		ELSIF v_action = 'MOVE-GET-TOPO' THEN
 
@@ -147,8 +161,10 @@ BEGIN
 			UPDATE node SET the_geom = st_setsrid(st_makepoint(v_dx, v_dy), v_epsg) WHERE node_id = v_node;
 
 			-- log
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Moving node ',v_node,' -> Done'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Transfer topology from node ',v_targetnode,' -> Done'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3654", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3080", "function":"3658", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 		END IF;
 	END IF;
 
