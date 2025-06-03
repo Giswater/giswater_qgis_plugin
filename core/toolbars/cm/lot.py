@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCheckBox, QComboBox, QLineEdit, \
-    QTableView, QWidget, QDateEdit, QLabel, QTextEdit
+    QTableView, QWidget, QDateEdit, QLabel, QTextEdit, QCompleter
 
 from typing import Optional, List
 from functools import partial
@@ -85,6 +85,7 @@ class AddNewLot:
 
         if lot_id:
             self._load_lot_relations(lot_id)
+            self.enable_feature_tabs_by_campaign(lot_id)
 
         if tools_gw.get_project_type() == 'ws':
             tools_qt.enable_tab_by_tab_name(self.dlg_lot.tab_widget, 'LoadsTab', False)
@@ -116,21 +117,30 @@ class AddNewLot:
         self.dlg_lot.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_lot, self.excluded_layers)
         )
+        self.dlg_lot.tab_feature.currentChanged.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
 
         # Relation feature buttons
         self.dlg_lot.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_lot, table_object, GwSelectionMode.LOT, False, None, None)
         )
+        self.dlg_lot.btn_insert.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
+
         self.dlg_lot.btn_delete.clicked.connect(
             partial(tools_gw.delete_records, self, self.dlg_lot, table_object, GwSelectionMode.LOT, None, None, None)
         )
+        self.dlg_lot.btn_delete.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
+
         self.dlg_lot.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_lot, table_object, GwSelectionMode.LOT)
         )
+        self.dlg_lot.btn_snapping.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
+
         self.dlg_lot.btn_expr_select.clicked.connect(
             partial(tools_gw.select_with_expression_dialog, self, self.dlg_lot, table_object,
                     selection_mode=GwSelectionMode.EXPRESSION_LOT)
         )
+        self.dlg_lot.btn_expr_select.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
+
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
@@ -218,6 +228,36 @@ class AddNewLot:
                 result_relation.append(row[0])
         return widget
 
+    def get_allowed_features_for_lot(self, lot_id, feature):
+        """Only be able to make the relations to the features id that come from campaign """
+        # feature: "arc", "node", etc.
+        row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
+        campaign_id = row[0] if row else None
+        if not campaign_id:
+            return []
+
+        feature_table = f"cm.om_campaign_x_{feature}"
+        feature_id = f"{feature}_id"
+        sql = f"SELECT {feature_id} FROM {feature_table} WHERE campaign_id = {campaign_id}"
+        return [row[feature_id] for row in tools_db.get_rows(sql)]
+
+    def enable_feature_tabs_by_campaign(self, lot_id):
+        row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
+        campaign_id = row[0] if row else None
+        if not campaign_id:
+            return []
+
+        feature_types = ['arc', 'node', 'connec', 'link']
+
+        for feature in feature_types:
+            count_row = tools_db.get_row(
+                f"SELECT COUNT(*) FROM cm.om_campaign_x_{feature} WHERE campaign_id = '{campaign_id}'")
+            count = count_row[0] if count_row else 0
+            tab_widget = getattr(self.dlg_lot, f"tab_{feature}", None)  # adjust to your widget naming
+            if tab_widget:
+                idx = self.dlg_lot.tab_feature.indexOf(tab_widget)
+                self.dlg_lot.tab_feature.setTabEnabled(idx, count > 0)
+
     def _load_lot_relations(self, lot_id):
         """
         Load related elements into lot relation tabs for the given ID.
@@ -281,6 +321,7 @@ class AddNewLot:
         tab = self.dlg_lot.tab_widget.widget(index)
         if tab.objectName() == "RelationsTab" and self.is_new_lot:
             self.save_lot(from_change_tab=True)
+            self.enable_feature_tabs_by_campaign(self.lot_id)
 
     def populate_cmb_team(self):
         """ Fill ComboBox cmb_assigned_to """
@@ -597,6 +638,31 @@ class AddNewLot:
 
         tools_qgis.show_info(f"{deleted} lot(s) deleted.", dialog=self.dlg_lot_man)
         self.filter_lot()
+
+    def _update_feature_completer_lot(self, dlg):
+        # Identify the current tab
+        tab_name = dlg.tab_feature.currentWidget().objectName()
+        table_map = {
+            'tab_arc': ('arc', 'arc_id'),
+            'tab_node': ('node', 'node_id'),
+            'tab_connec': ('connec', 'connec_id'),
+            'tab_link': ('link', 'link_id'),
+            'tab_gully': ('gully', 'gully_id'),
+        }
+        feature, id_column = table_map.get(tab_name, (None, None))
+        if not feature:
+            return
+
+        # Get the allowed IDs for this lot and feature
+        lot_id = self.lot_id_value  # or get the currently edited lot_id from the dialog
+        allowed_ids = self.get_allowed_features_for_lot(lot_id, feature)  # Returns a list of IDs
+
+        # Set up the completer
+        feature_id_lineedit = dlg.findChild(QLineEdit, "feature_id")
+        if feature_id_lineedit:
+            completer = QCompleter([str(x) for x in allowed_ids])
+            completer.setCaseSensitivity(False)
+            feature_id_lineedit.setCompleter(completer)
 
     """ FUNCTIONS RELATED WITH TAB LOAD"""
 
