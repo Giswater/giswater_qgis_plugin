@@ -179,7 +179,7 @@ BEGIN
 
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3606", "function":"2110", "parameters":{"v_count1":"'||v_count2||'"}, "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
+                       "data":{"message":"3606", "function":"2110", "parameters":{"v_count2":"'||v_count2||'"}, "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 443,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count2
@@ -220,7 +220,7 @@ BEGIN
                        "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3008", "separator_id":"2025"}}$$)';
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3606", "function":"2110", "parameters":{"v_count1":"'||v_count2||'"}, "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
+                       "data":{"message":"3606", "function":"2110", "parameters":{"v_count2":"'||v_count2||'"}, "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 443,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count2
