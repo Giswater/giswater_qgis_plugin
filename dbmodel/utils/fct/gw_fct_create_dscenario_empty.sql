@@ -63,28 +63,38 @@ BEGIN
 	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
 	v_expl_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'expl';
 
-
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE EMPTY DSCENARIO'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Name: ',v_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Descript: ',v_descript));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Parent: ',v_parent_id));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Type: ',v_dscenario_type));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('active: ',v_active));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3662", "function":"3134", "parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3664", "function":"3134", "parameters":{"v_descript":"'||quote_nullable(v_descript)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3666", "function":"3134", "parameters":{"v_parent_id":"'||quote_nullable(v_parent_id)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3668", "function":"3134", "parameters":{"v_dscenario_type":"'||v_dscenario_type||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3670", "function":"3134", "parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"1004", "separator_id":"2008"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2009"}}$$)';
 
 	-- process
 	-- inserting on catalog table
@@ -97,11 +107,14 @@ BEGIN
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3672", "function":"3134", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"3", "is_process":true}}$$)';
+
 	ELSE
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'The new dscenario have been created sucessfully');
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3674", "function":"3134", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 	END IF;
 
 	-- insert spacers

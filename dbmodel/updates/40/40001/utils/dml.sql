@@ -1857,3 +1857,29 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'utils', 'v_ui_element_x_node', 'inventory', 14, true, NULL, 'inventory', NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'utils', 'v_ui_element_x_node', 'descript', 15, true, NULL, 'descript', NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'utils', 'v_ui_element_x_node', 'location_type', 16, true, NULL, 'location_type', NULL, NULL);
+UPDATE sys_function SET function_alias = 'CREATE EMPTY DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_empty';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3662, 'Name: %v_name%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3664, 'Descript: %v_descript%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3666, 'Parent: %v_parent_id%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3668, 'Type: %v_dscenario_type%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3670, 'active: %v_active%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(1004, 'ERRORS', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2008, '--------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2009, '---------', 'separator');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3672, 'ERROR: The dscenario (%v_scenarioid%) already exists with proposed name %v_name%. Please try another one.', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3674, 'The new dscenario have been created sucessfully', NULL, 0, true, 'utils', 'core', 'AUDIT');
