@@ -1451,3 +1451,9 @@ VALUES(3524, 'Psectors connected with the feature: %,v_psector%', null, 0, true,
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3526, 'IMPORTANT: Activate psector before deleting features.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+-- 02/05/2025--
+UPDATE sys_function SET function_alias = 'ARC REPAIR FUNCTION' WHERE function_name = 'gw_fct_arc_repair';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3528, 'Repaired arcs: arc_id --> %arc_ids%', null, 0, true, 'utils', 'core', 'AUDIT');

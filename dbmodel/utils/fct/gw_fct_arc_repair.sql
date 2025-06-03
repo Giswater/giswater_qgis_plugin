@@ -114,10 +114,10 @@ BEGIN
 		AND cur_user=current_user AND arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE fid=103 AND descript ='a' AND cur_user=current_user))a;
 	END IF;
 
-	INSERT INTO audit_check_data (fid, error_message) VALUES (118, concat('ARC REPAIR FUNCTION'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (118, concat('-----------------------------'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (118, concat ('Repaired arcs: arc_id --> ',
-	(SELECT array_agg(arc_id) FROM (SELECT arc_id FROM anl_arc WHERE fid=118 AND cur_user=current_user)a )));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2496", "fid":"118", "is_process":true, "is_header":"true"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3528", "function":"2496", "fid":"118", "is_process":true, "parameters":{"arc_ids":"'||concat((SELECT array_agg(arc_id) FROM (SELECT arc_id FROM anl_arc WHERE fid=118 AND cur_user=current_user)a ))||'"}}}$$)';
 
 	-- Set config parameter
 	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_disable_error' ;
