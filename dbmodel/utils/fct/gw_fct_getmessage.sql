@@ -61,12 +61,12 @@ BEGIN
 	-- Get parameters from input json
 	v_message_id = lower(((p_data ->>'data')::json->>'message')::text);
 	v_function_id = lower(((p_data ->>'data')::json->>'function')::text);
-	v_parameters = lower(((p_data ->>'data')::json->>'parameters')::text);
+	v_parameters = ((p_data ->>'data')::json->>'parameters')::text;
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	v_isprocess = lower(((p_data ->>'data')::json->>'is_process')::text);
 
 	v_fid = lower(((p_data ->>'data')::json->>'fid')::text);
-	v_result_id = lower(((p_data ->>'data')::json->>'result_id')::text);
+	v_result_id = ((p_data ->>'data')::json->>'result_id')::text;
 	v_temp_table = ((p_data ->>'data')::json->>'tempTable')::text;
 	v_criticity = ((p_data ->>'data')::json->>'criticity')::integer;
 	v_is_header = ((p_data ->>'data')::json->>'is_header')::boolean;
@@ -131,6 +131,11 @@ BEGIN
         VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||');';
 
         EXECUTE v_querytext;
+
+		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Message passed successfully"}, "version":"'||v_version||'"'||
+       ',"body":{"form":{}'||
+           ',"data":{"info":"" }}'||
+            '}')::json;
     END IF;
 
 	-- get flow parameters
