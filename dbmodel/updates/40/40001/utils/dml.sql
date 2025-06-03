@@ -1778,10 +1778,6 @@ VALUES(3658, 'Transfer topology from node %v_targetnode% -> Done', null, 0, true
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3660, 'ERROR-357: No nodes have been selected', NULL, 0, true, 'utils', 'core', 'AUDIT');
 
-UPDATE config_form_fields
-SET widgetcontrols = REPLACE(widgetcontrols::text, 'NULLValue', 'nullValue')::json
-WHERE widgetcontrols::text LIKE '%NULLValue%';
-
 UPDATE sys_function SET function_alias = 'CREATE EMPTY DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_empty';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
