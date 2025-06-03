@@ -67,7 +67,7 @@ BEGIN
                 a.cost >= 0 OR a.reverse_cost >= 0
             )
         ), relation AS (
-            SELECT start_vid, start_vid_zone_id, start_vid_zone_name
+            SELECT start_vid, start_vid_mapzone_id, start_vid_mapzone_name
             FROM connected_arcs c
             JOIN (
                 SELECT dma_id AS start_vid_zone_id, name AS start_vid_zone_name, ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::integer AS node_id
@@ -89,8 +89,8 @@ BEGIN
                 ''state'', a.state,
                 ''state_type'', a.state_type,
                 ''is_operative'', vst.is_operative,
-                ''mapzone_id'', s.start_vid_mapzone_id,
-                ''mapzone_name'', s.start_vid_mapzone_name,
+                ''mapzone_id'', r.start_vid_mapzone_id,
+                ''mapzone_name'', r.start_vid_mapzone_name,
                 ''timestep'', (concat(''2001-01-01 01:'', floor(c.agg_cost)::integer / 60, '':'', floor(c.agg_cost)::integer % 60))::timestamp
 
             )

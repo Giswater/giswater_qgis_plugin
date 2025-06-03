@@ -56,7 +56,7 @@ BEGIN
 
         CREATE TEMP TABLE temp_pgr_node (
             pgr_node_id SERIAL NOT NULL,
-            node_id VARCHAR(16),
+            node_id int4,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
             fluid_type INTEGER DEFAULT 0,
@@ -71,11 +71,11 @@ BEGIN
 
         CREATE TEMP TABLE temp_pgr_arc (
             pgr_arc_id SERIAL NOT NULL,
-            arc_id VARCHAR(16),
+            arc_id int4,
             pgr_node_1 INT,
             pgr_node_2 INT,
-            node_1 VARCHAR(16),
-            node_2 VARCHAR(16),
+            node_1 int4,
+            node_2 int4,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
             fluid_type INTEGER DEFAULT 0,
@@ -94,8 +94,8 @@ BEGIN
         GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_arc TO role_basic;
 
         CREATE TEMP TABLE temp_pgr_connec (
-            connec_id varchar(16),
-            arc_id varchar(16),
+            connec_id int4,
+            arc_id int4,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
             fluid_type INTEGER DEFAULT 0,
@@ -107,8 +107,8 @@ BEGIN
 
 
         CREATE TEMP TABLE temp_pgr_link (
-            link_id varchar(16),
-            feature_id varchar(16),
+            link_id int4,
+            feature_id int4,
             feature_type varchar(16),
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
@@ -122,8 +122,8 @@ BEGIN
         -- Create temporary layers depending on the project type
         IF v_project_type = 'UD' THEN
             CREATE TEMP TABLE temp_pgr_gully (
-                gully_id varchar(16),
-                arc_id varchar(16),
+                gully_id int4,
+                arc_id int4,
                 mapzone_id INTEGER DEFAULT 0,
                 old_mapzone_id INTEGER,
                 fluid_type INTEGER DEFAULT 0,
@@ -134,7 +134,7 @@ BEGIN
         ELSIF v_project_type = 'WS' THEN
             ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL;
-            ALTER TABLE temp_pgr_node ADD COLUMN to_arc VARCHAR(30);
+            ALTER TABLE temp_pgr_node ADD COLUMN to_arc int4;
             IF v_fct_name = 'MINCUT' THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN cost_mapzone int default 1;
                 ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mapzone int default 1;
@@ -213,7 +213,6 @@ BEGIN
                         a.arc_id,
                         a.node_1,
                         a.node_2,
-                        a.initoverflowpath,
                         a.expl_id,
                         a.sector_id,
                         a.presszone_id,
@@ -307,6 +306,7 @@ BEGIN
                         connec.presszone_id,
                         connec.dma_id,
                         connec.dqa_id,
+                        connec.plot_id,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -487,6 +487,7 @@ BEGIN
                         connec.dwfzone_id,
                         connec.omzone_id,
                         connec.fluid_type,
+                        connec.plot_id,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -657,7 +658,6 @@ BEGIN
                     a.arc_id,
                     a.node_1,
                     a.node_2,
-                    a.initoverflowpath,
                     a.expl_id,
                     a.sector_id,
                     a.minsector_id,
@@ -699,6 +699,7 @@ BEGIN
                     presszone_id,
                     dma_id,
                     dqa_id,
+                    plot_id,
                     the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
@@ -769,6 +770,7 @@ BEGIN
                     c.dwfzone_id,
                     c.omzone_id,
                     c.fluid_type,
+                    c.plot_id,
                     c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type

@@ -75,7 +75,7 @@ BEGIN
         $q$)
     )
     INSERT INTO temp_pgr_node (node_id)
-    SELECT c.node::text
+    SELECT c.node::int4
     FROM connectedcomponents c
     WHERE EXISTS (
         SELECT 1

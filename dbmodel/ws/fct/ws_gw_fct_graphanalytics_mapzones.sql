@@ -296,19 +296,19 @@ BEGIN
     v_querytext =
 		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = ' || v_mapzone_field || '
 		FROM (
-			SELECT ' || v_mapzone_field || ', (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' AS node_id
+			SELECT ' || v_mapzone_field || ', ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::int4 AS node_id
 			FROM ' || v_mapzone_name || ' 
 			WHERE graphconfig IS NOT NULL 
 			AND active
 		) AS s 
-		WHERE s.node_id <> '''' AND n.node_id = s.node_id';
+		WHERE n.node_id = s.node_id';
     EXECUTE v_querytext;
 
 	-- Nodes forceClosed
     v_querytext =
 		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''forceClosed'' 
 		FROM (
-			SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) AS node_id
+			SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::int4 AS node_id
 			FROM ' || v_mapzone_name || ' 
 			WHERE graphconfig IS NOT NULL 
 			AND active
@@ -320,7 +320,7 @@ BEGIN
     v_querytext =
 		'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''ignore'' 
 		FROM (
-			SELECT json_array_elements_text((graphconfig->>''ignore'')::json) AS node_id
+			SELECT (json_array_elements_text((graphconfig->>''ignore'')::json))::int4 AS node_id
 			FROM ' || v_mapzone_name || ' 
 			WHERE graphconfig IS NOT NULL 
 			AND active 
@@ -330,11 +330,11 @@ BEGIN
 
 	-- Nodes forceClosed acording init parameters
 	UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'forceClosed'
-	WHERE n.node_id IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
+	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
 
 	-- Nodes forceOpen acording init parameters
 	UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'ignore'
-	WHERE n.node_id IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
+	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
 
 	-- ARCS TO MODIFY
 	-- ARCS VALVES
@@ -406,7 +406,7 @@ BEGIN
 			FROM temp_pgr_node n
 			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2) 
 			LEFT JOIN (
-				SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json) AS to_arc
+				SELECT (json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json))::int4 AS to_arc
 				FROM ' || v_mapzone_name || ' 
 				WHERE graphconfig IS NOT NULL 
 				AND active
@@ -761,10 +761,11 @@ BEGIN
 					WHERE mapzone_id > 0
 					GROUP BY mapzone_id
 					UNION
-					SELECT mapzone_id, ST_Collect(ext_plot.the_geom) AS geom FROM ext_plot, temp_pgr_connec c
+					SELECT mapzone_id, ST_Collect(ext_plot.the_geom) AS geom FROM temp_pgr_connec c
 					JOIN v_temp_connec vc USING (connec_id) 
+					LEFT JOIN ext_plot ON vc.plot_id = ext_plot.id
+					LEFT JOIN ext_plot ON ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
 					WHERE mapzone_id > 0
-					AND ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
 					GROUP BY mapzone_id	
 				) a 
 				GROUP BY mapzone_id 
@@ -789,7 +790,7 @@ BEGIN
 					UNION
 					SELECT tl.mapzone_id, (ST_Buffer(ST_Collect(vlc.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) AS geom 
 					FROM temp_pgr_link tl
-					JOIN v_temp_link_connec vlc ON tl.link_id = vlc.link_id::text
+					JOIN v_temp_link_connec vlc ON tl.link_id = vlc.link_id
 					WHERE tl.mapzone_id > 0
 					GROUP BY tl.mapzone_id
 				) c 
