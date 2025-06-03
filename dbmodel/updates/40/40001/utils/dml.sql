@@ -1781,6 +1781,7 @@ VALUES(3656, 'Keeping topology -> Done', null, 0, true, 'utils', 'core', 'AUDIT'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3658, 'Transfer topology from node %v_targetnode% -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
-
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3660, 'ERROR-357: No nodes have been selected', NULL, 0, true, 'utils', 'core', 'AUDIT');
 
 

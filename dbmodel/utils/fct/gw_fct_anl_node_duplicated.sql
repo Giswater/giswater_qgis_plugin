@@ -60,11 +60,16 @@ BEGIN
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
+		IF v_array IS NULL THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3660", "function":"2108", "fid":"106", "is_process":true}}$$)';
+		ELSE
+			EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
 				SELECT * FROM (
 				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 106, t1.the_geom
 				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
 				WHERE t1.node_id != t2.node_id AND t1.node_id IN ('||v_array||') ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
+		END IF;
 	ELSE
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
 				SELECT * FROM (

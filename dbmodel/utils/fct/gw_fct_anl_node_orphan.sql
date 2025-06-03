@@ -27,7 +27,7 @@ DECLARE
 
 rec_node record;
 
-v_closest_arc_id varchar;
+v_closest_arc_id integer;
 v_closest_arc_distance numeric;
 v_version text;
 v_result json;
@@ -161,7 +161,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3602", "function":"2110", "fid":"442", "fcount":"0", "is_process":true}}$$)';
 	ELSE
-		IF v_count1 > 0 and v_count2 > 0 THEN			
+		IF v_count1 > 0 and v_count2 > 0 THEN
 		 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3006", "separator_id":"2025"}}$$)';
 
@@ -169,7 +169,7 @@ BEGIN
                        "data":{"message":"3604", "function":"2110", "parameters":{"v_count1":"'||v_count1||'"}, "fcount":"'||v_count1||'", "fid":"442", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			SELECT 442,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count1
+			SELECT 442,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count1
 			FROM anl_node WHERE cur_user="current_user"() AND fid=442;
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -177,12 +177,12 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3008", "separator_id":"2025"}}$$)';
 
-	
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3606", "function":"2110", "parameters":{"v_count1":"'||v_count2||'"}, "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			SELECT 443,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count2
+			SELECT 443,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count2
 			FROM anl_node WHERE cur_user="current_user"() AND fid=443;
 
 		ELSIF v_count1 > 0 and v_count2 = 0 THEN
@@ -194,7 +194,7 @@ BEGIN
                        "data":{"message":"3604", "function":"2110", "parameters":{"v_count1":"'||v_count1||'"}, "fcount":"'||v_count1||'", "fid":"442", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			SELECT 442,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count1
+			SELECT 442,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count1
 			FROM anl_node WHERE cur_user="current_user"() AND fid=442;
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -223,7 +223,7 @@ BEGIN
                        "data":{"message":"3606", "function":"2110", "parameters":{"v_count1":"'||v_count2||'"}, "fcount":"'||v_count2||'", "fid":"443", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			SELECT 443,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count2
+			SELECT 443,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count2
 			FROM anl_node WHERE cur_user="current_user"() AND fid=443;
 
 		END IF;
