@@ -33,3 +33,7 @@ WHERE inputparams IS NOT NULL
 UPDATE config_toolbox SET inputparams='[{"widgetname": "nodeTolerance", "label": "Node tolerance:", "widgettype": "spinbox", "datatype": "float", "layoutname": "grl_option_parameters", "layoutorder": 1, "value": 0.01}]'::json;
 UPDATE config_toolbox SET inputparams='[{"widgetname": "connecTolerance", "label": "Node tolerance:", "widgettype": "spinbox", "datatype": "float", "layoutname": "grl_option_parameters", "layoutorder": 1, "value": 0.01}]'::json;
 UPDATE config_toolbox SET inputparams='[{"widgetname": "arcSearchNodes", "label": "Start/end points buffer", "widgettype": "text", "datatype": "float", "layoutname": "grl_option_parameters", "layoutorder": 1, "value": "0.5"}]'::json;
+
+UPDATE config_param_system
+SET value = REPLACE(value, 'vu_exploitation', 'exploitation')
+WHERE value LIKE '%vu_exploitation%';
