@@ -124,14 +124,17 @@ def delete_object(**kwargs):
 
     func_params = kwargs['func_params']
     complet_result = kwargs['complet_result']
+    qtable_name = func_params['targetwidget']
 
-    if 'featureType' in complet_result['body']['feature']:
+    if qtable_name == 'tab_features_tbl_element':
+        feature_type = tools_gw.get_signal_change_tab(dialog)
+        tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
+        qtable_name = f"{qtable_name}_x_{feature_type}"
+    elif 'featureType' in complet_result['body']['feature']:
         feature_type = complet_result['body']['feature']['featureType']
         tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
     else:
         tablename = f"v_ui_{func_params['sourceview']}"
-
-    qtable_name = func_params['targetwidget']
     qtable: QTableView = tools_qt.get_widget(dialog, f"{qtable_name}")
 
     # Get selected rows
@@ -1133,9 +1136,21 @@ def manage_duplicate_dscenario_copyfrom(dialog):
 
 def selection_init(**kwargs):
     """
-    Initialize the selection of the element.
+    Initialize the selection.
     """
     tools_gw.selection_init(kwargs.get('class'), kwargs.get('dialog'), kwargs.get('class').feature_type, GwSelectionMode.ELEMENT)
+
+
+def insert_feature(**kwargs):
+    """
+    Insert the selected records.
+    """
+    func_params = kwargs.get('func_params')
+    target_widget = func_params.get('targetwidget')
+    
+    tools_gw.insert_feature(kwargs.get('class'), kwargs.get('dialog'), None, GwSelectionMode.ELEMENT, target_widget=target_widget)
+
+
 
 # region unused functions atm
 

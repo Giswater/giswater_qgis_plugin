@@ -85,7 +85,7 @@ class GwInfo(QObject):
         if global_vars.project_type == 'ud':
             self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.rel_feature_type = None
-        self.excluded_layers = []
+        self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]
 
     def get_info_from_coordinates(self, point, tab_type):
         return self.open_form(point=point, tab_type=tab_type)
@@ -1866,7 +1866,10 @@ class GwInfo(QObject):
                 _json.clear()
 
             if "Accepted" in json_result['status']:
-                status = self.layer_new_feature.commitChanges()
+                # If we create a new feature
+                #if self.new_feature_id is not None:
+                if new_feature is not None:
+                    status = self.layer_new_feature.commitChanges()
                 msg = json_result['message']['text']
                 if msg is None:
                     msg = 'Feature upserted'
@@ -1896,7 +1899,9 @@ class GwInfo(QObject):
                         QgsApplication.taskManager().triggerTask(self.valve_thread)
             elif "Failed" in json_result['status']:
                 # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
-                self.layer_new_feature.rollBack()
+                # If we create a new feature
+                if self.new_feature_id is not None:
+                    self.layer_new_feature.rollBack()
                 return False
 
         # Tab EPA
@@ -2707,6 +2712,9 @@ class GwInfo(QObject):
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_features')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
+            tab_feature = dialog.tab_main.findChild(QTabWidget, 'tab_feature')
+            tab_feature.currentChanged.connect(partial(tools_gw.get_signal_change_tab, dialog, self.excluded_layers, 'tab_features_feature_id'))
+            tools_gw.get_signal_change_tab(dialog, self.excluded_layers, 'tab_features_feature_id')
             self.tab_features_loaded = True
         # Tab 'Connections'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
