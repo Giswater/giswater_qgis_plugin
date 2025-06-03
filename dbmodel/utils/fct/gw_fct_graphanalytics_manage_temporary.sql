@@ -59,6 +59,7 @@ BEGIN
             node_id VARCHAR(16),
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
+            fluid_type INTEGER DEFAULT 0,
             modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
             graph_delimiter VARCHAR(30) DEFAULT 'none',
             staticpressure FLOAT DEFAULT 0,
@@ -77,6 +78,7 @@ BEGIN
             node_2 VARCHAR(16),
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
+            fluid_type INTEGER DEFAULT 0,
             graph_delimiter VARCHAR(30) DEFAULT 'none',
             modif1 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_1
             modif2 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_2
@@ -96,6 +98,7 @@ BEGIN
             arc_id varchar(16),
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
+            fluid_type INTEGER DEFAULT 0,
             staticpressure FLOAT DEFAULT 0,
             CONSTRAINT temp_pgr_connec_pkey PRIMARY KEY (connec_id)
         );
@@ -109,6 +112,7 @@ BEGIN
             feature_type varchar(16),
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
+            fluid_type INTEGER DEFAULT 0,
             staticpressure FLOAT DEFAULT 0,
             CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (link_id)
         );
@@ -122,6 +126,7 @@ BEGIN
                 arc_id varchar(16),
                 mapzone_id INTEGER DEFAULT 0,
                 old_mapzone_id INTEGER,
+                fluid_type INTEGER DEFAULT 0,
                 CONSTRAINT temp_pgr_gully_pkey PRIMARY KEY (gully_id)
             );
             CREATE INDEX temp_pgr_gully_gully_id ON temp_pgr_gully USING btree (gully_id);
@@ -397,6 +402,7 @@ BEGIN
                         a.drainzone_id,
                         a.dwfzone_id,
                         a.omzone_id,
+                        a.fluid_type,
                         a.the_geom
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
@@ -433,6 +439,7 @@ BEGIN
                     node.drainzone_id,
                     node.dwfzone_id,
                     node.omzone_id,
+                    node.fluid_type,
                     node.the_geom
                     FROM node_selector
                     JOIN node ON node.node_id::text = node_selector.node_id::text
@@ -479,6 +486,7 @@ BEGIN
                         connec.drainzone_id,
                         connec.dwfzone_id,
                         connec.omzone_id,
+                        connec.fluid_type,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -525,6 +533,7 @@ BEGIN
                         gully.drainzone_id,
                         gully.dwfzone_id,
                         gully.omzone_id,
+                        gully.fluid_type,
                         gully.the_geom
                     FROM gully_selector
                     JOIN gully ON gully.gully_id::text = gully_selector.gully_id::text
@@ -575,6 +584,7 @@ BEGIN
                         l.drainzone_id,
                         l.dwfzone_id,
                         l.omzone_id,
+                        l.fluid_type,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -626,6 +636,7 @@ BEGIN
                         l.drainzone_id,
                         l.dwfzone_id,
                         l.omzone_id,
+                        l.fluid_type,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -725,6 +736,7 @@ BEGIN
                     a.drainzone_id,
                     a.dwfzone_id,
                     a.omzone_id,
+                    a.fluid_type,
                     a.the_geom
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
@@ -739,6 +751,7 @@ BEGIN
                     n.drainzone_id,
                     n.dwfzone_id,
                     n.omzone_id,
+                    n.fluid_type,
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
@@ -755,6 +768,7 @@ BEGIN
                     c.drainzone_id,
                     c.dwfzone_id,
                     c.omzone_id,
+                    c.fluid_type,
                     c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
@@ -769,6 +783,7 @@ BEGIN
                     g.drainzone_id,
                     g.dwfzone_id,
                     g.omzone_id,
+                    g.fluid_type,
                     g.the_geom
                 FROM gully g
                 JOIN value_state_type vst ON vst.id = g.state_type
@@ -785,6 +800,7 @@ BEGIN
                     l.drainzone_id,
                     l.dwfzone_id,
                     l.omzone_id,
+                    l.fluid_type,
                     l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
@@ -804,6 +820,7 @@ BEGIN
                     l.drainzone_id,
                     l.dwfzone_id,
                     l.omzone_id,
+                    l.fluid_type,
                     l.the_geom
                 FROM link l
                 JOIN gully g ON l.feature_id = g.gully_id
