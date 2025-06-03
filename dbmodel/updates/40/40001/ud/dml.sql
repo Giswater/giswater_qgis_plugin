@@ -1394,17 +1394,4 @@ VALUES(3424, 'Fluid type analysis', '{"featureType":[]}'::json, '[
   "layoutorder": 4}
 ]'::json, NULL, true, '{4}');
 
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'gully_id', 0, true, NULL, 'gully_id', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'element_id', 1, true, NULL, 'element_id', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'elementcat_id', 2, true, NULL, 'elementcat_id', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'num_elements', 3, true, NULL, 'num_elements', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'feature_class', 4, true, NULL, 'feature_class', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'element_type', 5, true, NULL, 'element_type', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'state', 6, true, NULL, 'state', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'state_type', 7, true, NULL, 'state_type', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'observ', 8, true, NULL, 'observ', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'comment', 9, true, NULL, 'comment', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'builtdate', 10, true, NULL, 'builtdate', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'enddate', 11, true, NULL, 'enddate', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'descript', 12, true, NULL, 'descript', NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('element_form', 'ud', 'v_ui_element_x_gully', 'location_type', 13, true, NULL, 'location_type', NULL, NULL);
+UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_gully' AND columnname='gully_id';
