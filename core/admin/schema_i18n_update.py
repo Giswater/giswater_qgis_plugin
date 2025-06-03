@@ -164,16 +164,16 @@ class GwSchemaI18NUpdate:
         # Run the updater of db_files and look at the result
         status_cfg_msg, errors = self._copy_db_files()
         if status_cfg_msg is True:
-            msg += f"{tools_qt.tr('Database translation successful to')} {self.lower_lang}.\n"
+            msg += f'''{tools_qt.tr('Database translation successful to')} {self.lower_lang}.\n'''
             self._commit_dest()
         elif status_cfg_msg is False:
-            msg += f"{tools_qt.tr('Database translation failed.')}\n"
+            msg += f'''{tools_qt.tr('Database translation failed.')}\n'''
         elif status_cfg_msg is None:
-            msg += f"{tools_qt.tr('Database translation canceled.')}\n"
+            msg += f'''{tools_qt.tr('Database translation canceled.')}\n'''
 
         # Look for errors
         if errors:
-            msg += f"{tools_qt.tr('There have been errors translating:')} {', '.join(errors)}"
+            msg += f'''{tools_qt.tr('There have been errors translating:')} {', '.join(errors)}'''
 
         self._change_lang()
 

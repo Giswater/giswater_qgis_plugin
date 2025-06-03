@@ -101,11 +101,11 @@ class GwI18NGenerator:
         if py_msg:
             status_py_msg = self._create_py_files()
             if status_py_msg is True:
-                msg += f"{tools_qt.tr('Python translation successful')}\n"
+                msg += f'''{tools_qt.tr('Python translation successful')}\n'''
             elif status_py_msg is False:
-                msg += f"{tools_qt.tr('Python translation failed')}\n"
+                msg += f'''{tools_qt.tr('Python translation failed')}\n'''
             elif status_py_msg is None:
-                msg += f"{tools_qt.tr('Python translation canceled')}\n"
+                msg += f'''{tools_qt.tr('Python translation canceled')}\n'''
 
         self._create_path_dic()
         for type_db_file in self.path_dic:
@@ -113,11 +113,11 @@ class GwI18NGenerator:
             if tools_qt.is_checked(self.dlg_qm, self.path_dic[type_db_file]['checkbox']):
                 status_all_db_msg, dbtable = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
                 if status_all_db_msg is True:
-                    msg += f"{type_db_file} {tools_qt.tr('translation successful')}\n"
+                    msg += f'''{type_db_file} {tools_qt.tr('translation successful')}\n'''
                 elif status_all_db_msg is False:
-                    msg += f"{type_db_file} {tools_qt.tr('translation failed in table')}: {dbtable}\n"
+                    msg += f'''{type_db_file} {tools_qt.tr('translation failed in table')}: {dbtable}\n'''
                 elif status_all_db_msg is None:
-                    msg += f"{type_db_file} {tools_qt.tr('translation canceled')}\n"
+                    msg += f'''{type_db_file} {tools_qt.tr('translation canceled')}\n'''
 
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)

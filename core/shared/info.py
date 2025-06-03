@@ -1413,8 +1413,8 @@ class GwInfo(QObject):
         # Select only first element of the feature list
         feature = feature_list[0]
         feature_id = feature.attribute(str(self.feature_type) + '_id')
-        msg = (f"{tools_qt.tr('Selected snapped feature_id to copy values from')}: {snapped_feature_attr[0]}\n"
-               f"{tools_qt.tr('Do you want to copy its values to the current node?')}\n\n")
+        msg = (f'''{tools_qt.tr('Selected snapped feature_id to copy values from')}: {snapped_feature_attr[0]}\n'''
+               f'''{tools_qt.tr('Do you want to copy its values to the current node?')}\n\n''')
         # Replace id because we don't have to copy it!
         snapped_feature_attr[0] = feature_id
         snapped_feature_attr_aux = []

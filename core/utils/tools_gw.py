@@ -1502,7 +1502,9 @@ def manage_feature_cat():
     feature_cat = OrderedDict(sorted(feature_cat.items(), key=lambda t: t[0]))
 
     if msg != tools_qt.tr("Field child_layer of id: "):
-        tools_qgis.show_warning(f"{msg} {tools_qt.tr('is not defined in table cat_feature')}")
+        msg = "{0} is not defined in table cat_feature"
+        msg_params = (msg, )
+        tools_qgis.show_warning(msg, msg_params=msg_params)
 
     return feature_cat
 
@@ -2575,7 +2577,9 @@ def get_actions_from_json(json_result, sql):
             except Exception as e:
                 tools_log.log_debug(f"{type(e).__name__}: {e}")
     except Exception as e:
-        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
+        msg = "{0}: {1}"
+        msg_params = (type(e).__name__, e,)
+        tools_qt.manage_exception(None, msg, sql, lib_vars.schema_name, msg_params=msg_params)
 
 
 def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None,
@@ -2784,19 +2788,19 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             # Set exception message details
             title = "Database execution failed"
             msg = ""
-            msg += f"{tools_qt.tr('File name')}: {file_name}\n"
-            msg += f"{tools_qt.tr('Function name')}: {function_name}\n"
-            msg += f"{tools_qt.tr('Line number')}: {function_line}\n"
+            msg += f'''{tools_qt.tr('File name')}: {file_name}\n'''
+            msg += f'''{tools_qt.tr('Function name')}: {function_name}\n'''
+            msg += f'''{tools_qt.tr('Line number')}: {function_line}\n'''
             if 'SQLERR' in json_result:
-                msg += f"{tools_qt.tr('Detail')}: {json_result['SQLERR']}\n"
+                msg += f'''{tools_qt.tr('Detail')}: {json_result['SQLERR']}\n'''
             elif 'NOSQLERR' in json_result:
-                msg += f"{tools_qt.tr('Detail')}: {json_result['NOSQLERR']}\n"
+                msg += f'''{tools_qt.tr('Detail')}: {json_result['NOSQLERR']}\n'''
             if 'SQLCONTEXT' in json_result:
-                msg += f"{tools_qt.tr('Context')}: {json_result['SQLCONTEXT']}\n"
+                msg += f'''{tools_qt.tr('Context')}: {json_result['SQLCONTEXT']}\n'''
             if sql:
                 msg += f"SQL: {sql}\n"
             if 'MSGERR' in json_result:
-                msg += f"{tools_qt.tr('Message error')}: {json_result['MSGERR']}"
+                msg += f'''{tools_qt.tr('Message error')}: {json_result['MSGERR']}'''
             lib_vars.session_vars['last_error_msg'] = msg
 
             if is_thread:
@@ -2808,7 +2812,9 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
                 tools_qt.show_exception_message(title, msg)
 
     except Exception:
-        tools_qt.manage_exception("Unhandled Error")
+        title = "Unhandled Error"
+        msg = "Unhandled Error"
+        tools_qt.manage_exception(title)
 
 
 def manage_json_return(json_result, sql, rubber_band=None, i=None):
@@ -2965,7 +2971,9 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                         tools_qgis.set_margin(v_layer, margin)
 
     except Exception as e:
-        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
+        msg = "{0}: {1}"
+        msg_params = (type(e).__name__, e,)
+        tools_qt.manage_exception(None, msg, sql, lib_vars.schema_name, msg_params=msg_params)
     finally:
         # Clean any broken temporal layers (left with no data)
         tools_qgis.clean_layer_group_from_toc('GW Temporal Layers')
@@ -3197,7 +3205,9 @@ def manage_layer_manager(json_result, sql=None):
                     global_vars.iface.setActiveLayer(prev_layer)
 
     except Exception as e:
-        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
+        msg = "{0}: {1}"
+        msg_params = (type(e).__name__, e,)
+        tools_qt.manage_exception(None, msg, sql, lib_vars.schema_name, msg_params=msg_params)
 
 
 def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):

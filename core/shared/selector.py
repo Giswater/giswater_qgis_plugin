@@ -299,14 +299,14 @@ class GwSelector:
         tab_name = dialog.main_tab.widget(index).objectName()
         selection_mode = selection_modes[tab_name]
 
-        msg = f"{tools_qt.tr('Clicking an item will check/uncheck it.')}"
+        msg = f'''{tools_qt.tr('Clicking an item will check/uncheck it.')}'''
         if selection_mode == 'keepPrevious':
-            msg += f"{tools_qt.tr('Checking any item will not uncheck any other item.')}\n"
+            msg += f'''{tools_qt.tr('Checking any item will not uncheck any other item.')}\n'''
         elif selection_mode == 'keepPreviousUsingShift':
-            msg += f"{tools_qt.tr('Checking any item will uncheck all other items unless Shift is pressed.')}\n"
+            msg += f'''{tools_qt.tr('Checking any item will uncheck all other items unless Shift is pressed.')}\n'''
         elif selection_mode == 'removePrevious':
-            msg += f"{tools_qt.tr('Checking any item will uncheck all other items.')}\n"
-        msg += f"""{tools_qt.tr("This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector")}_{tab_name}')."""
+            msg += f'''{tools_qt.tr('Checking any item will uncheck all other items.')}\n'''
+        msg += f'''{tools_qt.tr("This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector")}_{tab_name}').'''
         title = "Selector help"
         tools_qt.show_info_box(msg, title)
 
