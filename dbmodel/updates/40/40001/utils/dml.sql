@@ -1790,5 +1790,5 @@ VALUES(3390, 'Fluid type analysis', '{"featureType":[]}'::json, '[
   "selectedId": null, 
   "widgetname": "commitChanges", 
   "widgettype": "check", 
-  "layoutorder": 4}, 
+  "layoutorder": 4}
 ]'::json, NULL, true, '{4}');
