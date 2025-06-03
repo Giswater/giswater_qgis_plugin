@@ -27,6 +27,7 @@ v_affectrow integer;
 v_psector_geom geometry;
 v_action text;
 v_plan_psector_force_delete text;
+v_feature_id integer;
 
 BEGIN
 
@@ -626,8 +627,13 @@ BEGIN
 			-- delete from plan_psector_x_* tables
 			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel IN (1,2) ORDER BY id asc) LOOP
 				-- delete from psector_x_*
-				EXECUTE 'DELETE FROM plan_psector_x_'||lower(rec_type.id)||' 
-				WHERE psector_id = '||OLD.psector_id||';';
+				FOR v_feature_id IN
+					EXECUTE 'DELETE FROM plan_psector_x_'||lower(rec_type.id)||' 
+					WHERE psector_id = '||OLD.psector_id||' RETURNING '|| lower(rec_type.id)||'_id'
+				LOOP
+					EXECUTE 'DELETE FROM '||lower(rec_type.id) ||'
+					WHERE '||lower(rec_type.id) ||'_id = '||v_feature_id||' AND state = 2;';
+				END LOOP;
 			END LOOP;
 
 			-- reset psector geometry and set inactive
