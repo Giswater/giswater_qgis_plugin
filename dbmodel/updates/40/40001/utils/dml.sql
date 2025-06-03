@@ -1737,61 +1737,6 @@ VALUES(3628, 'There are no features with NULL elevation', null, 0, true, 'utils'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3630, 'It is impossible to carry out the process. Your config_param_system variable for Raster DEM is in FALSE.', null, 0, true, 'utils', 'core', 'AUDIT');
 
--- 03/06/2025
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
-VALUES(3424, 'gw_fct_graphanalytics_fluid_type', 'ud', 'function', 'json', 'json',
-'Function to generate fluid_type of your arcs and nodes. Stop your mouse over labels for more information about input parameters.', 'role_plan', NULL, 'core', NULL);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active)
-VALUES(637, 'Fluid type calculation	', 'ud	', NULL, 'core', true, 'Function process', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true);
-
-INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
-VALUES(3424, 'Fluid type analysis', '{"featureType":[]}'::json, '[
-{
-  "label": "Process name:", 
-  "value": null, 
-  "tooltip": "Process name", 
-  "comboIds": ["FLUIDTYPE"], 
-  "datatype": "text", 
-  "comboNames": ["Fluid type"], 
-  "layoutname": "grl_option_parameters", 
-  "selectedId": null,
-  "widgetname": "processName", 
-  "widgettype": "combo", 
-  "layoutorder": 1
-}, 
-{
-  "label": "Exploitation:", 
-  "value": null, 
-  "tooltip": "Choose exploitation to work with", 
-  "datatype": "text", 
-  "layoutname": "grl_option_parameters", 
-  "selectedId": null, 
-  "widgetname": "exploitation", 
-  "widgettype": "combo", 
-  "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", 
-  "layoutorder": 2
-}, 
-{
-  "label": "Use selected psectors:", 
-  "value": null, 
-  "tooltip": "If true, use selected psectors. If false ignore selected psectors and only works with on-service network", 
-  "datatype": "boolean",
-  "layoutname": "grl_option_parameters", 
-  "selectedId": null, 
-  "widgetname": "usePlanPsector", 
-  "widgettype": "check", 
-  "layoutorder": 3}, 
-{
-  "label": "Commit changes:", 
-  "value": null, 
-  "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables", 
-  "datatype": "boolean", "layoutname": "grl_option_parameters", 
-  "selectedId": null, 
-  "widgetname": "commitChanges", 
-  "widgettype": "check", 
-  "layoutorder": 4}
-]'::json, NULL, true, '{4}');
 
 UPDATE config_form_fields SET widgetfunction='{
   "functionName": "delete_manager_item",
