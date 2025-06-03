@@ -1792,3 +1792,12 @@ VALUES(3424, 'Fluid type analysis', '{"featureType":[]}'::json, '[
   "widgettype": "check", 
   "layoutorder": 4}
 ]'::json, NULL, true, '{4}');
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "delete_manager_item",
+  "parameters": {
+    "sourcetable": "element",
+    "targetwidget": "tab_none_tbl_element",
+    "field_object_id": "element_id"
+  }
+}'::json WHERE formname='element_manager' AND formtype='form_element' AND columnname='delete' AND tabname='tab_none';
