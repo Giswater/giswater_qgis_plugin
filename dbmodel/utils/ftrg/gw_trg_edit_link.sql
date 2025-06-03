@@ -619,14 +619,7 @@ BEGIN
 			END IF;
 		END IF;
 
-	END IF;
-
-	-- Verified
-	IF (NEW.verified IS NULL) THEN
-		NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-	END IF;
-
-	-- State_type
+		-- State_type
 		IF (NEW.state=0) THEN
 			IF (NEW.state_type IS NULL) THEN
 				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_0_vdefault' AND "cur_user"="current_user"() LIMIT 1);
@@ -649,8 +642,15 @@ BEGIN
 				v_sql = 'null';
 			END IF;
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3036", "function":"1318","parameters":{"state_id":"'||v_sql::text||'"}}}$$);';
+			"data":{"message":"3036", "function":"1318","parameters":{"state_id":"'||COALESCE(v_sql::text, '')||'"}}}$$);';
 		END IF;
+
+	END IF;
+
+	-- Verified
+	IF (NEW.verified IS NULL) THEN
+		NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	END IF;
 
 	-- upsert process
 	IF TG_OP ='INSERT' THEN
