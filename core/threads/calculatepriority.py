@@ -162,12 +162,9 @@ class GwCalculatePriority(GwTask):
                     arc["builtdate"], "year", None
                 ) or self.config_material.get_default_builtdate(arc["matcat_id"])
             residual_useful_life = builtdate + arc["total_expected_useful_life"] - year
-
-            result = (
-                arc["cost_constr"]
-                * residual_useful_life / arc["total_expected_useful_life"])
-
-            current_value += result if result > 0 else 0
+            multiplier = residual_useful_life / arc["total_expected_useful_life"]
+            result = (arc["cost_constr"] * multiplier) if multiplier > 0 else 0
+            current_value += result 
 
         return current_value
 
@@ -1160,9 +1157,11 @@ class GwCalculatePriority(GwTask):
         ivi_header = tools_qt.tr("IVI (Horizon year):")
         replacement_rate_header = tools_qt.tr("Replacement rate (%/year):")
         current_cost = sum(arc["current_cost_constr"] for arc in arcs)
+        
+        current_value = self._current_value(arcs, date.today().year)
         replacement_cost = self._replacement_cost(arcs)
-        ivi = self._calculate_ivi(arcs, self.target_year, True)
-
+        ivi = current_value / replacement_cost
+        ivi_target_year = self._calculate_ivi(arcs, self.target_year, True)
         replacement_rate = self.result_budget / replacement_cost * 100 if replacement_cost > 0 else 0
 
         columns = [
@@ -1179,7 +1178,7 @@ class GwCalculatePriority(GwTask):
                 f"{self.target_year}",
                 f"{current_cost:.2f}",
                 f"{replacement_cost:.2f}",
-                f"{ivi:.3f}",
+                f"{ivi_target_year:.3f}",
                 f"{replacement_rate:.2f}",
             ],
         ]
