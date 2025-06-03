@@ -1739,14 +1739,14 @@ VALUES(3630, 'It is impossible to carry out the process. Your config_param_syste
 
 -- 03/06/2025
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
-VALUES(3390, 'gw_fct_graphanalytics_fluid_type', 'ud', 'function', 'json', 'json',
+VALUES(3424, 'gw_fct_graphanalytics_fluid_type', 'ud', 'function', 'json', 'json',
 'Function to generate fluid_type of your arcs and nodes. Stop your mouse over labels for more information about input parameters.', 'role_plan', NULL, 'core', NULL);
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active)
 VALUES(637, 'Fluid type calculation	', 'ud	', NULL, 'core', true, 'Function process', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true);
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
-VALUES(3390, 'Fluid type analysis', '{"featureType":[]}'::json, '[
+VALUES(3424, 'Fluid type analysis', '{"featureType":[]}'::json, '[
 {
   "label": "Process name:", 
   "value": null, 

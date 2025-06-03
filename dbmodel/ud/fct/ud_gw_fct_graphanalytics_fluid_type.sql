@@ -6,7 +6,7 @@ or (at your option) any later version.
 */
 -- The code of this inundation function have been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
 
---FUNCTION CODE: 3390
+--FUNCTION CODE: 3424
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_fluid_type(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_fluid_type(p_data json)
