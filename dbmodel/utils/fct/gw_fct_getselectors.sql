@@ -280,6 +280,8 @@ BEGIN
 			IF v_selector_list != '' THEN
 				v_filterfromids = ' AND ' || v_table_id || ' IN '|| v_selector_list || ' ';
 			END IF;
+			-- always order descending for mincut
+			v_orderby_query = 'ORDER BY orderby DESC';
 		END IF;
 
 		-- built full filter
