@@ -60,14 +60,22 @@ BEGIN
                        parent_s,
                        lower(rec.id));
 
-    EXECUTE format(
-      'CREATE OR REPLACE VIEW %s AS
-         SELECT * FROM %s
-        join selector_lot sl using (lot_id)
-           WHERE sl.cur_user = current_user;',
-      view_name,
-      tbl_name
-    );
+    IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.views
+    WHERE table_schema = new_s
+      AND table_name = lower(format('ve_%s_lot_%s', parent_s, rec.id))
+    ) THEN
+        EXECUTE format(
+          'CREATE VIEW %s AS
+             SELECT * FROM %s
+             join selector_lot sl using (lot_id)
+             WHERE sl.cur_user = current_user;',
+          view_name,
+          tbl_name
+        );
+    END IF;
+
     END LOOP;
 
 END

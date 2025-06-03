@@ -64,11 +64,15 @@ BEGIN
         EXECUTE v_update_stmt;
     END IF;
 
-
     -- Retrieve admin version if defined
     SELECT value INTO v_version
     FROM config_param_system
     WHERE parameter = 'admin_version';
+
+    -- Update selector_lot for this user
+    INSERT INTO selector_lot (lot_id, cur_user)
+    VALUES (v_existing_id, current_user)
+    ON CONFLICT DO NOTHING;
 
     -- Build successful return JSON
     v_result := json_build_object(

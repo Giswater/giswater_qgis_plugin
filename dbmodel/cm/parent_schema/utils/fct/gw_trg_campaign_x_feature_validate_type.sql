@@ -42,7 +42,7 @@ BEGIN
         'SELECT c.%I_type
          FROM PARENT_SCHEMA.%I p 
          JOIN PARENT_SCHEMA.cat_%I c ON p.%Icat_id = c.id 
-         WHERE p.%I_id = $1',
+         WHERE p.%I_id = $1::integer',
         v_feature, v_feature, v_feature, v_feature, v_feature
     );
 

@@ -102,6 +102,11 @@ BEGIN
 	    EXECUTE v_querytext INTO v_newid;
 	END IF;
 
+    -- Update selector_campaign for this user
+    INSERT INTO selector_campaign (campaign_id, cur_user)
+    VALUES (v_newid, current_user);
+    ON CONFLICT DO NOTHING;
+
     -- Return success response
     RETURN json_build_object(
         'status', v_status,
