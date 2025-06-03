@@ -707,7 +707,7 @@ BEGIN
 			INSERT INTO link (link_id, code, sys_code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, omzone_id,
 			linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, verified, custom_length, datasource, top_elev1, y1, top_elev2, y2, link_type, location_type, epa_type,
 			annotation, observ, comment, descript, link, num_value, drainzone_outfall, dwfzone_outfall)
-			VALUES (NEW.link_id, NEW.code, NEW.sys_code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_omzone,
+			VALUES (NEW.link_id, NEW.code, NEW.sys_code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype::integer, v_omzone,
 			NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource,
 			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, 'LINK', NEW.location_type, NEW.epa_type,
 			NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, NEW.drainzone_outfall, NEW.dwfzone_outfall);
@@ -742,17 +742,16 @@ BEGIN
 				-- update connect
 				IF NEW.feature_type='CONNEC' AND v_pjoint_id IS NOT NULL THEN
 					IF v_projectype = 'WS' THEN
-						UPDATE connec SET dma_id = v_dma WHERE connec_id = NEW.feature_id;
+						UPDATE connec SET dma_id = v_dma, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
+					ELSIF v_projectype = 'UD' THEN
+						UPDATE connec SET fluid_type=v_fluidtype::integer WHERE connec_id = NEW.feature_id;
 					END IF;
 					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector,
-					omzone_id = v_omzone, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
+					omzone_id = v_omzone WHERE connec_id = NEW.feature_id;
 
 				ELSIF NEW.feature_type='GULLY' AND v_pjoint_id IS NOT NULL  THEN
-					IF v_projectype = 'WS' THEN
-						UPDATE gully SET dma_id = v_dma WHERE gully_id = NEW.feature_id;
-					END IF;
 					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector,
-					omzone_id = v_omzone, fluid_type=v_fluidtype WHERE gully_id = NEW.feature_id;
+					omzone_id = v_omzone, fluid_type=v_fluidtype::integer WHERE gully_id = NEW.feature_id;
 				END IF;
 
 				-- update specific colums for ws-link
@@ -816,30 +815,30 @@ BEGIN
 
 			-- update link
 			IF v_projectype = 'WS' THEN
-				UPDATE link SET dma_id = v_dma WHERE link_id=NEW.link_id;
+				UPDATE link SET dma_id = v_dma, fluid_type=v_fluidtype WHERE link_id=NEW.link_id;
+			ELSIF v_projectype = 'UD' THEN
+				UPDATE link SET fluid_type = v_fluidtype::integer WHERE link_id=NEW.link_id;
 			END IF;
 			UPDATE link SET exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector,
-			omzone_id = v_omzone, fluid_type=v_fluidtype, uncertain = NEW.uncertain
+			omzone_id = v_omzone, uncertain = NEW.uncertain
 			WHERE link_id=NEW.link_id;
 
 			-- force reconnection on connecs
 			IF NEW.feature_type = 'CONNEC' THEN
 				IF v_projectype = 'WS' THEN
-					UPDATE connec SET dma_id = v_dma WHERE connec_id = NEW.feature_id;
+					UPDATE connec SET dma_id = v_dma, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
+				ELSIF v_projectype = 'UD' THEN
+					UPDATE connec SET fluid_type=v_fluidtype::integer WHERE connec_id = NEW.feature_id;
 				END IF;
 
 				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
-				omzone_id = v_omzone, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
+				omzone_id = v_omzone WHERE connec_id = NEW.feature_id;
 
 				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type = 'GULLY' THEN
-				IF v_projectype = 'WS' THEN
-					UPDATE gully SET dma_id = v_dma WHERE gully_id = NEW.feature_id;
-				END IF;
-
 				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
-				omzone_id = v_omzone, fluid_type=v_fluidtype WHERE  gully_id = NEW.feature_id;
+				omzone_id = v_omzone, fluid_type=v_fluidtype::integer WHERE  gully_id = NEW.feature_id;
 			END IF;
 
 			-- update specific colums for ws-link
@@ -860,12 +859,14 @@ BEGIN
 
 			-- update specific colums for ws-link
 			IF v_projectype = 'WS' THEN
-				UPDATE link SET presszone_id = v_presszone, dqa_id = NEW.dqa_id, minsector_id = NEW.minsector_id WHERE link_id = NEW.link_id;
+				UPDATE link SET presszone_id = v_presszone, dqa_id = NEW.dqa_id, minsector_id = NEW.minsector_id, fluid_type = v_fluidtype WHERE link_id = NEW.link_id;
+			ELSIF v_projectype = 'UD' THEN
+				UPDATE link SET fluid_type = v_fluidtype::integer WHERE link_id = NEW.link_id;
 			END IF;
 
 			-- update link
 			UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, the_geom = NEW.the_geom, expl_id = v_expl, sector_id = v_sector,
-			omzone_id = v_omzone, fluid_type=v_fluidtype, uncertain = NEW.uncertain
+			omzone_id = v_omzone, uncertain = NEW.uncertain
 			WHERE link_id = NEW.link_id;
 
 		END IF;
