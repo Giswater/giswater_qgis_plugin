@@ -1050,7 +1050,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_genelem_egate', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -1093,7 +1101,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,
@@ -1151,7 +1165,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_genelem_eiot_sensor', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -1194,7 +1216,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,
@@ -1252,7 +1280,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_genelem_eprotector', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -1295,7 +1331,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,
@@ -1353,7 +1395,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_genelem_estep', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -1396,7 +1446,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,
@@ -1437,7 +1493,7 @@ VALUES
 ('ve_genelem_ecover', 'form_feature', 'tab_data', 'ownercat_id', 'lyt_data_1', 17, 'string', 'combo', 'Owner Catalog', 'Owner Catalog', NULL, false, false, true, false, NULL, 'SELECT id, id as idval FROM cat_owner WHERE id IS NOT NULL AND active IS TRUE', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
 ('ve_genelem_ecover', 'form_feature', 'tab_data', 'node_id', 'lyt_data_1', 1, 'string', 'text', 'node_id', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL),
 ('ve_genelem_ecover', 'form_feature', 'tab_data', 'enddate', 'lyt_data_1', 16, 'date', 'datetime', 'End Date', 'End Date', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
-('ve_genelem_ecover', 'form_feature', 'tab_data', 'elementcat_id', 'lyt_top_1', 0, 'string', 'combo', 'Element Catalog', 'Element Catalog', NULL, true, false, true, false, NULL, 'SELECT id, id as idval FROM cat_element WHERE element_type = ''EORIFICE''', true, false, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, false, NULL),
+('ve_genelem_ecover', 'form_feature', 'tab_data', 'elementcat_id', 'lyt_top_1', 0, 'string', 'combo', 'Element Catalog', 'Element Catalog', NULL, true, false, true, false, NULL, 'SELECT id, id as idval FROM cat_element WHERE element_type = ''ECOVER''', true, false, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, false, NULL),
 ('ve_genelem_ecover', 'form_feature', 'tab_data', 'element_id', 'lyt_top_1', 1, 'string', 'text', 'Element ID', 'Element ID', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, false, NULL),
 ('ve_genelem_ecover', 'form_feature', 'tab_data', 'expl_id', 'lyt_bot_1', 0, 'integer', 'combo', 'Exploitation ID', 'Exploitation ID', NULL, false, false, true, false, NULL, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', true, false, NULL, NULL, '{"label":"color:red; font-weight:bold"}'::json, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, false, NULL),
 ('ve_genelem_ecover', 'form_feature', 'tab_data', 'builtdate', 'lyt_data_1', 15, 'date', 'datetime', 'Built Date', 'Built Date', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
@@ -1454,7 +1510,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_genelem_ecover', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -1497,7 +1561,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,

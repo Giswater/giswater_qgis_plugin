@@ -322,7 +322,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_frelem_eweir', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -365,7 +373,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,
@@ -457,7 +471,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_frelem_eorifice', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -500,7 +522,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,
@@ -588,7 +616,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_frelem_eoutlet', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -631,7 +667,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,
@@ -713,7 +755,15 @@ VALUES
   "icon": "112"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL),
+}'::json, 
+'{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_features_tbl_element",
+    "sourceview": "element"
+  }
+}'::json, NULL, false, NULL),
 ('ve_frelem_epump', 'form_feature', 'tab_features', 'btn_expr_select', 'lyt_features_1', 4, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "178"
 }'::json, '{
@@ -756,7 +806,13 @@ VALUES
   "icon": "111"
 }'::json, '{
   "saveValue": false
-}'::json, NULL, NULL, false, NULL)
+}'::json, 
+'{
+  "functionName": "insert_feature",
+  "parameters": {
+    "targetwidget": "tab_features_feature_id"
+  }
+}'::json, NULL, false, NULL)
 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   layoutname = EXCLUDED.layoutname,
   layoutorder = EXCLUDED.layoutorder,
