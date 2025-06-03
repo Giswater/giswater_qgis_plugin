@@ -805,7 +805,7 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(3001, 'WARNINGS', 'header')
 INSERT INTO sys_label (id, idval, label_type) VALUES(2014, '--------------', 'separator');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3418, ' additional element(s) related to the downgraded node (%v_feature_id_value%) was/were also related to another operative feature(s) (element_id: %v_element_id%)', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3418, '%v_count% additional element(s) related to the downgraded node (%v_feature_id_value%) was/were also related to another operative feature(s) (element_id: %v_element_id%)', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3420, '%v_count_feature% node(s) have been downgraded', null, 0, true, 'utils', 'core', 'AUDIT');

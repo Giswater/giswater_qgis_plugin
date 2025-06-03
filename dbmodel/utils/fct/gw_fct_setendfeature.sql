@@ -85,14 +85,15 @@ BEGIN
 
 
 	-- build log
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('END FEATURE'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3068", "fid":"518", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '--------------');
+ 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3068", "fid":"518", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2014"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '-------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3068", "fid":"518", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2007"}}$$)';
+
 
 	FOR v_feature_element IN SELECT json_array_elements(v_feature)
     loop
@@ -137,13 +138,16 @@ BEGIN
 				EXECUTE ' SELECT array_agg(element_id) FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded arc (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3432", "function":"3068", "parameters":{"v_count":"'||v_count||'", "v_feature_id_value":"'||v_feature_id_value||'", "v_element_id":"'||v_element_id||'"}, "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
+
 				END IF;
 			END LOOP;
 
 			-- generic log for arcs
 			IF v_count_feature > 0 THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat(v_count_feature, ' arc(s) have been downgraded'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3434", "function":"3068", "parameters":{"v_count_feature":"'||v_count_feature||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 			END IF;
 
 
@@ -203,13 +207,16 @@ BEGIN
 				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded node (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3418", "function":"3068", "parameters":{"v_feature_id_value":"'||v_feature_id_value||'", "v_element_id":"'||v_element_id||'", "v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
 				END IF;
 			END LOOP;
 
 			-- generic log for nodes
 			IF v_count_feature > 0 THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat(v_count_feature, ' node(s) have been downgraded'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3420", "function":"3068", "parameters":{"v_count_feature":"'||v_count_feature||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+
 			END IF;
 
 		ELSIF v_feature_type = 'connec' then
@@ -237,13 +244,17 @@ BEGIN
 				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded connec (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3422", "function":"3068", "parameters":{"v_count":"'||v_count||'", "v_feature_id_value":"'||v_feature_id_value||'", "v_element_id":"'||v_element_id||'"}, "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
+
 				END IF;
 			END LOOP;
 
 			-- generic log for connecs
 			IF v_count_feature > 0 THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat(v_count_feature, ' connec(s) have been downgraded'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3424", "function":"3068", "parameters":{"v_count_feature":"'||v_count_feature||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+
 			END IF;
 
 		ELSIF v_feature_type = 'gully' THEN
@@ -262,13 +273,16 @@ BEGIN
 				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded gully (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3426", "function":"3068", "parameters":{"v_count":"'||v_count||'". "v_feature_id_value":"'||v_feature_id_value||'", "v_element_id":"'||v_element_id||'"}, "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
+
 				END IF;
 			end loop;
 
 			-- generic log for connecs
 			IF v_count_feature > 0 THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat(v_count_feature, ' gully(s) have been downgraded'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3428", "function":"3068", "parameters":{"v_count_feature":"'||v_count_feature||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 			END IF;
 		END IF;
 
@@ -306,7 +320,8 @@ BEGIN
 	IF v_audit_result is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
-		v_message = 'Process done successfully';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3430", "function":"3068", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
 	ELSE
 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
