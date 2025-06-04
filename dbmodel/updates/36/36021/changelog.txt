@@ -8,3 +8,4 @@
 - Bug fix on trg_edit_psector when execute without set operative
 - Bug fix on getsearch for empty combo values
 - Bug fix on setselectors for multi network projects
+- Add id column to doc_x_* views
