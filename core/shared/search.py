@@ -473,7 +473,6 @@ class GwSearch:
         line_edit_add.setText('')
         line_edit_add.blockSignals(False)
 
-
     def _clear_lineedits(self):
 
         # Clear all lineedit widgets from search tabs
