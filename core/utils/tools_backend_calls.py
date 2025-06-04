@@ -936,8 +936,14 @@ def open_selected_manager_item(**kwargs):
     if qtable.property('linkedobject') == 'v_ui_element':
         # Open selected element
         element_id = index.sibling(row, column_index).data()
-        manage_element(element_id, **kwargs)
-
+        sql = f"SELECT concat('ve_', lower(feature_class)) from v_ui_element where id = '{element_id}' "
+        table_name = tools_db.get_row(sql)
+        info_feature = GwInfo('tab_data')
+        complet_result, dialog = info_feature.open_form(table_name=table_name[0], feature_id=element_id, tab_type='data')
+        if not complet_result:
+            tools_log.log_info("FAIL open_selected_manager_item")
+            return
+        
 
 def manage_element(element_id, **kwargs):
     """ Function called in class tools_gw.add_button(...) -->
@@ -960,7 +966,7 @@ def delete_manager_item(**kwargs):
     params = kwargs['func_params']
     table_widget = params['targetwidget']
     table = params['sourcetable']
-    field_object_id = params['field_object_id']
+    field_object_id = params.get('field_object_id', None)
 
     # Get QTableView, delete selected rows and reload the table
     table_widget = tools_qt.get_widget(dialog, f"{table_widget}")

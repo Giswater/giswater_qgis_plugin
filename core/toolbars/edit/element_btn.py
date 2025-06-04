@@ -33,9 +33,7 @@ class GwElementButton(GwAction):
 
         
     def clicked_event(self):
-        #self.element.get_element(list_tabs=self.list_tabs, feature_type=self.feature_type)
 
-        # Refresh cat feature list
         self._fill_element_menu()
 
 

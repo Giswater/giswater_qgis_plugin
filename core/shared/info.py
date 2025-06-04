@@ -246,14 +246,13 @@ class GwInfo(QObject):
                 if feature_id:
                     x1 = self.complet_result['body']['feature']['geometry']['x']
                     y1 = self.complet_result['body']['feature']['geometry']['y']
+                    if x1 and y1:
+                        current_extent = global_vars.canvas.extent()
+                        feature_point = QgsPointXY(x1, y1)
 
-                    current_extent = global_vars.canvas.extent()
-
-                    feature_point = QgsPointXY(x1, y1)
-
-                    if not current_extent.contains(feature_point):
-                        global_vars.canvas.setCenter(feature_point)
-                        global_vars.canvas.refresh()
+                        if not current_extent.contains(feature_point):
+                            global_vars.canvas.setCenter(feature_point)
+                            global_vars.canvas.refresh()
 
                 feature_id = self.complet_result['body']['feature']['id']
 
@@ -316,7 +315,7 @@ class GwInfo(QObject):
         # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
-        # TODO: CHECK THIS
+        
         if self.info_layer and feature_cat.parent_layer == 've_genelem':
 
             tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
@@ -327,11 +326,6 @@ class GwInfo(QObject):
             self.info_layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
-            #self.iface.actionAddFeature().trigger()
-            # Get last feature id
-            #sql = f"select nextval('urn_id_seq'::regclass)"
-            #row = tools_db.get_row(sql)
-            #feature_id = row[0] if row else 1
 
             # Connect signal with feature_id
             tools_gw.connect_signal(self.info_layer.featureAdded, self._open_new_feature, 
@@ -339,8 +333,6 @@ class GwInfo(QObject):
             # Create a new feature with the given feature_id
             feature = QgsFeature(self.info_layer.fields())
             self.info_layer.addFeature(feature)
-
-
 
         elif self.info_layer:
             # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
