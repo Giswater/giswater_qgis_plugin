@@ -43,10 +43,13 @@ class AddNewLot:
         self.schemaname = lib_vars.schema_name
         self.iface = global_vars.iface
         self.dict_tables = None
+        self.lot_saved = False
+        self.is_new_lot = True
 
     def manage_lot(self, lot_id=None, is_new=True):
         """Open the AddLot dialog and load dynamic fields from gw_fct_getlot."""
 
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.is_new_lot = is_new
         self.lot_id_value = None
         self.ids = []
@@ -56,6 +59,13 @@ class AddNewLot:
         self.cmb_position = 17
         self.srid = lib_vars.data_epsg
         table_object = "lot"
+
+        if is_new:
+            self.is_new_lot = True
+            self.lot_saved = False
+        else:
+            self.is_new_lot = False
+            self.lot_saved = True
 
         self.list_ids = {ft: [] for ft in ['arc', 'node', 'connec', 'gully', 'link']}
         self.excluded_layers = [f"v_edit_{ft}" for ft in self.list_ids]
@@ -101,6 +111,8 @@ class AddNewLot:
         self.dlg_lot.rejected.connect(self.manage_rejected)
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(self.save_lot)
+        self.dlg_lot.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+        self.dlg_lot.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.layers))
 
         # Tab logic
         name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")
@@ -336,8 +348,9 @@ class AddNewLot:
 
     def _on_tab_change(self, index):
         tab = self.dlg_lot.tab_widget.widget(index)
-        if tab.objectName() == "RelationsTab" and self.is_new_lot:
+        if tab.objectName() == "RelationsTab" and self.is_new_lot and not self.lot_saved:
             self.save_lot(from_change_tab=True)
+            self.lot_saved = True  # Only block repeated auto-saves
             self.enable_feature_tabs_by_campaign(self.lot_id)
 
     def populate_cmb_team(self):
@@ -399,7 +412,7 @@ class AddNewLot:
             cmb_ot.currentIndexChanged.connect(self.update_workorder_fields)
             self.update_workorder_fields()  # call once immediately
 
-    def save_lot(self, from_change_tab=None):
+    def save_lot(self, from_change_tab=False):
         """Save lot using gw_fct_setlot (dynamic form logic) with mandatory field validation."""
 
         fields = {}
@@ -411,10 +424,8 @@ class AddNewLot:
             if not widget:
                 continue
 
-            # Reset border
             widget.setStyleSheet("")
 
-            # Extract value depending on widget type
             if isinstance(widget, QComboBox):
                 value = widget.currentData()
             elif isinstance(widget, QDateEdit):
@@ -424,12 +435,10 @@ class AddNewLot:
 
             fields[column] = value
 
-            # Check if mandatory field is missing
             if field.get("ismandatory", False) and not value:
                 widget.setStyleSheet("border: 1px solid red")
                 list_mandatory.append(field.get("widgetname"))
 
-        # Stop if any mandatory fields are missing
         if list_mandatory:
             tools_qgis.show_warning(
                 "Some mandatory fields are missing. Please fill the required fields (marked in red).",
@@ -454,13 +463,10 @@ class AddNewLot:
 
         if result and result.get("status") == "Accepted":
             self.lot_id = result["body"]["feature"]["id"]
+            self.is_new_lot = False
+            # Only close dialog if this was a manual Accept, never for auto-save
             if not from_change_tab:
-                tools_gw.close_dialog(self.dlg_lot)
-            # tools_db.execute_sql(f"SELECT cm.gw_fct_lot_psector_geom({self.lot_id})")
-            # status = self.save_visits()
-            # if status:
-            #    self.iface.mapCanvas().refreshAllLayers()
-            #    self.manage_rejected()
+                self.dlg_lot.accept()
         else:
             tools_qgis.show_warning("Error saving lot.")
 
