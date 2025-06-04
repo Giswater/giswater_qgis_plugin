@@ -13,22 +13,17 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setlot(p_data JSON)
 $BODY$
 
 DECLARE
-    v_fields        JSON;
+    v_fields        json;
     v_record        SCHEMA_NAME.om_campaign_lot%ROWTYPE;
-    v_existing_id   INTEGER;
-    v_result        JSON;
-    v_version       TEXT;
-    v_field_key     TEXT;
-    v_field_value   JSON;
-    v_update_stmt   TEXT;
-    v_set_clauses   TEXT := '';
-
-
+    v_existing_id   integer;
+    v_result        json;
+    v_version       text;
+    v_update_fields text;
+    v_update_values text;
 BEGIN
-    -- Set schema search path
     SET search_path = "SCHEMA_NAME", public;
 
-    -- Extract the fields object from JSON
+    -- Extract fields from JSON
     v_fields := (p_data -> 'data' -> 'fields')::json;
 
     -- Convert the JSON fields to a typed record
@@ -40,28 +35,29 @@ BEGIN
     WHERE lot_id = v_record.lot_id;
 
     IF v_existing_id IS NULL THEN
-        -- INSERT new lot using dynamic field mapping
+        -- INSERT new lot using jsonb_populate_record for dynamic mapping
         INSERT INTO om_campaign_lot
         SELECT * FROM jsonb_populate_record(NULL::SCHEMA_NAME.om_campaign_lot, v_fields::jsonb)
         RETURNING lot_id INTO v_existing_id;
 
     ELSE
-        -- UPDATE existing lot using dynamic SQL from the fields
-        FOR v_field_key, v_field_value IN
-            SELECT key, value FROM json_each(v_fields)
-        LOOP
-            -- Skip primary key from SET clause
-            IF v_field_key != 'lot_id' THEN
-                v_set_clauses := v_set_clauses || format('%I = %L, ', v_field_key, v_field_value::text);
-            END IF;
-        END LOOP;
+        -- Dynamic update using jsonb_populate_record, updating all columns except lot_id
+        -- Get all column names except 'lot_id'
+        SELECT string_agg(quote_ident(attname), ', ')
+        INTO v_update_fields
+        FROM pg_attribute
+        WHERE attrelid = 'SCHEMA_NAME.om_campaign_lot'::regclass
+          AND attnum > 0
+          AND NOT attisdropped
+          AND attname <> 'lot_id';
 
-        -- Trim final comma and build the UPDATE statement
-        v_set_clauses := left(v_set_clauses, length(v_set_clauses) - 2);
-        v_update_stmt := format('UPDATE SCHEMA_NAME.om_campaign_lot SET %s WHERE lot_id = %L', v_set_clauses, v_record.lot_id);
-
-        -- Execute the dynamic UPDATE
-        EXECUTE v_update_stmt;
+        -- Build dynamic SQL to update all fields except PK in a single assignment
+        EXECUTE format(
+            'UPDATE SCHEMA_NAME.om_campaign_lot SET (%s) = (SELECT %s FROM jsonb_populate_record(NULL::SCHEMA_NAME.om_campaign_lot, $1::jsonb)) WHERE lot_id = $2',
+            v_update_fields,
+            v_update_fields
+        )
+        USING v_fields::jsonb, v_record.lot_id;
     END IF;
 
     -- Retrieve admin version if defined
@@ -71,23 +67,22 @@ BEGIN
 
     -- Update selector_lot for this user
     INSERT INTO selector_lot (lot_id, cur_user)
-    VALUES (v_existing_id, current_user)
+    VALUES (COALESCE(v_existing_id, v_record.lot_id), current_user)
     ON CONFLICT DO NOTHING;
 
     -- Build successful return JSON
     v_result := json_build_object(
         'status', 'Accepted',
-        'message', format('Lot %s saved successfully', v_existing_id),
+        'message', format('Lot %s saved successfully', COALESCE(v_existing_id, v_record.lot_id)),
         'version', v_version,
         'body', json_build_object(
-            'feature', json_build_object('id', v_existing_id),
+            'feature', json_build_object('id', COALESCE(v_existing_id, v_record.lot_id)),
             'data', json_build_object('info', 'Lot saved correctly')
         )
     );
 
     RETURN v_result;
 
--- Catch and return any unexpected errors
 EXCEPTION WHEN OTHERS THEN
     RETURN json_build_object(
         'status', 'Failed',
