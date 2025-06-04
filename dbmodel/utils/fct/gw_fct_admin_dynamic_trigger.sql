@@ -37,11 +37,11 @@ v_action TEXT;
 v_result JSON;
 v_value_pkey TEXT;
 v_column_pkey TEXT;
-v_json_new_data JSON;
-v_json_old_data JSON;
 v_parent_layer TEXT;
 v_feature_type TEXT;
 v_sql_feature TEXT;
+v_update_where TEXT;
+v_search_schema TEXT;
 
 BEGIN
 
@@ -49,16 +49,12 @@ BEGIN
 	
 	v_origin_table :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tgTableName';
 	v_sql_feature :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'sqlFeature';
-	v_column_pkey := ((p_data ->> 'data')::json->>'parameters')::json->> 'pkeyColumn';
-	v_value_pkey :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'pkeyValue';
 
-	v_json_new_data :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'jsonNewData';
-	v_json_old_data :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'jsonOldData';
+	v_json_data :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'jsonData';
 
 	v_action :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'action';
 
-	EXECUTE 'SELECT parent_layer, LOWER(feature_type) FROM ('||v_sql_feature||')' 
-	INTO v_parent_layer, v_feature_type;
+	v_update_where :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'updateWhere';
 
 
 	DROP TABLE IF EXISTS temp_new_vals;
@@ -67,34 +63,35 @@ BEGIN
     CREATE TABLE temp_new_vals AS 
 	WITH aaa AS (
    		WITH aux AS (
-   			SELECT 1 AS id, '||QUOTE_LITERAL(v_json_new_data)||'::json AS js
+   			SELECT 1 AS id, '||QUOTE_LITERAL(v_json_data)||'::json AS js
    		), json_vals AS (
 			SELECT key AS col, replace(value::text, ''"'', '''''''') AS val
 			FROM aux,
 			jsonb_each(aux.js::jsonb) AS keys_values
 		), mapping_cols AS (	
-			select c.column_name AS col, c.table_name
+			select c.column_name AS col, c.table_name, c.table_schema
 			FROM information_schema.view_column_usage c
 			JOIN pg_views v ON c.view_schema = v.schemaname AND c.view_name = v.viewname
 			WHERE v.viewname = '||quote_literal(v_origin_table)||'
-			AND table_schema = CURRENT_SCHEMA
+			AND table_schema IN ('||v_search_schema||')
 		)
-		SELECT v.*, c.table_name, NULL AS exec_order 
+		SELECT v.*, concat(c.table_schema, ''.'', c.table_name) as table_name, NULL AS exec_order 
 		FROM json_vals v LEFT JOIN mapping_cols c USING (col)
 	), bbb AS (
-		select c.column_name AS col, c.table_name FROM information_schema.view_column_usage c
+		select c.column_name AS col,  concat(c.table_schema, ''.'', c.table_name) as table_name FROM information_schema.view_column_usage c
     	JOIN pg_views v ON c.view_schema = v.schemaname AND c.view_name = v.viewname
-	WHERE v.viewname = '||quote_literal(v_parent_layer)||' AND c.table_schema = CURRENT_SCHEMA
+	WHERE v.viewname = '||quote_literal(v_origin_table)||' AND c.table_schema IN ('||v_search_schema||')
 	)
-	SELECT DISTINCT CASE WHEN aaa.table_name = '||quote_literal(v_parent_layer)||' THEN bbb.table_name ELSE aaa.table_name END AS table_name, 
+	SELECT DISTINCT CASE WHEN aaa.table_name = '||quote_literal(v_origin_table)||' THEN bbb.table_name ELSE aaa.table_name END AS table_name, 
 	aaa.col, aaa.val, null data_type, aaa.exec_order FROM aaa LEFT JOIN bbb USING (col)
 	';
 
+	
 	EXECUTE v_sql;
 
 
 	-- discard non-updatable tables from INSERT/UPDATE statement
-	DELETE FROM temp_new_vals WHERE table_name ILIKE 'selector_%' OR table_name ILIKE 'cat_%';
+	DELETE FROM temp_new_vals WHERE table_name ILIKE '%selector_%' OR table_name ILIKE 'cat_%';
 	DELETE FROM temp_new_vals WHERE table_name IS NULL;
 
 
@@ -121,50 +118,37 @@ BEGIN
 	    v_sql = 'SELECT concat(
 	    ''INSERT INTO '', table_name, '' ('', string_agg(col, '', ''), '') 
     	VALUES ('', string_agg(concat(val, data_type), '', ''), '')''
-		) AS insert_sentence FROM temp_new_vals GROUP BY table_name, exec_order ORDER BY exec_order';
+		) AS trigger_sentence FROM temp_new_vals GROUP BY table_name, exec_order ORDER BY exec_order';
 	
-		v_sql = REPLACE(REPLACE(replace(v_sql, E'\n', ''), E'\t', ''), E'\r', '');
-	
-		-- built INSERT statements of the necessary tables ordered by exec_order
-	    EXECUTE v_sql INTO v_rec_insert;
-	   
-	    FOR v_rec_sentence IN EXECUTE v_sql
-	    LOOP
-		    
-	        EXECUTE v_rec_sentence.insert_sentence;
-	      	       
-	    END LOOP;
-	   
-	   	-- keep results
-		SELECT json_agg(row_to_json(v_rec_insert)) INTO v_json_insert;
-	   
-	ELSIF v_action = 'UPDATE' THEN
+	ELSEIF v_action = 'UPDATE' THEN
 
 		v_sql = 'SELECT CONCAT(
-		''UPDATE '', table_name, '' SET '', string_agg(concat(col, '' = '', val, data_type), '', ''), '' WHERE '', '||quote_literal(v_column_pkey)||', '' = '', '||quote_literal(quote_literal(v_value_pkey))||') AS update_sentence 
+		''UPDATE '', table_name, '' SET '', string_agg(concat(col, '' = '', val, data_type), '', ''), '' WHERE '', '||quote_literal(v_update_where)||') AS trigger_sentence 
 		FROM temp_new_vals GROUP BY table_name, exec_order ORDER BY exec_order';
-		
-		v_sql = REPLACE(REPLACE(replace(v_sql, E'\n', ''), E'\t', ''), E'\r', '');
-	
-	
-		-- built UPDATE statements of the necessary tables ordered by exec_order
-		EXECUTE v_sql INTO v_rec_update;
-	
-		FOR v_rec_sentence IN EXECUTE v_sql
-		LOOP
-			
-			EXECUTE v_rec_sentence.update_sentence;
-		
-		END LOOP;
-	
-		-- keep results
-		SELECT json_agg(row_to_json(v_rec_update)) INTO v_json_update;
+
+
+	ELSEIF v_action = 'DELETE' THEN
+
+		v_sql = 'SELECT CONCAT(
+		''DELETE FROM '', table_name, '' WHERE '', '||quote_literal(v_update_where)||') AS trigger_sentence 
+		FROM temp_new_vals GROUP BY table_name, exec_order ORDER BY exec_order';
 
 	END IF;
+	
+	v_sql = REPLACE(REPLACE(replace(v_sql, E'\n', ''), E'\t', ''), E'\r', '');
 
-	DROP TABLE IF EXISTS temp_new_vals;
+	-- built statements of the necessary tables ordered by exec_order
+	
+	FOR v_rec_sentence IN EXECUTE v_sql
+	LOOP
+		
+		EXECUTE v_rec_sentence.trigger_sentence;
+				
+	END LOOP;
+	   
+			
 
-	v_result := json_build_object('insert', v_json_insert, 'update', v_json_update);
+	v_result := json_build_object('insert', '{}', 'update', '{}', 'delete', '{}');
 
 RETURN v_result;
 
