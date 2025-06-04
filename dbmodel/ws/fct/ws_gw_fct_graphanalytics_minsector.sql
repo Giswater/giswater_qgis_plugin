@@ -74,10 +74,19 @@ BEGIN
     WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
 
 
-    -- Create temporary tables
+	-- Delete temporary tables
 	-- =======================
-	v_data := '{"data":{"fct_name":"MINSECTOR"}}';
-	SELECT gw_fct_graphanalytics_create_temptables(v_data) INTO v_response;
+	v_data := '{"data":{"action":"DROP", "fct_name":"MINSECTOR"}}';
+	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+
+	IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
+    END IF;
+
+	-- Create temporary tables
+	-- =======================
+	v_data := '{"data":{"action":"CREATE", "fct_name":"MINSECTOR", "use_psector":"FALSE"}}';
+	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
         RETURN v_response;
@@ -402,16 +411,6 @@ BEGIN
 
 	-- Restore original disable lock level
     UPDATE config_param_user SET value = v_original_disable_locklevel WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
-
-
-    -- Delete temporary tables
-	-- =======================
-	v_data := '{"data":{"fct_name":"MINSECTOR"}}';
-	SELECT gw_fct_graphanalytics_delete_temptables(v_data) INTO v_response;
-
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
 
     -- Return
     RETURN gw_fct_json_create_return(
