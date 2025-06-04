@@ -107,7 +107,8 @@ class GwSearch:
                         widget = self._set_typeahead_completer(widget, completer)
                         self.lineedit_list.append(widget)
                     elif field['widgettype'] == 'combo':
-                        widget = self._add_combobox(field)
+                        widget = tools_gw.add_combo(field)
+                        widget.currentIndexChanged.connect(partial(self._clear_lineedits))
                     elif field['widgettype'] == 'check':
                         kwargs = {"dialog": self.dlg_search, "field": field}
                         widget = tools_gw.add_checkbox(**kwargs)
@@ -183,7 +184,7 @@ class GwSearch:
 
 
     def refresh_tab(self, tab_name=None):
-        
+
         if tab_name:
             form = f'"singleTab":"{tab_name}"'
         else:
@@ -203,8 +204,7 @@ class GwSearch:
                 try:
                     if field['widgettype'] == 'combo':
                         widget = main_tab.findChild(QComboBox, field['widgetname'])
-                        list_items = self._get_list_items(widget, field)
-                        tools_qt.fill_combo_values(widget, list_items)
+                        tools_gw.fill_combo(widget, field)
                 except Exception:
                     msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
                           f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
@@ -481,45 +481,12 @@ class GwSearch:
         line_edit_add.blockSignals(False)
 
 
-    def _add_combobox(self, field):
-
-        widget = QComboBox()
-        widget.setObjectName(field['widgetname'])
-        widget.setProperty('columnname', field['columnname'])
-        list_items = self._get_list_items(widget, field)
-        tools_qt.fill_combo_values(widget, list_items)
-        tools_qt.set_combo_value(widget, field.get('selectedId'), 0, add_new=False)
-        # noinspection PyUnresolvedReferences
-        widget.currentIndexChanged.connect(partial(self._clear_lineedits))
-
-        return widget
-
-
     def _clear_lineedits(self):
 
         # Clear all lineedit widgets from search tabs
         for widget in self.lineedit_list:
             tools_qt.set_widget_text(self.dlg_search, widget, '')
 
-
-    def _get_list_items(self, widget, field):
-
-        # Generate list of items to add into combo
-        widget.blockSignals(True)
-        widget.clear()
-        widget.blockSignals(False)
-        list_items = []
-        comboIds = field.get('comboIds')
-        comboNames = field.get('comboNames')
-        comboFeature = field.get('comboFeature')
-        if None not in (comboIds, comboNames):
-            for i in range(0, len(comboIds)):
-                if comboFeature:
-                    elem = [comboIds[i], comboNames[i], comboFeature[i]]
-                else:
-                    elem = [comboIds[i], comboNames[i]]
-                list_items.append(elem)
-        return list_items
 
     def _open_hydrometer_dialog(self, table_name=None, feature_id=None, sys_feature_type_id=None, basic_search_hydrometer=False, feature_type=None):
         if basic_search_hydrometer:
