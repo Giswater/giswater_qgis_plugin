@@ -1794,3 +1794,6 @@ UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_ar
 UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_connec' AND columnname='connec_id';
 UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_link' AND columnname='link_id';
 UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_node' AND columnname='node_id';
+
+-- 04/06/2025
+INSERT INTO cat_element (id, element_type, matcat_id, geometry, descript, link, brand, "type", model, svg, active, geom1, geom2, isdoublegeom) VALUES('GATE-01', 'EGATE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
