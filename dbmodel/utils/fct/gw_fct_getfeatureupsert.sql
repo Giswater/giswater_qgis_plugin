@@ -561,17 +561,17 @@ BEGIN
 				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
-		
+
 		-- Node ID
 		IF upper(v_catfeature.feature_type) = 'ELEMENT' AND upper(v_catfeature.feature_class) = 'FRELEM' THEN
 			SELECT node_id INTO v_node_id FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
 			ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
 			if v_node_id is NULL THEN
 				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3620", "function":"2560","parameters":null, "is_process":true}}$$);
+				"data":{"message":"3694", "function":"2560","parameters":null, "is_process":true}}$$);
 			END IF;
 		END IF;
-		
+
 		-- Dma ID
 		IF v_project_type = 'WS' AND v_dma_id IS NULL THEN
 			SELECT count(*) into count_aux FROM dma WHERE ST_DWithin(v_reduced_geometry, dma.the_geom,0.001) AND active IS TRUE ;

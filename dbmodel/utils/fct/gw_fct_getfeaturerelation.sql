@@ -91,7 +91,7 @@ BEGIN
 
 		IF v_connect_connec IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3462", "function":"2725", "parameters":{"v_connect_connec":"'||v_connect_connec||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3676", "function":"2725", "parameters":{"v_connect_connec":"'||v_connect_connec||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		SELECT array_agg(feature_id) INTO v_connect_gully FROM v_ui_arc_x_relations
@@ -100,7 +100,7 @@ BEGIN
 		IF v_connect_gully IS NOT NULL THEN
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3464", "function":"2725", "parameters":{"v_connect_gully":"'||v_connect_gully||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3678", "function":"2725", "parameters":{"v_connect_gully":"'||v_connect_gully||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 		END IF;
 
@@ -112,7 +112,7 @@ BEGIN
 
 		IF v_connect_node IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3466", "function":"2725", "parameters":{"v_connect_node":"'||v_connect_node||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3680", "function":"2725", "parameters":{"v_connect_node":"'||v_connect_node||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 
 	ELSIF v_feature_type='node' THEN
@@ -123,7 +123,7 @@ BEGIN
 
 			IF v_connect_node IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3468", "function":"2725", "parameters":{"v_connect_node":"'||v_connect_node||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3682", "function":"2725", "parameters":{"v_connect_node":"'||v_connect_node||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 		END IF;
 
@@ -135,7 +135,7 @@ BEGIN
 
 		IF v_connect_arc IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3470", "function":"2725", "parameters":{"v_connect_arc":"'||v_connect_arc||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3684", "function":"2725", "parameters":{"v_connect_arc":"'||v_connect_arc||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--check arcs related to node (obsolete)
@@ -146,7 +146,7 @@ BEGIN
 
 		IF v_connect_arc IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3472", "function":"2725", "parameters":{"v_connect_arc":"'||v_connect_arc||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3686", "function":"2725", "parameters":{"v_connect_arc":"'||v_connect_arc||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--check related polygon
@@ -155,7 +155,7 @@ BEGIN
 
 		IF v_connect_pol IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3474", "function":"2725", "parameters":{"v_connect_pol":"'||v_connect_pol||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3688", "function":"2725", "parameters":{"v_connect_pol":"'||v_connect_pol||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 	ELSIF v_feature_type='connec' OR v_feature_type='gully' THEN
@@ -165,7 +165,7 @@ BEGIN
 
 		IF v_connect_connec IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3476", "function":"2725", "parameters":{"v_connect_connec":"'||v_connect_connec||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3690", "function":"2725", "parameters":{"v_connect_connec":"'||v_connect_connec||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '||v_feature_id||'
@@ -174,7 +174,7 @@ BEGIN
 
 		IF v_connect_gully IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3478", "function":"2725", "parameters":{"v_connect_gully":"'||v_connect_gully||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3692", "function":"2725", "parameters":{"v_connect_gully":"'||v_connect_gully||'"}, "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		--check related polygon
