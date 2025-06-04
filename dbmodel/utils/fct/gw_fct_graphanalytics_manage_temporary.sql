@@ -307,7 +307,7 @@ BEGIN
                         connec.presszone_id,
                         connec.dma_id,
                         connec.dqa_id,
-                        connec.plot_id,
+                        connec.plot_code,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -488,7 +488,7 @@ BEGIN
                         connec.dwfzone_id,
                         connec.omzone_id,
                         connec.fluid_type,
-                        connec.plot_id,
+                        connec.plot_code,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -700,7 +700,7 @@ BEGIN
                     presszone_id,
                     dma_id,
                     dqa_id,
-                    plot_id,
+                    plot_code,
                     the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
@@ -771,7 +771,7 @@ BEGIN
                     c.dwfzone_id,
                     c.omzone_id,
                     c.fluid_type,
-                    c.plot_id,
+                    c.plot_code,
                     c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
