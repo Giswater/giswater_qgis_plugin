@@ -1809,3 +1809,6 @@ UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_ar
 UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_connec' AND columnname='connec_id';
 UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_link' AND columnname='link_id';
 UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_node' AND columnname='node_id';
+
+-- 04/06/2025
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(3620, 'Any node was found at these coordinates.', 'Please select a node to place your element.', 1, true, 'utils', 'core', 'UI');

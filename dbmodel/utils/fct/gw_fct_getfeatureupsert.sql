@@ -63,6 +63,7 @@ v_numnodes integer;
 v_feature_type text;
 count_aux integer;
 v_sector_id integer;
+v_node_id integer;
 v_macrosector_id integer;
 v_expl_id integer;
 v_macroexploitation_id integer;
@@ -560,7 +561,17 @@ BEGIN
 				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
-
+		
+		-- Node ID
+		IF upper(v_catfeature.feature_type) = 'ELEMENT' THEN
+			SELECT node_id INTO v_node_id FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
+			ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
+			if v_node_id is NULL THEN
+				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3620", "function":"2560","parameters":null, "is_process":true}}$$);
+			END IF;
+		END IF;
+		
 		-- Dma ID
 		IF v_project_type = 'WS' AND v_dma_id IS NULL THEN
 			SELECT count(*) into count_aux FROM dma WHERE ST_DWithin(v_reduced_geometry, dma.the_geom,0.001) AND active IS TRUE ;
@@ -1013,7 +1024,12 @@ BEGIN
 
 				WHEN 'ownercat_id' THEN
 					field_value = (SELECT owner_vdefault FROM exploitation WHERE expl_id = v_expl_id LIMIT 1);
-
+				WHEN 'node_id' THEN
+					IF upper(v_catfeature.feature_type) = 'ELEMENT' THEN
+						IF v_node_id IS NOT NULL THEN
+							field_value = v_node_id;
+						END IF;
+					END IF;
 				-- rest (including addfields)
 				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'columnname');
 				END CASE;
