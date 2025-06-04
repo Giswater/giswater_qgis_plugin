@@ -34,7 +34,6 @@ BEGIN
         v_lot_id := OLD.lot_id;
         EXECUTE format('SELECT ($1).%I', v_feature_id_column) INTO v_feature_id_value USING OLD;
     ELSE
-        -- Optionally handle UPDATE here if needed
         RETURN NULL;
     END IF;
 
@@ -46,26 +45,35 @@ BEGIN
         v_feature_type,
         v_feature_id_column
     );
+    EXECUTE v_querytext INTO v_feature_child_type USING v_lot_id, v_feature_id_value;
 
-    EXECUTE v_querytext
-    INTO v_feature_child_type
-    USING NEW.lot_id, v_feature_id_value;
-
-    -- Compose the view name (be careful with naming conventions)
+    -- Compose view/table name
     v_view_name := format('ve_%s_%s', v_feature_type, lower(v_feature_child_type));
+    -- Compose the final table name (SCHEMA_NAME.PARENT_SCHEMA_xxx)
 
-    v_querytext := format(
-        'INSERT INTO SCHEMA_NAME.PARENT_SCHEMA_%I SELECT v.lot_id, vn.* FROM SCHEMA_NAME.ve_PARENT_SCHEMA_lot_%s v JOIN PARENT_SCHEMA.%I vn ON vn.node_id = v.node_id  WHERE v.lot_id = $1 AND v.%I = $2',
-        lower(v_feature_child_type),
-        v_feature_type,
-        v_view_name,
-        v_feature_id_column
-    );
+    IF TG_OP = 'INSERT' THEN
+        v_querytext := format(
+            'INSERT INTO SCHEMA_NAME.PARENT_SCHEMA_%I SELECT v.lot_id, vn.* FROM SCHEMA_NAME.ve_PARENT_SCHEMA_lot_%s v JOIN PARENT_SCHEMA.%I vn ON vn.node_id = v.node_id  WHERE v.lot_id = $1 AND v.%I = $2',
+            lower(v_feature_child_type),
+            v_feature_type,
+            v_view_name,
+            v_feature_id_column
+        );
+        EXECUTE v_querytext USING v_lot_id, v_feature_id_value;
+    ELSIF TG_OP = 'DELETE' THEN
+        v_querytext := format(
+            'DELETE FROM SCHEMA_NAME.PARENT_SCHEMA_%I WHERE lot_id = $1 AND %I = $2',
+            lower(v_feature_child_type),
+            v_feature_id_column
+        );
+        EXECUTE v_querytext USING v_lot_id, v_feature_id_value;
+    END IF;
 
-    -- Execute the insert
-    EXECUTE v_querytext
-    USING NEW.lot_id, v_feature_id_value;
-
-    RETURN NEW;
+    -- Return correct row type depending on operation
+    IF TG_OP = 'INSERT' THEN
+        RETURN NEW;
+    ELSE
+        RETURN OLD;
+    END IF;
 END;
 $function$;
