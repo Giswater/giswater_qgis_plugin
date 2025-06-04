@@ -1158,9 +1158,7 @@ class GwCalculatePriority(GwTask):
         replacement_rate_header = tools_qt.tr("Replacement rate (%/year):")
         current_cost = sum(arc["current_cost_constr"] for arc in arcs)
         
-        current_value = self._current_value(arcs, date.today().year)
         replacement_cost = self._replacement_cost(arcs)
-        ivi = current_value / replacement_cost
         ivi_target_year = self._calculate_ivi(arcs, self.target_year, True)
         replacement_rate = self.result_budget / replacement_cost * 100 if replacement_cost > 0 else 0
 

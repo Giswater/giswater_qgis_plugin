@@ -4763,14 +4763,6 @@ def load_tableview_lot(dialog, feature_type, lot_id, layers):
 
         tablename = qtable.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
         message = tools_qt.fill_table(qtable, tablename, expr, QSqlTableModel.OnFieldChange, schema_name='cm')
-        model = qtable.model()
-        if model:
-            before_count = model.rowCount()
-            model.select()
-            after_count = model.rowCount()
-
-            qtable.resizeColumnsToContents()
-            qtable.viewport().update()
 
         # Get ids from qtable (used for selection in snapping)
         feature_id_column = f"{feature_type}_id"
