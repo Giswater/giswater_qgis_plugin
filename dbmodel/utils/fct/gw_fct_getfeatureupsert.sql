@@ -563,7 +563,7 @@ BEGIN
 		END IF;
 		
 		-- Node ID
-		IF upper(v_catfeature.feature_type) = 'ELEMENT' THEN
+		IF upper(v_catfeature.feature_type) = 'ELEMENT' AND upper(v_catfeature.feature_class) = 'FRELEM' THEN
 			SELECT node_id INTO v_node_id FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
 			ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
 			if v_node_id is NULL THEN
@@ -1025,7 +1025,7 @@ BEGIN
 				WHEN 'ownercat_id' THEN
 					field_value = (SELECT owner_vdefault FROM exploitation WHERE expl_id = v_expl_id LIMIT 1);
 				WHEN 'node_id' THEN
-					IF upper(v_catfeature.feature_type) = 'ELEMENT' THEN
+					IF upper(v_catfeature.feature_type) = 'ELEMENT' AND upper(v_catfeature.feature_class) = 'FRELEM' THEN
 						IF v_node_id IS NOT NULL THEN
 							field_value = v_node_id;
 						END IF;
