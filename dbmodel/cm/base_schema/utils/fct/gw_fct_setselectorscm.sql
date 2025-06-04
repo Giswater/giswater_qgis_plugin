@@ -18,7 +18,7 @@ $BODY$
 
 DECLARE
 
-v_version json;
+v_version text;
 v_tabname text;
 v_tablename text;
 v_columnname text;
@@ -41,7 +41,7 @@ v_checkall boolean;
 v_geometry text;
 v_useatlas boolean;
 v_querytext text;
-v_message text = '{"level":1, "text":"Process done successfully"}';
+v_message json := json_build_object('level', 1, 'text', 'Process done successfully');
 v_count integer = 0;
 v_count_aux integer = 0;
 v_count_2 integer = 0;
@@ -230,14 +230,25 @@ BEGIN
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 
 	-- Return
-	v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{},
-	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "action":',v_action,',
-	"selectorType":"',v_selectortype,'", "id":"', v_id,'", "ids":"', v_ids,'",
-	"layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}');
+	v_return := json_build_object(
+	    'client', (p_data -> 'client'),
+	    'message', v_message::json,
+	    'form', json_build_object(
+	        'currentTab', v_tabname
+	    ),
+	    'feature', json_build_object(),
+	    'data', json_build_object(
+	        'userValues', COALESCE(v_uservalues::json, '{}'::json),
+	        'geometry', COALESCE(v_geometry::json, '{}'::json),
+	        'action', v_action,
+	        'selectorType', v_selectortype,
+	        'id', v_id,
+	        'ids', v_ids,
+	        'layers', COALESCE((p_data -> 'data' -> 'layers'), '{}'::json)
+	    )
+	);
 
-	--RAISE EXCEPTION 'return %', v_return;
-	RETURN gw_fct_getselectorscm(v_return);
-
+	RETURN gw_fct_getselectorscm(v_return::json);
 
 	--Exception handling
 	--EXCEPTION WHEN OTHERS THEN

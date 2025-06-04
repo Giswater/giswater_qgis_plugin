@@ -63,7 +63,7 @@ v_count_zone integer;
 rec_macro integer;
 v_count_selector integer;
 v_useatlas boolean;
-v_message text;
+v_message json;
 v_uservalues json;
 v_action text;
 v_zonetable text;
@@ -134,7 +134,7 @@ BEGIN
 	END IF;
 	-- profilactic control of message
 	IF v_message is null THEN
-		v_message = '{"level":111, "text":"Process done successfully"}';
+    	v_message := json_build_object('level', 111, 'text', 'Process done successfully');
 	END IF;
 
 	-- get system variables:
@@ -449,17 +449,28 @@ BEGIN
 
 
 		-- Return formtabs
-		RETURN '{"status":"Accepted", "version":'||v_version||
-			',"body":{"message":' || v_message ||
-			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
-			',"feature":{}'||
-			',"data":{
-				"userValues":'||v_uservalues||',
-				"geometry":'||v_geometry||',
-				"layerColumns":'||v_layerColumns||
-				'}'||
-			'}'||
-		    '}';
+		RETURN json_build_object(
+		    'status', 'Accepted',
+		    'version', v_version,
+		    'body', json_build_object(
+		        'message', v_message,
+		        'form', json_build_object(
+		            'formName', '',
+		            'formLabel', '',
+		            'currentTab', v_currenttab,
+		            'formText', '',
+		            'formTabs', COALESCE(v_formTabs::json, '[]'::json),
+		            'style', COALESCE(v_stylesheet::json, '{}'::json)
+		        ),
+		        'feature', json_build_object(),
+		        'data', json_build_object(
+		            'userValues', COALESCE(v_uservalues::json, '{}'::json),
+		            'geometry', COALESCE(v_geometry::json, '{}'::json),
+		            'layerColumns', COALESCE(v_layerColumns::json, '{}'::json)
+		        )
+		    )
+		);
+
 	END IF;
 
 	-- Exception handling
