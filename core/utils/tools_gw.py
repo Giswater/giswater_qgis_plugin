@@ -4053,7 +4053,8 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     answer = tools_qt.show_question(message, title, inf_text)
     if answer:
         for el in del_id:
-            class_object.ids.remove(str(el))
+            if str(el) in class_object.ids:
+                class_object.ids.remove(str(el))
     else:
         return
 
@@ -4744,6 +4745,7 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
 
 def load_tableview_lot(dialog, feature_type, lot_id, layers):
     """Reload QTableView for campaign_lot_x_<feature_type> safely, avoiding recursive selectionChanged loop."""
+
     if not lot_id:
         tools_qgis.show_warning("Lot ID not found.")
         return
@@ -4755,9 +4757,20 @@ def load_tableview_lot(dialog, feature_type, lot_id, layers):
 
     try:
         expr = f"lot_id = '{lot_id}'"
-        qtable = tools_qt.get_widget(dialog, f'tbl_campaign_lot_x_{feature_type}')
+
+        table_widget_name = f'tbl_campaign_lot_x_{feature_type}'
+        qtable = tools_qt.get_widget(dialog, table_widget_name)
+
         tablename = qtable.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
         message = tools_qt.fill_table(qtable, tablename, expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+        model = qtable.model()
+        if model:
+            before_count = model.rowCount()
+            model.select()
+            after_count = model.rowCount()
+
+            qtable.resizeColumnsToContents()
+            qtable.viewport().update()
 
         # Get ids from qtable (used for selection in snapping)
         feature_id_column = f"{feature_type}_id"

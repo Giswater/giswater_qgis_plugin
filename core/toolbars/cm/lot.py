@@ -114,9 +114,7 @@ class AddNewLot:
                 self.dlg_lot.tab_feature.removeTab(index)
 
         self.dlg_lot.tab_widget.currentChanged.connect(self._on_tab_change)
-        self.dlg_lot.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_lot, self.excluded_layers)
-        )
+        self.dlg_lot.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
         self.dlg_lot.tab_feature.currentChanged.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
 
         # Relation feature buttons
@@ -141,6 +139,20 @@ class AddNewLot:
         )
         self.dlg_lot.btn_expr_select.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
 
+        # Always set multi-row and full row selection for relation tables, both on create and edit
+        relation_table_names = [
+            "tbl_campaign_lot_x_arc",
+            "tbl_campaign_lot_x_node",
+            "tbl_campaign_lot_x_connec",
+            "tbl_campaign_lot_x_link"
+        ]
+        if tools_gw.get_project_type() == 'ud':
+            relation_table_names.append("tbl_campaign_lot_x_gully")
+
+        for table_name in relation_table_names:
+            view = getattr(self.dlg_lot, table_name, None)
+            if view:
+                tools_qt.set_tableview_config(view)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
@@ -227,6 +239,11 @@ class AddNewLot:
             for row in rows:
                 result_relation.append(row[0])
         return widget
+
+    def _on_tab_feature_changed(self):
+        # Update self.feature_type just like in Campaign
+        self.feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
+        print(f"[DEBUG] feature_type updated to: {self.feature_type}")
 
     def get_allowed_features_for_lot(self, lot_id, feature):
         """Only be able to make the relations to the features id that come from campaign """

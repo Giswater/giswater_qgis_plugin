@@ -239,6 +239,17 @@ class Campaign:
         self.dialog.tbl_campaign_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                  self.dialog.tbl_campaign_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
 
+        for table_name in [
+            "tbl_campaign_x_arc",
+            "tbl_campaign_x_node",
+            "tbl_campaign_x_connec",
+            "tbl_campaign_x_gully",
+            "tbl_campaign_x_link",
+        ]:
+            view = getattr(self.dialog, table_name, None)
+            if view:
+                tools_qt.set_tableview_config(view)
+
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
     def _load_campaign_relations(self, campaign_id):
