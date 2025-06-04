@@ -1635,4 +1635,18 @@ VALUES
 ('ve_epa_frweir', 'form_feature', 'tab_epa', 'day_min', 'lyt_epa_data_2', 12, 'integer', 'text', 'Day Minimum', 'Day Minimum', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
 ('ve_epa_frweir', 'form_feature', 'tab_epa', 'time_min', 'lyt_epa_data_2', 13, 'integer', 'text', 'Time Minimum', 'Time Minimum', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id"
+  }
+}'::json WHERE formname='gully' AND formtype='form_feature' AND columnname='tbl_elements' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json WHERE formname='gully' AND formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
 

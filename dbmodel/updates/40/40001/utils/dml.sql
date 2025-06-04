@@ -1600,3 +1600,78 @@ UPDATE config_form_fields SET widgetfunction='{
     "field_object_id": "id"
   }
 }'::json WHERE formname='element_manager' AND formtype='form_element' AND columnname='delete' AND tabname='tab_none';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id"
+  }
+}'::json WHERE formname='arc' AND formtype='form_feature' AND columnname='tbl_elements' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json WHERE formname='arc' AND formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id"
+  }
+}'::json WHERE formname='node' AND formtype='form_feature' AND columnname='tbl_elements' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json WHERE formname='node' AND formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id"
+  }
+}'::json WHERE formname='connec' AND formtype='form_feature' AND columnname='tbl_elements' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json WHERE formname='connec' AND formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id"
+  }
+}'::json WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='tbl_elements' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id"
+  }
+}'::json WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='tbl_elements' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
