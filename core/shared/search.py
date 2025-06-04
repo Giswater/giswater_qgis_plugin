@@ -105,7 +105,8 @@ class GwSearch:
                         widget = self._set_typeahead_completer(widget, completer)
                         self.lineedit_list.append(widget)
                     elif field['widgettype'] == 'combo':
-                        widget = self._add_combobox(field)
+                        widget = tools_gw.add_combo(field)
+                        widget.currentIndexChanged.connect(partial(self._clear_lineedits))
                     elif field['widgettype'] == 'check':
                         kwargs = {"dialog": self.dlg_search, "field": field}
                         widget = tools_gw.add_checkbox(**kwargs)
@@ -472,16 +473,6 @@ class GwSearch:
         line_edit_add.setText('')
         line_edit_add.blockSignals(False)
 
-    def _add_combobox(self, field):
-
-        widget = QComboBox()
-        widget.setObjectName(field['widgetname'])
-        widget.setProperty('columnname', field['columnname'])
-        tools_gw.fill_combo(widget, field)
-        # noinspection PyUnresolvedReferences
-        widget.currentIndexChanged.connect(partial(self._clear_lineedits))
-
-        return widget
 
     def _clear_lineedits(self):
 
