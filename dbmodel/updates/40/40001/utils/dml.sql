@@ -1797,3 +1797,12 @@ UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_no
 
 -- 04/06/2025
 INSERT INTO cat_element (id, element_type, matcat_id, geometry, descript, link, brand, "type", model, svg, active, geom1, geom2, isdoublegeom) VALUES('GATE-01', 'EGATE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "delete_manager_item",
+  "parameters": {
+    "sourcetable": "v_ui_element",
+    "targetwidget": "tab_none_tbl_element",
+    "field_object_id": "id"
+  }
+}'::json WHERE formname='element_manager' AND formtype='form_element' AND columnname='delete' AND tabname='tab_none';
