@@ -12,27 +12,30 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Table existence
+-- Check table minsector_mincut
 SELECT has_table('minsector_mincut'::name, 'Table minsector_mincut should exist');
 
--- Columns check (order matters)
+-- Check columns
 SELECT columns_are(
     'minsector_mincut',
     ARRAY[
-        'minsector_id', 'minsectors'
+        'minsector_id', 'mincut_minsector_id'
     ],
     'Table minsector_mincut should have the correct columns'
 );
 
--- PK
-SELECT col_is_pk('minsector_mincut', 'minsector_id', 'Column minsector_id should be primary key');
+-- Check primary key
+SELECT col_is_pk('minsector_mincut', ARRAY['minsector_id', 'mincut_minsector_id'], 'Columns minsector_id and mincut_minsector_id should be primary key');
 
--- Types
+-- Check column types
 SELECT col_type_is('minsector_mincut', 'minsector_id', 'integer', 'Column minsector_id should be integer');
-SELECT col_type_is('minsector_mincut', 'minsectors', 'integer[]', 'Column minsectors should be integer[]');
+SELECT col_type_is('minsector_mincut', 'mincut_minsector_id', 'integer', 'Column mincut_minsector_id should be integer');
 
--- No FKs
-SELECT hasnt_fk('minsector_mincut', 'Table minsector_mincut should have no foreign keys');
+-- Check foreign keys
+SELECT has_fk('minsector_mincut', 'Table minsector_mincut should have foreign keys');
+SELECT fk_ok('minsector_mincut', 'minsector_id', 'minsector', 'minsector_id', 'FK minsector_mincut_minsector_id_fkey should exist');
+SELECT fk_ok('minsector_mincut', 'mincut_minsector_id', 'minsector', 'minsector_id', 'FK minsector_mincut_mincut_minsector_id_fkey should exist');
+
 
 SELECT * FROM finish();
 

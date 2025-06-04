@@ -175,8 +175,11 @@ ALTER TABLE dimensions ALTER COLUMN muni_id SET DEFAULT 0;
 
 -- 12/05/2025
 CREATE TABLE minsector_mincut (
-	minsector_id integer PRIMARY KEY,
-	minsectors integer[]
+    minsector_id int4 NOT NULL,
+    mincut_minsector_id int4 NOT NULL,
+    CONSTRAINT minsector_mincut_pkey PRIMARY KEY (minsector_id, mincut_minsector_id),
+    CONSTRAINT minsector_mincut_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT minsector_mincut_mincut_minsector_id_fkey FOREIGN KEY (mincut_minsector_id) REFERENCES minsector(minsector_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- 15/05/2025
