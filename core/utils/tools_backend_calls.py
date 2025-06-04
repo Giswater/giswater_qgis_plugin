@@ -933,7 +933,7 @@ def open_selected_manager_item(**kwargs):
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
 
-    if qtable.property('linkedobject') == 'v_ui_element':
+    if qtable.property('linkedobject') in ('v_ui_element', 'tbl_element_x_arc', 'tbl_element_x_node', 'tbl_element_x_connec', 'tbl_element_x_link', 'tbl_element_x_gully'):
         # Open selected element
         element_id = index.sibling(row, column_index).data()
         sql = f"SELECT concat('ve_', lower(feature_class)) from v_ui_element where id = '{element_id}' "
