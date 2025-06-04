@@ -19,16 +19,26 @@ DECLARE
     v_view_name TEXT;
     v_feature_child_type TEXT;
     v_querytext TEXT;
-   	v_feature_id_value INTEGER;
+    v_feature_id_value INTEGER;
+    v_lot_id INTEGER;
+    v_row RECORD;
 BEGIN
     v_feature_id_column := v_feature_type || '_id';
     v_feature_column := v_feature_type || '_type';
-   
-   	EXECUTE format('SELECT ($1).%I', v_feature_id_column)
-    INTO v_feature_id_value
-    USING NEW;
-   
 
+    -- Use NEW for INSERT, OLD for DELETE
+    IF TG_OP = 'INSERT' THEN
+        v_lot_id := NEW.lot_id;
+        EXECUTE format('SELECT ($1).%I', v_feature_id_column) INTO v_feature_id_value USING NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        v_lot_id := OLD.lot_id;
+        EXECUTE format('SELECT ($1).%I', v_feature_id_column) INTO v_feature_id_value USING OLD;
+    ELSE
+        -- Optionally handle UPDATE here if needed
+        RETURN NULL;
+    END IF;
+
+    -- Get the feature child type
     v_querytext := format(
         'SELECT %I, %I FROM SCHEMA_NAME.ve_PARENT_SCHEMA_lot_%s WHERE lot_id = $1 AND %I = $2',
         v_feature_column,

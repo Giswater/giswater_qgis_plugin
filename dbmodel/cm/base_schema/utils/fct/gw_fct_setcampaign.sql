@@ -104,7 +104,7 @@ BEGIN
 
     -- Update selector_campaign for this user
     INSERT INTO selector_campaign (campaign_id, cur_user)
-    VALUES (v_newid, current_user);
+    VALUES (v_newid, current_user)
     ON CONFLICT DO NOTHING;
 
     -- Return success response
