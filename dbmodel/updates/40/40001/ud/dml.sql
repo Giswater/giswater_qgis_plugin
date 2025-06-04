@@ -1457,3 +1457,6 @@ UPDATE sys_function SET function_alias = 'ARC REPAIR FUNCTION' WHERE function_na
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3528, 'Repaired arcs: arc_id --> %arc_ids%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+-- 04/06/2025
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(3620, 'Any node was found at these coordinates.', 'Please select a node to place your element.', 1, true, 'ud', 'core', 'UI');
