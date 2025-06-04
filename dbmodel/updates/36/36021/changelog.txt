@@ -4,3 +4,7 @@
 - Add variable to choose if mincuts could be only deleted by its creator or by all users
 - Sanitize config_toolbox to avoid errors when setting default values
 - Bug fix on selector mincut config values and always order by desc
+- Bug fix on query to update ext_municipality
+- Bug fix on trg_edit_psector when execute without set operative
+- Bug fix on getsearch for empty combo values
+- Bug fix on setselectors for multi network projects
