@@ -23,25 +23,51 @@ $BODY$
 * EXAMPLE:
 
 -- QUERY SAMPLE
-SELECT gw_fct_graphanalytics_fluid_type('
-	{
-		"data":{
-			"parameters":{
-				"graphClass":"DRAINZONE",
-				"exploitation":"1,2,0",
-				"updateMapZone":2,
-				"geomParamUpdate":15,
-				"commitChanges":true,
-				"usePlanPsector":false,
-				"forceOpen":"1,2,3",
-				"forceClosed":"2,3,4"
-			}
+
+SELECT gw_fct_graphanalytics_fluid_type($${
+	"data":{
+		"parameters":{
+			"processName":"FLUIDTYPE",
+			"exploitation":"1", -- Specific exploitation
+			"usePlanPsector":"false", -- Not using psectors
+			"commitChanges":"false" -- Not committing changes (This means showing temporal layers as the result)
 		}
 	}
-');
+}$$);
+
+SELECT gw_fct_graphanalytics_fluid_type($${
+	"data":{
+		"parameters":{
+			"processName":"FLUIDTYPE",
+			"exploitation":"-901", -- Using selected exploitations
+			"usePlanPsector":"true",
+			"commitChanges":"false"
+		}
+	}
+}$$);
 
 
+SELECT gw_fct_graphanalytics_fluid_type($${
+	"data":{
+		"parameters":{
+			"processName":"FLUIDTYPE",
+			"exploitation":"-901",
+			"usePlanPsector":"true",
+			"commitChanges":"true" -- THIS CASE IS INCOMPATIBLE, AND IN THE CODE IT IS SET TO FALSE
+		}
+	}
+}$$);
 
+SELECT gw_fct_graphanalytics_fluid_type($${
+	"data":{
+		"parameters":{
+			"processName":"FLUIDTYPE",
+			"exploitation":"-902", -- Using all exploitations
+			"usePlanPsector":"false",
+			"commitChanges":"true" -- Committing changes (This means updating the real tables)
+		}
+	}
+}$$);
 
 
 
@@ -104,6 +130,10 @@ BEGIN
  	IF v_usepsector IS TRUE THEN
 		v_commitchanges = FALSE;
 	END IF;
+
+	v_result := COALESCE(v_result, '{}');
+	v_result_info := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 
 	-- MANAGE EXPL ARR
@@ -242,9 +272,83 @@ BEGIN
 	AND n.fluid_type <> t.fluid_type;
 
 	IF v_commitchanges IS TRUE THEN
-		RAISE NOTICE 'Updating fluid type';
+		RAISE NOTICE 'Updating fluid type on real tables';
+
+		v_querytext = 'UPDATE node SET fluid_type = t.fluid_type FROM temp_pgr_node t WHERE t.node_id = node.node_id AND t.fluid_type <> node.fluid_type;';
+		EXECUTE v_querytext;
+
+		v_querytext = 'UPDATE arc SET fluid_type = t.fluid_type FROM temp_pgr_arc t WHERE t.arc_id = arc.arc_id AND t.fluid_type <> arc.fluid_type;';
+		EXECUTE v_querytext;
 	ELSE
-		RAISE NOTICE 'Fluid type not updated';
+		RAISE NOTICE 'Showing temporal layers with fluid type and geometry';
+
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+			'properties', to_jsonb(row) - 'the_geom',
+			'crs',concat('EPSG:',ST_SRID(the_geom))
+		) AS feature
+		FROM (
+			SELECT v.arc_id AS feature_id, 'ARC' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
+			FROM v_temp_arc v
+			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+			WHERE ot.typevalue = 'fluid_type'
+			UNION
+			SELECT v.link_id AS feature_id, 'LINK' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
+			FROM v_temp_link_connec v
+			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+			WHERE ot.typevalue = 'fluid_type'
+			UNION
+			SELECT v.link_id AS feature_id, 'LINK' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
+			FROM v_temp_link_gully v
+			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+			WHERE ot.typevalue = 'fluid_type'
+		) row) features;
+
+		v_result := COALESCE(v_result, '{}');
+		v_result_line = concat ('{"geometryType":"LineString", "layerName": "Lines", "features":',v_result, '}');
+
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+			'properties', to_jsonb(row) - 'the_geom',
+			'crs',concat('EPSG:',ST_SRID(the_geom))
+		) AS feature
+		FROM (
+			SELECT v.node_id AS feature_id, 'NODE' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
+			FROM v_temp_node v
+			JOIN temp_pgr_node t ON t.node_id = v.node_id
+			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+			WHERE ot.typevalue = 'fluid_type'
+			UNION
+			SELECT v.connec_id AS feature_id, 'CONNECT' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
+			FROM v_temp_connec v
+			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+			WHERE ot.typevalue = 'fluid_type'
+			UNION
+			SELECT v.gully_id AS feature_id, 'GULLY' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
+			FROM v_temp_gully v
+			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+			WHERE ot.typevalue = 'fluid_type'
+		) row) features;
+
+		v_result := COALESCE(v_result, '{}');
+		v_result_point = concat ('{"geometryType":"Point", "layerName": "Points", "features":',v_result, '}');
+
+		v_result_polygon = '{"geometryType":"", "features":[]}';
+
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'Fluid type calculation done succesfully';
 	END IF;
 
 
