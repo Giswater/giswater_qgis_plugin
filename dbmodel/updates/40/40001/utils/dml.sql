@@ -1688,3 +1688,14 @@ inputparams='[
 {"widgetname": "updateMapZone", "label": "Update mapzone geometry method:", "widgettype": "combo", "datatype": "integer", "layoutname": "grl_option_parameters", "layoutorder": 8, "comboIds": [0, 1, 2, 3], "comboNames": ["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId": ""}, 
 {"widgetname": "geomParamUpdate", "label": "Geometry parameter:", "widgettype": "text", "datatype": "float", "layoutname": "grl_option_parameters", "layoutorder": 10, "isMandatory": false, "placeholder": "5-30", "value": ""}]'::json
 WHERE id=2706;
+
+UPDATE config_form_tabs SET tabactions='[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  }
+]'::json WHERE formname='ve_genelem' AND tabname='tab_data';

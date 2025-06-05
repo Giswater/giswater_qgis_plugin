@@ -1655,3 +1655,14 @@ UPDATE config_form_fields SET "label"='Maximum Pipe diameter:', tooltip='Maximum
 
 -- Massive update cause dma_id dissapears on ud projects
 UPDATE config_form_fields SET columnname = 'omzone_id', label = 'omzone', tooltip = 'omzone_id' WHERE columnname = 'dma_id';
+
+UPDATE config_form_tabs SET tabactions='[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  }
+]'::json WHERE formname='ve_frelem' AND tabname='tab_data';
