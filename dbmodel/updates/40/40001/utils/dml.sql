@@ -1022,7 +1022,6 @@ VALUES
 ('ve_frelem_epump', 'form_feature', 'tab_data', 'elementcat_id', 'lyt_top_1', 0, 'string', 'combo', 'Element Catalog', 'Element Catalog', NULL, true, false, true, false, NULL, 'SELECT id, id as idval FROM cat_element WHERE element_type = ''EPUMP''', true, false, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, false, NULL),
 ('ve_frelem_epump', 'form_feature', 'tab_data', 'element_id', 'lyt_top_1', 1, 'string', 'text', 'Element ID', 'Element ID', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, false, NULL),
 ('ve_frelem_epump', 'form_feature', 'tab_data', 'epa_type', 'lyt_top_1', 2, 'string', 'combo', 'EPA Type', 'EPA Type', NULL, false, false, true, false, NULL, 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''ELEMENT''', NULL, NULL, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top"}'::json, NULL, NULL, false, NULL),
-('ve_frelem_epump', 'form_feature', 'tab_data', 'to_arc', 'lyt_data_2', 1, 'string', 'text', 'to_arc', 'to_arc', NULL, true, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL),
 ('ve_frelem_epump', 'form_feature', 'tab_data', 'order_id', 'lyt_data_1', 22, 'double', 'text', 'order_id', NULL, NULL, true, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL),
 ('ve_frelem_epump', 'form_feature', 'tab_data', 'node_id', 'lyt_data_1', 1, 'string', 'text', 'node_id', NULL, NULL, true, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL),
 ('ve_frelem_epump', 'form_feature', 'tab_data', 'observ', 'lyt_data_3', 0, 'string', 'text', 'Observations', 'Observations', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":true}'::json, NULL, NULL, false, NULL),
@@ -1689,13 +1688,45 @@ inputparams='[
 {"widgetname": "geomParamUpdate", "label": "Geometry parameter:", "widgettype": "text", "datatype": "float", "layoutname": "grl_option_parameters", "layoutorder": 10, "isMandatory": false, "placeholder": "5-30", "value": ""}]'::json
 WHERE id=2706;
 
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formactions_typevalue', 'actionSetGeom', 'Set Geom', NULL, NULL);
+
 UPDATE config_form_tabs SET tabactions='[
   {
     "actionName": "actionEdit",
     "disabled": false
   },
   {
-    "actionName": "actionSetToArc",
+    "actionName": "actionSetGeom",
     "disabled": false
   }
 ]'::json WHERE formname='ve_genelem' AND tabname='tab_data';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {}
+}'::json WHERE formname='element_manager' AND formtype='form_element' AND columnname='create' AND tabname='tab_none';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {}
+}'::json WHERE formname='arc' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {}
+}'::json WHERE formname='node' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {}
+}'::json WHERE formname='connec' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {}
+}'::json WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {}
+}'::json WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';

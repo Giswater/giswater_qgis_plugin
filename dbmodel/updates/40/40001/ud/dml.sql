@@ -1664,5 +1664,14 @@ UPDATE config_form_tabs SET tabactions='[
   {
     "actionName": "actionSetToArc",
     "disabled": false
+  },
+  {
+    "actionName": "actionSetGeom",
+    "disabled": false
   }
 ]'::json WHERE formname='ve_frelem' AND tabname='tab_data';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {}
+}'::json WHERE formname='gully' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
