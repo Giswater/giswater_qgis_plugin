@@ -656,7 +656,7 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES (3540, 'INFO: Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES (3722, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
