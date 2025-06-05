@@ -75,17 +75,18 @@ BEGIN
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
 	-- create log
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+  						"data":{"function":"3112", "fid":'||v_fid||', "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+  						"data":{"function":"3112", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "prefix_id":"1003"}}$$)';
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"function":"3112", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "prefix_id":"1002"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"function":"3112", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true"
+						"prefix_id":"1001"}}$$)';
 
 	-- inserting on catalog table
 	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
@@ -96,17 +97,28 @@ BEGIN
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3530", "function":"3112", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"3", "is_process":true}}$$)';
 	ELSE 
 
 		-- insert process
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario ',v_name,' have been created with id:',v_scenarioid,'.'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Feature type: ',v_featuretype));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Exploitation: ',v_expl));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Selection mode: ',v_selectionmode));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3532", "function":"3112", "parameters":{"v_name":"'||v_name||'", "v_scenarioid":"'||v_scenarioid||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3534", "function":"3112", "parameters":{"v_featuretype":"'||v_featuretype||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3536", "function":"3112", "parameters":{"v_expl":"'||v_expl||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3538", "function":"3112", "parameters":{"v_selectionmode":"'||v_selectionmode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 1, concat('INFO: Process done successfully.'));
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3540", "function":"3112", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+
 		
 		-- queryfilter
 		IF v_selectionmode = 'previousSelection' THEN
@@ -130,9 +142,9 @@ BEGIN
 
 		-- log
 		GET DIAGNOSTICS v_count = row_count;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count, ' rows with features have been inserted on table ', v_table,'.'));
-		
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3542", "function":"3112", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"1", "is_process":true, "parameters":{"v_count":"'||v_count||'", "v_table":"'||v_table||'"}}}$$)';
+
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
 
@@ -140,6 +152,7 @@ BEGIN
 
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
 	
 	-- get results

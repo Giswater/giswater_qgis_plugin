@@ -610,6 +610,7 @@ INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_n
 INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_none', 'active', 'lyt_data_1', 4, 'boolean', 'check', 'active', 'active', NULL, false, false, true, false, false, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_none', 'lock_level', 'lyt_data_1', 5, 'integer', 'combo', 'lock_level', 'lock_level', NULL, false, false, true, false, NULL, 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level'' AND id IS NOT NULL', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
+<<<<<<< HEAD
 -- 05/06/2025
 -- WIP new algorithm to recalculate massive mincut with minsector
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3424, 'gw_fct_massivemincut_v1', 'ws', 'function', 'json', 'json', 'Function of graphanalytics for massive mincutzones identification.', 'role_plan', NULL, 'core', NULL);
@@ -621,3 +622,44 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 {"widgetname":"recalculateMinsectors", "label":"Recalculate minsectors:", "widgettype":"check","datatype":"boolean","tooltip":"If true, recalculate minsectors. If false, use existing minsectors" , "layoutname":"grl_option_parameters","layoutorder":3,"value":""},
 {"widgetname":"commitChanges", "label":"Commit changes:", "widgettype":"check","datatype":"boolean","tooltip":"If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables" , "layoutname":"grl_option_parameters","layoutorder":4,"value":""}
 ]'::json, NULL, true, '{4}');
+=======
+-- 04/06/2025
+UPDATE sys_function SET function_alias = 'CREATE DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_demand';
+INSERT INTO sys_label (id, idval, label_type) VALUES(1003, 'ERRORS', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(1002, 'WARNINGS', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(1001, 'INFO', 'header');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3530, 'ERROR: The dscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3532, 'New scenario %v_name% have been created with id:%v_scenarioid% .', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3534, 'Feature type: %v_featuretype%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3536, 'Exploitation: %v_expl%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3538, 'Selection mode: %v_selectionmode%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3540, 'INFO: Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> a4aeb2474 (feat(function_translation): translate gw_fct_create_dscenario_demand)
