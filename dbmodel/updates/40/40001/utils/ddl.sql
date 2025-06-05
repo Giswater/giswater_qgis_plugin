@@ -126,9 +126,6 @@ ALTER TABLE doc DROP CONSTRAINT IF EXISTS doc_doc_type_fkey;
 
 DROP TABLE IF EXISTS doc_type;
 
--- ALTER TABLE element ADD COLUMN epa_type varchar(16) NULL;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"epa_type", "dataType":"varchar(16)", "isUtils":"False"}}$$);
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_arc_traceability", "column":"undelete"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_connec_traceability", "column":"undelete"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_gully_traceability", "column":"undelete"}}$$);

@@ -1454,6 +1454,7 @@ CREATE TABLE element (
 	top_elev numeric(12, 4) NULL,
 	feature_type varchar(16) DEFAULT 'ELEMENT'::character varying NULL,
 	elementcat_id varchar(30) NOT NULL,
+	epa_type varchar(16) NOT NULL,
 	num_elements int4 NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,
@@ -1488,6 +1489,7 @@ CREATE TABLE element (
 	trace_featuregeom bool DEFAULT true NULL,
 	lock_level int4 NULL,
 	expl_visibility int2[] NULL,
+	geometry_type text NULL,
 	created_at timestamp with time zone DEFAULT now() NULL,
 	created_by varchar(50) DEFAULT CURRENT_USER NULL,
 	updated_at timestamp with time zone NULL,
@@ -1504,7 +1506,8 @@ CREATE TABLE element (
 	CONSTRAINT element_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_epa_type_check CHECK ((epa_type = ANY (ARRAY['FRPUMP'::text, 'VALVE'::text])))
 );
 
 CREATE INDEX element_index ON element USING gist (the_geom);

@@ -1628,6 +1628,7 @@ CREATE TABLE element (
 	top_elev numeric(12, 3) NULL,
 	feature_type varchar(16) DEFAULT 'ELEMENT'::character varying NULL,
 	elementcat_id varchar(30) NOT NULL,
+	epa_type varchar(16) NOT NULL,
 	num_elements int4 NULL,
 	state int2 NOT NULL,
 	state_type int2 NULL,
@@ -1678,7 +1679,8 @@ CREATE TABLE element (
 	CONSTRAINT element_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_epa_type_check CHECK ((epa_type = ANY (ARRAY['FRPUMP'::text, 'FRWEIR'::text, 'FRORIFICE'::text, 'FROUTLET'::text])))
 );
 CREATE INDEX element_index ON element USING gist (the_geom);
 CREATE INDEX element_muni ON element USING btree (muni_id);
