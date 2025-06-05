@@ -1652,3 +1652,6 @@ UPDATE config_form_fields SET widgetfunction='{
 
 -- 05/06/2025
 UPDATE config_form_fields SET "label"='Maximum Pipe diameter:', tooltip='Maximum Pipe diameter' WHERE formname='generic' AND formtype='link_to_gully' AND columnname='pipe_diameter' AND tabname='tab_none';
+
+-- Massive update cause dma_id dissapears on ud projects
+UPDATE config_form_fields SET columnname = 'omzone_id', label = 'omzone', tooltip = 'omzone_id' WHERE columnname = 'dma_id';
