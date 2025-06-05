@@ -1675,3 +1675,6 @@ UPDATE config_form_fields SET widgetfunction='{
     "targetwidget": "tab_elements_tbl_elements"
   }
 }'::json WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
+
+-- 05/06/2025
+UPDATE config_form_fields SET "label"='Maximum Pipe diameter:', tooltip='Maximum Pipe diameter' WHERE formname='generic' AND formtype='link_to_connec' AND columnname='pipe_diameter' AND tabname='tab_none';
