@@ -118,3 +118,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "
 -- 27/05/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"mincut_impact", "dataType":"json", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"mincut_affectation", "dataType":"json", "isUtils":"False"}}$$);
+
+-- 05/06/2025
+ALTER TABLE minsector DROP CONSTRAINT minsector_expl_id_fkey;
+ALTER TABLE minsector ALTER COLUMN expl_id TYPE _int4 USING ARRAY[expl_id::int4];

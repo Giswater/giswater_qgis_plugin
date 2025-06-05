@@ -1008,7 +1008,10 @@ AS WITH
     FROM connec_selected c;
 
 CREATE OR REPLACE VIEW v_edit_minsector
-AS SELECT m.minsector_id,
+AS WITH sel_expl AS (
+	SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+)
+SELECT m.minsector_id,
     m.code,
     m.dma_id,
     m.dqa_id,
@@ -1021,9 +1024,12 @@ AS SELECT m.minsector_id,
     m.descript,
     m.addparam::text AS addparam,
     m.the_geom
-   FROM selector_expl,
-    minsector m
-  WHERE m.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER;
+FROM minsector m
+WHERE EXISTS (
+  	SELECT 1
+  	FROM sel_expl
+  	WHERE sel_expl.expl_id = ANY (m.expl_id)
+)
 
 CREATE OR REPLACE VIEW v_edit_samplepoint
 AS SELECT sm.sample_id,
