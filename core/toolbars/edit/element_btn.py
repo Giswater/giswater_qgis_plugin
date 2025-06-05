@@ -48,7 +48,7 @@ class GwElementButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        # Get list of different connec, gully and node types
+        # Get list of different element types
         features_cat = tools_gw.manage_feature_cat()
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)

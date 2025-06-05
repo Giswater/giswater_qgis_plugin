@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1151</width>
+    <width>1201</width>
     <height>587</height>
    </rect>
   </property>
@@ -95,7 +95,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1101</width>
+             <width>1151</width>
              <height>337</height>
             </rect>
            </property>
@@ -116,8 +116,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1101</width>
-             <height>337</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -151,8 +151,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1101</width>
-             <height>328</height>
+             <width>111</width>
+             <height>64</height>
             </rect>
            </property>
            <attribute name="label">
@@ -491,6 +491,7 @@
    <addaction name="separator"/>
    <addaction name="actionHelp"/>
    <addaction name="actionAudit"/>
+   <addaction name="actionSetGeom"/>
   </widget>
   <action name="actionCentered">
    <property name="text">
@@ -656,6 +657,11 @@
   <action name="actionDemand">
    <property name="text">
     <string>Demand</string>
+   </property>
+  </action>
+  <action name="actionSetGeom">
+   <property name="text">
+    <string>Set Geom</string>
    </property>
   </action>
  </widget>

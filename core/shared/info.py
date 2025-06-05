@@ -27,7 +27,7 @@ from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 #from .catalog import GwCatalog
 from .dimensioning import GwDimensioning
-#from .element import GwElement
+from ..toolbars.edit.element_manager_btn import GwElementManagerButton
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
 from .workcat import GwWorkcat
@@ -69,6 +69,7 @@ class GwInfo(QObject):
         self.connected = False
         self.rubber_band = tools_gw.create_rubberband(self.canvas, "point")
         self.snapper_manager = GwSnapManager(self.iface)
+        self.vertex_marker = self.snapper_manager.vertex_marker
         self.snapper_manager.set_snapping_layers()
         self.conf_supp = None
         self.prev_action = None
@@ -86,6 +87,7 @@ class GwInfo(QObject):
             self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.rel_feature_type = None
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]
+        self.point_xy = {"x": None, "y": None}
 
     def get_info_from_coordinates(self, point, tab_type):
         return self.open_form(point=point, tab_type=tab_type)
@@ -272,7 +274,7 @@ class GwInfo(QObject):
 
             elif template == 'element':
                 element_id = self.complet_result['body']['feature']['id']
-                manage_element = GwElement()
+                manage_element = GwElementManagerButton()
                 manage_element.get_element(new_element_id=False, selected_object_id=element_id)
                 dlg_add_element = manage_element.get_element_dialog()
                 dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
@@ -372,8 +374,6 @@ class GwInfo(QObject):
                 return
         # Block the signals of de dialog so that the key ESC does not close it
         dialog.blockSignals(True)
-
-        self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Set signals
         tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
@@ -685,7 +685,6 @@ class GwInfo(QObject):
         self.action_link = self.dlg_cf.findChild(QAction, "actionLink")
         self.action_help = self.dlg_cf.findChild(QAction, "actionHelp")
         self.action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
-        # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         self.action_section = self.dlg_cf.findChild(QAction, "actionSection")
         self.action_orifice = self.dlg_cf.findChild(QAction, "actionOrifice")
         self.action_outlet = self.dlg_cf.findChild(QAction, "actionOutlet")
@@ -693,6 +692,7 @@ class GwInfo(QObject):
         self.action_weir = self.dlg_cf.findChild(QAction, "actionWeir")
         self.action_demand = self.dlg_cf.findChild(QAction, "actionDemand")
         self.action_audit = self.dlg_cf.findChild(QAction, "actionAudit")
+        self.action_set_geom = self.dlg_cf.findChild(QAction, "actionSetGeom")
 
     def _manage_icons(self):
         """ Adds icons to actions and buttons """
@@ -718,6 +718,7 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_weir, "162")
         tools_gw.add_icon(self.action_demand, "163")
         tools_gw.add_icon(self.action_audit, "177")
+        tools_gw.add_icon(self.action_set_geom, "133")
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False, tab='tab_data'):
         """ Creates and populates all the widgets """
@@ -879,7 +880,8 @@ class GwInfo(QObject):
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
-
+        self.action_set_geom.triggered.connect(self._get_point_xy)
+        
         # EPA Actions
         self.action_orifice.triggered.connect(partial(self._open_orifice_dlg))
         self.action_outlet.triggered.connect(partial(self._open_outlet_dlg))
@@ -1133,7 +1135,6 @@ class GwInfo(QObject):
             tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
 
         # Set circle vertex marker
-        self.vertex_marker = self.snapper_manager.vertex_marker
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
         self.vertex_marker.show()
 
@@ -1377,9 +1378,6 @@ class GwInfo(QObject):
 
         # Set snapping
         # layer = global_vars.iface.activeLayer() TODO: Remove this line if not needed
-
-        # Set marker
-        self.vertex_marker = self.snapper_manager.vertex_marker
 
         if feature_type == 'node':
             self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
@@ -1795,13 +1793,6 @@ class GwInfo(QObject):
                 if not self.layer_new_feature.isEditable():
                     self.layer_new_feature.startEditing()
                 self.layer_new_feature.updateFeature(new_feature)
-                
-                #status = self.layer_new_feature.commitChanges()
-                #if status is False:
-                #    error = self.layer_new_feature.commitErrors()
-                #    msg = str(error)
-                #    tools_log.log_warning(msg)
-                #    return False
 
                 self.new_feature_id = None
                 self._enable_action(dialog, "actionCentered", True)
@@ -1872,6 +1863,10 @@ class GwInfo(QObject):
                 self._reload_fields(dialog, json_result, p_widget)
                 if epa_type_changed:
                     self._reload_epa_tab(dialog)
+
+                # Update geometry field (if user have selected a point)
+                if self.point_xy['x'] is not None:
+                    self._update_geom(p_table_id, id_name, newfeature_id)
 
                 if thread:
                     # If param is true show question and create thread
@@ -3290,6 +3285,21 @@ class GwInfo(QObject):
         for combo_child in result['body']['data']:
             if combo_child is not None:
                 tools_gw.manage_combo_child(dialog, widget, combo_child)
+    
+    def _get_point_xy(self):
+        """ Capture point XY from the canvas """
+        self.snapper_manager.add_point(self.vertex_marker)
+        self.point_xy = self.snapper_manager.point_xy
+
+
+    def _update_geom(self, table_id, id_name, newfeature_id):
+        """ Update geometry field """
+        
+        srid = lib_vars.data_epsg
+        sql = (f"UPDATE {table_id}"
+               f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
+               f" WHERE {id_name} = {newfeature_id}")
+        tools_db.execute_sql(sql)
 
     # endregion
 # region Static functions used by the widgets in the custom form
@@ -4067,7 +4077,7 @@ def manage_element(element_id, **kwargs):
             expr_filter = f"{field_id} = '{feature_id}'"
             feature = tools_qgis.get_feature_by_expr(layer, expr_filter)
 
-    elem = GwElement()
+    elem = GwElementManagerButton()
     elem.get_element(True, feature, feature_type)
 
     # If element exist

@@ -13,7 +13,7 @@ import webbrowser
 from functools import partial
 from qgis.PyQt.QtCore import QDate, QRegExp, QRegularExpression
 from qgis.PyQt.QtGui import QStandardItemModel
-from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QTableView, QWidget, QDoubleSpinBox, QSpinBox
+from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QTableView, QWidget, QDoubleSpinBox, QSpinBox, QMenu
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsLayerTreeLayer, QgsVectorLayer
 from qgis.gui import QgsDateTimeEdit
 
@@ -21,7 +21,8 @@ from ... import global_vars
 from ..shared.document import GwDocument
 from ..shared.info import GwInfo
 from ..shared.visit import GwVisit
-from ..shared.element import GwElement
+from ..toolbars.edit.element_btn import GwElementButton
+from ..toolbars.edit.element_manager_btn import GwElementManagerButton
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from .selection_mode import GwSelectionMode
@@ -943,20 +944,40 @@ def open_selected_manager_item(**kwargs):
         if not complet_result:
             tools_log.log_info("FAIL open_selected_manager_item")
             return
-        
 
-def manage_element(element_id, **kwargs):
+
+def manage_element_menu(**kwargs):
     """ Function called in class tools_gw.add_button(...) -->
             widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
 
-    elem = GwElement()
-    elem.get_element(True)
-
-    # If element exist
-    if element_id:
-        tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
-    elem.dlg_add_element.btn_accept.clicked.connect(partial(reload_table_manager, **kwargs))
-
+    # Get widget from kwargs
+    button = kwargs['widget']
+    # Create menu for button
+    btn_menu = QMenu()
+    # Create info feature object for tab_data
+    info_feature = GwInfo('tab_data')
+    # Get list of different element types
+    features_cat = tools_gw.manage_feature_cat()
+    if features_cat is not None:
+        # Get list of feature categories
+        list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
+        # Add FRELEM type features first
+        for feature_cat in list_feature_cat:
+            if feature_cat.feature_class.upper() == 'FRELEM':
+                action_frelem = btn_menu.addAction(feature_cat.id)
+                action_frelem.triggered.connect(partial(info_feature.add_feature, feature_cat))
+        # Add separator between feature types
+        btn_menu.addSeparator()
+        # Get list again for GENELEM features
+        list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
+        # Add GENELEM type features
+        for feature_cat in list_feature_cat:
+            if feature_cat.feature_class.upper() == 'GENELEM':
+                action_genelem = btn_menu.addAction(feature_cat.id)
+                action_genelem.triggered.connect(partial(info_feature.add_feature, feature_cat))
+    # Set and show menu on button
+    button.setMenu(btn_menu)
+    button.showMenu()
 
 def delete_manager_item(**kwargs):
     """ Function called in class tools_gw.add_button(...) -->
