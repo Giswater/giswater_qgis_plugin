@@ -61,7 +61,7 @@ class GwMincutTools:
         tools_gw.load_settings(self.dlg_mincut_man)
 
         self._manage_dlg_widgets(self.complet_result)
-        self.load_connections(self.complet_result)
+        self.load_tableviews(self.complet_result)
 
         self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "tab_none_tbl_mincut_edit")
         tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager')
@@ -70,7 +70,7 @@ class GwMincutTools:
         self.tbl_mincut_edit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tbl_mincut_edit.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, self.tbl_mincut_edit, self.dlg_mincut_man))
 
-    def load_connections(self, complet_result, filter_fields=''):
+    def load_tableviews(self, complet_result, filter_fields=''):
         list_tables = self.dlg_mincut_man.findChildren(QTableView)
         complet_list = []
         for table in list_tables:

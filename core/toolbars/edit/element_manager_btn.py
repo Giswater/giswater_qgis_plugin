@@ -47,7 +47,7 @@ class GwElementManagerButton(GwAction):
 
         # Populate the dialog with fields
         self._populate_dynamic_widgets(self.dlg_mng, json_result)
-        self.load_connections(self.complet_result)
+        self.load_tableviews(self.complet_result)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_mng, dlg_name='element_manager')
@@ -121,7 +121,7 @@ class GwElementManagerButton(GwAction):
                 widget.setContextMenuPolicy(Qt.CustomContextMenu)
                 widget.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, widget, dialog))
 
-    def load_connections(self, complet_result):
+    def load_tableviews(self, complet_result):
         list_tables = self.dlg_mng.findChildren(QTableView)
         complet_list = []
         for table in list_tables:
