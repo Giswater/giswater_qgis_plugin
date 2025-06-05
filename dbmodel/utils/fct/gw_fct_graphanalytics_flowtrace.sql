@@ -82,9 +82,9 @@ BEGIN
 	-- Starting process
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"2772", "parameters":{"param1":"'||upper(v_class)||'"}, "fid":"'||v_fid||'", "is_header":true, "is_process":true}}$$)';
-	
+
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2772", "fid":"'||v_fid||'", "is_header":true, "is_process":true, "label_id":"1001", "separator_id":"2014"}}$$)';
+                       "data":{"function":"2772", "fid":"'||v_fid||'", "is_header":true, "is_process":true, "label_id":"3001", "separator_id":"2014"}}$$)';
 
 
 	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);

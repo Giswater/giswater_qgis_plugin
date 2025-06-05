@@ -102,10 +102,10 @@ BEGIN
                        "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"1004", "separator_id":"2008"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
+                       "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2009"}}$$)';
+                       "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
 
 	-- process
 	-- Create empty dscenario

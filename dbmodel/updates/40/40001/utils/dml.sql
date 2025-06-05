@@ -469,13 +469,6 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('message_type','DEBUG','
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','message_type','sys_message','message_type');
 
--- new messages for audit porpouses:
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1001, '--------', 'Audit separator', 0, true, 'generic', 'core', 'AUDIT');
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1003, '------------------------------', 'Audit separator', 0, true, 'generic', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1005, 'ERRORS', 'Audit separator', 3, true, 'generic', 'core', 'AUDIT');
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1007, 'WARNINGS', 'Audit separator', 2, true, 'generic', 'core', 'AUDIT');
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1009, 'INFO', 'Audit separator', 1, true, 'generic', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1101, 'INFO: Deactivated node proximity check.', 0, 'UD', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1103, 'CONNECT TO NETWORK', 0, 'generic', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, log_level, project_type, source, message_type) VALUES (1105, '-------------------------------------------------------------', 0, 'generic', 'core', 'AUDIT');
@@ -519,9 +512,7 @@ DELETE FROM sys_fprocess WHERE fid IN (202, 542);
 INSERT INTO sys_table (id, descript, sys_role, "source")
 VALUES('sys_label', 'Specific table to keep labels indexed and ready to translate', 'role_admin', 'core');
 
-INSERT INTO sys_label VALUES (1001, 'INFO');
-INSERT INTO sys_label VALUES (1002, 'WARNING');
-INSERT INTO sys_label VALUES (1003, 'ERROR');
+
 
 -- 08/05/2025
 UPDATE config_form_tableview SET columnindex=0 WHERE objectname='tbl_relations' AND columnname='rid';
@@ -592,10 +583,6 @@ UPDATE sys_table SET project_template = '{1}' WHERE id IN (
 	'v_ext_streetaxis',
 	'v_ext_plot'
 );
-UPDATE sys_label SET label_type = 'prefix';
-
-INSERT INTO sys_label (id, idval, label_type)
-VALUES (2030, '------------------------------', 'separator');
 
 UPDATE sys_function SET function_alias = 'CALCULATE THE REACH OF HYDRANTS' WHERE function_name = 'gw_fct_graphanalytics_hydrant';
 
@@ -793,9 +780,27 @@ VALUES(3416, 'Update values of arcs node_1 and node_2.', null, 0, true, 'utils',
 
 UPDATE sys_function SET function_alias = 'END FEATURE' WHERE function_name = 'gw_fct_setendfeature';
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(3001, 'WARNINGS', 'header');
+-- SYS_LABEL
+INSERT INTO sys_label (id, idval, label_type) VALUES (1001, 'INFO', 'prefix');
+INSERT INTO sys_label (id, idval, label_type) VALUES (1002, 'WARNING', 'prefix');
+INSERT INTO sys_label (id, idval, label_type) VALUES (1003, 'ERROR', 'prefix');
+INSERT INTO sys_label (id, idval, label_type) VALUES(1004, 'CRITICAL ERRORS', 'prefix');
+INSERT INTO sys_label (id, idval, label_type) VALUES(1005, 'HINT', 'prefix');
 
+INSERT INTO sys_label (id, idval, label_type) VALUES(3001, 'INFO', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(3002, 'WARNINGS', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(3003, 'ERRORS', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(3006, 'ARC DIVIDE = TRUE', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(3008, 'ARC DIVIDE = FALSE', 'header');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2008, '--------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2009, '---------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2014, '--------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2022, '----------------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2025, '-------------------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES (2030, '------------------------------', 'separator');
+
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3418, '%v_count% additional element(s) related to the downgraded node (%v_feature_id_value%) was/were also related to another operative feature(s) (element_id: %v_element_id%)', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -968,11 +973,8 @@ VALUES(3476, 'Reconnect planned: %v_count% connecs.', null, 0, true, 'utils', 'c
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3478, 'Arc fusion done successfully', null, 0, true, 'utils', 'core', 'UI');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(2022, '----------------------', 'separator');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(3004, 'CRITICAL ERRORS', 'prefix');
 
 UPDATE sys_function SET function_alias = 'FLOWTRACE ANALYTICS' WHERE function_name = 'gw_fct_graphanalytics_flowtrace';
 
@@ -1457,12 +1459,6 @@ UPDATE sys_function SET function_alias = 'NODE ORPHAN (OM) ANALYSIS' WHERE funct
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3602, 'There are no orphan nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(3006, 'ARC DIVIDE = TRUE', 'header');
-
-INSERT INTO sys_label (id, idval, label_type) VALUES(3008, 'ARC DIVIDE = FALSE', 'header');
-
-INSERT INTO sys_label (id, idval, label_type) VALUES(2025, '-------------------------', 'separator');
-
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3604, 'There are %v_count1% orphan nodes with isarcdivide=TRUE.', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -1575,9 +1571,7 @@ VALUES(3668, 'Type: %v_dscenario_type%', NULL, 0, true, 'utils', 'core', 'AUDIT'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3670, 'active: %v_active%', NULL, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(1004, 'ERRORS', 'header');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2008, '--------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2009, '---------', 'separator');
+
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3672, 'ERROR: The dscenario (%v_scenarioid%) already exists with proposed name %v_name%. Please try another one.', NULL, 0, true, 'utils', 'core', 'AUDIT');

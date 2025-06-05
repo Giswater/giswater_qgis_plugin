@@ -99,10 +99,10 @@ BEGIN
                        "data":{"function":"2998", "fid":"251", "criticity":"3", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3004", "separator_id":"2022"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2998", "fid":"251", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2014"}}$$)';
+                       "data":{"function":"2998", "fid":"251", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2014"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2998", "fid":"251", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2007"}}$$)';
+                       "data":{"function":"2998", "fid":"251", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2007"}}$$)';
 
 	-- save state & expl selector
 	IF v_selection_mode !='userSelectors' THEN

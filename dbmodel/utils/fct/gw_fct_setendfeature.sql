@@ -89,10 +89,10 @@ BEGIN
                        "data":{"function":"3068", "fid":"518", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
  	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3068", "fid":"518", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2014"}}$$)';
+                       "data":{"function":"3068", "fid":"518", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2014"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3068", "fid":"518", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2007"}}$$)';
+                       "data":{"function":"3068", "fid":"518", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2007"}}$$)';
 
 
 	FOR v_feature_element IN SELECT json_array_elements(v_feature)

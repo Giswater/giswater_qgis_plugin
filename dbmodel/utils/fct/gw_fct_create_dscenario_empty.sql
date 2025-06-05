@@ -72,10 +72,10 @@ BEGIN
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3662", "function":"3134", "parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
-	
+
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3664", "function":"3134", "parameters":{"v_descript":"'||quote_nullable(v_descript)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
-	
+
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3666", "function":"3134", "parameters":{"v_parent_id":"'||quote_nullable(v_parent_id)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
@@ -91,10 +91,10 @@ BEGIN
                        "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"1004", "separator_id":"2008"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
+                       "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2009"}}$$)';
+                       "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
 
 	-- process
 	-- inserting on catalog table

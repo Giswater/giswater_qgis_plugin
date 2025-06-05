@@ -70,7 +70,8 @@ BEGIN
 	v_temp_table = ((p_data ->>'data')::json->>'tempTable')::text;
 	v_criticity = ((p_data ->>'data')::json->>'criticity')::integer;
 	v_is_header = ((p_data ->>'data')::json->>'is_header')::boolean;
-	v_label_id = ((p_data ->>'data')::json->>'label_id')::text;
+	v_label_id = ((p_data ->>'data')::json->>'label_id')::integer;
+	v_prefix_id = ((p_data ->>'data')::json->>'prefix_id')::integer;
 	v_header_separator_id = ((p_data ->>'data')::json->>'separator_id')::integer;
 
 	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;

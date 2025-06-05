@@ -1029,7 +1029,7 @@ WHERE EXISTS (
   	SELECT 1
   	FROM sel_expl
   	WHERE sel_expl.expl_id = ANY (m.expl_id)
-)
+);
 
 CREATE OR REPLACE VIEW v_edit_samplepoint
 AS SELECT sm.sample_id,
