@@ -49,3 +49,8 @@ DELETE
 UPDATE
     ON
     v_edit_dimensions FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dimensions('dimensions');
+
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF
+DELETE
+    ON
+    v_ui_element FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element();

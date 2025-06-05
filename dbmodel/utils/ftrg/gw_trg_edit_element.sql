@@ -63,12 +63,10 @@ v_man_table TEXT;
 v_customfeature TEXT;
 v_childtable_name TEXT;
 v_element_id TEXT;
-v_view_level TEXT;
 v_feature_type TEXT;
 
 BEGIN
 
-	v_view_level:= TG_ARGV[0];
 	v_tg_table_name = TG_TABLE_NAME;
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -82,7 +80,7 @@ BEGIN
 
 	-- get feature_type and man_table dynamically
 	EXECUTE '
-	SELECT lower(feature_type) FROM cat_feature WHERE '||v_view_level||'_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
+	SELECT lower(feature_type) FROM cat_feature WHERE child_layer = '||quote_literal(v_tg_table_name)||' OR parent_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
 	INTO v_feature_type;
 
 
@@ -91,7 +89,7 @@ BEGIN
 	JOIN cat_feature cf ON cf.id = n.id
 	JOIN sys_feature_class s ON cf.feature_class = s.id
 	JOIN cat_'||v_feature_type||' ON cat_'||v_feature_type||'.id= '||quote_literal(NEW.elementcat_id)||'
-	WHERE n.id = cat_'||v_feature_type||'.'||v_feature_type||'_type AND '||v_view_level||'_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
+	WHERE n.id = cat_'||v_feature_type||'.'||v_feature_type||'_type AND child_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
 	INTO v_man_table;
 
 

@@ -554,7 +554,7 @@ AS SELECT polygon.pol_id,
     JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = element.muni_id);
 
 CREATE OR REPLACE VIEW v_ui_element
-AS SELECT element.element_id AS id,
+AS SELECT element.element_id,
     element.code,
     element.sys_code,
     element.top_elev,
