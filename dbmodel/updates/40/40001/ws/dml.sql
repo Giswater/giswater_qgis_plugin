@@ -566,6 +566,7 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 (3420, 'gw_trg_edit_omzone', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
 (3422, 'gw_trg_presszone_check_datatype', 'ws', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL);
 
+
 -- 02/06/2025
 
 UPDATE sys_function SET function_alias = 'NODE TOPOLOGICAL CONSISTENCY ANALYSIS' WHERE function_name = 'gw_fct_anl_node_topological_consistency';
@@ -621,12 +622,7 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 {"widgetname":"recalculateMinsectors", "label":"Recalculate minsectors:", "widgettype":"check","datatype":"boolean","tooltip":"If true, recalculate minsectors. If false, use existing minsectors" , "layoutname":"grl_option_parameters","layoutorder":3,"value":""},
 {"widgetname":"commitChanges", "label":"Commit changes:", "widgettype":"check","datatype":"boolean","tooltip":"If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables" , "layoutname":"grl_option_parameters","layoutorder":4,"value":""}
 ]'::json, NULL, true, '{4}');
-<<<<<<< Updated upstream
 
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 -- 04/06/2025
 UPDATE sys_function SET function_alias = 'CREATE DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_demand';
 INSERT INTO sys_label (id, idval, label_type) VALUES(1003, 'ERRORS', 'header');
@@ -652,27 +648,10 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES (3540, 'INFO: Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-<<<<<<< Updated upstream
-VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
-=======
+
 VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> a4aeb2474 (feat(function_translation): translate gw_fct_create_dscenario_demand)
-=======
-
-
+VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3706, 'INFO: %v_count% features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -685,5 +664,13 @@ VALUES(3710, 'Exploitation: %v_expl%.', null, 0, true, 'utils', 'core', 'AUDIT')
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3712, 'Selection mode: %v_selectionmode%.', null, 0, true, 'utils', 'core', 'AUDIT');
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+
+UPDATE sys_function SET function_alias = 'SHOW CURRENTLY EXECUTED MINCUTS' WHERE function_name = 'ws_gw_fct_mincut_show_current';
+--03/06/2025
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3542, 'No mincuts are being executed right now: %v_count%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3544, 'There are: %v_count% mincuts being executed at the moment..', null, 0, true, 'utils', 'core', 'AUDIT');
+

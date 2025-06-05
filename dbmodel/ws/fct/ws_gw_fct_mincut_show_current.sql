@@ -50,8 +50,10 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SHOW CURRENTLY EXECUTED MINCUTS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+	VALUES (v_fid, null, 4, concat('SHOW CURRENTLY EXECUTED MINCUTS'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3236", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- getting input data 	
 	v_expl_id := json_extract_path_text(p_data,'data','parameters','explId')::integer;
@@ -84,11 +86,13 @@ BEGIN
 	SELECT count(*) INTO v_count FROM om_mincut WHERE expl_id =v_expl_id and mincut_state = 1;
 
 	IF v_count = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (v_fid,  'No mincuts are being executed right now.', v_count);
+		
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3542", "function":"3236", "v_count":"'||v_count||'", "fid":"'||v_fid||'",  "is_process":true}}$$)';
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (v_fid,  concat ('There are ',v_count,' mincuts being executed at the moment.'), v_count);
+		
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3542", "function":"3236", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'","v_count":"'||v_count||'",  "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT v_fid,  concat ('Mincut_id: ',string_agg(id::text, ', '), '.' ), v_count 
