@@ -621,7 +621,12 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 {"widgetname":"recalculateMinsectors", "label":"Recalculate minsectors:", "widgettype":"check","datatype":"boolean","tooltip":"If true, recalculate minsectors. If false, use existing minsectors" , "layoutname":"grl_option_parameters","layoutorder":3,"value":""},
 {"widgetname":"commitChanges", "label":"Commit changes:", "widgettype":"check","datatype":"boolean","tooltip":"If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables" , "layoutname":"grl_option_parameters","layoutorder":4,"value":""}
 ]'::json, NULL, true, '{4}');
+<<<<<<< Updated upstream
 
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 -- 04/06/2025
 UPDATE sys_function SET function_alias = 'CREATE DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_demand';
 INSERT INTO sys_label (id, idval, label_type) VALUES(1003, 'ERRORS', 'header');
@@ -647,4 +652,38 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES (3540, 'INFO: Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+<<<<<<< Updated upstream
 VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
+=======
+VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> a4aeb2474 (feat(function_translation): translate gw_fct_create_dscenario_demand)
+=======
+
+
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3706, 'INFO: %v_count% features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3708, 'New scenario %v_name% have been created with id:%v_scenarioid%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3710, 'Exploitation: %v_expl%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3712, 'Selection mode: %v_selectionmode%.', null, 0, true, 'utils', 'core', 'AUDIT');
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes

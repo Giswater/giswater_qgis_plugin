@@ -1730,3 +1730,15 @@ UPDATE config_form_fields SET widgetfunction='{
   "functionName": "manage_element_menu",
   "parameters": {}
 }'::json WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+--05/06/2025
+
+UPDATE sys_function SET function_alias = 'CREATE DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_from_toc';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3696, 'ERROR: The dscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3698, 'ERROR: The table chosen does not fit with any epa dscenario. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3700, 'INFO: Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');

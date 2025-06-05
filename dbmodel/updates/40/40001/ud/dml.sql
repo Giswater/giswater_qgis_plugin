@@ -1675,3 +1675,12 @@ UPDATE config_form_fields SET widgetfunction='{
   "functionName": "manage_element_menu",
   "parameters": {}
 }'::json WHERE formname='gully' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+--05/06/2025
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3702, 'New scenario type %v_type% with name ''%v_name%'' and id ''%v_scenarioid%'' have been created.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3704, 'INFO: %v_count% features have been inserted on table %v_targettable%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
