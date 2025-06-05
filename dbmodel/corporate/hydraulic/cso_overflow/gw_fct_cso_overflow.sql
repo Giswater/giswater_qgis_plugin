@@ -113,7 +113,7 @@ BEGIN
 	execute '
 	update cso_inp_system_subc t set imperv_area = a.imperv from (
 		select '||v_thy_plv_drainzone||', sum(st_area('||v_geom_thy_plv||') * '||v_plv_cn||'/100) as imperv from '||v_thy_plv_table||' group by '||v_thy_plv_drainzone||'
-	)a where t.drainzone_id::text = a.'||v_thy_plv_drainzone||'::text;
+	)a where t.drainzone_id = a.'||v_thy_plv_drainzone||';
 	';
 
 	-- area of rainwater thyssen group by drainzone
@@ -121,14 +121,14 @@ BEGIN
 	update cso_inp_system_subc t set thyssen_plv_area = a.area_thy from (
 	select '||v_thy_plv_drainzone||', sum(st_area('||v_geom_thy_plv||')) as area_thy 
 	from '||v_thy_plv_table||' group by '||v_thy_plv_drainzone||'
-	)a where t.drainzone_id::text = a.drainzone_::text
+	)a where t.drainzone_id = a.drainzone_
 	';
 	
 	-- mean_runoff_coef
 	execute '
 	update cso_inp_system_subc t set mean_coef_runoff = a.c_value from (
 	select '||v_thy_plv_drainzone||', avg('||v_plv_ci||') as c_value from '||v_thy_plv_table||' group by '||v_thy_plv_drainzone||'
-	)a where a.'||v_thy_plv_drainzone||'::text = t.drainzone_id
+	)a where a.'||v_thy_plv_drainzone||' = t.drainzone_id
 	';
 	
 	-- sum of demand from sewage thyssen group by drainzone 
@@ -136,7 +136,7 @@ BEGIN
 	update cso_inp_system_subc s set demand = a.consumo from (
 	select '||v_thy_res_drainzone||', sum(consumo_su) as consumo from '||v_thy_res_table||' cntr
 	where '||v_thy_res_drainzone||' is not null
-	group by '||v_thy_res_drainzone||')a where s.drainzone_id::text = a.'||v_thy_res_drainzone||'::text';
+	group by '||v_thy_res_drainzone||')a where s.drainzone_id = a.'||v_thy_res_drainzone||'';
 
 	-- calc of equivalent inhabitants
 	execute '

@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public;
 
 CREATE TABLE cso_inp_system_subc (
 	node_id varchar NOT NULL,
-	drainzone_id varchar NULL,
+	drainzone_id integer NULL,
 	thyssen_plv_area numeric NULL,
 	imperv_area numeric NULL,
 	mean_coef_runoff numeric NULL,
