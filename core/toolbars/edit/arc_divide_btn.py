@@ -135,7 +135,7 @@ class GwArcDivideButton(GwMaptool):
     def _get_selected_action(self, name):
         """ Gets selected action """
 
-        if name == "DRAG-DROP":
+        if name == tools_qt.tr('DRAG-DROP'):
             self.selected_action = 1
         else:
             self.selected_action = 2
