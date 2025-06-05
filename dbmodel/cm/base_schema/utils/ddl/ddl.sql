@@ -575,3 +575,18 @@ CREATE TABLE selector_lot
   CONSTRAINT selector_lot_lot_id_cur_user_unique UNIQUE (lot_id, cur_user)
 
 );
+
+CREATE TABLE cm_log (
+	table_name text NULL,
+	lot_id int4 NULL,
+	feature_id int4 NULL,
+	feature_type text NULL,
+	"action" text NULL,
+	sql text NULL,
+	old_value json NULL,
+	new_value json NULL,
+	insert_by TEXT NULL,
+	insert_at TEXT NULL,
+	CONSTRAINT cm_log_pkey PRIMARY KEY (table_name, lot_id, feature_id, insert_at)
+);
+
