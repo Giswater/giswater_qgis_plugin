@@ -30,6 +30,7 @@ SELECT SCHEMA_NAME.gw_fct_cso_calculation
 WARNING! The name of the tables MUST be within the name of the schema.
 
 
+SELECT ud.gw_fct_cso_calculation($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25830}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"DRAINZONE", "exploitation":"-1", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "commitChanges":"false", "valueForDisconnected":null, "updateMapZone":"0", "geomParamUpdate":null, "macroexplId":"5", "drainzoneId":"456,78"}, "aux_params":null}}$$);
 
 
 
@@ -58,6 +59,10 @@ v_sql text;
 
 v_tstep numeric;
 
+v_selected_macroexpl_id text;
+v_selected_drainzone_id text;
+
+v_partialquery text;
 
 
 BEGIN
@@ -80,6 +85,60 @@ BEGIN
 	v_thy_res_drainzone := ((p_data ->>'data')::json->>'thyssenRes')::json->>'drainzoneId'::text;
 
 	v_tstep := (((p_data ->>'data')::json->>'rainfallParams')::json->>'tstepMinutes')::numeric;
+
+	v_selected_macroexpl_id = (((p_data ->>'data')::json->>'parameters')::json->>'macroexplId')::text;
+	v_selected_drainzone_id = (((p_data ->>'data')::json->>'parameters')::json->>'drainzoneId')::text;
+
+
+	IF v_selected_macroexpl_id IS NOT NULL THEN
+	
+		IF v_selected_macroexpl_id = '-901' THEN -- selected macroexpl
+
+			SELECT string_agg(macroexpl_id::text, ',') into v_selected_macroexpl_id from selector_macroexpl where cur_user = current_user;
+		
+		END IF;
+		
+		v_partialquery = 'WHERE e.macroexpl_id IN ('||v_selected_macroexpl_id||')';
+	
+	ELSE
+	
+		RAISE EXCEPTION 'selected macroexpl_id is null %', v_selected macroexpl_id;
+
+	END IF;
+
+	IF v_selected_drainzone_id IS NOT NULL THEN
+	
+		v_partialquery = v_partialquery ||' AND d.drainzone_id IN ('||v_selected_drainzone_id||')';
+
+	END IF;
+
+
+	if v_partialquery is null then
+
+		RAISE EXCEPTION 'Parameter selection have arrived null';
+
+	end if;
+
+	-- get the drainzones of execution according to selected options
+	v_sql = '
+	SELECT d.drainzone_id
+	FROM drainzone d 
+	JOIN node n ON d.graphconfig::json ->''use''->0 ->>''nodeParent''::TEXT = n.node_id::TEXT
+	JOIN exploitation e ON n.expl_id = e.expl_id '||v_partialquery||'';
+
+	--RAISE EXCEPTION 'v_sql %', v_sql;
+
+	EXECUTE 'SELECT count(*) from ('||v_sql||')a' INTO v_count;
+
+	IF v_count = 0 THEN
+	
+		return '{"status": "Failed", "message":{"level":1, "text":"No drainzones match with selected macroexpl and/or drainzone"}}'::json;
+	
+	ELSE
+	
+		EXECUTE 'SELECT string_agg(drainzone_id::text, '', '') FROM ('||v_sql||')a' INTO v_selected_drainzone_id;	
+	
+	END IF;
 
 
 	-- config variables
@@ -106,7 +165,7 @@ BEGIN
 	drainzone_id,
 	(link::json ->>''qmax'')::numeric as qmax,
 	(link::json ->>''vret'')::numeric as vret
-	from drainzone where link is not null
+	from drainzone where link is not null and drainzone_id IN ('||v_selected_drainzone_id||')
 	on conflict (node_id, drainzone_id) do nothing';
 
 	-- imperv area 
