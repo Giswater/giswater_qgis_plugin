@@ -8,6 +8,5 @@ or (at your option) any later version.
 
 SET search_path = "SCHEMA_NAME", public;
 
-v_returncoeff = (select value::numeric from config_param_system where "parameter" = 'cso_returncoeff');
-v_daily_supply = (select value::numeric from config_param_system where "parameter" = 'cso_daily_supply');
-
+INSERT INTO config_param_system ("parameter", value, descript) VALUES('cso_daily_supply', '150', 'Daily supply of water (L x hab x day)') ON CONFLICT ("parameter") DO NOTHING;
+INSERT INTO config_param_system ("parameter", value, descript) VALUES('cso_returncoeff', '0.8', 'Return coefficient (%)');
