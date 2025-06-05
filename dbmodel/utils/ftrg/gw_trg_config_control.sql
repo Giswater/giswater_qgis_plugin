@@ -51,7 +51,7 @@ BEGIN
 					SELECT id FROM cat_feature
 					WHERE feature_type = ANY (NEW.feature_type)
 					UNION
-					SELECT id FROM element_type
+					SELECT id FROM cat_feature_element
 					) THEN
 						v_variables = concat('table: ',v_configtable,', featurecat: ',rec_feature);
 						v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3172",
@@ -75,7 +75,7 @@ BEGIN
 			--check if all featurecat are present on table cat_feature
 			IF NEW.featurecat_id IS NOT NULL THEN
 				FOREACH rec_feature IN array(NEW.featurecat_id) LOOP
-					IF rec_feature NOT IN (SELECT id FROM cat_feature UNION SELECT id FROM element_type) THEN
+					IF rec_feature NOT IN (SELECT id FROM cat_feature UNION SELECT id FROM cat_feature_element) THEN
 						v_variables = concat('table: ',v_configtable,', featurecat: ',rec_feature);
 						v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3172",
 						"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');

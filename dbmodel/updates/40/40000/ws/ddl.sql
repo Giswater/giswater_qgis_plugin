@@ -1454,7 +1454,7 @@ CREATE TABLE element (
 	top_elev numeric(12, 4) NULL,
 	feature_type varchar(16) DEFAULT 'ELEMENT'::character varying NULL,
 	elementcat_id varchar(30) NOT NULL,
-	epa_type varchar(16) NOT NULL,
+	epa_type varchar(16) NULL,
 	num_elements int4 NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,

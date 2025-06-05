@@ -16,7 +16,7 @@ INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active)
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EPUMP', 'FRELEM', 'ELEMENT', 've_frelem', 've_frelem_epump', true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer)
-SELECT concat('E', upper(REPLACE(id, ' ', '_'))), 'GENELEM', 'ELEMENT', 've_genelem', concat('ve_genelem_', concat('e', lower(REPLACE(id, ' ', '_')))) FROM element_type ON CONFLICT (id) DO NOTHING;
+SELECT concat('E', upper(REPLACE(id, ' ', '_'))), 'GENELEM', 'ELEMENT', 've_genelem', concat('ve_genelem_', concat('e', lower(REPLACE(id, ' ', '_')))) FROM _element_type ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EORIFICE', 'FRELEM', 'ELEMENT', 've_frelem', 've_frelem_eorifice', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EOUTLET', 'FRELEM', 'ELEMENT', 've_frelem', 've_frelem_eoutlet', true) ON CONFLICT (id) DO NOTHING;

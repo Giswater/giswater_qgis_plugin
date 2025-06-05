@@ -186,13 +186,6 @@ BEGIN
 			NEW.element_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 
-		SELECT code_autofill INTO v_code_autofill_bool FROM element_type join cat_element on element_type.id=cat_element.element_type where cat_element.id=NEW.elementcat_id;
-
-		--Copy id to code field
-		IF (v_code_autofill_bool IS TRUE) THEN
-			NEW.code=NEW.element_id;
-		END IF;
-
 		-- LINK
 		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
 			NEW.link=NEW.element_id;

@@ -11,7 +11,7 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_la
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EVALVE', 'FRELEM', 'ELEMENT', 've_frelem', 've_frelem_evalve', true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer)
-SELECT concat('E', upper(REPLACE(id, ' ', '_'))), 'GENELEM', 'ELEMENT', 've_genelem', concat('ve_genelem_', concat('e', lower(REPLACE(id, ' ', '_')))) FROM element_type
+SELECT concat('E', upper(REPLACE(id, ' ', '_'))), 'GENELEM', 'ELEMENT', 've_genelem', concat('ve_genelem_', concat('e', lower(REPLACE(id, ' ', '_')))) FROM _element_type
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_feature (id, feature_class, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
@@ -631,9 +631,6 @@ VALUES(3544, 'There are: %v_count% mincuts being executed at the moment..', null
 
 -- 04/06/2025
 UPDATE sys_function SET function_alias = 'CREATE DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_demand';
-INSERT INTO sys_label (id, idval, label_type) VALUES(1003, 'ERRORS', 'header');
-INSERT INTO sys_label (id, idval, label_type) VALUES(1002, 'WARNINGS', 'header');
-INSERT INTO sys_label (id, idval, label_type) VALUES(1001, 'INFO', 'header');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3530, 'ERROR: The dscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');

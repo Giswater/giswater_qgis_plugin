@@ -196,3 +196,5 @@ UPDATE sys_table SET project_template = NULL;
 
 -- 21/05/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_function", "column":"function_alias", "dataType":"text"}}$$);
+
+ALTER TABLE element_type RENAME TO _element_type;
