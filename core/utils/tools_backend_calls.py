@@ -473,7 +473,9 @@ def open_rpt_result(**kwargs):
     complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type='tab_data')
 
     if not complet_result:
-        tools_log.log_info("FAIL open_rpt_result")
+        msg = "FAIL {0}"
+        msg_params = ("open_rpt_result",)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
 
@@ -506,7 +508,9 @@ def get_info_node(**kwargs):
     complet_result, dialog = custom_form.open_form(table_name='v_edit_node', feature_id=feature_id,
                                                        tab_type='tab_data', is_docker=False)
     if not complet_result:
-        tools_log.log_info("FAIL open_node")
+        msg = "FAIL {0}"
+        msg_params = ("open_node",)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
 
@@ -523,8 +527,9 @@ def get_graph_config(**kwargs):
 
     json_result = kwargs.get('json_result')
     if not json_result or json_result.get('status') != "Accepted":
-        msg = "Function get_graph_config error: json_result from last function is invalid"
-        tools_log.log_warning(msg)
+        msg = "Function {0} error: {1} from last function is invalid"
+        msg_params = ("get_graph_config", "json_result")
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
     has_conflicts = json_result['body']['data'].get('hasConflicts')
@@ -535,15 +540,17 @@ def get_graph_config(**kwargs):
     context = "NETSCENARIO" if netscenario_id else "OPERATIVE"
     mapzone_type = json_result['body']['data'].get('graphClass')
     if not mapzone_type:
-        msg = "Function get_graph_config error: missing key 'graphClass'"
-        tools_log.log_warning(msg)
+        msg = "Function {0} error: missing key {1}"
+        msg_params = ("get_graph_config", "graphClass")
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
     extras = f'"context":"{context}", "mapzone": "{mapzone_type}"'
     body = tools_gw.create_body(extras=extras)
     json_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', body)
     if json_result is None:
-        msg = "Function get_graph_config error: gw_fct_getgraphconfig returned null"
-        tools_log.log_warning(msg)
+        msg = "Function {0} error: {1} returned null"
+        msg_params = ("get_graph_config", "gw_fct_getgraphconfig")
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
 
@@ -581,8 +588,9 @@ def refresh_attribute_table(**kwargs):
     for layer_name in layers_name_list:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if not layer:
-            msg = f"Layer {layer_name} does not found, therefore, not configured"
-            tools_log.log_info(msg)
+            msg = "Layer {0} does not found, therefore, not configured"
+            msg_params = (layer_name,)
+            tools_log.log_info(msg, msg_params=msg_params)
             continue
 
         # Get sys variale
@@ -678,7 +686,9 @@ def set_column_visibility(**kwargs):
         col_name = kwargs["field"]
         hidden = kwargs["hidden"]
     except Exception as e:
-        tools_log.log_info(f"{kwargs}-->{type(e).__name__} --> {e}")
+        msg = "{0} --> {1} --> {2}"
+        msg_params = (kwargs, type(e).__name__, e)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
     config = layer.attributeTableConfig()
@@ -701,7 +711,9 @@ def set_column_multiline(**kwargs):
             layer = tools_qgis.get_layer_by_tablename(layer)
         field_index = kwargs["fieldIndex"]
     except Exception as e:
-        tools_log.log_info(f"{type(e).__name__} --> {e}")
+        msg = "{0} --> {1}"
+        msg_params = (type(e).__name__, e)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
     if field['widgettype'] == 'text':
@@ -721,7 +733,9 @@ def set_read_only(**kwargs):
             layer = tools_qgis.get_layer_by_tablename(layer)
         field_index = kwargs["fieldIndex"]
     except Exception as e:
-        tools_log.log_info(f"{type(e).__name__} --> {e}")
+        msg = "{0} --> {1}"
+        msg_params = (type(e).__name__, e)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
     # Get layer config
     config = layer.editFormConfig()
@@ -751,11 +765,13 @@ def load_qml(**kwargs):
     qml_path = kwargs.get('qmlPath')
 
     if not os.path.exists(qml_path):
-        tools_log.log_warning("File not found", parameter=qml_path)
+        msg = "File not found"
+        tools_log.log_warning(msg, parameter=qml_path)
         return False
 
     if not qml_path.endswith(".qml"):
-        tools_log.log_warning("File extension not valid", parameter=qml_path)
+        msg = "File extension not valid"
+        tools_log.log_warning(msg, parameter=qml_path)
         return False
 
     layer.loadNamedStyle(qml_path)

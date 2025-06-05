@@ -145,7 +145,9 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     """ Load a simple parser value """
 
     if config_type not in ("user", "project"):
-        tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
+        msg = "{0}: Reference {1} = '{2}' it is not managed"
+        msg_params = ("get_config_parser", "config_type", config_type)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return None
 
     # Get configuration filepath and parser object
@@ -159,7 +161,9 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
     # Needed to avoid errors with giswater plugins
     if path is None:
-        tools_log.log_warning("get_config_parser: Config file is not set")
+        msg = "{0}: Config file is not set"
+        msg_params = ("get_config_parser",)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return None
 
     value = None
@@ -167,7 +171,9 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     try:
         if parser is None:
             if plugin == 'core':
-                tools_log.log_info(f"Creating parser for file: {path}")
+                msg = "Creating parser for file: {0}"
+                msg_params = (path,)
+                tools_log.log_info(msg, msg_params=msg_params)
             parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
             parser.read(path)
 
@@ -197,7 +203,9 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         if chk_user_params and config_type in "user":
             _check_user_params(section, raw_parameter, file_name, prefix)
     except Exception as e:
-        tools_log.log_warning(f"get_config_parser exception [{type(e).__name__}]: {e}")
+        msg = "{0} exception [{1}]: {2}"
+        msg_params = ("get_config_parser", type(e).__name__, e)
+        tools_log.log_warning(msg, msg_params=msg_params)
 
     return value
 
@@ -207,7 +215,9 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     """ Save simple parser value """
 
     if config_type not in ("user", "project"):
-        tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
+        msg = "{0}: Reference {1} = '{2}' it is not managed"
+        msg_params = ("set_config_parser", "config_type", config_type)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return None
 
     # Get configuration filepath and parser object
@@ -253,7 +263,9 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
             configfile.close()
 
     except Exception as e:
-        tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
+        msg = "{0} exception [{1}]: {2}"
+        msg_params = ("set_config_parser", type(e).__name__, e)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
 
@@ -964,7 +976,9 @@ def configure_layers_from_table_name(table_name):
     else:
         # Validate if the table_name exists in the table_groups
         if table_name not in table_groups:
-            tools_log.log_info(f"Invalid table_name '{table_name}' provided. No configuration performed.")
+            msg = "Invalid {0} '{1}' provided. No configuration performed."
+            msg_params = ("table_name", table_name)
+            tools_log.log_info(msg, msg_params=msg_params)
             return False
         tables = table_groups[table_name]
 
@@ -986,7 +1000,9 @@ def configure_layers_from_table_name(table_name):
 
         # Validate the result
         if not json_result or json_result.get("status") != "Accepted":
-            tools_log.log_info(f"Failed to configure layer '{table}'. Skipping...")
+            msg = "Failed to configure layer '{0}'. Skipping..."
+            msg_params = (table,)
+            tools_log.log_info(msg, msg_params=msg_params)
             failed_layers.append(table)
             continue
 
@@ -2573,9 +2589,13 @@ def get_actions_from_json(json_result, sql):
                 getattr(tools_backend_calls, f"{function_name}")(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
-                tools_log.log_warning(f"Exception error: {e}")
+                msg = "Exception error: {0}"
+                msg_params = (e,)
+                tools_log.log_warning(msg, msg_params=msg_params)
             except Exception as e:
-                tools_log.log_debug(f"{type(e).__name__}: {e}")
+                msg = "{0}: {1}"
+                msg_params = (type(e).__name__, e,)
+                tools_log.log_debug(msg, msg_params=msg_params)
     except Exception as e:
         msg = "{0}: {1}"
         msg_params = (type(e).__name__, e,)
@@ -2599,9 +2619,12 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
     while json_result is None and attempt < global_vars.exec_procedure_max_retries:
         attempt += 1
         if attempt == 1:
-            tools_log.log_info("Starting process...")
+            msg = "Starting process..."
+            tools_log.log_info(msg)
         else:
-            tools_log.log_info(f"Retrieving process ({attempt}/{global_vars.exec_procedure_max_retries})...")
+            msg = "Retrieving process ({0}/{1})..."
+            msg_params = (attempt, global_vars.exec_procedure_max_retries)
+            tools_log.log_info(msg, msg_params=msg_params)
         json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql, rubber_band, aux_conn,
             is_thread, check_function)
         complet_result = json_result
@@ -2667,14 +2690,17 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     # Execute database function
     row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn, is_thread=is_thread)
     if not row or not row[0]:
-        tools_log.log_warning(f"Function error: {function_name}")
+        msg = "Function error: {0}"
+        msg_params = (function_name,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         tools_log.log_warning(sql)
         return None
 
     # Get json result
     json_result = row[0]
     if log_sql:
-        tools_log.log_db(json_result, header="SERVER RESPONSE")
+        title = "SERVER RESPONSE"
+        tools_log.log_db(json_result, header=title)
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:
@@ -2994,7 +3020,9 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
 
     exists = tools_db.check_table(table_relation)
     if not exists:
-        tools_log.log_info(f"Not found: {table_relation}")
+        msg = "Not found: {0}"
+        msg_params = (table_relation,)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
     if expr_filter is None:
@@ -3134,7 +3162,9 @@ def get_config_value(parameter='', columns='value', table='config_param_user', s
     if not tools_db.check_db_connection():
         return None
     if not tools_db.check_table(table):
-        tools_log.log_warning(f"Table not found: {table}")
+        msg = "Table not found: {0}"
+        msg_params = (table,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return None
 
     sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
@@ -3569,7 +3599,9 @@ def connect_signal_selection_changed(class_object, dialog, table_object, selecti
         global_vars.canvas.selectionChanged.connect(
             partial(selection_changed, class_object, dialog, table_object, selection_mode))
     except Exception as e:
-        tools_log.log_info(f"connect_signal_selection_changed: {e}")
+        msg = "{0}: {1}"
+        msg_params = ("connect_signal_selection_changed", e,)
+        tools_log.log_info(msg, msg_params=msg_params)
 
 
 def docker_dialog(dialog, dlg_name=None):
@@ -3588,7 +3620,9 @@ def docker_dialog(dialog, dlg_name=None):
         global_vars.iface.addDockWidget(positions[lib_vars.session_vars['dialog_docker'].position],
                                         lib_vars.session_vars['dialog_docker'])
     except RuntimeError as e:
-        tools_log.log_warning(f"{type(e).__name__} --> {e}")
+        msg = "{0}: {1}"
+        msg_params = (type(e).__name__, e,)
+        tools_log.log_warning(msg, msg_params=msg_params)
 
 
 def init_docker(docker_param='qgis_info_docker'):
@@ -3750,7 +3784,8 @@ def add_icon(widget, icon, folder="dialogs"):
             widget.setProperty('has_icon', True)
         return QIcon(icon_path)
     else:
-        tools_log.log_info("File not found", parameter=icon_path)
+        msg = "File not found"
+        tools_log.log_info(msg, parameter=icon_path)
         return False
 
 
@@ -3762,7 +3797,8 @@ def get_icon(icon, folder="dialogs"):
     if os.path.exists(icon_path):
         return QIcon(icon_path)
     else:
-        tools_log.log_info("File not found", parameter=icon_path)
+        msg = "File not found"
+        tools_log.log_info(msg, parameter=icon_path)
         return None
 
 
@@ -3845,8 +3881,9 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
     elif type(table_object) is QTableView:
         widget = table_object
     else:
-        msg = "Table_object is not a table name or QTableView"
-        tools_log.log_info(msg)
+        msg = "{0} is not a table name or {1}"
+        msg_params = ("Table_object", "QTableView")
+        tools_log.log_info(msg, msg_params=msg_params)
         return None
 
     table_name = f"{feature_type}"
@@ -4012,8 +4049,9 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     elif type(table_object) is QTableView:
         widget = table_object
     else:
-        msg = "Table_object is not a table name or QTableView"
-        tools_log.log_info(msg)
+        msg = "{0} is not a table name or {1}"
+        msg_params = ("Table_object", "QTableView")
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
     # Control when QTableView is void or has no model
@@ -4195,7 +4233,9 @@ def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
             class_obj = dialog.property('class_obj')
             getattr(class_obj, func_name)(**kwargs)
         except Exception as e:
-            tools_log.log_debug(f"Exception in tools_gw.execute_class_function (executing {func_name} from {dlg_class.__name__}): {e}")
+            msg = "Exception in {0} (executing {1} from {2}): {3}"
+            msg_params = ("tools_gw.execute_class_function", func_name, dlg_class.__name__, e,)
+            tools_log.log_debug(msg, msg_params=msg_params)
 
 
 def open_dlg_help():
@@ -4264,7 +4304,8 @@ def create_sqlite_conn(file_name):
             cursor = conn.cursor()
             status = True
         else:
-            tools_log.log_warning("Config database file not found", parameter=db_path)
+            msg = "Config database file not found"
+            tools_log.log_warning(msg, parameter=db_path)
     except Exception as e:
         tools_log.log_warning(str(e))
 
@@ -4277,7 +4318,9 @@ def manage_user_config_folder(user_folder_dir):
     try:
         config_folder = f"{user_folder_dir}{os.sep}core{os.sep}config{os.sep}"
         if not os.path.exists(config_folder):
-            tools_log.log_info(f"Creating user config folder: {config_folder}")
+            msg = "Creating user config folder: {0}"
+            msg_params = (config_folder,)
+            tools_log.log_info(msg, msg_params=msg_params)
             os.makedirs(config_folder)
 
         # Check if config files exists. If not create them empty
@@ -4289,7 +4332,9 @@ def manage_user_config_folder(user_folder_dir):
             open(filepath, 'a').close()
 
     except Exception as e:
-        tools_log.log_warning(f"manage_user_config_folder: {e}")
+        msg = "{0}: {1}"
+        msg_params = ("manage_user_config_folder", e,)
+        tools_log.log_warning(msg, msg_params=msg_params)
 
 
 def check_old_userconfig(user_folder_dir):
@@ -4408,7 +4453,9 @@ def remove_deprecated_config_vars():
     # Remove deprecated sections for init
     path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
-        tools_log.log_warning(f"File not found: {path}")
+        msg = "File not found: {0}"
+        msg_params = (path,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
     try:
@@ -4430,7 +4477,9 @@ def remove_deprecated_config_vars():
     # Remove deprecated sections for session
     path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
-        tools_log.log_warning(f"File not found: {path}")
+        msg = "File not found: {0}"
+        msg_params = (path,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
     try:
@@ -4452,7 +4501,9 @@ def remove_deprecated_config_vars():
     # Remove deprecated vars for init
     path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
-        tools_log.log_warning(f"File not found: {path}")
+        msg = "File not found: {0}"
+        msg_params = (path,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
     try:
@@ -4479,7 +4530,9 @@ def remove_deprecated_config_vars():
     # Remove deprecated vars for session
     path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
-        tools_log.log_warning(f"File not found: {path}")
+        msg = "File not found: {0}"
+        msg_params = (path,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
     try:
@@ -4640,7 +4693,9 @@ def reset_position_dialog(show_message=False, plugin='core', file_name='session'
             parser.write(configfile)
             configfile.close()
     except Exception as e:
-        tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
+        msg = "{0} exception [{1}]: {2}"
+        msg_params = ("reset_position_dialog", type(e).__name__, e,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
 # endregion
@@ -4871,7 +4926,9 @@ def _get_parser_from_filename(filename):
     parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
     filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
     if not os.path.exists(filepath):
-        tools_log.log_warning(f"File not found: {filepath}")
+        msg = "File not found: {0}"
+        msg_params = (filepath,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return filepath, None
 
     try:

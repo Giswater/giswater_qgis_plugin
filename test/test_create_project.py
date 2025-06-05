@@ -62,8 +62,9 @@ class GwTestQgis:
         lib_vars.session_vars['logged_status'] = status
 
         if self.test_giswater.lib_vars.session_vars['last_error']:
-            msg = self.test_giswater.lib_vars.session_vars['last_error']
-            tools_log.log_info(f"Database connection error: {msg}")
+            msg = "Database connection error: {0}"
+            msg_params = (msg,)
+            tools_log.log_info(msg, msg_params=msg_params)
             return False
 
         return True

@@ -32,16 +32,22 @@ class GwToggleValveTask(GwTask):
         # Execute setfields
         self.json_result = tools_gw.execute_procedure('gw_fct_setfields', body, is_thread=True, aux_conn=self.aux_conn)
         if not self.json_result:
-            tools_log.log_info("Function gw_fct_setfields failed")
+            msg = "Function {0} failed"
+            msg_params = ("gw_fct_setfields",)
+            tools_log.log_info(msg, msg_params=msg_params)
             return False
 
         # Execute mapzonestrigger
         if self.json_result and self.json_result['status'] != 'Failed':
             self.json_result = tools_gw.execute_procedure('gw_fct_setmapzonestrigger', body, is_thread=True, aux_conn=self.aux_conn)
             if not self.json_result:
-                tools_log.log_info("Function gw_fct_setmapzonestrigger failed")
+                msg = "Function {0} failed"
+                msg_params = ("gw_fct_setmapzonestrigger",)
+                tools_log.log_info(msg, msg_params=msg_params)
                 return False
-            tools_log.log_info("Function gw_fct_setmapzonestrigger finished successfully")
+            msg = "Function {0} finished successfully"
+            msg_params = ("gw_fct_setmapzonestrigger",)
+            tools_log.log_info(msg, msg_params=msg_params)
 
         # Refresh canvas
         tools_qgis.refresh_map_canvas()

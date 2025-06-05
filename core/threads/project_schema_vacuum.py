@@ -27,7 +27,9 @@ class GwVacuumSchemaTask(GwTask):
         schema_name = self.params.get('schema_name')
         logs = self.params.get('logs', False)
         verbose = self.params.get('verbose', False)
-        tools_log.log_info("Starting execute_vacuum method")
+        msg = "Starting execute_vacuum method"
+        msg_params = ("execute_vacuum",)
+        tools_log.log_info(msg, msg_params=msg_params)
         sql = (f"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema_name}' AND table_type = 'BASE TABLE' ORDER BY table_name")
         tables = tools_db.get_rows(sql, commit=True)
         # Create a separate connection for vacuum operations
@@ -53,16 +55,21 @@ class GwVacuumSchemaTask(GwTask):
                                     line = line.strip()
                                     if line.startswith("INFO:") and "CPU:" not in line:
                                         tools_log.log_info(line)
-                            tools_log.log_info(f"Vacuum executed: {schema_name}.{table[0].strip()}")
+                            msg = "Vacuum executed: {0}.{1}"
+                            msg_params = (schema_name, table[0].strip(),)
+                            tools_log.log_info(msg, msg_params=msg_params)
                             aux_conn.notices.clear()
                         else:
                             tools_db.execute_sql(f"VACUUM FULL ANALYZE {schema_name}.{table[0].strip()};", 
                                                 commit=False, aux_conn=aux_conn)
                             if logs:
-                                tools_log.log_info(f"Vacuum executed: {schema_name}.{table[0].strip()}")
+                                msg = "Vacuum executed: {0}.{1}"
+                                msg_params = (schema_name, table[0].strip(),)
+                                tools_log.log_info(msg, msg_params=msg_params)
                     except Exception as e:
-                        msg = f"Error executing vacuum: {e}"
-                        tools_log.log_error(msg)
+                        msg = "Error executing vacuum: {0}"
+                        msg_params = (e,)
+                        tools_log.log_error(msg, msg_params=msg_params)
                         return False
         finally:
             # Always clean up the auxiliary connection

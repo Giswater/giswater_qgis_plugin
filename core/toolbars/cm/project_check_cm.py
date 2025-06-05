@@ -37,10 +37,14 @@ class GwProjectCheckCMTask(GwTask):
         layers = self.params['layers']
         init_project = self.params['init_project']
         self.dlg_audit_project = self.params['dialog']
-        tools_log.log_info("Task 'Check project' execute function 'fill_check_project_table'")
+        msg = "Task '{0}' execute function '{1}'"
+        msg_params = ("Check project", "fill_check_project_table")
+        tools_log.log_info(msg, msg_params=msg_params)
         status, self.result = self.fill_check_project_table(layers, init_project)
         if not status:
-            tools_log.log_info("Function fill_check_project_table returned False")
+            msg = "Function '{0}' returned False"
+            msg_params = ("fill_check_project_table",)
+            tools_log.log_info(msg, msg_params=msg_params)
             return False
 
         return True
@@ -162,7 +166,9 @@ class GwProjectCheckCMTask(GwTask):
             if not result or (result['body']['variables']['hideForm'] is True):
                 return result
         except KeyError as e:
-            tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
+            msg = "EXCEPTION: {0}, {1}"
+            msg_params = (type(e).__name__, e,)
+            tools_log.log_warning(msg, msg_params=msg_params)
             return result
 
         return result

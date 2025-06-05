@@ -45,6 +45,7 @@ class GwRecursiveEpa(GwTask):
 
         self.exception = None
         self.error_msg = None
+        self.error_msg_params = None
         self.message = None
         self.common_msg = ""
         self.function_failed = False
@@ -63,8 +64,9 @@ class GwRecursiveEpa(GwTask):
         try:
             self.max_threads = int(max_threads)
         except ValueError:
-            msg = f"Tried to set max_threads to '{max_threads}' but it's not an integer. Defaulting to 4 threads."
-            tools_log.log_warning(msg)
+            msg = "Tried to set {0} to '{1}' but it's not an integer. Defaulting to 4 threads."
+            msg_params = ("max_threads", max_threads,)
+            tools_log.log_warning(msg, msg_params=msg_params)
 
         # Get queries and lists
         lists1, lists2, lists3, queries1, queries2, queries3 = self._get_queries_and_lists()
@@ -204,12 +206,14 @@ class GwRecursiveEpa(GwTask):
 
         # If PostgreSQL function returned null
         if self.complet_result is None:
-            msg = f"Database returned null. Check postgres function '{self.function_name}'"
-            tools_log.log_warning(msg)
+            msg = "Database returned null. Check postgres function '{0}'"
+            msg_params = (self.function_name,)
+            tools_log.log_warning(msg, msg_params=msg_params)
 
         if self.function_failed:
             if self.json_result is None or not self.json_result:
-                tools_log.log_warning("Function failed finished")
+                msg = "Function failed finished"
+                tools_log.log_warning(msg, msg_params=msg_params)
             if self.complet_result:
                 if 'status' in self.complet_result:
                     if "Failed" in self.complet_result['status']:
@@ -222,7 +226,7 @@ class GwRecursiveEpa(GwTask):
         if self.error_msg:
             title = "Task aborted - {0}"
             title_params = (self.description(),)
-            tools_qt.show_info_box(self.error_msg, title=title, title_params=title_params)
+            tools_qt.show_info_box(self.error_msg, title=title, title_params=title_params, msg_params=self.error_msg_params)
             return
 
         if self.exception:
@@ -275,8 +279,10 @@ class GwRecursiveEpa(GwTask):
 
         for i in range(1, 8):
             self.body = tools_gw.create_body(extras=extras + f', "step": {i}')
-            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {i} with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            msg = "Task 'Go2Epa' execute procedure '{1}' step {2} with parameters: '{1}', '{3}', '{4}', '{5}', '{6}'"
+            msg_params = ("gw_fct_pg2epa_main", i, self.body, "log_sql=True", f"aux_conn={self.aux_conn}", 
+                          "is_thread=True",)
+            tools_log.log_info(msg, msg_params=msg_params)
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
                                                      aux_conn=self.aux_conn, is_thread=True)
             if i == 6:
@@ -306,7 +312,8 @@ class GwRecursiveEpa(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info("Export INP file into PostgreSQL")
+        msg = "Export INP file into PostgreSQL"
+        tools_log.log_info(msg)
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
@@ -316,18 +323,21 @@ class GwRecursiveEpa(GwTask):
         self.file_rpt = rptfilename
         if self.file_inp == "null":
             message = "You have to set this parameter"
-            self.error_msg = f"{message}: INP file"
+            self.error_msg = "{0}: INP file"
+            self.error_msg_params = (message,)
             return False
 
         self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
-        self.common_msg += "Export INP finished. "
+        self.common_msg += tools_qt.tr("Export INP finished. ")
 
         return True
 
     def _fill_inp_file(self, folder_path=None, all_rows=None):
 
-        tools_log.log_info(f"Write inp file........: {folder_path}")
+        msg = "Write inp file........: {0}"
+        msg_params = (folder_path,)
+        tools_log.log_info(msg, msg_params=msg_params)
 
         # Generate generic INP file
         file_inp = open(folder_path, "w")
@@ -393,7 +403,8 @@ class GwRecursiveEpa(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info("Execute EPA software")
+        msg = "Execute EPA software"
+        tools_log.log_info(msg)
 
         # Set file to execute
         opener = None
@@ -406,7 +417,8 @@ class GwRecursiveEpa(GwTask):
             return False
 
         if not os.path.exists(opener):
-            self.error_msg = f"File not found: {opener}"
+            self.error_msg = "File not found: {0}"
+            self.error_msg_params = (opener,)
             return False
 
         files_errors = []
@@ -414,11 +426,12 @@ class GwRecursiveEpa(GwTask):
             msg = "INP file not found"
             if file_inp is not None:
                 if not os.path.exists(file_inp):
-                    self.error_msg = f"{msg}: {file_inp}"
+                    self.error_msg = "{0}: {1}"
+                    self.error_msg_params = (msg, file_inp,)
                     files_errors.append(file_inp)
             else:
-                self.error_msg = f"{msg}: {file_inp}"
-
+                self.error_msg = "{0}: {1}"
+                self.error_msg_params = (msg, file_inp,)
         # Using ThreadPoolExecutor to manage concurrent subprocesses
         with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
             # Submitting subprocesses for each file_inp/file_rpt pair
@@ -429,7 +442,7 @@ class GwRecursiveEpa(GwTask):
             for subproc in subprocesses:
                 subproc.result()  # Wait for completion
 
-        self.common_msg += "EPA model finished. "
+        self.common_msg += tools_qt.tr("EPA model finished. ")
 
         return True
 
@@ -446,7 +459,9 @@ class GwRecursiveEpa(GwTask):
     def _import_rpt(self, result_name, file_rpt):
         """ Import result file """
 
-        tools_log.log_info(f"Import rpt file........: {file_rpt}")
+        msg = "Import rpt file........: {0}"
+        msg_params = (file_rpt,)
+        tools_log.log_info(msg, msg_params=msg_params)
 
         self.rpt_result = None
         self.json_rpt = None
@@ -456,7 +471,9 @@ class GwRecursiveEpa(GwTask):
             status = self._read_rpt_file(file_rpt)
             if not status:
                 return False
-            tools_log.log_info("Task 'Go2Epa' execute function 'def _exec_import_function'")
+            msg = "Task 'Go2Epa' execute function 'def _exec_import_function'"
+            msg_params = ("def _exec_import_function",)
+            tools_log.log_info(msg, msg_params=msg_params)
             status = self._exec_import_function(result_name)
         except Exception as e:
             self.error_msg = str(e)
@@ -525,24 +542,30 @@ class GwRecursiveEpa(GwTask):
 
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
-                            error_near = f"Error near line {line_number + 1} -> {dirty_list}"
-                            tools_log.log_info(error_near)
-                            message = (f"The rpt file is not valid to import. "
-                                       f"Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
-                                       f"Please ckeck and fix it before continue. \n"
-                                       f"{error_near}")
+                            msg = "Error near line {0} -> {1}"
+                            msg_params = (line_number + 1, dirty_list,)
+                            tools_log.log_info(msg, msg_params=msg_params)
+                            message = ("The rpt file is not valid to import. "
+                                       "Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
+                                       "Please ckeck and fix it before continue. \n"
+                                       "{0}")
                             self.error_msg = message
+                            error_near = f"{tools_qt.tr('Error near line')} {line_number + 1} -> {dirty_list}"
+                            self.error_msg_params = (error_near,)
                             self._close_file()
                             del full_file
                             return False
                     elif bool(re.search('>50', str(dirty_list[x]))):
-                        error_near = f"Error near line {line_number + 1} -> {dirty_list}"
-                        tools_log.log_info(error_near)
-                        message = (f"The rpt file is not valid to import. "
-                                   f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
-                                   f"Please ckeck and fix it before continue. \n"
-                                   f"{error_near}")
+                        msg = "Error near line {0} -> {1}"
+                        msg_params = (line_number + 1, dirty_list,)
+                        tools_log.log_info(msg, msg_params=msg_params)
+                        message = ("The rpt file is not valid to import. "
+                                   "Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
+                                   "Please ckeck and fix it before continue. \n"
+                                   "{0}")
                         self.error_msg = message
+                        error_near = f"{tools_qt.tr('Error near line')} {line_number + 1} -> {dirty_list}"
+                        self.error_msg_params = (error_near,)
                         self._close_file()
                         del full_file
                         return False
@@ -610,7 +633,7 @@ class GwRecursiveEpa(GwTask):
                 return False
 
         # final message
-        self.common_msg += "Import RPT file finished."
+        self.common_msg += tools_qt.tr("Import RPT file finished.")
 
         return True
 

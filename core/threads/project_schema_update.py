@@ -46,12 +46,12 @@ class GwUpdateSchemaTask(GwTask):
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
         self.admin.progress_value = 0
-        msg = "Task 'Update schema' execute function '{0}'"
-        msg_params = ("def main_execution",)
+        msg = "Task '{0}' execute function '{1}'"
+        msg_params = ("Update schema", "main_execution",)
         tools_log.log_info(msg, msg_params=msg_params)
         status = self.main_execution()
         if not status:
-            msg = "Function {0} returned False"
+            msg = "Function '{0}' returned False"
             msg_params = ("main_execution",)
             tools_log.log_info(msg, msg_params=msg_params)
             return False

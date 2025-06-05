@@ -81,7 +81,9 @@ class GwInpConfig:
             try:
                 data = json.load(file)
             except json.JSONDecodeError as e:
-                tools_log.log_error(f"Error reading configuration file: {e}")
+                msg = "Error reading configuration file: {0}"
+                msg_params = (e,)
+                tools_log.log_error(msg, msg_params=msg_params)
                 return
         self.deserialize(data)
 
@@ -147,9 +149,9 @@ def toolsdb_execute_values(
     sql, argslist, template=None, page_size=100, fetch=False, commit=True
 ):
     if tools_db.dao is None:
-        tools_log.log_warning(
-            "The connection to the database is broken.", parameter=sql
-        )
+        msg = "The connection to the database is broken: {0}"
+        msg_params = (sql,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return None
 
     tools_db.dao.last_error = None
@@ -230,7 +232,9 @@ def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[
         config = GwInpConfig(file_path=self_cls.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
                                 municipality=municipality, dscenario=dscenario, raingage=raingage, catalogs=catalogs)
         config.write_to_file(config_path)
-        tools_log.log_info(f"Configuration saved to {config_path}")
+        msg = "Configuration saved to {0}"
+        msg_params = (config_path,)
+        tools_log.log_info(msg, msg_params=msg_params)
     except Exception as e:
         msg = "Error saving the configuration"
         param = str(e)
