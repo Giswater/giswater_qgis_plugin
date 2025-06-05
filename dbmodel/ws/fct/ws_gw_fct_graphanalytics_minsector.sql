@@ -24,22 +24,24 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"comm
 
 DECLARE
 
-    v_query TEXT;
-    v_data JSON;
-    v_hydrometer_service INT[];
+    -- dialog
     v_expl_id TEXT;
-    v_fid INTEGER = 134;
-    v_querytext TEXT;
-    v_commitchanges BOOLEAN;
-    v_result_info JSON;
-    v_result_point JSON;
-    v_result_line JSON;
-    v_result_polygon JSON;
-    v_result TEXT;
-    v_version TEXT;
+    v_expl_id_array TEXT[];
+    v_usepsectors BOOLEAN;
     v_updatemapzgeom INTEGER;
     v_geomparamupdate FLOAT;
+    v_commitchanges BOOLEAN;
+
+    v_query TEXT;
+    v_data JSON;
+
+    v_hydrometer_service INT[];
+    v_fid INTEGER = 134;
+    v_querytext TEXT;
+
+    v_version TEXT;
     v_srid INTEGER;
+
     v_concavehull FLOAT = 0.85;
     v_visible_layer TEXT;
     v_ignorebrokenvalves BOOLEAN = TRUE;
@@ -47,6 +49,12 @@ DECLARE
     v_macrominsector_id_arc TEXT;
 
     v_response JSON;
+
+    v_result_info JSON;
+    v_result_point JSON;
+    v_result_line JSON;
+    v_result_polygon JSON;
+    v_result TEXT;
 
 	-- LOCK LEVEL LOGIC
 	v_original_disable_locklevel json;
@@ -61,10 +69,25 @@ BEGIN
 
     -- Get variables from input JSON
 	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+    v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 
+	-- MANAGE EXPL ARR
+    -- For user selected exploitations
+    IF v_expl_id = '-901' THEN
+        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
+		FROM selector_expl;
+    -- For all exploitations
+    ELSIF v_expl_id = '-902' THEN
+        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
+        FROM exploitation
+		WHERE active;
+    -- For a specific exploitation/s
+    ELSE
+		v_expl_id_array = string_to_array(v_expl_id, ',');
+    END IF;
 
 	-- Get user variable for disabling lock level
     SELECT value::json INTO v_original_disable_locklevel FROM config_param_user
@@ -98,7 +121,7 @@ BEGIN
 
     -- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id":"' || v_expl_id || '"}}';
+	v_data := '{"data":{"expl_id_array":"' || v_expl_id_array || '", "mapzone_name":"MINSECTOR"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -353,7 +376,7 @@ BEGIN
             FROM arc a
             WHERE a.minsector_id <> '0'
             AND a.macrominsector_id <> '0'
-            AND a.expl_id::TEXT = ANY(string_to_array(v_expl_id, ','));
+            AND a.expl_id::TEXT = ANY(v_expl_id_array);
 
             DELETE FROM minsector_graph WHERE macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','));
         END IF;

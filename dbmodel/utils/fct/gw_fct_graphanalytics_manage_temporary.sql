@@ -163,6 +163,7 @@ BEGIN
 
             CREATE TEMP TABLE temp_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
             CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
+            CREATE TEMP TABLE temp_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
         ELSE
             CREATE TEMP TABLE temp_pgr_drivingdistance (
                 seq INT8 NOT NULL,

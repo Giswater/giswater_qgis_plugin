@@ -763,7 +763,7 @@ BEGIN
 					UNION
 					SELECT mapzone_id, ST_Collect(ext_plot.the_geom) AS geom FROM temp_pgr_connec c
 					JOIN v_temp_connec vc USING (connec_id) 
-					LEFT JOIN ext_plot ON vc.plot_id = ext_plot.id
+					LEFT JOIN ext_plot ON vc.plot_code = ext_plot.plot_code
 					LEFT JOIN ext_plot ON ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
 					WHERE mapzone_id > 0
 					GROUP BY mapzone_id	
