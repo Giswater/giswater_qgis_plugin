@@ -623,6 +623,14 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 {"widgetname":"commitChanges", "label":"Commit changes:", "widgettype":"check","datatype":"boolean","tooltip":"If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables" , "layoutname":"grl_option_parameters","layoutorder":4,"value":""}
 ]'::json, NULL, true, '{4}');
 
+--03/06/2025
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3542, 'No mincuts are being executed right now: %v_count%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3544, 'There are: %v_count% mincuts being executed at the moment..', null, 0, true, 'utils', 'core', 'AUDIT');
+
 -- 04/06/2025
 UPDATE sys_function SET function_alias = 'CREATE DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_demand';
 INSERT INTO sys_label (id, idval, label_type) VALUES(1003, 'ERRORS', 'header');
@@ -648,10 +656,8 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES (3540, 'INFO: Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-
 VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-VALUES (3542, 'INFO: %v_count% rows with features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3706, 'INFO: %v_count% features have been inserted on table %v_table%.', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -666,11 +672,18 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3712, 'Selection mode: %v_selectionmode%.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 UPDATE sys_function SET function_alias = 'SHOW CURRENTLY EXECUTED MINCUTS' WHERE function_name = 'ws_gw_fct_mincut_show_current';
---03/06/2025
+
+UPDATE sys_function SET function_alias = 'DUPLICATE DSCENARIO' WHERE function_name = 'gw_fct_duplicate_dscenario';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3542, 'No mincuts are being executed right now: %v_count%.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3714, 'Copy from: %v_copyfrom%', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3544, 'There are: %v_count% mincuts being executed at the moment..', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3716, 'Expl: %v_expl_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3718, 'INFO: Dscenario named "%v_name%" created with values from dscenario ( %v_copyfrom% )', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3720, 'INFO: Copied values from dscenario ( %v_copyfrom% ) to new dscenario ( %v_scenarioid% )', null, 0, true, 'utils', 'core', 'AUDIT');
 
