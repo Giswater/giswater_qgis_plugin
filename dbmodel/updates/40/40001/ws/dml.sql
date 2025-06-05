@@ -614,7 +614,7 @@ INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_n
 -- WIP new algorithm to recalculate massive mincut with minsector
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3424, 'gw_fct_massivemincut_v1', 'ws', 'function', 'json', 'json', 'Function of graphanalytics for massive mincutzones identification.', 'role_plan', NULL, 'core', NULL);
 
-INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(2768, 'Mincut massive v1', '{"featureType":[]}'::json, '[
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(3424, 'Mincut massive v1', '{"featureType":[]}'::json, '[
 {"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":1, 
 "dvQueryText":"SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "selectedId":"$userExploitation"},
 {"widgetname":"usePlanPsector", "label":"Use selected psectors:", "widgettype":"check","datatype":"boolean","tooltip":"If true, use selected psectors. If false ignore selected psectors and only works with on-service network" , "layoutname":"grl_option_parameters","layoutorder":2,"value":""},
