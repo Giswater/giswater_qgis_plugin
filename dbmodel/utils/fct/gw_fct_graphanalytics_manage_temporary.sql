@@ -163,8 +163,6 @@ BEGIN
 
             CREATE TEMP TABLE temp_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
             CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
-        ELSIF v_fct_name = 'MASSIVEMINCUT' THEN
-            CREATE TEMP TABLE temp_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
         ELSE
             CREATE TEMP TABLE temp_pgr_drivingdistance (
                 seq INT8 NOT NULL,
@@ -181,6 +179,10 @@ BEGIN
             CREATE INDEX temp_pgr_drivingdistance_node ON temp_pgr_drivingdistance USING btree (node);
             CREATE INDEX temp_pgr_drivingdistance_edge ON temp_pgr_drivingdistance USING btree (edge);
             GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_drivingdistance TO role_basic;
+
+            IF v_fct_name = 'MASSIVEMINCUT' THEN
+                CREATE TEMP TABLE temp_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
+            END IF;
         END IF;
 
 

@@ -7,6 +7,7 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3424
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_massivemincut_v1(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_massivemincut_v1(p_data json)
   RETURNS json AS
 $BODY$
@@ -22,7 +23,7 @@ DECLARE
 	v_srid INTEGER;
 	v_project_type TEXT;
 
-	v_fid integer;
+	v_fid integer = 129;
 
 	-- dialog variables
 	v_expl_id text;
@@ -89,12 +90,12 @@ BEGIN
 
 	-- Delete temporary tables
 	-- =======================
-	v_data := '{"data":{"action":"DROP", "fct_name":"MINCUT"}}';
+	v_data := '{"data":{"action":"DROP", "fct_name":"MASSIVEMINCUT"}}';
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
 	-- Create temporary tables
 	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"MINCUT", "use_psector":"'|| v_usepsector ||'"}}';
+	v_data := '{"data":{"action":"CREATE", "fct_name":"MASSIVEMINCUT", "use_psector":"'|| v_usepsector ||'", "expl_id_array":"'|| v_expl_id_array ||'"}}';
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -103,7 +104,7 @@ BEGIN
 
 	-- Start Building Log Message
 	-- =======================
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MASSIVE MINCUT - ', upper(v_class)));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MINCUT DYNAMIC SECTORITZATION'));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('------------------------------------------------------------------'));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Recalculate minsectors: ', upper(v_recalculate_minsectors::text)));
@@ -125,6 +126,17 @@ BEGIN
 
 
 
+	-- Return
+    RETURN gw_fct_json_create_return(
+        ('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done successfully"}, "version":"' || v_version || '"' ||
+        ',"body":{"form":{}' ||
+        ',"data":{"info":' || v_result_info || ',' ||
+        '"point":' || v_result_point || ',' ||
+        '"line":' || v_result_line || ',' ||
+        '"polygon":' || v_result_polygon || '}' ||
+        '}' ||
+        '}')::json, 3424, NULL, ('{"visible": ["' || v_visible_layer || '"]}')::json, NULL
+    );
 
 END;
 $BODY$
