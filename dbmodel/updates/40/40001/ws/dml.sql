@@ -747,6 +747,22 @@ VALUES(3758, '%v_count% nodes were inserted into demand table.', null, 0, true, 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3760, 'Exists %v_count% mapzones without assigned pattern_id. Fill the data before executing the process.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'CREATE EMPTY NETSCENARIO' WHERE function_name = 'gw_fct_create_netscenario_empty';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3762, 'Type: %v_netscenario_type%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3764, 'The netscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3766, 'The new netscenario have been created sucessfully', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'CREATE EMPTY NETSCENARIO' WHERE function_name = 'gw_fct_create_netscenario_from_toc';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3768, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.', null, 0, true, 'utils', 'core', 'AUDIT');
+
 
 
 

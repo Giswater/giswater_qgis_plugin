@@ -72,7 +72,6 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3666", "function":"3260", "parameters":{"v_parent_id":"'||quote_nullable(v_parent_id)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Type: ',v_netscenario_type));
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3762", "function":"3260", "parameters":{"v_netscenario_type":"'||v_netscenario_type||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
@@ -85,10 +84,10 @@ BEGIN
                        "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2008"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
+                       "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
+                       "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
 
 
 	-- process
@@ -103,7 +102,7 @@ BEGIN
 	IF v_scenarioid IS NULL THEN
 		SELECT netscenario_id INTO v_scenarioid FROM plan_netscenario where name = v_name;
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3764", "function":"3260", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"3", "is_process":true}}$$)';
+                       "data":{"message":"3764", "function":"3260", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"3", "prefix_id":"1003", "is_process":true}}$$)';
 
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

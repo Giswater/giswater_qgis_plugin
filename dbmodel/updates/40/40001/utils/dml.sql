@@ -1815,18 +1815,6 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(1007, 'ERROR-403', 'prefix'
 
 INSERT INTO sys_label (id, idval, label_type) VALUES(1008, 'ERROR-357', 'prefix');
 
---06/06/2025
-
-UPDATE sys_function SET function_alias = 'CREATE EMPTY NETSCENARIO' WHERE function_name = 'gw_fct_create_netscenario_empty';
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3762, 'Type: %v_netscenario_type%', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3764, 'ERROR: The netscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3766, 'The new netscenario have been created sucessfully', null, 0, true, 'utils', 'core', 'AUDIT');
 
 
 
