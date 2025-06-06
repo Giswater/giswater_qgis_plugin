@@ -918,8 +918,7 @@ VALUES(3440, 'Reconnect operative: %v_count% connecs.', null, 0, true, 'utils', 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3442, 'Reconnect operative: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3444, 'Reconnect planned: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
+
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3446, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -943,20 +942,21 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3458, 'Delete planned node: %v_node_id%.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3460, 'Warning: There are: %v_count%  orphan nodes related to existing arcs. Column arc_id remains with initial value.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3460, 'There are: %v_count%  orphan nodes related to existing arcs. Column arc_id remains with initial value.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 --28-05-2025
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3462, 'Warning: Connec: %feature_id% has been reconected with new arc_id but keeping the feature exit from initial node.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3462, 'Connec: %feature_id% has been reconected with new arc_id but keeping the feature exit from initial node.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3464, 'Warning: Gully: %feature_id%  has been reconected with new arc_id but keeping the feature exit from initial node.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3464, 'Gully: %feature_id%  has been reconected with new arc_id but keeping the feature exit from initial node.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(3010, 'Warning', 'prefix');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3466, 'Reconnect operative: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3468, 'Delete planned node: %v_node_id%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3470, 'Reconnect operative: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -964,8 +964,7 @@ VALUES(3470, 'Reconnect operative: %v_count% gullies.', null, 0, true, 'utils', 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3472, 'Delete arcs: %arc_id1% , %arc_id2% .', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3474, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
+
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3476, 'Reconnect planned: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
