@@ -67,13 +67,13 @@ BEGIN
                        "data":{"function":"3042", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3726", "function":"3042", "parameters":{"v_target_name":"'||v_target_name||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3726", "function":"3042", "parameters":{"v_target_name":"'||quote_nullable(v_target_name)||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3728", "function":"3042", "parameters":{"v_action":"'||v_action||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3728", "function":"3042", "parameters":{"v_action":"'||quote_nullable(v_action)||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3730", "function":"3042", "parameters":{"v_source_name":"'||v_source_name||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3730", "function":"3042", "parameters":{"v_source_name":"'||quote_nullable(v_source_name)||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
 
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
