@@ -83,7 +83,7 @@ BEGIN
 						"data":{"function":"3112", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "prefix_id":"1002"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"function":"3112", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true"
+						"data":{"function":"3112", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true",
 						"prefix_id":"1001"}}$$)';
 
 	-- inserting on catalog table
