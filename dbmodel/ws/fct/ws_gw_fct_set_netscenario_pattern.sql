@@ -52,11 +52,11 @@ BEGIN
 
   v_netscenario_mapzone = (((p_data ->>'data')::json->>'parameters')::json->>'dscenario_mapzone')::text;
   v_dscenario_demand = (((p_data ->>'data')::json->>'parameters')::json->>'dscenario_demand')::integer;
-  
+
 	-- manage log (fid:  v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('INSERT FEATURES WITH PATTERN INTO DEMAND DSCENARIO'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3258", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
 
 	--check if all mapzones have assigned pattern_id
 
@@ -65,7 +65,7 @@ BEGIN
 	INTO v_count;
 
 	IF v_count = 0 THEN
-		
+
 		EXECUTE 'INSERT INTO inp_dscenario_demand(dscenario_id, feature_id, feature_type, pattern_id)
 		SELECT '||v_dscenario_demand||', connec_id, ''CONNEC'', pattern_id FROM plan_netscenario_connec
 		WHERE netdscenario_id = '||quote_literal(v_netscenario_mapzone)||';';
@@ -74,7 +74,8 @@ BEGIN
 		WHERE dscenario_id =  '||v_dscenario_demand||' AND feature_type = ''CONNEC'''
 		INTO v_count;
 
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count,' connecs  were inserted into demand table.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3756", "function":"3258", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 		EXECUTE 'INSERT INTO inp_dscenario_demand( dscenario_id, feature_id, feature_type, pattern_id)
 		SELECT '||v_dscenario_demand||', node_id, ''NODE'', pattern_id FROM plan_netscenario_node
@@ -84,12 +85,14 @@ BEGIN
 		WHERE dscenario_id =  '||v_dscenario_demand||' AND feature_type = ''NODE'''
 		INTO v_count;
 
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count,' nodes were inserted into demand table.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3758", "function":"3258", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Exists ',v_count,' mapzones without assigned pattern_id. Fill the data before executing the process.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3760", "function":"3258", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	END IF;
 	-- get log (fid: v_fid)
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
 
 	IF v_audit_result is null THEN
@@ -98,20 +101,20 @@ BEGIN
         v_message = 'Process done successfully';
     ELSE
 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
     END IF;
 
 
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-				
+
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+
 	-- Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
             ',"body":{"form":{}'||

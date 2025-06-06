@@ -733,3 +733,22 @@ UPDATE config_toolbox SET inputparams='[
     "value": ""
   }
 ]'::json WHERE id=2706;
+
+--06/06/2025
+
+UPDATE sys_function SET function_alias = 'INSERT FEATURES WITH PATTERN INTO DEMAND DSCENARIO' WHERE function_name = 'gw_fct_set_netscenario_pattern';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3756, '%v_count% connecs  were inserted into demand table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3758, '%v_count% nodes were inserted into demand table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3760, 'Exists %v_count% mapzones without assigned pattern_id. Fill the data before executing the process.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
+
