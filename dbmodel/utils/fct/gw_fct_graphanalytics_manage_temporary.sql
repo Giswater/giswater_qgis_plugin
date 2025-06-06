@@ -864,6 +864,9 @@ BEGIN
             DROP TABLE IF EXISTS temp_minsector;
         ELSE
             DROP TABLE IF EXISTS temp_pgr_drivingdistance;
+            IF v_fct_name = 'MASSIVEMINCUT' THEN
+                DROP TABLE IF EXISTS temp_minsector_mincut;
+            END IF;
         END IF;
 
         -- Drop temporary views
