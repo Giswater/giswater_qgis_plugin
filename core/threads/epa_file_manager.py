@@ -512,7 +512,7 @@ class GwEpaFileManager(GwTask):
                                     "{2}")
                         self.error_msg = message
                         error_near = f"{tools_qt.tr('Error near line')} {line_number + 1} -> {dirty_list}"
-                        self.error_msg_params = ("force_import_velocity_higher_50ms",  "init.config", error_near,)
+                        self.error_msg_params = ("force_import_velocity_higher_50ms", "init.config", error_near,)
                         self._close_file()
                         del full_file
                         return False
