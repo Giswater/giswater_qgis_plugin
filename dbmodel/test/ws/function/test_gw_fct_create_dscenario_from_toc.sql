@@ -38,7 +38,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -53,7 +53,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -68,7 +68,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -83,7 +83,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -98,7 +98,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -113,7 +113,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -128,7 +128,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -143,7 +143,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -158,7 +158,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -173,7 +173,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -188,7 +188,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -203,7 +203,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -218,7 +218,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -233,7 +233,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -248,7 +248,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -263,7 +263,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -278,7 +278,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -293,7 +293,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -308,7 +308,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -323,7 +323,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -338,7 +338,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -353,7 +353,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -368,7 +368,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -383,7 +383,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -398,7 +398,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -413,7 +413,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -428,7 +428,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -443,7 +443,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -458,7 +458,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -473,7 +473,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -488,7 +488,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -503,7 +503,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -518,7 +518,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -533,7 +533,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -548,7 +548,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -563,7 +563,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -578,7 +578,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -593,7 +593,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -608,7 +608,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -623,7 +623,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -638,7 +638,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -653,7 +653,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -668,7 +668,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -683,7 +683,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -698,7 +698,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -713,7 +713,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -728,7 +728,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -743,7 +743,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -758,7 +758,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -773,7 +773,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -788,7 +788,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -803,7 +803,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -818,7 +818,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -833,7 +833,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -848,7 +848,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -863,7 +863,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -878,7 +878,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -893,7 +893,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -908,7 +908,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -923,7 +923,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -938,7 +938,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -953,7 +953,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -968,7 +968,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -983,7 +983,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -998,7 +998,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1013,7 +1013,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1028,7 +1028,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1043,7 +1043,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1058,7 +1058,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1073,7 +1073,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1088,7 +1088,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1103,7 +1103,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1118,7 +1118,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1133,7 +1133,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1148,7 +1148,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1163,7 +1163,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1178,7 +1178,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1193,7 +1193,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1208,7 +1208,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1223,7 +1223,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1238,7 +1238,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1253,7 +1253,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1268,7 +1268,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1283,7 +1283,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1298,7 +1298,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1313,7 +1313,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1328,7 +1328,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1343,7 +1343,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1358,7 +1358,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1373,7 +1373,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1388,7 +1388,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1403,7 +1403,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1418,7 +1418,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1433,7 +1433,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1448,7 +1448,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1463,7 +1463,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1478,7 +1478,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1493,7 +1493,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1508,7 +1508,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1523,7 +1523,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1538,7 +1538,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1553,7 +1553,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1568,7 +1568,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1583,7 +1583,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1598,7 +1598,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1613,7 +1613,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1628,7 +1628,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1643,7 +1643,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1658,7 +1658,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1673,7 +1673,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1688,7 +1688,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1703,7 +1703,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1718,7 +1718,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1733,7 +1733,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1748,7 +1748,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1763,7 +1763,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1778,7 +1778,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1793,7 +1793,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1808,7 +1808,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1823,7 +1823,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1838,7 +1838,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1853,7 +1853,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1868,7 +1868,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1883,7 +1883,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1898,7 +1898,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1913,7 +1913,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1928,7 +1928,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1943,7 +1943,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1958,7 +1958,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1973,7 +1973,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -1988,7 +1988,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2003,7 +2003,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2018,7 +2018,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2033,7 +2033,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2048,7 +2048,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2063,7 +2063,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2078,7 +2078,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2093,7 +2093,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2108,7 +2108,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2123,7 +2123,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2138,7 +2138,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2153,7 +2153,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2168,7 +2168,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2183,7 +2183,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2198,7 +2198,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2213,7 +2213,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2228,7 +2228,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2243,7 +2243,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2258,7 +2258,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2273,7 +2273,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2288,7 +2288,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2303,7 +2303,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2318,7 +2318,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2333,7 +2333,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2348,7 +2348,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2363,7 +2363,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2378,7 +2378,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2393,7 +2393,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2408,7 +2408,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2423,7 +2423,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2438,7 +2438,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2453,7 +2453,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2468,7 +2468,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2483,7 +2483,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2498,7 +2498,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2513,7 +2513,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2528,7 +2528,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2543,7 +2543,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2558,7 +2558,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2573,7 +2573,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2588,7 +2588,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2603,7 +2603,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2618,7 +2618,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2633,7 +2633,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2648,7 +2648,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2663,7 +2663,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2678,7 +2678,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2693,7 +2693,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2708,7 +2708,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2723,7 +2723,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2738,7 +2738,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2753,7 +2753,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2768,7 +2768,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2783,7 +2783,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2798,7 +2798,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2813,7 +2813,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2828,7 +2828,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2843,7 +2843,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2858,7 +2858,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2873,7 +2873,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2888,7 +2888,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2903,7 +2903,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2918,7 +2918,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2933,7 +2933,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2948,7 +2948,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2963,7 +2963,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2978,7 +2978,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -2993,7 +2993,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3008,7 +3008,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3023,7 +3023,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3038,7 +3038,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3053,7 +3053,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3068,7 +3068,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3083,7 +3083,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3098,7 +3098,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3113,7 +3113,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3128,7 +3128,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3143,7 +3143,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3158,7 +3158,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3173,7 +3173,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3188,7 +3188,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3203,7 +3203,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3218,7 +3218,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3233,7 +3233,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3248,7 +3248,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3263,7 +3263,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_virtualpump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3278,7 +3278,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3293,7 +3293,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3308,7 +3308,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3323,7 +3323,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3338,7 +3338,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3353,7 +3353,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3368,7 +3368,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3383,7 +3383,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3398,7 +3398,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3413,7 +3413,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3428,7 +3428,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3443,7 +3443,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3458,7 +3458,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3473,7 +3473,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3488,7 +3488,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3503,7 +3503,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3518,7 +3518,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3533,7 +3533,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3548,7 +3548,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3563,7 +3563,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3578,7 +3578,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3593,7 +3593,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3608,7 +3608,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3623,7 +3623,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3638,7 +3638,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3653,7 +3653,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3668,7 +3668,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3683,7 +3683,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3698,7 +3698,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3713,7 +3713,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3728,7 +3728,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3743,7 +3743,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3758,7 +3758,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3773,7 +3773,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3788,7 +3788,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3803,7 +3803,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3818,7 +3818,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3833,7 +3833,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3848,7 +3848,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3863,7 +3863,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3878,7 +3878,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3893,7 +3893,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3908,7 +3908,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3923,7 +3923,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3938,7 +3938,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3953,7 +3953,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3968,7 +3968,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3983,7 +3983,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -3998,7 +3998,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4013,7 +4013,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4028,7 +4028,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4043,7 +4043,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4058,7 +4058,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4073,7 +4073,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4088,7 +4088,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4103,7 +4103,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4118,7 +4118,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4133,7 +4133,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4148,7 +4148,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4163,7 +4163,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4178,7 +4178,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4193,7 +4193,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4208,7 +4208,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4223,7 +4223,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4238,7 +4238,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4253,7 +4253,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4268,7 +4268,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4283,7 +4283,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4298,7 +4298,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4313,7 +4313,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4328,7 +4328,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4343,7 +4343,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4358,7 +4358,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4373,7 +4373,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4388,7 +4388,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4403,7 +4403,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4418,7 +4418,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4433,7 +4433,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4448,7 +4448,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4463,7 +4463,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4478,7 +4478,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4493,7 +4493,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4508,7 +4508,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4523,7 +4523,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4538,7 +4538,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4553,7 +4553,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4568,7 +4568,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4583,7 +4583,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4598,7 +4598,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4613,7 +4613,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4628,7 +4628,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4643,7 +4643,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4658,7 +4658,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4673,7 +4673,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4688,7 +4688,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4703,7 +4703,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4718,7 +4718,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4733,7 +4733,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4748,7 +4748,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4763,7 +4763,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4778,7 +4778,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4793,7 +4793,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4808,7 +4808,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4823,7 +4823,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4838,7 +4838,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4853,7 +4853,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4868,7 +4868,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4883,7 +4883,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_connec", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4898,7 +4898,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4913,7 +4913,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4928,7 +4928,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4943,7 +4943,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4958,7 +4958,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4973,7 +4973,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -4988,7 +4988,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5003,7 +5003,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5018,7 +5018,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5033,7 +5033,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5048,7 +5048,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5063,7 +5063,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5078,7 +5078,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5093,7 +5093,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5108,7 +5108,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5123,7 +5123,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5138,7 +5138,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5153,7 +5153,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5168,7 +5168,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5183,7 +5183,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5198,7 +5198,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5213,7 +5213,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5228,7 +5228,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5243,7 +5243,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5258,7 +5258,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5273,7 +5273,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5288,7 +5288,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5303,7 +5303,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5318,7 +5318,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5333,7 +5333,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5348,7 +5348,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5363,7 +5363,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5378,7 +5378,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5393,7 +5393,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5408,7 +5408,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5423,7 +5423,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5438,7 +5438,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5453,7 +5453,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5468,7 +5468,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5483,7 +5483,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5498,7 +5498,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5513,7 +5513,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5528,7 +5528,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5543,7 +5543,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5558,7 +5558,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5573,7 +5573,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5588,7 +5588,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5603,7 +5603,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5618,7 +5618,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5633,7 +5633,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5648,7 +5648,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5663,7 +5663,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5678,7 +5678,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5693,7 +5693,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5708,7 +5708,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5723,7 +5723,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5738,7 +5738,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5753,7 +5753,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5768,7 +5768,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5783,7 +5783,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5798,7 +5798,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5813,7 +5813,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5828,7 +5828,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5843,7 +5843,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5858,7 +5858,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5873,7 +5873,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5888,7 +5888,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5903,7 +5903,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5918,7 +5918,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5933,7 +5933,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5948,7 +5948,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5963,7 +5963,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5978,7 +5978,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -5993,7 +5993,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6008,7 +6008,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6023,7 +6023,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6038,7 +6038,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6053,7 +6053,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6068,7 +6068,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6083,7 +6083,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6098,7 +6098,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6113,7 +6113,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6128,7 +6128,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6143,7 +6143,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6158,7 +6158,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6173,7 +6173,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6188,7 +6188,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6203,7 +6203,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6218,7 +6218,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6233,7 +6233,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6248,7 +6248,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6263,7 +6263,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6278,7 +6278,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6293,7 +6293,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6308,7 +6308,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6323,7 +6323,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6338,7 +6338,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6353,7 +6353,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6368,7 +6368,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6383,7 +6383,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6398,7 +6398,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6413,7 +6413,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6428,7 +6428,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6443,7 +6443,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6458,7 +6458,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6473,7 +6473,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6488,7 +6488,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6503,7 +6503,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_junction", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6518,7 +6518,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6533,7 +6533,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6548,7 +6548,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6563,7 +6563,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6578,7 +6578,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6593,7 +6593,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6608,7 +6608,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6623,7 +6623,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6638,7 +6638,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6653,7 +6653,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6668,7 +6668,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6683,7 +6683,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6698,7 +6698,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6713,7 +6713,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6728,7 +6728,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6743,7 +6743,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6758,7 +6758,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6773,7 +6773,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6788,7 +6788,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6803,7 +6803,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6818,7 +6818,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6833,7 +6833,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6848,7 +6848,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6863,7 +6863,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6878,7 +6878,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6893,7 +6893,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6908,7 +6908,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6923,7 +6923,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6938,7 +6938,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6953,7 +6953,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6968,7 +6968,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6983,7 +6983,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -6998,7 +6998,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7013,7 +7013,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7028,7 +7028,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7043,7 +7043,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7058,7 +7058,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7073,7 +7073,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7088,7 +7088,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7103,7 +7103,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7118,7 +7118,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7133,7 +7133,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7148,7 +7148,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7163,7 +7163,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7178,7 +7178,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7193,7 +7193,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7208,7 +7208,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7223,7 +7223,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7238,7 +7238,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7253,7 +7253,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7268,7 +7268,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7283,7 +7283,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7298,7 +7298,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7313,7 +7313,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7328,7 +7328,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7343,7 +7343,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7358,7 +7358,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7373,7 +7373,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7388,7 +7388,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7403,7 +7403,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7418,7 +7418,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7433,7 +7433,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7448,7 +7448,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7463,7 +7463,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7478,7 +7478,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7493,7 +7493,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7508,7 +7508,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7523,7 +7523,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7538,7 +7538,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7553,7 +7553,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7568,7 +7568,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7583,7 +7583,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7598,7 +7598,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7613,7 +7613,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7628,7 +7628,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7643,7 +7643,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7658,7 +7658,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7673,7 +7673,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7688,7 +7688,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7703,7 +7703,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7718,7 +7718,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7733,7 +7733,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7748,7 +7748,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7763,7 +7763,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7778,7 +7778,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7793,7 +7793,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7808,7 +7808,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7823,7 +7823,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7838,7 +7838,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7853,7 +7853,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7868,7 +7868,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7883,7 +7883,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7898,7 +7898,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7913,7 +7913,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7928,7 +7928,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7943,7 +7943,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7958,7 +7958,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7973,7 +7973,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -7988,7 +7988,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8003,7 +8003,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8018,7 +8018,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8033,7 +8033,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8048,7 +8048,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8063,7 +8063,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8078,7 +8078,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8093,7 +8093,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8108,7 +8108,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8123,7 +8123,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8138,7 +8138,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8153,7 +8153,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8168,7 +8168,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8183,7 +8183,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8198,7 +8198,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8213,7 +8213,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8228,7 +8228,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8243,7 +8243,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8258,7 +8258,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8273,7 +8273,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8288,7 +8288,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8303,7 +8303,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8318,7 +8318,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8333,7 +8333,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8348,7 +8348,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8363,7 +8363,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8378,7 +8378,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8393,7 +8393,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8408,7 +8408,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8423,7 +8423,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8438,7 +8438,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8453,7 +8453,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8468,7 +8468,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8483,7 +8483,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8498,7 +8498,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8513,7 +8513,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8528,7 +8528,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8543,7 +8543,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8558,7 +8558,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8573,7 +8573,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8588,7 +8588,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8603,7 +8603,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8618,7 +8618,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8633,7 +8633,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8648,7 +8648,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8663,7 +8663,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8678,7 +8678,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8693,7 +8693,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8708,7 +8708,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8723,7 +8723,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8738,7 +8738,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8753,7 +8753,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8768,7 +8768,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8783,7 +8783,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8798,7 +8798,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8813,7 +8813,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8828,7 +8828,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8843,7 +8843,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8858,7 +8858,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8873,7 +8873,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8888,7 +8888,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8903,7 +8903,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8918,7 +8918,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8933,7 +8933,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8948,7 +8948,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8963,7 +8963,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8978,7 +8978,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -8993,7 +8993,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9008,7 +9008,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9023,7 +9023,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9038,7 +9038,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9053,7 +9053,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9068,7 +9068,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9083,7 +9083,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9098,7 +9098,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9113,7 +9113,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9128,7 +9128,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9143,7 +9143,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9158,7 +9158,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9173,7 +9173,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9188,7 +9188,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9203,7 +9203,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9218,7 +9218,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9233,7 +9233,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9248,7 +9248,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9263,7 +9263,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9278,7 +9278,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9293,7 +9293,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9308,7 +9308,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9323,7 +9323,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9338,7 +9338,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9353,7 +9353,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9368,7 +9368,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9383,7 +9383,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9398,7 +9398,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9413,7 +9413,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9428,7 +9428,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9443,7 +9443,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9458,7 +9458,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9473,7 +9473,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9488,7 +9488,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9503,7 +9503,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9518,7 +9518,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9533,7 +9533,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9548,7 +9548,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9563,7 +9563,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9578,7 +9578,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9593,7 +9593,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9608,7 +9608,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9623,7 +9623,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9638,7 +9638,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9653,7 +9653,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9668,7 +9668,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9683,7 +9683,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9698,7 +9698,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9713,7 +9713,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9728,7 +9728,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9743,7 +9743,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9758,7 +9758,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9773,7 +9773,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9788,7 +9788,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9803,7 +9803,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9818,7 +9818,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9833,7 +9833,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9848,7 +9848,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9863,7 +9863,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9878,7 +9878,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9893,7 +9893,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9908,7 +9908,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9923,7 +9923,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9938,7 +9938,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9953,7 +9953,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9968,7 +9968,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9983,7 +9983,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -9998,7 +9998,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10013,7 +10013,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10028,7 +10028,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10043,7 +10043,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10058,7 +10058,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10073,7 +10073,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10088,7 +10088,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10103,7 +10103,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10118,7 +10118,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10133,7 +10133,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10148,7 +10148,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10163,7 +10163,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10178,7 +10178,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10193,7 +10193,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10208,7 +10208,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10223,7 +10223,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10238,7 +10238,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10253,7 +10253,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10268,7 +10268,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10283,7 +10283,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10298,7 +10298,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10313,7 +10313,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10328,7 +10328,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10343,7 +10343,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10358,7 +10358,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10373,7 +10373,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10388,7 +10388,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10403,7 +10403,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10418,7 +10418,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10433,7 +10433,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10448,7 +10448,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10463,7 +10463,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10478,7 +10478,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10493,7 +10493,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10508,7 +10508,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10523,7 +10523,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10538,7 +10538,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10553,7 +10553,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10568,7 +10568,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10583,7 +10583,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10598,7 +10598,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10613,7 +10613,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10628,7 +10628,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10643,7 +10643,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10658,7 +10658,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10673,7 +10673,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10688,7 +10688,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10703,7 +10703,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10718,7 +10718,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10733,7 +10733,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10748,7 +10748,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10763,7 +10763,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10778,7 +10778,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10793,7 +10793,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10808,7 +10808,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10823,7 +10823,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10838,7 +10838,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10853,7 +10853,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10868,7 +10868,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10883,7 +10883,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10898,7 +10898,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10913,7 +10913,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10928,7 +10928,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10943,7 +10943,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10958,7 +10958,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10973,7 +10973,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -10988,7 +10988,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11003,7 +11003,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11018,7 +11018,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11033,7 +11033,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11048,7 +11048,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11063,7 +11063,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11078,7 +11078,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11093,7 +11093,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11108,7 +11108,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11123,7 +11123,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11138,7 +11138,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11153,7 +11153,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11168,7 +11168,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11183,7 +11183,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11198,7 +11198,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11213,7 +11213,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11228,7 +11228,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11243,7 +11243,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11258,7 +11258,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11273,7 +11273,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11288,7 +11288,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11303,7 +11303,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11318,7 +11318,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11333,7 +11333,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11348,7 +11348,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11363,7 +11363,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11378,7 +11378,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11393,7 +11393,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11408,7 +11408,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11423,7 +11423,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11438,7 +11438,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11453,7 +11453,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11468,7 +11468,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11483,7 +11483,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11498,7 +11498,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11513,7 +11513,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11528,7 +11528,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11543,7 +11543,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11558,7 +11558,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11573,7 +11573,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11588,7 +11588,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11603,7 +11603,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11618,7 +11618,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11633,7 +11633,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11648,7 +11648,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11663,7 +11663,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11678,7 +11678,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11693,7 +11693,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11708,7 +11708,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11723,7 +11723,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11738,7 +11738,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11753,7 +11753,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11768,7 +11768,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11783,7 +11783,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11798,7 +11798,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11813,7 +11813,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11828,7 +11828,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11843,7 +11843,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11858,7 +11858,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11873,7 +11873,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11888,7 +11888,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11903,7 +11903,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11918,7 +11918,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11933,7 +11933,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11948,7 +11948,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11963,7 +11963,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11978,7 +11978,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -11993,7 +11993,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12008,7 +12008,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12023,7 +12023,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12038,7 +12038,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12053,7 +12053,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12068,7 +12068,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12083,7 +12083,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12098,7 +12098,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12113,7 +12113,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12128,7 +12128,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12143,7 +12143,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12158,7 +12158,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12173,7 +12173,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12188,7 +12188,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12203,7 +12203,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12218,7 +12218,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12233,7 +12233,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12248,7 +12248,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12263,7 +12263,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12278,7 +12278,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12293,7 +12293,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12308,7 +12308,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12323,7 +12323,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12338,7 +12338,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12353,7 +12353,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12368,7 +12368,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12383,7 +12383,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12398,7 +12398,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12413,7 +12413,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12428,7 +12428,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12443,7 +12443,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12458,7 +12458,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12473,7 +12473,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12488,7 +12488,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12503,7 +12503,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12518,7 +12518,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12533,7 +12533,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12548,7 +12548,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12563,7 +12563,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12578,7 +12578,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12593,7 +12593,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12608,7 +12608,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12623,7 +12623,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12638,7 +12638,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12653,7 +12653,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12668,7 +12668,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12683,7 +12683,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12698,7 +12698,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12713,7 +12713,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12728,7 +12728,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12743,7 +12743,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12758,7 +12758,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12773,7 +12773,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12788,7 +12788,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12803,7 +12803,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12818,7 +12818,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12833,7 +12833,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12848,7 +12848,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12863,7 +12863,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12878,7 +12878,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12893,7 +12893,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12908,7 +12908,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12923,7 +12923,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12938,7 +12938,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12953,7 +12953,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12968,7 +12968,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12983,7 +12983,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_tank", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -12998,7 +12998,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13013,7 +13013,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13028,7 +13028,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13043,7 +13043,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13058,7 +13058,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13073,7 +13073,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"DEMAND", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13088,7 +13088,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13103,7 +13103,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13118,7 +13118,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13133,7 +13133,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13148,7 +13148,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13163,7 +13163,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13178,7 +13178,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13193,7 +13193,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13208,7 +13208,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13223,7 +13223,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13238,7 +13238,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13253,7 +13253,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"INLET", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13268,7 +13268,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13283,7 +13283,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13298,7 +13298,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13313,7 +13313,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13328,7 +13328,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13343,7 +13343,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13358,7 +13358,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13373,7 +13373,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13388,7 +13388,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13403,7 +13403,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13418,7 +13418,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13433,7 +13433,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"PIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13448,7 +13448,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13463,7 +13463,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13478,7 +13478,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13493,7 +13493,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13508,7 +13508,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13523,7 +13523,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JOINED", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13538,7 +13538,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13553,7 +13553,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13568,7 +13568,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13583,7 +13583,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13598,7 +13598,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13613,7 +13613,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"OTHER", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13628,7 +13628,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13643,7 +13643,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13658,7 +13658,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13673,7 +13673,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13688,7 +13688,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13703,7 +13703,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"JUNCTION", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13718,7 +13718,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13733,7 +13733,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13748,7 +13748,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13763,7 +13763,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13778,7 +13778,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13793,7 +13793,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONNEC", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13808,7 +13808,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13823,7 +13823,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13838,7 +13838,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13853,7 +13853,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13868,7 +13868,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13883,7 +13883,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"SHORTPIPE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13898,7 +13898,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13913,7 +13913,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13928,7 +13928,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13943,7 +13943,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13958,7 +13958,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13973,7 +13973,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALVALVE", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -13988,7 +13988,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14003,7 +14003,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14018,7 +14018,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14033,7 +14033,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14048,7 +14048,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14063,7 +14063,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"VIRTUALPUMP", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14078,7 +14078,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14093,7 +14093,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14108,7 +14108,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14123,7 +14123,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14138,7 +14138,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14153,7 +14153,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"ADDITIONAL", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14168,7 +14168,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14183,7 +14183,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14198,7 +14198,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14213,7 +14213,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14228,7 +14228,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14243,7 +14243,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"CONTROLS", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14258,7 +14258,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14273,7 +14273,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14288,7 +14288,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14303,7 +14303,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14318,7 +14318,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14333,7 +14333,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RULES", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14348,7 +14348,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14363,7 +14363,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14378,7 +14378,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14393,7 +14393,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14408,7 +14408,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14423,7 +14423,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"RESERVOIR", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14438,7 +14438,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14453,7 +14453,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14468,7 +14468,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14483,7 +14483,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14498,7 +14498,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14513,7 +14513,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"TANK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14528,7 +14528,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14543,7 +14543,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"0", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14558,7 +14558,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14573,7 +14573,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"1", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14588,7 +14588,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"previousSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',
@@ -14603,7 +14603,7 @@ SELECT is(
         "feature":{"tableName":"v_edit_inp_valve", "featureType":"ARC", "id":[]},
         "data":{"filterFields":{}, "pageInfo":{},
         "selectionMode":"wholeSelection",
-        "parameters":{"name":null, "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
+        "parameters":{"name":"test", "descript":null, "type":"NETWORK", "exploitation":"2", "descript":null},
         "aux_params":null}
     }$$)::JSON)->>'status',
     'Accepted',

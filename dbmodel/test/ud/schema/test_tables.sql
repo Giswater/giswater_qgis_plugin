@@ -11,7 +11,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(327);
+SELECT plan(326);
 
 SELECT has_table('anl_arc') AS "Table 'anl_arc' exists";
 SELECT has_table('anl_arc_x_node') AS "Table 'anl_arc_x_node' exists";
@@ -87,7 +87,6 @@ SELECT has_table('doc_x_visit') AS "Table 'doc_x_visit' exists";
 SELECT has_table('doc_x_workcat') AS "Table 'doc_x_workcat' exists";
 SELECT has_table('edit_typevalue') AS "Table 'edit_typevalue' exists";
 SELECT has_table('element') AS "Table 'element' exists";
-SELECT has_table('element_type') AS "Table 'element_type' exists";
 SELECT has_table('element_x_arc') AS "Table 'element_x_arc' exists";
 SELECT has_table('element_x_connec') AS "Table 'element_x_connec' exists";
 SELECT has_table('element_x_gully') AS "Table 'element_x_gully' exists";
