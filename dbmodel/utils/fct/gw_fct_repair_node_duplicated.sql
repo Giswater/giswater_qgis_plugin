@@ -73,11 +73,11 @@ BEGIN
 	IF (SELECT node_id FROM node WHERE node_id = v_node) IS NULL OR (SELECT node_id FROM node WHERE node_id = v_targetnode) IS NULL THEN
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3640", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3640", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "prefix_id":"1003", "is_process":true}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3642", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3642", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "prefix_id":"1005", "is_process":true}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3644", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3644", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "prefix_id":"1001", "is_process":true}}$$)';
 
 	ELSE
 		IF v_action = 'DELETE' THEN

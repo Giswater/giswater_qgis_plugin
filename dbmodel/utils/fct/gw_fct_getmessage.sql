@@ -50,6 +50,7 @@ v_function_alias text;
 v_querytext text;
 v_separator text;
 v_prefix_id integer;
+v_fcount integer;
 
 BEGIN
 
@@ -72,6 +73,7 @@ BEGIN
 	v_is_header = ((p_data ->>'data')::json->>'is_header')::boolean;
 	v_label_id = ((p_data ->>'data')::json->>'label_id')::integer;
 	v_prefix_id = ((p_data ->>'data')::json->>'prefix_id')::integer;
+	v_fcount = ((p_data ->>'data')::json->>'fcount')::integer;
 	v_header_separator_id = ((p_data ->>'data')::json->>'separator_id')::integer;
 
 	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -102,20 +104,20 @@ BEGIN
 
 		IF rec_cat_label IS NULL THEN
 
-			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
-			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(COALESCE(v_function_alias, ''))||');';
+			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(COALESCE(v_function_alias, ''))||', '||quote_nullable(v_fcount)||');';
 		ELSE
 
-			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
-			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(rec_cat_label.idval)||');';
+			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(rec_cat_label.idval)||', '||quote_nullable(v_fcount)||');';
 		END IF;
 
 		EXECUTE v_querytext;
 
 		SELECT idval INTO v_separator FROM sys_label WHERE id = COALESCE(v_header_separator_id, 2030);
 
-		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
-		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||');';
+		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||', '||quote_nullable(v_fcount)||');';
 
 		EXECUTE v_querytext;
 
@@ -128,8 +130,8 @@ BEGIN
 	IF v_header_separator_id IS NOT NULL THEN
         SELECT idval INTO v_separator FROM sys_label WHERE id = COALESCE(v_header_separator_id, 2030);
 
-        v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
-        VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||');';
+        v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount)
+        VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||', '||quote_nullable(v_fcount)||');';
 
         EXECUTE v_querytext;
 
@@ -300,17 +302,17 @@ BEGIN
 		END IF;
 
 	ELSIF rec_cat_error.message_type = 'AUDIT' THEN
-		IF rec_cat_error.log_level = 0 AND v_criticity IS NOT NULL THEN
-			rec_cat_error.log_level = v_criticity;
-		END IF;
+        IF rec_cat_error.log_level = 0 AND v_criticity IS NOT NULL THEN
+            rec_cat_error.log_level = v_criticity;
+        END IF;
 
-		v_querytext = 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message)
-		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||rec_cat_error.log_level||','||quote_literal(rec_cat_error.error_message)||');';
+        v_querytext = 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount)
+        VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||rec_cat_error.log_level||','||quote_literal(rec_cat_error.error_message)||', '||quote_nullable(v_fcount)||');';
 
-		EXECUTE v_querytext;
+        EXECUTE v_querytext;
 
 
-	ELSIF rec_cat_error.message_type = 'DEBUG' THEN
+    ELSIF rec_cat_error.message_type = 'DEBUG' THEN
 
 	END IF;
 

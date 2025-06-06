@@ -1387,7 +1387,7 @@ UPDATE sys_table SET addparam='{
 UPDATE sys_function SET function_alias = 'ARC REVERSE FUNCTION' WHERE function_name = 'gw_fct_setarcreverse';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3562, 'ERROR-357: No arcs have been selected', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3562, 'No arcs have been selected', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3564, 'Selection mode ''Whole selection'' is not enabled in this function', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -1521,13 +1521,13 @@ UPDATE config_form_fields SET widgetfunction='{
 UPDATE sys_function SET function_alias = 'REPAIR NODES DUPLICATED' WHERE function_name = 'gw_fct_repair_node_duplicated';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3640, 'ERROR: Process failed', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3640, 'Process failed', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3642, 'HINT: Check your nodes id''s because there is no duplicated scenario.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3642, 'Check your nodes id''s because there is no duplicated scenario.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3644, 'INFO: Value for target node is optative, If null system will try to check closest node.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3644, 'Value for target node is optative, If null system will try to check closest node.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3646, 'Removing node %v_node% -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -1551,7 +1551,7 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3658, 'Transfer topology from node %v_targetnode% -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3660, 'ERROR-357: No nodes have been selected', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3660, 'No nodes have been selected', NULL, 0, true, 'utils', 'core', 'AUDIT');
 
 UPDATE sys_function SET function_alias = 'CREATE EMPTY DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_empty';
 
@@ -1570,10 +1570,8 @@ VALUES(3668, 'Type: %v_dscenario_type%', NULL, 0, true, 'utils', 'core', 'AUDIT'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3670, 'active: %v_active%', NULL, 0, true, 'utils', 'core', 'AUDIT');
 
-
-
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3672, 'ERROR: The dscenario (%v_scenarioid%) already exists with proposed name %v_name%. Please try another one.', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3672, 'The dscenario (%v_scenarioid%) already exists with proposed name %v_name%. Please try another one.', NULL, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3674, 'The new dscenario have been created sucessfully', NULL, 0, true, 'utils', 'core', 'AUDIT');
@@ -1725,8 +1723,6 @@ UPDATE config_form_fields SET widgetfunction='{
 }'::json WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
 --05/06/2025
 
-UPDATE sys_function SET function_alias = 'CREATE DSCENARIO' WHERE function_name = 'gw_fct_create_dscenario_from_toc';
-
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3696, 'ERROR: The dscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -1749,3 +1745,74 @@ UPDATE config_toolbox SET inputparams='[
     "selectedId": "1"
   }
 ]'::json WHERE id=2826;
+UPDATE sys_function SET function_alias = 'DUPLICATE DSCENARIO' WHERE function_name = 'gw_fct_duplicate_dscenario';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3714, 'Copy from: %v_copyfrom%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3716, 'Expl: %v_expl_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3718, 'Dscenario named "%v_name%" created with values from dscenario ( %v_copyfrom% )', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3720, 'Copied values from dscenario ( %v_copyfrom% ) to new dscenario ( %v_scenarioid% )', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'MANAGE DSCENARIO VALUES' WHERE function_name = 'gw_fct_manage_dscenario_values';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3724, 'Target and source are the same.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3726, 'Target scenario: %v_target_name%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3728, 'Action: %v_action%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3730, 'Copy from scenario: %v_source_name%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3732, 'Dscenario type for target and source is not the same.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3734, 'Target and source have the same dscenario_type.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3736, '%v_count% row(s) has/have been removed from inp_dscenario_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3738, 'There was/were %v_count% row(s) related to this dscenario which has/have been keep on table inp_dscenario_ %object_rec%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3740, 'No rows have been inserted on inp_dscenario_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3742, '%v_count2% row(s) has/have been inserted on inp_dscenario_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3744, '%v_count% row(s) have been removed from inp_dscenario_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3746, '%v_count% row(s) have been keep from inp_dscenario_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3748, 'No rows have been inserted on inp_dscenario_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3750, '%v_count2% row(s) have been inserted on inp_dscenario_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3752, '1 row(s) has/have been removed from cat_dscenario table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3754, 'PROCESS HAS FAILED......', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(1006, 'WARNING-403', 'prefix');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(1007, 'ERROR-403', 'prefix');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(1008, 'ERROR-357', 'prefix');
+
+

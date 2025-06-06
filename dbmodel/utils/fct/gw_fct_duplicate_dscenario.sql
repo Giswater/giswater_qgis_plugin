@@ -113,14 +113,14 @@ BEGIN
 	SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3718", "function":"3156", "parameters":{"v_name":"'||v_name||'", "v_copyfrom":"'||v_copyfrom||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3718", "function":"3156", "parameters":{"v_name":"'||v_name||'", "v_copyfrom":"'||v_copyfrom||'"}, "fid":"'||v_fid||'", "criticity":"1", "prefix_id":"1003", "is_process":true}}$$)';
 
 
 	-- Copy values from dscenario to copy from
 	EXECUTE 'SELECT gw_fct_manage_dscenario_values($${"client": '||(p_data ->>'client')::json||', "data": {"parameters": {"target": '||v_scenarioid||', "copyFrom": '||v_copyfrom||', "action": '||quote_ident(v_action)||'}}}$$);';
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3720", "function":"3156", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_copyfrom":"'||v_copyfrom||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3720", "function":"3156", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_copyfrom":"'||v_copyfrom||'"}, "fid":"'||v_fid||'", "criticity":"1", "prefix_id":"1003", "is_process":true}}$$)';
 
 
 	-- insert spacers

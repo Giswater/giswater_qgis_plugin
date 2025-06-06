@@ -668,19 +668,6 @@ VALUES(3712, 'Selection mode: %v_selectionmode%.', null, 0, true, 'utils', 'core
 
 UPDATE sys_function SET function_alias = 'SHOW CURRENTLY EXECUTED MINCUTS' WHERE function_name = 'ws_gw_fct_mincut_show_current';
 
-UPDATE sys_function SET function_alias = 'DUPLICATE DSCENARIO' WHERE function_name = 'gw_fct_duplicate_dscenario';
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3714, 'Copy from: %v_copyfrom%', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3716, 'Expl: %v_expl_id%', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3718, 'INFO: Dscenario named "%v_name%" created with values from dscenario ( %v_copyfrom% )', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3720, 'INFO: Copied values from dscenario ( %v_copyfrom% ) to new dscenario ( %v_scenarioid% )', null, 0, true, 'utils', 'core', 'AUDIT');
 
 -- 06/06/2025
 UPDATE config_toolbox SET inputparams='[

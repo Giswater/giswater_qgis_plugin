@@ -62,7 +62,7 @@ BEGIN
 	IF v_selectionmode = 'previousSelection' THEN
 		IF v_array IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3660", "function":"2108", "fid":"106", "is_process":true}}$$)';
+                       "data":{"message":"3660", "function":"2108", "fid":"106", "prefix_id":"1003", "is_process":true}}$$)';
 		ELSE
 			EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
 				SELECT * FROM (
@@ -106,7 +106,7 @@ BEGIN
 
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3600", "function":"2108", "parameters":{"v_count":"'||v_count||'"}, "fid":"106", "fcount":"'||v_count||'", "is_process":true}}$$)';
+                       "data":{"message":"3600", "function":"2108", "parameters":{"v_count":"'||v_count||'"}, "fid":"106", "fcount":"'||v_count||'", "prefix_id":"1008", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 106,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count

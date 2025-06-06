@@ -63,37 +63,50 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('MANAGE DSCENARIO VALUES'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Target scenario: ',v_target_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Action: ',v_action));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Copy from scenario: ',v_source_name));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3042", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3726", "function":"3042", "parameters":{"v_target_name":"'||v_target_name||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3728", "function":"3042", "parameters":{"v_action":"'||v_action||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3730", "function":"3042", "parameters":{"v_source_name":"'||v_source_name||'"}, "fid":"403", "criticity":"4", "is_process":true}}$$)';
+
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3042", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2008"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3042", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3042", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"1001", "separator_id":"2009"}}$$)';
 
 	IF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3756", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"3", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3724", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
+
 	ELSE
 
 		-- check dscenario type
 		IF v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 			IF (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_copyfrom) != (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_target) THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-403: Dscenario type for target and source is not the same.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3732", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1006", "is_process":true}}$$)';
+
 			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: Target and source have the same dscenario_type.'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3734", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
+
 			END IF;
 		END IF;
 
@@ -112,8 +125,9 @@ BEGIN
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
 					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 2, concat('WARNING: ',v_count,' row(s) has/have been removed from inp_dscenario_',object_rec.table,' table.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3736", "function":"3042", "parameters":{"v_count":"'||v_count||'", "object_rec":"'||object_rec.table||'"}, "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1002", "is_process":true}}$$)';
+
 					END IF;
 				END IF;
 
@@ -122,9 +136,10 @@ BEGIN
 					-- get message
 					EXECUTE 'SELECT count(*) FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target INTO v_count;
 					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: There was/were ',v_count,
-						' row(s) related to this dscenario which has/have been keep on table inp_dscenario_',object_rec.table,'.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3738", "function":"3042", "parameters":{"v_count":"'||v_count||'", "object_rec":"'||object_rec.table||'"}, "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1001", "is_process":true}}$$)';
+
+
 					END IF;
 
 					v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
@@ -136,11 +151,13 @@ BEGIN
 					-- get message
 					GET DIAGNOSTICS v_count2 = row_count;
 					IF v_count > 0 AND v_count2 = 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: No rows have been inserted on inp_dscenario_',object_rec.table,' table.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3740", "function":"3042", "parameters":{"object_rec":"'||object_rec.table||'"}, "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1001", "is_process":true}}$$)';
+
 					ELSIF v_count2 > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) has/have been inserted on inp_dscenario_',object_rec.table,' table.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3742", "function":"3042", "parameters":{"v_count2":"'||v_count2||'", "object_rec":"'||object_rec.table||'"}, "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1001", "is_process":true}}$$)';
+
 					END IF;
 				END IF;
 			END LOOP;
@@ -160,8 +177,9 @@ BEGIN
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
 					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_dscenario_',object_rec.table,' table.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3744", "function":"3042", "parameters":{"v_count":"'||v_count||'", "object_rec":"'||object_rec.table||'"}, "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1001", "is_process":true}}$$)';
+
 					END IF;
 				END IF;
 
@@ -170,8 +188,9 @@ BEGIN
 					-- get message
 					EXECUTE 'SELECT count(*) FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target INTO v_count;
 					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been keep from inp_dscenario_',object_rec.table,' table.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3746", "function":"3042", "parameters":{"v_count":"'||v_count||'", "object_rec":"'||object_rec.table||'"}, "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1001", "is_process":true}}$$)';
+
 					END IF;
 
 					IF object_rec.table = 'demand' THEN -- it is not possible to parametrize due table structure (dscenario_id is not first column)
@@ -189,11 +208,12 @@ BEGIN
 					-- get message
 					GET DIAGNOSTICS v_count2 = row_count;
 					IF v_count > 0 AND v_count2 = 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: No rows have been inserted on inp_dscenario_',object_rec.table,' table.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3748", "function":"3042", "parameters":{"object_rec":"'||object_rec.table||'"}, "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1001", "is_process":true}}$$)';
+
 					ELSIF v_count2 > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) have been inserted on inp_dscenario_',object_rec.table,' table.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3750", "function":"3042", "parameters":{"object_rec.table":"'||object_rec.table||'"}, "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1001", "is_process":true}}$$)';
 					END IF;
 				END IF;
 			END LOOP;
@@ -204,12 +224,14 @@ BEGIN
 			EXECUTE 'DELETE FROM cat_dscenario WHERE dscenario_id = '||v_target;
 
 			-- get message
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: 1 row(s) has/have been removed from cat_dscenario table.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3752", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1001", "is_process":true}}$$)';
+
 		END IF;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: Process done successfully.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3700", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "is_process":true}}$$)';
+
 
 		-- set selector
 		IF v_action != 'DELETE-ONLY' THEN
