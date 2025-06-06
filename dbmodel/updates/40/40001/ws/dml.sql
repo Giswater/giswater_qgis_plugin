@@ -682,3 +682,67 @@ VALUES(3718, 'INFO: Dscenario named "%v_name%" created with values from dscenari
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3720, 'INFO: Copied values from dscenario ( %v_copyfrom% ) to new dscenario ( %v_scenarioid% )', null, 0, true, 'utils', 'core', 'AUDIT');
 
+-- 06/06/2025
+UPDATE config_toolbox SET inputparams='[
+  {
+    "widgetname": "exploitation",
+    "label": "Exploitation:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Choose exploitation to work with",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC",
+    "selectedId": ""
+  },
+  {
+    "widgetname": "usePsectors",
+    "label": "Use masterplan psectors:",
+    "widgettype": "check",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 6,
+    "value": ""
+  },
+  {
+    "widgetname": "commitChanges",
+    "label": "Commit changes:",
+    "widgettype": "check",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 7,
+    "value": ""
+  },
+  {
+    "widgetname": "updateMapZone",
+    "label": "Update mapzone geometry method:",
+    "widgettype": "combo",
+    "datatype": "integer",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 8,
+    "comboIds": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "comboNames": [
+      "NONE",
+      "CONCAVE POLYGON",
+      "PIPE BUFFER",
+      "PLOT & PIPE BUFFER"
+    ],
+    "selectedId": ""
+  },
+  {
+    "widgetname": "geomParamUpdate",
+    "label": "Geometry parameter:",
+    "widgettype": "text",
+    "datatype": "float",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 10,
+    "isMandatory": false,
+    "placeholder": "5-30",
+    "value": ""
+  }
+]'::json WHERE id=2706;
