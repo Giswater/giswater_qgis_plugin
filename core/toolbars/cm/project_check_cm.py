@@ -10,8 +10,8 @@ import platform
 import os
 
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtWidgets import QCheckBox
-from qgis.core import Qgis
+from qgis.PyQt.QtWidgets import QCheckBox, QTextEdit
+from qgis.core import Qgis, QgsTask
 
 from ...threads.task import GwTask
 from ...utils import tools_gw
@@ -19,61 +19,79 @@ from ....libs import lib_vars, tools_qgis, tools_log, tools_qt, tools_os
 
 
 class GwProjectCheckCMTask(GwTask):
+    """
+    Task to check project health in the background for Campaign Management.
+    It executes a database function and passes the result back.
+    """
+    task_started = pyqtSignal()
+    task_finished = pyqtSignal()
 
-    task_finished = pyqtSignal(list)
-
-    def __init__(self, description='', params=None, timer=None):
-
+    def __init__(self, description, params=None):
         super().__init__(description)
         self.params = params if params else {}
-        self.result = None
-        self.dlg_audit_project = None
-        self.timer = timer
+        self.dialog = self.params.get('dialog')
+        self.log_widget = self.params.get('log_widget')
+        self.result_data = None
 
     def run(self):
-
+        """
+        Executes the main task.
+        """
         super().run()
+        self.task_started.emit()
+        try:
+            # Prepare the data and execute the database function to check the project.
+            # Use hardcoded parameters based on user's working SQL call.
+            project_type = "cm"
+            function_fid = 0
 
-        layers = self.params['layers']
-        init_project = self.params['init_project']
-        self.dlg_audit_project = self.params['dialog']
-        msg = "Task '{0}' execute function '{1}'"
-        msg_params = ("Check project", "fill_check_project_table")
-        tools_log.log_info(msg, msg_params=msg_params)
-        status, self.result = self.fill_check_project_table(layers, init_project)
-        if not status:
-            msg = "Function '{0}' returned False"
-            msg_params = ("fill_check_project_table",)
-            tools_log.log_info(msg, msg_params=msg_params)
+            extras = (
+                f'"parameters": {{"functionFid": {function_fid}, "project_type": "{project_type}"}}'
+            )
+            body = tools_gw.create_body(extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_setcheckproject_cm', body, schema_name='cm', conn=self.aux_conn)
+
+            if json_result and isinstance(json_result, list):
+                self.result_data = json_result[0]
+                return True
+            else:
+                self.exception = "Invalid response from database function."
+                return False
+
+        except Exception as e:
+            self.exception = e
             return False
 
-        return True
-
     def finished(self, result):
+        """
+        Handles the task completion.
+        """
+        if result and not self.isCanceled() and self.result_data and self.log_widget:
+            self.log_widget.clear()  # Clear previous logs
+            checks = self.result_data.get('checks', [])
+            if not checks:
+                self.log_widget.setText("Project check returned no results.")
+            else:
+                for check in checks:
+                    check_name = check.get('checkName', 'Unnamed Check')
+                    # The result data is nested twice
+                    inner_result = check.get('result', {}).get('result', [])
+                    
+                    if not inner_result:
+                        self.log_widget.append(f"<b>{check_name}:</b> OK")
+                    else:
+                        self.log_widget.append(f"<b>{check_name}:</b>")
+                        for item in inner_result:
+                            self.log_widget.append(f"- {item}")
+                    self.log_widget.append("") # Add a blank line for readability
+        elif not self.log_widget:
+            print("FATAL ERROR: Log widget object was not passed to the task.")
 
+        # Let the parent class handle logging, connection closing, etc.
         super().finished(result)
 
-        self.dlg_audit_project.progressBar.setVisible(False)
-        if self.timer:
-            self.timer.stop()
-        if self.isCanceled():
-            self.setProgress(100)
-            return
-
-        # Handle exception
-        if self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
-            title = "Key on returned json from ddbb is missed."
-            tools_qt.show_exception_message(title, msg)
-            return
-
-        # Show dialog with audit check project result
-        self._show_check_project_result(self.result)
-
-        self.setProgress(100)
+        # Notify the UI that the task is completely finished
+        self.task_finished.emit()
 
     def fill_check_project_table(self, layers, init_project):
         """ Fill table 'audit_check_project' table with layers data """
@@ -107,11 +125,11 @@ class GwProjectCheckCMTask(GwTask):
                 fields += '"fid":101, '
                 fields += f'"table_user":"{table_user}"}}, '
         fields = fields[:-2] + ']'
-
+        print("hooola")
         # Execute function 'gw_fct_setcheckproject'
-        result = self._execute_check_project_function(init_project, fields)
+        self.result = self._execute_check_project_function(init_project, fields)
 
-        return True, result
+        return True, self.result
 
     # region private functions
 
@@ -158,6 +176,7 @@ class GwProjectCheckCMTask(GwTask):
         # Execute procedure
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setcheckproject_cm', body, is_thread=True, aux_conn=self.aux_conn)
+        print(result)
         if result:
             open_curselectors = tools_gw.get_config_parser('dialogs_actions', 'curselectors_open_loadproject', "user", "init")
             open_curselectors = tools_os.set_boolean(open_curselectors, False)
@@ -177,12 +196,19 @@ class GwProjectCheckCMTask(GwTask):
         """ Show dialog with audit check project results """
 
         # Handle failed results
-        if result.get('status') == 'Failed':
+        if not result or result.get('status') == 'Failed':
             tools_gw.manage_json_exception(result)
             return False
 
-        # Call `fill_tab_log()` directly, no need to store variables
-        tools_gw.fill_tab_log(self.dlg_audit_project, result['body']['data'], reset_text=False)
+        # Extract and combine all log messages from the different categories
+        log_data = result['body']['data']
+        all_logs = []
+        for category in ['info', 'point', 'line', 'polygon']:
+            if category in log_data and log_data[category]:
+                all_logs.extend(log_data[category])
+
+        # Call `fill_tab_log()` with the combined list of logs
+        tools_gw.fill_tab_log(self.dlg_audit_project, all_logs, reset_text=False)
 
     def _add_selected_layers(self, dialog, m_layers):
         """ Receive a list of layers, look for the checks associated with each layer and if they are checked,

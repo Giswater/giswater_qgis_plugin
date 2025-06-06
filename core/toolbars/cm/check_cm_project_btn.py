@@ -8,7 +8,7 @@ or (at your option) any later version.
 from .project_check_cm import GwProjectCheckCMTask
 from ..dialog import GwAction
 
-from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QCheckBox
+from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QCheckBox, QWidget, QTextEdit
 from qgis.core import QgsApplication
 
 from ...utils import tools_gw
@@ -21,7 +21,6 @@ class GwCheckCMProjectButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.check_cm = GwProjectCheckCMTask()
 
     def clicked_event(self):
         self._open_check_project()
@@ -89,90 +88,49 @@ class GwCheckCMProjectButton(GwAction):
 
     def _on_accept_clicked(self):
         """Handles the Accept button click event and starts the project check task."""
-
-        # Enable the "Log" tab after pressing Accept
-        qtabwidget = self.dialog.findChild(QTabWidget, 'mainTab')
-        if qtabwidget:
-            tools_qt.enable_tab_by_tab_name(qtabwidget, "tab_log", True)  # Enable Log tab
-
         self._start_project_check()
 
     def _start_project_check(self):
         """Re-executes the project check process after Accept is pressed."""
 
-        # Show progress bar and timer when execution starts
-        self.dialog.progressBar.setVisible(True)
-        lbl_time = self.dialog.findChild(QLabel, "lbl_time")
-        if lbl_time:
-            lbl_time.setVisible(True)
-
         # Retrieve layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
-        print("layers: ", layers)
-        show_versions = tools_qt.is_checked(self.dialog, "tab_data_versions_check")
-        show_qgis_project = tools_qt.is_checked(self.dialog, "tab_data_qgisproj_check")
 
-        # Set parameters and re-run the project check task
+        # Find the log widget and pass it directly to the task for reliability
+        log_widget = self.dialog.findChild(QTextEdit, "txt_infolog")
+
+        # Set parameters and re-run the project check task.
         params = {"layers": layers, "init_project": "false", "dialog": self.dialog,
-                  "show_versions": show_versions, "show_qgis_project": show_qgis_project}
+                  "log_widget": log_widget}
 
         self.project_check_task = GwProjectCheckCMTask('check_project', params)
 
-        # After `GwProjectCheckTask` completes, execute `gw_fct_setcheckdatabase`
-        # self._execute_checkdatabase()
+        # Connect task signals to UI updates
+        self.project_check_task.task_started.connect(self._on_task_started)
+        self.project_check_task.task_finished.connect(self._on_task_finished)
 
         QgsApplication.taskManager().addTask(self.project_check_task)
-        QgsApplication.taskManager().triggerTask(self.project_check_task)
 
-    def _execute_checkdatabase(self):
-        """Executes `gw_fct_setcheckdatabase` and updates the Log tab with results."""
+    def _on_task_started(self):
+        """Disables controls and shows progress indicators when the task starts."""
+        self.dialog.btn_accept.setEnabled(False)
+        
+        # Find the QTabWidget and the specific tab to switch to
+        tab_widget = self.dialog.findChild(QTabWidget, "mainTab")
+        log_tab = self.dialog.findChild(QWidget, "tab_log")
+        if tab_widget and log_tab:
+            tab_widget.setCurrentWidget(log_tab)
 
-        # Collect selected checkboxes
-        check_parameters = self._get_selected_checks()
-        if not any(check_parameters.values()):
-            print("No checkboxes selected. Skipping gw_fct_setcheckdatabase.")
-            return
-
-        # Format parameters properly
-        parameters = ', '.join([f'"{key}": {str(value).lower()}' for key, value in check_parameters.items()])
-        extras = f'"parameters": {{{parameters}}}'
-        body = tools_gw.create_body(extras=extras)
-
-        # Execute procedure
-        json_result = tools_gw.execute_procedure('gw_fct_setcheckdatabase', body)
-
-        if not json_result or json_result.get("status") != "Accepted":
-            print(f"Failed to execute gw_fct_setcheckdatabase: {json_result}")
-            return
-        tools_gw.fill_tab_log(self.dialog, json_result['body']['data'], reset_text=False)
-
-    def _get_selected_checks(self):
-        """Returns a dictionary of the selected checkboxes using `is_checked` from tools_qt,
-        excluding system health checkboxes.
-        """
-        result_json = {}
-
-        # Find all QCheckBox widgets inside the dialog
-        list_widgets = self.dialog.findChildren(QCheckBox)
-
-        for widget in list_widgets:
-            widget_name = widget.objectName()  # Get the checkbox name
-            checked_value = tools_qt.is_checked(self.dialog, widget)
-
-            # Exclude "versions_check" and "qgisproj_check"
-            if widget_name in ["tab_data_versions_check", "tab_data_qgisproj_check"]:
-                continue  # Skip these checkboxes
-
-            # Store only checkboxes with valid names
-            if widget_name and checked_value:
-                result_json[widget_name] = checked_value
-
-        return result_json
+        tools_qt.enable_tab_by_tab_name(self.dialog.mainTab, "tab_data", False)
+        self.dialog.progressBar.setVisible(True)
+        self.dialog.lbl_time.setVisible(True)
 
     def _on_task_finished(self):
-        """Hides progress indicators when the project check is complete."""
+        """Enables controls and hides progress indicators when the task is complete."""
+        self.dialog.btn_accept.setEnabled(True)
+        tools_qt.enable_tab_by_tab_name(self.dialog.mainTab, "tab_data", True)
         self.dialog.progressBar.setVisible(False)
-        lbl_time = self.dialog.findChild(QLabel, "lbl_time")
-        if lbl_time:
-            lbl_time.setVisible(False)
+        self.dialog.lbl_time.setVisible(False)
+
+    # endregion
 
