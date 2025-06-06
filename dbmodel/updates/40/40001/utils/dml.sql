@@ -1735,3 +1735,17 @@ VALUES(3698, 'ERROR: The table chosen does not fit with any epa dscenario. Pleas
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3700, 'INFO: Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+-- 06/06/2025
+UPDATE config_toolbox SET inputparams='[
+  {
+    "widgetname": "exploitation",
+    "label": "Exploitation ids:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "dvQueryText": "select expl_id as id, name as idval from exploitation where active is not false order by name",
+    "selectedId": "1"
+  }
+]'::json WHERE id=2826;
