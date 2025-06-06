@@ -31,7 +31,11 @@ GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
-    (gw_fct_set_netscenario_pattern($${"client":{"device":4, "lang":"es_ES", "version":"4.0.001", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters"}, "aux_params":null}}$$)::JSON)->>'status',
+    (gw_fct_set_netscenario_pattern($${"client":{"device":4, "lang":"es_ES", "version":"4.0.001", "infoType":1, "epsg":25831},
+"form":{},
+"feature":{},
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"netscenario":"1", "dscenario_demand":"1"},
+"aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_set_netscenario_pattern returns status "Accepted"'
 );
@@ -40,3 +44,4 @@ SELECT is(
 SELECT finish();
 
 ROLLBACK;
+
