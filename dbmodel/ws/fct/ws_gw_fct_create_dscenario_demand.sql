@@ -35,7 +35,6 @@ v_projecttype text;
 v_fid integer = 403;
 v_action text;
 v_querytext text;
-v_result_id text = null;
 v_name text;
 v_descript text;
 v_id text;
@@ -43,7 +42,6 @@ v_selectionmode text;
 v_scenarioid integer;
 v_tablename text;
 v_featuretype text;
-v_table text;
 v_columns text;
 v_queryfilter text;
 v_expl integer;
@@ -143,7 +141,7 @@ BEGIN
 		-- log
 		GET DIAGNOSTICS v_count = row_count;
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3722", "function":"3112", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"1", "is_process":true, "parameters":{"v_count":"'||v_count||'", "v_table":"'||v_table||'"}}}$$)';
+						"data":{"message":"3722", "function":"3112", "fid":"'||v_fid||'", "result_id":"null", "criticity":"1", "is_process":true, "parameters":{"v_count":"'||v_count||'", "v_table":"null"}}}$$)';
 
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;

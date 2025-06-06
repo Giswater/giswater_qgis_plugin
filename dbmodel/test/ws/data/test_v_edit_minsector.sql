@@ -15,7 +15,7 @@ SELECT plan(6);
 
 INSERT INTO v_edit_minsector
 (minsector_id, code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
-VALUES(-901, '-901', 0, 0, 1, 0, 0, 0, 0, 0, '', null, null);
+VALUES(-901, '-901', 0, 0, 1, ARRAY[0], 0, 0, 0, 0, '', null, null);
 SELECT is((SELECT count(*)::integer FROM v_edit_minsector WHERE code = '-901'), 1, 'INSERT: v_edit_minsector -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM minsector WHERE code = '-901'), 1, 'INSERT: minsector -901 was inserted');
 

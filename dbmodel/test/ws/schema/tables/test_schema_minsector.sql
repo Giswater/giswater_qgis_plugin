@@ -34,7 +34,7 @@ SELECT col_type_is('minsector', 'minsector_id', 'integer', 'Column minsector_id 
 SELECT col_type_is('minsector', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('minsector', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('minsector', 'presszone_id', 'integer', 'Column presszone_id should be integer');
-SELECT col_type_is('minsector', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('minsector', 'expl_id', 'integer[]', 'Column expl_id should be array of integer');
 SELECT col_type_is('minsector', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('minsector', 'num_border', 'integer', 'Column num_border should be integer');
 SELECT col_type_is('minsector', 'num_connec', 'integer', 'Column num_connec should be integer');
@@ -50,10 +50,9 @@ SELECT col_type_is('minsector', 'muni_id', 'integer', 'Column muni_id should be 
 SELECT has_fk('minsector', 'Table minsector should have foreign keys');
 SELECT fk_ok('minsector', 'dma_id', 'dma', 'dma_id', 'FK dma_id should reference dma.dma_id');
 SELECT fk_ok('minsector', 'dqa_id', 'dqa', 'dqa_id', 'FK dqa_id should reference dqa.dqa_id');
-SELECT fk_ok('minsector', 'expl_id', 'exploitation', 'expl_id', 'FK expl_id should reference exploitation.expl_id');
 SELECT fk_ok('minsector', 'presszone_id', 'presszone', 'presszone_id', 'FK presszone_id should reference presszone.presszone_id');
 SELECT fk_ok('minsector', 'muni_id', 'ext_municipality', 'muni_id', 'FK muni_id should reference ext_municipality.muni_id');
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;
