@@ -40,6 +40,7 @@ class GwEpaFileManager(GwTask):
 
         self.exception = None
         self.error_msg = None
+        self.error_msg_params = None
         self.message = None
         self.common_msg = ""
         self.function_failed = False
@@ -179,7 +180,7 @@ class GwEpaFileManager(GwTask):
         if self.error_msg:
             title = "Task aborted - {0}"
             title_params = (self.description(),)
-            tools_qt.show_info_box(self.error_msg, title=title, title_params=title_params)
+            tools_qt.show_info_box(self.error_msg, title=title, title_params=title_params, msg_params=self.error_msg_params)
             return
 
         if self.exception:
@@ -360,16 +361,19 @@ class GwEpaFileManager(GwTask):
 
         if self.file_rpt == "null":
             message = "You have to set this parameter"
-            self.error_msg = f"{message}: RPT file"
+            self.error_msg = "{0}: RPT file"
+            self.error_msg_params = (message,)
             return False
 
         msg = "INP file not found"
         if self.file_inp is not None:
             if not os.path.exists(self.file_inp):
-                self.error_msg = f"{msg}: {self.file_inp}"
+                self.error_msg = "{0}: {1}"
+                self.error_msg_params = (msg, self.file_inp,)
                 return False
         else:
-            self.error_msg = f"{msg}: {self.file_inp}"
+            self.error_msg = "{0}: {1}"
+            self.error_msg_params = (msg, self.file_inp,)
             return False
 
         # Set file to execute
@@ -383,7 +387,8 @@ class GwEpaFileManager(GwTask):
             return False
 
         if not os.path.exists(opener):
-            self.error_msg = f"File not found: {opener}"
+            self.error_msg = "File not found: {0}"
+            self.error_msg_params = (opener,)
             return False
 
         subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
@@ -489,8 +494,10 @@ class GwEpaFileManager(GwTask):
                             message = ("The rpt file is not valid to import. "
                                         "Because columns on rpt file are overlapped, it seems you need to improve your simulation. "
                                         "Please check and fix it before continuing.\n"
-                                        + msg.format(*msg_params))
+                                        "{0}")
                             self.error_msg = message
+                            error_near = f"{tools_qt.tr('Error near line')} {line_number + 1} -> {dirty_list}"
+                            self.error_msg_params = (error_near,)
                             self._close_file()
                             del full_file
                             return False
@@ -501,9 +508,11 @@ class GwEpaFileManager(GwTask):
                         message = ("The rpt file is not valid to import. "
                                     "Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
                                     "Please ckeck and fix it before continue. \n"
-                                    "Note: You can force the import by activating the variable 'force_import_velocity_higher_50ms' on the init.config file. \n"
-                                    + msg.format(*msg_params))
+                                    "Note: You can force the import by activating the variable '{0}' on the {1} file. \n"
+                                    "{2}")
                         self.error_msg = message
+                        error_near = f"{tools_qt.tr('Error near line')} {line_number + 1} -> {dirty_list}"
+                        self.error_msg_params = ("force_import_velocity_higher_50ms",  "init.config", error_near,)
                         self._close_file()
                         del full_file
                         return False

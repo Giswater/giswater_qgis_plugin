@@ -49,6 +49,19 @@ class GwSchemaI18NManager:
         self.dlg_qm.rejected.connect(self._save_user_values)
         self.dlg_qm.rejected.connect(self._close_db_org)
         self.dlg_qm.rejected.connect(self._close_db_i18n)
+        self.dlg_qm.chk_all.clicked.connect(self._check_all)
+
+
+    def _check_all(self):
+        if not tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_all):
+            return
+        
+        tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_dialogs, True)
+        tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_am_dialogs, True)
+        tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_cm_dialogs, True)
+        tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_py_messages, True)
+        tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_py_dialogs, True)
+        tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_for_su_tables, True)
 
     def _load_user_values(self):
         """
@@ -195,8 +208,9 @@ class GwSchemaI18NManager:
 
     # endregion
     def _update_i18n_databse(self):
+        """ Determine which part of the database update (ws, ud, am, pyhton...) """
         self.project_types = []
-
+            
         if tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_dialogs):
             self.project_types.extend(["ws", "ud"])
         if tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_am_dialogs):
@@ -205,6 +219,8 @@ class GwSchemaI18NManager:
             self.project_types.extend(["cm"])
 
         self.py_messages = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_messages)
+        self.py_dialogs = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_dialogs)
+        self.delete_old_keys = False
         self.schema_i18n = "i18n"
 
         if self.project_types:
@@ -213,43 +229,64 @@ class GwSchemaI18NManager:
         if self.py_messages:
             self._update_py_messages()
 
+        if self.py_dialogs:
+            self._update_py_dialogs()
+
+
     # region Missing DB Dialogs
     def _update_db_tables(self):
+        """ Update the database tables (ws or ud or am or cm or su_tables)"""
+
+        # Check for basic information
         self.check_for_su_tables = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_for_su_tables)
         major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir).replace(".", "")
         text_error = ''
         no_repeat_table = []
 
+        # Loop through the selected project types (ws, ud...)
         for self.project_type in self.project_types:
+            # Get the tables to update
             tables_i18n, sutables_i18n = self.tables_dic(self.project_type)
+
+            # Get the schema to update
             self.schema_org = self.project_type
-            print(self.project_type)
             if self.project_type != "am":
                 self.schema_org = f"{self.project_type}{major_version}_trans"
 
+            # Check if the schema exists
             schema_exists = self._detect_schema(self.schema_org)
             if not schema_exists:
                 msg = "The schema ({0}) does not exists"
                 msg_params = (self.schema_org,)
                 tools_qt.show_info_box(msg, msg_params=msg_params)
                 return
+
+            # Check if the su_tables are needed
             if self.check_for_su_tables:
                 tables_i18n.extend(sutables_i18n)
 
+            # Loop through the tables to update
             text_error += f'\n{self.project_type}:\n'
             self.dlg_qm.lbl_info.clear()
             for table_i18n in tables_i18n:
                 table_i18n = f"{self.schema_i18n}.{table_i18n}"
+
+                # Check if the table has already been determined as not existing
                 if table_i18n not in no_repeat_table:
+                    #Get basic information about the table and project
                     table_exists = self.detect_table_func(table_i18n)
                     correct_lang = self._verify_lang()
                     self._change_table_lyt(table_i18n.split(".")[1])
+
+                    # Check if the table exists
                     if not table_exists:
                         msg = "The table ({0}) does not exists"
-                        msg_params = (self.schema_org,)
+                        msg_params = (table_i18n,)
                         tools_qt.show_info_box(msg, msg_params=msg_params)
                         no_repeat_table.append(table_i18n)
+                    # Check if the table exists
                     elif correct_lang:
+                        # Update the table
                         text_error += self._update_tables(table_i18n)
 
                         # check for all primary keys reapeted, but project_types
@@ -260,14 +297,17 @@ class GwSchemaI18NManager:
                         tools_qt.show_info_box(msg)
                         break
 
-
-
         self.dlg_qm.lbl_info.clear()
         tools_qt.show_info_box(text_error)
 
     def _update_tables(self, table_i18n):
+        """ Update the table """
+
+        # Get the original table
         tables_org = self._find_table_org(table_i18n)
 
+        # Loop through the original tables and act according to the type of data inside (declared in the name)
+        # Set the query message
         query = ""
         for table_org in tables_org:
             if "json" in table_i18n:
@@ -277,6 +317,7 @@ class GwSchemaI18NManager:
             else:
                 query += self._update_any_table(table_i18n, table_org)
 
+        # Determine the return message acording to the query message 
         if query == '':
             return f'{table_i18n.split(".")[1]}: 1- No update needed. '
         else:
@@ -286,9 +327,13 @@ class GwSchemaI18NManager:
                 return f'{table_i18n.split(".")[1]}: 1- Succesfully updated table. '
             except Exception as e:
                 self.conn_i18n.rollback()
-                return f"An error occured while translating {table_i18n}: {e}\n"
+                print(query)
+                return f"\nAn error occured while translating {table_i18n}: {e}\n"
 
     def _update_any_table(self, table_i18n, table_org):
+        """ Update table with the classical format (no %json and no config_form_fields_feat) """
+
+        # Get the columns and rows to compare
         columns_i18n, columns_org, names = self._get_rows_to_compare(table_i18n, table_org)
 
         columns = ", ".join(columns_i18n)
@@ -299,6 +344,7 @@ class GwSchemaI18NManager:
         query = f"SELECT {columns} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
 
+        # Change None values to "" t be able to compare them
         query = ""
         if rows_i18n:
             for row_i18n in rows_i18n:
@@ -309,11 +355,14 @@ class GwSchemaI18NManager:
                         row_i18n[column_i18n] = ''
 
         for row_org in rows_org:
+            # Change None values to "" t be able to compare them
             for column_org in columns_org:
                 if row_org[column_org] is None:
                     row_org[column_org] = ''
 
             row_org_com = row_org
+
+            # Add the project type to the row if org does not have it
             no_project_type = ["dbconfig_form_fields", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", "dbconfig_toolbox",
                                "edit_typevalue", "plan_typevalue", "om_typevalue", "dbtable", "su_feature", "su_basic_tables"]
             if table_i18n in no_project_type:
@@ -321,12 +370,13 @@ class GwSchemaI18NManager:
 
             # Check if the row from org doesn't exist in i18n, and construct the query
             if rows_i18n is None or row_org_com not in rows_i18n:
-                # Safely handle NULL values and avoid SQL injection
+                # Safely handle NULL values and extrange charcaters and avoid SQL injection
                 texts = []
                 for name in names:
                     value = f"'{row_org[name].replace("'", "''")}'" if row_org[name] not in [None, ''] else 'NULL'
                     texts.append(value)
 
+                # Construct the query
                 if 'dbconfig_form_fields' in table_i18n:
                     query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us) 
                                     VALUES ('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}',
@@ -449,6 +499,10 @@ class GwSchemaI18NManager:
         return query
 
     def _get_rows_to_compare(self, table_i18n, table_org):
+        """ Get the columns and rows to compare """
+
+        # Set the columns and rows to compare
+        # Columns_i18n (columns translation DB), Colums_org (columns original DB), names (colums to translate in original DB)
         if 'dbconfig_form_fields' in table_i18n:
             columns_i18n = ["formname", "formtype", "source", "lb_en_us", "tt_en_us", "project_type"]
             columns_org = ["formname", "formtype", "columnname", "label", "tooltip"]
@@ -470,7 +524,8 @@ class GwSchemaI18NManager:
             names = ["idval"]
 
         elif 'dbmessage' in table_i18n:
-            columns_i18n = ["project_type", "CAST(source AS INTEGER) AS source", "CAST(log_level AS INTEGER) AS log_level", "ms_en_us", "ht_en_us"]
+            columns_i18n = ["project_type", "CAST(source AS INTEGER) AS source", 
+                            "CAST(log_level AS INTEGER) AS log_level", "ms_en_us", "ht_en_us"]
             columns_org = ["project_type", "id", "log_level", "error_message", "hint_message"]
             names = ["error_message", "hint_message"]
 
@@ -519,6 +574,7 @@ class GwSchemaI18NManager:
             columns_org = ["id", "descript", "alias"]
             names = ["descript", "alias"]
 
+        # Update the su_basic_tables table (It has a different format, more than one table_org)
         elif 'su_basic_tables' in table_i18n:
             columns_i18n = ["project_type", "source", "na_en_us", "ob_en_us"]
             columns_org = ["id", "name"]
@@ -549,6 +605,9 @@ class GwSchemaI18NManager:
     # region Json
 
     def _json_update(self, table_i18n, table_org):
+        """ Update the table with the json format """
+
+        # Set the column to update in the table_org (filterparam, inputparams, widgetcontrols)
         column = ""
         if table_org == 'config_report':
             column = "filterparam"
@@ -556,47 +615,51 @@ class GwSchemaI18NManager:
             column = 'inputparams'
         elif table_org == 'config_form_fields':
             column = 'widgetcontrols'
+
+        # Get the rows from the original table
         query = f"SELECT * FROM {self.schema_org}.{table_org}"
         rows = self._get_rows(query, self.cursor_org)
+
+        # Set the query message
         query = ""
         for row in rows:
-
+            #Get safe row values and avoid SQL injection
             safe_row_column = str(row[column]).replace("'", "''")
             if row[column] not in [None, "", "None"]:
+                # Get the data to update
                 datas = self.extract_and_update_strings(row[column])
 
+                # Loop through the data to update
                 for i, data in enumerate(datas):
-
                     for key, text in data.items():
                         # Handle string or list of strings
                         if isinstance(text, list):
-                            text = ", ".join(text)  # or use another delimiter
+                            text = ", ".join(text)
                         elif not isinstance(text, str):
-                            continue  # Skip if it's not a string or list
+                            continue
 
+                        # Get safe text and Construct the query
                         safe_text = text.replace("'", "''")
                         if "config_form_fields" in table_i18n:
                             query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, formname, formtype, source, hint, text, lb_en_us)
                             VALUES ('giswater', '{self.project_type}', '{table_org}', '{row['formname']}', '{row['formtype']}', '{row['columnname']}', '{key}_{i}', '{safe_row_column}', '{safe_text}')
                             ON CONFLICT (source_code, project_type, context, formname, formtype, source, hint, text)
                             DO UPDATE SET lb_en_us = '{safe_text}'; """
-
-                            # Execute or collect query_row
-                            query += query_row
                         else:
                             query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, hint, text, source, lb_en_us)
                             VALUES ('giswater', '{self.project_type}', '{table_org}', '{key}_{i}', '{safe_row_column}', '{row['id']}', '{safe_text}')
                             ON CONFLICT (source_code, project_type, context, hint, text, source)
                             DO UPDATE SET lb_en_us = '{safe_text}'; """
 
-                            # Execute or collect query_row
-                            query += query_row
+                        query += query_row
         return query
 
     # endregion
     # region Config_form_fields_feat
 
     def _dbconfig_form_fields_feat_update(self, table_i18n):
+        """ Update the table with the config_form_fields_feat format. Use an sql type program to do it """
+
         schema = table_i18n.split('.')[0]
         table_org = f"{schema}.dbconfig_form_fields"
         query = f"""
@@ -699,23 +762,23 @@ class GwSchemaI18NManager:
         delete_query = self._delete_duplicates_rows(table)
         try:
             self.cursor_i18n.execute(delete_query)
-            self.conn_i18n.commit()  # Commit the deletion
+            self.conn_i18n.commit() 
         except Exception as e:
-            self.conn_i18n.rollback()  # Rollback in case of error
+            self.conn_i18n.rollback()
             return f"Error deleting rows (Rename proj.type): {e}"
 
         # Step 5: Insert the unique final rows back into the table
         final_rows_tot = final_rows + final_rows_no_utils if final_rows_no_utils else final_rows
         insert_query = self._add_duplicates_rows(table, final_rows_tot, final_rows)
         if insert_query == "":
-            return "No rows to unify"
+            return "No rows to unify\n"
         try:
             self.cursor_i18n.execute(insert_query)
         except Exception as e:
-            self.conn_i18n.rollback()  # Rollback in case of error
+            self.conn_i18n.rollback()
             return f"Error inserting rows: {e}"
 
-        self.conn_i18n.commit()  # Commit the insertions
+        self.conn_i18n.commit()
         return "2- Rows updated successfully.\n"
 
     def _get_duplicates_rows(self, table):
@@ -794,91 +857,313 @@ class GwSchemaI18NManager:
 
     # endregion
 
-    # region PY Messages
+    # region python
+    def _update_py_dialogs(self):
+        """ Update the table with the python dialogs """
+
+        # Make the user know what is being done
+        self.project_type = "python"
+        self._change_table_lyt("pydialog")
+
+        # Find the files to search for messages
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        files = self._find_files(path, ".ui")
+        
+        # Determine the key and find the messages
+        processed_entries = {}  # Use a dictionary to store unique entries
+        keys = ["<string>", "<widget", 'name=']
+        for file in files:
+            coincidencias = self._search_lines(file, keys[0])
+            if coincidencias:
+                for num_line, content in coincidencias:
+                    dialog_name, toolbar_name, source = self._search_dialog_info(file, keys[1], keys[2], num_line)
+                    pattern = r'>(.*?)<'
+                    match = re.search(pattern, content)
+                    if match:
+                        message_text = match.group(1)
+                        # Determine actual_source (which is stored in pydialog.source)
+                        actual_source = f"dlg_{dialog_name}" if source.startswith('dlg_') else source
+                        # Key for de-duplication and DB matching
+                        db_key = (actual_source, dialog_name, toolbar_name)
+                        processed_entries[db_key] = message_text
+
+        # Add btn_help to messages
+        help_db_key = ("btn_help", "common", "common")
+        processed_entries[help_db_key] = "Help"
+
+        # primary_keys_final should match the structure (actual_source, dialog_name, toolbar_name)
+        primary_keys_final = list(processed_entries.keys())
+
+        # Determine existing primary keys from the database
+        primary_keys_org = []
+        try:
+            query = f"SELECT source, dialog_name, toolbar_name FROM {self.schema_i18n}.pydialog"
+            self.cursor_i18n.execute(query)
+            rows = self.cursor_i18n.fetchall()
+            for row in rows:
+                primary_keys_org.append((row["source"], row["dialog_name"], row["toolbar_name"]))
+        except Exception as e:
+            print(f"Error fetching existing primary keys: {e}")
+
+        # Delete removed widgets
+        old_keys = set(primary_keys_org) - set(primary_keys_final)
+
+        if old_keys and self.delete_old_keys:
+            delete_values = []
+            for actual_source, dialog_name, toolbar_name in old_keys:
+                # Escape single quotes
+                esc_actual_source = actual_source.replace("'", "''")
+                esc_dialog_name = dialog_name.replace("'", "''") 
+                esc_toolbar_name = toolbar_name.replace("'", "''")
+                delete_values.append(f"(source = '{esc_actual_source}' AND dialog_name = '{esc_dialog_name}' AND toolbar_name = '{esc_toolbar_name}')")
+            
+            # Single delete query for all old keys
+            if delete_values: # Ensure there's something to delete
+                delete_query = f"DELETE FROM {self.schema_i18n}.pydialog WHERE {' OR '.join(delete_values)}"
+                try:
+                    self.cursor_i18n.execute(delete_query)
+                except Exception as e:
+                    print(f"Error deleting rows: {e}")
+
+        # Update the table
+        text_error = ""
+        values_list = []
+        # Iterate over de-duplicated entries
+        for (actual_source, dialog_name, toolbar_name), message in processed_entries.items():
+            # Escape single quotes
+            esc_message = message.replace("'", "''")
+            esc_dialog_name = dialog_name.replace("'", "''")
+            esc_toolbar_name = toolbar_name.replace("'", "''")
+            esc_actual_source = actual_source.replace("'", "''")
+
+            values_list.append(
+                f"('giswater', 'utils', '{esc_dialog_name}', '{esc_toolbar_name}', '{esc_actual_source}', '{esc_message}')"
+            )
+
+        if values_list:
+            # Single upsert query with all values
+            query = f"""
+                INSERT INTO {self.schema_i18n}.pydialog 
+                (source_code, project_type, dialog_name, toolbar_name, source, lb_en_us)
+                VALUES 
+                {',\n'.join(values_list)}
+                ON CONFLICT (source_code, project_type, dialog_name, toolbar_name, source) 
+                DO UPDATE SET 
+                    lb_en_us = EXCLUDED.lb_en_us;
+            """
+
+            try:
+                self.cursor_i18n.execute(query)
+            except Exception as e:
+                text_error = f"Error updating table: {str(e)}"
+                print(e)
+
+        if text_error:
+            tools_qt.show_info_box(text_error)
+        else:
+            msg = "All dialogs updated correctly"
+            tools_qt.show_info_box(msg)
+
+        self.conn_i18n.commit()
+
     def _update_py_messages(self):
+        """ Update the table with the python messages """
+
         self.project_type = "python"
         self._change_table_lyt("pymessage")
         path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "..")
         )
-        files = self._find_py_files(path)
-
+        print(path)
+        files = self._find_files(path, ".py")
+        
         messages = []
         fields = ['message', 'msg', 'title']
         patterns = ['=', ' =', '= ', ' = ']
-        quotes = ['"', "'", '("', "('"]
+        quotes = ['"', "'", '(']
 
         # Generate all combinations
         keys = [f"{field}{pattern}{quote}" for field, pattern, quote in product(fields, patterns, quotes)]
 
-        for key in keys:
-            for file in files:
+        for file in files:
+            for key in keys:
                 coincidencias = self._search_lines(file, key)
                 if coincidencias:
                     for num_line, content in coincidencias:
+                        if "(" in key:
+                            key = 'msg = "'
                         match = re.search(rf'{re.escape(key)}(.*?){key[-1]}', content)
                         if match:
                             messages.append(match.group(1))
 
-        text_error = ""
-        for message in messages:
-            message = message.replace("'", "''")
-            query = f"""INSERT INTO i18n_proves.pymessage (source_code, source, ms_en_us) VALUES ('giswater', '{message}', '{message}') ON CONFLICT DO NOTHING;\n"""
+        # Determine existing primary keys from the database
+        primary_keys_org = []
+        try:
+            self.cursor_i18n.execute(f"SELECT source FROM {self.schema_i18n}.pymessage")
+            rows = self.cursor_i18n.fetchall()
+            for row in rows:
+                primary_keys_org.append(row["source"])
+        except Exception as e:
+            print(f"Error fetching existing primary keys: {e}")
 
-            try:
-                self.cursor_i18n.execute(query)
-            except Exception as e:
-                text_error += f"Error updating: {message}.\n"
-                print(e)
+        # Delete removed widgets
+        primary_keys_org_set = set(primary_keys_org)
+        primary_keys_final_set = set(messages)
+        old_messages = primary_keys_org_set - primary_keys_final_set
 
-        if len(text_error) > 1:
-            tools_qt.show_info_box(text_error)
+        if old_messages:
+            if self.delete_old_keys:
+                for source in old_messages:
+                    source = source.replace("'", "''")
+                    query = f"DELETE FROM {self.schema_i18n}.pymessage WHERE source = '{source}';"
+                    try:
+                        self.cursor_i18n.execute(query)
+                    except Exception as e:
+                        print(f"Error deleting row: {e} - Query: {query}")
+
+        # Insert new messages
+        msg = ""
+        msg_params = None
+        new_messages = primary_keys_final_set - primary_keys_org_set
+        if new_messages:
+            for message in new_messages:
+                message = message.replace("'", "''")
+                query = (f"""INSERT INTO {self.schema_i18n}.pymessage (source_code, source, ms_en_us) """
+                         f"""VALUES ('giswater', '{message}', '{message}') ON CONFLICT (source_code, source) """
+                         f"""DO UPDATE SET ms_en_us = '{message}'""")
+
+                try:
+                    self.cursor_i18n.execute(query)
+                except Exception:
+                    msg = "Error updating: {0}.\n"
+                    msg_params = (message,)
+                    title = "Error updating message"
+                    tools_qt.show_exception_message(title, msg, msg_params=msg_params)
+                    print(query)
+                    break
+
+        if len(msg) > 1:
+            tools_qt.show_info_box(msg, msg_params=msg_params)
         else:
             msg = "All messages updated correctly"
             tools_qt.show_info_box(msg)
 
         self.conn_i18n.commit()
+    # endregion
 
-    def _find_py_files(self, path):
+    #region python functions
+    
+    def _find_files(self, path, file_type):
+        """ Find all files with the given file type in the given path """
+
         py_files = []
-
         for folder, subfolder, files in os.walk(path):
+            if folder.split(os.sep) in ['packages', 'resources']:
+                continue
             for file in files:
-                if file.endswith(".py"):
+                if file.endswith(file_type):
                     file_path = os.path.join(folder, file)
                     py_files.append(file_path)
 
         return py_files
 
+
     def _search_lines(self, file, key):
+        """ Search for the lines with the key in the file """
+
         found_lines = []
         try:
             with open(file, "r", encoding="utf-8") as f:
-                lines = f.readlines()
-                num_line = 0  # Initialize the line number outside the loop
-                while num_line < len(lines):  # Continue until we go through all the lines
-                    line = lines[num_line].strip()
+                in_multiline = False
+                full_text = ""
+
+                for num_line, raw_line in enumerate(f):
+                    line = raw_line.strip()
+                    
+                    if in_multiline:
+                        full_text += line
+                        if line.endswith(")"):
+                            found_lines = self._msg_multines_end(found_lines, full_text, num_line)
+                            in_multiline = False
+                        continue
+
                     if line.startswith(key):
-                        if "(" not in key:  # If no parenthesis in the key
+                        if "(" not in key:
                             found_lines.append((num_line, line))
-                        else:  # If the key contains parenthesis
-                            full_text = line[0]
-                            while ")" not in line:  # Loop to find the closing parenthesis
-                                full_text += line[1:-1]  # Remove the parentheses
-                                num_line += 1
-                                line = lines[num_line].strip()  # Move to the next line
-                            full_text += line[1:-2] + key[-1] + ")" # Add the part before the closing parenthesis
-                            found_lines.append((num_line, full_text))
-                            print(full_text)
-                    num_line += 1  # Increment the line number after each iteration
+                        else:
+                            if line.endswith(")"):
+                                found_lines = self._msg_multines_end(found_lines, full_text, num_line)
+                            else:
+                                # Begin multi-line
+                                in_multiline = True
+                                full_text = line
+
+        except FileNotFoundError:
+            msg = "File not found: {0}"
+            msg_params = (file,)
+            title = "File not found"
+            tools_qt.show_exception_message(title, msg, msg_params=msg_params)
         except Exception as e:
-            print(f"No se pudo leer el archivo {file}: {e}")
+            msg = "Error reading file {0}: {1}"
+            msg_params = (file, e,)
+            title = "Error reading file"
+            tools_qt.show_exception_message(title, msg, msg_params=msg_params)
         return found_lines
+    
+
+    def _msg_multines_end(self, found_lines, full_text, num_line):
+        """ Extract the message from the multiline """
+
+        matches = re.findall(r"(['\"])(.*?)\1", full_text)
+        if matches:
+            final_text = 'msg = "' + ''.join(m[1] for m in matches) + '"'
+            found_lines.append((num_line, final_text))
+        else:
+            if full_text != "":
+                msg = "Error: Could not extract message from line: {0}"
+                msg_params = (full_text,)
+                title = "Error finding string"
+                tools_qt.show_exception_message(title, msg, msg_params=msg_params)
+            found_lines.append((num_line, full_text.strip()))
+        return found_lines
+    
+
+    def _search_dialog_info(self, file, key_row, key_text, num_line):
+        """ Search for the dialog info in the file """
+
+        with open(file, "r", encoding="utf-8") as f:
+            # Extract folder and file name (assuming the file path is used)
+            toolbar_name = os.path.basename(os.path.dirname(file))
+            dialog_name = os.path.basename(file)
+            dialog_name = dialog_name.split(".")[0]
+
+            # Read all lines into a list
+            lines = f.readlines()
+            
+            # Search for the key in the file, starting from the given line
+            while num_line >= 0 and key_row not in lines[num_line]:
+                num_line -= 1  
+            
+            if num_line < 0:
+                return None  
+
+            # Now extract the value between quotes using regex
+            pattern = rf'{re.escape(key_text)}"(.*?)"'
+            match = re.search(pattern, lines[num_line])
+
+            if match:
+                source = match.group(1)
+            else:
+                source = ""
+            
+            return dialog_name, toolbar_name, source
 
     
     #endregion
     # region Global funcitons
     def _detect_schema(self, schema_name):
+        """ Detect if the schema exists """
+
         query = "SELECT schema_name FROM information_schema.schemata;"
         self.cursor_org.execute(query)
         schemas = self.cursor_org.fetchall()
@@ -893,12 +1178,16 @@ class GwSchemaI18NManager:
         return existing_schema
 
     def detect_table_func(self, table):
+        """ Detect if the table exists """
+
         self.cursor_i18n.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
         result = self.cursor_i18n.fetchone()
         existing_table = result[0] > 0  # Check if count is greater than 0
         return existing_table
 
     def _find_table_org(self, table_i18n):
+        """ Find the table in the original DB """
+
         # Create the query using table_i18n
         query = f'SELECT * FROM {table_i18n}'
         rows = self._get_rows(query, self.cursor_i18n)
@@ -907,7 +1196,10 @@ class GwSchemaI18NManager:
         tables_org = []
         # Process the table name based on its prefix
         if "dbtypevalue" in table_i18n:
-            tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue"]
+            if self.project_type == "am":
+                tables_org = ["sys_typevalue"]
+            if self.project_type in ["ws", "ud"]:
+                tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue"]
         elif "dbjson" in table_i18n:
             tables_org = ["config_report", "config_toolbox"]
         elif "dbconfig_form_fields_json" in table_i18n:
@@ -942,6 +1234,7 @@ class GwSchemaI18NManager:
 
     def _get_rows(self, sql, cursor):
         """ Get multiple rows from selected query """
+
         rows = None
         try:
             cursor.execute(sql)
@@ -952,6 +1245,8 @@ class GwSchemaI18NManager:
             return rows
 
     def _vacuum_commit(self, table, conn, cursor):
+        """ Vacuum and commit the table """
+
         old_isolation_level = conn.isolation_level
         conn.set_isolation_level(0)
         cursor.execute(f"VACUUM FULL {table};")
@@ -959,6 +1254,7 @@ class GwSchemaI18NManager:
         conn.set_isolation_level(old_isolation_level)
 
     def _change_table_lyt(self, table):
+        """ Change the label to inform the user about the table being processed """
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
         msg = "From {0}, updating {1}..."
@@ -967,6 +1263,7 @@ class GwSchemaI18NManager:
         QApplication.processEvents()
 
     def _detect_column_names(self, table):
+        """ Detect the column names of the table """
         query = f"""
             SELECT a.attname AS column_name
             FROM pg_index i
@@ -1007,6 +1304,8 @@ class GwSchemaI18NManager:
         return results
 
     def _verify_lang(self):
+        """ Verify if the language is en_US """
+
         if self.project_type in ["ws", "ud"]:
             query = f"SELECT language from {self.schema_org}.sys_version"
             self.cursor_org.execute(query)
@@ -1016,23 +1315,22 @@ class GwSchemaI18NManager:
         return True
 
     def tables_dic(self, schema_type):
+        """ Define the tables to be translated in a dictionary """
         dbtables_dic = {
             "ws": {
-                # "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
-                #     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                #     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
-                #     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                #  ],
-                 "dbtables": [],
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
+                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                ],
                  "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
-                # "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
-                #     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                #     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
-                #     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                #  ],
-                 "dbtables": [],
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
+                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                ],
                  "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
@@ -1040,8 +1338,8 @@ class GwSchemaI18NManager:
                 "sutables": []
             },
             "cm": {
-                "dbtables": ["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "sys_typevalue", "dbconfig_form_fields_json"],
+                "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
+                             "dbtypevalue", "dbconfig_form_fields_json"],
                 "sutables": []
             },
         }
@@ -1145,3 +1443,7 @@ class GwSchemaI18NManager:
         message = "GitHub Issues"
         message = "or"
         message = "our website"
+        message = "Export INP finished. "
+        message = "Error near line"
+        message = "EPA model finished. "
+        message = "Import RPT file finished."

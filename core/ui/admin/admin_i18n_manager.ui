@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>964</width>
-    <height>575</height>
+    <height>573</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -32,13 +32,6 @@
       <string>Search Options</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="chk_py_messages">
-        <property name="text">
-         <string>Check for PY Messages</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="chk_for_su_tables">
         <property name="text">
@@ -53,17 +46,38 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QCheckBox" name="chk_am_dialogs">
         <property name="text">
          <string>Check for am tables</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QCheckBox" name="chk_cm_dialogs">
         <property name="text">
          <string>Check for cm tables</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QCheckBox" name="chk_py_dialogs">
+        <property name="text">
+         <string>Check for PY Dialogs</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QCheckBox" name="chk_all">
+        <property name="text">
+         <string>Check All</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QCheckBox" name="chk_py_messages">
+        <property name="text">
+         <string>Check for PY Messages</string>
         </property>
        </widget>
       </item>

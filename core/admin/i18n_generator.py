@@ -17,7 +17,7 @@ import psycopg2.extras
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_log
 
 from PyQt5.QtWidgets import QApplication
 
@@ -267,10 +267,35 @@ class GwI18NGenerator:
         del ts_file
 
         lrelease_path = f"{self.plugin_dir}{os.sep}resources{os.sep}i18n{os.sep}lrelease.exe"
-        status = subprocess.call([lrelease_path, ts_path], shell=False)
-        if status == 0:
-            return True
-        else:
+        try:
+            tools_log.log_info(f"Running lrelease: {lrelease_path} {ts_path}")
+            
+            # Use subprocess.run to capture output and errors
+            process = subprocess.run(
+                [lrelease_path, ts_path],
+                shell=False,
+                capture_output=True,  # Capture stdout and stderr
+                text=True  # Decode stdout/stderr as text
+            )
+
+            status = process.returncode
+            stdout = process.stdout
+            stderr = process.stderr
+
+            tools_log.log_info(f"lrelease completed with status: {status}")
+            if stdout:
+                tools_log.log_info(f"lrelease stdout:\n{stdout}")
+
+            if status == 0:
+                tools_log.log_info("lrelease succeeded")
+                return True
+            else:
+                tools_log.log_warning(f"lrelease failed with status {status}")
+                if stderr:
+                    tools_log.log_warning(f"lrelease stderr:\n{stderr}")
+                return False
+        except Exception as e:
+            tools_log.log_warning(f"Error running lrelease: {str(e)}")
             return False
 
     def _get_title(self, py_dialogs, name, key_label):
@@ -869,12 +894,12 @@ class GwI18NGenerator:
                 "tables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"]
             },
             "cm": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}updates{os.sep}{major_version}{os.sep}{ver_build}"
-                        f"{os.sep}i18n{os.sep}{self.language}{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}cm{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
-                "tables": []  # ["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
+                "tables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
+                             "dbtypevalue", "dbconfig_form_fields_json"]
             }
         }
 
