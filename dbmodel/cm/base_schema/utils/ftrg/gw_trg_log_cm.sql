@@ -9,27 +9,25 @@ or (at your option) any later version.
 
 CREATE OR REPLACE FUNCTION cm.gw_trg_log_cm() RETURNS trigger AS $$
 DECLARE
-
     v_feature_type TEXT := TG_ARGV[0];
+    v_mission_type TEXT := TG_ARGV[1];
+    v_mission_id_column TEXT := TG_ARGV[2];
+    
     v_feature_id_column TEXT;
-    v_feature_column TEXT;
-    v_querytext TEXT;
     v_feature_id_value INTEGER;
-    changed_fields text[];
+    v_mission_id_value INTEGER;
+    
     old_json jsonb := '{}'::jsonb;
     new_json jsonb := '{}'::jsonb;
     col text;
 BEGIN
-
     v_feature_id_column := v_feature_type || '_id';
-    v_feature_column := v_feature_type || '_type';
 
+    -- Get mission_id from the correct column
     IF TG_OP IN ('INSERT', 'UPDATE') THEN
-        EXECUTE format('SELECT ($1).%I', v_feature_id_column) INTO v_feature_id_value USING NEW;
-    END IF;
-
-    IF TG_OP = 'DELETE' THEN
-        EXECUTE format('SELECT ($1).%I', v_feature_id_column) INTO v_feature_id_value USING OLD;
+        EXECUTE format('SELECT ($1).%I, ($1).%I', v_feature_id_column, v_mission_id_column) INTO v_feature_id_value, v_mission_id_value USING NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        EXECUTE format('SELECT ($1).%I, ($1).%I', v_feature_id_column, v_mission_id_column) INTO v_feature_id_value, v_mission_id_value USING OLD;
     END IF;
 
     IF TG_OP = 'UPDATE' THEN
@@ -42,23 +40,26 @@ BEGIN
             END IF;
         END LOOP;
         IF old_json = '{}'::jsonb THEN
-            -- No changes, do not log
-            RETURN NULL;
+            RETURN NULL; -- No changes, do not log
         END IF;
-        INSERT INTO cm.cm_log(table_name, lot_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
-        VALUES (TG_TABLE_NAME, COALESCE(NEW.lot_id, OLD.lot_id), v_feature_id_value, v_feature_type, TG_OP, current_query(), old_json, new_json, current_user, now());
+        
+        INSERT INTO cm.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), old_json, new_json, current_user, now());
         RETURN NEW;
+        
     ELSIF TG_OP = 'INSERT' THEN
         new_json := to_jsonb(NEW);
-        INSERT INTO cm.cm_log(table_name, lot_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
-        VALUES (TG_TABLE_NAME, NEW.lot_id, v_feature_id_value, v_feature_type, TG_OP, current_query(), NULL, new_json, current_user, now());
+        INSERT INTO cm.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), NULL, new_json, current_user, now());
         RETURN NEW;
+        
     ELSIF TG_OP = 'DELETE' THEN
         old_json := to_jsonb(OLD);
-        INSERT INTO cm.cm_log(table_name, lot_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
-        VALUES (TG_TABLE_NAME, OLD.lot_id, v_feature_id_value, v_feature_type, TG_OP, current_query(), old_json, NULL, current_user, now());
+        INSERT INTO cm.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), old_json, NULL, current_user, now());
         RETURN OLD;
     END IF;
+    
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;

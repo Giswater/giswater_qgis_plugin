@@ -1,9 +1,19 @@
--- DROP FUNCTION cm.cm_trg_edit_feature();
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
 
-CREATE OR REPLACE FUNCTION cm.cm_trg_edit_feature()
+
+-- DROP FUNCTION if exists SCHEMA_NAME.cm_trg_edit_feature();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.cm_trg_edit_feature()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
+
+--FUNCTION CODE: UNKNOWN
+
 DECLARE
 v_json_new_data json;
 v_json_old_data json;
@@ -20,7 +30,7 @@ v_json_data JSON;
 
 BEGIN
 
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', ws_0604, public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', PARENT_SCHEMA, public';
 
 	-- get input params --
 	v_num_pkeys = 2; -- number OF pkeys (first "n" columns of the view)
@@ -89,7 +99,7 @@ BEGIN
        
        	--RAISE EXCEPTION 'v_input_json %', v_input_json;
 
-        PERFORM ws_0604_2.gw_fct_admin_dynamic_trigger(v_input_json);
+        PERFORM PARENT_SCHEMA_2.gw_fct_admin_dynamic_trigger(v_input_json);
  
        
        
@@ -104,5 +114,5 @@ $function$
 
 -- Permissions
 
-ALTER FUNCTION cm.cm_trg_edit_feature() OWNER TO postgres;
-GRANT ALL ON FUNCTION cm.cm_trg_edit_feature() TO postgres;
+ALTER FUNCTION SCHEMA_NAME.cm_trg_edit_feature() OWNER TO postgres;
+GRANT ALL ON FUNCTION SCHEMA_NAME.cm_trg_edit_feature() TO postgres;

@@ -577,16 +577,37 @@ CREATE TABLE selector_lot
 );
 
 CREATE TABLE cm_log (
-	table_name text NULL,
-	lot_id int4 NULL,
-	feature_id int4 NULL,
+	table_name text NOT NULL,
+  mission_type text NOT NULL,
+	mission_id int4 NOT NULL,
+	feature_id int4 NOT NULL,
 	feature_type text NULL,
 	"action" text NULL,
 	sql text NULL,
 	old_value json NULL,
 	new_value json NULL,
 	insert_by TEXT NULL,
-	insert_at TEXT NULL,
-	CONSTRAINT cm_log_pkey PRIMARY KEY (table_name, lot_id, feature_id, insert_at)
+	insert_at timestamptz NOT NULL,
+	CONSTRAINT cm_log_pkey PRIMARY KEY (table_name, mission_type, mission_id, feature_id, insert_at)
+);
+
+CREATE TABLE sys_fprocess_cm (
+	fid int4 NOT NULL,
+	fprocess_name varchar(100) NULL,
+	project_type varchar(6) NULL,
+	parameters json NULL,
+	"source" text NULL,
+	isaudit bool NULL,
+	fprocess_type text NULL,
+	addparam json NULL,
+	except_level int4 NULL,
+	except_msg text NULL,
+	except_table text NULL,
+	except_table_msg text NULL,
+	query_text text NULL,
+	info_msg text NULL,
+	function_name text NULL,
+	active bool NULL,
+	CONSTRAINT sys_fprocess_cm_pkey PRIMARY KEY (fid)
 );
 

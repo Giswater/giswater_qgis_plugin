@@ -87,3 +87,130 @@ FOR EACH ROW EXECUTE FUNCTION SCHEMA_NAME.gw_trg_lot_x_feature_check_campaign('c
 DROP TRIGGER IF EXISTS trg_validate_lot_x_link_feature ON "SCHEMA_NAME".om_campaign_lot_x_link;
 CREATE TRIGGER trg_validate_lot_x_link_feature BEFORE INSERT OR UPDATE ON "SCHEMA_NAME".om_campaign_lot_x_link
 FOR EACH ROW EXECUTE FUNCTION SCHEMA_NAME.gw_trg_lot_x_feature_check_campaign('link');
+
+DO $$
+DECLARE
+    rec record;
+    view_name text;
+    trigger_name text;
+    feature_type text;
+BEGIN
+    FOR rec IN
+        SELECT id FROM PARENT_SCHEMA.cat_feature
+    LOOP
+        feature_type := lower(rec.id);
+        
+        -- Conditional for gully, same as before
+        IF feature_type = 'gully' AND 'PARENT_TYPE' <> 'ud' THEN
+            CONTINUE;
+        END IF;
+
+        -- Construct the view name exactly as in ddl.sql
+        view_name := 've_' || 'PARENT_SCHEMA' || '_lot_' || feature_type;
+        trigger_name := 'trg_PARENT_SCHEMA_edit_lot_' || feature_type;
+
+        EXECUTE
+        'CREATE OR REPLACE TRIGGER ' || trigger_name || ' INSTEAD OF
+        INSERT OR DELETE OR UPDATE
+        ON ' || 'SCHEMA_NAME' || '.' || view_name ||' FOR EACH ROW EXECUTE FUNCTION '||'SCHEMA_NAME'||'.cm_trg_edit_feature()';
+    END LOOP;
+END
+$$;
+
+-- Create triggers for log in the tables
+DO $$
+DECLARE
+    rec record;
+    trigger_name text;
+    feature_type text;
+    mission_type text;
+    mission_id_column text;
+    has_lot_id boolean;
+    has_campaign_id boolean;
+BEGIN
+    -- Triggers for parent schema tables (e.g., junio06_ws_adaptation)
+    FOR rec IN
+        SELECT
+            t.table_name,
+            cf.feature_type
+        FROM
+            information_schema.tables t
+        JOIN
+            PARENT_SCHEMA.cat_feature cf ON t.table_name = 'PARENT_SCHEMA' || '_' || lower(cf.id)
+        WHERE
+            t.table_schema = 'SCHEMA_NAME'
+    LOOP
+        -- Check for lot_id column
+        SELECT EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = 'SCHEMA_NAME' AND table_name = rec.table_name AND column_name = 'lot_id'
+        ) INTO has_lot_id;
+
+        -- Check for campaign_id column
+        SELECT EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = 'SCHEMA_NAME' AND table_name = rec.table_name AND column_name = 'campaign_id'
+        ) INTO has_campaign_id;
+
+        feature_type := lower(rec.feature_type);
+        trigger_name := 'trg_log_' || rec.table_name;
+        mission_type := NULL;
+        mission_id_column := NULL;
+
+        IF has_lot_id THEN
+            mission_type := 'lot';
+            mission_id_column := 'lot_id';
+        ELSIF has_campaign_id THEN
+            mission_type := 'campaign';
+            mission_id_column := 'campaign_id';
+        END IF;
+
+        IF mission_type IS NOT NULL THEN
+            EXECUTE format(
+                'CREATE OR REPLACE TRIGGER %I ' ||
+                'AFTER INSERT OR UPDATE OR DELETE ON %I.%I ' ||
+                'FOR EACH ROW EXECUTE PROCEDURE %I.gw_trg_log_cm(%L, %L, %L)',
+                trigger_name, 'SCHEMA_NAME', rec.table_name, 'SCHEMA_NAME', feature_type, mission_type, mission_id_column
+            );
+        END IF;
+    END LOOP;
+
+    -- Triggers for om_campaign_x_ tables
+    FOR rec IN
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'SCHEMA_NAME' AND table_name LIKE 'om_campaign_x_%'
+    LOOP
+        feature_type := split_part(rec.table_name, '_x_', 2);
+        trigger_name := 'trg_log_' || rec.table_name;
+        mission_type := 'campaign';
+        mission_id_column := 'campaign_id';
+
+        EXECUTE format(
+            'CREATE OR REPLACE TRIGGER %I ' ||
+            'AFTER INSERT OR UPDATE OR DELETE ON %I.%I ' ||
+            'FOR EACH ROW EXECUTE PROCEDURE %I.gw_trg_log_cm(%L, %L, %L)',
+            trigger_name, 'SCHEMA_NAME', rec.table_name, 'SCHEMA_NAME', feature_type, mission_type, mission_id_column
+        );
+    END LOOP;
+
+    -- Triggers for om_campaign_lot_x_ tables
+    FOR rec IN
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'SCHEMA_NAME' AND table_name LIKE 'om_campaign_lot_x_%'
+    LOOP
+        feature_type := split_part(rec.table_name, '_x_', 2);
+        trigger_name := 'trg_log_' || rec.table_name;
+        mission_type := 'lot';
+        mission_id_column := 'lot_id';
+
+        EXECUTE format(
+            'CREATE OR REPLACE TRIGGER %I ' ||
+            'AFTER INSERT OR UPDATE OR DELETE ON %I.%I ' ||
+            'FOR EACH ROW EXECUTE PROCEDURE %I.gw_trg_log_cm(%L, %L, %L)',
+            trigger_name, 'SCHEMA_NAME', rec.table_name, 'SCHEMA_NAME', feature_type, mission_type, mission_id_column
+        );
+    END LOOP;
+END
+$$;

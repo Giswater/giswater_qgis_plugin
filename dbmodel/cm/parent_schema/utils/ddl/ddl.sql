@@ -76,16 +76,6 @@ BEGIN
         );
     END IF;
 
-    EXECUTE 
-    'CREATE TRIGGER cm_trg_edit_feature INSTEAD OF
-    INSERT
-    OR
-    DELETE
-    OR
-    UPDATE
-    ON '||view_name||' FOR EACH ROW EXECUTE FUNCTION '||new_s||'.cm_trg_edit_feature()';
-
     END LOOP;
-
 END
 $$;
