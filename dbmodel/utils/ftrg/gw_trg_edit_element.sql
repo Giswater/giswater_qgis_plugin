@@ -78,34 +78,34 @@ BEGIN
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
-	-- get feature_type and man_table dynamically
-	EXECUTE '
-	SELECT lower(feature_type) FROM cat_feature WHERE child_layer = '||quote_literal(v_tg_table_name)||' OR parent_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
-	INTO v_feature_type;
-
-
-	EXECUTE '
-	SELECT man_table FROM cat_feature_'||v_feature_type||' n
-	JOIN cat_feature cf ON cf.id = n.id
-	JOIN sys_feature_class s ON cf.feature_class = s.id
-	JOIN cat_'||v_feature_type||' ON cat_'||v_feature_type||'.id= '||quote_literal(NEW.elementcat_id)||'
-	WHERE n.id = cat_'||v_feature_type||'.'||v_feature_type||'_type AND child_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
-	INTO v_man_table;
-
-
-	--modify values for custom view inserts
-	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'ELEMENT') THEN
-		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature_element c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id  WHERE c.id=v_man_table);
-	END IF;
-
-	IF v_unitsfactor IS NULL THEN
-		v_unitsfactor = 1;
-	END IF;
-
-
-	-- get element_type and associated feature
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+        -- get feature_type and man_table dynamically
+        EXECUTE '
+        SELECT lower(feature_type) FROM cat_feature WHERE child_layer = '||quote_literal(v_tg_table_name)||' OR parent_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
+        INTO v_feature_type;
+
+
+        EXECUTE '
+        SELECT man_table FROM cat_feature_'||v_feature_type||' n
+        JOIN cat_feature cf ON cf.id = n.id
+        JOIN sys_feature_class s ON cf.feature_class = s.id
+        JOIN cat_'||v_feature_type||' ON cat_'||v_feature_type||'.id= '||quote_literal(NEW.elementcat_id)||'
+        WHERE n.id = cat_'||v_feature_type||'.'||v_feature_type||'_type AND child_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
+        INTO v_man_table;
+
+
+        --modify values for custom view inserts
+        IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'ELEMENT') THEN
+            v_customfeature:=v_man_table;
+            v_man_table:=(SELECT man_table FROM cat_feature_element c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id  WHERE c.id=v_man_table);
+        END IF;
+
+        IF v_unitsfactor IS NULL THEN
+            v_unitsfactor = 1;
+        END IF;
+
+
+        -- get element_type and associated feature
         SELECT element_type INTO v_element_type FROM cat_element WHERE id=NEW.elementcat_id;
 		SELECT node_id, 'node'::text INTO v_feature, v_tablefeature FROM v_edit_node WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 		IF v_feature IS NULL THEN
