@@ -198,3 +198,6 @@ UPDATE sys_table SET project_template = NULL;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_function", "column":"function_alias", "dataType":"text"}}$$);
 
 ALTER TABLE element_type RENAME TO _element_type;
+
+-- 09/06/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"audit_check_data", "column":"result_id", "dataType":"varchar(50)", "isUtils":"False"}}$$);

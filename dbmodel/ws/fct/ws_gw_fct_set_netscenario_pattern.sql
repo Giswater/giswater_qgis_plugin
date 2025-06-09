@@ -60,15 +60,15 @@ BEGIN
 
 	--check if all mapzones have assigned pattern_id
 
-	EXECUTE 'SELECT count(*) FROM plan_netscenario WHERE netscenario_type = ''DMA'' AND netscenario_id = '||quote_literal(v_netscenario_mapzone)||'
-	and pattern_id IS NULL;'
+	EXECUTE 'SELECT count(*) FROM plan_netscenario WHERE netscenario_type = ''DMA'' AND netscenario_id = '||quote_nullable(v_netscenario_mapzone)||'
+	and parent_id IS NULL;'
 	INTO v_count;
 
 	IF v_count = 0 THEN
 
 		EXECUTE 'INSERT INTO inp_dscenario_demand(dscenario_id, feature_id, feature_type, pattern_id)
 		SELECT '||v_dscenario_demand||', connec_id, ''CONNEC'', pattern_id FROM plan_netscenario_connec
-		WHERE netdscenario_id = '||quote_literal(v_netscenario_mapzone)||';';
+		WHERE netscenario_id = '||quote_nullable(v_netscenario_mapzone)||';';
 
 		EXECUTE 'SELECT count(*) from inp_dscenario_demand
 		WHERE dscenario_id =  '||v_dscenario_demand||' AND feature_type = ''CONNEC'''
@@ -79,7 +79,7 @@ BEGIN
 
 		EXECUTE 'INSERT INTO inp_dscenario_demand( dscenario_id, feature_id, feature_type, pattern_id)
 		SELECT '||v_dscenario_demand||', node_id, ''NODE'', pattern_id FROM plan_netscenario_node
-		WHERE  netscenario_id = '||quote_literal(v_netscenario_mapzone)||';';
+		WHERE  netscenario_id = '||quote_nullable(v_netscenario_mapzone)||';';
 
 		EXECUTE 'SELECT count(*) from inp_dscenario_demand
 		WHERE dscenario_id =  '||v_dscenario_demand||' AND feature_type = ''NODE'''
