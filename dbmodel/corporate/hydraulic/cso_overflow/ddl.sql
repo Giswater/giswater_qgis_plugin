@@ -55,11 +55,11 @@ CREATE TABLE cso_subc_wwf (
 	node_type text NULL,
 	drainzone_id int4 NULL,
 	lito_reclass text NULL,
-	usos_reclass text NULL,
+	landuse_reclass text NULL,
 	slope_reclass text NULL,
 	cn_code text NULL,
 	cn_value int4 NULL,
-	po numeric(10,3) NULL,
+	po_value numeric(10,3) NULL,
 	c_value numeric(10,3) NULL,
 	ci_value numeric(10,3) NULL,
 	the_geom public.geometry(MULTIPOLYGON, SRID_VALUE) NULL
