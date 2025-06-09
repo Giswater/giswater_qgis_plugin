@@ -247,13 +247,6 @@ ALTER TABLE gully DROP CONSTRAINT gully_fluid_type_feature_type_fkey;
 ALTER TABLE gully DROP CONSTRAINT gully_function_type_feature_type_fkey;
 ALTER TABLE gully DROP CONSTRAINT gully_location_type_feature_type_fkey;
 
--- 29/11/2024
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"macrominsector_id", "dataType":"integer"}}$$);
-ALTER TABLE node ALTER COLUMN macrominsector_id SET DEFAULT 0;
-ALTER TABLE arc ALTER COLUMN macrominsector_id SET DEFAULT 0;
-ALTER TABLE connec ALTER COLUMN macrominsector_id SET DEFAULT 0;
-ALTER TABLE link ALTER COLUMN macrominsector_id SET DEFAULT 0;
-ALTER TABLE gully ALTER COLUMN macrominsector_id SET DEFAULT 0;
 -- 02/12/2024
 DROP VIEW IF EXISTS ve_epa_orifice;
 DROP VIEW IF EXISTS v_edit_inp_orifice;
@@ -887,7 +880,6 @@ CREATE TABLE node (
 	omzone_id int4 DEFAULT 0 NULL,
 	omunit_id int4 DEFAULT 0 NULL,
 	minsector_id int4 DEFAULT 0 NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	dwfzone_outfall int4[] NULL,
 	drainzone_outfall int4[] NULL,
 	pavcat_id text NULL,
@@ -1102,7 +1094,6 @@ CREATE TABLE arc (
 	omzone_id int4 DEFAULT 0 NULL,
 	omunit_id int4 DEFAULT 0 NULL,
 	minsector_id int4 DEFAULT 0 NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	pavcat_id varchar(30) NULL,
 	soilcat_id varchar(16) NULL,
 	function_type varchar(50) NULL,
@@ -1290,7 +1281,6 @@ CREATE TABLE connec (
 	omzone_id int4 DEFAULT 0 NULL,
 	omunit_id int4 DEFAULT 0 NULL,
 	minsector_id int4 DEFAULT 0 NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	drainzone_outfall int4[] NULL,
 	dwfzone_outfall int4[] NULL,
 	soilcat_id varchar(16) NULL,
@@ -1485,7 +1475,6 @@ CREATE TABLE gully (
 	omzone_id int4 DEFAULT 0 NULL,
 	omunit_id int4 DEFAULT 0 NULL,
 	minsector_id int4 DEFAULT 0 NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	soilcat_id varchar(16) NULL,
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
@@ -1745,7 +1734,6 @@ CREATE TABLE link (
 	omzone_id int4 DEFAULT 0 NULL,
 	drainzone_outfall int4[] NULL,
 	dwfzone_outfall int4[] NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	location_type varchar(50) NULL,
 	_fluid_type varchar(50) NULL,
 	fluid_type int4 DEFAULT 0 NOT NULL,

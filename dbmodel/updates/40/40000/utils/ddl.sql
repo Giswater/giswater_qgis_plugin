@@ -380,7 +380,6 @@ CREATE TABLE archived_psector_link_traceability (
     enddate date NULL,
     uncertain bool NULL,
     muni_id int4 NULL,
-    macrominsector_id int4 NULL,
     verified int2 NULL,
     supplyzone_id int4 NULL,
     n_hydrometer int4 NULL,

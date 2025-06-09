@@ -48,7 +48,7 @@ INSERT INTO cat_link (id, link_type) VALUES ('UPDATE_LINK_40', 'LINK');
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
 created_at, sector_id, omzone_id, _fluid_type, expl_visibility, epa_type, is_operative, created_by, updated_at,
 updated_by, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
-macrominsector_id, top_elev1, top_elev2, y2, link_type)
+top_elev1, top_elev2, y2, link_type)
 SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id::integer, feature_type, exit_id::integer, exit_type, userdefined_geom, state, expl_id, the_geom,
 tstamp, sector_id, dma_id, fluid_type, ARRAY[expl_id2], epa_type, is_operative, insert_user, lastupdate, lastupdate_user,
 CASE
@@ -63,7 +63,6 @@ CASE
     END
   ELSE conneccat_id
 END AS conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
-macrominsector_id,
 CASE
   WHEN feature_type = 'GULLY' THEN
     (SELECT g.top_elev FROM gully g WHERE g.gully_id = feature_id::int4 LIMIT 1)

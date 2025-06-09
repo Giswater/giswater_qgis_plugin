@@ -369,45 +369,27 @@ BEGIN
     ELSE
 
         -- Update minsector
-        TRUNCATE minsector;
+        TRUNCATE minsector, minsector_mincut;
         INSERT INTO minsector SELECT * FROM temp_minsector;
 
-        -- Update minsector graph
-        -- For user selected exploitations
-        IF v_expl_id = '-901' THEN
-            SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
-            FROM v_edit_arc a
-            WHERE a.minsector_id <> '0'
-            AND a.macrominsector_id <> '0';
+        -- TODO: revise this part with macrominsector_id
+        -- -- Update minsector graph
+        -- SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
+        -- FROM arc a
+        -- WHERE a.minsector_id <> '0'
+        -- AND a.macrominsector_id <> '0'
+        -- AND a.expl_id::TEXT = ANY(string_to_array(v_expl_id_array, ','));
 
-            DELETE FROM minsector_graph WHERE macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','));
-        -- For all exploitations
-        ELSIF v_expl_id = '-902' THEN
-            SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
-            FROM arc a
-            WHERE a.minsector_id <> '0'
-            AND a.macrominsector_id <> '0';
-
-            TRUNCATE minsector_graph;
-        -- For a specific exploitation/s
-        ELSE
-            SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
-            FROM arc a
-            WHERE a.minsector_id <> '0'
-            AND a.macrominsector_id <> '0'
-            AND a.expl_id::TEXT = ANY(v_expl_id_array);
-
-            DELETE FROM minsector_graph WHERE macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','));
-        END IF;
+        -- DELETE FROM minsector_graph WHERE macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','));
 
         INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)
         SELECT node_id, minsector_1, minsector_2 FROM temp_minsector_graph;
 
         -- Update minsector_id set to '0'
-        EXECUTE 'UPDATE arc SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
-        EXECUTE 'UPDATE node SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
-        EXECUTE 'UPDATE connec SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
-        EXECUTE 'UPDATE link SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
+        EXECUTE 'UPDATE arc SET minsector_id = 0 WHERE minsector_id <> 0';
+        EXECUTE 'UPDATE node SET minsector_id = 0 WHERE minsector_id <> 0';
+        EXECUTE 'UPDATE connec SET minsector_id = 0 WHERE minsector_id <> 0';
+        EXECUTE 'UPDATE link SET minsector_id = 0 WHERE minsector_id <> 0';
 
         -- Update minsector_id only for the elements that are in the temporary tables
         EXECUTE 'UPDATE arc a SET minsector_id = t.mapzone_id FROM temp_pgr_arc t WHERE a.arc_id = t.arc_id';

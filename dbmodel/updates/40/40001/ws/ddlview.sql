@@ -147,7 +147,6 @@ AS WITH
       omzone_table.macroomzone_id,
       omzone_table.omzone_type,
       arc.minsector_id,
-      arc.macrominsector_id,
       arc.pavcat_id,
       arc.soilcat_id,
       arc.function_type,
@@ -378,7 +377,6 @@ AS WITH
         omzone_table.macroomzone_id,
         omzone_table.omzone_type,
         node.minsector_id,
-        node.macrominsector_id,
         node.pavcat_id,
         node.soilcat_id,
         node.function_type,
@@ -626,7 +624,6 @@ AS WITH
         omzone_table.macroomzone_id,
         omzone_table.omzone_type,
         l.minsector_id,
-        l.macrominsector_id,
         l.location_type,
         l.fluid_type,
         l.custom_length,
@@ -729,7 +726,7 @@ AS WITH
         SELECT link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_type, macrosector_id,
         l.dma_id, dma_type, l.omzone_id, omzone_type, macrodma_id, l.presszone_id, presszone_type, presszone_head, l.dqa_id, dqa_type, dqa_table.macrodqa_id,
         l.supplyzone_id, supplyzone_type, fluid_type,
-        minsector_id, staticpressure, null::integer AS macrominsector_id
+        minsector_id, staticpressure
         FROM link l
         JOIN exploitation USING (expl_id)
         JOIN sector_table ON sector_table.sector_id = l.sector_id
@@ -869,10 +866,6 @@ AS WITH
             WHEN link_planned.minsector_id IS NULL THEN connec.minsector_id
             ELSE link_planned.minsector_id
           END AS minsector_id,
-          CASE
-            WHEN link_planned.macrominsector_id IS NULL THEN connec.macrominsector_id
-            ELSE link_planned.macrominsector_id
-          END AS macrominsector_id,
           connec.soilcat_id,
           connec.function_type,
           connec.category_type,
@@ -4433,7 +4426,6 @@ SELECT
     m.nodecat_id,
     m.minsector_1,
     m.minsector_2,
-    m.macrominsector_id,
     n.expl_id
 FROM minsector_graph m
 JOIN node n ON n.node_id = m.node_id

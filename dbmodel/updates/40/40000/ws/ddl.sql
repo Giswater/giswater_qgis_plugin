@@ -258,14 +258,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_virtua
 
 -- 21/11/24
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"minsector_graph", "column":"expl_id"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"macrominsector_id", "dataType":"integer"}}$$);
-
--- 29/11/24
-ALTER TABLE node ALTER COLUMN macrominsector_id SET DEFAULT 0;
-ALTER TABLE arc ALTER COLUMN macrominsector_id SET DEFAULT 0;
-ALTER TABLE connec ALTER COLUMN macrominsector_id SET DEFAULT 0;
-ALTER TABLE link ALTER COLUMN macrominsector_id SET DEFAULT 0;
-ALTER TABLE minsector_graph ALTER COLUMN macrominsector_id SET DEFAULT 0;
 
 -- 02/12/2024
 
@@ -1088,7 +1080,6 @@ CREATE TABLE arc (
 	dqa_id int4 DEFAULT 0 NULL,
 	omzone_id int4 DEFAULT 0 NULL,
 	minsector_id int4 DEFAULT 0 NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	pavcat_id varchar(30) NULL,
 	soilcat_id varchar(30) NULL,
 	function_type varchar(50) NULL,
@@ -1301,7 +1292,6 @@ CREATE TABLE connec (
 	omzone_id int4 DEFAULT 0 NULL,
 	crmzone_id int4 DEFAULT 0 NULL,
 	minsector_id int4 DEFAULT 0 NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	soilcat_id varchar(16) NULL,
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
@@ -1639,7 +1629,6 @@ CREATE TABLE node (
 	dqa_id int4 NULL,
 	omzone_id int4 NULL,
 	minsector_id int4 NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	pavcat_id text NULL,
 	soilcat_id varchar(30) NULL,
 	function_type varchar(50) NULL,
@@ -1788,7 +1777,6 @@ CREATE TABLE link (
 	dqa_id int4 NULL,
 	omzone_id int4 NULL,
 	minsector_id int4 NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
 	location_type varchar(50) NULL,
 	fluid_type varchar(50) NULL,
 	custom_length numeric(12, 2) NULL,
