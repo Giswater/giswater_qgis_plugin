@@ -212,5 +212,21 @@ BEGIN
             trigger_name, 'SCHEMA_NAME', rec.table_name, 'SCHEMA_NAME', feature_type, mission_type, mission_id_column
         );
     END LOOP;
+
+    -- Trigger for om_campaign
+    EXECUTE format(
+        'CREATE OR REPLACE TRIGGER trg_log_om_campaign ' ||
+        'AFTER INSERT OR UPDATE OR DELETE ON %I.om_campaign ' ||
+        'FOR EACH ROW EXECUTE PROCEDURE %I.gw_trg_log_cm(%L, %L, %L)',
+        'SCHEMA_NAME', 'SCHEMA_NAME', 'campaign', 'campaign', 'campaign_id'
+    );
+
+    -- Trigger for om_campaign_lot
+    EXECUTE format(
+        'CREATE OR REPLACE TRIGGER trg_log_om_campaign_lot ' ||
+        'AFTER INSERT OR UPDATE OR DELETE ON %I.om_campaign_lot ' ||
+        'FOR EACH ROW EXECUTE PROCEDURE %I.gw_trg_log_cm(%L, %L, %L)',
+        'SCHEMA_NAME', 'SCHEMA_NAME', 'lot', 'lot', 'lot_id'
+    );
 END
 $$;
