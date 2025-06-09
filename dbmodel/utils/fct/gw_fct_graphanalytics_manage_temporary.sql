@@ -123,8 +123,8 @@ BEGIN
             CREATE INDEX temp_pgr_connectedcomponents_node ON temp_pgr_connectedcomponents USING btree (node);
             GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_connectedcomponents TO role_basic;
 
-            CREATE TEMP TABLE temp_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
-            CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
+            CREATE TEMP TABLE temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
+            CREATE TEMP TABLE temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
         ELSE
             CREATE TEMP TABLE temp_pgr_drivingdistance (
                 seq INT8 NOT NULL,
@@ -821,11 +821,20 @@ BEGIN
 
         END IF;
 
+        IF v_fct_name = 'MINSECTOR' THEN
+            CREATE TEMPORARY VIEW temp_pgr_minsector_old AS
+            SELECT DISTINCT v.minsector_id
+            FROM temp_pgr_arc t
+            JOIN v_temp_arc v USING (arc_id)
+            WHERE v.minsector_id IS NOT NULL;
+        END IF;
 
 
 
         v_return_message = 'The temporary tables/views have been created successfully';
     ELSIF v_action = 'DROP' THEN
+
+        DROP VIEW IF EXISTS temp_pgr_minsector_old;
         -- Drop temporary tables
         DROP TABLE IF EXISTS temp_pgr_mapzone;
         DROP TABLE IF EXISTS temp_pgr_node;
@@ -833,8 +842,8 @@ BEGIN
         DROP TABLE IF EXISTS temp_audit_check_data;
         DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
         DROP TABLE IF EXISTS temp_pgr_minsector;
-        DROP TABLE IF EXISTS temp_minsector_graph;
-        DROP TABLE IF EXISTS temp_minsector;
+        DROP TABLE IF EXISTS temp_pgr_minsector_graph;
+        DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_minsector_mincut;
 

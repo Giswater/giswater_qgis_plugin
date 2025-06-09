@@ -967,14 +967,11 @@ BEGIN
 						ELSE mapzone_id
 						END AS mapzone_id
 					FROM temp_pgr_arc
-					WHERE arc_id IS NOT NULL
 				)
 				UPDATE arc SET '||quote_ident(v_mapzone_field)||' = arcs.mapzone_id
 				FROM arcs
 				WHERE arc.arc_id = arcs.arc_id
-				AND arc.'||quote_ident(v_mapzone_field)||' <> arcs.mapzone_id
-				AND arc.'||quote_ident(v_mapzone_field)||' <> 0
-				';
+				AND arc.'||quote_ident(v_mapzone_field)||' <> arcs.mapzone_id;';
 			RAISE NOTICE 'v_querytext:: UPDATE arc with temp_pgr_arc mapzone_id %', v_querytext;
 			EXECUTE v_querytext;
 
@@ -986,13 +983,11 @@ BEGIN
 						ELSE mapzone_id
 						END AS mapzone_id
 					FROM temp_pgr_node
-					WHERE node_id IS NOT NULL
 				)
 				UPDATE node SET '||quote_ident(v_mapzone_field)||' = nodes.mapzone_id
 				FROM nodes
 				WHERE node.node_id = nodes.node_id
-				AND node.'||quote_ident(v_mapzone_field)||' <> nodes.mapzone_id
-				';
+				AND node.'||quote_ident(v_mapzone_field)||' <> nodes.mapzone_id;';
 			RAISE NOTICE 'v_querytext:: UPDATE node with temp_pgr_node mapzone_id %', v_querytext;
 			EXECUTE v_querytext;
 
@@ -1005,13 +1000,11 @@ BEGIN
 						END AS mapzone_id
 					FROM temp_pgr_arc
 					JOIN v_temp_connec USING (arc_id)
-					WHERE connec_id IS NOT NULL
 				)
 				UPDATE connec SET '||quote_ident(v_mapzone_field)||' = connecs.mapzone_id
 				FROM connecs
 				WHERE connec.connec_id = connecs.connec_id
-				AND connec.'||quote_ident(v_mapzone_field)||' <> connecs.mapzone_id
-			';
+				AND connec.'||quote_ident(v_mapzone_field)||' <> connecs.mapzone_id;';
 			RAISE NOTICE 'v_querytext:: UPDATE connec with temp_pgr_arc join v_temp_connec mapzone_id %', v_querytext;
 			EXECUTE v_querytext;
 
@@ -1024,13 +1017,11 @@ BEGIN
 						END AS mapzone_id
 					FROM temp_pgr_arc
 					JOIN v_temp_link_connec USING (arc_id)
-					WHERE link_id IS NOT NULL
 				)
 				UPDATE link SET '||quote_ident(v_mapzone_field)||' = links.mapzone_id
 				FROM links
 				WHERE link.link_id = links.link_id
-				AND link.'||quote_ident(v_mapzone_field)||' <> links.mapzone_id
-			';
+				AND link.'||quote_ident(v_mapzone_field)||' <> links.mapzone_id;';
 			RAISE NOTICE 'v_querytext:: UPDATE link with temp_pgr_arc join v_temp_link_connec mapzone_id %', v_querytext;
 			EXECUTE v_querytext;
 
@@ -1039,7 +1030,8 @@ BEGIN
 				WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 				AND NOT EXISTS (
 					SELECT 1 FROM temp_pgr_arc tpa WHERE tpa.mapzone_id = arc.'||quote_ident(v_mapzone_field)||'
-				);';
+				)
+				AND arc.'||quote_ident(v_mapzone_field)||' <> 0;';
 				RAISE NOTICE 'v_querytext:: UPDATE arc old_mapzone_id not in temp_pgr_arc %', v_querytext;
 				EXECUTE v_querytext;
 
@@ -1047,7 +1039,8 @@ BEGIN
 				WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 				AND NOT EXISTS (
 					SELECT 1 FROM temp_pgr_node tpn WHERE tpn.mapzone_id = node.'||quote_ident(v_mapzone_field)||'
-				);';
+				)
+				AND node.'||quote_ident(v_mapzone_field)||' <> 0;';
 				RAISE NOTICE 'v_querytext:: UPDATE node old_mapzone_id not in temp_pgr_node %', v_querytext;
 				EXECUTE v_querytext;
 
@@ -1055,7 +1048,8 @@ BEGIN
 				WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 				AND NOT EXISTS (
 					SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE vc.connec_id = connec.'||quote_ident(v_mapzone_field)||'
-				);';
+				)
+				AND connec.'||quote_ident(v_mapzone_field)||' <> 0;';
 				RAISE NOTICE 'v_querytext:: UPDATE connec old_mapzone_id not in v_temp_connec join temp_pgr_arc %', v_querytext;
 				EXECUTE v_querytext;
 
@@ -1063,7 +1057,8 @@ BEGIN
 				WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 				AND NOT EXISTS (
 					SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id) WHERE vc.link_id = link.'||quote_ident(v_mapzone_field)||'
-				);';
+				)
+				AND link.'||quote_ident(v_mapzone_field)||' <> 0;';
 				RAISE NOTICE 'v_querytext:: UPDATE link old_mapzone_id not in v_temp_link_connec join temp_pgr_arc %', v_querytext;
 				EXECUTE v_querytext;
 			END IF;
