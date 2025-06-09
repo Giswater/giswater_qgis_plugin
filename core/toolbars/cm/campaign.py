@@ -27,6 +27,8 @@ class Campaign:
         self.iface = global_vars.iface
         self.campaign_date_format = 'yyyy-MM-dd'
         self.schema_parent = lib_vars.schema_name
+        # self.cm_schema = lib_vars.project_vars['cm_schema']
+        # self.cm_schema = self.cm_schema.strip("'")
         self.project_type = tools_gw.get_project_type()
         self.dialog = None
         self.campaign_type = None
@@ -108,6 +110,7 @@ class Campaign:
         :param campaign_id: ID of the campaign to load. If None, creates a new campaign.
         :param mode: Type of campaign dialog to load. Options: 'review', 'visit'.
         """
+        self.campaign_id = campaign_id
 
         # In the edit_typevalue or another cm.edit_typevalue
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '1', 'Review', NULL, NULL);
@@ -163,7 +166,6 @@ class Campaign:
                 widget.setText(str(campaign_id))
                 widget.setProperty("columnname", "campaign_id")
                 widget.setObjectName("campaign_id")
-                self.campaign_id = campaign_id
 
         tools_gw.load_settings(self.dialog)
 
@@ -257,13 +259,11 @@ class Campaign:
         Load related elements into campaign relation tabs for the given ID.
         Includes 'gully' only if project type is UD.
         """
-
         relation_tabs = {
             "tbl_campaign_x_arc": ("om_campaign_x_arc", "arc_id"),
             "tbl_campaign_x_node": ("om_campaign_x_node", "node_id"),
             "tbl_campaign_x_connec": ("om_campaign_x_connec", "connec_id"),
             "tbl_campaign_x_link": ("om_campaign_x_link", "link_id")
-
         }
 
         # Only include gully and link if project type is 'ud'
@@ -476,23 +476,26 @@ class Campaign:
         )
 
         self.dialog.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None),
+            lambda: tools_gw.insert_feature(self, self.dialog, "campaign", GwSelectionMode.CAMPAIGN, True, None, None)
         )
         self.dialog.btn_insert.clicked.connect(
             lambda: self._update_feature_completer(self.dialog)
         )
+
         self.dialog.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None),
+            lambda: tools_gw.delete_records(self, self.dialog, "campaign", GwSelectionMode.CAMPAIGN)
         )
         self.dialog.btn_delete.clicked.connect(
             lambda: self._update_feature_completer(self.dialog)
         )
+
         self.dialog.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN),
+            lambda: GwSelectionMode.get_features_from_snapping(self, self.current_feature, self.layers)
         )
         self.dialog.btn_snapping.clicked.connect(
             lambda: self._update_feature_completer(self.dialog)
         )
+
         self.dialog.btn_expr_select.clicked.connect(
             partial(tools_gw.select_with_expression_dialog, self, self.dialog, table_object,
                     selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN),

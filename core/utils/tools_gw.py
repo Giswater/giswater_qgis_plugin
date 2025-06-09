@@ -3470,11 +3470,10 @@ def show_expression_dialog(feature_type, dialog, table_object):
     return dlg.exec_()
 
 
-def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, remove_ids=True, lazy_widget=None,
-                   lazy_init_function=None):
-    """ Select feature with entered id. Set a model with selected filter.
-        Attach that model to selected table
-    """
+def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
+                   remove_ids=True, lazy_widget=None,
+                   lazy_init_function=None, refresh_callback=None):
+    """ Get selected features of the current layer and insert in the table of the form """
 
     tools_qgis.disconnect_signal_selection_changed()
     feature_type = get_signal_change_tab(dialog)
@@ -3569,9 +3568,16 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
     # Clear the feature_id text field
     tools_qt.set_widget_text(dialog, "feature_id", "")
 
+    if refresh_callback:
+        refresh_callback()
+
 
 def remove_selection(remove_groups=True, layers=None):
-    """ Remove all previous selections """
+    """ Removes selection from layers.
+    :param remove_groups: Remove groups of layers (bool)
+    :param layers: Dictionary of layers to remove selection from (optional)
+    :return: Dictionary of layers with removed selection
+    """
 
     list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
     if global_vars.project_type == 'ud':
@@ -4032,7 +4038,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
 
 
 def delete_records(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
-                   lazy_widget=None, lazy_init_function=None, extra_field=None):
+                   lazy_widget=None, lazy_init_function=None, extra_field=None, refresh_callback=None):
     """ Delete selected elements of the table """
 
     tools_qgis.disconnect_signal_selection_changed()
@@ -4079,12 +4085,32 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     del_id = []
     inf_text = ""
     list_id = ""
-    for i in range(0, len(selected_list)):
-        row = selected_list[i].row()
-        id_feature = widget.model().record(row).value(field_id)
-        inf_text += f"{id_feature}, "
-        list_id += f"'{id_feature}', "
-        del_id.append(id_feature)
+
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.LOT):
+        model = widget.model()
+        # Find column index for the field_id
+        col_index = -1
+        for c in range(model.columnCount()):
+            header_item = model.horizontalHeaderItem(c)
+            if header_item and header_item.text() == field_id:
+                col_index = c
+                break
+        
+        if col_index != -1:
+            for i in range(0, len(selected_list)):
+                row = selected_list[i].row()
+                id_feature = model.item(row, col_index).text()
+                inf_text += f"{id_feature}, "
+                list_id += f"'{id_feature}', "
+                del_id.append(id_feature)
+    else:
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_feature = widget.model().record(row).value(field_id)
+            inf_text += f"{id_feature}, "
+            list_id += f"'{id_feature}', "
+            del_id.append(id_feature)
+
     inf_text = inf_text[:-2]
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
@@ -4122,13 +4148,31 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     elif selection_mode == GwSelectionMode.CAMPAIGN:
         state = None
         if extra_field is not None and len(selected_list) == 1:
-            state = widget.model().record(selected_list[0].row()).value(extra_field)
+            # Special handling for Campaign manager's QStandardItemModel
+            model = widget.model()
+            col_index = -1
+            for c in range(model.columnCount()):
+                header_item = model.horizontalHeaderItem(c)
+                if header_item and header_item.text() == extra_field:
+                    col_index = c
+                    break
+            if col_index != -1:
+                state = model.item(selected_list[0].row(), col_index).text()
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.layers)
     elif selection_mode == GwSelectionMode.LOT:
         state = None
         if extra_field is not None and len(selected_list) == 1:
-            state = widget.model().record(selected_list[0].row()).value(extra_field)
+            # Special handling for Lot manager's QStandardItemModel
+            model = widget.model()
+            col_index = -1
+            for c in range(model.columnCount()):
+                header_item = model.horizontalHeaderItem(c)
+                if header_item and header_item.text() == extra_field:
+                    col_index = c
+                    break
+            if col_index != -1:
+                state = model.item(selected_list[0].row(), col_index).text()
         _delete_feature_lot(dialog, feature_type, list_id, class_object.lot_id, state)
         load_tableview_lot(dialog, class_object.feature_type, class_object.lot_id, class_object.layers)
     else:
@@ -4145,6 +4189,8 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     # Update list
     class_object.list_ids[feature_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
+    if refresh_callback:
+        refresh_callback()
 
 
 def get_parent_layers_visibility():
@@ -4799,7 +4845,7 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
         tools_db.execute_sql(sql)
 
 
-def load_tableview_lot(dialog, feature_type, lot_id, layers):
+def load_tableview_lot(dialog, feature_type, lot_id, layers, ids=None):
     """Reload QTableView for campaign_lot_x_<feature_type> safely, avoiding recursive selectionChanged loop."""
 
     if not lot_id:
@@ -4851,7 +4897,9 @@ def _delete_feature_lot(dialog, feature_type, list_id, lot_id, state=None):
 
 
 def _insert_feature_psector(dialog, feature_type, ids=None):
-    """ Insert features_id to table plan_@feature_type_x_psector """
+    """ Insert features_id to table plan_@feature_type_x_psector"""
+    if not ids:
+        return
 
     widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
     tablename = widget.property('tablename')

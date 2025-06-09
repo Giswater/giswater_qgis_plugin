@@ -33,7 +33,8 @@ class AddNewLot:
         self.rb_red.setColor(Qt.darkRed)
         self.rb_red.setIconSize(20)
         self.rb_list = []
-        self.schema_name = lib_vars.schema_name
+        self.schema_parent = lib_vars.schema_name
+        # self.cm_schema = lib_vars.project_vars['cm_schema']
         self.lot_date_format = 'yyyy-MM-dd'
         self.max_id = 0
         self.signal_selectionChanged = False
@@ -49,6 +50,7 @@ class AddNewLot:
     def manage_lot(self, lot_id=None, is_new=True):
         """Open the AddLot dialog and load dynamic fields from gw_fct_getlot."""
 
+        self.lot_id = lot_id
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.is_new_lot = is_new
         self.lot_id_value = None
@@ -82,7 +84,6 @@ class AddNewLot:
         self.load_lot_dialog(lot_id)
 
         # Reference key widgets
-        self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
 
         if self.lot_id_value:
@@ -131,12 +132,14 @@ class AddNewLot:
 
         # Relation feature buttons
         self.dlg_lot.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dlg_lot, table_object, GwSelectionMode.LOT, False, None, None)
+            lambda: tools_gw.insert_feature(self, self.dlg_lot, table_object, GwSelectionMode.LOT, False, None, None,
+                                            refresh_callback=lambda: self._load_lot_relations(self.lot_id))
         )
         self.dlg_lot.btn_insert.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
 
         self.dlg_lot.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_lot, table_object, GwSelectionMode.LOT, None, None, None)
+            lambda: tools_gw.delete_records(self, self.dlg_lot, table_object, GwSelectionMode.LOT, None, None, None,
+                                            refresh_callback=lambda: self._load_lot_relations(self.lot_id))
         )
         self.dlg_lot.btn_delete.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
 
@@ -173,9 +176,11 @@ class AddNewLot:
         """Dynamically load and populate lot dialog using gw_fct_getlot"""
 
         p_data = {
-            "feature": {"id": lot_id, "tableName": "om_campaign_lot", "idName": "lot_id"},
+            "feature": {"tableName": "om_campaign_lot", "idName": "lot_id"},
             "data": {}
         }
+        if lot_id:
+            p_data["feature"]["id"] = lot_id
 
         response = tools_gw.execute_procedure("gw_fct_getlot", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
