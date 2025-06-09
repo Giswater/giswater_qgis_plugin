@@ -854,11 +854,25 @@ BEGIN
 			WHERE t.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
 			EXECUTE v_querytext;
 
+			v_querytext = 'UPDATE '||v_mapzone_name||' SET 
+				expl_id = array_agg(DISTINCT vn.expl_id)::int[],
+				muni_id = array_agg(DISTINCT vn.muni_id)::int[],
+				sector_id = array_agg(DISTINCT vn.sector_id)::int[],
+				updated_at = now(), 
+				updated_by = current_user 
+			FROM temp_pgr_node tn
+			JOIN v_temp_node vn USING (node_id)
+			JOIN temp_pgr_mapzone tm ON tn.mapzone_id = tm.mapzone_id
+			WHERE tm.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field||'
+			AND tn.mapzone_id IS NOT NULL
+			GROUP BY tm.mapzone_id';
+			EXECUTE v_querytext;
+
 
 			-- old zone id array
 			SELECT string_agg(a.old_mapzone_id::text, ',') INTO v_old_mapzone_id_array
 			FROM (
-				SELECT DISTINCT old_mapzone_id FROM temp_pgr_arc
+				SELECT DISTINCT old_mapzone_id FROM temp_pgr_node
 			) a
 			WHERE a.old_mapzone_id IS NOT NULL
 			AND a.old_mapzone_id > 0;
