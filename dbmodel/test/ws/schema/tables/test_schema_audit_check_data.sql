@@ -32,7 +32,7 @@ SELECT col_is_pk('audit_check_data', 'id', 'Column id should be primary key');
 -- Check column types
 SELECT col_type_is('audit_check_data', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('audit_check_data', 'fid', 'smallint', 'Column fid should be smallint');
-SELECT col_type_is('audit_check_data', 'result_id', 'character varying(30)', 'Column result_id should be varchar(30)');
+SELECT col_type_is('audit_check_data', 'result_id', 'character varying(50)', 'Column result_id should be varchar(50)');
 SELECT col_type_is('audit_check_data', 'table_id', 'text', 'Column table_id should be text');
 SELECT col_type_is('audit_check_data', 'column_id', 'text', 'Column column_id should be text');
 SELECT col_type_is('audit_check_data', 'criticity', 'smallint', 'Column criticity should be smallint');
