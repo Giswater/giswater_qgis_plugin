@@ -185,6 +185,7 @@ BEGIN
                         a.presszone_id,
                         a.dma_id,
                         a.dqa_id,
+                        a.muni_id,
                         a.the_geom
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
@@ -223,6 +224,7 @@ BEGIN
                     node.presszone_id,
                     node.dma_id,
                     node.dqa_id,
+                    node.muni_id,
                     node.the_geom
                     FROM node_selector
                     JOIN node ON node.node_id::text = node_selector.node_id::text
@@ -274,6 +276,7 @@ BEGIN
                         connec.dma_id,
                         connec.dqa_id,
                         connec.plot_code,
+                        connec.muni_id,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -324,6 +327,7 @@ BEGIN
                         l.presszone_id,
                         l.dma_id,
                         l.dqa_id,
+                        l.muni_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -370,6 +374,7 @@ BEGIN
                         a.dwfzone_id,
                         a.omzone_id,
                         a.fluid_type,
+                        a.muni_id,
                         a.the_geom
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
@@ -407,6 +412,7 @@ BEGIN
                     node.dwfzone_id,
                     node.omzone_id,
                     node.fluid_type,
+                    node.muni_id,
                     node.the_geom
                     FROM node_selector
                     JOIN node ON node.node_id::text = node_selector.node_id::text
@@ -455,6 +461,7 @@ BEGIN
                         connec.omzone_id,
                         connec.fluid_type,
                         connec.plot_code,
+                        connec.muni_id,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -502,6 +509,7 @@ BEGIN
                         gully.dwfzone_id,
                         gully.omzone_id,
                         gully.fluid_type,
+                        gully.muni_id,
                         gully.the_geom
                     FROM gully_selector
                     JOIN gully ON gully.gully_id::text = gully_selector.gully_id::text
@@ -553,6 +561,7 @@ BEGIN
                         l.dwfzone_id,
                         l.omzone_id,
                         l.fluid_type,
+                        l.muni_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -605,6 +614,7 @@ BEGIN
                         l.dwfzone_id,
                         l.omzone_id,
                         l.fluid_type,
+                        l.muni_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -631,6 +641,7 @@ BEGIN
                     a.presszone_id,
                     a.dma_id,
                     a.dqa_id,
+                    a.muni_id,
                     a.the_geom
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
@@ -648,6 +659,7 @@ BEGIN
                     n.presszone_id,
                     n.dma_id,
                     n.dqa_id,
+                    n.muni_id,
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
@@ -667,6 +679,7 @@ BEGIN
                     dma_id,
                     dqa_id,
                     plot_code,
+                    muni_id,
                     the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
@@ -683,6 +696,7 @@ BEGIN
                     l.presszone_id,
                     l.dma_id,
                     l.dqa_id,
+                    l.muni_id,
                     l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
@@ -705,6 +719,7 @@ BEGIN
                     a.dwfzone_id,
                     a.omzone_id,
                     a.fluid_type,
+                    a.muni_id,
                     a.the_geom
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
@@ -720,6 +735,7 @@ BEGIN
                     n.dwfzone_id,
                     n.omzone_id,
                     n.fluid_type,
+                    n.muni_id,
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
@@ -738,6 +754,7 @@ BEGIN
                     c.omzone_id,
                     c.fluid_type,
                     c.plot_code,
+                    c.muni_id,
                     c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
@@ -753,6 +770,7 @@ BEGIN
                     g.dwfzone_id,
                     g.omzone_id,
                     g.fluid_type,
+                    g.muni_id,
                     g.the_geom
                 FROM gully g
                 JOIN value_state_type vst ON vst.id = g.state_type
@@ -770,6 +788,7 @@ BEGIN
                     l.dwfzone_id,
                     l.omzone_id,
                     l.fluid_type,
+                    l.muni_id,
                     l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
