@@ -84,7 +84,7 @@ BEGIN
             AND vtn.expl_id::text = ANY (''' || v_expl_id_array || ''')
         )
         GROUP BY c.component
-    ),
+    )
     INSERT INTO temp_pgr_node (node_id)
     SELECT c.node::int4
     FROM connectedcomponents c
