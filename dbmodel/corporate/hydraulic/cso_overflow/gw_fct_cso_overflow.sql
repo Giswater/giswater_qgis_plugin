@@ -64,8 +64,6 @@ v_selected_drainzone_id text;
 
 v_filter_macroexpl text;
 v_filter_drainzone TEXT;
-v_use_macroexpl boolean;
-v_use_drainzone boolean;
 
 
 BEGIN
@@ -89,8 +87,6 @@ BEGIN
 
 	v_tstep := (((p_data ->>'data')::json->>'rainfallParams')::json->>'tstepMinutes')::numeric;
 
-	v_selected_macroexpl_id = (((p_data ->>'data')::json->>'parameters')::json->>'macroexplId')::text;
-	v_selected_drainzone_id = (((p_data ->>'data')::json->>'parameters')::json->>'drainzoneId')::text;
 
 	
 	IF v_selected_macroexpl_id IS NOT NULL then
