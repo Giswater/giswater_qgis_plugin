@@ -31,9 +31,9 @@ SELECT col_is_pk('minsector', ARRAY['minsector_id'], 'Column minsector_id should
 
 -- Check column types
 SELECT col_type_is('minsector', 'minsector_id', 'integer', 'Column minsector_id should be integer');
-SELECT col_type_is('minsector', 'dma_id', 'integer', 'Column dma_id should be integer');
-SELECT col_type_is('minsector', 'dqa_id', 'integer', 'Column dqa_id should be integer');
-SELECT col_type_is('minsector', 'presszone_id', 'integer', 'Column presszone_id should be integer');
+SELECT col_type_is('minsector', 'dma_id', 'integer[]', 'Column dma_id should be array of integer');
+SELECT col_type_is('minsector', 'dqa_id', 'integer[]', 'Column dqa_id should be array of integer');
+SELECT col_type_is('minsector', 'presszone_id', 'integer[]', 'Column presszone_id should be array of integer');
 SELECT col_type_is('minsector', 'expl_id', 'integer[]', 'Column expl_id should be array of integer');
 SELECT col_type_is('minsector', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('minsector', 'num_border', 'integer', 'Column num_border should be integer');
@@ -43,15 +43,8 @@ SELECT col_type_is('minsector', 'length', 'numeric(12,3)', 'Column length should
 SELECT col_type_is('minsector', 'addparam', 'json', 'Column addparam should be json');
 SELECT col_type_is('minsector', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('minsector', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('minsector', 'sector_id', 'integer', 'Column sector_id should be integer');
-SELECT col_type_is('minsector', 'muni_id', 'integer', 'Column muni_id should be integer');
-
--- Check foreign keys
-SELECT has_fk('minsector', 'Table minsector should have foreign keys');
-SELECT fk_ok('minsector', 'dma_id', 'dma', 'dma_id', 'FK dma_id should reference dma.dma_id');
-SELECT fk_ok('minsector', 'dqa_id', 'dqa', 'dqa_id', 'FK dqa_id should reference dqa.dqa_id');
-SELECT fk_ok('minsector', 'presszone_id', 'presszone', 'presszone_id', 'FK presszone_id should reference presszone.presszone_id');
-SELECT fk_ok('minsector', 'muni_id', 'ext_municipality', 'muni_id', 'FK muni_id should reference ext_municipality.muni_id');
+SELECT col_type_is('minsector', 'sector_id', 'integer[]', 'Column sector_id should be array of integer');
+SELECT col_type_is('minsector', 'muni_id', 'integer[]', 'Column muni_id should be array of integer');
 
 SELECT * FROM finish();
 

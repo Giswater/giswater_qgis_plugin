@@ -119,6 +119,16 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"mincut_impact", "dataType":"json", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"mincut_affectation", "dataType":"json", "isUtils":"False"}}$$);
 
--- 05/06/2025
+-- 09/06/2025
+-- Convert dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id to arrays in minsector
+ALTER TABLE minsector DROP CONSTRAINT minsector_dma_id_fkey;
+ALTER TABLE minsector ALTER COLUMN dma_id TYPE _int4 USING ARRAY[dma_id::int4];
+ALTER TABLE minsector DROP CONSTRAINT minsector_dqa_id_fkey;
+ALTER TABLE minsector ALTER COLUMN dqa_id TYPE _int4 USING ARRAY[dqa_id::int4];
+ALTER TABLE minsector DROP CONSTRAINT minsector_presszonecat_id_fkey;
+ALTER TABLE minsector ALTER COLUMN presszone_id TYPE _int4 USING ARRAY[presszone_id::int4];
 ALTER TABLE minsector DROP CONSTRAINT minsector_expl_id_fkey;
 ALTER TABLE minsector ALTER COLUMN expl_id TYPE _int4 USING ARRAY[expl_id::int4];
+ALTER TABLE minsector ALTER COLUMN sector_id TYPE _int4 USING ARRAY[sector_id::int4];
+ALTER TABLE minsector DROP CONSTRAINT minsectormuni_id_fkey;
+ALTER TABLE minsector ALTER COLUMN muni_id TYPE _int4 USING ARRAY[muni_id::int4];
