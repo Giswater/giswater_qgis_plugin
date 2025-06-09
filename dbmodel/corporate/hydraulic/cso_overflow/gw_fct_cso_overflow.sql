@@ -92,43 +92,28 @@ BEGIN
 	v_selected_macroexpl_id = (((p_data ->>'data')::json->>'parameters')::json->>'macroexplId')::text;
 	v_selected_drainzone_id = (((p_data ->>'data')::json->>'parameters')::json->>'drainzoneId')::text;
 
-	v_use_macroexpl = (((p_data ->>'data')::json->>'parameters')::json->>'enableMacroexplId')::boolean;
-	v_use_drainzone = (((p_data ->>'data')::json->>'parameters')::json->>'enableDrainzoneId')::boolean;
-
-
-	IF v_use_macroexpl IS TRUE THEN 	
 	
-		IF v_selected_macroexpl_id IS NOT NULL then
+	IF v_selected_macroexpl_id IS NOT NULL then
 
-			IF v_selected_macroexpl_id = '-901' THEN -- selected macroexpl
-	
-				SELECT string_agg(macroexpl_id::text, ',') into v_selected_macroexpl_id from selector_macroexpl where cur_user = current_user;
-			
-			END IF;
-			
-			v_filter_macroexpl = 'e.macroexpl_id IN ('||v_selected_macroexpl_id||')';
+		IF v_selected_macroexpl_id = '-901' THEN -- selected macroexpl
+
+			SELECT string_agg(macroexpl_id::text, ',') into v_selected_macroexpl_id from selector_macroexpl where cur_user = current_user;
 		
 		END IF;
-	
-	ELSE
-	
-		v_filter_macroexpl = 'true';
 		
+		v_filter_macroexpl = 'e.macroexpl_id IN ('||v_selected_macroexpl_id||')';
+	
 	END IF;
 
-		
-	IF v_use_drainzone IS TRUE THEN 
 	
-		IF v_selected_drainzone_id IS NOT NULL THEN
-		
-			v_filter_drainzone = 'd.drainzone_id IN ('||v_selected_drainzone_id||')';
-		
-		END IF;
+	IF v_selected_drainzone_id IS NOT NULL THEN
 	
+		v_filter_drainzone = 'AND d.drainzone_id IN ('||v_selected_drainzone_id||')';
+
 	ELSE
 
-		v_filter_drainzone = 'true';
-
+		v_filter_drainzone = '';
+	
 	END IF;
 
 
@@ -138,7 +123,7 @@ BEGIN
 	SELECT d.drainzone_id
 	FROM drainzone d 
 	JOIN node n ON d.graphconfig::json ->''use''->0 ->>''nodeParent''::TEXT = n.node_id::TEXT
-	JOIN exploitation e ON n.expl_id = e.expl_id WHERE '||v_filter_macroexpl||' AND '||v_filter_drainzone||'';
+	JOIN exploitation e ON n.expl_id = e.expl_id WHERE '||v_filter_macroexpl||' '||v_filter_drainzone||'';
 
 	--RAISE EXCEPTION 'v_sql %', v_sql;
 
