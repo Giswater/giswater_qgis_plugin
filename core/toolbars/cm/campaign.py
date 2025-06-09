@@ -472,28 +472,28 @@ class Campaign:
         self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
 
         self.dialog.tab_feature.currentChanged.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
         )
 
         self.dialog.btn_insert.clicked.connect(
-            lambda: tools_gw.insert_feature(self, self.dialog, "campaign", GwSelectionMode.CAMPAIGN, True, None, None)
+            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None)
         )
         self.dialog.btn_insert.clicked.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
         )
 
         self.dialog.btn_delete.clicked.connect(
-            lambda: tools_gw.delete_records(self, self.dialog, "campaign", GwSelectionMode.CAMPAIGN)
+            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None)
         )
         self.dialog.btn_delete.clicked.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
         )
 
         self.dialog.btn_snapping.clicked.connect(
-            lambda: GwSelectionMode.get_features_from_snapping(self, self.current_feature, self.layers)
+            partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN),
         )
         self.dialog.btn_snapping.clicked.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
         )
 
         self.dialog.btn_expr_select.clicked.connect(
@@ -501,7 +501,7 @@ class Campaign:
                     selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN),
         )
         self.dialog.btn_expr_select.clicked.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
         )
 
     def _on_tab_feature_changed(self):
