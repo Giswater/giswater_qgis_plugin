@@ -20,7 +20,7 @@ SELECT has_table('minsector'::name, 'Table minsector should exist');
 SELECT columns_are(
     'minsector',
     ARRAY[
-        'minsector_id', 'dma_id', 'dqa_id', 'presszone_id', 'expl_id', 'the_geom', 'num_border',
+        'minsector_id', 'dma_id', 'dqa_id', 'presszone_id', 'supplyzone_id', 'expl_id', 'the_geom', 'num_border',
         'num_connec', 'num_hydro', 'length', 'addparam', 'code', 'descript', 'sector_id', 'muni_id'
     ],
     'Table minsector should have the correct columns'
@@ -34,6 +34,7 @@ SELECT col_type_is('minsector', 'minsector_id', 'integer', 'Column minsector_id 
 SELECT col_type_is('minsector', 'dma_id', 'integer[]', 'Column dma_id should be array of integer');
 SELECT col_type_is('minsector', 'dqa_id', 'integer[]', 'Column dqa_id should be array of integer');
 SELECT col_type_is('minsector', 'presszone_id', 'integer[]', 'Column presszone_id should be array of integer');
+SELECT col_type_is('minsector', 'supplyzone_id', 'integer[]', 'Column supplyzone_id should be array of integer');
 SELECT col_type_is('minsector', 'expl_id', 'integer[]', 'Column expl_id should be array of integer');
 SELECT col_type_is('minsector', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('minsector', 'num_border', 'integer', 'Column num_border should be integer');

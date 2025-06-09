@@ -132,3 +132,5 @@ ALTER TABLE minsector ALTER COLUMN expl_id TYPE _int4 USING ARRAY[expl_id::int4]
 ALTER TABLE minsector ALTER COLUMN sector_id TYPE _int4 USING ARRAY[sector_id::int4];
 ALTER TABLE minsector DROP CONSTRAINT minsectormuni_id_fkey;
 ALTER TABLE minsector ALTER COLUMN muni_id TYPE _int4 USING ARRAY[muni_id::int4];
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"supplyzone_id", "dataType":"integer[]", "isUtils":"False"}}$$);

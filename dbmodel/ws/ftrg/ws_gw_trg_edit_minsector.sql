@@ -10,7 +10,7 @@ or (at your option) any later version.
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_minsector()  RETURNS trigger AS
 $BODY$
 
-DECLARE 
+DECLARE
 v_newpattern json;
 v_status boolean;
 v_value text;
@@ -18,11 +18,11 @@ v_value text;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	
-	IF TG_OP = 'INSERT' THEN		
+
+	IF TG_OP = 'INSERT' THEN
 		-- expl_id
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
-			RETURN NULL;				
+			RETURN NULL;
 		END IF;
 
 		IF NEW.the_geom IS NOT NULL THEN
@@ -30,31 +30,31 @@ BEGIN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 			END IF;
 		END IF;
-		
-		INSERT INTO minsector (code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
-		VALUES ( NEW.code, NEW.dma_id, NEW.dqa_id, NEW.presszone_id, NEW.expl_id, NEW.num_border, NEW.num_connec, NEW.num_hydro, NEW.length, NEW.descript, (NEW.addparam)::json, NEW.the_geom);
-			
+
+		INSERT INTO minsector (code, dma_id, dqa_id, presszone_id, supplyzone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
+		VALUES ( NEW.code, NEW.dma_id, NEW.dqa_id, NEW.presszone_id, NEW.supplyzone_id, NEW.expl_id, NEW.num_border, NEW.num_connec, NEW.num_hydro, NEW.length, NEW.descript, (NEW.addparam)::json, NEW.the_geom);
+
 
 		RETURN NEW;
-		
+
 	ELSIF TG_OP = 'UPDATE' THEN
-   	
-		UPDATE minsector 
-		SET minsector_id =NEW.minsector_id, code = NEW.code, dma_id = NEW.dma_id, dqa_id = NEW.dqa_id, presszone_id= NEW.presszone_id, expl_id=NEW.expl_id, 
+
+		UPDATE minsector
+		SET minsector_id =NEW.minsector_id, code = NEW.code, dma_id = NEW.dma_id, dqa_id = NEW.dqa_id, presszone_id= NEW.presszone_id, supplyzone_id= NEW.supplyzone_id, expl_id=NEW.expl_id,
 		num_border=NEW.num_border, num_connec=NEW.num_connec, num_hydro=NEW.num_hydro, length=NEW.length, descript=NEW.descript, addparam=(NEW.addparam)::json, the_geom=NEW.the_geom
 		WHERE minsector_id=OLD.minsector_id;
-		
+
 		RETURN NEW;
-		
-	ELSIF TG_OP = 'DELETE' THEN  
-	 
-		DELETE FROM minsector WHERE minsector_id = OLD.minsector_id;		
+
+	ELSIF TG_OP = 'DELETE' THEN
+
+		DELETE FROM minsector WHERE minsector_id = OLD.minsector_id;
 		RETURN NULL;
-     
+
 	END IF;
 
 END;
-	
+
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
