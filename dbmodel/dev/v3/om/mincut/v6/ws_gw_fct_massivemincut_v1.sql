@@ -95,7 +95,7 @@ BEGIN
 
 	-- Create temporary tables
 	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"MASSIVEMINCUT", "use_psector":"'|| v_usepsector ||'", "expl_id_array":"'|| v_expl_id_array ||'"}}';
+	v_data := '{"data":{"action":"CREATE", "fct_name":"MASSIVEMINCUT", "use_psector":"'|| v_usepsector ||'"}}';
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
