@@ -25,7 +25,7 @@ SELECT columns_are(
         'exit_topelev', 'exit_elev', 'sector_id', 'dma_id', 'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id',
         'expl_visibility', 'epa_type', 'is_operative', 'insert_user', 'lastupdate', 'lastupdate_user', 'staticpressure',
         'conneccat_id', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'uncertain', 'muni_id',
-        'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource'
+        'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource'
     ],
     'Table archived_psector_link_traceability should have the correct columns'
 );

@@ -46,8 +46,6 @@ DECLARE
     v_visible_layer TEXT;
     v_ignorebrokenvalves BOOLEAN = TRUE;
 
-    v_macrominsector_id_arc TEXT;
-
     v_response JSON;
 
     v_result_info JSON;
@@ -371,16 +369,6 @@ BEGIN
         -- Update minsector
         TRUNCATE minsector, minsector_mincut;
         INSERT INTO minsector SELECT * FROM temp_minsector;
-
-        -- TODO: revise this part with macrominsector_id
-        -- -- Update minsector graph
-        -- SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
-        -- FROM arc a
-        -- WHERE a.minsector_id <> '0'
-        -- AND a.macrominsector_id <> '0'
-        -- AND a.expl_id::TEXT = ANY(string_to_array(v_expl_id_array, ','));
-
-        -- DELETE FROM minsector_graph WHERE macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','));
 
         INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)
         SELECT node_id, minsector_1, minsector_2 FROM temp_minsector_graph;

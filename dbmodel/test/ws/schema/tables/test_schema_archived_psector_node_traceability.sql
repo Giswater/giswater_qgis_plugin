@@ -29,7 +29,7 @@ SELECT columns_are(
         'hemisphere', 'expl_id', 'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility', 'workcat_id_plan',
         'asset_id', 'om_state', 'conserv_state', 'access_type', 'placement_type', 'expl_visibility', 'brand_id', 'model_id',
-        'serial_number', 'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2', 'top_elev', 'custom_top_elev',
+        'serial_number', 'label_quadrant', 'streetname', 'streetname2', 'top_elev', 'custom_top_elev',
         'datasource', 'supplyzone_id', 'lock_level', 'is_scadamap'
     ],
     'Table archived_psector_node_traceability should have the correct columns'

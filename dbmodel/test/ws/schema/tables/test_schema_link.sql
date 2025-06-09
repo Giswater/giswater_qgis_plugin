@@ -24,7 +24,7 @@ SELECT columns_are(
         'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'sector_id', 'dma_id',
         'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_visibility', 'epa_type', 'is_operative',
         'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
-        'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'custom_length', 'datasource',
+        'uncertain', 'muni_id', 'verified', 'supplyzone_id', 'custom_length', 'datasource',
         'omzone_id', 'lock_level', 'annotation', 'comment', 'descript', 'link', 'location_type', 'num_value', 'observ',
         'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'state_type'
     ],
@@ -74,7 +74,6 @@ SELECT col_not_null('link', 'expl_id', 'Column expl_id should be NOT NULL');
 -- Check default values
 SELECT col_default_is('link', 'created_at', 'now()', 'Column created_at should default to now()');
 SELECT col_default_is('link', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
-SELECT col_default_is('link', 'macrominsector_id', '0', 'Column macrominsector_id should default to 0');
 
 -- Check indexes
 SELECT has_index('link', 'link_exit_id', 'Should have index on exit_id');

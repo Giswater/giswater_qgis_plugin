@@ -29,7 +29,7 @@ SELECT columns_are(
         'minsector_id', 'dqa_id', 'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
         'om_state', 'conserv_state', 'parent_id', 'expl_visibility', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
-        'macrominsector_id', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
+        'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table arc should have the correct columns'
@@ -125,7 +125,6 @@ SELECT col_type_is('arc', 'brand_id', 'varchar(50)', 'Column brand_id should be 
 SELECT col_type_is('arc', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
 SELECT col_type_is('arc', 'serial_number', 'varchar(100)', 'Column serial_number should be varchar(100)');
 SELECT col_type_is('arc', 'label_quadrant', 'varchar(12)', 'Column label_quadrant should be varchar(12)');
-SELECT col_type_is('arc', 'macrominsector_id', 'integer', 'Column macrominsector_id should be integer');
 SELECT col_type_is('arc', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
 SELECT col_type_is('arc', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('arc', 'lock_level', 'integer', 'Column lock_level should be integer');

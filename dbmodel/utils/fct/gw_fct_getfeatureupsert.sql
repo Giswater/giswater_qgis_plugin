@@ -74,7 +74,6 @@ v_macroomzone_id integer;
 v_supplyzone_id integer;
 v_dwfzone_id integer;
 v_drainzone_id integer;
-v_macrominsector_id integer;
 v_muni_id integer;
 v_district_id integer;
 v_project_type varchar;
@@ -380,11 +379,6 @@ BEGIN
 							v_dqa_id = v_noderecord1.dqa_id;
 						ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
 							v_dqa_id = 0;
-						END IF;
-
-						-- getting macrominsector_id by heritage from nodes
-						IF v_noderecord1.macrominsector_id = v_noderecord2.macrominsector_id THEN
-							v_macrominsector_id = v_noderecord1.macrominsector_id;
 						END IF;
 
 						-- getting supplyzone by heritage from nodes:
@@ -867,8 +861,6 @@ BEGIN
 					field_value = v_dqa_id;
 				WHEN 'supplyzone_id' THEN
 					field_value = v_supplyzone_id;
-				WHEN 'macrominsector_id' THEN
-					field_value = v_macrominsector_id;
 
 				-- static mapzones
 				WHEN 'macrosector_id' THEN

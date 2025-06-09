@@ -390,7 +390,7 @@ BEGIN
 
 					   EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3354", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'", "rec_aux1.arc_id":"'||rec_aux1.arc_id||'", "rec_aux2.arc_id":"'||rec_aux2.arc_id||'"}, "fid":"212", "result_id":"arc divide", "is_process":true}}$$)';
-					
+
 
 						END IF;
 
@@ -403,7 +403,7 @@ BEGIN
 
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3356", "function":"2114", "parameters":{"rec_node.node_id":"'||rec_node.node_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
-					
+
 						END LOOP;
 
 						IF v_project_type='UD' THEN
@@ -646,7 +646,7 @@ BEGIN
 
 							--reconfigure mapzones
 							IF v_new_node_graph IS NOT NULL THEN
-								
+
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3364", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 							END IF;
@@ -681,7 +681,7 @@ BEGIN
 
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"2114", "fid":"212", "criticity":"0", "is_process":true, "is_header":"true"}}$$)';
-						
+
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3368", "function":"2114", "fid":"212", "criticity":"0", "is_process":true}}$$)';
 							END IF;
@@ -690,7 +690,7 @@ BEGIN
 						--set arc to obsolete or delete it
 						IF v_set_arc_obsolete IS TRUE THEN
 							UPDATE arc SET state=0, state_type=v_obsoletetype  WHERE arc_id=v_arc_id;
-			
+
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3370", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
@@ -810,7 +810,7 @@ BEGIN
 						END IF;
 
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3396", "function":"2114","fid":"212", "criticity":"1", "is_process":true}}$$)';						
+                       "data":{"message":"3396", "function":"2114","fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3398", "function":"2114","fid":"212", "criticity":"1", "is_process":true}}$$)';
@@ -1076,7 +1076,7 @@ BEGIN
 					IF v_project_type ='WS' THEN
 
 						UPDATE node SET presszone_id = rec_aux1.presszone_id, dqa_id = rec_aux1.dqa_id, dma_id = rec_aux1.dma_id,
-						minsector_id = rec_aux1.minsector_id, macrominsector_id = rec_aux1.minsector_id WHERE node_id = v_node_id;
+						minsector_id = rec_aux1.minsector_id WHERE node_id = v_node_id;
 
 					ELSIF v_project_type ='UD' THEN
 

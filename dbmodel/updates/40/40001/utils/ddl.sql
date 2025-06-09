@@ -201,3 +201,8 @@ ALTER TABLE element_type RENAME TO _element_type;
 
 -- 09/06/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"audit_check_data", "column":"result_id", "dataType":"varchar(50)", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_node_traceability", "column":"macrominsector_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_arc_traceability", "column":"macrominsector_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_connec_traceability", "column":"macrominsector_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_gully_traceability", "column":"macrominsector_id"}}$$);

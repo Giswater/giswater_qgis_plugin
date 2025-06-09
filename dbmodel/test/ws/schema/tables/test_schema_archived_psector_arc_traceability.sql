@@ -30,7 +30,7 @@ SELECT columns_are(
         'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
         'om_state', 'conserv_state', 'parent_id', 'expl_visibility', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
-        'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap'
+        'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap'
     ],
     'Table archived_psector_arc_traceability should have the correct columns'
 );

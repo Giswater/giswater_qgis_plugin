@@ -33,7 +33,7 @@ SELECT columns_are(
         'label_x', 'label_y', 'label_rotation', 'label_quadrant', 'publish', 'inventory', 'num_value',
         'adate', 'adescript', 'sector_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
         'asset_id', 'pavcat_id', 'om_state', 'macroomzone_id', 'conserv_state', 'parent_id', 'expl_visibility', 'is_operative',
-        'brand_id', 'model_id', 'serial_number', 'minsector_id', 'macrominsector_id',
+        'brand_id', 'model_id', 'serial_number', 'minsector_id',
         'flow_max', 'flow_min', 'flow_avg', 'vel_max', 'vel_min', 'vel_avg',
         'tot_headloss_max', 'tot_headloss_min', 'mincut_connecs', 'mincut_hydrometers', 'mincut_length', 'mincut_watervol', 'mincut_criticity', 'result_id',
         'created_at', 'created_by', 'updated_at', 'updated_by',

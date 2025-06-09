@@ -30,7 +30,7 @@ SELECT columns_are(
         'expl_id', 'num_value', 'feature_type', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate',
         'adescript', 'accessibility', 'workcat_id_plan', 'asset_id', 'om_state', 'conserv_state',
         'access_type', 'placement_type', 'expl_visibility', 'brand_id', 'model_id', 'serial_number',
-        'label_quadrant', 'macrominsector_id', 'supplyzone_id', 'lock_level', 'is_scadamap', 'pavcat_id',
+        'label_quadrant', 'supplyzone_id', 'lock_level', 'is_scadamap', 'pavcat_id',
         'omzone_id',
         'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
@@ -45,8 +45,6 @@ SELECT col_type_is('node', 'node_id', 'integer', 'Column node_id should be integ
 SELECT col_has_default('node', 'node_id', 'Column node_id should have a default value');
 SELECT col_type_is('node', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_default_is('node', 'feature_type', 'NODE', 'Column feature_type should default to NODE');
-SELECT col_type_is('node', 'macrominsector_id', 'integer', 'Column macrominsector_id should be integer');
-SELECT col_default_is('node', 'macrominsector_id', '0', 'Column macrominsector_id should default to 0');
 
 -- Check foreign keys
 SELECT has_fk('node', 'Table node should have foreign keys');
