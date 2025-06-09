@@ -57,7 +57,7 @@ update config_typevalue set addparam ='{"orderBy":51}' where id ='{"level_1":"IN
 
 -- sys table
 DELETE FROM sys_table WHERE id = 'v_edit_flwreg';
-INSERT INTO sys_table (id, descript, sys_role, context, "source") VALUES('ve_frelem', 'Specific view for flowregulator elements', 'role_basic', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', 'core');
+INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, "source") VALUES('ve_frelem', 'Specific view for flowregulator elements', 'role_basic', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', 'Flow regulators', 2, 'core');
 
 UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"OTHER"}' , orderby = 1 WHERE id = 'v_edit_dimensions';
 

@@ -11,6 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FRWEIR', 'ELEMENT', 'inp_frweir', NULL, true);
 INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FRORIFICE', 'ELEMENT', 'inp_frorifice', NULL, true);
 INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FROUTLET', 'ELEMENT', 'inp_froutlet', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('UNDEFINED', 'ELEMENT', NULL, NULL, true);
 
 -- Adding flowregulator objects on cat_feature [Modified from first version]
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EPUMP', 'FRELEM', 'ELEMENT', 've_frelem', 've_frelem_epump', true) ON CONFLICT (id) DO NOTHING;
@@ -583,7 +584,7 @@ INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_epa_frorifice', 've_e
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_epa_froutlet', 've_epa_froutlet', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_epa_frpump', 've_epa_frpump', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_epa_frweir', 've_epa_frweir', 'role_edit');
-INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_genelem', 've_genelem', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, "source") VALUES('ve_genelem', 'Specific view for general elements', 'role_basic', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', 'General elements', 1, 'core');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('ve_visit_gully_singlevent', 've_visit_gully_singlevent', 'role_edit');
 
 DELETE FROM sys_table WHERE id = 'audit_psector_arc_traceability';

@@ -77,7 +77,8 @@ BEGIN
   END LOOP;
 END $func$;
 
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('VALVE', 'ELEMENT', 'inp_frvalve', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FRVALVE', 'ELEMENT', 'inp_frvalve', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('UNDEFINED', 'ELEMENT', NULL, NULL, true);
 
 
 -- move data from old tables to new tables
