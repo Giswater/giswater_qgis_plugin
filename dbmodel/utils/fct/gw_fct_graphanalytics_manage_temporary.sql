@@ -93,46 +93,8 @@ BEGIN
         CREATE INDEX temp_pgr_arc_node2 ON temp_pgr_arc USING btree (node_2);
         GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_arc TO role_basic;
 
-        -- NOTE: Not used in the current version
-        -- CREATE TEMP TABLE temp_pgr_connec (
-        --     connec_id int4,
-        --     arc_id int4,
-        --     mapzone_id INTEGER DEFAULT 0,
-        --     old_mapzone_id INTEGER,
-        --     fluid_type INTEGER DEFAULT 0,
-        --     staticpressure FLOAT DEFAULT 0,
-        --     CONSTRAINT temp_pgr_connec_pkey PRIMARY KEY (connec_id)
-        -- );
-        -- CREATE INDEX temp_pgr_connec_connec_id ON temp_pgr_connec USING btree (connec_id);
-        -- CREATE INDEX temp_pgr_connec_arc_id ON temp_pgr_connec USING btree (arc_id);
-
-
-        -- CREATE TEMP TABLE temp_pgr_link (
-        --     link_id int4,
-        --     feature_id int4,
-        --     feature_type varchar(16),
-        --     mapzone_id INTEGER DEFAULT 0,
-        --     old_mapzone_id INTEGER,
-        --     fluid_type INTEGER DEFAULT 0,
-        --     staticpressure FLOAT DEFAULT 0,
-        --     CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (link_id)
-        -- );
-        -- CREATE INDEX temp_pgr_link_link_id ON temp_pgr_link USING btree (link_id);
-        -- CREATE INDEX temp_pgr_link_feature_id ON temp_pgr_link USING btree (feature_id);
-
         -- Create temporary layers depending on the project type
-        IF v_project_type = 'UD' THEN
-            -- CREATE TEMP TABLE temp_pgr_gully (
-            --     gully_id int4,
-            --     arc_id int4,
-            --     mapzone_id INTEGER DEFAULT 0,
-            --     old_mapzone_id INTEGER,
-            --     fluid_type INTEGER DEFAULT 0,
-            --     CONSTRAINT temp_pgr_gully_pkey PRIMARY KEY (gully_id)
-            -- );
-            -- CREATE INDEX temp_pgr_gully_gully_id ON temp_pgr_gully USING btree (gully_id);
-            -- CREATE INDEX temp_pgr_gully_arc_id ON temp_pgr_gully USING btree (arc_id);
-        ELSIF v_project_type = 'WS' THEN
+        IF v_project_type = 'WS' THEN
             ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN to_arc int4;
@@ -849,9 +811,6 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_mapzone;
         DROP TABLE IF EXISTS temp_pgr_node;
         DROP TABLE IF EXISTS temp_pgr_arc;
-        DROP TABLE IF EXISTS temp_pgr_connec;
-        DROP TABLE IF EXISTS temp_pgr_gully;
-        DROP TABLE IF EXISTS temp_pgr_link;
         DROP TABLE IF EXISTS temp_audit_check_data;
         DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
         DROP TABLE IF EXISTS temp_pgr_minsector;
