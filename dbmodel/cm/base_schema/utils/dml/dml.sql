@@ -235,3 +235,23 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 INSERT INTO sys_version (giswater, project_type, postgres, postgis, "language", epsg)
 VALUES('', 'cm', (select version()), (select postgis_version()), '', 00000);
+
+
+GRANT ALL PRIVILEGES ON DATABASE bgeo TO role_cm_field;
+GRANT ALL PRIVILEGES ON DATABASE bgeo TO role_cm_manager;
+GRANT ALL PRIVILEGES ON DATABASE bgeo TO role_cm_admin;
+
+GRANT ALL ON SCHEMA SCHEMA_NAME TO role_cm_field;
+GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_field;
+GRANT ALL ON TABLE selector_lot TO role_cm_field;
+GRANT ALL ON TABLE cm_log TO role_cm_field;
+
+GRANT ALL ON SCHEMA SCHEMA_NAME TO role_cm_manager;
+GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_manager;
+GRANT ALL ON SCHEMA SCHEMA_NAME TO role_cm_manager;
+GRANT ALL ON ALL TABLES IN SCHEMA cm TO role_cm_manager;
+
+GRANT ALL ON SCHEMA SCHEMA_NAME TO role_cm_admin;
+GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_admin;
+GRANT ALL ON SCHEMA SCHEMA_NAME TO role_cm_admin;
+GRANT ALL ON ALL TABLES IN SCHEMA cm TO role_cm_admin;

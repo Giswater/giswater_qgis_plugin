@@ -611,3 +611,20 @@ CREATE TABLE sys_fprocess_cm (
 	CONSTRAINT sys_fprocess_cm_pkey PRIMARY KEY (fid)
 );
 
+CREATE TABLE audit_check_data (
+	id serial4 NOT NULL,
+	fid int2 NULL,
+	result_id varchar(50) NULL,
+	table_id text NULL,
+	column_id text NULL,
+	criticity int2 NULL,
+	enabled bool NULL,
+	error_message text NULL,
+	tstamp timestamp NULL DEFAULT now(),
+	cur_user text NULL DEFAULT "current_user"(),
+	feature_type text NULL,
+	feature_id text NULL,
+	addparam json NULL,
+	fcount int4 NULL,
+	CONSTRAINT audit_check_data_pkey PRIMARY KEY (id)
+);

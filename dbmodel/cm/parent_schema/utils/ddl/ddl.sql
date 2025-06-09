@@ -43,6 +43,9 @@ BEGIN
       'ALTER TABLE %s ADD CONSTRAINT %I PRIMARY KEY (lot_id, %I);',
       tbl_name, constraint_name, feature_col
     );
+    
+    EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', tbl_name);
+    
     END LOOP;
 
   -- Create corresponding empty views named ve_<PARENT>_lot_<feature_id>

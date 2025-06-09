@@ -97,9 +97,7 @@ BEGIN
             )
         );
        
-       	--RAISE EXCEPTION 'v_input_json %', v_input_json;
-
-        PERFORM PARENT_SCHEMA_2.gw_fct_admin_dynamic_trigger(v_input_json);
+        PERFORM PARENT_SCHEMA_.gw_fct_admin_dynamic_trigger(v_input_json);
  
        
        
