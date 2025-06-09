@@ -852,22 +852,13 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_connec;
         DROP TABLE IF EXISTS temp_pgr_gully;
         DROP TABLE IF EXISTS temp_pgr_link;
-
-        -- Drop other additional temporary tables
         DROP TABLE IF EXISTS temp_audit_check_data;
-
-        -- For specific functions
-        IF v_fct_name = 'MINSECTOR' THEN
-            DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
-            DROP TABLE IF EXISTS temp_pgr_minsector;
-            DROP TABLE IF EXISTS temp_minsector_graph;
-            DROP TABLE IF EXISTS temp_minsector;
-        ELSE
-            DROP TABLE IF EXISTS temp_pgr_drivingdistance;
-            IF v_fct_name = 'MASSIVEMINCUT' THEN
-                DROP TABLE IF EXISTS temp_minsector_mincut;
-            END IF;
-        END IF;
+        DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
+        DROP TABLE IF EXISTS temp_pgr_minsector;
+        DROP TABLE IF EXISTS temp_minsector_graph;
+        DROP TABLE IF EXISTS temp_minsector;
+        DROP TABLE IF EXISTS temp_pgr_drivingdistance;
+        DROP TABLE IF EXISTS temp_minsector_mincut;
 
         -- Drop temporary views
         DROP VIEW IF EXISTS v_temp_node;
