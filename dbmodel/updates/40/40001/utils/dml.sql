@@ -1868,3 +1868,8 @@ UPDATE sys_function SET function_alias = 'ARC REPAIR FUNCTION' WHERE function_na
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3528, 'Repaired arcs: arc_id --> %arc_ids%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+DELETE FROM sys_table WHERE id='v_ui_om_visit_x_doc';
+UPDATE sys_table SET sys_role='role_om' WHERE id='v_ui_doc_x_visit';
+UPDATE sys_table SET sys_role='role_plan' WHERE id='doc_x_psector';
+UPDATE sys_table SET sys_role='role_plan' WHERE id='v_ui_doc_x_psector';
