@@ -70,9 +70,6 @@ BEGIN
 	
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- reset all
-	delete from cso_inp_system_subc;
-	delete from cso_out_vol;
 
 
 	-- input params
@@ -135,6 +132,9 @@ BEGIN
 	
 	END IF;
 
+	-- reset all
+	execute 'delete from cso_inp_system_subc where drainzone_id in ('||v_selected_drainzone_id||')';
+	execute 'delete from cso_out_vol where drainzone_id in ('||v_selected_drainzone_id||')';
 
 	-- config variables
 	v_returncoeff = (select value::numeric from config_param_system where "parameter" = 'cso_returncoeff');
