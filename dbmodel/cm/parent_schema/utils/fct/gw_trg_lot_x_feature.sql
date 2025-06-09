@@ -39,13 +39,19 @@ BEGIN
 
     -- Get the feature child type
     v_querytext := format(
-        'SELECT %I, %I FROM SCHEMA_NAME.ve_PARENT_SCHEMA_lot_%s WHERE lot_id = $1 AND %I = $2',
-        v_feature_column,
-        v_feature_id_column,
-        v_feature_type,
-        v_feature_id_column
+        'SELECT c.%s_type ' ||
+        'FROM PARENT_SCHEMA.%s p ' ||
+        'JOIN PARENT_SCHEMA.cat_%s c ON p.%scat_id = c.id ' ||
+        'WHERE p.%s_id = $1',
+        v_feature_type, v_feature_type, v_feature_type, v_feature_type, v_feature_type
     );
-    EXECUTE v_querytext INTO v_feature_child_type USING v_lot_id, v_feature_id_value;
+    EXECUTE v_querytext INTO v_feature_child_type USING v_feature_id_value;
+    
+    IF v_feature_child_type IS NULL THEN
+        IF TG_OP = 'INSERT' THEN RETURN NEW;
+        ELSE RETURN OLD;
+        END IF;
+    END IF;
 
     -- Compose view/table name
     v_view_name := format('ve_%s_%s', v_feature_type, lower(v_feature_child_type));
