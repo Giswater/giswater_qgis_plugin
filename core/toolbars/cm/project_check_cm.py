@@ -49,23 +49,24 @@ class GwProjectCheckCMTask(GwTask):
                 f'"parameters": {{"functionFid": {function_fid}, "project_type": "{project_type}"}}'
             )
             body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_setcheckproject_cm', body, schema_name='cm', conn=self.aux_conn)
-
-            if json_result and isinstance(json_result, list):
-                self.result_data = json_result[0]
+            self.result_data = tools_gw.execute_procedure('gw_fct_setcheckproject_cm', body, schema_name='cm', aux_conn=self.aux_conn)
+            if self.result_data['status'] == 'Accepted':
                 return True
             else:
-                self.exception = "Invalid response from database function."
                 return False
-
         except Exception as e:
-            self.exception = e
-            return False
+            msg = "EXCEPTION: {0}, {1}"
+            msg_params = (type(e).__name__, str(e),)
+            tools_log.log_warning(msg, msg_params=msg_params)
+
 
     def finished(self, result):
         """
         Handles the task completion.
         """
+
+        super().finished(result)
+
         if result and not self.isCanceled() and self.result_data and self.log_widget:
             self.log_widget.clear()  # Clear previous logs
             checks = self.result_data.get('checks', [])
@@ -87,11 +88,11 @@ class GwProjectCheckCMTask(GwTask):
         elif not self.log_widget:
             print("FATAL ERROR: Log widget object was not passed to the task.")
 
-        # Let the parent class handle logging, connection closing, etc.
-        super().finished(result)
-
         # Notify the UI that the task is completely finished
         self.task_finished.emit()
+
+        # Show dialog with audit check project result
+        self._show_check_project_result(self.result_data)
 
     def fill_check_project_table(self, layers, init_project):
         """ Fill table 'audit_check_project' table with layers data """
@@ -125,7 +126,6 @@ class GwProjectCheckCMTask(GwTask):
                 fields += '"fid":101, '
                 fields += f'"table_user":"{table_user}"}}, '
         fields = fields[:-2] + ']'
-        print("hooola")
         # Execute function 'gw_fct_setcheckproject'
         self.result = self._execute_check_project_function(init_project, fields)
 
@@ -176,7 +176,6 @@ class GwProjectCheckCMTask(GwTask):
         # Execute procedure
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setcheckproject_cm', body, is_thread=True, aux_conn=self.aux_conn)
-        print(result)
         if result:
             open_curselectors = tools_gw.get_config_parser('dialogs_actions', 'curselectors_open_loadproject', "user", "init")
             open_curselectors = tools_os.set_boolean(open_curselectors, False)
@@ -208,7 +207,7 @@ class GwProjectCheckCMTask(GwTask):
                 all_logs.extend(log_data[category])
 
         # Call `fill_tab_log()` with the combined list of logs
-        tools_gw.fill_tab_log(self.dlg_audit_project, all_logs, reset_text=False)
+        tools_gw.fill_tab_log(self.dialog, all_logs, reset_text=False)
 
     def _add_selected_layers(self, dialog, m_layers):
         """ Receive a list of layers, look for the checks associated with each layer and if they are checked,

@@ -101,7 +101,7 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="0">
-        <widget class="QTextEdit" name="txt_infolog"/>
+        <layout class="QGridLayout" name="lyt_log_1"/>
        </item>
       </layout>
      </widget>

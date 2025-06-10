@@ -1837,8 +1837,10 @@ def add_widget(dialog, field, lbl, widget):
 
 def add_widget_combined(dialog, field, label, widget, old_widget_pos):
     """ Insert widget into layout based on orientation and label position """
-    layout = dialog.findChild(QGridLayout, field['layoutname'])
 
+    layout = dialog.findChild(QGridLayout, field['layoutname'])
+    if layout in (None, 'null', 'NULL', 'Null'):
+        return
     orientation = layout.property('lytOrientation')
     old_widget_pos = int(old_widget_pos) if old_widget_pos is not None else 0
     widget_pos = int(field.get('layoutorder', 0))
@@ -5153,9 +5155,6 @@ def _get_extent_parameters(schema_name):
         return rectangle
 
 
-# endregion
-
-
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     """ Put filter widgets into layout and set headers into QTableView """
 
@@ -5229,9 +5228,32 @@ def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_
     return complet_list
 
 
+def populate_dynamic_widgets(dialog, complet_result, class_info):
+    """Creates and populates all widgets dynamically into the dialog layout."""
+
+    # Retrieve the tablename from the JSON response if available
+    tablename = complet_result['body']['form'].get('tableName', 'default_table')
+    old_widget_pos = 0
+
+    # Loop through fields and add them to the appropriate layouts
+    for field in complet_result['body']['data']['fields']:
+        # Skip hidden fields
+        if field.get('hidden'):
+            continue
+
+        # Pass required parameters (dialog, result, field, tablename, class_info)
+        label, widget = set_widgets(dialog, complet_result, field, tablename, class_info)
+
+        if widget is None:
+            continue
+
+        # Add widgets to the layout
+        old_widget_pos = add_widget_combined(dialog, field, label, widget, old_widget_pos)
+
+# endregion
+
+
 # region Info buttons
-
-
 def set_filter_listeners(complet_result, dialog, widget_list, columnname, widgetname, feature_id=None):
     """
     functions called in -> widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))

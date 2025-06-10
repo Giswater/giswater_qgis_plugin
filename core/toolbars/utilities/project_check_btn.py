@@ -50,7 +50,7 @@ class GwProjectCheckButton(GwAction):
         tools_gw.load_settings(self.dialog)
 
         # Populate the dialog with fields
-        self._populate_dynamic_widgets(self.dialog, json_result)
+        tools_gw.populate_dynamic_widgets(self.dialog, json_result, self)
 
         # Disable the "Log" tab initially
         tools_gw.disable_tab_log(self.dialog)
@@ -66,28 +66,6 @@ class GwProjectCheckButton(GwAction):
 
         # Open the dialog
         tools_gw.open_dialog(self.dialog, dlg_name=form_type)
-
-    def _populate_dynamic_widgets(self, dialog, complet_result):
-        """Creates and populates all widgets dynamically into the dialog layout."""
-
-        # Retrieve the tablename from the JSON response if available
-        tablename = complet_result['body']['form'].get('tableName', 'default_table')
-        old_widget_pos = 0
-
-        # Loop through fields and add them to the appropriate layouts
-        for field in complet_result['body']['data']['fields']:
-            # Skip hidden fields
-            if field.get('hidden'):
-                continue
-
-            # Pass required parameters (dialog, result, field, tablename, class_info)
-            label, widget = tools_gw.set_widgets(dialog, complet_result, field, tablename, self)
-
-            if widget is None:
-                continue
-
-            # Add widgets to the layout
-            old_widget_pos = tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
     def _on_accept_clicked(self):
         """Handles the Accept button click event and starts the project check task."""
