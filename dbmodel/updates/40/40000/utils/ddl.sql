@@ -347,7 +347,6 @@ CREATE TABLE archived_psector_link_traceability (
     audit_tstamp timestamp DEFAULT now() NULL,
     audit_user text DEFAULT CURRENT_USER NULL,
     "action" varchar(16) NOT NULL,
-
     link_id int4 NOT NULL,
     code text NULL,
     feature_id varchar(16) NULL,

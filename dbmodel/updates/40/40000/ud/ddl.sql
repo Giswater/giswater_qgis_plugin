@@ -1629,8 +1629,6 @@ CREATE TABLE element (
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
 	location_type varchar(50) NULL,
-	_fluid_type varchar(50) NULL,
-	fluid_type int4 DEFAULT 0 NOT NULL,
 	observ varchar(254) NULL,
 	"comment" varchar(254) NULL,
 	link varchar(512) NULL,
