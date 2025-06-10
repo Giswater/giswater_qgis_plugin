@@ -186,6 +186,7 @@ BEGIN
                         a.dma_id,
                         a.dqa_id,
                         a.muni_id,
+                        a.minsector_id,
                         a.the_geom
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
