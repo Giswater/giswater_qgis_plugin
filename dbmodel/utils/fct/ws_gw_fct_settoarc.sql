@@ -107,11 +107,11 @@ BEGIN
 	IF v_graphdelim && ARRAY['SECTOR','PRESSZONE','DMA','DQA'] THEN
 
 		--define list of mapzones to be set
-		v_mapzone_array = ARRAY[lower(v_graphdelim)];
+		SELECT array_agg(lower(unnest)) INTO v_mapzone_array FROM unnest(v_graphdelim);
 
 		FOREACH rec IN ARRAY(v_mapzone_array) LOOP
 
-		    IF rec = 'dma' OR rec = 'presszone'  THEN
+		    IF rec IN ('dma', 'presszone', 'dqa') THEN
 			IF rec = 'dma' THEN
 			    v_mapzone_id=v_dma_id;
 
@@ -120,7 +120,11 @@ BEGIN
 			ELSIF rec = 'presszone' THEN
 			    v_mapzone_id=v_presszone_id;
 
-			    INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of presszone ', v_dma_id, ' with value ',v_arc_id, '.'));
+			    INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of presszone ', v_presszone_id, ' with value ',v_arc_id, '.'));
+			ELSIF rec = 'dqa' THEN
+				v_mapzone_id=v_dqa_id;
+
+				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of dqa ', v_dqa_id, ' with value ',v_arc_id, '.'));
 			END IF;
 
 			IF v_mapzone_id IS NULL THEN
@@ -144,7 +148,7 @@ BEGIN
 			ELSE
 
 			    EXECUTE  'SELECT 1 FROM '||rec||' CROSS JOIN json_array_elements((graphconfig->>''use'')::json) elem 
-			    WHERE elem->>''nodeParent'' = '||v_feature_id||' AND '||rec||'_id = '||v_mapzone_id||' LIMIT 1'
+			    WHERE (elem->>''nodeParent'')::int4 = '||v_feature_id||' AND '||rec||'_id = '||v_mapzone_id||' LIMIT 1'
 			    INTO v_check_graphconfig;
 
 			    IF v_check_graphconfig = '1'  THEN
@@ -154,8 +158,8 @@ BEGIN
 				select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as elem
 				from '||rec||'
 				cross join json_array_elements((graphconfig->>''use'')::json) elem
-				where elem->>''nodeParent'' = '||quote_literal(v_feature_id)||' AND '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text)a 
-				WHERE '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text';
+				where (elem->>''nodeParent'')::int4 = '||v_feature_id||' AND '||rec||'_id = '||v_mapzone_id||')a 
+				WHERE '||rec||'_id ='||v_mapzone_id||'';
 
 			    ELSE
 				--Define graphconfig in case when there is definition for mapzone and node is not defined there
