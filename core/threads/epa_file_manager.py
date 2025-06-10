@@ -75,7 +75,7 @@ class GwEpaFileManager(GwTask):
     def main_process(self) -> bool:
         status = True
         msg = "Task 'Go2Epa' execute function '{0}'"
-        if self.go2epa_export_inp or self.go2epa_execute_epa:   
+        if self.go2epa_export_inp or self.go2epa_execute_epa:
             msg_params = ("_exec_function_pg2epa",)
             tools_log.log_info(msg, msg_params=msg_params)
             status = self._exec_function_pg2epa()
@@ -228,7 +228,7 @@ class GwEpaFileManager(GwTask):
         main_json_result = None
         for step in range(1, 8):
             self.body = tools_gw.create_body(extras=(extras + f', "step": {step}'))
-            msg = "Task 'Go2Epa' execute procedure '{0}' step {1}}"
+            msg = "Task 'Go2Epa' execute procedure '{0}' step {1}"
             msg_params = ("gw_fct_pg2epa_main", step,)
             tools_log.log_info(msg, msg_params=msg_params)
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
@@ -264,7 +264,7 @@ class GwEpaFileManager(GwTask):
 
         if self.isCanceled():
             return False
-        
+
         msg = "Export INP file into PostgreSQL"
         tools_log.log_info(msg)
 
