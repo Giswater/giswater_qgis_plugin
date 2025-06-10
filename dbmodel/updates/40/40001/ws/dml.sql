@@ -777,33 +777,27 @@ VALUES(3772, 'There are %v_count2% arcs (state=1) on the selected exploitation(s
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3774, 'There are %v_count1% arcs (state=1) on the selected exploitation(s) and all of them have minsector_id informed.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(3009, 'RESUME', 'header');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '-------------------------------------------------', 'header');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3776, 'Massive analysis have been done. %v_count1% mincut''s have been triggered (one by each minsector all of them using the mincut_id = -1). To check results you can query:', null, 0, true, 'utils', 'core', 'AUDIT');
-=======
+
 --06/06/2025
 UPDATE sys_function SET function_alias = 'CREATE EMPTY NETSCENARIO' WHERE function_name = 'gw_fct_duplicate_netscenario';
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3800, 'Name: %v_name%', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3802, 'Descript: %v_descript%', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3804, 'Parent: %v_parent_id%', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3806, 'Type: %v_netscenario_type%', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3808, 'active: %v_active%', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_label (id, idval, label_type) VALUES (1003, 'ERRORS', 'prefix');
-INSERT INTO sys_label (id, idval, label_type) VALUES (1002, 'WARNINGS', 'prefix');
-INSERT INTO sys_label (id, idval, label_type) VALUES (1001, 'INFO', 'prefix');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3810, 'ERROR: The netscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');

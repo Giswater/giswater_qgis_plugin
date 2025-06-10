@@ -792,6 +792,7 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(3002, 'WARNINGS', 'header')
 INSERT INTO sys_label (id, idval, label_type) VALUES(3003, 'ERRORS', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3006, 'ARC DIVIDE = TRUE', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3008, 'ARC DIVIDE = FALSE', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(3009, 'RESUME', 'header');
 
 INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2008, '--------', 'separator');
@@ -800,6 +801,7 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(2014, '--------------', 'se
 INSERT INTO sys_label (id, idval, label_type) VALUES(2022, '----------------------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2025, '-------------------------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES (2030, '------------------------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '-------------------------------------------------', 'header');
 
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
