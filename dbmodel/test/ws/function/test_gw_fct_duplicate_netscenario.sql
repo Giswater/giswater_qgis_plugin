@@ -13,35 +13,25 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(2);
 
--- Create roles for testing
-CREATE USER plan_user;
-GRANT role_plan to plan_user;
+INSERT INTO plan_netscenario (netscenario_id, "name", descript, parent_id, netscenario_type, active, expl_id, log)
+VALUES(1, 'netscenario1', 'netscenario1', NULL, 'DMA', true, NULL, NULL);
 
-CREATE USER epa_user;
-GRANT role_epa to epa_user;
-
-CREATE USER edit_user;
-GRANT role_edit to edit_user;
-
-CREATE USER om_user;
-GRANT role_om to om_user;
-
-CREATE USER basic_user;
-GRANT role_basic to basic_user;
+INSERT INTO plan_netscenario (netscenario_id, "name", descript, parent_id, netscenario_type, active, expl_id, log)
+VALUES(2, 'netscenario2', 'netscenario2', NULL, 'PRESSZONE', true, NULL, NULL);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_duplicate_netscenario($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "name":"netscenario",
-    "descript":null, "parent":null, "active":"true"}, "aux_params":null}}$$)::JSON)->>'status',
+    "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "name":"netscenario-copied-1",
+    "descript":"descript-copied-1", "parent":"1", "active":"true"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_duplicate_netscenario with active : true returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_duplicate_netscenario($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "name":"netscenario",
-    "descript":null, "parent":null, "active":"false"}, "aux_params":null}}$$)::JSON)->>'status',
+    "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"2", "name":"netscenario-copied-2",
+    "descript":"descript-copied-2", "parent":"2", "active":"false"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_duplicate_netscenario with active : false returns status "Accepted"'
 );
