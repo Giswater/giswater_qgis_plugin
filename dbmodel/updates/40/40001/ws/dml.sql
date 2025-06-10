@@ -764,6 +764,7 @@ UPDATE sys_function SET function_alias = 'CREATE EMPTY NETSCENARIO' WHERE functi
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3768, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+<<<<<<< HEAD
 --10/06/2025
 
 UPDATE sys_function SET function_alias = 'MASSIVE MINCUT ANALYSIS (fid 129 & 149)' WHERE function_name = 'gw_fct_massivemincut';
@@ -782,6 +783,23 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '--------------------
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3776, 'Massive analysis have been done. %v_count1% mincut''s have been triggered (one by each minsector all of them using the mincut_id = -1). To check results you can query:', null, 0, true, 'utils', 'core', 'AUDIT');
+=======
+--06/06/2025
+UPDATE sys_function SET function_alias = 'CREATE EMPTY NETSCENARIO' WHERE function_name = 'gw_fct_duplicate_netscenario';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(3800, 'Name: %v_name%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(3802, 'Descript: %v_descript%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(3804, 'Parent: %v_parent_id%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+>>>>>>> d4a91a78e (feat(function_translation): translate gw_fct_duplicate_netscenario)
 
 
 
