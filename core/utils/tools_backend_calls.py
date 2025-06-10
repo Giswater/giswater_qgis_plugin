@@ -1194,6 +1194,7 @@ def manage_duplicate_dscenario_copyfrom(dialog):
         tools_qt.set_widget_text(dialog, 'active', row[3])
         tools_qt.set_combo_value(dialog.findChild(QComboBox, 'expl'), f"{row[4]}", 0)
 
+
 def selection_init(**kwargs):
     """
     Initialize the selection.

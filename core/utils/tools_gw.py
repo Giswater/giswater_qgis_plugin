@@ -3526,7 +3526,7 @@ def show_expression_dialog(feature_type, dialog, table_object):
 
 
 def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, 
-                   remove_ids=True, lazy_widget=None, lazy_init_function=None, target_widget=None):
+                   remove_ids=True, lazy_widget=None, lazy_init_function=None, refresh_callback=None, target_widget=None):
     """ Select feature with entered id. Set a model with selected filter.
         Attach that model to selected table
     """
