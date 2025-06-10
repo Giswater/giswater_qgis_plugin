@@ -33,17 +33,13 @@ BEGIN
 
     EXECUTE format(
       'CREATE TABLE IF NOT EXISTS %s (
+           id serial4 primary key,
            lot_id integer,
-           LIKE %I.%I INCLUDING ALL);',
+           LIKE %I.%I);',
       tbl_name,
       parent_s, rec.child_layer
     );
-
-    EXECUTE format(
-      'ALTER TABLE %s ADD CONSTRAINT %I PRIMARY KEY (lot_id, %I);',
-      tbl_name, constraint_name, feature_col
-    );
-    
+    EXECUTE format('ALTER TABLE %s ADD CONSTRAINT %I UNIQUE (lot_id,%I);', tbl_name, constraint_name, feature_col);
     EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', tbl_name);
     
     END LOOP;
@@ -71,10 +67,18 @@ BEGIN
     ) THEN
         EXECUTE format(
           'CREATE VIEW %s AS
+            WITH sel_lot AS (
+              SELECT selector_lot.lot_id FROM selector_lot
+              WHERE selector_lot.cur_user = current_user
+            )
              SELECT * FROM %s
-             join selector_lot sl using (lot_id)
-             WHERE sl.cur_user = current_user;',
+             WHERE EXISTS (
+              SELECT 1 
+              FROM sel_lot 
+              WHERE sel_lot.lot_id = %s.lot_id
+            );',
           view_name,
+          tbl_name,
           tbl_name
         );
     END IF;

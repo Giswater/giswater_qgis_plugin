@@ -366,26 +366,30 @@ CREATE TABLE om_campaign_review
 
 CREATE TABLE om_campaign_x_arc
 (
+  id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
   arc_id character varying(16) NOT NULL, -- fk arc
   code character varying(30),
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (campaign_id, arc_id),
+  CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_x_arc_un UNIQUE (campaign_id, arc_id),
   CONSTRAINT om_campaign_x_arc_campaign_id_fkey FOREIGN KEY (campaign_id)
     REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE om_campaign_x_connec
 (
+  id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (campaign_id, connec_id),
+  CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_x_connec_un UNIQUE (campaign_id, connec_id),
   CONSTRAINT om_campaign_x_connec_campaign_id_fkey FOREIGN KEY (campaign_id)
     REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -393,13 +397,15 @@ CREATE TABLE om_campaign_x_connec
 
 CREATE TABLE om_campaign_x_link
 (
+  id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
   link_id integer NOT NULL, -- fk link
   code character varying(30),
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_lot_x_link_pkey PRIMARY KEY (campaign_id, link_id),
+  CONSTRAINT om_lot_x_link_pkey PRIMARY KEY (id),
+  CONSTRAINT om_lot_x_link_un UNIQUE (campaign_id, link_id),
   CONSTRAINT om_campaign_x_link_campaign_id_fkey FOREIGN KEY (campaign_id)
     REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -407,13 +413,15 @@ CREATE TABLE om_campaign_x_link
 
 CREATE TABLE om_campaign_x_node
 (
+  id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
   node_id character varying(16) NOT NULL, -- fk node
   code character varying(30),
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (campaign_id, node_id),
+  CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_x_node_un UNIQUE (campaign_id, node_id),
   CONSTRAINT om_campaign_x_node_campaign_id_fkey FOREIGN KEY (campaign_id)
     REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 
@@ -421,13 +429,17 @@ CREATE TABLE om_campaign_x_node
 
 CREATE TABLE om_campaign_x_gully
 (
+  id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
   gully_id character varying(16) NOT NULL, -- fk gully
   code character varying(30),
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_campaign_x_gully_pkey PRIMARY KEY (campaign_id, gully_id)
+  CONSTRAINT om_campaign_x_gully_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_x_gully_un UNIQUE (campaign_id, gully_id),
+  CONSTRAINT om_campaign_x_gully_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -459,6 +471,7 @@ CREATE TABLE om_campaign_lot
 
 CREATE TABLE om_campaign_lot_x_arc
 (
+  id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
   arc_id character varying(16) NOT NULL, -- fk arc
   code character varying(30),
@@ -471,13 +484,15 @@ CREATE TABLE om_campaign_lot_x_arc
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (lot_id, arc_id),
+  CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_lot_x_arc_un UNIQUE (lot_id, arc_id),
   CONSTRAINT om_campaign_lot_x_arc_lot_id_fkey FOREIGN KEY (lot_id)
     REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE om_campaign_lot_x_connec
 (
+  id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
@@ -490,7 +505,8 @@ CREATE TABLE om_campaign_lot_x_connec
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (lot_id, connec_id),
+  CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_lot_x_connec_un UNIQUE (lot_id, connec_id),
   CONSTRAINT om_campaign_lot_x_connec_lot_id_fkey FOREIGN KEY (lot_id)
     REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 
@@ -499,6 +515,7 @@ CREATE TABLE om_campaign_lot_x_connec
 
 CREATE TABLE om_campaign_lot_x_link
 (
+  id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
   link_id integer NOT NULL, -- fk link
   code character varying(30),
@@ -511,7 +528,8 @@ CREATE TABLE om_campaign_lot_x_link
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (lot_id, link_id),
+  CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_lot_x_link_un UNIQUE (lot_id, link_id),
   CONSTRAINT om_campaign_lot_x_link_lot_id_fkey FOREIGN KEY (lot_id)
     REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 
@@ -520,6 +538,7 @@ CREATE TABLE om_campaign_lot_x_link
 
 CREATE TABLE om_campaign_lot_x_node
 (
+  id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
   node_id character varying(16) NOT NULL, -- fk node
   code character varying(30),
@@ -532,13 +551,15 @@ CREATE TABLE om_campaign_lot_x_node
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (lot_id, node_id),
+  CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_lot_x_node_un UNIQUE (lot_id, node_id),
   CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id)
     REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE om_campaign_lot_x_gully
 (
+  id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
@@ -551,7 +572,10 @@ CREATE TABLE om_campaign_lot_x_gully
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (lot_id, connec_id)
+  CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_lot_x_gully_un UNIQUE (lot_id, connec_id),
+  CONSTRAINT om_campaign_lot_x_gully_lot_id_fkey FOREIGN KEY (lot_id)
+    REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 

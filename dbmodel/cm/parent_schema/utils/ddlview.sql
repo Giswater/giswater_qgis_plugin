@@ -12,6 +12,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- CAMPAIGN x FEATURE
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_node as
 SELECT
+om_campaign_x_node.id,
 om_campaign.campaign_id,
 node.node_id,
 node.code,
@@ -30,6 +31,7 @@ WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"(
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_arc as
 SELECT
+om_campaign_x_arc.id,
 om_campaign.campaign_id,
 arc.arc_id,
 arc.code,
@@ -48,6 +50,7 @@ WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"(
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_connec as
 SELECT
+om_campaign_x_connec.id,
 om_campaign.campaign_id,
 connec.connec_id,
 connec.code,
@@ -66,6 +69,7 @@ WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"(
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_link AS
 SELECT
+om_campaign_x_link.id,
 om_campaign.campaign_id,
 link.link_id,
 link.code,
@@ -85,6 +89,7 @@ WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"(
 -- LOT X FEATURE
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_node as
 SELECT
+om_campaign_lot_x_node.id,
 om_campaign_lot.lot_id,
 node.node_id,
 node.code,
@@ -109,6 +114,7 @@ WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_arc as
 SELECT
+om_campaign_lot_x_arc.id,
 om_campaign_lot.lot_id,
 arc.arc_id,
 arc.code,
@@ -133,6 +139,7 @@ WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_connec as
 SELECT
+om_campaign_lot_x_connec.id,
 om_campaign_lot.lot_id,
 connec.connec_id,
 connec.code,
@@ -158,6 +165,7 @@ WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_link AS
 SELECT
+om_campaign_lot_x_link.id,
 om_campaign_lot.lot_id,
 link.link_id,
 link.code,

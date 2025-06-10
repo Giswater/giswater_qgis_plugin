@@ -237,9 +237,9 @@ INSERT INTO sys_version (giswater, project_type, postgres, postgis, "language", 
 VALUES('', 'cm', (select version()), (select postgis_version()), '', 00000);
 
 
-GRANT ALL PRIVILEGES ON DATABASE bgeo TO role_cm_field;
-GRANT ALL PRIVILEGES ON DATABASE bgeo TO role_cm_manager;
-GRANT ALL PRIVILEGES ON DATABASE bgeo TO role_cm_admin;
+GRANT ALL PRIVILEGES ON DATABASE BD_NAME TO role_cm_field;
+GRANT ALL PRIVILEGES ON DATABASE BD_NAME TO role_cm_manager;
+GRANT ALL PRIVILEGES ON DATABASE BD_NAME TO role_cm_admin;
 
 GRANT ALL ON SCHEMA SCHEMA_NAME TO role_cm_field;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_field;
