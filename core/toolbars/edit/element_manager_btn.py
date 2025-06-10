@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import QTableView, QGridLayout
 
 from ...utils import tools_gw
 from ...ui.ui_manager import GwElementManagerUi
-from ....libs import  tools_qgis
+from ....libs import tools_qgis
 from ..dialog import GwAction
 
 
@@ -21,7 +21,6 @@ class GwElementManagerButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-
 
     def clicked_event(self):
         """ Button 34: Edit element   

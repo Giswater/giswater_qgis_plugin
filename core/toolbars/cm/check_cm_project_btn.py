@@ -8,7 +8,7 @@ or (at your option) any later version.
 from .project_check_cm import GwProjectCheckCMTask
 from ..dialog import GwAction
 
-from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QCheckBox, QWidget, QTextEdit
+from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QWidget, QTextEdit
 from qgis.core import QgsApplication
 
 from ...utils import tools_gw

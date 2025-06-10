@@ -25,7 +25,7 @@ from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpressi
     QgsPointXY, QgsProject, QgsFeature
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
-#from .catalog import GwCatalog
+from ..shared.catalog import GwCatalog
 from .dimensioning import GwDimensioning
 from ..toolbars.edit.element_manager_btn import GwElementManagerButton
 from .visit_gallery import GwVisitGallery
@@ -1859,9 +1859,8 @@ class GwInfo(QObject):
 
             if "Accepted" in json_result['status']:
                 # If we create a new feature
-                #if self.new_feature_id is not None:
                 if new_feature is not None:
-                    status = self.layer_new_feature.commitChanges()
+                    self.layer_new_feature.commitChanges()
                 msg = json_result['message']['text']
                 if msg is None:
                     msg = 'Feature upserted'
@@ -2811,7 +2810,6 @@ class GwInfo(QObject):
                 return False
             tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
 
-
     def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields, id_name=None):
         """ Put filter widgets into layout and set headers into QTableView """
 
@@ -3245,7 +3243,7 @@ class GwInfo(QObject):
             else:
                 msg = "NO FEATURE TYPE DEFINED"
                 tools_log.log_info(msg)
-        except Exception as e:
+        except Exception:
             pass
 
         tools_gw.init_docker()
@@ -3299,7 +3297,6 @@ class GwInfo(QObject):
         """ Capture point XY from the canvas """
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
-
 
     def _update_geom(self, table_id, id_name, newfeature_id):
         """ Update geometry field """

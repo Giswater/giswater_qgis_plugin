@@ -14,6 +14,8 @@ from .... import global_vars
 from functools import partial
 from ....libs import tools_os
 from ...shared.info import GwInfo
+
+
 class GwElementButton(GwAction):
     """ Button 33: Element """
 
@@ -30,12 +32,10 @@ class GwElementButton(GwAction):
         if toolbar is not None:
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
-
         
     def clicked_event(self):
 
         self._fill_element_menu()
-
 
     def _fill_element_menu(self):
         """ Fill add point menu """
@@ -80,6 +80,5 @@ class GwElementButton(GwAction):
                     obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
             self.menu.addSeparator()
 
-    
     def _save_last_selection(self, menu, feature_cat):
         menu.setProperty("last_selection", feature_cat)

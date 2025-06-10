@@ -10,12 +10,12 @@ import platform
 import os
 
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtWidgets import QCheckBox, QTextEdit
-from qgis.core import Qgis, QgsTask
+from qgis.PyQt.QtWidgets import QCheckBox
+from qgis.core import Qgis
 
 from ...threads.task import GwTask
 from ...utils import tools_gw
-from ....libs import lib_vars, tools_qgis, tools_log, tools_qt, tools_os
+from ....libs import lib_vars, tools_qgis, tools_log, tools_os
 
 
 class GwProjectCheckCMTask(GwTask):
@@ -83,7 +83,7 @@ class GwProjectCheckCMTask(GwTask):
                         self.log_widget.append(f"<b>{check_name}:</b>")
                         for item in inner_result:
                             self.log_widget.append(f"- {item}")
-                    self.log_widget.append("") # Add a blank line for readability
+                    self.log_widget.append("")  # Add a blank line for readability
         elif not self.log_widget:
             print("FATAL ERROR: Log widget object was not passed to the task.")
 

@@ -21,8 +21,6 @@ from ... import global_vars
 from ..shared.document import GwDocument
 from ..shared.info import GwInfo
 from ..shared.visit import GwVisit
-from ..toolbars.edit.element_btn import GwElementButton
-from ..toolbars.edit.element_manager_btn import GwElementManagerButton
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from .selection_mode import GwSelectionMode
@@ -73,7 +71,6 @@ def add_object(**kwargs):
     elif qtable_name == 'tbl_element' or 'element' in tab_name:
         object_id = kwargs['complet_result_info']['body']['feature']['id']
         field_object_id = kwargs['complet_result_info']['body']['feature']['idName']
-        object_type = kwargs['complet_result_info']['body']['feature']['featureType']
 
     # Check if this object exists
     if 'sourceview' in func_params:
@@ -987,7 +984,6 @@ def manage_element_menu(**kwargs):
     elif table == 'v_ui_element_x_arc':
         connect = [partial(add_object, **kwargs), partial(_reload_table, **kwargs)]
 
-    
     # Create menu for button
     btn_menu = QMenu()
     # Create info feature object for tab_data
@@ -1014,6 +1010,7 @@ def manage_element_menu(**kwargs):
     # Set and show menu on button
     button.setMenu(btn_menu)
     button.showMenu()
+
 
 def delete_manager_item(**kwargs):
     """ Function called in class tools_gw.add_button(...) -->
@@ -1214,9 +1211,7 @@ def insert_feature(**kwargs):
     tools_gw.insert_feature(kwargs.get('class'), kwargs.get('dialog'), None, GwSelectionMode.ELEMENT, target_widget=target_widget)
 
 
-
 # region unused functions atm
-
 
 def get_all_layers(group, all_layers):
 

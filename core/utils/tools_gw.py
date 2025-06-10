@@ -3365,7 +3365,6 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
 
     # Retrieve the correct table widget
-    #table_widget = dialog.findChild(QTableView, expected_table_name)
     table_widget = dialog.findChildren(QTableView, QRegularExpression(f"{expected_table_name}$"))[0]
     if not table_widget:
         return
@@ -3436,7 +3435,6 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         selection_flags = QItemSelectionModel.Select | QItemSelectionModel.Rows | QItemSelectionModel.Current
 
         for row in range(model.rowCount()):
-            #index = model.index(row, model.fieldIndex(field_id))
             model_index = get_model_index(model, row, field_id)
             row_value = str(model_index)
             if row_value in selected_ids:
@@ -3453,6 +3451,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
 
     enable_feature_type(dialog, widget_table=table_object, ids=class_object.rel_list_ids[class_object.rel_feature_type])
 
+
 def get_model_index(model, row, field_name):
     if hasattr(model, 'fieldIndex'):
         column_index = model.fieldIndex(field_name)
@@ -3467,6 +3466,7 @@ def get_model_index(model, row, field_name):
         return model.index(row, column_index).data()
     else:
         return None
+
 
 def set_model_signals(class_object):
 
