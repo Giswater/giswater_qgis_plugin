@@ -2403,3 +2403,4 @@ UPDATE config_form_fields SET iseditable = FALSE WHERE columnname = 'fluid_type'
 -- 10/06/2025
 -- remove fluid_type from element forms
 DELETE FROM config_form_fields WHERE formname ILIKE '%elem%' AND formtype = 'form_feature' AND columnname = 'fluid_type';
+DELETE FROM sys_foreignkey WHERE typevalue_table='om_typevalue' AND typevalue_name='fluid_type' AND target_table='element' AND target_field='fluid_type';
