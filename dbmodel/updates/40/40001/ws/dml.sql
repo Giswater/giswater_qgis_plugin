@@ -777,11 +777,8 @@ VALUES(3772, 'There are %v_count2% arcs (state=1) on the selected exploitation(s
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3774, 'There are %v_count1% arcs (state=1) on the selected exploitation(s) and all of them have minsector_id informed.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-<<<<<<< Updated upstream
-=======
 INSERT INTO sys_label (id, idval, label_type) VALUES(3009, 'RESUME', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '-------------------------------------------------', 'separator');
->>>>>>> Stashed changes
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3776, 'Massive analysis have been done. %v_count1% mincut''s have been triggered (one by each minsector all of them using the mincut_id = -1). To check results you can query:', null, 0, true, 'utils', 'core', 'AUDIT');
