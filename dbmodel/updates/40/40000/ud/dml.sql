@@ -2986,9 +2986,6 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 VALUES('om_typevalue', 'fluid_type', 'link', 'fluid_type', NULL, true);
 
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
-VALUES('om_typevalue', 'fluid_type', 'element', 'fluid_type', NULL, true);
-
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
 VALUES('om_typevalue', 'fluid_type', 'arc', 'fluid_type', NULL, true);
 
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
