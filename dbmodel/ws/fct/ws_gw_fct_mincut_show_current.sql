@@ -50,8 +50,6 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-	
-	VALUES (v_fid, null, 4, concat('SHOW CURRENTLY EXECUTED MINCUTS'));
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"3236", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
