@@ -764,7 +764,6 @@ UPDATE sys_function SET function_alias = 'CREATE EMPTY NETSCENARIO' WHERE functi
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3768, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-<<<<<<< HEAD
 --10/06/2025
 
 UPDATE sys_function SET function_alias = 'MASSIVE MINCUT ANALYSIS (fid 129 & 149)' WHERE function_name = 'gw_fct_massivemincut';
@@ -814,17 +813,6 @@ VALUES (3812, 'The new netscenario have been created successfully.', null, 0, tr
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3814, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-
-
-
-
-
-
-
-
->>>>>>> d4a91a78e (feat(function_translation): translate gw_fct_duplicate_netscenario)
-
 
 
 
