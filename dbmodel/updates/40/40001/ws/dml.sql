@@ -799,6 +799,8 @@ VALUES(3806, 'Type: %v_netscenario_type%', null, 0, true, 'utils', 'core', 'AUDI
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3808, 'active: %v_active%', null, 0, true, 'utils', 'core', 'AUDIT');
 
+
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3810, 'ERROR: The netscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -851,6 +853,8 @@ BEGIN
 END
 $$;
 
+-- 10/06/2025
+UPDATE sys_function SET function_alias = 'SET INITLEVEL VALUES' WHERE function_name = 'gw_fct_pg2epa_setinitvalues';
 
 DO $$
 DECLARE
@@ -923,3 +927,8 @@ UPDATE config_typevalue SET addparam='{"orderBy":5}'::json WHERE typevalue='sys_
 UPDATE config_typevalue SET addparam='{"orderBy":6}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "CONNEC"]}';
 UPDATE config_typevalue SET addparam='{"orderBy":7}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "GULLY"]}';
 UPDATE config_typevalue SET addparam='{"orderBy":8}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "NODE"]}';
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4002, 'Initlevel of %v_count% inlets has been updated.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4004, 'Initlevel of %v_count% tanks has been updated.', null, 0, true, 'utils', 'core', 'AUDIT');

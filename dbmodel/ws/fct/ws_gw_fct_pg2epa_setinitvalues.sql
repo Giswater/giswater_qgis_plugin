@@ -43,8 +43,9 @@ BEGIN
 		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
 	-- create log
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SET INITLEVEL VALUES'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3268", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 
 	EXECUTE 'SELECT time FROM rpt_node ORDER BY split_part(time,'':'',1)::integer desc LIMIT 1' INTO v_time;
@@ -54,7 +55,9 @@ BEGIN
 
 	EXECUTE 'UPDATE inp_inlet SET initlevel = press FROM rpt_node WHERE inp_inlet.node_id = rpt_node.node_id AND result_id='||quote_literal(v_result_id)||' AND time ='||quote_literal(v_time)||';';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Initlevel of ',v_count,' inlets has been updated.'));
+	
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4002", "function":"3268", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT count(distinct node_id) FROM inp_tank JOIN rpt_node USING (node_id) WHERE result_id='||quote_literal(v_result_id)||';'
 	INTO v_count;
@@ -62,8 +65,9 @@ BEGIN
 	EXECUTE 'UPDATE inp_tank SET initlevel = press FROM rpt_node WHERE inp_tank.node_id = rpt_node.node_id AND result_id='||quote_literal(v_result_id)||' AND time ='||quote_literal(v_time)||';';
 
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Initlevel of ',v_count,' tanks has been updated.'));
 
+EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4004", "function":"3268", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
