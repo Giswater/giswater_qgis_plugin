@@ -99,6 +99,10 @@ BEGIN
 			v_fieldvalue := v_values ->> (aux_json ->> 'columnname');
 
 			IF (aux_json ->> 'widgettype') = 'combo' THEN
+				-- Special handling for reviewclass_id
+				IF (aux_json ->> 'columnname') = 'reviewclass_id' THEN
+					SELECT reviewclass_id::text INTO v_fieldvalue FROM om_campaign_review WHERE campaign_id = v_id::integer;
+				END IF;
 				v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'selectedId', COALESCE(v_fieldvalue, ''));
 			ELSE
 				v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'value', COALESCE(v_fieldvalue, ''));

@@ -67,7 +67,7 @@ BEGIN
 	        quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
 	        quote_nullable(v_fields ->> 'real_enddate') || '::date, ' ||
 	        v_campaign_type || ', ' ||
-	        quote_nullable(v_fields ->> 'description') || ', ' ||
+	        quote_nullable(v_fields ->> 'descript') || ', ' ||
 	        (v_fields ->> 'active')::bool || ', ' ||
 	        quote_nullable(v_fields ->> 'organization_id') || ', ' ||
 	        quote_nullable(v_fields ->> 'duration') || ', ' ||
@@ -92,7 +92,7 @@ BEGIN
 	        'real_startdate = ' || quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
 	        'real_enddate = ' || quote_nullable(v_fields ->> 'real_enddate') || '::date, ' ||
 	        'campaign_type = ' || v_campaign_type || ', ' ||
-	        'descript = ' || quote_nullable(v_fields ->> 'description') || ', ' ||
+	        'descript = ' || quote_nullable(v_fields ->> 'descript') || ', ' ||
 	        'active = ' || (v_fields ->> 'active')::bool || ', ' ||
 	        'organization_id = ' || quote_nullable(v_fields ->> 'organization_id') || ', ' ||
 	        'duration = ' || quote_nullable(v_fields ->> 'duration') || ', ' ||
