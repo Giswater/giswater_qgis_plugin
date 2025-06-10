@@ -685,7 +685,7 @@ UPDATE config_toolbox SET inputparams='[
     "selectedId": ""
   },
   {
-    "widgetname": "usePsectors",
+    "widgetname": "usePlanPsector",
     "label": "Use masterplan psectors:",
     "widgettype": "check",
     "datatype": "boolean",

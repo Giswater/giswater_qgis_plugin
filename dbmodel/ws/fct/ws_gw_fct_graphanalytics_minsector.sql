@@ -402,27 +402,6 @@ BEGIN
     ) sub
     WHERE sub.minsector_id = t.minsector_id;
 
-    -- Update minsector temporary geometry
-	-- =======================
-    v_data := json_build_object(
-        'data', json_build_object(
-            'fid', v_fid,
-            'version', v_version,
-            'updatemapzgeom', v_updatemapzgeom,
-            'concavehull', v_concavehull,
-            'geomparamupdate', v_geomparamupdate,
-            'table', 'minsector',
-            'field', 'mapzone_id',
-            'fieldmp', 'minsector_id',
-            'srid', v_srid
-        )
-	);
-    SELECT gw_fct_graphanalytics_settempgeom(v_data) INTO v_response;
-
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
-
 	IF v_commitchanges IS FALSE THEN
         -- Polygons
         EXECUTE 'SELECT jsonb_agg(features.feature) 
@@ -465,7 +444,7 @@ BEGIN
             UPDATE arc SET minsector_id = arcs.mapzone_id
             FROM arcs
             WHERE arc.arc_id = arcs.arc_id
-            AND arc.minsector_id <> arcs.mapzone_id;';
+            AND arc.minsector_id IS DISTINCT FROM arcs.mapzone_id;';
         EXECUTE v_querytext;
 
         v_querytext = '
@@ -480,7 +459,7 @@ BEGIN
             UPDATE node SET minsector_id = nodes.mapzone_id
             FROM nodes
             WHERE node.node_id = nodes.node_id
-            AND node.minsector_id <> nodes.mapzone_id;';
+            AND node.minsector_id IS DISTINCT FROM nodes.mapzone_id;';
         EXECUTE v_querytext;
 
         v_querytext = '
@@ -496,7 +475,7 @@ BEGIN
             UPDATE connec SET minsector_id = connecs.mapzone_id
             FROM connecs
             WHERE connec.connec_id = connecs.connec_id
-            AND connec.minsector_id <> connecs.mapzone_id;';
+            AND connec.minsector_id IS DISTINCT FROM connecs.mapzone_id;';
         EXECUTE v_querytext;
 
         v_querytext = '
@@ -512,7 +491,7 @@ BEGIN
             UPDATE link SET minsector_id = links.mapzone_id
             FROM links
             WHERE link.link_id = links.link_id
-            AND link.minsector_id <> links.mapzone_id;';
+            AND link.minsector_id IS DISTINCT FROM links.mapzone_id;';
         EXECUTE v_querytext;
 
         v_querytext = '
@@ -524,7 +503,7 @@ BEGIN
             AND NOT EXISTS (
                 SELECT 1 FROM temp_pgr_arc tpa WHERE tpa.mapzone_id = arc.minsector_id
             )
-            AND arc.minsector_id <> 0;
+            AND arc.minsector_id IS DISTINCT FROM 0;
         ';
         EXECUTE v_querytext;
 
@@ -537,7 +516,7 @@ BEGIN
             AND NOT EXISTS (
                 SELECT 1 FROM temp_pgr_node tpn WHERE tpn.mapzone_id = node.minsector_id
             )
-            AND node.minsector_id <> 0;
+            AND node.minsector_id IS DISTINCT FROM 0;
         ';
         EXECUTE v_querytext;
 
@@ -550,7 +529,7 @@ BEGIN
             AND NOT EXISTS (
                 SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE vc.connec_id = connec.connec_id
             )
-            AND connec.minsector_id <> 0;
+            AND connec.minsector_id IS DISTINCT FROM 0;
         ';
         EXECUTE v_querytext;
 
@@ -563,7 +542,7 @@ BEGIN
             AND NOT EXISTS (
                 SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id) WHERE vc.link_id = link.link_id
             )
-            AND link.minsector_id <> 0;
+            AND link.minsector_id IS DISTINCT FROM 0;
         ';
         EXECUTE v_querytext;
 
