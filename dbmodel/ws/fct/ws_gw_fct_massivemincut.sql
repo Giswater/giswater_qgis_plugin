@@ -44,7 +44,7 @@ SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fid=129 AND cur_user=current_user
 
 TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
 
---fid: 
+--fid:
 125, 134
 129 & 149 fid: are relationed
 129 it is one row for mincut to resume data for each minsector
@@ -89,48 +89,49 @@ BEGIN
 		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
 	END IF;
-	
+
 	-- update anl_arc table
     	UPDATE anl_arc set result_id = null where cur_user = current_user;
 
 	-- check criticity of data in order to continue or not
 	SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
 	IF v_count > 3 THEN
-	
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 order by criticity desc, id asc) row;
 
-		v_result := COALESCE(v_result, '{}'); 
+		v_result := COALESCE(v_result, '{}');
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 		-- Control nulls
-		v_result_info := COALESCE(v_result_info, '{}'); 
-		
+		v_result_info := COALESCE(v_result_info, '{}');
+
 		--  Return
 		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
-		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
+		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;
 	END IF;
- 
+
 	-- reset previous data
 	DELETE FROM audit_log_data WHERE cur_user=current_user AND fid IN (129,149);
 	DELETE FROM audit_check_data WHERE cur_user=current_user AND fid =v_fid;
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MASSIVE MINCUT ANALYSIS (fid 129 & 149)'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2712", "fid":"'||v_fid||'", "is_process":true, "is_header":"true"}}$$)';
 
-	
+
+
 	INSERT INTO om_mincut VALUES (-1, 'Massive Mincut (system)') ON CONFLICT (id) DO nothing;
 
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 	DELETE FROM selector_psector WHERE cur_user=current_user;
-		
+
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
 		DELETE FROM selector_expl WHERE cur_user=current_user;
-		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation where macroexpl_id IN 
+		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation where macroexpl_id IN
 		(SELECT distinct(macroexpl_id) FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
 
@@ -138,37 +139,38 @@ BEGIN
 	SELECT count(*) into v_count2 FROM arc WHERE state = 1 AND minsector_id IS null and expl_id IN (select (json_array_elements_text(v_expl))::integer);
 
 	IF v_count1 = 0 THEN
-		INSERT INTO audit_check_data (fid, error_message) VALUES
-		(v_fid, concat('WARNING-',v_fid,': All arcs (state=1) on the selected exploitation(s) have not minsector_id informed. Please check your data before continue'));
-	ELSIF v_count2 > 0 THEN 
-		INSERT INTO audit_check_data (fid, error_message) VALUES
-		(v_fid, concat('WARNING-',v_fid,': There are ',v_count2, ' arcs (state=1) on the selected exploitation(s) without minsector_id informed. Please check your data before continue'));
-	ELSE 
-		INSERT INTO audit_check_data (fid, error_message) VALUES (
-		v_fid, concat('There are ',v_count1, ' arcs (state=1) on the selected exploitation(s) and all of them have minsector_id informed.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3770", "function":"2712", "fid":"'||v_fid||'", "prefix_id":"1002", "is_process":true}}$$)';
+
+	ELSIF v_count2 > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3772", "function":"2712", "parameters":{"v_count2":"'||v_count2||'"}, "fid":"'||v_fid||'", "prefix_id":"1002", "is_process":true}}$$)';
+	ELSE
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3774", "function":"2712", "parameters":{"v_count1":"'||v_count1||'"}, "fid":"'||v_fid||'", "is_process":true}}$$)';
 
 		v_count1 = 0;
-	
+
 		-- starting recursive process for all minsectors
-		LOOP		
+		LOOP
 			v_count1 = v_count1 + 1;
 
 			RAISE NOTICE '----------------------- % maxmsector % ', v_count1, v_maxmsector;
-		
-			-- get arc_id represented minsector (fid: 134)			
+
+			-- get arc_id represented minsector (fid: 134)
 			v_arc = (SELECT descript FROM anl_arc WHERE result_id IS NULL AND fid=134 AND cur_user=current_user LIMIT 1);
 
 			EXIT WHEN v_arc is null;
 			EXIT WHEN v_count1  = v_maxmsector;
-		
+
 			-- set flag not don't take it in next loop
 			UPDATE anl_arc SET result_id='flag' WHERE descript=v_arc AND fid=134 AND cur_user=current_user;
 
 			--call engine function
 			PERFORM gw_fct_mincut(v_arc, 'arc', -1, false);
-		
+
 			-- insert results into audit table
-			INSERT INTO audit_log_data (fid, feature_id, log_message) 
+			INSERT INTO audit_log_data (fid, feature_id, log_message)
 			SELECT 129, v_arc,  output::text FROM om_mincut WHERE id=-1;
 
 			--SELECT * FROM om_mincut WHERE id=-1;
@@ -176,8 +178,8 @@ BEGIN
 		END LOOP;
 
 		-- message
-		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (v_fid, concat('Massive analysis have been done. ',v_count1, ' mincut''s have been triggered (one by each minsector all of them using the mincut_id = -1). To check results you can query:'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3776", "function":"2712", "parameters":{"v_count1":"'||v_count1||'"}, "fid":"'||v_fid||'", "is_process":true}}$$)';
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('RESUME (fid : 129)'));
 		INSERT INTO audit_check_data (fid, error_message)
@@ -187,27 +189,28 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('SELECT log_message FROM audit_log_data WHERE fid=149 AND cur_user=current_user'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '');
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'RESUME');
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '-------------------------------------------------');
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2712", "fid":"'||v_fid||'", "is_process":true, "is_header":"true", "label_id":"3009", "separator_id":"2049"}}$$)';
+
 		INSERT INTO audit_check_data (fid, error_message)
-		SELECT 129, reverse(substring(reverse(substring(log_message,2,999)),2,999)) FROM audit_log_data 
+		SELECT 129, reverse(substring(reverse(substring(log_message,2,999)),2,999)) FROM audit_log_data
 		WHERE fid=129 AND cur_user=current_user ORDER BY (((log_message::json->>'connecs')::json->>'hydrometers')::json->>'total')::integer desc;
-		
+
 	END IF;
-	
+
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
-	
+
 	--  Return
 	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Mincut massive process done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
@@ -218,7 +221,7 @@ BEGIN
 				'}'||
 		       '}'||
 	    '}')::json;
-	
+
 	RETURN v_count1;
 
 END;

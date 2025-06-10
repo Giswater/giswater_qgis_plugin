@@ -764,7 +764,24 @@ UPDATE sys_function SET function_alias = 'CREATE EMPTY NETSCENARIO' WHERE functi
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3768, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+--10/06/2025
 
+UPDATE sys_function SET function_alias = 'MASSIVE MINCUT ANALYSIS (fid 129 & 149)' WHERE function_name = 'gw_fct_massivemincut';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3770, 'All arcs (state=1) on the selected exploitation(s) have not minsector_id informed. Please check your data before continue', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3772, 'There are %v_count2% arcs (state=1) on the selected exploitation(s) without minsector_id informed. Please check your data before continue', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3774, 'There are %v_count1% arcs (state=1) on the selected exploitation(s) and all of them have minsector_id informed.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES(3009, 'RESUME', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '-------------------------------------------------', 'header');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3776, 'Massive analysis have been done. %v_count1% mincut''s have been triggered (one by each minsector all of them using the mincut_id = -1). To check results you can query:', null, 0, true, 'utils', 'core', 'AUDIT');
 
 
 
