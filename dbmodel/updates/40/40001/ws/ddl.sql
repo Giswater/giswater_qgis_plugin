@@ -134,3 +134,8 @@ ALTER TABLE minsector DROP CONSTRAINT minsectormuni_id_fkey;
 ALTER TABLE minsector ALTER COLUMN muni_id TYPE _int4 USING ARRAY[muni_id::int4];
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"supplyzone_id", "dataType":"integer[]", "isUtils":"False"}}$$);
+
+-- 10/06/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"minsector_graph", "column":"macrominsector_id"}}$$);
+ALTER TABLE minsector_graph ADD CONSTRAINT minsector_graph_minsector_1_fk FOREIGN KEY (minsector_1) REFERENCES minsector(minsector_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE minsector_graph ADD CONSTRAINT minsector_graph_minsector_2_fk FOREIGN KEY (minsector_2) REFERENCES minsector(minsector_id) ON DELETE CASCADE ON UPDATE CASCADE;

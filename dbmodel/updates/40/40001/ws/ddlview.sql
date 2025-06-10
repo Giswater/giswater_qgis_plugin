@@ -4421,7 +4421,11 @@ CREATE OR REPLACE VIEW vcv_dma_log
   GROUP BY n.node_id, n.dma_id;
 
 -- 21/11/24
+
 CREATE OR REPLACE VIEW v_minsector_graph AS
+WITH sel_expl AS (
+	SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+)
 SELECT
     m.node_id,
     m.nodecat_id,
@@ -4430,8 +4434,9 @@ SELECT
     n.expl_id
 FROM minsector_graph m
 JOIN node n ON n.node_id = m.node_id
-JOIN selector_expl s ON s.expl_id = n.expl_id
-WHERE s.cur_user = CURRENT_USER;
+WHERE EXISTS (
+	SELECT 1 FROM sel_expl WHERE sel_expl.expl_id = n.expl_id
+);
 
 
 
