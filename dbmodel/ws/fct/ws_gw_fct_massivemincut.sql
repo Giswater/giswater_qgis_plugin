@@ -190,7 +190,7 @@ BEGIN
 		VALUES (v_fid, concat('SELECT log_message FROM audit_log_data WHERE fid=149 AND cur_user=current_user'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '');
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2712", "fid":"'||v_fid||'", "is_process":true, "is_header":"true", "label_id":"3011", "separator_id":"2049"}}$$)';
+                       "data":{"function":"2712", "fid":"'||v_fid||'", "is_process":true, "is_header":"true", "label_id":"3009", "separator_id":"2049"}}$$)';
 
 		INSERT INTO audit_check_data (fid, error_message)
 		SELECT 129, reverse(substring(reverse(substring(log_message,2,999)),2,999)) FROM audit_log_data
