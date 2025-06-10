@@ -9,6 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- Create tables and views related with cat_feature
 DO $$
+
 DECLARE
   parent_s   CONSTANT text := 'PARENT_SCHEMA';
   new_s      CONSTANT text := 'SCHEMA_NAME';
@@ -56,8 +57,8 @@ BEGIN
         WHERE table_schema = new_s
         AND table_name = lower(format('ve_%s_lot_%s', parent_s, rec.id))
       ) THEN
-          EXECUTE format(
-            'CREATE VIEW %s AS
+        EXECUTE format(
+          'CREATE VIEW %s AS
             WITH sel_lot AS (
                 SELECT selector_lot.lot_id FROM selector_lot
                 WHERE selector_lot.cur_user = current_user
@@ -68,17 +69,18 @@ BEGIN
               SELECT 1 
               FROM sel_lot 
               WHERE sel_lot.lot_id = %s.lot_id
-            );',
-          view_name,
-          tbl_name,
-          rec.feature_type,
-          rec.feature_type,
-          rec.feature_type,
-          tbl_name
-      );
+          );',
+        view_name,
+        tbl_name,
+        rec.feature_type,
+        rec.feature_type,
+        rec.feature_type,
+        tbl_name
+        );
 
-    END IF;
+      END IF;
 
     END LOOP;
+
 END
 $$;
