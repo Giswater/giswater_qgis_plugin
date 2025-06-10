@@ -968,14 +968,31 @@ class AddNewLot:
         # Build ids
         ids = ",".join(str(v) for v in values)
 
+        # If deleting users, get their login names first to also drop the DB user
+        login_names_to_drop = []
+        if tablename == "cat_user":
+            login_names_rows = tools_db.get_rows(f"SELECT loginname FROM cm.cat_user WHERE {idname} IN ({ids})")
+            if login_names_rows:
+                login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
+
         # Create message for the question
         msg = f"Are you sure you want to delete these records: ({ids})?."
+        if tablename == "cat_user" and login_names_to_drop:
+            msg += f"\\nThis will also delete the database user(s): {', '.join(login_names_to_drop)}"
+
         answer = tools_qt.show_question(msg, "Delete records")
 
         # Check answer
         if answer:
-            # Delete records
-            tools_db.execute_sql(f"DELETE FROM cm.{tablename} WHERE {idname} IN ({str(ids)})")
+            # Delete records from the application table first
+            if tools_db.execute_sql(f"DELETE FROM cm.{tablename} WHERE {idname} IN ({str(ids)})"):
+                # If it was a user, also drop the database user
+                if tablename == "cat_user":
+                    for login_name in login_names_to_drop:
+                        if not tools_db.execute_sql(f'DROP USER IF EXISTS "{login_name}"', commit=True):
+                            tools_qgis.show_warning(f"Failed to drop database user '{login_name}'. It may need to be removed manually.")
+            else:
+                tools_qgis.show_warning(f"Failed to delete records from {tablename}.")
 
             # Chek user role
             if self.user_data["role"] == "role_cm_admin":
@@ -1308,9 +1325,9 @@ def upsert_user(**kwargs):
             return
 
         # Grant the group role to the new user
-        grant_sql = f'GRANT "{new_role_name}" TO "{login_name}";'
+        grant_sql = f'GRANT "{new_role_name}", "role_basic" TO "{login_name}";'
         if not tools_db.execute_sql(grant_sql, commit=True):
-            tools_qgis.show_warning(f"User '{login_name}' was created, but failed to grant role '{new_role_name}'.")
+            tools_qgis.show_warning(f"User '{login_name}' was created, but failed to grant roles ('{new_role_name}', 'role_basic').")
             # Continue to insert into cat_user anyway
 
         # Prepare SQL to insert user data into the application table
@@ -1352,6 +1369,9 @@ def upsert_user(**kwargs):
             pw_change_sql = f'ALTER USER "{login_name}" WITH PASSWORD \'{password}\';'
             if not tools_db.execute_sql(pw_change_sql, commit=True):
                 tools_qgis.show_warning(f"Failed to update password for user '{login_name}'.")
+
+        # Grant basic role to make sure user has it
+        tools_db.execute_sql(f'GRANT "role_basic" TO "{login_name}"', commit=True)
 
         # Prepare SQL to update the user data in the application table
         sql = f"UPDATE cm.cat_user SET username = '{user_name}', fullname = '{full_name}', descript = '{descript}', active = {active}, \
