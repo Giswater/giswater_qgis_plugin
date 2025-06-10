@@ -20,6 +20,10 @@ DECLARE
     v_version       text;
     v_update_fields text;
     v_update_values text;
+	v_organization	integer;
+	v_team			integer;
+	v_campaign		integer;
+	v_sql			text;
 BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
@@ -38,7 +42,7 @@ BEGIN
         -- INSERT new lot using jsonb_populate_record for dynamic mapping
         INSERT INTO om_campaign_lot
         SELECT * FROM jsonb_populate_record(NULL::SCHEMA_NAME.om_campaign_lot, v_fields::jsonb)
-        RETURNING lot_id INTO v_existing_id;
+        RETURNING lot_id, team_id, campaign_id INTO v_existing_id, v_team, v_campaign;
 
     ELSE
         -- Dynamic update using jsonb_populate_record, updating all columns except lot_id
@@ -65,10 +69,21 @@ BEGIN
     FROM config_param_system
     WHERE parameter = 'admin_version';
 
-    -- Update selector_lot for this user
-    INSERT INTO selector_lot (lot_id, cur_user)
-    VALUES (COALESCE(v_existing_id, v_record.lot_id), current_user)
-    ON CONFLICT DO NOTHING;
+	-- Update selector_lot for field users on selected team, manager users on selected organization and admin users (only new lots)
+	IF v_existing_id IS NULL THEN
+		-- Get organization
+		SELECT organization_id INTO v_organization FROM SCHEMA_NAME.om_campaign WHERE campaign_id=v_campaign;
+	
+	    v_sql = 'INSERT INTO selector_lot (lot_id, cur_user)
+	    select coalesce('|| v_existing_id ||','|| v_record.lot_id ||'), username from cat_user
+	    join cat_team using (team_id) 
+		where (role_id=''role_cm_manager'' and organization_id = '|| v_organization||')
+		OR (role_id=''role_cm_admin'') or (role_id=''role_cm_field'' and organization_id = '|| v_organization||'
+		and team_id = '||v_team||')
+	    ON CONFLICT DO NOTHING;';
+		
+		EXECUTE v_sql;
+	END IF;
 
     -- Build successful return JSON
     v_result := json_build_object(

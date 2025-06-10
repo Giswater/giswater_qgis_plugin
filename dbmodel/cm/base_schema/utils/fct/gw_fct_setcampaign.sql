@@ -102,10 +102,13 @@ BEGIN
 	    EXECUTE v_querytext INTO v_newid;
 	END IF;
 
-    -- Update selector_campaign for this user
-    INSERT INTO selector_campaign (campaign_id, cur_user)
-    VALUES (v_newid, current_user)
-    ON CONFLICT DO NOTHING;
+	-- Update selector_campaign for manager users for selected organization and admin users
+    EXECUTE 'INSERT INTO selector_campaign (campaign_id, cur_user)
+    select '|| v_newid ||', username from cat_user
+    join cat_team using (team_id) 
+	where (role_id=''role_cm_manager'' and organization_id = ' || quote_nullable(v_fields ->> 'organization_id') || ')
+	OR (role_id=''role_cm_admin'')
+    ON CONFLICT DO NOTHING;';
 
     -- Return success response
     RETURN json_build_object(
