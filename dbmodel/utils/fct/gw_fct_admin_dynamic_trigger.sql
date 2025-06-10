@@ -59,31 +59,37 @@ BEGIN
 
 	DROP TABLE IF EXISTS temp_new_vals;
 
+	-- for 1-level-dependencies (non-restricted tables to basic users)
 	v_sql = '
-    CREATE TABLE temp_new_vals AS 
+	CREATE TABLE temp_new_vals AS 
 	WITH aaa AS (
-   		WITH aux AS (
-   			SELECT 1 AS id, '||QUOTE_LITERAL(v_json_data)||'::json AS js
-   		), json_vals AS (
+		WITH aux AS (
+	   		SELECT 1 AS id, '||QUOTE_LITERAL(v_json_data)||'::json AS js
+		), json_vals AS (
 			SELECT key AS col, replace(value::text, ''"'', '''''''') AS val
 			FROM aux,
 			jsonb_each(aux.js::jsonb) AS keys_values
-		), mapping_cols AS (	
-			select c.column_name AS col, c.table_name, c.table_schema
-			FROM information_schema.view_column_usage c
-			JOIN pg_views v ON c.view_schema = v.schemaname AND c.view_name = v.viewname
-			WHERE v.viewname = '||quote_literal(v_origin_table)||'
-			AND table_schema IN ('||v_search_schema||')
 		)
-		SELECT v.*, concat(c.table_schema, ''.'', c.table_name) as table_name, NULL AS exec_order 
-		FROM json_vals v LEFT JOIN mapping_cols c USING (col)
+		SELECT v.*, NULL as data_type, NULL AS exec_order 
+		FROM json_vals v
 	), bbb AS (
-		select c.column_name AS col,  concat(c.table_schema, ''.'', c.table_name) as table_name FROM information_schema.view_column_usage c
-    	JOIN pg_views v ON c.view_schema = v.schemaname AND c.view_name = v.viewname
-	WHERE v.viewname = '||quote_literal(v_origin_table)||' AND c.table_schema IN ('||v_search_schema||')
+		SELECT distinct
+		    v.relname AS vista,
+		    t.relname AS table_name,
+		    a.attname AS columna
+		FROM pg_rewrite r
+		JOIN pg_class v ON r.ev_class = v.oid
+		JOIN pg_depend d ON r.oid = d.objid
+		JOIN pg_class t ON d.refobjid = t.oid
+		JOIN pg_attribute a ON a.attrelid = t.oid
+		JOIN pg_namespace n ON v.relnamespace = n.oid
+		WHERE v.relname = '||quote_literal(v_origin_table)||'
+	    AND a.attnum > 0
+	    AND NOT a.attisdropped
+	    AND t.relkind = ''r''
+ 		AND n.nspname = '||quote_literal(current_schema)||'
 	)
-	SELECT DISTINCT CASE WHEN aaa.table_name = '||quote_literal(v_origin_table)||' THEN bbb.table_name ELSE aaa.table_name END AS table_name, 
-	aaa.col, aaa.val, null data_type, aaa.exec_order FROM aaa LEFT JOIN bbb USING (col)
+	SELECT b.table_name, a.* FROM aaa a JOIN bbb b ON a.col = b.columna;
 	';
 
 	
