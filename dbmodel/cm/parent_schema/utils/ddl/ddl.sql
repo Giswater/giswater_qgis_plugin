@@ -11,13 +11,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DO $$
 
 DECLARE
-  parent_s   CONSTANT text := 'PARENT_SCHEMA';
-  new_s      CONSTANT text := 'SCHEMA_NAME';
-  rec        RECORD;
-  tbl_name   text;
-  view_name  text;
+
+  parent_s CONSTANT text := 'PARENT_SCHEMA';
+  new_s CONSTANT text := 'SCHEMA_NAME';
+  rec RECORD;
+  tbl_name text;
+  view_name text;
   feature_col text;
   constraint_name text;
+
 BEGIN
 
   -- Create one empty table per feature, cloning structure of the view/table
