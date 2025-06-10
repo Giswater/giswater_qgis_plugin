@@ -75,8 +75,9 @@ BEGIN
 
 	-- manage log (fid: 518)
 	DELETE FROM audit_check_data WHERE fid=518 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('MERGE PSECTOR'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "is_process":true, "is_header":"true"}}$$)';
+
 
     -- insert connec2network variable for user in case it doesn't exist
     INSERT INTO config_param_user VALUES('edit_connec_automatic_link', 'false', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
@@ -91,7 +92,10 @@ BEGIN
 	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_connec_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='edit_connec_proximity';
 	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_gully_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='edit_gully_proximity';
 
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('Deactivate topology control for connecs and gullies.' ));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3778", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+
 
 	--capture input values
  	v_old_psector_ids = ((((p_data ->>'data')::json)->>'parameters')::json->>'psector_ids')::text;
@@ -105,8 +109,9 @@ BEGIN
 	IF v_count > 1 THEN
 		INSERT INTO audit_check_data (fid, result_id, error_message)
 		VALUES (518, v_result_id, '');
-		INSERT INTO audit_check_data (fid, result_id, error_message)
-		VALUES (518, v_result_id, 'ERROR!!! Psectors must have the same priority, status, psector_type and expl_id to be merged.');
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3780", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "prefix_id":"1003", "is_process":true}}$$)';
+
 		INSERT INTO audit_check_data (fid, result_id, error_message)
 		VALUES (518, v_result_id, '');
 	END IF;
@@ -119,8 +124,11 @@ BEGIN
 	 	SELECT v_new_psector_name, psector_type, expl_id, priority
 	 	FROM plan_psector WHERE psector_id=v_old_psector_id RETURNING psector_id INTO v_new_psector_id;
 
-		INSERT INTO audit_check_data (fid, result_id, error_message)
-		VALUES (518, v_result_id, concat('Create psector ',v_new_psector_id,' as ',v_new_psector_name,'.' ));
+		--INSERT INTO audit_check_data (fid, result_id, error_message)
+		--VALUES (518, v_result_id, concat('Create psector ',v_new_psector_id,' as ',v_new_psector_name,'.' ));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3782", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_new_psector_id":"'||v_new_psector_id||'", "v_new_psector_name":"'||v_new_psector_name||'"}, "is_process":true}}$$)';
+
 
 		SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_current' and cur_user=current_user;
 
@@ -141,7 +149,9 @@ BEGIN
 			WHERE psector_id=ANY(v_psector_ids) AND state=0;
 
 			UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('Copied arcs with state 0: ', v_list_features_obsolete ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3784", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_list_features_obsolete":"'||v_list_features_obsolete||'"}, "is_process":true}}$$)';
+
 		END IF;
 
 		--copy nodes with state 0 inside plan_psector tables
@@ -153,7 +163,8 @@ BEGIN
 			SELECT DISTINCT ON (node_id) node_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_node
 			WHERE psector_id=ANY(v_psector_ids) AND state=0;
 
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('Copied nodes with state 0: ', v_list_features_obsolete ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3786", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_list_features_obsolete":"'||v_list_features_obsolete||'"}, "is_process":true}}$$)';
 		END IF;
 
 		--copy connecs with state 0 inside plan_psector tables
@@ -165,7 +176,9 @@ BEGIN
 			SELECT DISTINCT ON (connec_id) connec_id, v_new_psector_id, 0, false, descript, arc_id, link_id FROM plan_psector_x_connec
 			WHERE psector_id=ANY(v_psector_ids) AND state=0 ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('Copied connecs with state 0: ', v_list_features_obsolete ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3788", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_list_features_obsolete":"'||v_list_features_obsolete||'"}, "is_process":true}}$$)';
+
 		END IF;
 
 		--copy connecs with state 1 inside plan_psector tables
@@ -177,7 +190,9 @@ BEGIN
 			SELECT DISTINCT ON (connec_id) connec_id, v_new_psector_id, 1, false, descript FROM plan_psector_x_connec
 			WHERE psector_id=ANY(v_psector_ids) AND state=1 AND doable=false ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('Copied connecs with state 1 (doable false): ', v_list_connec_undoable));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3790", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_list_connec_undoable":"'||v_list_connec_undoable||'"}, "is_process":true}}$$)';
+
 		END IF;
 
 		IF v_project_type='UD' THEN
@@ -189,7 +204,9 @@ BEGIN
 				SELECT DISTINCT ON (connec_id) gully_id, v_new_psector_id, state, doable, descript, arc_id, link_id FROM plan_psector_x_gully
 				WHERE psector_id=ANY(v_psector_ids) AND state=0 ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 
-				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('Copied gullies with state 0: ', v_list_features_obsolete ));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3792", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_list_features_obsolete":"'||v_list_features_obsolete||'"}, "is_process":true}}$$)';
+
 			END IF;
 
 			--copy gullies with state 1 inside plan_psector tables
@@ -201,7 +218,8 @@ BEGIN
 				SELECT DISTINCT ON (gully_id) gully_id, v_new_psector_id, 1, false, descript FROM plan_psector_x_gully
 				WHERE psector_id=ANY(v_psector_ids) AND state=1 AND doable=false ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 
-				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('Copied gullies with state 1: ', v_list_gully_undoable));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3794", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_list_gully_undoable":"'||v_list_gully_undoable||'"}, "is_process":true}}$$)';
 			END IF;
 		END IF;
 
@@ -211,7 +229,9 @@ BEGIN
 			INSERT INTO plan_psector_x_other(price_id, measurement, psector_id, descript)
 			SELECT DISTINCT ON (price_id) price_id, measurement, psector_id, descript FROM plan_psector_x_other WHERE psector_id=ANY(v_psector_ids);
 
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (518, v_result_id, concat('Copied other prices: ', v_list_features_obsolete ));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3796", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_list_features_obsolete":"'||v_list_features_obsolete||'"}, "is_process":true}}$$)';
+
 		END IF;
 
 		-- set selector with selected psectors
@@ -266,8 +286,9 @@ BEGIN
 			into v_list_features_obsolete USING v_psector_ids;
 
 			IF v_list_features_obsolete IS NOT NULL THEN
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (518, v_result_id, concat('New ',lower(rec_type.id),' inserted with state 1: ', v_list_features_obsolete));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3902", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"rec_type.id":"'||lower(rec_type.id)||'", "v_list_features_obsolete":"'||v_list_features_obsolete||'"}, "is_process":true}}$$)';
+
 			END IF;
 
 		END LOOP;
@@ -275,8 +296,8 @@ BEGIN
 		-- delete old psector from selector and set new
 		DELETE FROM selector_psector WHERE psector_id=ANY(v_psector_ids) AND cur_user=current_user;
 		INSERT INTO selector_psector VALUES (v_new_psector_id, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
-		INSERT INTO audit_check_data (fid, result_id, error_message)
-		VALUES (518, v_result_id, concat('Set ',v_new_psector_name,' as current psector.' ));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3798", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_new_psector_name":"'||v_new_psector_name||'"}, "is_process":true}}$$)';
 
 		-- select forced arcs to connect with
 		SELECT string_agg(arc_id,',') INTO v_list_arc_new FROM plan_psector_x_arc WHERE psector_id=v_new_psector_id;

@@ -1925,3 +1925,41 @@ UPDATE config_form_fields SET widgetfunction='{
     "sourceview": "element"
   }
 }'::json WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+UPDATE sys_function SET function_alias = 'MERGE PSECTOR' WHERE function_name = 'gw_fct_psector_merge';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3778, 'Deactivate topology control for connecs and gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3780, 'Psectors must have the same priority, status, psector_type and expl_id to be merged.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3782, 'Create psector %v_new_psector_id% as %v_new_psector_name%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3784, 'Copied arcs with state 0: %v_list_features_obsolete%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3786, 'Copied nodes with state 0: %v_list_features_obsolete%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3788, 'Copied connecs with state 0: %v_list_features_obsolete%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3790, 'Copied connecs with state 1 (doable false): %v_list_connec_undoable%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3792, 'Copied gullies with state 0: %v_list_features_obsolete%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3794, 'Copied gullies with state 1: %v_list_gully_undoable%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3796, 'Copied other prices: %v_list_features_obsolete%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3798, 'Set %v_new_psector_name% as current psector.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3902, 'New %rec_type.id% inserted with state 1: %v_list_features_obsolete%', null, 0, true, 'utils', 'core', 'AUDIT');
