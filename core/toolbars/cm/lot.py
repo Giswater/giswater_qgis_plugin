@@ -695,6 +695,22 @@ class AddNewLot:
             completer.setCaseSensitivity(False)
             feature_id_lineedit.setCompleter(completer)
 
+    def _get_role_from_team_name(self, team_name: str) -> Optional[str]:
+        """Determines the database role based on the team name."""
+        if not team_name:
+            return None
+
+        team_name_lower = team_name.lower()
+
+        if "admin" in team_name_lower:
+            return "role_cm_admin"
+        elif "manager" in team_name_lower:
+            return "role_cm_manager"
+        elif "field" in team_name_lower:
+            return "role_cm_field"
+
+        return None
+
     """ FUNCTIONS RELATED WITH TAB LOAD"""
 
     def get_current_user(self):
@@ -1244,7 +1260,7 @@ def upsert_team(**kwargs):
 
 
 def upsert_user(**kwargs):
-    """ Create organization """
+    """ Create or update a user and its corresponding database role. """
 
     dlg = kwargs["dialog"]
     this = kwargs["class"]
@@ -1258,53 +1274,108 @@ def upsert_user(**kwargs):
     descript = tools_qt.get_text(dlg, "tab_none_descript")
     team_id = tools_qt.get_combo_value(dlg, "tab_none_team_id")
     active = tools_qt.get_widget_value(dlg, "tab_none_active")
+    password = tools_qt.get_text(dlg, "tab_none_password")
 
     # Validate input values
     if any(value in (None, "", "null") for value in [login_name, user_name, full_name, code, descript, team_id]):
-        message = "Missing required fields"
-        tools_qt.show_info_box(message, "Info")
+        tools_qt.show_info_box("Missing required fields", "Info")
         return
 
-    # Validate if name already exists
+    # Get team name and the corresponding role for the new/updated team
+    team_name_row = tools_db.get_row(f"SELECT teamname FROM cm.cat_team WHERE team_id = {team_id}")
+    if not team_name_row:
+        tools_qgis.show_warning("Selected team not found.")
+        return
+    new_team_name = team_name_row[0]
+    new_role_name = this._get_role_from_team_name(new_team_name)
+
+    if not new_role_name:
+        tools_qgis.show_warning(f"Could not determine a valid role for team '{new_team_name}'.")
+        return
+
+    # Validate if user name already exists
     sql_name_exists = f"SELECT * FROM cm.cat_user WHERE username = '{str(user_name)}'"
 
-    if not user_id:
+    if not user_id:  # This is a new user
+        # Create the database user
+        create_sql = f'CREATE USER "{login_name}" WITH LOGIN'
+        if password and password not in ('', 'null'):
+            create_sql += f" PASSWORD '{password}'"
+        
+        if not tools_db.execute_sql(f"{create_sql};", commit=True):
+            tools_qgis.show_warning(
+                f"Failed to create database user '{login_name}'. The user might already exist in the database.")
+            return
+
+        # Grant the group role to the new user
+        grant_sql = f'GRANT "{new_role_name}" TO "{login_name}";'
+        if not tools_db.execute_sql(grant_sql, commit=True):
+            tools_qgis.show_warning(f"User '{login_name}' was created, but failed to grant role '{new_role_name}'.")
+            # Continue to insert into cat_user anyway
+
+        # Prepare SQL to insert user data into the application table
         sql = f"INSERT INTO cm.cat_user (username, descript, active, team_id, code, loginname, fullname) \
                 VALUES ('{user_name}', '{descript}', {active}, '{team_id}', '{code}', '{login_name}', '{full_name}')"
-    else:
+
+    else:  # This is an existing user
         sql_name_exists += f" AND user_id != {user_id}"
+
+        # Get original user data to check for changes in login name or team
+        user_data_row = tools_db.get_row(f"SELECT loginname, team_id FROM cm.cat_user WHERE user_id = {user_id}")
+        original_login_name = user_data_row[0] if user_data_row else None
+        old_team_id = user_data_row[1] if user_data_row else None
+        
+        if not original_login_name:
+            tools_qgis.show_warning("Could not find the original user to update.")
+            return
+
+        # If the login name was changed, rename the database user first
+        if original_login_name != login_name:
+            rename_sql = f'ALTER USER "{original_login_name}" RENAME TO "{login_name}";'
+            if not tools_db.execute_sql(rename_sql, commit=True):
+                tools_qgis.show_warning(f"Failed to rename user from '{original_login_name}' to '{login_name}'. The new name might already be in use in the database.")
+                return
+
+        # If the user's team has changed, update their database role accordingly
+        if old_team_id and old_team_id != int(team_id):
+            old_team_name_row = tools_db.get_row(f"SELECT teamname FROM cm.cat_team WHERE team_id = {old_team_id}")
+            if old_team_name_row:
+                old_role_name = this._get_role_from_team_name(old_team_name_row[0])
+                if old_role_name and old_role_name != new_role_name:
+                    revoke_sql = f'REVOKE "{old_role_name}" FROM "{login_name}";'
+                    grant_sql = f'GRANT "{new_role_name}" TO "{login_name}";'
+                    tools_db.execute_sql(revoke_sql, commit=True)
+                    tools_db.execute_sql(grant_sql, commit=True)
+
+        # If a new password was provided, update it in the database
+        if password and password not in ('', 'null'):
+            pw_change_sql = f'ALTER USER "{login_name}" WITH PASSWORD \'{password}\';'
+            if not tools_db.execute_sql(pw_change_sql, commit=True):
+                tools_qgis.show_warning(f"Failed to update password for user '{login_name}'.")
+
+        # Prepare SQL to update the user data in the application table
         sql = f"UPDATE cm.cat_user SET username = '{user_name}', fullname = '{full_name}', descript = '{descript}', active = {active}, \
                 code = '{code}', loginname = '{login_name}', team_id = '{team_id}' WHERE user_id = {user_id}"
         this.user_id = None
 
     rows = tools_db.get_rows(sql_name_exists, commit=True)
     if rows:
-        message = "The user name already exists"
-        tools_qt.show_info_box(message, "Info", parameter=str(user_name))
+        tools_qt.show_info_box("The user name already exists", "Info", parameter=str(user_name))
         return
 
-    # Execute SQL
+    # Save the user data to the application's user table
     status = tools_db.execute_sql(sql, commit=True)
 
     if not status:
-        message = "Error creating or updating team"
-        tools_qgis.show_warning(message, parameter=str(user_name))
+        tools_qgis.show_warning("Error creating or updating user in cat_user table.", parameter=str(user_name))
         return
 
-    # Close dialog
+    # Close the dialog and refresh the user list
     tools_gw.close_dialog(dlg)
-
-    # Chek user role
     if this.user_data["role"] == "role_cm_admin":
-        # Reload table without filtering
         this.populate_tableview("cat_user")
-    else:
-        # Create sql filter and populate table
-        sql_filter = f"WHERE ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {this.user_data['org_id']})"
-        this.populate_tableview("cat_user", sql_filter)
 
 
 def close(**kwargs):
     """ Close dialog """
-
     tools_gw.close_dialog(kwargs["dialog"])

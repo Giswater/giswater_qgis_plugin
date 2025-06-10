@@ -2354,6 +2354,18 @@ def add_lineedit(field):
 
     widget = QLineEdit()
     widget.setObjectName(field['widgetname'])
+
+    if field.get('columnname') == 'password':
+        widget.setEchoMode(QLineEdit.Password)
+        widget.setClearButtonEnabled(True)
+
+        # Add toggle password visibility action
+        action = QAction(widget)
+        action.setIcon(QIcon(os.path.join(lib_vars.plugin_dir, "icons", "dialogs", "142.png")))
+        action.setCheckable(True)
+        action.triggered.connect(partial(toggle_visibility, widget, action))
+        widget.addAction(action, QLineEdit.TrailingPosition)
+
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
@@ -2373,6 +2385,14 @@ def add_lineedit(field):
         widget.setText(field['value'])
     return widget
 
+
+def toggle_visibility(widget, action, checked):
+    if checked:
+        widget.setEchoMode(QLineEdit.Normal)
+        action.setIcon(QIcon(os.path.join(lib_vars.plugin_dir, "icons", "dialogs", "141.png")))
+    else:
+        widget.setEchoMode(QLineEdit.Password)
+        action.setIcon(QIcon(os.path.join(lib_vars.plugin_dir, "icons", "dialogs", "142.png")))
 
 def add_tableview(complet_result, field, dialog, module=sys.modules[__name__], class_self=None):
     """
