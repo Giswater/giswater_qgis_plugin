@@ -314,6 +314,78 @@ BEGIN
     ) a WHERE a.minsector_id = temp_pgr_minsector.minsector_id;
     UPDATE minsector a SET num_hydro = 0 WHERE num_hydro IS NULL;
 
+    -- update geometry of mapzones
+    IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
+        -- do nothing
+
+    ELSIF  v_updatemapzgeom = 1 THEN
+
+        -- concave polygon
+        v_querytext = '
+            UPDATE temp_pgr_minsector SET the_geom = ST_Multi(b.the_geom) 
+                FROM (
+                    WITH polygon AS (
+                        SELECT ST_Collect(v.the_geom) AS g, t.mapzone_id AS minsector_id
+                        FROM temp_pgr_arc t
+                        JOIN v_temp_arc v USING (arc_id)
+                        GROUP BY t.mapzone_id
+                    )
+                    SELECT 
+                        mapzone_id AS minsector_id, 
+                        CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::text THEN ST_Buffer(ST_ConcaveHull(g, '||v_concavehull||'), 3)::geometry(Polygon,'||v_srid||')
+                        ELSE ST_Expand(ST_Buffer(g, 3::double precision), 1::double precision)::geometry(Polygon, '||v_srid||') 
+                        END AS the_geom 
+                    FROM polygon
+                ) b 
+            WHERE b.minsector_id = temp_pgr_minsector.minsector_id
+        ';
+        EXECUTE v_querytext;
+
+    ELSIF  v_updatemapzgeom = 2 THEN
+
+        -- pipe buffer
+        v_querytext = '
+            UPDATE temp_pgr_minsector SET the_geom = ST_Multi(geom) 
+            FROM (
+                SELECT t.mapzone_id AS minsector_id, (ST_Buffer(ST_Collect(v.the_geom),'||v_geomparamupdate||')) AS geom 
+                FROM temp_pgr_arc t
+                JOIN v_temp_arc v USING (arc_id)
+                WHERE mapzone_id > 0 
+                GROUP BY t.mapzone_id
+            ) b 
+            WHERE b.minsector_id = temp_pgr_minsector.minsector_id;
+        ';
+        EXECUTE v_querytext;
+
+    ELSIF  v_updatemapzgeom = 3 THEN
+
+        -- use plot and pipe buffer
+        v_querytext = '
+            UPDATE temp_pgr_minsector SET the_geom = geom 
+            FROM (
+                SELECT minsector_id, ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom 
+                FROM (
+                    SELECT t.mapzone_id AS minsector_id, ST_Buffer(ST_Collect(v.the_geom), '||v_geomparamupdate||') AS geom 
+                    FROM temp_pgr_arc t
+                    JOIN v_temp_arc v USING (arc_id)
+                    WHERE mapzone_id::integer > 0
+                    GROUP BY t.mapzone_id 
+                    UNION
+                    SELECT t.mapzone_id AS minsector_id, ST_Collect(ext_plot.the_geom) AS geom 
+                    FROM temp_pgr_arc t 
+                    JOIN v_temp_connec vc USING (arc_id)
+                    LEFT JOIN ext_plot ON vc.plot_code = ext_plot.plot_code
+					LEFT JOIN ext_plot ON ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
+                    WHERE mapzone_id::integer > 0 
+                    GROUP BY t.mapzone_id
+                ) c 
+                GROUP BY minsector_id
+            ) b 
+            WHERE b.minsector_id = temp_pgr_minsector.minsector_id
+        ';
+        EXECUTE v_querytext;
+    END IF;
+
 	-- Update minsector temporary length
     UPDATE temp_pgr_minsector SET length = b.length FROM (
         SELECT minsector_id, SUM(st_length2d(a.the_geom)::NUMERIC(12,2)) AS length
