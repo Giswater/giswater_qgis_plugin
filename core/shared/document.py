@@ -67,16 +67,16 @@ class GwDocument(QObject):
         # Get layers of every feature_type
 
         # Setting lists
-        self.ids = []
-        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
-        self.layers = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
-        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
-        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
-        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
-        self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
+        self.rel_ids = []
+        self.rel_list_ids = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
+        self.rel_layers = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
+        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
+        self.rel_layers['element'] = tools_gw.get_layers_from_feature_type('element')
         if self.project_type == 'ud':
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         params = ['arc', 'node', 'connec', 'gully', 'link', 'element']
         if list_tabs:
@@ -92,10 +92,10 @@ class GwDocument(QObject):
             self.doc_tables = doc_tables
         # Remove all previous selections
         if self.single_tool_mode:
-            self.layers = tools_gw.remove_selection(True, layers=self.layers)
+            self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
 
         if feature is not None:
-            layer = self.layers[feature_type][0]
+            layer = self.rel_layers[feature_type][0]
             layer.selectByIds([feature.id()])
 
         # Set icons
@@ -177,7 +177,7 @@ class GwDocument(QObject):
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_doc.rejected.connect(
-            lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers))
+            lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers))
         )
         # Widgets
         self.dlg_add_doc.doc_name.textChanged.connect(partial(self._check_doc_exists))
@@ -192,7 +192,7 @@ class GwDocument(QObject):
             partial(self._manage_document_accept, table_object, tablename, qtable, item_id, True)
         )
         self.dlg_add_doc.btn_cancel.clicked.connect(
-            lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers))
+            lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers))
         )
         self.dlg_add_doc.btn_apply.clicked.connect(
             partial(self._manage_document_accept, table_object, tablename, qtable, item_id, False)
@@ -227,7 +227,7 @@ class GwDocument(QObject):
 
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
-        self.feature_type = "arc"
+        self.rel_feature_type = "arc"
         tools_gw.get_signal_change_tab(self.dlg_add_doc, self.excluded_layers)
 
         # Open the dialog
@@ -639,15 +639,15 @@ class GwDocument(QObject):
         if sql is not None and sql != "":
             tools_db.execute_sql(sql)
 
-        arc_ids = self.list_ids['arc']
-        node_ids = self.list_ids['node']
-        connec_ids = self.list_ids['connec']
-        link_ids = self.list_ids['link']
+        arc_ids = self.rel_list_ids['arc']
+        node_ids = self.rel_list_ids['node']
+        connec_ids = self.rel_list_ids['connec']
+        link_ids = self.rel_list_ids['link']
         workcat_ids = self._get_associated_workcat_ids()
         psector_ids = self._get_associated_psector_ids()
         visit_ids = self._get_associated_visit_ids()
-        gully_ids = self.list_ids['gully']
-        element_ids = self.list_ids['element']
+        gully_ids = self.rel_list_ids['gully']
+        element_ids = self.rel_list_ids['element']
 
         data = {
             'arc': arc_ids,
@@ -681,7 +681,7 @@ class GwDocument(QObject):
             self.is_new = False
             self._activate_tabs(True)
             if close_dlg:
-                tools_gw.manage_close(self.dlg_add_doc, table_object, None, self.single_tool_mode, self.layers)
+                tools_gw.manage_close(self.dlg_add_doc, table_object, None, self.single_tool_mode, self.rel_layers)
             else:
                 msg = "Values saved successfully."
                 tools_qgis.show_info(msg, dialog=self.dlg_add_doc)
@@ -807,7 +807,7 @@ class GwDocument(QObject):
     def _fill_dialog_document(self, dialog, table_object, single_tool_mode=None, doc_id=None):
 
         # Reset list of selected records
-        self.ids, self.list_ids = tools_gw.reset_feature_list()
+        self.rel_ids, self.rel_list_ids = tools_gw.reset_feature_list()
 
         list_feature_type = ['arc', 'node', 'connec', 'element', 'link']
         if global_vars.project_type == 'ud':

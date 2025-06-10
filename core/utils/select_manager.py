@@ -35,7 +35,7 @@ class GwSelectManager(QgsMapTool):
         self.dialog = dialog
         self.selection_mode = selection_mode
         self.save_rectangle = save_rectangle
-
+        
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
 
@@ -80,8 +80,7 @@ class GwSelectManager(QgsMapTool):
         # Reconnect signal to enhance process
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
-
-        for i, layer in enumerate(self.class_object.layers[self.class_object.feature_type]):
+        for i, layer in enumerate(self.class_object.rel_layers[self.class_object.rel_feature_type]):
             # Selection by rectangle
             if rectangle:
                 if selected_rectangle is None:

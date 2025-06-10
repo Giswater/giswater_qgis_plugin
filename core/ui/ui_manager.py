@@ -239,15 +239,6 @@ class GwDocManagerUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-UINAME = "element"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwElementUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
 UINAME = "element_manager"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 

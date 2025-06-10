@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>776</width>
+    <width>1201</width>
     <height>587</height>
    </rect>
   </property>
@@ -95,7 +95,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>726</width>
+             <width>1151</width>
              <height>337</height>
             </rect>
            </property>
@@ -116,8 +116,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>726</width>
-             <height>337</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -151,8 +151,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>726</width>
-             <height>328</height>
+             <width>111</width>
+             <height>64</height>
             </rect>
            </property>
            <attribute name="label">
@@ -242,6 +242,80 @@
         </item>
         <item row="2" column="0">
          <layout class="QGridLayout" name="lyt_relation_3"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_features">
+       <attribute name="title">
+        <string>Features</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_15">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="lyt_features_1"/>
+        </item>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="lyt_features_2">
+          <item row="0" column="0">
+           <widget class="QTabWidget" name="tab_feature">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="tab_arc">
+             <attribute name="title">
+              <string>Arc</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_18">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_features_2_arc"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_node">
+             <attribute name="title">
+              <string>Node</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_19">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_features_2_node"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_connec">
+             <attribute name="title">
+              <string>Connec</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_21">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_features_2_connec"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_gully">
+             <attribute name="title">
+              <string>Gully</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_23">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_features_2_gully"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_link">
+             <attribute name="title">
+              <string>Link</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_24">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_features_2_link"/>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <layout class="QGridLayout" name="lyt_features_3"/>
         </item>
        </layout>
       </widget>
@@ -417,6 +491,7 @@
    <addaction name="separator"/>
    <addaction name="actionHelp"/>
    <addaction name="actionAudit"/>
+   <addaction name="actionSetGeom"/>
   </widget>
   <action name="actionCentered">
    <property name="text">
@@ -582,6 +657,11 @@
   <action name="actionDemand">
    <property name="text">
     <string>Demand</string>
+   </property>
+  </action>
+  <action name="actionSetGeom">
+   <property name="text">
+    <string>Set Geom</string>
    </property>
   </action>
  </widget>
