@@ -21,13 +21,13 @@ SELECT SCHEMA_NAME.gw_fct_gettypeahead($${
 "feature":{"tableName":"ve_arc_pipe"},
 "data":{"queryText":"SELECT id AS id, id AS idval FROM cat_arc WHERE id IS NOT NULL",
 	"textToSearch":"FD"}}$$)
-	
+
 SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
-"queryText":"SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL", 
+"queryText":"SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL",
 "queryTextFilter":"AND m.name", "parentId":"muni_id", "parentValue":"", "textToSearch":"Ave"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
-"queryText":"SELECT a.postnumber AS id, a.postnumber AS idval FROM ext_address a JOIN ext_streetaxis m ON streetaxis_id=m.id WHERE a.id IS NOT NULL", 
+"queryText":"SELECT a.postnumber AS id, a.postnumber AS idval FROM ext_address a JOIN ext_streetaxis m ON streetaxis_id=m.id WHERE a.id IS NOT NULL",
 "queryTextFilter":"AND m.name", "parentId":"streetname", "parentValue":"Avenida de Aragó", "textToSearch":"1"}}$$);
 
 */
@@ -38,11 +38,11 @@ v_response json;
 v_message text;
 v_version text;
 v_querytext text;
-v_querytextparent text; 
-v_parent text; 
-v_parentvalue text; 
+v_querytextparent text;
+v_parent text;
+v_parentvalue text;
 v_textosearch text;
-v_fieldtosearch text; 
+v_fieldtosearch text;
 v_position integer;
 v_error_context text;
 
@@ -50,7 +50,7 @@ BEGIN
 
 	-- set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
@@ -58,7 +58,7 @@ BEGIN
 	-- filter input data
 	p_data = replace (p_data::text, 'None', '');
 
-	-- getting input data 
+	-- getting input data
 	v_querytext := ((p_data ->>'data')::json->>'queryText')::text;
 	v_parent :=  ((p_data ->>'data')::json->>'parentId')::text;
 	v_querytextparent :=  ((p_data ->>'data')::json->>'queryTextFilter')::text;
@@ -78,18 +78,25 @@ BEGIN
 	ELSE
 
 		v_position = position('AND' in v_querytextparent);
-		
+
 		IF v_position > 0 and v_position <3 THEN
 			v_querytextparent =overlay(v_querytextparent placing 'AND(' from v_position for 3);
-			
-			v_querytext = concat (v_querytext, ' ', v_querytextparent, ' = ' ,quote_literal(v_parentvalue),')'); 
-			
+
+			v_querytext = concat (v_querytext, ' ', v_querytextparent, ' = ' ,quote_literal(v_parentvalue),')');
+
 		ELSE
-			v_querytext = concat (v_querytext, ' ', v_querytextparent, ' = ' ,quote_literal(v_parentvalue)); 
+			v_querytext = concat (v_querytext, ' ', v_querytextparent, ' = ' ,quote_literal(v_parentvalue));
 		END IF;
 
 	END IF;
-	v_querytext = concat ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT * FROM (', (v_querytext), ')a WHERE idval ILIKE $$%', v_textosearch, '%$$ LIMIT 10)a');
+
+	v_querytext = concat(
+		'SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT * FROM (',
+		v_querytext,
+		')a WHERE CAST(idval AS TEXT) ILIKE $$%',
+		v_textosearch,
+		'%$$ LIMIT 10)a'
+	);
 
 	-- execute query text
 	EXECUTE v_querytext INTO v_response;
@@ -103,15 +110,15 @@ BEGIN
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
-    	    ', "body": {"data":'|| v_response || '}}')::json;      
+    	    ', "body": {"data":'|| v_response || '}}')::json;
 
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 
-	
-	 
+
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
