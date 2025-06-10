@@ -777,7 +777,7 @@ VALUES(3772, 'There are %v_count2% arcs (state=1) on the selected exploitation(s
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3774, 'There are %v_count1% arcs (state=1) on the selected exploitation(s) and all of them have minsector_id informed.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(3009, 'RESUME', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(3011, 'RESUME', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '-------------------------------------------------', 'separator');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
