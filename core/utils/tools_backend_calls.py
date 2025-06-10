@@ -54,12 +54,12 @@ def add_object(**kwargs):
             filter_sign = button.property('widgetcontrols')['filterSign']
 
     # Get values from dialog
-    object_id = tools_qt.get_text(dialog, f"{func_params['sourcewidget']}")
-    if object_id == 'null':
-        msg = "You need to insert data"
-        tools_qgis.show_warning(msg, parameter=func_params['sourcewidget'])
-        return
-
+    if 'sourcewidget' in func_params:
+        object_id = tools_qt.get_text(dialog, f"{func_params['sourcewidget']}")
+        if object_id == 'null':
+            msg = "You need to insert data"
+            tools_qgis.show_warning(msg, parameter=func_params['sourcewidget'])
+            return
     # Special case for documents: get the document ID using the name
     if qtable_name == 'tbl_document' or 'doc' in tab_name:
         sql = f"SELECT id FROM doc WHERE name = '{object_id}'"
@@ -70,9 +70,18 @@ def add_object(**kwargs):
             return
         # Use the found document ID
         object_id = row['id']
+    elif qtable_name == 'tbl_element' or 'element' in tab_name:
+        object_id = kwargs['complet_result_info']['body']['feature']['id']
+        field_object_id = kwargs['complet_result_info']['body']['feature']['idName']
+        object_type = kwargs['complet_result_info']['body']['feature']['featureType']
 
     # Check if this object exists
-    view_object = f"v_ui_{func_params['sourceview']}"
+    if 'sourceview' in func_params:
+        view_object = f"v_ui_{func_params['sourceview']}"
+        tablename = func_params['sourceview'] + "_x_" + feature_type
+    else:
+        view_object = func_params['sourcetable']
+    
     sql = ("SELECT * FROM " + view_object + ""
            " WHERE id = '" + object_id + "'")
     row = tools_db.get_row(sql, log_sql=True)
@@ -82,16 +91,18 @@ def add_object(**kwargs):
         return
 
     # Check if this object is already associated to current feature
-    field_object_id = dialog.findChild(QWidget, func_params['sourcewidget']).property('columnname')
     if qtable_name == 'tbl_document' or 'doc' in tab_name:
         field_object_id = 'doc_id'
+    elif qtable_name == 'tbl_element' or 'element' in tab_name:
+        object_id = kwargs['complet_result_info']['body']['feature']['id']
+        field_object_id = kwargs['complet_result_info']['body']['feature']['idName']
+    else:
+        field_object_id = dialog.findChild(QWidget, func_params['sourcewidget']).property('columnname')
 
-    tablename = func_params['sourceview'] + "_x_" + feature_type
     sql = ("SELECT * FROM " + str(tablename) + ""
            " WHERE " + str(field_id) + " = '" + str(feature_id) + "'"
            " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
     row = tools_db.get_row(sql, log_info=False)
-
     # If object already exist show warning message
     if row:
         msg = "Object already associated with this feature"
@@ -952,6 +963,15 @@ def manage_element_menu(**kwargs):
 
     # Get widget from kwargs
     button = kwargs['widget']
+    func_params = kwargs['func_params']
+    table = func_params['sourcetable']
+    connect = None
+    if table == 'v_ui_element': 
+        connect = [partial(reload_table_manager, **kwargs)]
+    elif table == 'v_ui_element_x_arc':
+        connect = [partial(add_object, **kwargs), partial(_reload_table, **kwargs)]
+
+    
     # Create menu for button
     btn_menu = QMenu()
     # Create info feature object for tab_data
@@ -965,7 +985,7 @@ def manage_element_menu(**kwargs):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_class.upper() == 'FRELEM':
                 action_frelem = btn_menu.addAction(feature_cat.id)
-                action_frelem.triggered.connect(partial(info_feature.add_feature, feature_cat))
+                action_frelem.triggered.connect(partial(info_feature.add_feature, feature_cat, connect_signal=connect))
         # Add separator between feature types
         btn_menu.addSeparator()
         # Get list again for GENELEM features
@@ -974,7 +994,7 @@ def manage_element_menu(**kwargs):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_class.upper() == 'GENELEM':
                 action_genelem = btn_menu.addAction(feature_cat.id)
-                action_genelem.triggered.connect(partial(info_feature.add_feature, feature_cat))
+                action_genelem.triggered.connect(partial(info_feature.add_feature, feature_cat, connect_signal=connect))
     # Set and show menu on button
     button.setMenu(btn_menu)
     button.showMenu()

@@ -96,7 +96,7 @@ class GwInfo(QObject):
         return self.open_form(table_name=table_name, feature_id=feature_id, tab_type=tab_type, is_add_schema=is_add_schema)
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
-                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False):
+                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False, connect_signal=None):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -259,7 +259,7 @@ class GwInfo(QObject):
                 feature_id = self.complet_result['body']['feature']['id']
 
                 result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
-                    new_feature=new_feature)
+                    new_feature=new_feature, connect_signal=connect_signal)
                 if feature_cat is not None:
                     self._manage_new_feature(self.complet_result, dialog)
                 return result, dialog
@@ -297,7 +297,7 @@ class GwInfo(QObject):
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
-    def add_feature(self, feature_cat, action=None):
+    def add_feature(self, feature_cat, action=None, connect_signal=None):
         """ Button 21, 22: Add 'node', 'arc', 'connec' or 'element' """
 
         global is_inserting  # noqa: F824
@@ -330,7 +330,7 @@ class GwInfo(QObject):
             self.info_layer.startEditing()
 
             # Connect signal with feature_id
-            tools_gw.connect_signal(self.info_layer.featureAdded, self._open_new_feature, 
+            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal), 
                                     'info', 'add_feature_featureAdded_open_new_feature')
             # Create a new feature with the given feature_id
             feature = QgsFeature(self.info_layer.fields())
@@ -349,7 +349,7 @@ class GwInfo(QObject):
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
             self.iface.actionAddFeature().trigger()
-            tools_gw.connect_signal(self.info_layer.featureAdded, self._open_new_feature,
+            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal),
                                     'info', 'add_feature_featureAdded_open_new_feature')
         else:
             message = "Layer not found"
@@ -388,9 +388,10 @@ class GwInfo(QObject):
 
     # region private functions
 
-    def _get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature):
+    def _get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature, connect_signal=None):
         return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id,
-                              layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature)
+                              layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature,
+                              connect_signal=connect_signal)
 
     def _manage_new_feature(self, complet_result, dialog):
 
@@ -487,7 +488,7 @@ class GwInfo(QObject):
 
         return result, self.dlg_generic
 
-    def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
+    def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None, connect_signal=None):
         """
         Opens a custom form
             :param feature_id: the id of the node that will populate the form (Integer)
@@ -498,7 +499,6 @@ class GwInfo(QObject):
             :param new_feature: Whether the form will create a new feature or not (Boolean)
             :return: self.complt_result, self.dlg_cf
         """
-
         # Dialog
         self.dlg_cf = GwInfoFeatureUi(self, sub_tag)
         tools_gw.load_settings(self.dlg_cf)
@@ -649,6 +649,15 @@ class GwInfo(QObject):
 
         if rows and schema_actived:
             self._enable_action(dlg_cf, self.action_audit, True)
+
+        if connect_signal:
+            for signal in connect_signal:
+                func_name = signal.func.__name__
+                if func_name == "add_object":
+                    signal_kwargs = signal.keywords
+                    signal_kwargs['complet_result_info'] = complet_result
+                    
+                self.dlg_cf.dlg_closed.connect(signal)
 
         return self.complet_result, self.dlg_cf
 
@@ -3058,7 +3067,6 @@ class GwInfo(QObject):
         for field in result['body']['data']['fields']:
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
             if widget.property('typeahead'):
-                # print(field['comboIds'])
                 tools_qt.set_completer_object(QCompleter(), QStandardItemModel(), widget, field['comboIds'])
                 tools_qt.set_widget_text(self.dlg_cf, widget, field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
@@ -3214,7 +3222,7 @@ class GwInfo(QObject):
         if not self.iface.actionAddFeature().isChecked():
             tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
-    def _open_new_feature(self, feature_id):
+    def _open_new_feature(self, feature_id, connect_signal=None):
         """
         :param feature_id: Parameter sent by the featureAdded method itself
         :return:
@@ -3248,7 +3256,8 @@ class GwInfo(QObject):
         self.info_feature.prev_action = self.prev_action
         result, dialog = self.info_feature._get_feature_insert(point=list_points, feature_cat=self.feature_cat,
                                                                new_feature_id=feature_id, new_feature=feature,
-                                                               layer_new_feature=self.info_layer, tab_type='data')
+                                                               layer_new_feature=self.info_layer, tab_type='data', 
+                                                               connect_signal=connect_signal)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         config = self.info_layer.editFormConfig()
