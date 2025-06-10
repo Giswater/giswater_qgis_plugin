@@ -1907,7 +1907,7 @@ class GwAdminButton:
         if not self._check_project_name(name, description):
             return
 
-        msg = "This process will take time (few minutes). Are you sure to continue?"
+        msg = "This process will take a few seconds. Are you sure to continue?"
         title = "Create base schema"
         answer = tools_qt.show_question(msg, title)
         if not answer:
@@ -2141,7 +2141,6 @@ class GwAdminButton:
 
         status = False
         f = None
-
         PARENT_SCHEMA = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         SCHEMA_SRID = str(self.project_epsg)
         if schema_option in ('load_parent_schema', 'load_example'):
@@ -2165,7 +2164,12 @@ class GwAdminButton:
             if f:
                 file_content = f.read()
                 f_to_read = file_content.replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
-                    "PARENT_SCHEMA", PARENT_SCHEMA)
+                    "PARENT_SCHEMA", PARENT_SCHEMA).replace("PARENT_TYPE", self.project_type_selected)
+                if "BD_NAME" in f_to_read:
+                    BD_NAME = self._get_current_db_name()
+                    if BD_NAME:
+                        f_to_read = f_to_read.replace("BD_NAME", BD_NAME)
+
                 status = tools_db.execute_sql(f_to_read, filepath=filepath, commit=self.dev_commit, is_thread=False)
 
                 if tools_os.set_boolean(status, False) is False:
@@ -2197,6 +2201,23 @@ class GwAdminButton:
             if f:
                 f.close()
             return status
+
+    def _get_current_db_name(self):
+        """
+        Gets the database name from the currently selected connection in the admin dialog.
+        """
+        if not hasattr(self, 'dlg_readsql') or isdeleted(self.dlg_readsql):
+            return None
+
+        connection_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
+        if not connection_name or connection_name == 'null':
+            return None
+
+        settings = QSettings()
+        settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
+        db_name = settings.value("database", "")
+        settings.endGroup()
+        return db_name
 
     def _execute_sql_files(self, filedir, set_progress_bar=False):
         """"""
