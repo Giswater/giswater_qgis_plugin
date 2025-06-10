@@ -796,6 +796,30 @@ VALUES(3802, 'Descript: %v_descript%', null, 0, true, 'utils', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(3804, 'Parent: %v_parent_id%', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(3806, 'Type: %v_netscenario_type%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(3808, 'active: %v_active%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_label (id, idval, label_type) VALUES (1003, 'ERRORS', 'prefix');
+INSERT INTO sys_label (id, idval, label_type) VALUES (1002, 'WARNINGS', 'prefix');
+INSERT INTO sys_label (id, idval, label_type) VALUES (1001, 'INFO', 'prefix');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3810, 'ERROR: The netscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3812, 'The new netscenario have been created successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3814, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
+
 
 
 

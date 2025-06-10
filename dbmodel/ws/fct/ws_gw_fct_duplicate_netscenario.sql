@@ -60,32 +60,28 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE EMPTY NETSCENARIO'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
 						"data":{"function":"3262", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Name: ',v_name));
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
 						"data":{"message":"3800 ", "function":"3262", "parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Descript: ',v_descript));
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
 						"data":{"message":"3802", "function":"3262", "parameters":{"v_descript":"'||v_descript||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Parent: ',v_parent_id));
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3802", "function":"3262", "parameters":{"v_parent_id":"'||v_parent_id||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
-
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Type: ',v_netscenario_type));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('active: ',v_active));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
+						"data":{"message":"3804", "function":"3262", "parameters":{"v_parent_id":"'||v_parent_id||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
+						"data":{"message":"3806", "function":"3262", "parameters":{"v_netscenario_type":"'||v_netscenario_type||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{},
+						"data":{"message":"3808", "function":"3262", "parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"function":"3262", "fid":"'||v_fid||'", "criticity":"3", "is_process":true,"is_header":"true", "prefix_id":"1003"}$$)';
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+						"data":{"function":"3262", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "prefix_id":"1002"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+						"data":{"function":"3262", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "prefix_id":"1001"}}$$)';
 
 	-- process
 	-- inserting on catalog table
@@ -99,10 +95,12 @@ BEGIN
 
 	IF v_scenarioid IS NULL THEN
 		SELECT netscenario_id INTO v_scenarioid FROM plan_netscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, null, 3, concat('ERROR: The netscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
+						"data":{"message":"3810", "function":"3262", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"3", "is_process":true}}$$)';
+
 	ELSE 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'The new netscenario have been created sucessfully');
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
+						"data":{"message":"3812", "function":"3262", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 		IF v_netscenario_type = 'DMA' THEN
 			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, dma_name, pattern_id, graphconfig, the_geom) 
@@ -114,7 +112,8 @@ BEGIN
 			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 		END IF;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.');
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3814", "function":"3262", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 	END IF;
 
 	-- insert spacers
