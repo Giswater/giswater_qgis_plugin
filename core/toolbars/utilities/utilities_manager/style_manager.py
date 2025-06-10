@@ -464,7 +464,7 @@ class GwStyleManager:
                 if layer['geomField'] == "None" or not layer['geomField']:
                     continue  # Skip layers without a geometry field
 
-                context = json.loads(layer['context'])
+                context = json.loads(layer['context']['layer_menu'])
 
                 # Level 1 of the context
                 if 'level_1' in context and context['level_1'] not in dict_menu:

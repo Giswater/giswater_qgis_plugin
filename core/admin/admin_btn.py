@@ -1152,7 +1152,7 @@ class GwAdminButton:
 
         gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-                                                    roletype)
+                                                    roletype, layer_project_type=tools_qt.get_combo_value(self.dlg_create_gis_project, 'cmb_project_type', 1))
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
@@ -1193,6 +1193,16 @@ class GwAdminButton:
         qgis_file_export = tools_gw.get_config_parser('btn_admin', 'qgis_file_export', "user", "session", prefix=False,
                                                       force_reload=True)
         qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
+        
+        #self.cmb_create_project_type.addItem(str(aux))
+        list_project_type = tools_db.execute_returning(f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'")
+        try:
+            result = {list_project_type[i]: list_project_type[i + 1] for i in range(0, len(list_project_type), 2)}
+        except Exception:
+            result = {}
+        tools_qt.fill_combo_values(self.dlg_create_gis_project.cmb_project_type, list(result.items()))
+        if len(list(result.items())) <= 1:
+            self.dlg_create_gis_project.cmb_project_type.setEnabled(False)
         self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
         self.dlg_create_gis_project.txt_gis_folder.setEnabled(False)
         if self.is_service:

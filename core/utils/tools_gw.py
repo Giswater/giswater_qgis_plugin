@@ -34,7 +34,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
-    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression
+    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -707,7 +707,8 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None,
+                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=True):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -716,25 +717,37 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         :param child_layers: List of layers (StringList)
         :param group: Name of the group that will be created in the toc (String)
         :param style_id: Id of the style we want to load (integer or String)
+        :param alias: Alias of the layer (String)
+        :param sub_sub_group: Sub-sub-group of the layer (String)
+        :param schema: Schema of the layer (String)
+        :param visibility: Visibility of the layer (Boolean)
+        :param auth_id: Auth ID of the layer (String)
+        :param extent: Extent of the layer (QgsRectangle)
     """
 
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
+
+    auth_id = tools_db.get_srid('v_edit_node', schema_name) if auth_id is None else auth_id
+    extent = _get_extent_parameters(schema_name) if extent is None else extent
+
     field_id = field_id.replace(" ", "")
-    uri = tools_db.get_uri()
-    uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-    if the_geom:
-        try:
-            uri.setSrid(f"{lib_vars.data_epsg}")
-        except Exception:
-            pass
+    uri, status = tools_db.get_uri(tablename, the_geom, schema_name)
+    if status is False:
+        uri.setDataSource(schema_name, f'{tablename}', '', None, field_id)
+    else:
+        uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+    
+    if passwd is not None:
+        uri.setPassword(passwd)
+    
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
     if sub_group:
         sub_group = sub_group.capitalize()
     if sub_sub_group:
         sub_sub_group = sub_sub_group.capitalize()
-
+    
     if the_geom == "rast":
         connString = f"PG: dbname={tools_db.dao_db_credentials['db']} host={tools_db.dao_db_credentials['host']} " \
                      f"user={tools_db.dao_db_credentials['user']} password={tools_db.dao_db_credentials['password']} " \
@@ -753,14 +766,14 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
         # Apply styles to layer
         if style_id in (None, "-1"):
-            set_layer_styles(tablename_og, layer)
+            set_layer_styles(tablename_og, layer, schema_name)
 
         if tablename and schema != 'am':
             # Set layer config
             feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
             extras = '"infoType":"' + str(lib_vars.project_vars['info_type']) + '"'
             body = create_body(feature=feature, extras=extras)
-            json_result = execute_procedure('gw_fct_getinfofromid', body)
+            json_result = execute_procedure('gw_fct_getinfofromid', body, schema_name=schema_name)
             config_layer_attributes(json_result, layer, alias)
 
             # Manage valueRelation
@@ -791,7 +804,18 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                                                                                  })
                     vr_layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
-    global_vars.iface.mapCanvas().refresh()
+    if visibility is not None:
+        if visibility is False:
+            tools_qgis.set_layer_visible(layer, recursive=False, visible=False)
+
+    if the_geom is not None and the_geom != 'None':
+        layer.setCrs(QgsCoordinateReferenceSystem(auth_id))
+
+    if extent is not None:
+        layer.setExtent(extent)
+    
+    if create_project is False:
+        global_vars.iface.mapCanvas().refresh()
 
 
 def validate_qml(qml_content):
@@ -805,9 +829,9 @@ def validate_qml(qml_content):
         return False, str(e)
 
 
-def set_layer_styles(tablename, layer):
+def set_layer_styles(tablename, layer, schema_name):
     body = f'$${{"data":{{"layername":"{tablename}"}}}}$$'
-    json_return = execute_procedure('gw_fct_getstyle', body)
+    json_return = execute_procedure('gw_fct_getstyle', body, schema_name=schema_name)
     if json_return is None or json_return['status'] == 'Failed':
         return
     if 'styles' in json_return['body']:
@@ -5086,6 +5110,27 @@ def _get_parser_from_filename(filename):
         return filepath, None
 
     return filepath, parser
+
+def _get_extent_parameters(schema_name):
+
+        rectangle = None
+        table_name = "node"
+        geom_name = "the_geom"
+        sql = (f"SELECT ST_XMax(gometries) AS xmax, ST_XMin(gometries) AS xmin, "
+               f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
+               f"FROM "
+               f"(SELECT ST_Collect({geom_name}) AS gometries FROM {schema_name}.{table_name}) AS foo")
+        row = tools_db.get_row(sql)
+        if row:
+            xmin = row["xmin"]
+            xmax = row["xmax"]
+            ymin = row["ymin"]
+            ymax = row["ymax"]
+            
+            rectangle = QgsRectangle(xmin or -1.555992, ymin or -1.000000, xmax or 1.555992, ymax or 1.000000)
+            
+
+        return rectangle
 
 
 # endregion
