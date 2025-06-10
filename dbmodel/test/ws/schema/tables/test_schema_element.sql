@@ -21,7 +21,7 @@ SELECT columns_are(
     'element',
     ARRAY[
         'element_id', 'code', 'sys_code', 'elementcat_id', 'serial_number', 'num_elements', 'state', 'state_type',
-        'observ', 'comment', 'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id',
+        'observ', 'comment', 'function_type', 'category_type', 'location_type', 'workcat_id',
         'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified',
         'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id', 'feature_type',
         'top_elev', 'expl_visibility', 'trace_featuregeom', 'geometry_type', 'epa_type',
@@ -47,7 +47,6 @@ SELECT col_type_is('element', 'observ', 'varchar(254)', 'Column observ should be
 SELECT col_type_is('element', 'comment', 'varchar(254)', 'Column comment should be varchar(254)');
 SELECT col_type_is('element', 'function_type', 'varchar(50)', 'Column function_type should be varchar(50)');
 SELECT col_type_is('element', 'category_type', 'varchar(50)', 'Column category_type should be varchar(50)');
-SELECT col_type_is('element', 'fluid_type', 'varchar(50)', 'Column fluid_type should be varchar(50)');
 SELECT col_type_is('element', 'location_type', 'varchar(50)', 'Column location_type should be varchar(50)');
 SELECT col_type_is('element', 'workcat_id', 'varchar(30)', 'Column workcat_id should be varchar(30)');
 SELECT col_type_is('element', 'workcat_id_end', 'varchar(30)', 'Column workcat_id_end should be varchar(30)');
