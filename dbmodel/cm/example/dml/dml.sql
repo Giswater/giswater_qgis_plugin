@@ -47,3 +47,14 @@ query_text = EXCLUDED.query_text,
 info_msg = EXCLUDED.info_msg,
 function_name = EXCLUDED.function_name,
 active = EXCLUDED.active; 
+
+INSERT INTO sys_fprocess_cm (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active) VALUES(355, 'Check orphan nodes', 'cm', NULL, 'core', true, 'Check cm', NULL, 3, 'There are some orphan nodes', 'cm_node', NULL, 'SELECT a.node_id, a.nodecat_id, a.expl_id, a.the_geom FROM ws_40_lots.v_edit_node a JOIN ws_40_lots.cat_node nc ON nodecat_id=id JOIN ws_40_lots.cat_feature_node nt ON nt.id=nc.node_type JOIN ws_40_lots.node ON node.node_id = a.node_id WHERE a.state > 0 AND isarcdivide = ''false'' AND node.arc_id IS null', 'All teams have users assigned.', '[]', true)
+ON CONFLICT (fid) DO UPDATE SET
+fprocess_name = EXCLUDED.fprocess_name,
+project_type = EXCLUDED.project_type,
+parameters = EXCLUDED.parameters,
+"source" = EXCLUDED.source,
+isaudit = EXCLUDED.isaudit,
+fprocess_type = EXCLUDED.fprocess_type,
+addparam = EXCLUDED.addparam,
+except_level = EXCLUDED.except_level,

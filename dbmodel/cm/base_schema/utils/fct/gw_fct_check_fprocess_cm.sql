@@ -22,9 +22,17 @@ DECLARE
 	v_process_except_msg text;
 	v_process_fid integer;
 	v_process_except_level integer;
+
+	v_schemaname text;
+	v_id integer;
+	v_cat varchar;
+	v_expl_id integer;
+	v_fid integer;
+
 BEGIN
-	DROP TABLE IF EXISTS t_audit_check_data;
-	CREATE TEMP TABLE t_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+
+	SET search_path = 'SCHEMA_NAME', public;
+	v_schemaname := 'SCHEMA_NAME';
 
     v_check_fid := (p_data->'data'->'parameters'->>'checkFid')::integer;
     v_function_fid := (p_data->'data'->'parameters'->>'functionFid')::integer;
@@ -47,7 +55,11 @@ BEGIN
 		v_process_except_msg,
 		v_process_fid,
 		v_process_except_level
-	FROM sys_fprocess_SCHEMA_NAME WHERE fid = v_check_fid;
+	FROM sys_fprocess_cm WHERE fid = v_check_fid;
+	
+	-- replace variables (usando COALESCE para evitar NULLs)
+	v_exceptable_id = concat(replace (v_process_except_table, 'cm_', ''), '_id');
+	v_exceptable_catalog = concat(replace (v_process_except_table, 'cm_', ''), 'cat_id');
 
     -- manage query count
 	RAISE NOTICE 'hola v_check_fid %', v_check_fid;
@@ -93,8 +105,7 @@ BEGIN
 			v_querytext = 'INSERT INTO t_'||v_process_except_table||' ('||v_exceptable_id||', '||v_exceptable_catalog||', 
 					expl_id, fid, the_geom, descript)	SELECT '||v_exceptable_id||', '||v_exceptable_catalog||', 
 					expl_id, '||v_check_fid||', the_geom, '||quote_literal(v_process_name)||' FROM ('||v_process_query_text||')a';
-
-			RAISE NOTICE 'v_querytext %', v_querytext;
+			
 			EXECUTE v_querytext;
 
 		END IF;
@@ -109,16 +120,14 @@ BEGIN
 					expl_id, fid, the_geom, descript)	SELECT '||v_exceptable_id||', '||v_exceptable_catalog||', 
 					expl_id, '||v_check_fid||', the_geom, '||quote_literal(v_process_name)||' FROM ('||v_process_query_text||')a';
 
-			RAISE NOTICE 'v_querytext %', v_querytext;
 			EXECUTE v_querytext;
 		END IF;
 
 	END IF;
 
 
-    RETURN json_build_object(
-        'status','ok'
-    );
+	RETURN '{}';
+
 END;
 $function$
 ;
