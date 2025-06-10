@@ -42,18 +42,18 @@ SELECT is (
 
 SELECT is (
     (gw_fct_getfeatureinsert($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"ve_connec_connec"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
+    "feature":{"tableName":"ve_connec_cjoin"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
     "coordinates":{"x1":419084.29857150157, "y1":4576491.071025222}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getfeatureinsert -> ve_connec_connec returns status "Accepted"'
+    'Check if gw_fct_getfeatureinsert -> ve_connec_cjoin returns status "Accepted"'
 );
 
 SELECT is (
     (gw_fct_getfeatureinsert($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"ve_gully_gully"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
+    "feature":{"tableName":"ve_gully_ginlet"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
     "coordinates":{"x1":419072.55354624306, "y1":4576497.782468226}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getfeatureinsert -> ve_gully_gully returns status "Accepted"'
+    'Check if gw_fct_getfeatureinsert -> ve_gully_ginlet returns status "Accepted"'
 );
 
 SELECT is (

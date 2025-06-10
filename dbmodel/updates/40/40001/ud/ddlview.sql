@@ -37,6 +37,10 @@ DROP VIEW IF EXISTS ve_elem_protector;
 DROP VIEW IF EXISTS ve_elem_pump;
 DROP VIEW IF EXISTS ve_elem_step;
 DROP VIEW IF EXISTS v_edit_element;
+DROP VIEW IF EXISTS v_edit_link_connec;
+DROP VIEW IF EXISTS v_edit_link_gully;
+DROP VIEW IF EXISTS ve_link_link;
+
 
 -- ====
 

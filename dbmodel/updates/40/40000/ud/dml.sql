@@ -2995,3 +2995,6 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 VALUES('om_typevalue', 'fluid_type', 'node', 'fluid_type', NULL, true);
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+DROP TRIGGER gw_trg_typevalue_fk ON sys_table;
+DELETE FROM sys_foreignkey WHERE typevalue_table = 'config_typevalue' AND typevalue_name = 'sys_table_context' AND target_table = 'sys_table' AND target_field = 'context';

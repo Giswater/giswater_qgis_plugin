@@ -679,6 +679,8 @@ BEGIN
 			NEW.uncertain, NEW.muni_id, NEW.verified, NEW.datasource, NEW.top_elev1, NEW.depth1, NEW.top_elev2, NEW.depth2, NEW.location_type,
 			NEW.custom_length, NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, v_dma, NEW.state_type);
 
+			INSERT INTO man_pipelink VALUES (NEW.link_id);
+
 		ELSIF  v_projectype = 'UD' THEN
 			IF NEW.linkcat_id IS NULL THEN
 				IF NEW.feature_type ='CONNEC' THEN
@@ -711,10 +713,9 @@ BEGIN
 			NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource,
 			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, 'LINK', NEW.location_type, NEW.epa_type,
 			NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, NEW.drainzone_outfall, NEW.dwfzone_outfall);
-		END IF;
 
-		-- Inserts to man tables
-		INSERT INTO man_link VALUES (NEW.link_id);
+			INSERT INTO man_conduitlink VALUES (NEW.link_id);
+		END IF;
 
 		-- update feature
 		IF NEW.state = 0 THEN

@@ -7,6 +7,7 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+UPDATE sys_feature_class SET man_table = 'man_pipelink' WHERE id = 'LINK';
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EPUMP', 'FRELEM', 'ELEMENT', 've_frelem', 've_frelem_epump', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EVALVE', 'FRELEM', 'ELEMENT', 've_frelem', 've_frelem_evalve', true) ON CONFLICT (id) DO NOTHING;
 
@@ -179,7 +180,7 @@ INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('v_edit_link', 'form_feature', 'tab_data', 'macrodma_id', 'lyt_data_1', 23, 'integer', 'text', 'Macrodma ID', 'Macrodma ID', NULL, false, false, false, false, NULL, 'SELECT macrodma_id as id, name as idval FROM macrodma WHERE macrodma_id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
-INSERT INTO man_link (link_id)
+INSERT INTO man_pipelink (link_id)
 SELECT link_id
 FROM v_edit_link;
 
@@ -399,9 +400,9 @@ UPDATE inp_typevalue SET idval='POWERPUMP',id='POWERPUMP' WHERE typevalue='inp_t
 INSERT INTO connec_add (connec_id) SELECT connec_id FROM connec ON CONFLICT (connec_id) DO NOTHING;
 
 -- 19/05/2025
-INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_supplyzone', 'Shows editable information about supplyzone.', 'role_basic', '{1}', '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 6, 'Supplyzone', NULL, NULL, NULL, 'core', NULL);
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_supplyzone', 'Shows editable information about supplyzone.', 'role_basic', '{"template": [1]}', '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 6, 'Supplyzone', NULL, NULL, NULL, 'core', NULL);
 
-UPDATE sys_table SET project_template = '{1}'
+UPDATE sys_table SET project_template = '{"template": [1]}'
 WHERE id IN (
 	'v_edit_macrodma',
 	'v_edit_dma',
@@ -433,7 +434,7 @@ INSERT INTO sys_table (id, descript, sys_role) VALUES ('inp_frvalve', 'inp_frval
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('macroomzone', 'macroomzone', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('man_frelem', 'man_frelem', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('man_genelem', 'man_genelem', 'role_edit');
-INSERT INTO sys_table (id, descript, sys_role) VALUES ('man_link', 'man_link', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('man_pipelink', 'man_pipelink', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('minsector_mincut', 'minsector_mincut', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('om_visit_x_link', 'om_visit_x_link', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('omzone', 'omzone', 'role_edit');
@@ -809,6 +810,119 @@ VALUES (3812, 'The new netscenario have been created successfully.', null, 0, tr
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3814, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.', null, 0, true, 'utils', 'core', 'AUDIT');
+-- 09/06/2025
+ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
+
+INSERT INTO sys_feature_class (id, type, epa_default, man_table) VALUES ('VLINK', 'LINK', 'VIRTUAL', 'man_vlink');
+INSERT INTO sys_feature_class (id, type, epa_default, man_table) VALUES ('VCONNEC', 'CONNEC', 'VIRTUAL', 'man_vconnec');
+UPDATE sys_feature_class SET id = 'PIPELINK', man_table = 'man_pipelink' WHERE id = 'LINK';
+
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, descript, active) VALUES ('VLINK', 'VLINK', 'LINK', 'v_edit_link', 've_link_vlink', 'Virtual link', true);
+
+UPDATE cat_feature SET id = 'PIPELINK', child_layer = 've_link_pipelink' WHERE id = 'LINK';
+
+INSERT INTO cat_feature_link (id) VALUES ('VLINK');
+
+ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
+
+-- Update sys_table context syntax and update config_typevalue references
+DO $$
+DECLARE
+  level_values text[];
+  output_json jsonb;
+	layer record;
+BEGIN
+
+	FOR layer IN (SELECT * FROM config_typevalue WHERE typevalue = 'sys_table_context')
+	LOOP
+    -- Extract values of keys starting with 'level_' into an array
+    IF layer.id::text NOT LIKE '{"levels":%}' THEN
+      level_values := ARRAY(
+          SELECT value::text
+          FROM jsonb_each_text(layer.id::jsonb)
+          WHERE key LIKE 'level_%'
+          ORDER BY key
+      );
+
+      -- Build the resulting JSON
+      output_json := jsonb_build_object('levels', level_values);
+
+    UPDATE config_typevalue SET id = output_json WHERE id = layer.id AND typevalue = 'sys_table_context';
+  END IF;
+
+	END LOOP;
+END
+$$;
 
 
+DO $$
+DECLARE
+  level_values text[];
+  output_json jsonb;
+	layer record;
+BEGIN
 
+	FOR layer IN (select * from sys_table where context is not null)
+	LOOP
+    IF layer.context::text NOT LIKE '{"levels":%}' THEN
+      -- Extract values of keys starting with 'level_' into an array
+      level_values := ARRAY(
+          SELECT value::text
+          FROM jsonb_each_text(layer.context::jsonb)
+          WHERE key LIKE 'level_%'
+          ORDER BY key
+      );
+
+      -- Build the resulting JSON
+      output_json := jsonb_build_object('levels', level_values);
+
+      UPDATE sys_table set context = output_json where id = layer.id;
+    END IF;
+	END LOOP;
+END
+$$;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('config_typevalue', 'sys_table_context', 'sys_table', 'context', NULL, true);
+
+
+UPDATE sys_table SET orderBy = 1, alias = 'Municipality', project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb,context='{"levels": ["BASEMAP", "ADDRESS"]}' WHERE id='v_ext_municipality';
+
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_edit_supplyzone';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_edit_presszone';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_edit_dqa';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, alias= 'Link' WHERE id='v_edit_link';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_edit_macrodma';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_edit_exploitation';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_edit_sector';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_edit_macrosector';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 3}'::jsonb WHERE id='ve_pol_node';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 3}'::jsonb WHERE id='ve_pol_connec';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='v_edit_dimensions';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_ext_address';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='v_ext_plot';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='v_ext_streetaxis';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id='v_edit_dma';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='v_edit_cat_feature_arc';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, alias='Connec' WHERE id='v_edit_connec';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, alias='Arc' WHERE id='v_edit_arc';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='cat_node';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='cat_arc';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='v_edit_cat_feature_node';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='cat_connec';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='v_edit_cat_feature_connec';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, alias = 'Node' WHERE id='v_edit_node';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='cat_material';
+
+UPDATE sys_table SET context = NULL, orderBy = NULL, alias = NULL WHERE id='ext_municipality';
+
+UPDATE sys_style SET layername='v_ext_municipality' WHERE layername='ext_municipality' AND styleconfig_id=101;
+
+DELETE FROM sys_table WHERE id = 've_link_link';
+
+
+UPDATE config_typevalue SET addparam='{"orderBy":3}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "POLYGON"]}';
+UPDATE config_typevalue SET addparam='{"orderBy":4}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "LINK"]}';
+UPDATE config_typevalue SET addparam='{"orderBy":5}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "ARC"]}';
+UPDATE config_typevalue SET addparam='{"orderBy":6}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "CONNEC"]}';
+UPDATE config_typevalue SET addparam='{"orderBy":7}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "GULLY"]}';
+UPDATE config_typevalue SET addparam='{"orderBy":8}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "NODE"]}';

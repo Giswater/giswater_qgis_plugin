@@ -75,7 +75,7 @@ BEGIN
 	-- manage log (fid: 152)
 	DELETE FROM audit_check_data WHERE fid = 152 AND cur_user=current_user;
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2736", "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
+                       "data":{"function":"2736", "fid":"152", "result_id":"'||COALESCE(v_result_id, null)||'", "is_process":true, "is_header":"true"}}$$)';
 
  	--get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;

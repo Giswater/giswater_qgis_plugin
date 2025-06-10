@@ -3415,3 +3415,7 @@ UPDATE config_form_fields
 INSERT INTO edit_typevalue VALUES('omzone_type', 'UNDEFINED', 'UNDEFINED', NULL, NULL);
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+DROP TRIGGER gw_trg_typevalue_fk ON sys_table;
+DELETE FROM sys_foreignkey WHERE typevalue_table = 'config_typevalue' AND typevalue_name = 'sys_table_context' AND target_table = 'sys_table' AND target_field = 'context';
+

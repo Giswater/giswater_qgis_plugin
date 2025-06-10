@@ -257,3 +257,28 @@ CREATE INDEX subcathment_index ON inp_subcatchment USING gist (the_geom);
 
 -- 20/05/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"conduit_capacity", "dataType":"float", "isUtils":"False"}}$$);
+
+-- 10/06/2025
+CREATE TABLE man_vlink (
+	link_id int4 NOT NULL,
+	CONSTRAINT man_vlink_pkey PRIMARY KEY (link_id),
+	CONSTRAINT man_vlink_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE man_vgully (
+	gully_id int4 NOT NULL,
+	CONSTRAINT man_vgully_pkey PRIMARY KEY (gully_id),
+	CONSTRAINT man_vgully_gully_id_fkey FOREIGN KEY (gully_id) REFERENCES gully(gully_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE man_vconnec (
+	connec_id int4 NOT NULL,
+	CONSTRAINT man_vconnec_pkey PRIMARY KEY (connec_id),
+	CONSTRAINT man_vconnec_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE man_conduitlink (
+	link_id int4 NOT NULL,
+	CONSTRAINT man_conduitlink_pkey PRIMARY KEY (link_id),
+	CONSTRAINT man_conduitlink_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE
+);

@@ -33,7 +33,7 @@ SELECT col_is_pk('sys_table', ARRAY['id'], 'Column id should be primary key');
 SELECT col_type_is('sys_table', 'id', 'text', 'Column id should be text');
 SELECT col_type_is('sys_table', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('sys_table', 'sys_role', 'character varying(30)', 'Column sys_role should be character varying(30)');
-SELECT col_type_is('sys_table', 'project_template', 'integer[]', 'Column project_template should be integer[]');
+SELECT col_type_is('sys_table', 'project_template', 'jsonb', 'Column project_template should be jsonb');
 SELECT col_type_is('sys_table', 'context', 'character varying(500)', 'Column context should be character varying(500)');
 SELECT col_type_is('sys_table', 'orderby', 'smallint', 'Column orderby should be smallint');
 SELECT col_type_is('sys_table', 'alias', 'text', 'Column alias should be text');

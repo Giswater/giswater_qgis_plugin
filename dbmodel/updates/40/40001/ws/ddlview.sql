@@ -13,6 +13,7 @@ DROP VIEW IF EXISTS v_rpt_comp_arc_hourly;
 
 DROP VIEW IF EXISTS v_edit_inp_pattern;
 DROP VIEW IF EXISTS v_edit_inp_pattern_value;
+DROP VIEW IF EXISTS ve_link_link;
 
 DROP VIEW IF EXISTS v_price_x_arc;
 

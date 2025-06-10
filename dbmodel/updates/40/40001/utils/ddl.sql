@@ -210,3 +210,27 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_p
 -- 10/06/2025
 DELETE FROM config_toolbox WHERE id=3336;
 DELETE FROM sys_function WHERE id=3336; -- gw_fct_graphanalytics_macrominsector
+
+-- Update sys_table project_template to jsonb
+DO $$
+DECLARE
+	roww record;
+	layers text[] := ARRAY[]::text[];
+	item text;
+BEGIN
+
+	FOR roww IN (SELECT * FROM sys_table WHERE project_template IS NOT NULL)
+	LOOP
+		IF 1 = ANY(roww.project_template) THEN
+			layers := layers || roww.id;
+		END IF;
+	END LOOP;
+
+	ALTER TABLE sys_table ALTER COLUMN project_template TYPE jsonb USING to_jsonb(project_template);
+
+	FOREACH item IN ARRAY layers
+	LOOP
+		UPDATE sys_table SET project_template = '{"template": [1]}'::jsonb WHERE id = item;
+	END LOOP;
+END
+$$;

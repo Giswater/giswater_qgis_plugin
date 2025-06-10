@@ -52,18 +52,18 @@ INSERT INTO cat_brand_model VALUES ('model4', 'brand2', NULL, NULL, true, NULL);
 INSERT INTO cat_brand_model VALUES ('model5', 'brand3', NULL, NULL, true, NULL);
 INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, NULL);
 
-INSERT INTO cat_connec VALUES ('PVC-CC025_D', 'CONNEC', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC040_I', 'CONNEC', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC-CC025_T', 'CONNEC', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC-CC030_D', 'CONNEC', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC020_D', 'CONNEC', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC030_D', 'CONNEC', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('PVC-CC025_D', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CON-CC040_I', 'CJOIN', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('PVC-CC025_T', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('PVC-CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CON-CC020_D', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CON-CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('VIRTUAL', 'VCONNEC', NULL, 'VIRTUAL', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Virtual connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC025_D', 'CONNEC', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC040_I', 'CONNEC', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC025_T', 'CONNEC', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC030_D', 'CONNEC', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC020_D', 'CONNEC', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CC025_D', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CC040_I', 'CJOIN', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CC025_T', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CC020_D', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
 
 INSERT INTO cat_node VALUES ('CHAMBER-01', 'CHAMBER', NULL, NULL, 3.00, 2.50, 3.00, 'Chamber 3x2.5x3m', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_CH300x250-H300', true, NULL, NULL);
 INSERT INTO cat_node VALUES ('HIGH POINT-01', 'HIGHPOINT', NULL, NULL, 1.00, 1.00, NULL, 'High point', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD80-H160', true, NULL, NULL);
@@ -102,19 +102,19 @@ INSERT INTO cat_work VALUES ('work2', NULL, NULL, NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_work VALUES ('work3', NULL, NULL, NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_work VALUES ('work4', NULL, NULL, NULL, NULL, NULL, NULL, true);
 
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT3', 'GULLY', 'FD', 64.0000, 30.0000, 693.0000/1920.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT6', 'GULLY', 'FD', 56.5000, 29.5000, 725.0000/1667.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT4', 'GULLY', 'FD', 12.4000, 100.0000, 582.4000/1240.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT1', 'GULLY', 'FD', 78.0000, 36.4000, 1214.0000/2839.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT2', 'GULLY', 'FD', 78.0000, 34.1000, 873.0000/2659.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT5', 'GULLY', 'FD', 97.5000, 47.5000, 1400.0000/4825.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT7', 'GULLY', 'FD', 50.0000, 25.0000, 400.0000/860.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT1', 'GULLY', 'Iron', 32.5000, 100.0000, 1112.4000/3020.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT5', 'GULLY', 'FD', 47.5000, 100.0000, 1400.0000/4825.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT4', 'GULLY', 'FD', 77.6000, 34.5000, 1050.0000/2677.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT2', 'GULLY', 'FD', 19.5000, 100.0000, 751.9000/1950.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT3', 'GULLY', 'FD', 10.0000, 100.0000, 397.4000/1140.0000, true);
-INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('N/I', 'GULLY', 'N/I', 0.0000, 0.0000, NULL, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT3', 'GINLET', 'FD', 64.0000, 30.0000, 693.0000/1920.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT6', 'GINLET', 'FD', 56.5000, 29.5000, 725.0000/1667.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT4', 'GINLET', 'FD', 12.4000, 100.0000, 582.4000/1240.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT1', 'GINLET', 'FD', 78.0000, 36.4000, 1214.0000/2839.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT2', 'GINLET', 'FD', 78.0000, 34.1000, 873.0000/2659.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT5', 'GINLET', 'FD', 97.5000, 47.5000, 1400.0000/4825.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT7', 'GINLET', 'FD', 50.0000, 25.0000, 400.0000/860.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT1', 'GINLET', 'Iron', 32.5000, 100.0000, 1112.4000/3020.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT5', 'GINLET', 'FD', 47.5000, 100.0000, 1400.0000/4825.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('SGRT4', 'GINLET', 'FD', 77.6000, 34.5000, 1050.0000/2677.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT2', 'GINLET', 'FD', 19.5000, 100.0000, 751.9000/1950.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('BGRT3', 'GINLET', 'FD', 10.0000, 100.0000, 397.4000/1140.0000, true);
+INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('N/I', 'GINLET', 'N/I', 0.0000, 0.0000, NULL, true);
 INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, active) VALUES ('VGULLY', 'VGULLY', 'FD', 10.0000, 100.0000, 397.4000/1140.0000, true);
 
 -----------------------------
@@ -194,5 +194,5 @@ INSERT INTO cat_element (id, element_type, active) VALUES ('EWEIR-01', 'EWEIR', 
 INSERT INTO cat_element (id, element_type, active) VALUES ('PUMP-01', 'EPUMP', TRUE) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
-SELECT id, 'LINK' as link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
+SELECT id, 'CONDUITLINK' as link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
 FROM cat_connec ON CONFLICT DO NOTHING;

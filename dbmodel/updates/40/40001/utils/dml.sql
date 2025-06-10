@@ -559,9 +559,9 @@ INSERT INTO node_add (node_id) SELECT node_id FROM node ON CONFLICT (node_id) DO
 INSERT INTO arc_add (arc_id) SELECT arc_id FROM arc ON CONFLICT (arc_id) DO NOTHING;
 
 -- 19/05/2025
-INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_link', 'Shows editable information about links.', 'role_basic', '{1}', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', 1, 'Link (parent)', NULL, NULL, NULL, 'core', NULL);
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_link', 'Shows editable information about links.', 'role_basic', '{"template": [1]}', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', 1, 'Link (parent)', NULL, NULL, NULL, 'core', NULL);
 
-UPDATE sys_table SET project_template = '{1}' WHERE id IN (
+UPDATE sys_table SET project_template = '{"template": [1]}' WHERE id IN (
 	'v_edit_cat_feature_node',
 	'v_edit_cat_feature_arc',
 	'v_edit_cat_feature_connec',
@@ -1963,3 +1963,5 @@ VALUES(3798, 'Set %v_new_psector_name% as current psector.', null, 0, true, 'uti
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3902, 'New %rec_type.id% inserted with state 1: %v_list_features_obsolete%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('project_type', '1', 'Basic', 'Basic', NULL);
