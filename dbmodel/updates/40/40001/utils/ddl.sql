@@ -206,3 +206,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_p
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_arc_traceability", "column":"macrominsector_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_connec_traceability", "column":"macrominsector_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_gully_traceability", "column":"macrominsector_id"}}$$);
+
+-- 10/06/2025
+DELETE FROM config_toolbox WHERE id=3336;
+DELETE FROM sys_function WHERE id=3336; -- gw_fct_graphanalytics_macrominsector
