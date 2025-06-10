@@ -28,6 +28,8 @@ DECLARE
 	-- dialog variables
 	v_expl_id text;
 	v_expl_id_array text;
+	v_updatemapzgeom integer;
+	v_geomparamupdate float;
 	v_usepsector boolean;
 	v_recalculate_minsectors boolean;
 	v_commitchanges boolean;
@@ -57,7 +59,6 @@ BEGIN
 	SELECT giswater, epsg, UPPER(project_type) INTO v_version, v_srid, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_expl_id := (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
-
 	v_usepsector := (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
 	v_recalculate_minsectors := (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'recalculateMinsectors');
 	v_commitchanges := (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
@@ -88,19 +89,40 @@ BEGIN
 		v_expl_id_array := string_to_array(v_expl_id, ',');
     END IF;
 
-	-- Delete temporary tables
-	-- =======================
-	v_data := '{"data":{"action":"DROP", "fct_name":"MASSIVEMINCUT"}}';
-	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+	IF v_recalculate_minsectors = 'true' THEN
 
-	-- Create temporary tables
-	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"MASSIVEMINCUT", "use_psector":"'|| v_usepsector ||'"}}';
-	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+		v_updatemapzone = (SELECT (value::json->>'MINSECTOR')::json->>'updateMapZone' FROM config_param_system WHERE parameter = 'utils_graphanalytics_vdefault');
+		v_geomparamupdate = (SELECT (value::json->>'MINSECTOR')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'utils_graphanalytics_vdefault');
 
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
+		v_data := '{"data":{"parameters":{"exploitation":"'|| v_expl_id_array || '", "usePlanPsector":"'|| v_usepsector || '", "commitChanges":"'|| v_commitchanges || '", "updateMapZone":"'|| v_updatemapzone || '", "geomParamUpdate":"'|| v_geomparamupdate || '"}}}';
+		SELECT gw_fct_graphanalytics_minsector(v_data) INTO v_response;
+
+		IF v_response->>'status' <> 'Accepted' THEN
+			RETURN v_response;
+		END IF;
+
+		-- TODO: We need to refill temp_pgr_node and temp_pgr_arc with
+		-- data from temp_pgr_minsector and temp_pgr_minsector_graph
+	ELSE
+		-- Delete temporary tables
+		-- =======================
+		v_data := '{"data":{"action":"DROP", "fct_name":"MINSECTOR"}}';
+		SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+
+		-- Create temporary tables
+		-- =======================
+		v_data := '{"data":{"action":"CREATE", "fct_name":"MINSECTOR", "use_psector":"'|| v_usepsector ||'"}}';
+		SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+
+	 	IF v_response->>'status' <> 'Accepted' THEN
+        	RETURN v_response;
+    	END IF;
+
+	END IF;
+
+
+
+
 
 	-- Start Building Log Message
 	-- =======================
