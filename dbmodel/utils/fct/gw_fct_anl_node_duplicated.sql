@@ -109,7 +109,7 @@ BEGIN
                        "data":{"message":"3600", "function":"2108", "parameters":{"v_count":"'||v_count||'"}, "fid":"106", "fcount":"'||v_count||'", "prefix_id":"1008", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 106,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count
+		SELECT 106,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count
 		FROM anl_node WHERE cur_user="current_user"() AND fid=106;
 
 	END IF;
