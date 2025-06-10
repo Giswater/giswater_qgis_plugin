@@ -91,10 +91,8 @@ BEGIN
 	)
 	SELECT b.table_name, a.* FROM aaa a JOIN bbb b ON a.col = b.columna;
 	';
-
 	
 	EXECUTE v_sql;
-
 
 	-- discard non-updatable tables from INSERT/UPDATE statement
 	DELETE FROM temp_new_vals WHERE table_name ILIKE '%selector_%' OR table_name ILIKE 'cat_%';
@@ -112,7 +110,6 @@ BEGIN
 	
 	-- set '' to data_type 
 	UPDATE temp_new_vals SET data_type = '' WHERE data_type IS NULL;
-
 
 	-- set execution order of INSERT statements
 	UPDATE temp_new_vals SET exec_order = 1 WHERE table_name = v_feature_type;
@@ -132,7 +129,6 @@ BEGIN
 		''UPDATE '', table_name, '' SET '', string_agg(concat(col, '' = '', val, data_type), '', ''), '' WHERE '', '||quote_literal(v_update_where)||') AS trigger_sentence 
 		FROM temp_new_vals GROUP BY table_name, exec_order ORDER BY exec_order';
 
-
 	ELSEIF v_action = 'DELETE' THEN
 
 		v_sql = 'SELECT CONCAT(
@@ -151,8 +147,6 @@ BEGIN
 		EXECUTE v_rec_sentence.trigger_sentence;
 				
 	END LOOP;
-	   
-			
 
 	v_result := json_build_object('insert', '{}', 'update', '{}', 'delete', '{}');
 
@@ -161,4 +155,3 @@ RETURN v_result;
 END;
 $function$
 ;
-
