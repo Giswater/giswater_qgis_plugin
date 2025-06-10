@@ -23,21 +23,22 @@ BEGIN
     FOR rec IN
       SELECT id, child_layer, feature_type FROM PARENT_SCHEMA.cat_feature
     LOOP
-    tbl_name := format('%I.%I_%s', new_s, parent_s, lower(rec.id));
-    feature_col := lower(rec.feature_type) || '_id';
-    constraint_name := tbl_name || '_pkey';
 
-    EXECUTE format(
-      'CREATE TABLE IF NOT EXISTS %s (
-           id serial4 primary key,
-           lot_id integer,
-           LIKE %I.%I);',
+      tbl_name := format('%I.%I_%s', new_s, parent_s, lower(rec.id));
+      feature_col := lower(rec.feature_type) || '_id';
+      constraint_name := tbl_name || '_pkey';
+
+      EXECUTE format(
+        'CREATE TABLE IF NOT EXISTS %s (
+            id serial4 primary key,
+            lot_id integer,
+            LIKE %I.%I);',
       tbl_name,
       parent_s, rec.child_layer
-    );
+      );
 
-    EXECUTE format('ALTER TABLE %s ADD CONSTRAINT %I UNIQUE (lot_id,%I);', tbl_name, constraint_name, feature_col);
-    EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', tbl_name);
+      EXECUTE format('ALTER TABLE %s ADD CONSTRAINT %I UNIQUE (lot_id,%I);', tbl_name, constraint_name, feature_col);
+      EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', tbl_name);
     
     END LOOP;
 
@@ -46,25 +47,24 @@ BEGIN
       SELECT id, feature_type FROM PARENT_SCHEMA.cat_feature
     LOOP
 
-    view_name := format('%I.ve_%s_lot_%s', new_s, parent_s, lower(rec.id));
+      view_name := format('%I.ve_%s_lot_%s', new_s, parent_s, lower(rec.id));
+      tbl_name := format('%I.%I_%s', new_s, parent_s, lower(rec.id));
 
-    tbl_name := format('%I.%I_%s', new_s, parent_s, lower(rec.id));
-
-    IF NOT EXISTS (
-    SELECT 1
-    FROM information_schema.views
-    WHERE table_schema = new_s
-      AND table_name = lower(format('ve_%s_lot_%s', parent_s, rec.id))
-    ) THEN
-        EXECUTE format(
-          'CREATE VIEW %s AS
+      IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.views
+        WHERE table_schema = new_s
+        AND table_name = lower(format('ve_%s_lot_%s', parent_s, rec.id))
+      ) THEN
+          EXECUTE format(
+            'CREATE VIEW %s AS
             WITH sel_lot AS (
-              SELECT selector_lot.lot_id FROM selector_lot
-              WHERE selector_lot.cur_user = current_user
+                SELECT selector_lot.lot_id FROM selector_lot
+                WHERE selector_lot.cur_user = current_user
             )
-             SELECT a.*, b.status FROM %s a
-             LEFT om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%_id = b.%_id
-             WHERE EXISTS (
+            SELECT a.*, b.status FROM %s a
+            LEFT om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%_id = b.%_id
+            WHERE EXISTS (
               SELECT 1 
               FROM sel_lot 
               WHERE sel_lot.lot_id = %s.lot_id
@@ -75,7 +75,8 @@ BEGIN
           rec.feature_type,
           rec.feature_type,
           tbl_name
-        );
+      );
+
     END IF;
 
     END LOOP;
