@@ -12,7 +12,7 @@ import json
 from ..utils import tools_gw  # noqa: F401
 from ... import global_vars
 from ...libs import tools_log, tools_qt, tools_db, tools_qgis
-from qgis.core import QgsProject, QgsCoordinateReferenceSystem
+from qgis.core import QgsProject, QgsCoordinateReferenceSystem, QgsLayerTreeLayer, QgsLayerTreeGroup
 from ...libs import lib_vars
 
 
@@ -102,6 +102,12 @@ class GwGisFileCreate:
 
         # Set project variables
         project = self._set_project_vars(project, export_passwd)
+
+        # Collapse all layers
+        groups = root.findLayers()
+        for group in groups:
+            if isinstance(group, QgsLayerTreeLayer):
+                group.setExpanded(False)
 
         # Set camera position on v_edit_node
         global_vars.iface.mapCanvas().setExtent(tools_gw._get_extent_parameters(schema))
