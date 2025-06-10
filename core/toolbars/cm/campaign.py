@@ -181,8 +181,12 @@ class Campaign:
             if not widget:
                 continue
 
-            if "value" in field:
+            # Prioritize selectedId for combos, otherwise use value
+            if isinstance(widget, QComboBox) and "selectedId" in field:
+                self.set_widget_value(widget, field["selectedId"])
+            elif "value" in field:
                 self.set_widget_value(widget, field["value"])
+
             if "columnname" in field:
                 widget.setProperty("columnname", field["columnname"])
             if "widgetname" in field:
@@ -336,7 +340,7 @@ class Campaign:
         elif isinstance(widget, QCheckBox):
             widget.setChecked(str(value).lower() in ["true", "1"])
         elif isinstance(widget, QComboBox):
-            index = widget.findData(value)
+            index = widget.findData(str(value))
             if index >= 0:
                 widget.setCurrentIndex(index)
 
