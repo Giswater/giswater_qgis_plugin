@@ -2399,3 +2399,7 @@ DELETE FROM config_form_fields
 WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='fluid_type' AND tabname='tab_none';
 
 UPDATE config_form_fields SET iseditable = FALSE WHERE columnname = 'fluid_type';
+
+-- 10/06/2025
+-- remove fluid_type from element forms
+DELETE FROM config_form_fields WHERE formname ILIKE '%elem%' AND formtype = 'form_feature' AND columnname = 'fluid_type';
