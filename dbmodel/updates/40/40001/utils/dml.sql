@@ -1873,3 +1873,53 @@ DELETE FROM sys_table WHERE id='v_ui_om_visit_x_doc';
 UPDATE sys_table SET sys_role='role_om' WHERE id='v_ui_doc_x_visit';
 UPDATE sys_table SET sys_role='role_plan' WHERE id='doc_x_psector';
 UPDATE sys_table SET sys_role='role_plan' WHERE id='v_ui_doc_x_psector';
+
+-- 10/06/2025
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element",
+    "targetwidget": "tbl_element",
+    "field_object_id": "id"
+  }
+}'::json WHERE formname='element_manager' AND formtype='form_element' AND columnname='create' AND tabname='tab_none';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_arc",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json WHERE formname='arc' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_arc",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json WHERE formname='node' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_arc",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+UPDATE config_form_fields SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_arc",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
