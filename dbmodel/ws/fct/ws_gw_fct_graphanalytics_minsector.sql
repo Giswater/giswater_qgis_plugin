@@ -396,9 +396,10 @@ BEGIN
     UPDATE temp_pgr_minsector t
     SET expl_id = sub.expl_id_arr
     FROM (
-        SELECT n.node_id::INTEGER AS minsector_id, array_agg(DISTINCT n.expl_id) AS expl_id_arr
-        FROM node n
-        GROUP BY n.node_id
+        SELECT tn.mapzone_id AS minsector_id, array_agg(DISTINCT vn.expl_id) AS expl_id_arr
+        FROM temp_pgr_node tn
+		JOIN v_temp_node vn USING (node_id)
+        GROUP BY tn.mapzone_id
     ) sub
     WHERE sub.minsector_id = t.minsector_id;
 
