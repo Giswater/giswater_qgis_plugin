@@ -813,15 +813,15 @@ BEGIN
 					''properties'', to_jsonb(row) - ''the_geom''
 				) AS feature
 				FROM (
-					SELECT DISTINCT ON (t.connec_id) t.connec_id, c.conneccat_id, c.state, c.expl_id, NULL AS mapzone_id, c.the_geom, ''Disconnected''::text AS descript
+					SELECT DISTINCT ON (vc.connec_id) vc.connec_id, vc.conneccat_id, vc.state, vc.expl_id, NULL AS mapzone_id, vc.the_geom, ''Disconnected''::text AS descript
 					FROM temp_pgr_arc ta
 					JOIN v_temp_connec vc USING (arc_id)
-					WHERE t.mapzone_id = 0
+					WHERE ta.mapzone_id = 0
 					UNION
-					SELECT DISTINCT ON (t.connec_id) t.connec_id, c.conneccat_id, c.state, c.expl_id, NULL AS mapzone_id, c.the_geom, ''Conflict''::text AS descript
+					SELECT DISTINCT ON (vc.connec_id) vc.connec_id, vc.conneccat_id, vc.state, vc.expl_id, NULL AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript
 					FROM temp_pgr_arc ta
 					JOIN v_temp_connec vc USING (arc_id)
-					WHERE t.mapzone_id = -1
+					WHERE ta.mapzone_id = -1
 				) row
 			) features
 		' INTO v_result;

@@ -278,6 +278,8 @@ BEGIN
                         connec.dqa_id,
                         connec.plot_code,
                         connec.muni_id,
+                        connec.conneccat_id,
+                        connec.state,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -463,6 +465,8 @@ BEGIN
                         connec.fluid_type,
                         connec.plot_code,
                         connec.muni_id,
+                        connec.conneccat_id,
+                        connec.state,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -670,18 +674,20 @@ BEGIN
 
                 CREATE TEMPORARY VIEW v_temp_connec AS
                 SELECT
-                    connec_id,
-                    arc_id,
-                    expl_id,
-                    top_elev,
-                    depth,
-                    sector_id,
-                    presszone_id,
-                    dma_id,
-                    dqa_id,
-                    plot_code,
-                    muni_id,
-                    the_geom
+                    c.connec_id,
+                    c.arc_id,
+                    c.expl_id,
+                    c.top_elev,
+                    c.depth,
+                    c.sector_id,
+                    c.presszone_id,
+                    c.dma_id,
+                    c.dqa_id,
+                    c.plot_code,
+                    c.muni_id,
+                    c.conneccat_id,
+                    c.state,
+                    c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
                 WHERE c.state = 1 AND vst.is_operative = TRUE;
@@ -756,6 +762,8 @@ BEGIN
                     c.fluid_type,
                     c.plot_code,
                     c.muni_id,
+                    c.conneccat_id,
+                    c.state,
                     c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
