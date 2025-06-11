@@ -964,3 +964,5 @@ VALUES(4018, 'Use psectors:', null, 0, true, 'utils', 'core', 'AUDIT');
 
     INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4020, 'INFO-%v_fid% : Minsector attribute on arc/node/connec/link features have NOT BEEN updated by this process.', null, 0, true, 'utils', 'core', 'AUDIT');    
+
+UPDATE sys_function SET function_alias = 'SET PSECTOR COST FOR REMOVED PIPES' WHERE function_name = 'gw_fct_setpsectorcostremovedpipes';

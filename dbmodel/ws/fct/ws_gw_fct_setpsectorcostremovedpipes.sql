@@ -51,8 +51,9 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"()AND fid=v_fid;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SET PSECTOR COST FOR REMOVED PIPES'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------------');
+	
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3322", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 
 	v_sql = 'INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, observ)
