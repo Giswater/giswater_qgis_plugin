@@ -876,12 +876,12 @@ BEGIN
 						''properties'', to_jsonb(row) - ''the_geom''
 					) AS feature
 					FROM (
-						SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, t.mapzone_id::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
-						FROM temp_pgr_arc t
-						JOIN arc a USING (arc_id)
-						JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
+						SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, ta.mapzone_id::TEXT AS mapzone_id, va.the_geom, m.name AS descript 
+						FROM temp_pgr_arc ta
+						JOIN v_temp_arc va USING (arc_id)
+						JOIN '|| v_mapzone_name ||' m ON ta.mapzone_id = m.'|| v_mapzone_field ||'
 						WHERE '|| v_mapzone_field ||'::integer IN ('||v_floodonlymapzone||')
-						AND t.arc_id IS NOT NULL
+						AND ta.arc_id IS NOT NULL
 					) row 
 				) features
 			' INTO v_result;
@@ -900,11 +900,11 @@ BEGIN
 					''properties'', to_jsonb(row) - ''the_geom''
 				) AS feature
 				FROM (
-					SELECT t.mapzone_id::TEXT AS mapzone_id, m.name AS descript, '||v_fid||' AS fid, n.expl_id, n.the_geom
-					FROM temp_pgr_node t
-					JOIN node n USING (node_id)
-					JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
-					WHERE t.node_id IS NOT NULL
+					SELECT tn.mapzone_id::TEXT AS mapzone_id, m.name AS descript, '||v_fid||' AS fid, vn.expl_id, vn.the_geom
+					FROM temp_pgr_node tn
+					JOIN v_temp_node vn USING (node_id)
+					JOIN '|| v_mapzone_name ||' m ON tn.mapzone_id = m.'|| v_mapzone_field ||'
+					WHERE tn.node_id IS NOT NULL
 				) row 
 			) features'
 			INTO v_result;
