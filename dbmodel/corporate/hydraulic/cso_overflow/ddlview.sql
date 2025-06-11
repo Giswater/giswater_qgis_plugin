@@ -20,14 +20,26 @@ CREATE OR REPLACE VIEW v_cso_drainzone_rainfall
 	ORDER BY cso_out_vol.node_id, cso_out_vol.rf_name;
  
   
-CREATE OR REPLACE VIEW v_cso_drainzone
-	AS select d.drainzone_id, cov.outfall_id, thyssen_plv_area ::numeric(12,3) as total_area, imperv_area::numeric(12,3), 
-	mean_coef_runoff::numeric(12,3) as runoffc, demand::numeric(12,3), eq_inhab::integer ,
-	(avg(efficiency))::numeric(12,3) as efficiency, the_geom
-	from v_cso_drainzone_rainfall cov
-	left join cso_inp_system_subc cso ON cso.drainzone_id::text = cov.drainzone_id
-	LEFT JOIN drainzone d ON d.drainzone_id::text = cov.drainzone_id
-	group by 1, 2, 3, 4, 5, 6, 7, 9
+CREATE OR REPLACE VIEW v_cso_drainzone AS 
+SELECT d.drainzone_id,
+    cov.outfall_id,
+    e.name AS muni_name,
+    concat(m.macroexpl_id, ' - ', m.name, ' (', ex.expl_id, ' ', ex.name, ')') AS expl_name,
+    cso.thyssen_plv_area::numeric(12,3) AS total_area,
+    cso.imperv_area::numeric(12,3) AS imperv_area,
+    cso.mean_coef_runoff::numeric(12,3) AS runoffc,
+    cso.demand::numeric(12,3) AS demand,
+    cso.eq_inhab::integer AS eq_inhab,
+    avg(cov.efficiency)::numeric(12,3) AS efficiency,
+    d.the_geom
+   FROM ud.v_cso_drainzone_rainfall cov
+     LEFT JOIN ud.cso_inp_system_subc cso ON cso.drainzone_id::text = cov.drainzone_id
+     LEFT JOIN ud.drainzone d ON d.drainzone_id::text = cov.drainzone_id
+     LEFT JOIN ud.vu_node n ON cov.outfall_id = n.node_id
+     JOIN ud.macroexploitation m ON m.macroexpl_id = n.macroexpl_id
+     JOIN ud.exploitation ex ON ex.expl_id = n.expl_id
+	 JOIN ud.ext_municipality e ON n.muni_id = e.muni_id
+	group by 1, 2, 3, 4, 5, 6, 7, 8, 9
 	order by 3;
 
 
