@@ -123,7 +123,7 @@ class Workorder:
             # On update, take the first selected row
             selected = self.manager_dialog.tbl_workorder.selectionModel().selectedRows()
             if not selected:
-                msg = tools_qt.tr("Please select a workorder to open.", context_name="cm")
+                msg = "Please select a workorder to open."
                 tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
             workorder_id = selected[0].data()
@@ -142,14 +142,14 @@ class Workorder:
             try:
                 body["feature"]["id"] = int(workorder_id)
             except (TypeError, ValueError):
-                msg = tools_qt.tr("Invalid workorder ID.", context_name="cm")
+                msg = "Invalid workorder ID."
                 tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
 
         p_data = tools_gw.create_body(body=body)
         res = tools_gw.execute_procedure('gw_fct_getworkorder', p_data, schema_name='cm')
         if not res or res.get('status') != 'Accepted':
-            msg = tools_qt.tr("Failed to load workorder form.", context_name="cm")
+            msg = "Failed to load workorder form."
             tools_qgis.show_warning(msg)
             return
 
@@ -270,10 +270,10 @@ class Workorder:
         """Delete selected workorder with confirmation"""
         sel = self.manager_dialog.tbl_workorder.selectionModel().selectedRows()
         if not sel:
-            msg = tools_qt.tr("Select a workorder to delete.", context_name="cm")
+            msg = "Select a workorder to delete."
             tools_qgis.show_warning(msg, dialog=self.manager_dialog)
             return
-        msg = tools_qt.tr("Are you sure you want to delete {0} workorder(s)?", context_name="cm")
+        msg = "Are you sure you want to delete {0} workorder(s)?"
         msg_params = (len(sel),)
         msg = msg.format(*msg_params)
         if not tools_qt.show_question(msg, title="Delete Workorder(s)"):
@@ -288,7 +288,7 @@ class Workorder:
             sql = f"DELETE FROM cm.workorder WHERE workorder_id = {wid}"
             if tools_db.execute_sql(sql):
                 deleted += 1
-        msg = tools_qt.tr("{0} workorder(s) deleted.", context_name="cm")
+        msg = "{0} workorder(s) deleted."
         msg_params = (deleted,)
         msg = msg.format(*msg_params)
         tools_qgis.show_info(msg, dialog=self.manager_dialog)

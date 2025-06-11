@@ -74,7 +74,7 @@ class GwProjectCheckCMTask(GwTask):
             msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
             msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
             msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
-            title = tools_qt.tr("Key on returned json from ddbb is missed.", context_name="cm")
+            title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
             return
 
