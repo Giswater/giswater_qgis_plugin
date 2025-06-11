@@ -28,7 +28,7 @@ CREATE OR REPLACE VIEW v_cso_drainzone
 	left join cso_inp_system_subc cso ON cso.drainzone_id::text = cov.drainzone_id
 	LEFT JOIN drainzone d ON d.drainzone_id::text = cov.drainzone_id
 	group by 1, 2, 3, 4, 5, 6, 7, 9
-	order by 3
+	order by 3;
 
 
 CREATE OR REPLACE VIEW v_cso_drainzone_rainfall_tstep
@@ -37,21 +37,21 @@ CREATE OR REPLACE VIEW v_cso_drainzone_rainfall_tstep
     cso_out_vol.node_id as ouftall_id,
     cso_out_vol.rf_name as rainfall,
     cso_out_vol.rf_tstep,
-    round(cso_out_vol.rf_volume, 3) AS rf_intensity,
-    round(cso_out_vol.vol_residual, 3) AS vol_residual,
-    round(cso_out_vol.vol_max_epi, 3) AS vol_max_epi,
-    round(cso_out_vol.vol_res_epi, 3) AS vol_res_epi,
-    round(cso_out_vol.vol_rainfall, 3) AS vol_rainfall,
-    round(cso_out_vol.vol_total, 3) AS vol_total,
-    round(cso_out_vol.vol_runoff, 3) AS vol_runoff,
-    round(cso_out_vol.vol_infiltr, 3) AS vol_infiltr,
-    round(cso_out_vol.vol_circ, 3) AS vol_circ,
-    round(cso_out_vol.vol_circ_dep, 3) AS vol_circ_dep,
-    round(cso_out_vol.vol_circ_red, 3) AS vol_circ_red,
-    round(cso_out_vol.vol_non_leaked, 3) AS vol_non_leaked,
-    round(cso_out_vol.vol_leaked, 3) AS vol_leaked,
-    round(cso_out_vol.vol_wwtp, 3) AS vol_wwtp,
-    round(cso_out_vol.vol_treated, 3) AS vol_treated,
-    round(cso_out_vol.efficiency, 3) AS efficiency
-	FROM cso_out_vol
+    round(cso_out_vol.rf_volume::numeric, 3) AS rf_intensity,
+    round(cso_out_vol.vol_residual::numeric, 3) AS vol_residual,
+    round(cso_out_vol.vol_max_epi::numeric, 3) AS vol_max_epi,
+    round(cso_out_vol.vol_res_epi::numeric, 3) AS vol_res_epi,
+    round(cso_out_vol.vol_rainfall::numeric, 3) AS vol_rainfall,
+    round(cso_out_vol.vol_total::numeric, 3) AS vol_total,
+    round(cso_out_vol.vol_runoff::numeric, 3) AS vol_runoff,
+    round(cso_out_vol.vol_infiltr::numeric, 3) AS vol_infiltr,
+    round(cso_out_vol.vol_circ::numeric, 3) AS vol_circ,
+    round(cso_out_vol.vol_circ_dep::numeric, 3) AS vol_circ_dep,
+    round(cso_out_vol.vol_circ_red::numeric, 3) AS vol_circ_red,
+    round(cso_out_vol.vol_non_leaked::numeric, 3) AS vol_non_leaked,
+    round(cso_out_vol.vol_leaked::numeric, 3) AS vol_leaked,
+    round(cso_out_vol.vol_wwtp::numeric, 3) AS vol_wwtp,
+    round(cso_out_vol.vol_treated::numeric, 3) AS vol_treated,
+    round(cso_out_vol.efficiency::numeric, 3) AS efficiency
+	FROM ud.cso_out_vol
 	order by 2, 4, rf_tstep::time;
