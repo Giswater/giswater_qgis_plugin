@@ -2292,6 +2292,7 @@ UPDATE config_form_fields SET dv_querytext='WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
   WHERE parameter = ''plan_psector_current''
+  AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
 FROM value_state 
