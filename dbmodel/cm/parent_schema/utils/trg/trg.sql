@@ -98,29 +98,29 @@ FOR EACH ROW EXECUTE FUNCTION SCHEMA_NAME.gw_trg_lot_x_feature_check_campaign('g
 
 DO $$
 DECLARE
-    rec record;
-    view_name text;
-    trigger_name text;
-    feature_type text;
+    v_rec record;
+    v_view_name text;
+    v_trigger_name text;
+    v_feature_type text;
 BEGIN
-    FOR rec IN
-        SELECT id FROM PARENT_SCHEMA.cat_feature
+    FOR v_rec IN
+        SELECT id FROM PARENT_SCHEMA.cat_feature WHERE feature_type <> 'ELEMENT'
     LOOP
-        feature_type := lower(rec.id);
-        
+        v_feature_type := lower(v_rec.id);
+
         -- Conditional for gully, same as before
-        IF feature_type = 'gully' AND 'PARENT_TYPE' <> 'ud' THEN
+        IF v_feature_type = 'gully' AND 'PARENT_TYPE' <> 'ud' THEN
             CONTINUE;
         END IF;
 
         -- Construct the view name exactly as in ddl.sql
-        view_name := 've_' || 'PARENT_SCHEMA' || '_lot_' || feature_type;
-        trigger_name := 'trg_PARENT_SCHEMA_edit_lot_' || feature_type;
+        v_view_name := 've_' || 'PARENT_SCHEMA' || '_lot_' || v_feature_type;
+        v_trigger_name := 'trg_PARENT_SCHEMA_edit_lot_' || v_feature_type;
 
         EXECUTE
-        'CREATE OR REPLACE TRIGGER ' || trigger_name || ' INSTEAD OF
+        'CREATE OR REPLACE TRIGGER ' || v_trigger_name || ' INSTEAD OF
         INSERT OR DELETE OR UPDATE
-        ON ' || 'SCHEMA_NAME' || '.' || view_name ||' FOR EACH ROW EXECUTE FUNCTION '||'SCHEMA_NAME'||'.cm_trg_edit_feature()';
+        ON ' || 'SCHEMA_NAME' || '.' || v_view_name ||' FOR EACH ROW EXECUTE FUNCTION '||'SCHEMA_NAME'||'.cm_trg_edit_feature()';
     END LOOP;
 END
 $$;

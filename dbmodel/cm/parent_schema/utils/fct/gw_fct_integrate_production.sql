@@ -7,12 +7,12 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3426
 
-CREATE OR REPLACE FUNCTION ws_cm.gw_fct_cm_integrate_production(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cm_integrate_production(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_cm.gw_fct_cm_integrate_production($${"data":{"parameters":{"campaignId":9}}}$$)
+SELECT SCHEMA_NAME.gw_fct_cm_integrate_production($${"data":{"parameters":{"campaignId":9}}}$$)
 */
 
 DECLARE

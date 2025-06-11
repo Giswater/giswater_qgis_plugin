@@ -27,9 +27,9 @@ BEGIN
       SELECT id, child_layer, feature_type FROM PARENT_SCHEMA.cat_feature
     LOOP
 
-      tbl_name := format('%I.%I_%s', new_s, parent_s, lower(rec.id));
+      tbl_name := format('%I_%s', parent_s, lower(rec.id));
       feature_col := lower(rec.feature_type) || '_id';
-      constraint_name := tbl_name || '_pkey';
+      constraint_name := tbl_name || '_uq';
 
       EXECUTE format(
         'CREATE TABLE IF NOT EXISTS %s (
@@ -47,11 +47,11 @@ BEGIN
 
   -- Create corresponding empty views named ve_<PARENT>_lot_<feature_id>
     FOR rec IN
-      SELECT id, feature_type FROM PARENT_SCHEMA.cat_feature
+      SELECT id, feature_type FROM PARENT_SCHEMA.cat_feature WHERE feature_type <> 'ELEMENT'
     LOOP
 
-      view_name := format('%I.ve_%s_lot_%s', new_s, parent_s, lower(rec.id));
-      tbl_name := format('%I.%I_%s', new_s, parent_s, lower(rec.id));
+      view_name := format('ve_%s_lot_%s', parent_s, lower(rec.id));
+      tbl_name := format('%I_%s', parent_s, lower(rec.id));
 
       IF NOT EXISTS (
         SELECT 1
@@ -65,19 +65,19 @@ BEGIN
                 SELECT selector_lot.lot_id FROM selector_lot
                 WHERE selector_lot.cur_user = current_user
             )
-            SELECT a.*, b.status FROM %s a
-            LEFT om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%_id = b.%_id
+            SELECT a.*, b.status 
+            FROM %s a
+            LEFT JOIN om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%s_id = b.%s_id
             WHERE EXISTS (
               SELECT 1 
               FROM sel_lot 
-              WHERE sel_lot.lot_id = %s.lot_id
+              WHERE sel_lot.lot_id = a.lot_id
           );',
         view_name,
         tbl_name,
-        rec.feature_type,
-        rec.feature_type,
-        rec.feature_type,
-        tbl_name
+        lower(rec.feature_type),
+        lower(rec.feature_type),
+        lower(rec.feature_type)
         );
 
       END IF;

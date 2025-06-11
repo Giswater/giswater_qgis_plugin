@@ -31,41 +31,43 @@ INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, te
 -- Team: Manager o1
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
 (3,  '79234561A', 'jperis',    'jperis',    'Juan Peris Gallego',   'manager o1', 2, true),
-(4,  '10923456H', 'msierra',   'msierra',   'Marta Sierra Roca',    'manager o1', 2, true);
+(4,  '10923456H', 'msierra',   'msierra',   'Marta Sierra Roca',    'manager o1', 2, true),
+(5,  '38145678P', 'o1_manager', 'o1_manager', 'o1_manager', 'o1_manager', 2, true);
 
 -- Team: Manager o2
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
-(5,  '52013478Y', 'atorres',   'atorres',   'Ana Torres Delgado',   'manager o2', 3, true),
-(6,  '64823109F', 'cfuentes',  'cfuentes',  'Carlos Fuentes Mora',  'manager o2', 3, true);
+(6,  '52013478Y', 'atorres',   'atorres',   'Ana Torres Delgado',   'manager o2', 3, true),
+(7,  '64823109F', 'cfuentes',  'cfuentes',  'Carlos Fuentes Mora',  'manager o2', 3, true),
+(8,  '38145678P', 'o2_manager', 'o2_manager', 'o2_manager', 'o2_manager', 3, true);
 
 -- Team: o1 field 1
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
-(7,  '78124567Q', 'lblanco',   'lblanco',   'Laura Blanco Martos',  'o1 field 1', 4, true),
-(8,  '34567012K', 'dferrer',   'dferrer',   'David Ferrer Romeu',   'o1 field 1', 4, true),
-(9, '11111111A', 'o1_field1', 'o1_field1', 'o1_field1', 'o1 field 1', 4, true);
+(9,  '78124567Q', 'lblanco',   'lblanco',   'Laura Blanco Martos',  'o1 field 1', 4, true),
+(10,  '34567012K', 'dferrer',   'dferrer',   'David Ferrer Romeu',   'o1 field 1', 4, true),
+(11, '11111111A', 'o1_field1', 'o1_field1', 'o1_field1', 'o1 field 1', 4, true);
 
 -- Team: o1 field 2
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
-(10,  '46283910L', 'ngallart',  'ngallart',  'Nuria Gallart Costa',  'o1 field 2', 5, true),
-(11, '57201894W', 'omartin',   'omartin',   'Oscar Martin Serra',   'o1 field 2', 5, true),
-(12, '22222222B', 'o1_field2', 'o1_field2', 'o1_field2', 'o1 field 2', 5, true);
+(12,  '46283910L', 'ngallart',  'ngallart',  'Nuria Gallart Costa',  'o1 field 2', 5, true),
+(13, '57201894W', 'omartin',   'omartin',   'Oscar Martin Serra',   'o1 field 2', 5, true),
+(14, '22222222B', 'o1_field2', 'o1_field2', 'o1_field2', 'o1 field 2', 5, true);
 
 -- Team: o2 field 1
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
-(13, '68391740T', 'iramos',    'iramos',    'Ines Ramos Vega',      'o2 field 1', 6, true),
-(14, '78291034X', 'pablo',     'pablo',     'Pablo Nuñez Bravo',    'o2 field 1', 6, true),
-(15, '33333333C', 'o2_field1', 'o2_field1', 'o2_field1', 'o2 field 1', 6, true);
+(15, '68391740T', 'iramos',    'iramos',    'Ines Ramos Vega',      'o2 field 1', 6, true),
+(16, '78291034X', 'pablo',     'pablo',     'Pablo Nuñez Bravo',    'o2 field 1', 6, true),
+(17, '33333333C', 'o2_field1', 'o2_field1', 'o2_field1', 'o2 field 1', 6, true);
 
 -- Team: o2 field 2
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
-(16, '84023910S', 'cgil',      'cgil',      'Carla Gil Torras',     'o2 field 2', 7, true),
-(17, '92034185M', 'rbueno',    'rbueno',    'Raul Bueno Soler',     'o2 field 2', 7, true),
-(18, '44444444D', 'o2_field2', 'o2_field2', 'o2_field2', 'o2 field 2', 7, true);
+(18, '84023910S', 'cgil',      'cgil',      'Carla Gil Torras',     'o2 field 2', 7, true),
+(19, '92034185M', 'rbueno',    'rbueno',    'Raul Bueno Soler',     'o2 field 2', 7, true),
+(20, '44444444D', 'o2_field2', 'o2_field2', 'o2_field2', 'o2 field 2', 7, true);
 
 -- Easy user for test in local
 INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
-(19, '92034185M', 'postgres', 'postgres', 'Postgres', 'o2 field 2', 1, true);
-
+(21, '92034185M', 'postgres', 'postgres', 'Postgres', 'administrador', 1, true),
+(22, '1', 'bgeoadmin', 'bgeoadmin', 'bgeoadmin', 'administrador', 1, true);
 
 -- Reset sequences
 SELECT setval('cat_organization_organization_id_seq', (SELECT MAX(organization_id) FROM cat_organization), true);
