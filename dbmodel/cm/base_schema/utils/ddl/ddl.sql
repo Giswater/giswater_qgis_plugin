@@ -216,6 +216,8 @@ CREATE TABLE cat_organization (
 	code text NULL,
 	orgname text NULL,
 	descript text NULL,
+	expl_id int[],
+	sector_id int[],
 	active bool NULL DEFAULT true,
 	CONSTRAINT cat_organization_unique UNIQUE (orgname),
 	CONSTRAINT cat_organization_pkey PRIMARY KEY (organization_id)
