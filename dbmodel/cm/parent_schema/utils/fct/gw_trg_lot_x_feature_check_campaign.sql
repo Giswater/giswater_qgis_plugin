@@ -15,7 +15,7 @@ AS $function$
 DECLARE
     v_feature TEXT := TG_ARGV[0];
     v_lot_id INTEGER;
-    v_feature_id TEXT;
+    v_feature_id INTEGER;
     v_campaign_id INTEGER;
     v_exists BOOLEAN;
 BEGIN
