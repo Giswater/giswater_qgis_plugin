@@ -983,9 +983,9 @@ class AddNewLot:
                 login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
 
         # Create message for the question        
-        msg = f"{tools_qt.tr("Are you sure you want to delete these records:")} ({ids})?"
+        msg = f"{tools_qt.tr('Are you sure you want to delete these records:')} ({ids})?"
         if tablename == "cat_user" and login_names_to_drop:
-            msg += f"\\n{tools_qt.tr("This will also delete the database user(s):")} {', '.join(login_names_to_drop)}"
+            msg += f"\\n{tools_qt.tr('This will also delete the database user(s):')} {', '.join(login_names_to_drop)}"
         title = "Delete records"
         answer = tools_qt.show_question(msg, title=title)
 
