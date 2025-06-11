@@ -92,7 +92,7 @@ v_message text;
 v_hide_form boolean;
 v_array_node_id json;
 v_node_id integer;
-v_arc_closest text;
+v_arc_closest integer;
 v_set_arc_obsolete boolean;
 v_set_old_code boolean;
 v_obsoletetype integer;
@@ -416,7 +416,7 @@ BEGIN
 						SELECT connec_id FROM connec c JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id AND
 						c.state = 1
 						LOOP
-							v_array_connec:= array_append(v_array_connec, v_connec_id);
+							v_array_connec:= array_append(v_array_connec, v_connec_id::text);
 						END LOOP;
 
 						SELECT count(connec_id) INTO v_count_connec FROM v_edit_connec WHERE arc_id=v_arc_id AND state > 0;
