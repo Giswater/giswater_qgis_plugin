@@ -36,13 +36,33 @@ BEGIN
 	v_num_pkeys = 2; -- number OF pkeys (first "n" columns of the view)
 
 
-
 	-- schema where to search tables (for campaings)
 	WITH mec AS (
 		SELECT unnest(string_to_array(current_setting('search_path'), ', ')) AS esquema
 	)
 	SELECT string_agg(quote_literal(esquema), ', ') INTO v_search_schema 
 	FROM mec WHERE esquema NOT ILIKE '%$%' AND esquema <> 'public';
+    
+	IF TG_OP = 'INSERT' THEN
+		IF NEW.id is null THEN
+			NEW.id = (SELECT nextval('om_campaign_lot_x_node_id_seq'));
+		END IF;
+
+        -- enhance needed to manage any feature not only node
+		IF NEW.node_id is null THEN
+			NEW.node_id = (SELECT nextval('cm_urn_id_seq'));
+		END IF;
+
+		IF NEW.expl_id is null THEN
+			NEW.expl_id = (SELECT expl_id FROM om_campaign_lot WHERE lot_id=NEW.lot_id);
+		END IF;
+
+		IF NEW.sector_id is null THEN
+			NEW.sector_id = (SELECT sector_id FROM om_campaign_lot WHERE lot_id=NEW.lot_id);
+		END IF;
+		
+		NEW.state=1; NEW.state_type=2;
+	END IF;
 
 	-- get json data
 	SELECT COALESCE(row_to_json(NEW), '{}') INTO v_json_new_data;
@@ -63,7 +83,7 @@ BEGIN
     WITH aaa AS (
 	   	SELECT column_name AS col FROM information_schema.COLUMNS 
 	  	WHERE table_schema = '||quote_literal(TG_TABLE_SCHEMA)||' AND table_name = '||quote_literal(TG_TABLE_NAME)||'
-	  	LIMIT '||v_num_pkeys||'
+	  	LIMIT '||v_num_pkeys||' OFFSET 1
 	), aux AS (
    			SELECT 1 AS id, '||QUOTE_LITERAL(v_json_data)||'::json AS js
 	), prep_pkey_syntax AS (		
