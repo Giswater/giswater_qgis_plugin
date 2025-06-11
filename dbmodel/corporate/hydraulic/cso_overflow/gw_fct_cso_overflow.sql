@@ -29,10 +29,8 @@ SELECT SCHEMA_NAME.gw_fct_cso_calculation
 
 WARNING! The name of the tables MUST be within the name of the schema.
 
-
-SELECT ud.gw_fct_cso_calculation($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25830}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"DRAINZONE", "exploitation":"-1", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "commitChanges":"false", "valueForDisconnected":null, "updateMapZone":"0", "geomParamUpdate":null, "macroexplId":"5", "drainzoneId":"456,78"}, "aux_params":null}}$$);
-
-
+SELECT ud.gw_fct_cso_calculation($${"client":{"device":4, "lang":"es_ES", "epsg":25830}, "form":{}, "feature":{}, 
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"macroexplId":"5", "drainzoneId":null}}}$$);
 
 */
 
@@ -82,7 +80,11 @@ BEGIN
 	v_thy_res_table := ((p_data ->>'data')::json->>'thyssenRes')::json->>'tableName'::text;
 	v_thy_res_drainzone := ((p_data ->>'data')::json->>'thyssenRes')::json->>'drainzoneId'::text;
 
-	v_tstep := (((p_data ->>'data')::json->>'rainfallParams')::json->>'tstepMinutes')::numeric;
+	v_tstep = 10; -- tstep of the timeseries (every 10 mins, 5 mins., etc.)
+
+	v_selected_macroexpl_id := (((p_data ->>'data')::json->>'parameters')::json->>'macroexplId')::text;
+	v_selected_drainzone_id := (((p_data ->>'data')::json->>'parameters')::json->>'drainzoneId')::text;
+
 
 
 	
@@ -110,15 +112,13 @@ BEGIN
 	END IF;
 
 
-
 	-- get the drainzones of execution according to selected options
 	v_sql = '
 	SELECT d.drainzone_id
 	FROM drainzone d 
 	JOIN node n ON d.graphconfig::json ->''use''->0 ->>''nodeParent''::TEXT = n.node_id::TEXT
-	JOIN exploitation e ON n.expl_id = e.expl_id WHERE '||v_filter_macroexpl||' '||v_filter_drainzone||'';
+	JOIN exploitation e ON n.expl_id = e.expl_id WHERE '||v_filter_macroexpl||' '||v_filter_drainzone||' AND d.active IS TRUE';
 
-	--RAISE EXCEPTION 'v_sql %', v_sql;
 
 	EXECUTE 'SELECT count(*) from ('||v_sql||')a' INTO v_count;
 
@@ -132,21 +132,13 @@ BEGIN
 	
 	END IF;
 
-	-- reset all
+	-- reset data from selected drainzone_id
 	execute 'delete from cso_inp_system_subc where drainzone_id in ('||v_selected_drainzone_id||')';
 	execute 'delete from cso_out_vol where drainzone_id in ('||v_selected_drainzone_id||')';
 
 	-- config variables
 	v_returncoeff = (select value::numeric from config_param_system where "parameter" = 'cso_returncoeff');
 	v_daily_supply = (select value::numeric from config_param_system where "parameter" = 'cso_daily_supply');
-
-
-	--  check if geom columns exist in thyssen de pluviales
-	execute '
-	select column_name from information_schema.columns where table_schema = '||quote_literal(split_part(v_thy_plv_table, '.', 1))||' 
-	and table_name = '||quote_literal(split_part(v_thy_plv_table, '.', 2))||' and column_name ILIKE  ''%geom%'' limit 1'
-	into v_geom_thy_plv;
-
 
 	
 	-- INITIAL DATA: SCHEMA_NAME NETWORK DATA (cso_inp_system_subc)
@@ -166,31 +158,31 @@ BEGIN
 	-- imperv area 
 	execute '
 	update cso_inp_system_subc t set imperv_area = a.imperv from (
-		select '||v_thy_plv_drainzone||', sum(st_area('||v_geom_thy_plv||') * '||v_plv_cn||'/100) as imperv from '||v_thy_plv_table||' group by '||v_thy_plv_drainzone||'
-	)a where t.drainzone_id = a.'||v_thy_plv_drainzone||';
+		select drainzone_id, sum(st_area(the_geom) * cn_value/100) as imperv from cso_subc_wwf group by drainzone_id
+	)a where t.drainzone_id = a.drainzone_id;
 	';
 
 	-- area of rainwater thyssen group by drainzone
 	execute '
 	update cso_inp_system_subc t set thyssen_plv_area = a.area_thy from (
-	select '||v_thy_plv_drainzone||', sum(st_area('||v_geom_thy_plv||')) as area_thy 
-	from '||v_thy_plv_table||' group by '||v_thy_plv_drainzone||'
-	)a where t.drainzone_id = a.drainzone_
+	select drainzone_id, sum(st_area(the_geom)) as area_thy 
+	from cso_subc_wwf group by drainzone_id
+	)a where t.drainzone_id = a.drainzone_id
 	';
 	
 	-- mean_runoff_coef
 	execute '
 	update cso_inp_system_subc t set mean_coef_runoff = a.c_value from (
-	select '||v_thy_plv_drainzone||', avg('||v_plv_ci||') as c_value from '||v_thy_plv_table||' group by '||v_thy_plv_drainzone||'
-	)a where a.'||v_thy_plv_drainzone||' = t.drainzone_id
+	select drainzone_id, avg(ci_value) as c_value from cso_subc_wwf group by drainzone_id
+	)a where a.drainzone_id = t.drainzone_id
 	';
 	
 	-- sum of demand from sewage thyssen group by drainzone 
 	execute '
 	update cso_inp_system_subc s set demand = a.consumo from (
-	select '||v_thy_res_drainzone||', sum(consumo_su) as consumo from '||v_thy_res_table||' cntr
-	where '||v_thy_res_drainzone||' is not null
-	group by '||v_thy_res_drainzone||')a where s.drainzone_id = a.'||v_thy_res_drainzone||'';
+	select drainzone_id, sum(consumption) as consumo from cso_subc_dwf cntr
+	where drainzone_id is not null
+	group by drainzone_id)a where s.drainzone_id = a.drainzone_id';
 
 	-- calc of equivalent inhabitants
 	execute '
@@ -232,25 +224,14 @@ BEGIN
 	
 		raise exception 'v_returncoeff, v_daily_supply % %', v_daily_supply, v_daily_supply;
 	
-	elsif (select count(*) from cso_inp_rainfall) = 0 then
+	END IF;
+	
+	if (select count(*) from cso_inp_rainfall) = 0 then
 	
 		raise exception 'no tienes lluvias en la cso_inp_rainfall';
 		
 	end if;
 	
-	if v_geom_thy_plv is null then 
-	
-		raise exception 'geom column does not exist in thyssen table';
-	
-	elsif v_thy_res_drainzone is null then 
-	
-		raise exception 'drainzone_id column does not exist in thyssen table';
-	
-	elsif v_plv_cn is null then
-	
-		raise exception 'curve_number column does not exist in thyssen table';
-	
-	end if;
 
 	-- START ALGORITHM
 	-- ===============
@@ -259,9 +240,8 @@ BEGIN
 	FOR rec_rainfall in select * from cso_inp_rainfall
 	LOOP	
 		
-		
 		-- for each subcatchment
-		FOR rec_subc in select * from cso_inp_system_subc
+		FOR rec_subc in execute 'select * from cso_inp_system_subc where drainzone_id in ('||v_selected_drainzone_id||')'
 		LOOP
 			
 			raise notice 'rec_rainfall.rf_name: %, rec_rainfall.rf_tstep: %', rec_rainfall.rf_name, rec_rainfall.rf_tstep;
@@ -315,7 +295,6 @@ BEGIN
 				set vol_wwtp = vol_non_leaked + vol_circ_dep 
 				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
 			
-		
 			update cso_out_vol
 				set vol_treated = vol_infiltr + vol_wwtp -- columna Z
 				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
@@ -326,7 +305,9 @@ BEGIN
 				set efficiency = vol_treated / vol_total -- columna AA
 				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
 		END LOOP;
+		
 	END LOOP;
+	
 
 	-- clean temp tables
 	drop table if exists cso_inp_rainfall;
