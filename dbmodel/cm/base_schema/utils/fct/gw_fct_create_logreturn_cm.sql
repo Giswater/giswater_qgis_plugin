@@ -34,7 +34,6 @@ BEGIN
 	IF v_returntype = 'fillExcepTables' THEN
 		DELETE FROM audit_check_data WHERE fid in (select fid from t_audit_check_data) and cur_user=current_user;
 		INSERT INTO audit_check_data SELECT * FROM t_audit_check_data;
-	END IF;
 
 	ELSIF v_returntype = 'info' THEN
 
