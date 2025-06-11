@@ -59,7 +59,6 @@ class GwProjectCheckCMTask(GwTask):
             msg_params = (type(e).__name__, str(e),)
             tools_log.log_warning(msg, msg_params=msg_params)
 
-
     def finished(self, result):
         """
         Handles the task completion.
@@ -191,7 +190,6 @@ class GwProjectCheckCMTask(GwTask):
 
         # Call `fill_tab_log()` directly, no need to store variables
         tools_gw.fill_tab_log(self.dialog, result['body']['data'], reset_text=False)
-
 
     def _add_selected_layers(self, dialog, m_layers):
         """ Receive a list of layers, look for the checks associated with each layer and if they are checked,

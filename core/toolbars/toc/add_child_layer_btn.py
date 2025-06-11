@@ -16,7 +16,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt, lib_vars, tools_db
+from ....libs import tools_qgis, tools_qt, lib_vars
 
 
 class GwAddChildLayerButton(GwAction):

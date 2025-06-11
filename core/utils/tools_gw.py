@@ -675,7 +675,7 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
         feature_id = dialog.findChild(QLineEdit, feature_id_widget_name)
     else:
         feature_id = dialog.findChild(QLineEdit, 'feature_id')
-    
+
     if feature_id:
         set_completer_widget(viewname, feature_id, field_id, add_id=True)
 
@@ -737,17 +737,17 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         uri.setDataSource(schema_name, f'{tablename}', '', None, field_id)
     else:
         uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-    
+
     if passwd is not None:
         uri.setPassword(passwd)
-    
+
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
     if sub_group:
         sub_group = sub_group.capitalize()
     if sub_sub_group:
         sub_sub_group = sub_sub_group.capitalize()
-    
+
     if the_geom == "rast":
         connString = f"PG: dbname={tools_db.dao_db_credentials['db']} host={tools_db.dao_db_credentials['host']} " \
                      f"user={tools_db.dao_db_credentials['user']} password={tools_db.dao_db_credentials['password']} " \
@@ -813,7 +813,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     if extent is not None:
         layer.setExtent(extent)
-    
+
     if create_project is False:
         global_vars.iface.mapCanvas().refresh()
 
@@ -3414,13 +3414,13 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     table_widget = dialog.findChildren(QTableView, QRegularExpression(f"{expected_table_name}$"))[0]
     if not table_widget:
         return
-    
+
     model = table_widget.model()
     selection_model = table_widget.selectionModel()
 
     # Handle cases where the table is empty
     table_ids = []
-    
+
     if model:
         table_ids = [
             str(get_model_index(model, row, field_id)) for row in range(model.rowCount())
@@ -3571,7 +3571,7 @@ def show_expression_dialog(feature_type, dialog, table_object):
     return dlg.exec_()
 
 
-def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, 
+def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
                    remove_ids=True, lazy_widget=None, lazy_init_function=None, refresh_callback=None, target_widget=None):
     """ Select feature with entered id. Set a model with selected filter.
         Attach that model to selected table
@@ -3634,7 +3634,7 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         expr_filter = expr_filter[:-2] + ")"
     else:
         expr_filter = f'"{field_id}" IN (NULL)'
-    
+
     # Check expression
     (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
     if not is_valid:
@@ -4222,7 +4222,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
             if header_item and header_item.text() == field_id:
                 col_index = c
                 break
-        
+
         if col_index != -1:
             for i in range(0, len(selected_list)):
                 row = selected_list[i].row()
@@ -5133,26 +5133,27 @@ def _get_parser_from_filename(filename):
 
     return filepath, parser
 
+
 def _get_extent_parameters(schema_name):
+    """ Get extent parameters for a given schema """
 
-        rectangle = None
-        table_name = "node"
-        geom_name = "the_geom"
-        sql = (f"SELECT ST_XMax(gometries) AS xmax, ST_XMin(gometries) AS xmin, "
-               f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
-               f"FROM "
-               f"(SELECT ST_Collect({geom_name}) AS gometries FROM {schema_name}.{table_name}) AS foo")
-        row = tools_db.get_row(sql)
-        if row:
-            xmin = row["xmin"]
-            xmax = row["xmax"]
-            ymin = row["ymin"]
-            ymax = row["ymax"]
-            
-            rectangle = QgsRectangle(xmin or -1.555992, ymin or -1.000000, xmax or 1.555992, ymax or 1.000000)
-            
+    rectangle = None
+    table_name = "node"
+    geom_name = "the_geom"
+    sql = (f"SELECT ST_XMax(gometries) AS xmax, ST_XMin(gometries) AS xmin, "
+            f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
+            f"FROM "
+            f"(SELECT ST_Collect({geom_name}) AS gometries FROM {schema_name}.{table_name}) AS foo")
+    row = tools_db.get_row(sql)
+    if row:
+        xmin = row["xmin"]
+        xmax = row["xmax"]
+        ymin = row["ymin"]
+        ymax = row["ymax"]
 
-        return rectangle
+        rectangle = QgsRectangle(xmin or -1.555992, ymin or -1.000000, xmax or 1.555992, ymax or 1.000000)
+
+    return rectangle
 
 
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):

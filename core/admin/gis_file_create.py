@@ -12,8 +12,7 @@ import json
 from ..utils import tools_gw  # noqa: F401
 from ... import global_vars
 from ...libs import tools_log, tools_qt, tools_db, tools_qgis
-from qgis.core import QgsProject, QgsCoordinateReferenceSystem, QgsLayerTreeLayer, QgsLayerTreeGroup
-from ...libs import lib_vars
+from qgis.core import QgsProject, QgsCoordinateReferenceSystem, QgsLayerTreeLayer
 
 
 class GwGisFileCreate:
@@ -26,7 +25,7 @@ class GwGisFileCreate:
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
                              export_passwd=False, roletype='admin', layer_source=None, layer_project_type=None):
-        
+
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
 
@@ -96,7 +95,7 @@ class GwGisFileCreate:
                     tools_gw.add_layer_database(layer['tableName'], layer['geomField'], layer['tableId'], levels[0], levels[1] if len(levels) > 1 else None, style_id='-1', alias=layer['layerName'],
                                                 sub_sub_group=levels[2] if len(levels) > 2 else None, schema=schema, visibility=layer.get('template').get('visibility'), auth_id=auth_id,
                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True)
-        
+
         # Set project CRS
         project.setCrs(QgsCoordinateReferenceSystem(auth_id))
 
@@ -150,7 +149,7 @@ class GwGisFileCreate:
         return None
 
     def _set_project_vars(self, project, export_passwd):
-        
+
         project_type = tools_gw.get_project_type()
         project.setCustomVariables({'gwAddSchema': '', 'gwInfoType': 'full', 'gwMainSchema': '', 'gwProjectRole': 'role_admin', 'gwProjectType': project_type,
                                      'gwStoreCredentials': f"{export_passwd}", 'svg_path': 'C:/Users/usuario/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/svg'})

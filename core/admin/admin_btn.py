@@ -382,7 +382,7 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
 
         return result
-    
+
     def _vacuum_project_data_schema(self, verbose=False):
         """ Execute task to vacuum schema """
         description = "Vacuum schema"
@@ -1193,8 +1193,7 @@ class GwAdminButton:
         qgis_file_export = tools_gw.get_config_parser('btn_admin', 'qgis_file_export', "user", "session", prefix=False,
                                                       force_reload=True)
         qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
-        
-        #self.cmb_create_project_type.addItem(str(aux))
+
         list_project_type = tools_db.execute_returning(f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'")
         try:
             result = {list_project_type[i]: list_project_type[i + 1] for i in range(0, len(list_project_type), 2)}
@@ -2236,7 +2235,7 @@ class GwAdminButton:
             msg = "Folder not found"
             tools_log.log_info(msg, parameter=filedir)
             return True
-        
+
         msg = "Processing folder"
         tools_log.log_info(msg, parameter=filedir)
 
