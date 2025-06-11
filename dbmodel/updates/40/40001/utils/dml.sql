@@ -793,14 +793,17 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(3003, 'ERRORS', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3006, 'ARC DIVIDE = TRUE', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3008, 'ARC DIVIDE = FALSE', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3009, 'RESUME', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(3010, 'CHECK SYSTEM', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES(3011, 'CHECK DB DATA', 'header');
 
+INSERT INTO sys_label (id, idval, label_type) VALUES(2000, '', 'separator'); -- break line
 INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2008, '--------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2009, '---------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2014, '--------------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2022, '----------------------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2025, '-------------------------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES (2030, '------------------------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2030, '------------------------------', 'separator');
 INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '-------------------------------------------------', 'header');
 
 
@@ -953,7 +956,6 @@ VALUES(3462, 'Connec: %feature_id% has been reconected with new arc_id but keepi
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3464, 'Gully: %feature_id%  has been reconected with new arc_id but keeping the feature exit from initial node.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_label (id, idval, label_type) VALUES(3010, 'Warning', 'prefix');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3466, 'Reconnect operative: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -1965,3 +1967,44 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3902, 'New %rec_type.id% inserted with state 1: %v_list_features_obsolete%', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('project_type', '1', 'Basic', 'Basic', NULL);
+
+-- check project messages
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4100, 'Giswater version: %version%', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4102, 'Version of plugin is different than the database version. DB: %version%, plugin: %qgis_version%.', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4104, 'PostgreSQL version: %version%', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4106, 'PostGIS version: %postgis_version%', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4108, 'QGIS version: %qgis_version%', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4110, 'O/S version: %os_version%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4112, 'Log volume (User folder): %logfoldervolume%', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4114, 'QGIS variables: gwProjectType: %v_qgis_project_type%, gwInfoType: %v_infotype%, gwProjectRole: %v_projectrole%, gwMainSchema: %v_mainschema%, gwAddSchema: %v_addschema%', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4116, 'Logged as %current_user% on %now%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4118, 'There is/are %v_count% layers that come from differen host: %v_layer_list%.', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4120, 'All layers come from current host', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4122, 'There is/are %v_count% layers that come from different database: %v_layer_list%.', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4124, 'All layers come from current database', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4126, 'There is/are %v_count% layers that come from different schema: %v_layer_list%.', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4128, 'All layers come from current schema', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4130, 'There is/are %v_count% layers that have been added by different user: %v_layer_list%.', null, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4132, 'All layers have been added by current user', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4134, 'Set feature state = 1 for addschema and user', null, 0, true, 'utils', 'core', 'AUDIT');

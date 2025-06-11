@@ -188,7 +188,7 @@ BEGIN
 			rec_cat_error.error_message = concat(rec_cat_label.idval, ': ', rec_cat_error.error_message);
 		ELSIF rec_cat_error.message_type = 'AUDIT' THEN
 			-- add header to message if message type is AUDIT
-			rec_cat_error.error_message = concat(rec_cat_label.idval, ' ', COALESCE(v_fid, ''), ': ', rec_cat_error.error_message);
+			rec_cat_error.error_message = concat(rec_cat_label.idval, ' ', COALESCE(v_result_id, ''), ': ', rec_cat_error.error_message);
 		END IF;
 	END IF;
 

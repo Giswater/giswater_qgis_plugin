@@ -109,41 +109,102 @@ BEGIN
 	-- create temp tables
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"CHECKPROJECT"}}}$$)';
 
+	-- Header log
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3236", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3010", "separator_id":"2030", "tempTable":"t_"}}$$)';
 	IF v_show_versions THEN
 		--check plugin and db version and other system parameters
 		IF v_qgis_version = v_version THEN
-			v_errortext=concat('Giswater version: ',v_version,'.');
-			INSERT INTO t_audit_check_data (fid,  criticity, error_message,fcount)
-			VALUES (101, 4, v_errortext,0);
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4100", "function":"3236", "fid":"'||v_fid||'", "result_id":"null", "fcount":"0", 
+			"parameters":{"version":"'||v_version||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 		ELSE
-			v_errortext=concat('ERROR-349: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
-			INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (101, 3, '349',v_errortext, 1);
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4102", "function":"3236", "fid":"'||v_fid||'", "result_id":"349", "fcount":"1", 
+			"parameters":{"version":"'||v_version||'", "qgis_version":"'||v_qgisversion||'"}, "prefix_id":"1003", "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 		END IF;
 
-		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('PostgreSQL version: ',(SELECT version())));
-		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('PostGIS version: ',(SELECT postgis_version())));
-		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('QGIS version: ', v_qgisversion));
-		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('O/S version: ', v_osversion));
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4104", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		"parameters":{"version":"'||(SELECT version())||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4106", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		"parameters":{"postgis_version":"'||(SELECT postgis_version())||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4108", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		"parameters":{"qgis_version":"'||v_qgisversion||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4110", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		"parameters":{"os_version":"'||v_osversion||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3236", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "separator_id":"2000", "fcount":"0", "tempTable":"t_"}}$$)';
 	END IF;
 
 	IF v_show_qgis_project THEN
-		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
-		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
-		quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
-		v_errortext=concat('Logged as ', current_user,' on ', now());
-		INSERT INTO t_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-	END IF;
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4112", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		"parameters":{"logfoldervolume":"'||v_logfoldervolume||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4114", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		"parameters":{"gwprojecttype":"'||quote_nullable(v_qgis_project_type)||'", "gwinfotype":"'||quote_nullable(v_infotype)||'", "gwprojectrole":"'||quote_nullable(v_projectrole)||'", 
+		"gwmainschema":"'||quote_nullable(v_mainschema)||'", "gwaddschema":"'||quote_nullable(v_addschema)||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4116", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		"parameters":{"current_user":"'||current_user||'", "now":"'||now()||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 
-	-- check layers from project and insert on log table
-	v_querytext=NULL;
-	FOR v_field in SELECT * FROM json_array_elements(v_insert_fields) LOOP
-		select into v_querytext concat(v_querytext, 'INSERT INTO t_audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
-		select into v_querytext concat(v_querytext, 'VALUES('||quote_literal((v_field->>'table_schema'))||', '||quote_literal((v_field->>'table_id'))||', '||quote_literal((v_field->>'table_dbname'))||',
-		'||quote_literal((v_field->>'table_host'))||'') ;
-		select into v_querytext concat(v_querytext, ', '||quote_literal((v_field->>'fid'))||', '||quote_literal((v_field->>'table_user'))||');') ;
-	END LOOP;
-	IF v_querytext IS NOT NULL THEN EXECUTE v_querytext; END IF;
+
+		-- check layers from project and insert on log table
+		v_querytext=NULL;
+		FOR v_field in SELECT * FROM json_array_elements(v_insert_fields) LOOP
+			select into v_querytext concat(v_querytext, 'INSERT INTO t_audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
+			select into v_querytext concat(v_querytext, 'VALUES('||quote_literal((v_field->>'table_schema'))||', '||quote_literal((v_field->>'table_id'))||', '||quote_literal((v_field->>'table_dbname'))||',
+			'||quote_literal((v_field->>'table_host'))||'') ;
+			select into v_querytext concat(v_querytext, ', '||quote_literal((v_field->>'fid'))||', '||quote_literal((v_field->>'table_user'))||');') ;
+		END LOOP;
+		IF v_querytext IS NOT NULL THEN EXECUTE v_querytext; END IF;
+
+		-- get db source using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
+		SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema
+		FROM t_audit_check_project where table_id = 'v_edit_node' and cur_user=current_user;
+
+		--check layers host (350)
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
+		FROM audit_check_project WHERE table_host != v_table_host AND cur_user=current_user;
+
+		IF v_count>0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4118", "function":"3236", "fid":"'||v_fid||'", "result_id":"350", "fcount":"0", 
+			"parameters":{"v_count":"'||v_count||'", "v_layer_list":"'||v_layer_list||'"}, "criticity":"3", "prefix_id":"1003", "is_process":true, "tempTable":"t_"}}$$)';
+		ELSE
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4120", "function":"3236", "fid":"'||v_fid||'", "result_id":"350", "fcount":"0", 
+			"criticity":"1", "prefix_id":"1001", "is_process":true, "tempTable":"t_"}}$$)';
+		END IF;
+
+		--check layers database (351)
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
+		FROM audit_check_project WHERE table_dbname != v_table_dbname AND cur_user=current_user;
+
+		IF v_count>0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4122", "function":"3236", "fid":"'||v_fid||'", "result_id":"351", "fcount":"0", 
+			"parameters":{"v_count":"'||v_count||'", "v_layer_list":"'||v_layer_list||'"}, "criticity":"3", "prefix_id":"1003", "is_process":true, "tempTable":"t_"}}$$)';
+		ELSE
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4124", "function":"3236", "fid":"'||v_fid||'", "result_id":"351", "fcount":"0", 
+			"criticity":"1", "prefix_id":"1001", "is_process":true, "tempTable":"t_"}}$$)';
+		END IF;
+
+		--check layers database (352)
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
+		FROM audit_check_project WHERE table_schema != v_table_schema AND cur_user=current_user;
+
+		IF v_count>0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4126", "function":"3236", "fid":"'||v_fid||'", "result_id":"352", "fcount":"0", 
+			"parameters":{"v_count":"'||v_count||'", "v_layer_list":"'||v_layer_list||'"}, "criticity":"3", "prefix_id":"1003", "is_process":true, "tempTable":"t_"}}$$)';
+		ELSE
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4128", "function":"3236", "fid":"'||v_fid||'", "result_id":"352", "fcount":"0", 
+			"criticity":"1", "prefix_id":"1001", "is_process":true, "tempTable":"t_"}}$$)';
+		END IF;
+
+		--check layers user (353)
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
+		FROM audit_check_project WHERE cur_user != table_user AND table_user != 'None' AND cur_user=current_user;
+
+		IF v_count>0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4130", "function":"3236", "fid":"'||v_fid||'", "result_id":"353", "fcount":"0", 
+			"parameters":{"v_count":"'||v_count||'", "v_layer_list":"'||v_layer_list||'"}, "criticity":"3", "prefix_id":"1003", "is_process":true, "tempTable":"t_"}}$$)';
+		ELSE
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4132", "function":"3236", "fid":"'||v_fid||'", "result_id":"353", "fcount":"0", 
+			"criticity":"1", "prefix_id":"1001", "is_process":true, "tempTable":"t_"}}$$)';
+		END IF;
+	END IF;
 
 	-- Force state selector in case of null values for addschema
 	IF v_addschema IS NOT NULL THEN
@@ -151,8 +212,8 @@ BEGIN
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 		IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN
 			INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-			v_errortext=concat('Set feature state = 1 for addschema and user');
-			INSERT INTO t_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4134", "function":"3236", "fid":"'||v_fid||'", "result_id":"null", "fcount":"0", 
+			"criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 		END IF;
 		SET search_path = 'SCHEMA_NAME';
 	END IF;
@@ -166,66 +227,6 @@ BEGIN
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
 	v_uservalues := COALESCE(v_uservalues, '{}');
-
-	-- get db source using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
-	SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema
-	FROM t_audit_check_project where table_id = 'v_edit_node' and cur_user=current_user;
-
-	--check layers host (350)
-	SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
-	FROM audit_check_project WHERE table_host != v_table_host AND cur_user=current_user;
-
-	IF v_count>0 THEN
-		v_errortext = concat('ERROR-350 (QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
-
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id,error_message)
-		VALUES (101, 3,'350',v_errortext );
-	ELSE
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (101, 1, '350', 'INFO (QGIS PROJ): All layers come from current host');
-	END IF;
-
-	--check layers database (351)
-	SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
-	FROM audit_check_project WHERE table_dbname != v_table_dbname AND cur_user=current_user;
-
-	IF v_count>0 THEN
-		v_errortext = concat('ERROR-351 (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
-
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (101, 3, '351', v_errortext );
-	ELSE
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (101, 1, '351', 'INFO (QGIS PROJ): All layers come from current database');
-	END IF;
-
-	--check layers database (352)
-	SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
-	FROM audit_check_project WHERE table_schema != v_table_schema AND cur_user=current_user;
-
-	IF v_count>0 THEN
-		v_errortext = concat('ERROR-352 (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
-
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (101, 3, '352', v_errortext );
-	ELSE
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (101, 1, '352', 'INFO (QGIS PROJ): All layers come from current schema');
-	END IF;
-
-	--check layers user (353)
-	SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
-	FROM audit_check_project WHERE cur_user != table_user AND table_user != 'None' AND cur_user=current_user;
-
-	IF v_count>0 THEN
-		v_errortext = concat('ERROR-353 (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
-
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (101, 3,'353',v_errortext );
-	ELSE
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (101, 1, '353','INFO (QGIS PROJ): All layers have been added by current user');
-	END IF;
 
 	-- built return
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;

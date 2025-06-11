@@ -507,7 +507,7 @@ BEGIN
 					SELECT count(*) INTO v_count FROM v_edit_node WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
 					IF v_count > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3460", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "prefix_id":"3010","fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3460", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "prefix_id":"1002","fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END IF;
 
 					-- links from connec related to node
@@ -515,7 +515,7 @@ BEGIN
 						INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable) VALUES (rec_link.feature_id, v_new_record.arc_id, v_psector_id, 1, false);
 
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3462", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"},"prefix_id":"3010", "fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3462", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"},"prefix_id":"1002", "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END LOOP;
 
 					-- links from gully related to node
@@ -523,7 +523,7 @@ BEGIN
 						INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable) VALUES (rec_link.feature_id, v_new_record.arc_id, v_psector_id, 1, false);
 
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3464", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"}, "prefix_id":"3010","fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3464", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"}, "prefix_id":"1002","fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END LOOP;
 
 					-- update operative connecs
@@ -552,9 +552,9 @@ BEGIN
 							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1
 							ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 
-							
-							
-							
+
+
+
 
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        		"data":{"message":"3470", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
@@ -578,7 +578,7 @@ BEGIN
 							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id)
 							AND state = 1;
 
-					
+
 						END IF;
 					END IF;
 
