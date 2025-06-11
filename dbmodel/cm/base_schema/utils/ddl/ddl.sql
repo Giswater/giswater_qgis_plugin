@@ -333,7 +333,9 @@ CREATE TABLE om_campaign
   organization_id integer,
   duration text,
   status integer not NULL,
-  the_geom geometry(MultiPolygon,25831),
+  expl_id integer,
+  sector_id integer,
+  the_geom geometry(MultiPolygon,SRID_VALUE),
   CONSTRAINT om_campaign_pkey PRIMARY KEY (campaign_id),
   CONSTRAINT om_campaign_check_type check (campaign_type in (1,2)),
   CONSTRAINT om_campaign_organization_id_fkey FOREIGN KEY (organization_id)
@@ -459,7 +461,9 @@ CREATE TABLE om_campaign_lot
   team_id integer, -- fk cat_team
   duration text,
   status int2 not NULL,
-  the_geom geometry(MultiPolygon,25831),
+  expl_id integer,
+  sector_id integer,
+  the_geom geometry(MULTIPOLYGON,SRID_VALUE),
   CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (lot_id),
   CONSTRAINT om_campaign_lot_campaign_id_fkey FOREIGN KEY (campaign_id)
     REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -485,7 +489,8 @@ CREATE TABLE om_campaign_lot_x_arc
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  action int2,  
+  action int2, 
+  the_geom geometry(LINESTRING, SRID_VALUE)  
   CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_arc_un UNIQUE (lot_id, arc_id),
   CONSTRAINT om_campaign_lot_x_arc_lot_id_fkey FOREIGN KEY (lot_id)
@@ -508,6 +513,7 @@ CREATE TABLE om_campaign_lot_x_connec
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2,  
+  the_geom geometry(POINT, SRID_VALUE)
   CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_connec_un UNIQUE (lot_id, connec_id),
   CONSTRAINT om_campaign_lot_x_connec_lot_id_fkey FOREIGN KEY (lot_id)
@@ -532,6 +538,7 @@ CREATE TABLE om_campaign_lot_x_link
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2, 
+  the_geom geometry(LINESTRING, SRID_VALUE)
   CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_link_un UNIQUE (lot_id, link_id),
   CONSTRAINT om_campaign_lot_x_link_lot_id_fkey FOREIGN KEY (lot_id)
@@ -556,6 +563,7 @@ CREATE TABLE om_campaign_lot_x_node
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2, 
+  the_geom geometry(POINT, SRID_VALUE)
   CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_node_un UNIQUE (lot_id, node_id),
   CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id)
@@ -578,6 +586,7 @@ CREATE TABLE om_campaign_lot_x_gully
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2, 
+  the_geom geometry(POINT, SRID_VALUE)
   CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_gully_un UNIQUE (lot_id, connec_id),
   CONSTRAINT om_campaign_lot_x_gully_lot_id_fkey FOREIGN KEY (lot_id)
@@ -658,3 +667,11 @@ CREATE TABLE audit_check_data (
 	fcount int4 NULL,
 	CONSTRAINT audit_check_data_pkey PRIMARY KEY (id)
 );
+
+CREATE SEQUENCE cm.cm_urn_id_seq
+    INCREMENT BY -1
+    MAXVALUE 1
+    MINVALUE -9223372036854775807
+    START -1
+    CACHE 1
+    NO CYCLE;

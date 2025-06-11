@@ -1,7 +1,24 @@
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setcheckproject_SCHEMA_NAME(p_data json)
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+--FUNCTION CODE: NEW CODE FOR THIS FUNCT
+
+CREATE OR REPLACE FUNCTION gw_fct_setcheckproject_cm(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
+
+/*
+SELECT gw_fct_setcheckproject_cm($${"client":{"device":4, "lang":"es_ES", "version":"4.0.001", "infoType":1, "epsg":25831}, 
+"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters": {"functionFid": 0, "lotId": 3, "campaignId":4, "project_type": "cm"}}}$$);
+
+*/
+
+
 
 DECLARE
 	-- system variables
@@ -30,6 +47,9 @@ DECLARE
 	v_qgis_layers_setpropierties boolean;
 	v_qgis_init_guide_map boolean;
 	v_return json;
+	v_campaign integer;
+	v_lot integer;
+
 BEGIN
 
 	SET search_path = 'SCHEMA_NAME', public;
@@ -39,7 +59,9 @@ BEGIN
 
 
     v_fid := (p_data->'data'->'parameters'->>'functionFid')::integer;
-    v_project_type := COALESCE(p_data->'data'->'parameters'->>'project_type', 'SCHEMA_NAME');
+    v_project_type := COALESCE(p_data->'data'->'parameters'->>'project_type', 'cm');
+    v_campaign := p_data->'data'->'parameters'->>'campaignId';
+	v_lot := p_data->'data'->'parameters'->>'lotId';
 
     IF v_fid IS NULL THEN
         RETURN json_build_object('status', 'error', 'message', 'Missing parameter: functionFid');
@@ -51,7 +73,7 @@ BEGIN
 
 	DROP TABLE IF EXISTS t_cm_arc;
 	CREATE TEMP TABLE t_cm_arc (
-		arc_id integer,
+		arc_id integer primary key,
 		arccat_id varchar,
 		expl_id integer,
 		fid integer,
@@ -61,7 +83,7 @@ BEGIN
 
 	DROP TABLE IF EXISTS t_cm_node;
 	CREATE TEMP TABLE t_cm_node (
-		node_id integer,
+		node_id integer primary key,
 		nodecat_id varchar,
 		expl_id integer,
 		fid integer,
@@ -71,22 +93,34 @@ BEGIN
 
 	DROP TABLE IF EXISTS t_cm_connec;
 	CREATE TEMP TABLE t_cm_connec (
-		connec_id integer,
+		connec_id integer primary key,
 		conneccat_id varchar,
 		expl_id integer,
 		fid integer,
 		the_geom geometry,
 		descript text
 	);
+
+	DROP TABLE IF EXISTS t_cm_connec;
+	CREATE TEMP TABLE t_cm_connec (
+		connec_id integer primary key,
+		conneccat_id varchar,
+		expl_id integer,
+		fid integer,
+		the_geom geometry,
+		descript text
+	);
+
 	-- ENDSECTION
+
 	
 	-- fill log table
-	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, 'CHECK DB DATA');
+	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, 'CONTROL DE CALIDAD');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, '------------------------------');
-	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 3, 'CRITICAL ERRORS');
+	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 3, 'ERRORES CRÍTICOS');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 3, '----------------------');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 2, '');
-	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 2, 'WARNINGS');
+	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 2, 'ALERTAS');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 2, '--------------');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 1, '');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 1, 'INFO');

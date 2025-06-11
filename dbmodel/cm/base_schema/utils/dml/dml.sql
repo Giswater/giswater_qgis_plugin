@@ -256,3 +256,10 @@ GRANT ALL ON SCHEMA SCHEMA_NAME TO role_cm_admin;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_admin;
 GRANT ALL ON SCHEMA SCHEMA_NAME TO role_cm_admin;
 GRANT ALL ON ALL TABLES IN SCHEMA SCHEMA_NAME TO role_cm_admin;
+
+
+UPDATE config_form_fields SET 
+widgetcontrols = '{"vdefault_value": 
+"Esta función tiene por objetivo pasar el control de calidad de una campaña, pudiendo escoger de forma concreta un lote especifico.<br><br>Se analizan diferentes aspectos siendo lo más destacado que se configura para que los datos esten operativos en el conjunto de una campaña para que el modelo hidraulico funcione."}' 
+WHERE formtype ='check_project_cm' and columnname ='txt_info';
+
