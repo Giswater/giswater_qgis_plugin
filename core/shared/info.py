@@ -2122,9 +2122,10 @@ class GwInfo(QObject):
             if new_feature is None:
                 can_edit = tools_os.set_boolean(tools_db.check_role_user('role_epa'))
                 if not can_edit:
-                    message = "You are not enabled to modify this epa_type widget"
+                    message = "You are not enabled to modify this {0} widget"
+                    msg_params = ("epa_type",)
                     title = "Change epa_type"
-                    tools_qt.show_info_box(message, title)
+                    tools_qt.show_info_box(message, title, msg_params=msg_params)
                     return
                 widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
                 msg = ("You are going to change the epa_type. With this operation you will lose information about "
