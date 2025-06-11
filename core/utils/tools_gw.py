@@ -697,7 +697,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
     widget.setCompleter(completer)
     model = QStringListModel()
     sql = (f"SELECT {feature_type}_id"
-           f" FROM {viewname}")
+           f" FROM {lib_vars.schema_name}.{viewname}")
     row = tools_db.get_rows(sql)
     if row:
         for i in range(0, len(row)):
@@ -3188,10 +3188,10 @@ def get_layers_from_feature_type(feature_type):
 
     list_items = []
     sql = (f"SELECT child_layer "
-           f"FROM cat_feature "
+           f"FROM {lib_vars.schema_name}.cat_feature "
            f"WHERE upper(feature_type) = '{feature_type.upper()}' "
            f"UNION SELECT DISTINCT parent_layer "
-           f"FROM cat_feature "
+           f"FROM {lib_vars.schema_name}.cat_feature "
            f"WHERE upper(feature_type) = '{feature_type.upper()}';")
     rows = tools_db.get_rows(sql)
     if rows:
@@ -3823,7 +3823,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
     if schema_name is not None:
         config_table = f"{schema_name}.config_form_tableview"
     else:
-        config_table = "config_form_tableview"
+        config_table = f"{lib_vars.schema_name}.config_form_tableview"
 
     # Set width and alias of visible columns
     columns_to_delete = []
@@ -4074,7 +4074,7 @@ def set_completer_widget(tablename, widget, field_id, add_id=False,
         field_id += '_id'
 
     sql = (f"SELECT DISTINCT({field_id})"
-           f" FROM {tablename}"
+           f" FROM {lib_vars.schema_name}.{tablename}"
            f" ORDER BY {field_id}")
     rows = tools_db.get_rows(sql)
     tools_qt.set_completer_rows(widget, rows, filter_mode=filter_mode)
