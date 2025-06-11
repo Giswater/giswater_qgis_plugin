@@ -12,6 +12,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QCheckBox, QComboBox, QLineEd
 
 from typing import Optional, List
 from functools import partial
+import json
 
 from ...ui.ui_manager import TeamCreateUi, UserCreateUi, AddLotUi, LotManagementUi, \
     ResourcesManagementUi, OrganizationCreateUi
@@ -82,6 +83,15 @@ class AddNewLot:
 
         # Load dynamic form and apply fields
         self.load_lot_dialog(lot_id)
+
+        # Use findChild with the widget's objectName for a reliable connection.
+        campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
+        if campaign_combo:
+            campaign_combo.currentIndexChanged.connect(self._update_team_combo)
+            # Initial population when the dialog opens
+            self._update_team_combo()
+        else:
+            print("[DEBUG] Critical: Could not find 'tab_data_campaign_id' widget to connect signal.")
 
         # Reference key widgets
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
@@ -261,6 +271,50 @@ class AddNewLot:
                 result_relation.append(row[0])
         return widget
 
+    def _update_team_combo(self):
+        """
+        Update team combo based on selected campaign. This function manually
+        populates the combobox to ensure only the Team ID is stored as item data,
+        which is essential for saving the lot correctly.
+        """
+        campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
+        team_combo = self.dlg_lot.findChild(QComboBox, "tab_data_team_id")
+
+        if not campaign_combo or not team_combo:
+            return
+
+        # Preserve the currently selected team ID to restore the selection later.
+        current_team_id = team_combo.currentData()
+        if isinstance(current_team_id, (list, tuple)):
+            current_team_id = current_team_id[0]
+
+        campaign_id = campaign_combo.currentData()
+
+        team_combo.blockSignals(True)
+        team_combo.clear()
+        team_combo.addItem("", None)  # Add a blank item.
+
+        if campaign_id:
+            body = {"p_campaign_id": campaign_id}
+            response = tools_gw.execute_procedure("gw_fct_getcmteam", body, schema_name="cm", check_function=False)
+
+            if isinstance(response, str):
+                response = json.loads(response)
+
+            if response and response.get("status") == "Accepted":
+                teams = response.get("body", {}).get("data", [])
+                if teams:
+                    for team in teams:
+                        # Add item with the name as text and ONLY the ID as data.
+                        team_combo.addItem(str(team['idval']), team['id'])
+
+        # Restore the selection if possible.
+        if current_team_id is not None:
+            index = team_combo.findData(current_team_id)
+            if index > -1:
+                team_combo.setCurrentIndex(index)
+        team_combo.blockSignals(False)
+
     def _on_tab_feature_changed(self):
         # Update self.feature_type just like in Campaign
         self.feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
@@ -323,29 +377,37 @@ class AddNewLot:
                 self.populate_manager_lot(view, sql)
 
     def get_widget_by_columnname(self, dialog, columnname):
+        """Find a widget in a dialog by its 'columnname' property."""
         for widget in dialog.findChildren(QWidget):
             if widget.property("columnname") == columnname:
                 return widget
         return None
 
     def set_widget_value(self, widget, value):
-        """Sets the widget value from JSON"""
+        """Sets the widget value from JSON."""
+        if value is None:
+            return
 
         if isinstance(widget, QLineEdit):
             widget.setText(str(value))
         elif isinstance(widget, QTextEdit):
             widget.setPlainText(str(value))
         elif isinstance(widget, QDateEdit):
-            if value:
-                date = QDate.fromString(value, "yyyy-MM-dd")
-                if date.isValid():
-                    widget.setDate(date)
+            date = QDate.fromString(value, "yyyy-MM-dd")
+            if date.isValid():
+                widget.setDate(date)
         elif isinstance(widget, QCheckBox):
             widget.setChecked(str(value).lower() in ["true", "1"])
         elif isinstance(widget, QComboBox):
-            index = widget.findData(str(value))
-            if index >= 0:
+            # Find by data (ID)
+            index = widget.findData(value)
+            if index > -1:
                 widget.setCurrentIndex(index)
+            else:
+                # Fallback to text if data not found
+                index = widget.findText(str(value))
+                if index > -1:
+                    widget.setCurrentIndex(index)
 
     def _check_enable_tab_relations(self):
         name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")
