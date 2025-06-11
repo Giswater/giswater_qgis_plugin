@@ -771,17 +771,17 @@ BEGIN
 						''properties'', to_jsonb(row) - ''the_geom''
 					) AS feature
 					FROM (
-						SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Disconnected''::text AS descript 
-						FROM temp_pgr_arc t
-						JOIN arc a USING (arc_id)
-						WHERE t.mapzone_id = 0
-						AND t.arc_id IS NOT NULL
+						SELECT DISTINCT ON (ta.arc_id) ta.arc_id, va.arccat_id, va.state, va.expl_id, NULL AS mapzone_id, va.the_geom, ''Disconnected''::text AS descript 
+						FROM temp_pgr_arc ta
+						JOIN v_temp_arc va USING (arc_id)
+						WHERE ta.mapzone_id = 0
+						AND ta.arc_id IS NOT NULL
 						UNION
-						SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Conflict''::text AS descript 
-						FROM temp_pgr_arc t
-						JOIN arc a USING (arc_id)
-						WHERE t.mapzone_id = -1
-						AND t.arc_id IS NOT NULL
+						SELECT DISTINCT ON (ta.arc_id) ta.arc_id, va.arccat_id, va.state, va.expl_id, NULL AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
+						FROM temp_pgr_arc ta
+						JOIN v_temp_arc va USING (arc_id)
+						WHERE ta.mapzone_id = -1
+						AND ta.arc_id IS NOT NULL
 					) row 
 				) features
 			' INTO v_result;
@@ -789,11 +789,11 @@ BEGIN
 			SELECT EXISTS (
 				SELECT 1
 				FROM (
-					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, 'Conflict'::text AS descript
-					FROM temp_pgr_arc t
-					JOIN arc a USING (arc_id)
-					WHERE t.mapzone_id = -1
-					AND t.arc_id IS NOT NULL
+					SELECT DISTINCT ON (ta.arc_id) ta.arc_id, va.arccat_id, va.state, va.expl_id, NULL AS mapzone_id, va.the_geom, 'Conflict'::text AS descript
+					FROM temp_pgr_arc ta
+					JOIN v_temp_arc va USING (arc_id)
+					WHERE ta.mapzone_id = -1
+					AND ta.arc_id IS NOT NULL
 				) s
 			) INTO v_has_conflicts;
 
@@ -843,24 +843,24 @@ BEGIN
 					''properties'', to_jsonb(row) - ''the_geom''
 				) AS feature
 				FROM (
-					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Disconnected''::text AS descript 
-					FROM temp_pgr_arc t
-					JOIN arc a USING (arc_id)
-					WHERE t.mapzone_id = 0
-					AND t.arc_id IS NOT NULL
+					SELECT DISTINCT ON (ta.arc_id) ta.arc_id, vc.conneccat_id, vc.state, vc.expl_id, NULL AS mapzone_id, vc.the_geom, ''Disconnected''::text AS descript 
+					FROM temp_pgr_arc ta
+					JOIN v_temp_connec vc USING (arc_id)
+					WHERE ta.mapzone_id = 0
+					AND ta.arc_id IS NOT NULL
 					UNION
-					SELECT DISTINCT ON (t.arc_id) t.arc_id, a.arccat_id, a.state, a.expl_id, NULL AS mapzone_id, a.the_geom, ''Conflict''::text AS descript 
-					FROM temp_pgr_arc t
-					JOIN arc a USING (arc_id)
-					WHERE t.mapzone_id = -1
-					AND t.arc_id IS NOT NULL
+					SELECT DISTINCT ON (ta.arc_id) ta.arc_id, vc.conneccat_id, vc.state, vc.expl_id, NULL AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
+					FROM temp_pgr_arc ta
+					JOIN v_temp_connec vc USING (arc_id)
+					WHERE ta.mapzone_id = -1
+					AND ta.arc_id IS NOT NULL
 					UNION
-					SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, t.mapzone_id::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
-					FROM temp_pgr_arc t
-					JOIN arc a USING (arc_id)
-					JOIN '|| v_mapzone_name ||' m ON t.mapzone_id = m.'|| v_mapzone_field ||'
+					SELECT ta.arc_id, vc.conneccat_id, vc.state, vc.expl_id, ta.mapzone_id::TEXT AS mapzone_id, vc.the_geom, m.name AS descript 
+					FROM temp_pgr_arc ta
+					JOIN v_temp_connec vc USING (arc_id)
+					JOIN '|| v_mapzone_name ||' m ON ta.mapzone_id = m.'|| v_mapzone_field ||'
 					WHERE m.'|| v_mapzone_field ||'::integer > 0
-					AND t.arc_id IS NOT NULL
+					AND ta.arc_id IS NOT NULL
 				) row 
 			) features';
 			RAISE NOTICE 'v_querytext:: %', v_querytext;
@@ -936,17 +936,24 @@ BEGIN
 			EXECUTE v_querytext;
 
 			v_querytext = 'UPDATE '||v_mapzone_name||' SET 
-				expl_id = array_agg(DISTINCT vn.expl_id)::int[],
-				muni_id = array_agg(DISTINCT vn.muni_id)::int[],
-				sector_id = array_agg(DISTINCT vn.sector_id)::int[],
+				expl_id = subq.expl_ids,
+				muni_id = subq.muni_ids,
+				sector_id = subq.sector_ids,
 				updated_at = now(), 
 				updated_by = current_user 
-			FROM temp_pgr_node tn
-			JOIN v_temp_node vn USING (node_id)
-			JOIN temp_pgr_mapzone tm ON tn.mapzone_id = tm.mapzone_id
-			WHERE tm.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field||'
-			AND tn.mapzone_id IS NOT NULL
-			GROUP BY tm.mapzone_id';
+			FROM (
+				SELECT 
+					tm.mapzone_id,
+					array_agg(DISTINCT vn.expl_id)::int[] AS expl_ids,
+					array_agg(DISTINCT vn.muni_id)::int[] AS muni_ids,
+					array_agg(DISTINCT vn.sector_id)::int[] AS sector_ids
+				FROM temp_pgr_node tn
+				JOIN v_temp_node vn USING (node_id)
+				JOIN temp_pgr_mapzone tm ON tn.mapzone_id = tm.mapzone_id
+				WHERE tn.mapzone_id IS NOT NULL
+				GROUP BY tm.mapzone_id
+			) subq
+			WHERE subq.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
 			EXECUTE v_querytext;
 
 			-- old zone id array

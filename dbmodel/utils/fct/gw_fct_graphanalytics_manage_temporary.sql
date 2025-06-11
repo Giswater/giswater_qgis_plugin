@@ -187,6 +187,8 @@ BEGIN
                         a.dqa_id,
                         a.muni_id,
                         a.minsector_id,
+                        a.arccat_id,
+                        a.state,
                         a.the_geom
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
@@ -378,6 +380,8 @@ BEGIN
                         a.omzone_id,
                         a.fluid_type,
                         a.muni_id,
+                        a.arccat_id,
+                        a.state,
                         a.the_geom
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
@@ -647,6 +651,8 @@ BEGIN
                     a.dma_id,
                     a.dqa_id,
                     a.muni_id,
+                    a.arccat_id,
+                    a.state,
                     a.the_geom
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
@@ -727,6 +733,8 @@ BEGIN
                     a.omzone_id,
                     a.fluid_type,
                     a.muni_id,
+                    a.arccat_id,
+                    a.state,
                     a.the_geom
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
