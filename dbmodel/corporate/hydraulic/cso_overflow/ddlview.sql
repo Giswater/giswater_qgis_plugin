@@ -33,8 +33,8 @@ SELECT d.drainzone_id,
     avg(cov.efficiency)::numeric(12,3) AS efficiency,
     d.the_geom
    FROM v_cso_drainzone_rainfall cov
-     LEFT JOIN cso_inp_system_subc cso ON cso.drainzone_id::text = cov.drainzone_id
-     LEFT JOIN drainzone d ON d.drainzone_id::text = cov.drainzone_id
+     LEFT JOIN cso_inp_system_subc cso ON cso.drainzone_id = cov.drainzone_id
+     LEFT JOIN drainzone d ON d.drainzone_id = cov.drainzone_id
      LEFT JOIN vu_node n ON cov.outfall_id = n.node_id
      JOIN macroexploitation m ON m.macroexpl_id = n.macroexpl_id
      JOIN exploitation ex ON ex.expl_id = n.expl_id
