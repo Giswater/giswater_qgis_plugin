@@ -32,13 +32,13 @@ SELECT d.drainzone_id,
     cso.eq_inhab::integer AS eq_inhab,
     avg(cov.efficiency)::numeric(12,3) AS efficiency,
     d.the_geom
-   FROM ud.v_cso_drainzone_rainfall cov
-     LEFT JOIN ud.cso_inp_system_subc cso ON cso.drainzone_id::text = cov.drainzone_id
-     LEFT JOIN ud.drainzone d ON d.drainzone_id::text = cov.drainzone_id
-     LEFT JOIN ud.vu_node n ON cov.outfall_id = n.node_id
-     JOIN ud.macroexploitation m ON m.macroexpl_id = n.macroexpl_id
-     JOIN ud.exploitation ex ON ex.expl_id = n.expl_id
-	 JOIN ud.ext_municipality e ON n.muni_id = e.muni_id
+   FROM v_cso_drainzone_rainfall cov
+     LEFT JOIN cso_inp_system_subc cso ON cso.drainzone_id::text = cov.drainzone_id
+     LEFT JOIN drainzone d ON d.drainzone_id::text = cov.drainzone_id
+     LEFT JOIN vu_node n ON cov.outfall_id = n.node_id
+     JOIN macroexploitation m ON m.macroexpl_id = n.macroexpl_id
+     JOIN exploitation ex ON ex.expl_id = n.expl_id
+	 JOIN ext_municipality e ON n.muni_id = e.muni_id
 	group by 1, 2, 3, 4, 5, 6, 7, 8, 9
 	order by 3;
 
@@ -65,5 +65,5 @@ CREATE OR REPLACE VIEW v_cso_drainzone_rainfall_tstep
     round(cso_out_vol.vol_wwtp::numeric, 3) AS vol_wwtp,
     round(cso_out_vol.vol_treated::numeric, 3) AS vol_treated,
     round(cso_out_vol.efficiency::numeric, 3) AS efficiency
-	FROM ud.cso_out_vol
+	FROM cso_out_vol
 	order by 2, 4, rf_tstep::time;
