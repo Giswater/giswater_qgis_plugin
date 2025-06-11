@@ -120,14 +120,14 @@ class Campaign:
         # Setting lists
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.ids = []
-        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
-        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
-        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
-        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
-        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.rel_list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
+        self.rel_layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
+        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         if self.project_type == 'ud':
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
-        self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
+            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+        self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
         self.excluded_layers = [
             "v_edit_arc", "v_edit_node", "v_edit_connec",
             "v_edit_gully", "v_edit_link"
@@ -204,7 +204,7 @@ class Campaign:
         tools_gw.add_icon(self.dialog.btn_expr_select, '178')
 
         self.dialog.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-        self.dialog.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.layers))
+        self.dialog.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.rel_layers))
 
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
@@ -383,7 +383,7 @@ class Campaign:
             tools_qgis.show_info("Campaign saved successfully.", dialog=self.dialog)
             self.campaign_saved = True
             self.is_new_campaign = False
-            tools_gw.remove_selection(True, layers=self.layers)
+            tools_gw.remove_selection(True, layers=self.rel_layers)
             tools_gw.reset_rubberband(self.rubber_band)
 
             # Update campaign ID in the dialog

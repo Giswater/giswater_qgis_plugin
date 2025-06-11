@@ -69,12 +69,12 @@ class AddNewLot:
             self.is_new_lot = False
             self.lot_saved = True
 
-        self.list_ids = {ft: [] for ft in ['arc', 'node', 'connec', 'gully', 'link']}
-        self.excluded_layers = [f"v_edit_{ft}" for ft in self.list_ids]
+        self.rel_list_ids = {ft: [] for ft in ['arc', 'node', 'connec', 'gully', 'link']}
+        self.excluded_layers = [f"v_edit_{ft}" for ft in self.rel_list_ids]
 
-        self.layers = {ft: tools_gw.get_layers_from_feature_type(ft) for ft in ['arc', 'node', 'connec', 'link']}
+        self.rel_layers = {ft: tools_gw.get_layers_from_feature_type(ft) for ft in ['arc', 'node', 'connec', 'link']}
         if tools_gw.get_project_type() == 'ud':
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Create dialog and load base settings
         self.dlg_lot = AddLotUi(self)
@@ -113,7 +113,7 @@ class AddNewLot:
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(self.save_lot)
         self.dlg_lot.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-        self.dlg_lot.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.layers))
+        self.dlg_lot.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.rel_layers))
 
         # Tab logic
         name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")
