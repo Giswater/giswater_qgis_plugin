@@ -184,7 +184,8 @@ class AddNewLot:
 
         response = tools_gw.execute_procedure("gw_fct_getlot", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
-            tools_qgis.show_warning("Failed to load lot form.")
+            msg = "Failed to load lot form."
+            tools_qgis.show_warning(msg)
             return
 
         form_fields = response["body"]["data"].get("fields", [])
@@ -448,8 +449,9 @@ class AddNewLot:
                 list_mandatory.append(field.get("widgetname"))
 
         if list_mandatory:
+            msg = "Some mandatory fields are missing. Please fill the required fields (marked in red)."
             tools_qgis.show_warning(
-                "Some mandatory fields are missing. Please fill the required fields (marked in red).",
+                msg,
                 dialog=self.dlg_lot
             )
             return False
@@ -476,7 +478,8 @@ class AddNewLot:
             if not from_change_tab:
                 self.dlg_lot.accept()
         else:
-            tools_qgis.show_warning("Error saving lot.")
+            msg = "Error saving lot."
+            tools_qgis.show_warning(msg)
 
     def reset_rb_list(self, rb_list):
         """Resets the main rubber band and clears all rubber band selections in the provided list,
@@ -508,9 +511,10 @@ class AddNewLot:
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QTableView.SelectRows)
 
         # Fill combo values for lot date_filter_type combo
-        date_types = [['real_startdate', 'Data inici'], ['real_enddate', 'Data fi'],
-                      ['startdate', 'Data inici planificada'],
-                      ['enddate', 'Data final planificada']]
+        date_types = [['real_startdate', tools_qt.tr("Start date", context_name="cm")],
+                      ['real_enddate', tools_qt.tr("End date", context_name="cm")],
+                      ['startdate', tools_qt.tr("Planned start date", context_name="cm")],
+                      ['enddate', tools_qt.tr("Planned end date", context_name="cm")]]
         tools_qt.fill_combo_values(self.dlg_lot_man.cmb_date_filter_type, date_types, 1, sort_combo=False)
 
         # Fill combo values for lot status (based on sys_typevalue table)
@@ -634,7 +638,8 @@ class AddNewLot:
         else:
             selected = self.dlg_lot_man.tbl_lots.selectionModel().selectedRows()
             if not selected:
-                tools_qgis.show_warning("Please select a lot to open.", dialog=self.dlg_lot_man)
+                msg = "Please select a lot to open."
+                tools_qgis.show_warning(msg, dialog=self.dlg_lot_man)
                 return
             lot_id = selected[0].data()
 
@@ -643,7 +648,8 @@ class AddNewLot:
             if lot_id > 0:
                 self.manage_lot(lot_id=lot_id, is_new=False)
         except (ValueError, TypeError):
-            tools_qgis.show_warning("Invalid lot ID.")
+            msg = "Invalid lot ID."
+            tools_qgis.show_warning(msg)
 
     def delete_lot(self):
         """Delete selected lot(s) with confirmation."""
@@ -652,9 +658,9 @@ class AddNewLot:
         if not selected:
             tools_qgis.show_warning("Select a lot to delete.", dialog=self.dlg_lot_man)
             return
-
-        msg = f"Are you sure you want to delete {len(selected)} lot(s)?"
-        if not tools_qt.show_question(msg, title="Delete Lot(s)"):
+        msg = "Are you sure you want to delete {0} lot(s)?"
+        msg_params = (len(selected),)
+        if not tools_qt.show_question(msg, msg_params=msg_params, title="Delete Lot(s)"):
             return
 
         deleted = 0
@@ -666,8 +672,9 @@ class AddNewLot:
             sql = f"DELETE FROM cm.om_campaign_lot WHERE lot_id = {lot_id}"
             if tools_db.execute_sql(sql):
                 deleted += 1
-
-        tools_qgis.show_info(f"{deleted} lot(s) deleted.", dialog=self.dlg_lot_man)
+        msg = "{0} lot(s) deleted."
+        msg_params = (deleted,)
+        tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.dlg_lot_man)
         self.filter_lot()
 
     def _update_feature_completer_lot(self, dlg):
@@ -975,12 +982,12 @@ class AddNewLot:
             if login_names_rows:
                 login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
 
-        # Create message for the question
-        msg = f"Are you sure you want to delete these records: ({ids})?."
+        # Create message for the question        
+        msg = f"{tools_qt.tr("Are you sure you want to delete these records:")} ({ids})?"
         if tablename == "cat_user" and login_names_to_drop:
-            msg += f"\\nThis will also delete the database user(s): {', '.join(login_names_to_drop)}"
-
-        answer = tools_qt.show_question(msg, "Delete records")
+            msg += f"\\n{tools_qt.tr("This will also delete the database user(s):")} {', '.join(login_names_to_drop)}"
+        title = "Delete records"
+        answer = tools_qt.show_question(msg, title=title)
 
         # Check answer
         if answer:
@@ -990,9 +997,13 @@ class AddNewLot:
                 if tablename == "cat_user":
                     for login_name in login_names_to_drop:
                         if not tools_db.execute_sql(f'DROP USER IF EXISTS "{login_name}"', commit=True):
-                            tools_qgis.show_warning(f"Failed to drop database user '{login_name}'. It may need to be removed manually.")
+                            msg = "Failed to drop database user '{0}'. It may need to be removed manually."
+                            msg_params = (login_name,)
+                            tools_qgis.show_warning(msg, msg_params=msg_params)
             else:
-                tools_qgis.show_warning(f"Failed to delete records from {tablename}.")
+                msg = "Failed to delete records from {0}."
+                msg_params = (tablename,)
+                tools_qgis.show_warning(msg, msg_params=msg_params)
 
             # Chek user role
             if self.user_data["role"] == "role_cm_admin":
@@ -1161,8 +1172,8 @@ class AddNewLot:
                 values.append(item.text())
 
         if not values:
-            message = "No records selected"
-            tools_qgis.show_warning(message)
+            msg = "No records selected"
+            tools_qgis.show_warning(msg)
 
         return values
 
@@ -1198,16 +1209,16 @@ def upsert_organization(**kwargs):
 
     rows = tools_db.get_rows(sql_name_exists, commit=True)
     if rows:
-        message = "The organization name already exists"
-        tools_qt.show_info_box(message, "Info", parameter=str(name))
+        msg = "The organization name already exists"
+        tools_qt.show_info_box(msg, "Info", parameter=str(name))
         return
 
     # Execute SQL
     status = tools_db.execute_sql(sql, commit=True)
 
     if not status:
-        message = "Error creating or updating organization"
-        tools_qgis.show_warning(message, parameter=str(name))
+        msg = "Error creating or updating organization"
+        tools_qgis.show_warning(msg, parameter=str(name))
         return
 
     # Close dialog
@@ -1234,8 +1245,8 @@ def upsert_team(**kwargs):
 
     # Validate input values
     if name == "null" or descript == "null" or org_id == '' or code == 'null':
-        message = "Missing required fields"
-        tools_qt.show_info_box(message, "Info")
+        msg = "Missing required fields"
+        tools_qt.show_info_box(msg, "Info")
         return
 
     # Validate if name already exists
@@ -1252,16 +1263,16 @@ def upsert_team(**kwargs):
 
     rows = tools_db.get_rows(sql_name_exists, commit=True)
     if rows:
-        message = "The team name already exists"
-        tools_qt.show_info_box(message, "Info", parameter=str(name))
+        msg = "The team name already exists"
+        tools_qt.show_info_box(msg, "Info", parameter=str(name))
         return
 
     # Execute SQL
     status = tools_db.execute_sql(sql, commit=True)
 
     if not status:
-        message = "Error creating or updating team"
-        tools_qgis.show_warning(message, parameter=str(name))
+        msg = "Error creating or updating team"
+        tools_qgis.show_warning(msg, parameter=str(name))
         return
 
     # Close dialog
@@ -1295,19 +1306,23 @@ def upsert_user(**kwargs):
 
     # Validate input values
     if any(value in (None, "", "null") for value in [login_name, user_name, full_name, code, descript, team_id]):
-        tools_qt.show_info_box("Missing required fields", "Info")
+        msg = "Missing required fields"
+        tools_qt.show_info_box(msg, "Info")
         return
 
     # Get team name and the corresponding role for the new/updated team
     team_name_row = tools_db.get_row(f"SELECT teamname FROM cm.cat_team WHERE team_id = {team_id}")
     if not team_name_row:
-        tools_qgis.show_warning("Selected team not found.")
+        msg = "Selected team not found."
+        tools_qgis.show_warning(msg)
         return
     new_team_name = team_name_row[0]
     new_role_name = this._get_role_from_team_name(new_team_name)
 
     if not new_role_name:
-        tools_qgis.show_warning(f"Could not determine a valid role for team '{new_team_name}'.")
+        msg = "Could not determine a valid role for team '{0}'."
+        msg_params = (new_team_name,)
+        tools_qgis.show_warning(msg, msg_params=msg_params)
         return
 
     # Validate if user name already exists
@@ -1320,14 +1335,17 @@ def upsert_user(**kwargs):
             create_sql += f" PASSWORD '{password}'"
         
         if not tools_db.execute_sql(f"{create_sql};", commit=True):
-            tools_qgis.show_warning(
-                f"Failed to create database user '{login_name}'. The user might already exist in the database.")
+            msg = "Failed to create database user '{0}'. The user might already exist in the database."
+            msg_params = (login_name,)
+            tools_qgis.show_warning(msg, msg_params=msg_params)
             return
 
         # Grant the group role to the new user
         grant_sql = f'GRANT "{new_role_name}", "role_basic" TO "{login_name}";'
         if not tools_db.execute_sql(grant_sql, commit=True):
-            tools_qgis.show_warning(f"User '{login_name}' was created, but failed to grant roles ('{new_role_name}', 'role_basic').")
+            msg = "User '{0}' was created, but failed to grant roles ('{1}', 'role_basic')."
+            msg_params = (login_name, new_role_name)
+            tools_qgis.show_warning(msg, msg_params=msg_params)
             # Continue to insert into cat_user anyway
 
         # Prepare SQL to insert user data into the application table
@@ -1343,14 +1361,17 @@ def upsert_user(**kwargs):
         old_team_id = user_data_row[1] if user_data_row else None
         
         if not original_login_name:
-            tools_qgis.show_warning("Could not find the original user to update.")
+            msg = "Could not find the original user to update."
+            tools_qgis.show_warning(msg)
             return
 
         # If the login name was changed, rename the database user first
         if original_login_name != login_name:
             rename_sql = f'ALTER USER "{original_login_name}" RENAME TO "{login_name}";'
             if not tools_db.execute_sql(rename_sql, commit=True):
-                tools_qgis.show_warning(f"Failed to rename user from '{original_login_name}' to '{login_name}'. The new name might already be in use in the database.")
+                msg = "Failed to rename user from '{0}' to '{1}'. The new name might already be in use in the database."
+                msg_params = (original_login_name, login_name)
+                tools_qgis.show_warning(msg, msg_params=msg_params)
                 return
 
         # If the user's team has changed, update their database role accordingly
@@ -1368,7 +1389,9 @@ def upsert_user(**kwargs):
         if password and password not in ('', 'null'):
             pw_change_sql = f'ALTER USER "{login_name}" WITH PASSWORD \'{password}\';'
             if not tools_db.execute_sql(pw_change_sql, commit=True):
-                tools_qgis.show_warning(f"Failed to update password for user '{login_name}'.")
+                msg = "Failed to update password for user '{0}'."
+                msg_params = (login_name,)
+                tools_qgis.show_warning(msg, msg_params=msg_params)
 
         # Grant basic role to make sure user has it
         tools_db.execute_sql(f'GRANT "role_basic" TO "{login_name}"', commit=True)
@@ -1380,14 +1403,16 @@ def upsert_user(**kwargs):
 
     rows = tools_db.get_rows(sql_name_exists, commit=True)
     if rows:
-        tools_qt.show_info_box("The user name already exists", "Info", parameter=str(user_name))
+        msg = "The user name already exists"
+        tools_qt.show_info_box(msg, "Info", parameter=str(user_name))
         return
 
     # Save the user data to the application's user table
     status = tools_db.execute_sql(sql, commit=True)
 
     if not status:
-        tools_qgis.show_warning("Error creating or updating user in cat_user table.", parameter=str(user_name))
+        msg = "Error creating or updating user in cat_user table."
+        tools_qgis.show_warning(msg, parameter=str(user_name))
         return
 
     # Close the dialog and refresh the user list

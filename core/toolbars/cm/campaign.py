@@ -53,8 +53,9 @@ class Campaign:
         self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
 
         # Populate combo date type
-        rows = [['real_startdate', 'Data inici'], ['real_enddate', 'Data fi'], ['startdate', 'Data inici planificada'],
-                ['enddate', 'Data final planificada']]
+        
+        rows = [['real_startdate', tools_qt.tr('Start date', 'cm')], ['real_enddate', tools_qt.tr('End date', 'cm')], ['startdate', tools_qt.tr('Planned start date', 'cm')],
+                ['enddate', tools_qt.tr('Planned end date', 'cm')]]
         tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
 
         # Fill combo values for campaign status (based on sys_typevalue table)
@@ -380,7 +381,8 @@ class Campaign:
         result = tools_gw.execute_procedure("gw_fct_setcampaign", body, schema_name="cm")
 
         if result.get("status") == "Accepted":
-            tools_qgis.show_info("Campaign saved successfully.", dialog=self.dialog)
+            msg = "Campaign saved successfully."
+            tools_qgis.show_info(msg, dialog=self.dialog)
             self.campaign_saved = True
             self.is_new_campaign = False
             tools_gw.remove_selection(True, layers=self.rel_layers)
@@ -402,7 +404,8 @@ class Campaign:
                 self.dialog.accept()
 
         else:
-            tools_qgis.show_warning(result.get("message", "Failed to save campaign."))
+            msg = "Failed to save campaign"
+            tools_qgis.show_warning(result.get("message", msg))
 
     def extract_campaign_fields(self, dialog):
         """Build a JSON string of field values from the campaign dialog"""
@@ -796,8 +799,10 @@ class Campaign:
 
         # Confirm deletion
         count = len(selected)
-        msg = f"Are you sure you want to delete {count} campaign(s)?"
-        if not tools_qt.show_question(msg):
+
+        msg = "Are you sure you want to delete {0} campaign(s)?"
+        msg_params = (count,)
+        if not tools_qt.show_question(msg, msg_params=msg_params):
             return
 
         success = 0
@@ -808,9 +813,9 @@ class Campaign:
             sql = f"DELETE FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
             if tools_db.execute_sql(sql):
                 success += 1
-
-        msg = f"{count} campaign(s) deleted."
-        tools_qgis.show_info(msg, dialog=self.manager_dialog)
+        msg = "{0} campaign(s) deleted."
+        msg_params = count
+        tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.manager_dialog)
         self.filter_campaigns()
 
     def open_campaign(self, index=None):
@@ -827,7 +832,8 @@ class Campaign:
         else:
             selected = self.manager_dialog.tbl_campaign.selectionModel().selectedRows()
             if not selected:
-                tools_qgis.show_warning("No campaign selected.", dialog=self.manager_dialog)
+                msg = "No campaign selected."
+                tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
 
             campaign_id = selected[0].data()

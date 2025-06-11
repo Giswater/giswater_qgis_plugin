@@ -1447,3 +1447,5 @@ class GwSchemaI18NManager:
         message = "Error near line"
         message = "EPA model finished. "
         message = "Import RPT file finished."
+        message = "Are you sure you want to delete these records:"
+        message = "This will also delete the database user(s):"
