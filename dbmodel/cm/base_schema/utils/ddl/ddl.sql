@@ -369,7 +369,7 @@ CREATE TABLE om_campaign_x_arc
 (
   id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
-  arc_id character varying(16) NOT NULL, -- fk arc
+  arc_id integer NOT NULL, -- fk arc
   code character varying(30),
   status int2,
   admin_observ text,
@@ -384,7 +384,7 @@ CREATE TABLE om_campaign_x_connec
 (
   id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
-  connec_id character varying(16) NOT NULL, -- fk connec
+  connec_id integer NOT NULL, -- fk connec
   code character varying(30),
   status int2,
   admin_observ text,
@@ -405,8 +405,8 @@ CREATE TABLE om_campaign_x_link
   status int2,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_lot_x_link_pkey PRIMARY KEY (id),
-  CONSTRAINT om_lot_x_link_un UNIQUE (campaign_id, link_id),
+  CONSTRAINT om_campaign_x_link_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_x_link_un UNIQUE (campaign_id, link_id),
   CONSTRAINT om_campaign_x_link_campaign_id_fkey FOREIGN KEY (campaign_id)
     REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -416,7 +416,7 @@ CREATE TABLE om_campaign_x_node
 (
   id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
-  node_id character varying(16) NOT NULL, -- fk node
+  node_id integer NOT NULL, -- fk node
   code character varying(30),
   status int2,
   admin_observ text,
@@ -432,7 +432,7 @@ CREATE TABLE om_campaign_x_gully
 (
   id serial4 NOT NULL,
   campaign_id integer NOT NULL, -- fk om_campaign
-  gully_id character varying(16) NOT NULL, -- fk gully
+  gully_id integer NOT NULL, -- fk gully
   code character varying(30),
   status int2,
   admin_observ text,
@@ -474,7 +474,7 @@ CREATE TABLE om_campaign_lot_x_arc
 (
   id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
-  arc_id character varying(16) NOT NULL, -- fk arc
+  arc_id integer NOT NULL, -- fk arc
   code character varying(30),
   status int2,
   org_observ text,
@@ -496,7 +496,7 @@ CREATE TABLE om_campaign_lot_x_connec
 (
   id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
-  connec_id character varying(16) NOT NULL, -- fk connec
+  connec_id integer NOT NULL, -- fk connec
   code character varying(30),
   status int2,
   org_observ text,
@@ -544,7 +544,7 @@ CREATE TABLE om_campaign_lot_x_node
 (
   id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
-  node_id character varying(16) NOT NULL, -- fk node
+  node_id integer NOT NULL, -- fk node
   code character varying(30),
   status int2,
   org_observ text,
@@ -566,7 +566,7 @@ CREATE TABLE om_campaign_lot_x_gully
 (
   id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
-  connec_id character varying(16) NOT NULL, -- fk connec
+  gully_id integer NOT NULL, -- fk connec
   code character varying(30),
   status int2,
   org_observ text,
