@@ -70,11 +70,16 @@ BEGIN
 	
 	IF v_step = 1 THEN
 			-- start build log message
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('CALCULATE COST OF RECONSTRUCTION'));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
+			
+		--INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('CALCULATE COST OF RECONSTRUCTION'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2128", "fid":"'||v_fid||'", "is_process":true, "is_header":"true"}}$$)';
 
 		IF v_result_name IN (SELECT name FROM plan_result_cat) THEN 
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('1ST. STEP Result with this name is already defined on plan_result tables.'));
+			--INSERT INTO audit_check_data (fid, error_message) 
+			--VALUES (v_fid, concat('1ST. STEP Result with this name is already defined on plan_result tables.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4006", "function":"2128", "fid":"'||v_fid||'", "is_process":true}}$$)';
 		ELSE
 			-- inserting result on table plan_result_cat
 			INSERT INTO plan_result_cat (name, result_type, coefficient, tstamp, cur_user, descript, pricecat_id) VALUES
@@ -187,9 +192,21 @@ BEGIN
 			INSERT INTO selector_plan_result (cur_user, result_id) VALUES (current_user, v_result_id) ON CONFLICT (cur_user, result_id) DO NOTHING;
 
 			-- inserting log
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '1ST. STEP executed');
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'Snapshot of values form v_plan_arc and v_plan_node have been inserted on plan_result_arc and plan_result_node tables');
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'This proces enables to execute STEP 2 in order to calculate amortized values using age,cost and acoeff (amortized rate per year)');
+			--INSERT INTO audit_check_data (fid, error_message) 
+			--VALUES (v_fid, '1ST. STEP executed');
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4008", "function":"2128", "fid":"'||v_fid||'", "is_process":true}}$$)';
+
+			--INSERT INTO audit_check_data (fid, error_message) 
+			--VALUES (v_fid, 'Snapshot of values form v_plan_arc and v_plan_node have been inserted on plan_result_arc and plan_result_node tables');
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4010", "function":"2128", "fid":"'||v_fid||'", "is_process":true}}$$)';
+
+
+			--INSERT INTO audit_check_data (fid, error_message) 
+			--VALUES (v_fid, 'This proces enables to execute STEP 2 in order to calculate amortized values using age,cost and acoeff (amortized rate per year)');
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4012", "function":"2128", "fid":"'||v_fid||'", "is_process":true}}$$)';
 		END IF;
 	ELSIF v_step = 2 THEN
 		
@@ -213,8 +230,15 @@ BEGIN
 						ELSE 0::numeric(12,2) END
 		WHERE result_id = v_result_id;
 
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '2ND STEP executed');
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'Amortized values using age,cost and acoeff have been calculated');
+		--INSERT INTO audit_check_data (fid, error_message) 
+		--VALUES (v_fid, '2ND STEP executed');
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4014", "function":"2128", "fid":"'||v_fid||'", "is_process":true}}$$)';
+
+		INSERT INTO audit_check_data (fid, error_message) 
+		VALUES (v_fid, 'Amortized values using age,cost and acoeff have been calculated');
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4016", "function":"2128", "fid":"'||v_fid||'", "is_process":true}}$$)';
 	
 	END IF;
 	
