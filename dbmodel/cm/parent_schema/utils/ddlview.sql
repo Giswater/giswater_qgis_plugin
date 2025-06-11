@@ -104,6 +104,7 @@ om_campaign_lot_x_node.update_count,
 om_campaign_lot_x_node.update_log,
 qindex1,
 qindex2,
+action, 
 node.the_geom
 FROM selector_lot, om_campaign_lot
 JOIN om_campaign_lot_x_node ON om_campaign_lot_x_node.lot_id = om_campaign_lot.lot_id
@@ -129,6 +130,7 @@ om_campaign_lot_x_arc.update_count,
 om_campaign_lot_x_arc.update_log,
 qindex1,
 qindex2,
+action, 
 arc.the_geom
 FROM selector_lot, om_campaign_lot
 JOIN om_campaign_lot_x_arc ON om_campaign_lot_x_arc.lot_id = om_campaign_lot.lot_id
@@ -154,6 +156,7 @@ om_campaign_lot_x_connec.update_count,
 om_campaign_lot_x_connec.update_log,
 om_campaign_lot_x_connec.qindex1,
 om_campaign_lot_x_connec.qindex2,
+action, 
 connec.the_geom
 FROM selector_lot, om_campaign_lot
 JOIN om_campaign_lot_x_connec ON om_campaign_lot_x_connec.lot_id = om_campaign_lot.lot_id
@@ -180,6 +183,7 @@ om_campaign_lot_x_link.update_count,
 om_campaign_lot_x_link.update_log, 	
 om_campaign_lot_x_link.qindex1,
 om_campaign_lot_x_link.qindex2,
+action, 
 link.the_geom
 FROM selector_lot, om_campaign_lot
 JOIN om_campaign_lot_x_link ON om_campaign_lot_x_link.lot_id = om_campaign_lot.lot_id

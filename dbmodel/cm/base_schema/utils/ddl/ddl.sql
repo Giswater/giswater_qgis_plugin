@@ -370,7 +370,7 @@ CREATE TABLE om_campaign_x_arc
   campaign_id integer NOT NULL, -- fk om_campaign
   arc_id character varying(16) NOT NULL, -- fk arc
   code character varying(30),
-  status integer,
+  status int2,
   admin_observ text,
   org_observ text,
   CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (id),
@@ -385,7 +385,7 @@ CREATE TABLE om_campaign_x_connec
   campaign_id integer NOT NULL, -- fk om_campaign
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
-  status integer,
+  status int2,
   admin_observ text,
   org_observ text,
   CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (id),
@@ -401,7 +401,7 @@ CREATE TABLE om_campaign_x_link
   campaign_id integer NOT NULL, -- fk om_campaign
   link_id integer NOT NULL, -- fk link
   code character varying(30),
-  status integer,
+  status int2,
   admin_observ text,
   org_observ text,
   CONSTRAINT om_lot_x_link_pkey PRIMARY KEY (id),
@@ -417,7 +417,7 @@ CREATE TABLE om_campaign_x_node
   campaign_id integer NOT NULL, -- fk om_campaign
   node_id character varying(16) NOT NULL, -- fk node
   code character varying(30),
-  status integer,
+  status int2,
   admin_observ text,
   org_observ text,
   CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (id),
@@ -433,7 +433,7 @@ CREATE TABLE om_campaign_x_gully
   campaign_id integer NOT NULL, -- fk om_campaign
   gully_id character varying(16) NOT NULL, -- fk gully
   code character varying(30),
-  status integer,
+  status int2,
   admin_observ text,
   org_observ text,
   CONSTRAINT om_campaign_x_gully_pkey PRIMARY KEY (id),
@@ -457,7 +457,7 @@ CREATE TABLE om_campaign_lot
   active boolean DEFAULT true,
   team_id integer, -- fk cat_team
   duration text,
-  status integer not NULL,
+  status int2 not NULL,
   the_geom geometry(MultiPolygon,25831),
   CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (lot_id),
   CONSTRAINT om_campaign_lot_campaign_id_fkey FOREIGN KEY (campaign_id)
@@ -475,7 +475,7 @@ CREATE TABLE om_campaign_lot_x_arc
   lot_id integer NOT NULL, -- fk om_campaign_lot
   arc_id character varying(16) NOT NULL, -- fk arc
   code character varying(30),
-  status integer,
+  status int2,
   org_observ text,
   team_observ text,
   update_at timestamp,
@@ -484,6 +484,7 @@ CREATE TABLE om_campaign_lot_x_arc
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
+  action int2,  
   CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_arc_un UNIQUE (lot_id, arc_id),
   CONSTRAINT om_campaign_lot_x_arc_lot_id_fkey FOREIGN KEY (lot_id)
@@ -496,7 +497,7 @@ CREATE TABLE om_campaign_lot_x_connec
   lot_id integer NOT NULL, -- fk om_campaign_lot
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
-  status integer,
+  status int2,
   org_observ text,
   team_observ text,
   update_at timestamp,
@@ -505,6 +506,7 @@ CREATE TABLE om_campaign_lot_x_connec
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
+  action int2,  
   CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_connec_un UNIQUE (lot_id, connec_id),
   CONSTRAINT om_campaign_lot_x_connec_lot_id_fkey FOREIGN KEY (lot_id)
@@ -519,7 +521,7 @@ CREATE TABLE om_campaign_lot_x_link
   lot_id integer NOT NULL, -- fk om_campaign_lot
   link_id integer NOT NULL, -- fk link
   code character varying(30),
-  status integer,
+  status int2,
   org_observ text,
   team_observ text,
   update_at timestamp,
@@ -528,6 +530,7 @@ CREATE TABLE om_campaign_lot_x_link
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
+  action int2, 
   CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_link_un UNIQUE (lot_id, link_id),
   CONSTRAINT om_campaign_lot_x_link_lot_id_fkey FOREIGN KEY (lot_id)
@@ -542,7 +545,7 @@ CREATE TABLE om_campaign_lot_x_node
   lot_id integer NOT NULL, -- fk om_campaign_lot
   node_id character varying(16) NOT NULL, -- fk node
   code character varying(30),
-  status integer,
+  status int2,
   org_observ text,
   team_observ text,
   update_at timestamp,
@@ -551,6 +554,7 @@ CREATE TABLE om_campaign_lot_x_node
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
+  action int2, 
   CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_node_un UNIQUE (lot_id, node_id),
   CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id)
@@ -563,7 +567,7 @@ CREATE TABLE om_campaign_lot_x_gully
   lot_id integer NOT NULL, -- fk om_campaign_lot
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
-  status integer,
+  status int2,
   org_observ text,
   team_observ text,
   update_at timestamp,
@@ -572,6 +576,7 @@ CREATE TABLE om_campaign_lot_x_gully
   update_log jsonb,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
+  action int2, 
   CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_gully_un UNIQUE (lot_id, connec_id),
   CONSTRAINT om_campaign_lot_x_gully_lot_id_fkey FOREIGN KEY (lot_id)
