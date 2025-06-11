@@ -48,7 +48,7 @@ BEGIN
     IF v_action = 'CREATE' THEN
         -- Create temporary tables
         CREATE TEMP TABLE temp_pgr_mapzone (
-            mapzone_id SERIAL NOT NULL,
+            mapzone_id int4 NOT NULL,
             the_geom geometry(Geometry, SRID_VALUE),
             CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (mapzone_id)
         );
