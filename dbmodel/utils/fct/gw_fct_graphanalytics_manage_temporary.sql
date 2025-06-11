@@ -858,7 +858,6 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_arc;
         DROP TABLE IF EXISTS temp_audit_check_data;
         DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
-        DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_pgr_minsector_graph;
         DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
