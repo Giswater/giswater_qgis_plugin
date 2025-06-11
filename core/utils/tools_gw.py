@@ -2396,6 +2396,7 @@ def toggle_visibility(widget, action, checked):
         widget.setEchoMode(QLineEdit.Password)
         action.setIcon(QIcon(os.path.join(lib_vars.plugin_dir, "icons", "dialogs", "142.png")))
 
+
 def add_tableview(complet_result, field, dialog, module=sys.modules[__name__], class_self=None):
     """
     Add widgets QTableView type.

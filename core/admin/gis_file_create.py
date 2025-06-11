@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import shutil
 import json
 # TODO: Check this - do not delete this import for the moment
 from ..utils import tools_gw  # noqa: F401
