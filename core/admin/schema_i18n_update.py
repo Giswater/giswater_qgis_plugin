@@ -38,15 +38,10 @@ class GwSchemaI18NUpdate:
         self.dlg_qm.btn_translate.setEnabled(False)
 
         # Get the project_types (ws, ud)
-        self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
-                                                        force_reload=True)
-        self.project_types = self.project_types.split(',')
-
-        # Populate combo types
+        self.tables_dic()
         self.dlg_qm.cmb_projecttype.clear()
-        for aux in self.project_types:
-            self.dlg_qm.cmb_projecttype.addItem(str(aux))
-        self.dlg_qm.cmb_projecttype.addItem("am")
+        for shcema_type in self.dbtables_dic:
+            self.dlg_qm.cmb_projecttype.addItem(shcema_type)
 
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_update_translation')
 
@@ -119,6 +114,8 @@ class GwSchemaI18NUpdate:
         rows = tools_db.get_rows(sql, commit=self.dev_commit)
         if rows is None:
             return
+        
+        print(filter_)
 
         result_list = []
         for row in rows:
@@ -129,7 +126,7 @@ class GwSchemaI18NUpdate:
             if exists and str(exists[0]) == 'True':
                 sql = f"SELECT project_type FROM {row[0]}.sys_version"
                 result = tools_db.get_row(sql)
-                if result is not None and result[0] == filter_.upper():
+                if result is not None and result[0] in [filter_.upper(), filter_.lower()]:
                     elem = [row[0], row[0]]
                     result_list.append(elem)
         if not result_list:
@@ -159,10 +156,10 @@ class GwSchemaI18NUpdate:
         # Initalize the language and the message (for errors,etc)
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
-        msg = ''
 
         # Run the updater of db_files and look at the result
         status_cfg_msg, errors = self._copy_db_files()
+        msg = f'''{tools_qt.tr('In schema')} {self.project_type}:'''
         if status_cfg_msg is True:
             msg += f'''{tools_qt.tr('Database translation successful to')} {self.lower_lang}.\n'''
             self._commit_dest()
@@ -199,7 +196,7 @@ class GwSchemaI18NUpdate:
             self.cursor_dest.execute(sql_1)
             self._commit_dest
 
-        dbtables = self.tables_dic(self.project_type)
+        dbtables = self.dbtables_dic[self.project_type]['dbtables']
         schema_i18n = "i18n"
         for dbtable in dbtables:
             dbtable = f"{schema_i18n}.{dbtable}"
@@ -778,8 +775,8 @@ class GwSchemaI18NUpdate:
         cur_dest.execute(final_query)
         conn_dest.commit()
 
-    def tables_dic(self, schema_type):
-        dbtables_dic = {
+    def tables_dic(self):
+        self.dbtables_dic = {
             "ws": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
@@ -798,9 +795,9 @@ class GwSchemaI18NUpdate:
                 "dbtables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"]
             },
             "cm": {
-                "dbtables": []  # ["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
+                "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
+                             "dbtypevalue", "dbconfig_form_fields_json"]
             },
         }
-        return dbtables_dic[schema_type]['dbtables']
 
     # endregion

@@ -830,7 +830,7 @@ class GwSchemaI18NManager:
         insert_query = ""
         for k, row in enumerate(final_rows_tot):
             row_keys = list(row.keys())[:-1]
-            if k < len(final_rows):
+            if 'project_type' in row_keys:
                 row_keys.remove('project_type')
             insert_query += f"INSERT INTO {table} ("
 
@@ -853,6 +853,8 @@ class GwSchemaI18NManager:
             # Add processed values to query
             insert_query += ", ".join(values)
             insert_query += ", 'utils');\n" if k < len(final_rows) else ");\n"
+
+            print(insert_query)
         return insert_query
 
     # endregion
@@ -994,7 +996,10 @@ class GwSchemaI18NManager:
                             key = 'msg = "'
                         match = re.search(rf'{re.escape(key)}(.*?){key[-1]}', content)
                         if match:
-                            messages.append(match.group(1))
+                            message = self._search_for_lines(match.group(1))
+                            if len(message) > 1:
+                                print(f'message- {message}')
+                            messages.extend(message)
 
         # Determine existing primary keys from the database
         primary_keys_org = []
@@ -1022,6 +1027,7 @@ class GwSchemaI18NManager:
                         print(f"Error deleting row: {e} - Query: {query}")
 
         # Insert new messages
+        
         msg = ""
         msg_params = None
         new_messages = primary_keys_final_set - primary_keys_org_set
@@ -1029,8 +1035,8 @@ class GwSchemaI18NManager:
             for message in new_messages:
                 message = message.replace("'", "''")
                 query = (f"""INSERT INTO {self.schema_i18n}.pymessage (source_code, source, ms_en_us) """
-                         f"""VALUES ('giswater', '{message}', '{message}') ON CONFLICT (source_code, source) """
-                         f"""DO UPDATE SET ms_en_us = '{message}'""")
+                        f"""VALUES ('giswater', '{message}', '{message}') ON CONFLICT (source_code, source) """
+                        f"""DO UPDATE SET ms_en_us = '{message}'""")
 
                 try:
                     self.cursor_i18n.execute(query)
@@ -1052,7 +1058,14 @@ class GwSchemaI18NManager:
     # endregion
 
     #region python functions
-    
+    def _search_for_lines(self, message):
+        if '\\n' in message:
+            print(f'message- {message.split('\\n')}')
+            return message.split('\\n')
+        else:
+            return [message]
+
+        
     def _find_files(self, path, file_type):
         """ Find all files with the given file type in the given path """
 
@@ -1449,3 +1462,12 @@ class GwSchemaI18NManager:
         message = "Import RPT file finished."
         message = "Are you sure you want to delete these records:"
         message = "This will also delete the database user(s):"
+        message = "PostgreSQL version"
+        message = "PostGis version"
+        message = "PgRouting version"
+        message = "Version"
+        message = "Schema name"
+        message = "Language"
+        message = "Date of creation"
+        message = "Date of last update"
+        message = "In schema"

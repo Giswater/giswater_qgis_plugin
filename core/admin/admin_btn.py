@@ -1242,8 +1242,9 @@ class GwAdminButton:
 
         # Check if project name is valid
         if project_name == 'null':
-            msg = "The 'Project_name' field is required."
-            tools_qt.show_info_box(msg, "Info")
+            msg = "The '{0}' field is required."
+            msg_params = ("Project_name")
+            tools_qt.show_info_box(msg, "Info", msg_params=msg_params)
             return False
         elif any(c.isupper() for c in project_name) is True:
             msg = "The project name can't have any upper-case characters"
@@ -1693,15 +1694,15 @@ class GwAdminButton:
             project_date_update = last_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
             if project_date_create == project_date_update:
                 project_date_update = ''
-            msg = (f'PostgreSQL version: {self.postgresql_version}\n'
-                   f'PostGis version: {self.postgis_version}\n'
-                   f'PgRouting version: {self.pgrouting_version}\n \n'
-                   f'Schema name: {schema_name}\n'
-                   f'Version: {self.project_version}\n'
-                   f'EPSG: {self.project_epsg}\n'
-                   f'Language: {self.project_language}\n'
-                   f'Date of creation: {project_date_create}\n'
-                   f'Date of last update: {project_date_update}\n')
+            msg = (f'''{tools_qt.tr("PostgreSQL version")}: {self.postgresql_version}\n'''
+                   f'''{tools_qt.tr("PostGis version")}: {self.postgis_version}\n'''
+                   f'''{tools_qt.tr("PgRouting version")}: {self.pgrouting_version}\n \n'''
+                   f'''{tools_qt.tr("Schema name")}: {schema_name}\n'''
+                   f'''{tools_qt.tr("Version")}: {self.project_version}\n'''
+                   f'''EPSG: {self.project_epsg}\n'''
+                   f'''{tools_qt.tr("Language")}: {self.project_language}\n'''
+                   f'''{tools_qt.tr("Date of creation")}: {project_date_create}\n'''
+                   f'''{tools_qt.tr("Date of last update")}: {project_date_update}\n''')
 
             self.software_version_info.setText(msg)
 
@@ -1884,7 +1885,7 @@ class GwAdminButton:
         self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.clicked.connect(self.on_btn_pschema_qgis_file_clicked)
 
         self.dlg_readsql_create_cm_project.setWindowTitle("Create CM Project")
-        tools_gw.open_dialog(self.dlg_readsql_create_cm_project, dlg_name='admin_cmdbproject')
+        tools_gw.open_dialog(self.dlg_readsql_create_cm_project, dlg_name='admin_cm_create')
 
     def on_btn_create_base_clicked(self):
         """Handle the 'Create Base Schema' button click."""
@@ -2404,8 +2405,10 @@ class GwAdminButton:
             tools_qt.show_info_box(msg, "Warning", msg_params=msg_params)
             return
 
-        msg = f"Are you sure you want delete schema '{project_name}' ?"
-        result = tools_qt.show_question(msg, "Info", force_action=True)
+        msg = "Are you sure you want delete schema '{0}'?"
+        msg_params = (project_name,)
+        title = "Info"
+        result = tools_qt.show_question(msg, title, force_action=True, msg_params=msg_params)
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = tools_db.execute_sql(sql)
@@ -3295,12 +3298,12 @@ class GwAdminButton:
             lib_vars.session_vars['dialog_docker'] = GwDocker(self)
             lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
             tools_gw.manage_docker_options('admin_position')
-            tools_gw.docker_dialog(self.dlg_readsql, dlg_name='admin_ui')
+            tools_gw.docker_dialog(self.dlg_readsql, dlg_name='admin')
             self.dlg_readsql.dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
             self._set_buttons_enabled()
         except Exception as e:
             tools_log.log_info(str(e))
-            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin')
 
     def _set_buttons_enabled(self):
         """ Disable/enable buttons """
