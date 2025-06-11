@@ -150,6 +150,8 @@ BEGIN
 
 	v_result := json_build_object('insert', '{}', 'update', '{}', 'delete', '{}');
 
+	DROP TABLE IF EXISTS temp_new_vals;
+
 RETURN v_result;
 
 END;
