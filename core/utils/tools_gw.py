@@ -4897,7 +4897,7 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
 
     for feature_id in ids or []:
         sql = f"""
-            INSERT INTO {tablename} (campaign_id, {feature_type}_id, code)
+            INSERT INTO {tablename} (campaign_id, {feature_type}_id, status)
             VALUES ('{campaign_id}', '{feature_id}', 1)
             ON CONFLICT DO NOTHING;
         """
@@ -4973,7 +4973,7 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
 
     for feature_id in ids or []:
         sql = f"""
-            INSERT INTO {tablename} (lot_id, {feature_type}_id, code)
+            INSERT INTO {tablename} (lot_id, {feature_type}_id, status)
             VALUES ({lot_id}, {feature_id}, 1)
             ON CONFLICT DO NOTHING;
         """
