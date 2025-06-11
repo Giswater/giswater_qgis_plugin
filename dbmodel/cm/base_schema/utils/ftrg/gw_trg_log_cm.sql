@@ -7,7 +7,9 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 
 
-CREATE OR REPLACE FUNCTION cm.gw_trg_log_cm() RETURNS trigger AS $$
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_log_cm() RETURNS trigger AS $$
 DECLARE
     v_feature_type TEXT := TG_ARGV[0];
     v_mission_type TEXT := TG_ARGV[1];
@@ -43,19 +45,19 @@ BEGIN
             RETURN NULL; -- No changes, do not log
         END IF;
         
-        INSERT INTO cm.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        INSERT INTO SCHEMA_NAME.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
         VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), old_json, new_json, current_user, now());
         RETURN NEW;
         
     ELSIF TG_OP = 'INSERT' THEN
         new_json := to_jsonb(NEW);
-        INSERT INTO cm.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        INSERT INTO SCHEMA_NAME.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
         VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), NULL, new_json, current_user, now());
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
         old_json := to_jsonb(OLD);
-        INSERT INTO cm.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        INSERT INTO SCHEMA_NAME.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
         VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), old_json, NULL, current_user, now());
         RETURN OLD;
     END IF;
