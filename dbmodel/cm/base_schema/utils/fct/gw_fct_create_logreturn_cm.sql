@@ -31,7 +31,19 @@ BEGIN
 
 	v_result = NULL;
 
-	IF v_returntype = 'point' THEN
+	IF v_returntype = 'fillExcepTables' THEN
+		DELETE FROM audit_check_data WHERE fid in (select fid from t_audit_check_data) and cur_user=current_user;
+		INSERT INTO audit_check_data SELECT * FROM t_audit_check_data;
+	END IF;
+
+	ELSIF v_returntype = 'info' THEN
+
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+		FROM (SELECT id, error_message as message FROM t_audit_check_data order by criticity desc, id asc) row;
+		v_result := COALESCE(v_result, '{}');
+		v_result := concat ('{"geometryType":"", "values":',v_result, '}');
+
+	ELSIF v_returntype = 'point' THEN
 
 		SELECT jsonb_agg(features.feature) INTO v_result
 		FROM (
