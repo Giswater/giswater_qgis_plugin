@@ -41,7 +41,8 @@ BEGIN
 	-- managing results
   	v_result := COALESCE(v_result, '{}');
 
-	--LOOP cat_feature WHERE id IN (campaign) ORDER BY node, connec, arc, link
+/*
+	LOOP cat_feature WHERE id IN (campaign) ORDER BY node, connec, arc, link
 
 		-- INSERT (action = 1);
 		INSERT INTO ws.ve_node_shutoff_valve
@@ -55,7 +56,9 @@ BEGIN
 		DELETE FROM ws.ve_node_shutoff_valve 
 		FROM cm.ws_cm_shutoff_valve v join cm.om_campaign_lot using (lot_id) where lot_id in (select lot_id from cm.om_campaign_lot where campaign_id = 9) AND action = 3; 
 
-	--END LOOP;
+	END LOOP;
+
+*/
 
 	
   	-- Control nulls
