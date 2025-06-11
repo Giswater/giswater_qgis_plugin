@@ -766,7 +766,6 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3768, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 --10/06/2025
-
 UPDATE sys_function SET function_alias = 'MASSIVE MINCUT ANALYSIS (fid 129 & 149)' WHERE function_name = 'gw_fct_massivemincut';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)

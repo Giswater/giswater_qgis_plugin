@@ -51,8 +51,9 @@ BEGIN
 	-- delete previous log results
 	DELETE FROM audit_check_data WHERE fid=358 AND cur_user=current_user;
 
-	INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('RESET USER PROFILE FUNCTION'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('---------------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+						"data":{"function":"2922", "fid":"358", "is_process":true, "is_header":"true"}}$$)';
+
 
 
 	-- check if user exists
@@ -70,7 +71,9 @@ BEGIN
 					
 				IF v_count1 = v_count2 AND v_count1 > 0 THEN
 
-					INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: User ',v_user,' have been copied from ',v_copyfromuser,' values'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+					"data":{"message":"3816", "function":"2922", "parameters":{"v_user":"'||v_user||'", "v_copyfromuser":"'||v_copyfromuser||'"}, "prefix_id":"1001", "fid":"358", "is_process":true}}$$)';
+
 
 					-- config_param_user
 					DELETE FROM config_param_user WHERE cur_user=v_user;
@@ -88,9 +91,9 @@ BEGIN
 					INSERT INTO selector_state (state_id, cur_user) SELECT state_id, v_user FROM selector_state WHERE cur_user=v_copyfromuser;
 					INSERT INTO selector_workcat (workcat_id, cur_user) SELECT workcat_id, v_user FROM selector_workcat WHERE cur_user=v_copyfromuser;
 
-					INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: User parameters and BASIC selectors have been copied (selector_state, selector_expl, selector_hydrometer, selector_workcat)'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+										"data":{"message":"3818", "function":"2922", "fid":"358", "prefix_id":"1001","is_process":true}}$$)';
 		
-
 					-- om selectors
 					IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member')) THEN
 
@@ -101,7 +104,8 @@ BEGIN
 						INSERT INTO selector_audit (fid, cur_user) SELECT fid, v_user FROM selector_audit WHERE cur_user=v_copyfromuser;
 						INSERT INTO selector_date (from_date, to_date, context, cur_user) SELECT from_date, to_date, context, v_user FROM selector_date WHERE cur_user=v_copyfromuser;	
 
-						INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: OM selectors have been copied (selector_audit, selector_date)'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+											"data":{"message":"3820", "function":"2922", "fid":"358", "prefix_id":"1001","is_process":true}}$$)';
 
 						IF v_projecttype ='UD' THEN	
 
@@ -109,12 +113,13 @@ BEGIN
 							DELETE FROM selector_mincut_result WHERE cur_user=v_user;
 							INSERT INTO selector_mincut_result (result_id, cur_user) SELECT result_id, v_user FROM selector_mincut_result WHERE cur_user=v_copyfromuser;
 
-							INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: OM-WS selectors have been copied (selector_mincut_result)'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},  "data":{"message":"3822", "function":"2922", "fid":"358", "prefix_id":"1001" "is_process":true}}$$)';
 						END IF; 
 					END IF;
 
 					IF 'role_edit' IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member')) THEN
-							INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: There is no specific selectors for role_edit'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+												"data":{"message":"3824", "function":"2922", "fid":"358", "prefix_id":"1001" "is_process":true}}$$)';
 					END IF;
 					
 					-- epa selectors
@@ -130,7 +135,8 @@ BEGIN
 						INSERT INTO selector_rpt_main (result_id, cur_user) SELECT result_id, v_user FROM selector_rpt_main WHERE cur_user=v_copyfromuser;
 						INSERT INTO selector_sector (sector_id, cur_user) SELECT sector_id, v_user FROM selector_sector WHERE cur_user=v_copyfromuser;
 						
-						INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: EPA selectors have been copied (selector_sector, selector_rpt_main, selector_inp_result, selector_rpt_compare)'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+											"data":{"message":"3826", "function":"2922", "fid":"358", "prefix_id":"1001" "is_process":true}}$$)';
 
 						IF v_projecttype ='UD' THEN	
 						
@@ -140,7 +146,8 @@ BEGIN
 							INSERT INTO selector_rpt_main_tstep (resultdate, resulttime, cur_user) SELECT resultdate, resulttime, v_user FROM selector_rpt_main_tstep WHERE cur_user=v_copyfromuser;
 							INSERT INTO selector_rpt_compare_tstep (resultdate, resulttime, cur_user) SELECT resultdate, resulttime, v_user FROM selector_rpt_compare_tstep WHERE cur_user=v_copyfromuser;
 
-							INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: EPA-UD selectors have been copied (selector_rpt_main_tstep, selector_rpt_compare_tstep)'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+												"data":{"message":"3828", "function":"2922", "fid":"358", "prefix_id":"1001", "is_process":true}}$$)';
 
 						ELSE
 							DELETE FROM selector_inp_dscenario WHERE cur_user=v_user;
@@ -153,7 +160,8 @@ BEGIN
 							INSERT INTO selector_rpt_main_tstep (timestep, cur_user) SELECT timestep, v_user FROM selector_rpt_main_tstep WHERE cur_user=v_copyfromuser;
 							INSERT INTO selector_rpt_compare_tstep (timestep, cur_user) SELECT timestep, v_user FROM selector_rpt_compare_tstep WHERE cur_user=v_copyfromuser;
 
-							INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: EPA-WS selectors have been copied (selector_inp_dscenario, selector_rpt_compare_tstep, selector_rpt_main_tstep)'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+												"data":{"message":"3830", "function":"2922", "fid":"358", "prefix_id":"1001", "is_process":true}}$$)';
 
 						END IF;
 
@@ -168,19 +176,24 @@ BEGIN
 						INSERT INTO selector_plan_result (result_id, cur_user) SELECT result_id, v_user FROM selector_plan_result WHERE cur_user=v_copyfromuser;
 						INSERT INTO selector_psector (psector_id, cur_user) SELECT psector_id, v_user FROM selector_psector WHERE cur_user=v_copyfromuser;
 
-						INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: Plan selectors have been copied (selector_plan_result,selector_psector)'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+											"data":{"message":"3832", "function":"2922", "fid":"358", "prefix_id":"1001", "is_process":true}}$$)';
 
 					END IF;					
 
 				ELSE
 					-- Destination user and copied user has not the same role
-					INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR-358: User and copied User has not the same role'));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+										"data":{"message":"3834", "function":"2922", "fid":"358", "prefix_id":"1003", "is_process":true}}$$)';
+
 					v_level = 2;
 					v_message = 'Destination user and copied user has not the same role';
 				END IF;
 			ELSE
 				-- Destination user and copied user has not the same role
-				INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR-358: Copied user does not exists'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+									"data":{"message":"3836", "function":"2922", "fid":"358", "prefix_id":"1003", "is_process":true}}$$)';
+
 				v_level = 2;
 				v_message = 'From user does not exists';
 			END IF;
@@ -205,15 +218,19 @@ BEGIN
 			INSERT INTO selector_state (state_id, cur_user) SELECT 1, v_user FROM value_state LIMIT 1;
 			INSERT INTO selector_hydrometer (state_id, cur_user) SELECT id, v_user FROM ext_rtc_hydrometer_state;
 
-			INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: User ',v_user,' have been reset'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+								"data":{"message":"3838", "function":"2922", "parameters":{"v_user":"'||v_user||'"},"fid":"358", "prefix_id":"1001", "is_process":true}}$$)';
 
-			INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: User parameters and BASIC selectors have been reset (selector_state, selector_expl, selector_hydrometer, selector_workcat)'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+								"data":{"message":"3840", "function":"2922", "fid":"358", "prefix_id":"1001", "is_process":true}}$$)';
 			
 		END IF;
 		
 	ELSE
 		-- User does not exists
-		INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR-358: User does not exists'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+							"data":{"message":"3842", "function":"2922","fid":"358", "prefix_id":"1003", "is_process":true}}$$)';
+
 		v_level = 2;
 		v_message = 'User does not exists';
 	END IF;	

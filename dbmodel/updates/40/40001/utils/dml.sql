@@ -2008,3 +2008,48 @@ VALUES(4132, 'All layers have been added by current user', null, 0, true, 'utils
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4134, 'Set feature state = 1 for addschema and user', null, 0, true, 'utils', 'core', 'AUDIT');
+
+--11/06/2025
+UPDATE sys_function SET function_alias = 'RESET USER PROFILE FUNCTION' WHERE function_name = 'gw_fct_admin_role_resetuserprofile'; 
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES (3816, 'INFO: User %v_user% have been copied from %v_copyfromuser% values', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES (3818, 'INFO: User parameters and BASIC selectors have been copied (selector_state, selector_expl, selector_hydrometer, selector_workcat)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3820, 'INFO: OM selectors have been copied (selector_audit, selector_date)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES (3822, 'INFO: OM-WS selectors have been copied (selector_mincut_result)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES (3824, 'INFO: There is no specific selectors for role_edit', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES (3826, 'INFO: EPA selectors have been copied (selector_sector, selector_rpt_main, selector_inp_result, selector_rpt_compare)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES (3828, 'INFO: EPA-UD selectors have been copied (selector_rpt_main_tstep, selector_rpt_compare_tstep)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3830, 'INFO: EPA-WS selectors have been copied (selector_inp_dscenario, selector_rpt_compare_tstep, selector_rpt_main_tstep)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES (3832, 'INFO: Plan selectors have been copied (selector_plan_result, selector_psector)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3834, 'ERROR-358: User and copied User has not the same role', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3836, 'ERROR-358: Copied user does not exist', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3838, 'INFO: User %v_user% have been reset', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3840, 'INFO: User parameters and BASIC selectors have been reset (selector_state, selector_expl, selector_hydrometer, selector_workcat)', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3842, 'ERROR-358: User does not exist', null, 0, true, 'utils', 'core', 'AUDIT');
