@@ -300,6 +300,7 @@ CREATE TABLE om_reviewclass_x_object
 (
   reviewclass_id integer NOT NULL, -- fk om_reviewclass
   object_id text NOT NULL,
+  orderby int2,
   active boolean DEFAULT true,
   CONSTRAINT om_reviewclass_x_object_pkey PRIMARY KEY (reviewclass_id, object_id)
 );

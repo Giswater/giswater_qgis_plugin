@@ -12,9 +12,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_cm.gw_fct_cm_integrate_production($${"data":{"parameters":{"campaignId":3}}}$$)
-
-
+SELECT ws_cm.gw_fct_cm_integrate_production($${"data":{"parameters":{"campaignId":9}}}$$)
 */
 
 DECLARE
@@ -26,41 +24,103 @@ v_result_point json;
 v_error_context text;
 v_version text;
 v_msgerr json;
+v_catfeature record;
+v_cmschema text;
+v_parentschema text;
+v_querytext text;
+v_column_list text;
+v_update_list text;
+
 
 BEGIN
-
-  	-- Search path
-  	SET search_path = "ws_cm", public;
-
+ 
+   	SET search_path = "PARENT_SCHEMA", public;
+	v_cmschema = 'SCHEMA_NAME';
+   	v_parentschema = 'PARENT_SCHEMA';
+  
   	-- select version
   	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-
+  
   	-- getting input data
-  	v_campaign :=  (((p_data ->>'data')::json->>'parameters')::json->>'campaignId')::boolean;
+  	v_campaign :=  (((p_data ->>'data')::json->>'parameters')::json->>'campaignId')::integer;
+	 
+  	v_querytext=
+  	'SELECT object_id, feature_type, 
+	child_layer as target_layer, 
+	lower(concat('''||v_parentschema||'_'',object_id)) as source_layer,
+	lower(concat(''om_campaign_lot_x_'',feature_type)) as campaign_layer,
+	lower(concat(feature_type,''_id'')) as column_id
+	from '||v_cmschema||'.om_reviewclass_x_object 
+	join '||v_parentschema||'.cat_feature on id = object_id 
+	join '||v_cmschema||'.om_campaign_review using (reviewclass_id)
+	join '||v_cmschema||'.om_campaign using (campaign_id) 
+	WHERE campaign_id = 9 ORDER BY orderby';
+  
+	raise notice 'v_querytext %', v_querytext;
 	
-	-- managing results
-  	v_result := COALESCE(v_result, '{}');
-
-/*
-	LOOP cat_feature WHERE id IN (campaign) ORDER BY node, connec, arc, link
-
-		-- INSERT (action = 1);
-		INSERT INTO ws.ve_node_shutoff_valve
-		select v.* from cm.ws_cm_shutoff_valve v join cm.om_campaign_lot using (lot_id) where lot_id in (select lot_id from cm.om_campaign_lot where campaign_id = 9) AND action = 1;
-	
-		-- UPDATE (action = 2)
-		UPDATE ws.ve_node_shutoff_valve 
-		FROM cm.ws_cm_shutoff_valve v join cm.om_campaign_lot using (lot_id) where lot_id in (select lot_id from cm.om_campaign_lot where campaign_id = 9) AND action = 2;
+	FOR v_catfeature IN execute v_querytext
+	LOOP
 		
-		-- DELETE (action = 3)
-		DELETE FROM ws.ve_node_shutoff_valve 
-		FROM cm.ws_cm_shutoff_valve v join cm.om_campaign_lot using (lot_id) where lot_id in (select lot_id from cm.om_campaign_lot where campaign_id = 9) AND action = 3; 
+		-- insert (action = 1);
+		-- get columns excluding those are not used
+		SELECT string_agg('s.' || quote_ident(column_name), ', ')
+	    INTO v_column_list
+	    FROM information_schema.columns
+	    WHERE table_name = v_catfeature.source_layer
+	      AND table_schema = v_cmschema 
+	      AND column_name not IN ('id','lot_id');
+	    
+	     -- set querytext
+	     v_querytext := 
+        'INSERT INTO ' || v_catfeature.target_layer || ' ' ||
+        'SELECT ' || v_column_list || ' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
+        'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
+        'USING (' || v_catfeature.column_id || ') ' ||
+        'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
+
+		raise notice 'v_querytext %', v_querytext;
+		execute v_querytext;
+	
+	    -- update (action = 2)
+		-- get columns excluding those are not used
+        SELECT string_agg(format('%I = s.%I', column_name, column_name), ', ')
+	    INTO v_update_list
+	    FROM information_schema.columns
+	    WHERE table_name = v_catfeature.target_layer
+	      AND table_schema = v_parentschema;
+	    
+	     
+	    v_querytext := 
+        'UPDATE ' || v_catfeature.target_layer || ' t SET ' || v_update_list ||
+        ' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
+        'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
+        'USING (' || v_catfeature.column_id || ') ' ||
+        'WHERE t.' || v_catfeature.column_id || ' = s.' || v_catfeature.column_id ||
+        ' AND l.action = 2 AND l.lot_id IN (' ||
+            'SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign ||
+        ');';
+	
+
+		raise notice 'v_querytext %', v_querytext;
+		execute v_querytext;
+	
+		-- delete (action = 3)
+		v_querytext = 
+		'DELETE FROM ' || v_catfeature.target_layer ||
+		' WHERE ' || v_catfeature.column_id || ' IN (SELECT ' || v_catfeature.column_id || 
+		' FROM ' || v_cmschema || '.' || v_catfeature.source_layer ||' s ' ||
+        ' JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
+        ' USING (' || v_catfeature.column_id || ') ' ||
+        ' WHERE action = 3 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || '));';
+
+		raise notice 'v_querytext %', v_querytext;	
+		execute v_querytext;
 
 	END LOOP;
 
-*/
+	-- managing results
+  	v_result := COALESCE(v_result, '{}');
 
-	
   	-- Control nulls
   	v_result_info := COALESCE(v_result_info, '{}');
   	v_result_point := COALESCE(v_result_point, '{}');
@@ -74,9 +134,9 @@ BEGIN
   	    '}')::json, 3426, null, null, null);
 
 
-  	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
-	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
+  	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	--RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;
 $BODY$
