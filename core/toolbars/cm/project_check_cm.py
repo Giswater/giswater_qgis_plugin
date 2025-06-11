@@ -15,7 +15,7 @@ from qgis.core import Qgis
 
 from ...threads.task import GwTask
 from ...utils import tools_gw
-from ....libs import lib_vars, tools_qgis, tools_log, tools_os
+from ....libs import lib_vars, tools_qgis, tools_log, tools_os, tools_qt
 
 
 class GwProjectCheckCMTask(GwTask):
@@ -67,32 +67,22 @@ class GwProjectCheckCMTask(GwTask):
 
         super().finished(result)
 
-        if result and not self.isCanceled() and self.result_data and self.log_widget:
-            self.log_widget.clear()  # Clear previous logs
-            checks = self.result_data.get('checks', [])
-            if not checks:
-                self.log_widget.setText("Project check returned no results.")
-            else:
-                for check in checks:
-                    check_name = check.get('checkName', 'Unnamed Check')
-                    # The result data is nested twice
-                    inner_result = check.get('result', {}).get('result', [])
-                    
-                    if not inner_result:
-                        self.log_widget.append(f"<b>{check_name}:</b> OK")
-                    else:
-                        self.log_widget.append(f"<b>{check_name}:</b>")
-                        for item in inner_result:
-                            self.log_widget.append(f"- {item}")
-                    self.log_widget.append("")  # Add a blank line for readability
-        elif not self.log_widget:
-            print("FATAL ERROR: Log widget object was not passed to the task.")
+        self.dialog.progressBar.setVisible(False)
 
-        # Notify the UI that the task is completely finished
-        self.task_finished.emit()
+        # Handle exception
+        if self.exception is not None:
+            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
+            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
+            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
+            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            title = "Key on returned json from ddbb is missed."
+            tools_qt.show_exception_message(title, msg)
+            return
 
         # Show dialog with audit check project result
         self._show_check_project_result(self.result_data)
+
+        self.setProgress(100)
 
     def fill_check_project_table(self, layers, init_project):
         """ Fill table 'audit_check_project' table with layers data """
@@ -195,19 +185,13 @@ class GwProjectCheckCMTask(GwTask):
         """ Show dialog with audit check project results """
 
         # Handle failed results
-        if not result or result.get('status') == 'Failed':
+        if result.get('status') == 'Failed':
             tools_gw.manage_json_exception(result)
             return False
 
-        # Extract and combine all log messages from the different categories
-        log_data = result['body']['data']
-        all_logs = []
-        for category in ['info', 'point', 'line', 'polygon']:
-            if category in log_data and log_data[category]:
-                all_logs.extend(log_data[category])
+        # Call `fill_tab_log()` directly, no need to store variables
+        tools_gw.fill_tab_log(self.dialog, result['body']['data'], reset_text=False)
 
-        # Call `fill_tab_log()` with the combined list of logs
-        tools_gw.fill_tab_log(self.dialog, all_logs, reset_text=False)
 
     def _add_selected_layers(self, dialog, m_layers):
         """ Receive a list of layers, look for the checks associated with each layer and if they are checked,
@@ -245,6 +229,6 @@ class GwProjectCheckCMTask(GwTask):
                             tools_qgis.create_qml(layer, qml)
                 tools_qgis.set_layer_visible(layer)
 
-        tools_gw.close_dialog(self.dlg_audit_project)
+        tools_gw.close_dialog(self.dialog)
 
     # endregion
