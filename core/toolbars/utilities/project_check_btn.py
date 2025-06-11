@@ -98,8 +98,8 @@ class GwProjectCheckButton(GwAction):
 
         self.project_check_task = GwProjectCheckTask('check_project', params)
 
-        # After `GwProjectCheckTask` completes, execute `gw_fct_setcheckdatabase`
-        self._execute_checkdatabase()
+        # Connect task completion to execute checkdatabase
+        self.project_check_task.taskCompleted.connect(self._execute_checkdatabase)
 
         QgsApplication.taskManager().addTask(self.project_check_task)
         QgsApplication.taskManager().triggerTask(self.project_check_task)
