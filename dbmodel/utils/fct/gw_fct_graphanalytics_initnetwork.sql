@@ -70,7 +70,7 @@ BEGIN
     v_querytext = '
     WITH connectedcomponents AS (
         SELECT * FROM pgr_connectedcomponents($q$
-            SELECT arc_id::int AS id, node_1::int AS source, node_2::int AS target, 1 AS cost
+            SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost
             FROM v_temp_arc
         $q$)
     ),
@@ -80,13 +80,13 @@ BEGIN
         WHERE EXISTS (
             SELECT 1
             FROM v_temp_node vtn
-            WHERE c.node = vtn.node_id::int
+            WHERE c.node = vtn.node_id
             AND vtn.expl_id::text = ANY (''' || v_expl_id_array || ''')
         )
         GROUP BY c.component
     )
     INSERT INTO temp_pgr_node (node_id)
-    SELECT c.node::int4
+    SELECT c.node
     FROM connectedcomponents c
     WHERE EXISTS (
         SELECT 1
