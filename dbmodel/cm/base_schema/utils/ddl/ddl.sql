@@ -492,7 +492,7 @@ CREATE TABLE om_campaign_lot_x_arc
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2, 
-  the_geom geometry(LINESTRING, SRID_VALUE)  
+  the_geom geometry(LINESTRING, SRID_VALUE),
   CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_arc_un UNIQUE (lot_id, arc_id),
   CONSTRAINT om_campaign_lot_x_arc_lot_id_fkey FOREIGN KEY (lot_id)
@@ -515,7 +515,7 @@ CREATE TABLE om_campaign_lot_x_connec
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2,  
-  the_geom geometry(POINT, SRID_VALUE)
+  the_geom geometry(POINT, SRID_VALUE),
   CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_connec_un UNIQUE (lot_id, connec_id),
   CONSTRAINT om_campaign_lot_x_connec_lot_id_fkey FOREIGN KEY (lot_id)
@@ -540,7 +540,7 @@ CREATE TABLE om_campaign_lot_x_link
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2, 
-  the_geom geometry(LINESTRING, SRID_VALUE)
+  the_geom geometry(LINESTRING, SRID_VALUE),
   CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_link_un UNIQUE (lot_id, link_id),
   CONSTRAINT om_campaign_lot_x_link_lot_id_fkey FOREIGN KEY (lot_id)
@@ -565,7 +565,7 @@ CREATE TABLE om_campaign_lot_x_node
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2, 
-  the_geom geometry(POINT, SRID_VALUE)
+  the_geom geometry(POINT, SRID_VALUE),
   CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_node_un UNIQUE (lot_id, node_id),
   CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id)
@@ -588,7 +588,7 @@ CREATE TABLE om_campaign_lot_x_gully
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   action int2, 
-  the_geom geometry(POINT, SRID_VALUE)
+  the_geom geometry(POINT, SRID_VALUE),
   CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (id),
   CONSTRAINT om_campaign_lot_x_gully_un UNIQUE (lot_id, connec_id),
   CONSTRAINT om_campaign_lot_x_gully_lot_id_fkey FOREIGN KEY (lot_id)
