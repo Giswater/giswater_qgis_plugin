@@ -2065,7 +2065,23 @@ VALUES (3904, 'Migration mode activated. Topocontrol is disabled', null, 0, true
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3906, 'Work mode activated. Topocontrol is enabled', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'IMPORT FLOWMETER AGGREGATED VALUES FILE' WHERE function_name = 'gw_fct_import_scada_flowmeteragg_values';
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3908, 'Reading values from temp_csv table -> Done!', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3910, 'Inserting values on ext_rtc_scada_x_data table -> Done!', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3912, 'Deleting values from temp_csv -> Done!', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3914, 'Refactorize value to one value per day -> Done!', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3916, 'Process finished with %i% rows inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3918, 'Data from %v_count% scada tags have been imported.', null, 0, true, 'utils', 'core', 'AUDIT');
 

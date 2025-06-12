@@ -46,12 +46,12 @@ BEGIN
 
 	-- get system parameters
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-   
+
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
 	DELETE FROM temp_data;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT FLOWMETER AGGREGATED VALUES FILE'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3272", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "is_process":true, "is_header":"true"}}$$)';
 
 	-- refactoring data on temp csv
 	FOR v_addfields IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
@@ -78,39 +78,50 @@ BEGIN
 		IF v_loop_numdays IS NOT NULL THEN  -- excluding by this way last row wich from temp_csv
 			FOR n IN i..v_loop_numdays
 			LOOP
-				INSERT INTO temp_data (feature_id, date_value, float_value, int_value, text_value, log_message) 
-				VALUES (v_addfields.csv2, v_currentdate + n, ((v_nextvol -v_currentvol)/(v_volume_numdays))::numeric(12,4), 
+				INSERT INTO temp_data (feature_id, date_value, float_value, int_value, text_value, log_message)
+				VALUES (v_addfields.csv2, v_currentdate + n, ((v_nextvol -v_currentvol)/(v_volume_numdays))::numeric(12,4),
 				v_addfields.csv5::integer, v_addfields.csv6::text, v_addfields.csv1);
-			END LOOP;	
+			END LOOP;
 		END IF;
 	END LOOP;
 
 	-- mapping values on table
 	INSERT INTO ext_rtc_scada_x_data SELECT log_message, feature_id, date_value::date, float_value, int_value, text_value  FROM temp_data;
-	
+
 	-- couting
 	SELECT count(*) INTO v_count FROM (SELECT DISTINCT csv1 FROM temp_csv WHERE cur_user=current_user AND fid = v_fid)a;
 	SELECT count(*) INTO i FROM (SELECT feature_id FROM temp_data)a;
 
 
 	-- manage log (fid: v_fid)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done!'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_rtc_scada_x_data table -> Done!'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Deleting values from temp_csv -> Done!'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Refactorize value to one value per day -> Done!'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished with ',i, ' rows inserted.'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Data from ',v_count, ' scada tags have been imported.'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3908", "function":"3272", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3910", "function":"3272", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3912", "function":"3272", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3914", "function":"3272", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3916", "function":"3272", "parameters":{"i":"'||i||'"}, "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3918", "function":"3272", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
 
 	-- get log (fid: v_fid)
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-			
+
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
- 
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"Process executed"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
