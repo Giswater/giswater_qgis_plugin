@@ -874,8 +874,9 @@ class GwSchemaI18NManager:
         # Determine the key and find the messages
         processed_entries = {}  # Use a dictionary to store unique entries
         keys = ["<string>", "<widget", 'name=']
+        avoid_keys = ["<action name="]
         for file in files:
-            coincidencias = self._search_lines(file, keys[0])
+            coincidencias = self._search_lines(file, keys[0], avoid_keys)
             if coincidencias:
                 for num_line, content in coincidencias:
                     dialog_name, toolbar_name, source = self._search_dialog_info(file, keys[1], keys[2], num_line)
@@ -1081,7 +1082,7 @@ class GwSchemaI18NManager:
         return py_files
 
 
-    def _search_lines(self, file, key):
+    def _search_lines(self, file, key, avoid_keys=None):
         """ Search for the lines with the key in the file """
 
         found_lines = []
@@ -1110,6 +1111,8 @@ class GwSchemaI18NManager:
                                 # Begin multi-line
                                 in_multiline = True
                                 full_text = line
+                    elif avoid_keys and any(avoid_key in line for avoid_key in avoid_keys):
+                        continue
 
         except FileNotFoundError:
             msg = "File not found: {0}"

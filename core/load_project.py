@@ -337,7 +337,7 @@ class GwLoadProject(QObject):
                       "which isn't. To do this, you need to configure the QGIS project setting this project's "
                       "variables: {1} and {2}.")
                 msg_params = ("v_edit_node", "gwMainSchema", "gwAddSchema")
-                tools_qt.show_info_box(msg)
+                tools_qt.show_info_box(msg, msg_params=msg_params)
                 return False
 
             # If there are layers with a different schema, the one that the user has in the project variable

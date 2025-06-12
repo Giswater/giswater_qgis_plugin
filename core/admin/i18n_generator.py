@@ -109,7 +109,6 @@ class GwI18NGenerator:
 
         self._create_path_dic()
         for type_db_file in self.path_dic:
-
             if tools_qt.is_checked(self.dlg_qm, self.path_dic[type_db_file]['checkbox']):
                 status_all_db_msg, dbtable = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
                 if status_all_db_msg is True:
