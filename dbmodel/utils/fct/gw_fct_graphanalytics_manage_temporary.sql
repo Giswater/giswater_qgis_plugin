@@ -141,6 +141,18 @@ BEGIN
             CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
 
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_edges (
+                pgr_arc_id INT8 NOT NULL,
+                graph_delimiter VARCHAR(30),
+                minsector_1 INT8 NOT NULL,
+                minsector_2 INT8 NOT NULL,
+                "cost" FLOAT8 NULL,
+                reverse_cost FLOAT8 NULL,
+                CONSTRAINT temp_pgr_minsector_edges_pkey PRIMARY KEY (pgr_arc_id)
+            );
+            CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_1_idx ON temp_pgr_minsector_edges USING btree (minsector_1);
+            CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_2_idx ON temp_pgr_minsector_edges USING btree (minsector_2);
+
         END IF;
 
         -- Create temporary views
@@ -854,7 +866,6 @@ BEGIN
         v_return_message = 'The temporary tables/views have been created successfully';
     ELSIF v_action = 'DROP' THEN
 
-        DROP VIEW IF EXISTS temp_pgr_minsector_old;
         -- Drop temporary tables
         DROP TABLE IF EXISTS temp_pgr_mapzone;
         DROP TABLE IF EXISTS temp_pgr_node;
@@ -865,6 +876,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_minsector_mincut;
+        DROP TABLE IF EXISTS temp_pgr_minsector_edges;
 
         -- Drop temporary views
         DROP VIEW IF EXISTS v_temp_node;
@@ -873,6 +885,7 @@ BEGIN
         DROP VIEW IF EXISTS v_temp_gully;
         DROP VIEW IF EXISTS v_temp_link_connec;
         DROP VIEW IF EXISTS v_temp_link_gully;
+        DROP VIEW IF EXISTS temp_pgr_minsector_old;
 
         v_return_message = 'The temporary tables have been dropped successfully';
     END IF;
