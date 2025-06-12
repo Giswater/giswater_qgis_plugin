@@ -2056,3 +2056,16 @@ VALUES (3840, 'INFO: User parameters and BASIC selectors have been reset (select
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3842, 'ERROR-358: User does not exist', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'TOPOCONTROL FOR DATA MIGRATION' WHERE function_name = 'gw_fct_admin_manage_migra';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3904, 'Migration mode activated. Topocontrol is disabled', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3906, 'Work mode activated. Topocontrol is enabled', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
