@@ -383,8 +383,7 @@ BEGIN
     UPDATE temp_pgr_arc a SET mapzone_id = n.mapzone_id
     FROM temp_pgr_node n
     WHERE a.pgr_node_1 = n.pgr_node_id
-    AND a.arc_id IS NOT NULL
-    AND a.pgr_node_2 IS NOT NULL;
+    AND a.arc_id IS NOT NULL;
 
     INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2)
     SELECT COALESCE(n1.node_id, n2.node_id), n1.mapzone_id, n2.mapzone_id
