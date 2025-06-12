@@ -840,7 +840,7 @@ BEGIN
         END IF;
 
         IF v_fct_name = 'MINSECTOR' THEN
-            CREATE TEMPORARY VIEW IF NOT EXISTS temp_pgr_minsector_old AS
+            CREATE OR REPLACE TEMPORARY VIEW temp_pgr_minsector_old AS
             SELECT DISTINCT v.minsector_id
             FROM temp_pgr_arc t
             JOIN v_temp_arc v USING (arc_id)

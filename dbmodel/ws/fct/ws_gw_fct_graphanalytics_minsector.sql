@@ -414,7 +414,7 @@ BEGIN
 
 	-- Update minsector temporary exploitation
     UPDATE temp_pgr_minsector t
-    SET expl_id = sub.expl_id_arr
+    SET expl_id = sub.expl_id_arr,
     dma_id = sub.dma_id_arr,
     dqa_id = sub.dqa_id_arr,
     muni_id = sub.muni_id_arr,
