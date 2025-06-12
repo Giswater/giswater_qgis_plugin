@@ -22,8 +22,8 @@ SELECT SCHEMA_NAME.gw_fct_mincut('134706', 'arc', -1, false)
 
 DECLARE
 
-node_1_aux text;
-node_2_aux text;
+node_1_aux integer;
+node_2_aux integer;
 controlValue integer;
 exists_id text;
 polygon_aux public.geometry;
@@ -100,11 +100,11 @@ BEGIN
 	END IF;
 
 	IF type_element_arg='node' OR type_element_arg='NODE' THEN
-		SELECT expl_id INTO expl_id_arg FROM node WHERE node_id=element_id_arg;
-		SELECT muni_id INTO v_muni_id FROM node WHERE node_id=element_id_arg;
+		SELECT expl_id INTO expl_id_arg FROM node WHERE node_id::text=element_id_arg;
+		SELECT muni_id INTO v_muni_id FROM node WHERE node_id::text=element_id_arg;
 	ELSE
-		SELECT expl_id INTO expl_id_arg FROM arc WHERE arc_id=element_id_arg;
-		SELECT muni_id INTO v_muni_id FROM arc WHERE arc_id=element_id_arg;
+		SELECT expl_id INTO expl_id_arg FROM arc WHERE arc_id::text=element_id_arg;
+		SELECT muni_id INTO v_muni_id FROM arc WHERE arc_id::text=element_id_arg;
 	END IF;
 
 	SELECT macroexpl_id INTO macroexpl_id_arg FROM exploitation WHERE expl_id=expl_id_arg;
@@ -168,7 +168,7 @@ BEGIN
 	-- The element to isolate could be an arc or a node
 	IF type_element_arg = 'arc' OR type_element_arg='ARC' THEN
 
-		IF (SELECT state FROM arc WHERE (arc_id = element_id_arg))=0 THEN
+		IF (SELECT state FROM arc WHERE (arc_id::text = element_id_arg))=0 THEN
 			v_querystring = 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3002", "function":"2304","parameters":{"element_id":"'||element_id_arg::text||'"}, "is_process":true}}$$);';
 			v_debug_vars := json_build_object('element_id_arg', element_id_arg);
@@ -179,12 +179,12 @@ BEGIN
 
 		-- Check an existing arc
 		SELECT COUNT(*) INTO controlValue FROM v_edit_arc
-		WHERE (arc_id = element_id_arg) AND (is_operative IS TRUE);
+		WHERE (arc_id::text = element_id_arg) AND (is_operative IS TRUE);
 
 		IF controlValue = 1 THEN
 
 			-- Select public.geometry
-			SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+			SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id::text = element_id_arg;
 
 			-- call engine to determinate the isolated area
 			IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
@@ -197,10 +197,10 @@ BEGIN
 
 				-- insert the initial arc
 				INSERT INTO om_mincut_arc (arc_id, the_geom, result_id)
-				SELECT arc_id, the_geom, result_id_arg FROM arc WHERE arc_id = element_id_arg;
+				SELECT arc_id, the_geom, result_id_arg FROM arc WHERE arc_id::text = element_id_arg;
 
 				-- Run for extremes node
-				SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+				SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id::text = element_id_arg;
 
 				IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
 					v_querystring = 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

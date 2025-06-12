@@ -30,15 +30,12 @@ DECLARE
 v_class text = 'MINCUT';
 v_feature record;
 v_data json;
-v_arcid text;
 v_mincutid integer;
 v_mincutstep integer;
-v_arc text;
+v_arc integer;
 v_querytext text;
 affected_rows numeric;
 cont1 integer default 0;
-v_arctwin text;
-v_nodetwin text;
 v_checkvalve record;
 v_isrecursive boolean;
 
@@ -136,7 +133,7 @@ BEGIN
 		AND active;
 
 		-- set the starting elements
-		UPDATE temp_anlgraph SET water=1 , flag = 1 WHERE arc_id::text IN (SELECT arc_id FROM temp_arc WHERE result_id = v_mincutid::text);
+		UPDATE temp_anlgraph SET water=1 , flag = 1 WHERE arc_id IN (SELECT arc_id FROM temp_arc WHERE result_id = v_mincutid::text);
 
 	END IF;
 
@@ -155,11 +152,10 @@ BEGIN
 	IF v_mincutstep = 1 THEN
 
 		UPDATE temp_anlgraph SET water=0 WHERE arc_id IN (
-
 			SELECT distinct (t.arc_id) FROM temp_anlgraph t JOIN
 			(SELECT node_1 AS node_id, arc_id FROM temp_anlgraph WHERE arc_id = v_arc UNION SELECT node_2, arc_id FROM temp_anlgraph WHERE arc_id = v_arc) a
 			ON a.node_id = node_1 or a.node_id = node_2
-			JOIN om_mincut_valve v on v.node_id = a.node_id::text
+			JOIN om_mincut_valve v on v.node_id = a.node_id
 			WHERE result_id=v_mincutid AND (unaccess = FALSE AND broken = FALSE)
 			AND t.arc_id <> a.arc_id);
 	END IF;
@@ -184,7 +180,7 @@ BEGIN
 	-- insert valve results into table
 	IF v_mincutstep = 1 THEN
 		v_querytext = 'UPDATE om_mincut_valve SET proposed=TRUE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
-			(SELECT node_1::varchar(16) FROM (
+			(SELECT node_1 FROM (
 			select id, arc_id, node_1, node_2, water, flag from temp_anlgraph where checkf > 0 UNION select id, arc_id, node_2, node_1, water, flag from temp_anlgraph  where checkf > 0 
 			)a)';
 		EXECUTE v_querytext;
@@ -192,7 +188,7 @@ BEGIN
 	ELSIF v_mincutstep = 2 THEN
 
 		v_querytext = 'UPDATE om_mincut_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
-			(SELECT node_1::varchar(16) FROM (
+			(SELECT node_1 FROM (
 			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraph where checkf > 0 UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraph  where checkf > 0 
 			)a group by node_1  having sum(water) > 1 and sum(flag) > 2 or  sum(flag) = 6)';
 		EXECUTE v_querytext;

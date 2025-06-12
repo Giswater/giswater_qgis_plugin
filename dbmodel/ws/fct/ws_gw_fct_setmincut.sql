@@ -175,10 +175,10 @@ BEGIN
 					SELECT gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors) INTO v_response;
 				END IF;
 
-				v_querytext = concat('UPDATE om_mincut SET mincut_class = ', v_mincut_class, ', ', 
-							'anl_the_geom = ''', ST_SetSRID(ST_Point(v_xcoord, v_ycoord), v_client_epsg), ''', ', 
-							'anl_user = ''', v_cur_user, ''', ', 
-							'anl_feature_type = ''ARC'', ', 
+				v_querytext = concat('UPDATE om_mincut SET mincut_class = ', v_mincut_class, ', ',
+							'anl_the_geom = ''', ST_SetSRID(ST_Point(v_xcoord, v_ycoord), v_client_epsg), ''', ',
+							'anl_user = ''', v_cur_user, ''', ',
+							'anl_feature_type = ''ARC'', ',
 							'anl_feature_id = ', v_arc, ' ',
 							'WHERE id = ', v_mincut);
 
@@ -197,13 +197,13 @@ BEGIN
 					INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id) VALUES (v_mincut, v_id);
 				END LOOP;
 
-				v_querytext = concat('UPDATE om_mincut SET mincut_class = ', v_mincut_class, ', ', 
+				v_querytext = concat('UPDATE om_mincut SET mincut_class = ', v_mincut_class, ', ',
 							'expl_id = ', (SELECT expl_id FROM v_edit_connec WHERE connec_id = v_connec), ', ',
 							'macroexpl_id = ', (SELECT macroexpl_id FROM v_edit_connec WHERE connec_id = v_connec), ', ',
 							'muni_id = ', (SELECT muni_id FROM v_edit_connec WHERE connec_id = v_connec), ', ',
-							'anl_the_geom = ''', ST_SetSRID(ST_Point(v_xcoord, v_ycoord), v_client_epsg), ''', ', 
-							'anl_user = ''', v_cur_user, ''', ', 
-							'anl_feature_type = ''CONNEC'', ', 
+							'anl_the_geom = ''', ST_SetSRID(ST_Point(v_xcoord, v_ycoord), v_client_epsg), ''', ',
+							'anl_user = ''', v_cur_user, ''', ',
+							'anl_feature_type = ''CONNEC'', ',
 							'anl_feature_id = ', v_connec, ' ',
 							'WHERE id = ', v_mincut);
 			END IF;
