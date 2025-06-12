@@ -4973,8 +4973,10 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
 
     for feature_id in ids or []:
         sql = f"""
-            INSERT INTO {tablename} (lot_id, {feature_type}_id, status)
-            VALUES ({lot_id}, {feature_id}, 1)
+            INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code, the_geom)
+            SELECT {lot_id}, {feature_id}, 1, code, the_geom
+            FROM {lib_vars.schema_name}.{feature_type}
+            WHERE {feature_type}_id = {feature_id}
             ON CONFLICT DO NOTHING;
         """
         tools_db.execute_sql(sql)
