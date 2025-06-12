@@ -1276,6 +1276,13 @@ def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal
     :return:
     """
 
+    attributes_map = {
+        int: QVariant.Int,
+        float: QVariant.Double,
+        bool: QVariant.Bool,
+        list: QVariant.StringList,
+        str: QVariant.String,
+    }
     prov = virtual_layer.dataProvider()
     # Enter editing mode
     virtual_layer.startEditing()
@@ -1285,7 +1292,7 @@ def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal
         for key, value in list(data[layer_type]['features'][0]['properties'].items()):
             if key == 'the_geom':
                 continue
-            prov.addAttributes([QgsField(str(key), QVariant.String)])
+            prov.addAttributes([QgsField(str(key), attributes_map.get(type(value), QVariant.String))])
 
     for feature in data[layer_type]['features']:
         geometry = tools_qgis.get_geometry_from_json(feature)
