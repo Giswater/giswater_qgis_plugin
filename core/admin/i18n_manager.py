@@ -827,35 +827,54 @@ class GwSchemaI18NManager:
     def _add_duplicates_rows(self, table, final_rows_tot, final_rows):
         """Create query to add the correct rows to the table"""
 
-        insert_query = ""
+        pk_query = f"""
+            SELECT a.attname
+            FROM   pg_index i
+            JOIN   pg_attribute a ON a.attrelid = i.indrelid
+                                 AND a.attnum = ANY(i.indkey)
+            WHERE  i.indrelid = '{table}'::regclass
+            AND    i.indisprimary;
+        """
+        pk_rows = self._get_rows(pk_query, self.cursor_i18n)
+        primary_keys = [row[0] for row in pk_rows] if pk_rows else []
+
+        if not primary_keys:
+            print(f"Warning: No primary key found for table {table}. Cannot generate ON CONFLICT clause.")
+            return ""
+
+        queries = []
         for k, row in enumerate(final_rows_tot):
             row_keys = list(row.keys())[:-1]
             if 'project_type' in row_keys:
                 row_keys.remove('project_type')
-            insert_query += f"INSERT INTO {table} ("
-
-            # Handle columns (keys)
-            insert_query += ", ".join([row_key for row_key in row_keys])
-            insert_query += ", project_type) VALUES ("
-
+            
+            columns = row_keys + ['project_type']
+            
             values = []
             for row_key in row_keys:
                 value = row[row_key]
                 if isinstance(value, str):
-                    value = f"""'{value.replace("'", "''")}'"""  # Escape single quotes in strings
-                elif isinstance(value, (datetime, date)):  # Handle timestamps properly
-                    value = f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'"
+                    values.append(f"'{value.replace("'", "''")}'")
+                elif isinstance(value, (datetime, date)):
+                    values.append(f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'")
                 elif value in [None, 'None', '']:
-                    value = "Null"
+                    values.append("NULL")
                 else:
-                    value = str(value)  # Convert other types directly
-                values.append(value)
-            # Add processed values to query
-            insert_query += ", ".join(values)
-            insert_query += ", 'utils');\n" if k < len(final_rows) else ");\n"
+                    values.append(str(value))
 
-            print(insert_query)
-        return insert_query
+            project_type_val = "'utils'" if k < len(final_rows) else f"'{row.get('project_type', '')}'"
+            values.append(project_type_val)
+
+            update_columns = [col for col in columns if col not in primary_keys]
+            update_expressions = [f"{col} = EXCLUDED.{col}" for col in update_columns]
+
+            query = (
+                f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({', '.join(values)}) "
+                f"ON CONFLICT ({', '.join(primary_keys)}) DO UPDATE SET {', '.join(update_expressions)};"
+            )
+            queries.append(query)
+            
+        return "\n".join(queries)
 
     # endregion
 
@@ -1285,9 +1304,10 @@ class GwSchemaI18NManager:
         query = f"""
             SELECT a.attname AS column_name
             FROM pg_index i
-            JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+            JOIN pg_attribute a ON a.attrelid = i.indrelid
+                                 AND a.attnum = ANY(i.indkey)
             WHERE i.indrelid = '{table}'::regclass
-            AND i.indisprimary;
+            AND    i.indisprimary;
             """
 
         self.cursor_i18n.execute(query)
@@ -1336,19 +1356,11 @@ class GwSchemaI18NManager:
         """ Define the tables to be translated in a dictionary """
         dbtables_dic = {
             "ws": {
-                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
-                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                ],
-                 "sutables": ["su_basic_tables", "su_feature"]
+                "dbtables": ["dbconfig_form_fields_json"],
+                "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
-                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
-                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                ],
+                "dbtables": ["dbconfig_form_fields_json"],
                  "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
