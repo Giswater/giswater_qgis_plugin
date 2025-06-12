@@ -3245,7 +3245,10 @@ def get_role_permissions(qgis_project_role):
         return 'role_basic'
 
 
-def get_config_value(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
+def get_config_value(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True, schema_name=None):
+    
+    if schema_name is None:
+        schema_name = lib_vars.schema_name
 
     if not tools_db.check_db_connection():
         return None

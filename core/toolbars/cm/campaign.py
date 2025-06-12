@@ -14,7 +14,7 @@ from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
-from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, GwSelectorUi
+from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi
 from ...shared.selector import GwSelector
 
 
@@ -82,7 +82,7 @@ class Campaign:
         """ Open the campaign-specific selector when the button is clicked """
         selector_type = "selector_campaign"
         # Show form in docker
-        #tools_gw.init_docker('qgis_form_docker')
+        tools_gw.init_docker('qgis_form_docker')
         selector = GwSelector()
         selector.open_selector(selector_type)
 
