@@ -144,10 +144,11 @@ BEGIN
             CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_edges (
                 pgr_arc_id INT8 NOT NULL,
                 graph_delimiter VARCHAR(30),
+                mincut_id INT8,
                 minsector_1 INT8 NOT NULL,
                 minsector_2 INT8 NOT NULL,
-                "cost" FLOAT8 NULL,
-                reverse_cost FLOAT8 NULL,
+                "cost" FLOAT8,
+                reverse_cost FLOAT8,
                 CONSTRAINT temp_pgr_minsector_edges_pkey PRIMARY KEY (pgr_arc_id)
             );
             CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_1_idx ON temp_pgr_minsector_edges USING btree (minsector_1);
