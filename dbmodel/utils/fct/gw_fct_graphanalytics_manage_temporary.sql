@@ -65,8 +65,7 @@ BEGIN
             staticpressure FLOAT DEFAULT 0,
             CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
         );
-        CREATE INDEX temp_pgr_node_node_id ON temp_pgr_node USING btree (node_id);
-        GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_node TO role_basic;
+        CREATE INDEX IF NOT EXISTS temp_pgr_node_node_id_idx ON temp_pgr_node USING btree (node_id);
 
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc (
@@ -86,12 +85,11 @@ BEGIN
             reverse_cost INT DEFAULT 1,
             CONSTRAINT temp_pgr_arc_pkey PRIMARY KEY (pgr_arc_id)
         );
-        CREATE INDEX temp_pgr_arc_pgr_arc_id ON temp_pgr_arc USING btree (pgr_arc_id);
-        CREATE INDEX temp_pgr_arc_pgr_node1 ON temp_pgr_arc USING btree (pgr_node_1);
-        CREATE INDEX temp_pgr_arc_pgr_node2 ON temp_pgr_arc USING btree (pgr_node_2);
-        CREATE INDEX temp_pgr_arc_node1 ON temp_pgr_arc USING btree (node_1);
-        CREATE INDEX temp_pgr_arc_node2 ON temp_pgr_arc USING btree (node_2);
-        GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_arc TO role_basic;
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_pgr_arc_id_idx ON temp_pgr_arc USING btree (pgr_arc_id);
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_pgr_node1_idx ON temp_pgr_arc USING btree (pgr_node_1);
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_pgr_node2_idx ON temp_pgr_arc USING btree (pgr_node_2);
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_node1_idx ON temp_pgr_arc USING btree (node_1);
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_node2_idx ON temp_pgr_arc USING btree (node_2);
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance (
                 seq INT8 NOT NULL,
@@ -104,10 +102,9 @@ BEGIN
                 agg_cost FLOAT8 NULL,
                 CONSTRAINT temp_pgr_drivingdistance_pkey PRIMARY KEY (seq)
             );
-        CREATE INDEX temp_pgr_drivingdistance_start_vid ON temp_pgr_drivingdistance USING btree (start_vid);
-        CREATE INDEX temp_pgr_drivingdistance_node ON temp_pgr_drivingdistance USING btree (node);
-        CREATE INDEX temp_pgr_drivingdistance_edge ON temp_pgr_drivingdistance USING btree (edge);
-        GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_drivingdistance TO role_basic;
+        CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_start_vid_idx ON temp_pgr_drivingdistance USING btree (start_vid);
+        CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_node_idx ON temp_pgr_drivingdistance USING btree (node);
+        CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_edge_idx ON temp_pgr_drivingdistance USING btree (edge);
 
         -- Create other additional temporary tables
         CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
@@ -135,9 +132,8 @@ BEGIN
                 node INT8 NULL,
                 CONSTRAINT temp_pgr_connectedcomponents_pkey PRIMARY KEY (seq)
             );
-            CREATE INDEX temp_pgr_connectedcomponents_component ON temp_pgr_connectedcomponents USING btree (component);
-            CREATE INDEX temp_pgr_connectedcomponents_node ON temp_pgr_connectedcomponents USING btree (node);
-            GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_connectedcomponents TO role_basic;
+            CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
+            CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
 
             CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
