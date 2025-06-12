@@ -814,7 +814,7 @@ class Campaign:
             if tools_db.execute_sql(sql):
                 success += 1
         msg = "{0} campaign(s) deleted."
-        msg_params = count
+        msg_params = (count,)
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.manager_dialog)
         self.filter_campaigns()
 
