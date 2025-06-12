@@ -59,7 +59,7 @@ BEGIN
 
     IF TG_OP = 'INSERT' THEN
         v_querytext := format(
-            'INSERT INTO SCHEMA_NAME.PARENT_SCHEMA_%I SELECT (SELECT nextval(''SCHEMA_NAME.PARENT_SCHEMA_%I_id_seq''::regclass)), v.lot_id, vn.* FROM SCHEMA_NAME.ve_PARENT_SCHEMA_lot_%s v JOIN PARENT_SCHEMA.%I vn ON vn.%I::integer = v.%I  WHERE v.lot_id = $1 AND v.%I = $2',
+            'INSERT INTO SCHEMA_NAME.PARENT_SCHEMA_%I SELECT (SELECT nextval(''SCHEMA_NAME.PARENT_SCHEMA_%I_id_seq''::regclass)), v.lot_id, vn.* FROM SCHEMA_NAME.om_campaign_lot_x_%s v JOIN PARENT_SCHEMA.%I vn ON vn.%I::integer = v.%I  WHERE v.lot_id = $1 AND v.%I = $2',
             lower(v_feature_child_type),
             lower(v_feature_child_type),
             v_feature_type,
