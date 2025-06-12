@@ -46,7 +46,8 @@ DECLARE
     v_visible_layer TEXT;
     v_ignorebrokenvalves BOOLEAN = TRUE;
 
-    v_macrominsector_id_arc TEXT;
+    -- CHECKS
+    v_arc_list TEXT;
 
     v_response JSON;
 
@@ -100,6 +101,21 @@ BEGIN
     -- Set disable lock level to true for this operation
     UPDATE config_param_user SET value = '{"update":true, "delete":true}'
     WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
+
+    -- CHECKS
+    -- =======================
+
+	-- Check for arcs with missing node_1 or node_2
+    SELECT string_agg(arc_id::text, ',') INTO v_arc_list FROM arc
+    JOIN value_state_type vst ON vst.id = arc.state_type
+    WHERE vst.is_operative = TRUE
+    AND (arc.node_1 IS NULL OR arc.node_2 IS NULL)
+    AND arc.state > 0;
+
+    IF v_arc_list IS NOT NULL THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4022", "function":"2706", "fid":"'||v_fid||'", "is_process":true,
+		"parameters":{"v_arc_list":"'||v_arc_list||'"}}}$$)';
+	END IF;
 
 
 	-- Delete temporary tables
