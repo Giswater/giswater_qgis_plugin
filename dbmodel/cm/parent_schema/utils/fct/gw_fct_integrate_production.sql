@@ -54,7 +54,7 @@ BEGIN
 	join '||v_parentschema||'.cat_feature on id = object_id 
 	join '||v_cmschema||'.om_campaign_review using (reviewclass_id)
 	join '||v_cmschema||'.om_campaign using (campaign_id) 
-	WHERE campaign_id = 9 ORDER BY orderby';
+	WHERE campaign_id = '||v_campaign||' ORDER BY orderby';
   
 	raise notice 'v_querytext %', v_querytext;
 	
