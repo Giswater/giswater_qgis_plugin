@@ -71,6 +71,7 @@ BEGIN
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc (
             pgr_arc_id SERIAL NOT NULL,
             arc_id int4,
+            old_arc_id int4,
             pgr_node_1 INT,
             pgr_node_2 INT,
             node_1 int4,

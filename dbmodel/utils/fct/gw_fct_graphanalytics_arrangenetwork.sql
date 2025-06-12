@@ -37,7 +37,7 @@ BEGIN
 
     -- Disconnect arcs with modif = TRUE at nodes with modif1 = TRUE; a new arc N_new->N_original is created with the v_cost and v_reverse_cost
     FOR v_record IN
-	    SELECT n.graph_delimiter AS n_graph_delimiter, a.graph_delimiter AS a_graph_delimiter, a.pgr_arc_id, a.pgr_node_1, a.node_1
+	    SELECT n.graph_delimiter AS n_graph_delimiter, a.graph_delimiter AS a_graph_delimiter, a.pgr_arc_id, a.arc_id, a.pgr_node_1, a.node_1
 	    FROM temp_pgr_node n
 	    JOIN temp_pgr_arc a ON n.pgr_node_id =a.pgr_node_1
 	    WHERE n.modif AND a.modif1
@@ -46,14 +46,14 @@ BEGIN
         SELECT LAST_VALUE INTO v_pgr_node_id FROM temp_pgr_node_pgr_node_id_seq;
 	    UPDATE temp_pgr_arc SET pgr_node_1 = v_pgr_node_id, node_1 = NULL
 	    WHERE pgr_arc_id = v_record.pgr_arc_id;
-	    INSERT INTO temp_pgr_arc (pgr_node_1, pgr_node_2, node_1, graph_delimiter, cost, reverse_cost)
-	    VALUES (v_record.pgr_node_1, v_pgr_node_id, v_record.node_1,
+	    INSERT INTO temp_pgr_arc (old_arc_id, pgr_node_1, pgr_node_2, node_1, graph_delimiter, cost, reverse_cost)
+	    VALUES (v_record.arc_id, v_record.pgr_node_1, v_pgr_node_id, v_record.node_1,
         CASE WHEN v_record.a_graph_delimiter = 'none' THEN v_record.n_graph_delimiter ELSE v_record.a_graph_delimiter END, v_cost, v_reverse_cost);
     END LOOP;
 
     -- Disconnect arcs with modif = TRUE at nodes with modif2 = TRUE; a new arc N_new->N_original is created with the v_cost and v_reverse_cost
     FOR v_record IN
-	    SELECT n.graph_delimiter AS n_graph_delimiter, a.graph_delimiter AS a_graph_delimiter, a.pgr_arc_id, a.pgr_node_2, a.node_2
+	    SELECT n.graph_delimiter AS n_graph_delimiter, a.graph_delimiter AS a_graph_delimiter, a.pgr_arc_id, a.arc_id, a.pgr_node_2, a.node_2
 	    FROM temp_pgr_node n
 	    JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_2
 	    WHERE n.modif AND a.modif2
@@ -62,8 +62,8 @@ BEGIN
         SELECT LAST_VALUE INTO v_pgr_node_id FROM temp_pgr_node_pgr_node_id_seq;
 	    UPDATE temp_pgr_arc SET pgr_node_2 = v_pgr_node_id, node_2 = NULL
 	    WHERE pgr_arc_id = v_record.pgr_arc_id;
-	    INSERT INTO temp_pgr_arc(pgr_node_1, pgr_node_2, node_2, graph_delimiter, cost, reverse_cost)
-	    VALUES (v_pgr_node_id, v_record.pgr_node_2, v_record.node_2,
+	    INSERT INTO temp_pgr_arc(old_arc_id, pgr_node_1, pgr_node_2, node_2, graph_delimiter, cost, reverse_cost)
+	    VALUES (v_record.arc_id, v_pgr_node_id, v_record.pgr_node_2, v_record.node_2,
         CASE WHEN v_record.a_graph_delimiter = 'none' THEN v_record.n_graph_delimiter ELSE v_record.a_graph_delimiter END, v_cost, v_reverse_cost);
     END LOOP;
 
