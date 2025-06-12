@@ -394,16 +394,28 @@ BEGIN
     AND n1.mapzone_id <> 0 AND n2.mapzone_id <> 0
     AND n1.mapzone_id <> n2.mapzone_id;
 
-    -- Set mapzone_id to 0 for nodes at the border of minsectors
-    UPDATE temp_pgr_node n SET mapzone_id = 0
-    FROM temp_pgr_minsector_graph s
-    WHERE n.node_id = s.node_id;
-
     -- Insert into minsector temporary table
     INSERT INTO temp_pgr_minsector
     SELECT DISTINCT mapzone_id
     FROM temp_pgr_arc
     WHERE mapzone_id > 0;
+
+    -- table used for Massive Mincut; for SECTORS, mapzone_id=0 is replaced for node_id; the node_id for Sectors don't exist in temp_pgr_minsector)
+    INSERT INTO temp_pgr_minsector_edges (pgr_arc_id, graph_delimiter, minsector_1, minsector_2, cost, reverse_cost)
+    SELECT a.pgr_arc_id, a.graph_delimiter,
+    COALESCE (NULLIF(n1.mapzone_id,0), a.node_1) AS minsector_1, 
+    COALESCE (NULLIF(n2.mapzone_id,0), a.node_2) AS minsector_2,
+    a.cost, a.reverse_cost
+    FROM temp_pgr_arc a
+    JOIN temp_pgr_node n1 ON n1.pgr_node_id = a.pgr_node_1  
+    JOIN temp_pgr_node n2 ON n2.pgr_node_id = a.pgr_node_2 
+    WHERE arc_id IS NULL 
+    AND  n1.mapzone_id <> n2.mapzone_id;
+
+    -- Set mapzone_id to 0 for nodes at the border of minsectors
+    UPDATE temp_pgr_node n SET mapzone_id = 0
+    FROM temp_pgr_minsector_graph s
+    WHERE n.node_id = s.node_id;
 
     -- Update minsector temporary num_border
     UPDATE temp_pgr_minsector t SET num_border = a.num
