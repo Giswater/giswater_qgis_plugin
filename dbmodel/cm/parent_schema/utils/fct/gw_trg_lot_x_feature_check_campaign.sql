@@ -45,6 +45,10 @@ BEGIN
 	INTO v_exists
 	USING v_campaign_id, v_feature_id;
 
+    IF NOT v_exists THEN
+        RETURN NULL;
+    END IF;
+
     RETURN NEW;
 END;
 $function$

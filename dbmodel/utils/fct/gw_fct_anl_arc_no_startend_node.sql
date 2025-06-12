@@ -165,7 +165,6 @@ BEGIN
                        "data":{"message":"3582", "function":"2102", "fid":"103", "fcount":"0", "is_process":true}}$$)';
 	ELSE
 		IF v_count_state1 > 0 THEN
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3586", "function":"2102", "fid":"103", "parameters":{"v_count_state1":"'||v_count_state1||'"}, "fcount":"'||v_count_state1||'", "is_process":true}}$$)';
 
