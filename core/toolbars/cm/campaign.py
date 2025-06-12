@@ -80,23 +80,11 @@ class Campaign:
 
     def open_campaign_selector(self):
         """ Open the campaign-specific selector when the button is clicked """
-
-        # Set is_campaign flag to True to trigger the campaign logic
-        campaignSelector = GwSelector()
-
-        dlg_selector = GwSelectorUi(self)
-        tools_gw.load_settings(dlg_selector)
-        current_tab = tools_gw.get_config_parser('dialogs_tab_cm', "dlg_selector_campaign", "user", "session")
-        selector_values = "selector_campaign"
-
-        dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
-        dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
-        dlg_selector.rejected.connect(
-            partial(tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'campaign'))
-
-        campaignSelector.get_selector(dlg_selector, selector_values, current_tab=current_tab)
-
-        tools_gw.open_dialog(dlg_selector, dlg_name='selector')
+        selector_type = "selector_campaign"
+        # Show form in docker
+        #tools_gw.init_docker('qgis_form_docker')
+        selector = GwSelector()
+        selector.open_selector(selector_type)
 
     def load_campaign_dialog(self, campaign_id=None, mode="review"):
         """
