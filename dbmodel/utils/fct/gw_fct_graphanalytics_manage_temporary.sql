@@ -47,14 +47,14 @@ BEGIN
 
     IF v_action = 'CREATE' THEN
         -- Create temporary tables
-        CREATE TEMP TABLE temp_pgr_mapzone (
+        CREATE TEMP TABLE IF NOT EXISTS temp_pgr_mapzone (
             mapzone_id int4 NOT NULL,
             the_geom geometry(Geometry, SRID_VALUE),
             CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (mapzone_id)
         );
 
 
-        CREATE TEMP TABLE temp_pgr_node (
+        CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node (
             pgr_node_id SERIAL NOT NULL,
             node_id int4,
             mapzone_id INTEGER DEFAULT 0,
@@ -69,7 +69,7 @@ BEGIN
         GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_node TO role_basic;
 
 
-        CREATE TEMP TABLE temp_pgr_arc (
+        CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc (
             pgr_arc_id SERIAL NOT NULL,
             arc_id int4,
             pgr_node_1 INT,
@@ -93,6 +93,25 @@ BEGIN
         CREATE INDEX temp_pgr_arc_node2 ON temp_pgr_arc USING btree (node_2);
         GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_arc TO role_basic;
 
+        CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance (
+                seq INT8 NOT NULL,
+                "depth" INT8 NULL,
+                start_vid INT8 NULL,
+                pred INT8 NULL,
+                node INT8 NULL,
+                edge INT8 NULL,
+                "cost" FLOAT8 NULL,
+                agg_cost FLOAT8 NULL,
+                CONSTRAINT temp_pgr_drivingdistance_pkey PRIMARY KEY (seq)
+            );
+        CREATE INDEX temp_pgr_drivingdistance_start_vid ON temp_pgr_drivingdistance USING btree (start_vid);
+        CREATE INDEX temp_pgr_drivingdistance_node ON temp_pgr_drivingdistance USING btree (node);
+        CREATE INDEX temp_pgr_drivingdistance_edge ON temp_pgr_drivingdistance USING btree (edge);
+        GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_drivingdistance TO role_basic;
+
+        -- Create other additional temporary tables
+        CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+
         -- Create temporary layers depending on the project type
         IF v_project_type = 'WS' THEN
             ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
@@ -108,12 +127,9 @@ BEGIN
             END IF;
         END IF;
 
-        -- Create other additional temporary tables
-        CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-
         -- For specific functions
         IF v_fct_name = 'MINSECTOR' THEN
-            CREATE TEMP TABLE temp_pgr_connectedcomponents (
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
                 seq INT8 NOT NULL,
                 component INT8 NULL,
                 node INT8 NULL,
@@ -123,37 +139,18 @@ BEGIN
             CREATE INDEX temp_pgr_connectedcomponents_node ON temp_pgr_connectedcomponents USING btree (node);
             GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_connectedcomponents TO role_basic;
 
-            CREATE TEMP TABLE temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
-            CREATE TEMP TABLE temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
-        ELSE
-            CREATE TEMP TABLE temp_pgr_drivingdistance (
-                seq INT8 NOT NULL,
-                "depth" INT8 NULL,
-                start_vid INT8 NULL,
-                pred INT8 NULL,
-                node INT8 NULL,
-                edge INT8 NULL,
-                "cost" FLOAT8 NULL,
-                agg_cost FLOAT8 NULL,
-                CONSTRAINT temp_pgr_drivingdistance_pkey PRIMARY KEY (seq)
-            );
-            CREATE INDEX temp_pgr_drivingdistance_start_vid ON temp_pgr_drivingdistance USING btree (start_vid);
-            CREATE INDEX temp_pgr_drivingdistance_node ON temp_pgr_drivingdistance USING btree (node);
-            CREATE INDEX temp_pgr_drivingdistance_edge ON temp_pgr_drivingdistance USING btree (edge);
-            GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_drivingdistance TO role_basic;
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
 
-            IF v_fct_name = 'MASSIVEMINCUT' THEN
-                CREATE TEMP TABLE temp_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
-            END IF;
         END IF;
-
 
         -- Create temporary views
         IF v_use_psector = 'true' THEN
             -- with psectors
             IF v_project_type = 'WS' THEN
 
-                CREATE TEMPORARY VIEW v_temp_arc AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_arc AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), arc_psector AS (
@@ -198,7 +195,7 @@ BEGIN
                 SELECT * FROM arc_selected
                 WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
-                CREATE TEMPORARY VIEW v_temp_node AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_node AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), node_psector AS (
@@ -238,7 +235,7 @@ BEGIN
                 )
                 SELECT * FROM node_selected n;
 
-                CREATE TEMPORARY VIEW v_temp_connec AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), connec_psector AS (
@@ -290,7 +287,7 @@ BEGIN
                 )
                 SELECT * FROM connec_selected;
 
-                CREATE TEMPORARY VIEW v_temp_link_connec AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), link_psector AS (
@@ -343,7 +340,7 @@ BEGIN
 
             ELSIF v_project_type = 'UD' THEN
 
-                CREATE TEMPORARY VIEW v_temp_arc AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_arc AS
                 WITH sel_expl AS (
                     SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
                 ), sel_ps AS (
@@ -391,7 +388,7 @@ BEGIN
                 SELECT * FROM arc_selected
                 WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
-                CREATE TEMPORARY VIEW v_temp_node AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_node AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), node_psector AS (
@@ -430,7 +427,7 @@ BEGIN
                 )
                 SELECT * FROM node_selected;
 
-                CREATE TEMPORARY VIEW v_temp_connec AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), connec_psector AS (
@@ -479,7 +476,7 @@ BEGIN
                 )
                 SELECT * FROM connec_selected;
 
-                CREATE TEMPORARY VIEW v_temp_gully AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_gully AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), gully_psector AS (
@@ -527,7 +524,7 @@ BEGIN
                 )
                 SELECT * FROM gully_selected;
 
-                CREATE TEMPORARY VIEW v_temp_link_connec AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ),link_psector AS (
@@ -639,7 +636,7 @@ BEGIN
             -- without psectors
             IF v_project_type = 'WS' THEN
 
-                CREATE TEMPORARY VIEW v_temp_arc AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_arc AS
                 SELECT
                     a.arc_id,
                     a.node_1,
@@ -659,7 +656,7 @@ BEGIN
                 WHERE a.state = 1 AND vst.is_operative = TRUE
                 AND node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
-                CREATE TEMPORARY VIEW v_temp_node AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_node AS
                 SELECT
                     n.node_id,
                     cf.graph_delimiter,
@@ -678,7 +675,7 @@ BEGIN
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
                 WHERE n.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW v_temp_connec AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_connec AS
                 SELECT
                     c.connec_id,
                     c.arc_id,
@@ -698,7 +695,7 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = c.state_type
                 WHERE c.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW v_temp_link_connec AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_connec AS
                 SELECT
                     l.link_id,
                     c.arc_id,
@@ -720,7 +717,7 @@ BEGIN
 
             ELSIF v_project_type = 'UD' THEN
 
-                CREATE TEMPORARY VIEW v_temp_arc AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_arc AS
                 SELECT
                     a.arc_id,
                     a.node_1,
@@ -740,7 +737,7 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = a.state_type
                 WHERE a.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW v_temp_node AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_node AS
                 SELECT
                     n.node_id,
                     cf.graph_delimiter,
@@ -758,7 +755,7 @@ BEGIN
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
                 WHERE n.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW v_temp_connec AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_connec AS
                 SELECT
                     c.connec_id,
                     c.arc_id,
@@ -777,7 +774,7 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = c.state_type
                 WHERE c.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW v_temp_gully AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_gully AS
                 SELECT
                     g.gully_id,
                     g.arc_id,
@@ -793,7 +790,7 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = g.state_type
                 WHERE g.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW v_temp_link_connec AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_connec AS
                 SELECT
                     l.link_id,
                     c.arc_id,
@@ -814,7 +811,7 @@ BEGIN
                 AND vst.is_operative = TRUE
                 AND l.feature_type = 'CONNEC';
 
-                CREATE TEMPORARY VIEW v_temp_link_gully AS
+                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_gully AS
                 SELECT
                     l.link_id,
                     g.arc_id,
@@ -839,7 +836,7 @@ BEGIN
         END IF;
 
         IF v_fct_name = 'MINSECTOR' THEN
-            CREATE TEMPORARY VIEW temp_pgr_minsector_old AS
+            CREATE TEMPORARY VIEW IF NOT EXISTS temp_pgr_minsector_old AS
             SELECT DISTINCT v.minsector_id
             FROM temp_pgr_arc t
             JOIN v_temp_arc v USING (arc_id)
