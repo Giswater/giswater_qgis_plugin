@@ -787,6 +787,18 @@ INSERT INTO sys_label (id, idval, label_type) VALUES (1003, 'ERROR', 'prefix');
 INSERT INTO sys_label (id, idval, label_type) VALUES(1004, 'CRITICAL ERRORS', 'prefix');
 INSERT INTO sys_label (id, idval, label_type) VALUES(1005, 'HINT', 'prefix');
 
+INSERT INTO sys_label (id, idval, label_type) VALUES(2000, '', 'separator'); -- break line
+INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2008, '--------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2009, '---------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2010, '----------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2011, '-----------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2014, '--------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2022, '----------------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2025, '-------------------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2030, '------------------------------', 'separator');
+INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '-------------------------------------------------', 'header');
+
 INSERT INTO sys_label (id, idval, label_type) VALUES(3001, 'INFO', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3002, 'WARNINGS', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3003, 'ERRORS', 'header');
@@ -795,16 +807,7 @@ INSERT INTO sys_label (id, idval, label_type) VALUES(3008, 'ARC DIVIDE = FALSE',
 INSERT INTO sys_label (id, idval, label_type) VALUES(3009, 'RESUME', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3010, 'CHECK SYSTEM', 'header');
 INSERT INTO sys_label (id, idval, label_type) VALUES(3011, 'CHECK DB DATA', 'header');
-
-INSERT INTO sys_label (id, idval, label_type) VALUES(2000, '', 'separator'); -- break line
-INSERT INTO sys_label (id, idval, label_type) VALUES(2007, '-------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2008, '--------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2009, '---------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2014, '--------------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2022, '----------------------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2025, '-------------------------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2030, '------------------------------', 'separator');
-INSERT INTO sys_label (id, idval, label_type) VALUES(2049, '-------------------------------------------------', 'header');
+INSERT INTO sys_label (id, idval, label_type) VALUES (3012, 'DETAILS', 'header');
 
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
@@ -2010,46 +2013,46 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4134, 'Set feature state = 1 for addschema and user', null, 0, true, 'utils', 'core', 'AUDIT');
 
 --11/06/2025
-UPDATE sys_function SET function_alias = 'RESET USER PROFILE FUNCTION' WHERE function_name = 'gw_fct_admin_role_resetuserprofile'; 
+UPDATE sys_function SET function_alias = 'RESET USER PROFILE FUNCTION' WHERE function_name = 'gw_fct_admin_role_resetuserprofile';
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3816, 'INFO: User %v_user% have been copied from %v_copyfromuser% values', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3818, 'INFO: User parameters and BASIC selectors have been copied (selector_state, selector_expl, selector_hydrometer, selector_workcat)', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3820, 'INFO: OM selectors have been copied (selector_audit, selector_date)', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3822, 'INFO: OM-WS selectors have been copied (selector_mincut_result)', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3824, 'INFO: There is no specific selectors for role_edit', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3826, 'INFO: EPA selectors have been copied (selector_sector, selector_rpt_main, selector_inp_result, selector_rpt_compare)', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3828, 'INFO: EPA-UD selectors have been copied (selector_rpt_main_tstep, selector_rpt_compare_tstep)', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3830, 'INFO: EPA-WS selectors have been copied (selector_inp_dscenario, selector_rpt_compare_tstep, selector_rpt_main_tstep)', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3832, 'INFO: Plan selectors have been copied (selector_plan_result, selector_psector)', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3834, 'ERROR-358: User and copied User has not the same role', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3836, 'ERROR-358: Copied user does not exist', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3838, 'INFO: User %v_user% have been reset', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3840, 'INFO: User parameters and BASIC selectors have been reset (selector_state, selector_expl, selector_hydrometer, selector_workcat)', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3842, 'ERROR-358: User does not exist', null, 0, true, 'utils', 'core', 'AUDIT');

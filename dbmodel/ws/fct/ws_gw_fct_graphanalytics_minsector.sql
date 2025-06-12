@@ -120,34 +120,20 @@ BEGIN
         RETURN v_response;
     END IF;
 
+
 	-- Starting process
-	
-    	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2706", "fid":"'||v_fid||'", "tempTable":"temp_", "is_process":true, "is_header":"true"}}$$)';	
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true", "separator_id":"2049", "tempTable":"temp_"}}$$)';
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4018", "function":"2706", "fid":"'||v_fid||'", "criticity":"4", "is_process":true,
+    "parameters":{"v_usepsector":"'||upper(v_usepsector::text)||'"}, "separator_id":"2000", "tempTable":"temp_"}}$$)';
 
-
-   
-    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4018", "function":"2706","parameters":{"Use psectors":"'||upper(v_usepsector::text)||'"}, "fid":"'||v_fid||'", "tempTable":"temp_","is_process":true}}$$)';
-
-    INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
-
-    	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2706", "fid":"'||v_fid||'","criticity":"3", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"1003"}}$$)';	
-
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '');
-	
-    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2706", "fid":"'||v_fid||'","criticity":"2", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3001"}}$$)';	
-	
-     EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2706", "fid":"'||v_fid||'","criticity":"1", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"1001"}}$$)';	
-	
-     EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2706", "fid":"'||v_fid||'","criticity":"1", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3021"}}$$)';	
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'","criticity":"3", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2011"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "separator_id":"2000", "tempTable":"temp_"}}$$)';
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'","criticity":"2", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2014"}}$$)';
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'","criticity":"1", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2007"}}$$)';
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'","criticity":"0", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3012", "separator_id":"2010"}}$$)';
 
     -- Initialize process
-
+	-- =======================
 	v_data := '{"data":{"expl_id_array":"' || v_expl_id_array || '", "mapzone_name":"MINSECTOR"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
@@ -157,21 +143,14 @@ BEGIN
 
     -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR' or "graph_delimiter" = 'SECTOR'
 
-    UPDATE temp_pgr_node t
-    SET graph_delimiter = LOWER(gd)
-    FROM (
-        SELECT n.node_id, unnest(cf.graph_delimiter) AS gd
-        FROM node n
-        JOIN cat_node cn ON cn.id = n.nodecat_id
-        JOIN cat_feature_node cf ON cf.id = cn.node_type
-        WHERE ('MINSECTOR' = ANY(cf.graph_delimiter) OR 'SECTOR' = ANY(cf.graph_delimiter))
-    ) sub
-    WHERE t.node_id = sub.node_id;
-
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
-    UPDATE temp_pgr_node n set closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
+    UPDATE temp_pgr_node t
+    set graph_delimiter = 'minsector', closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
     FROM man_valve v
-    WHERE n.node_id = v.node_id AND n.graph_delimiter = 'minsector';
+    JOIN node n using (node_id)
+    JOIN cat_node cn ON cn.id = n.nodecat_id
+    JOIN cat_feature_node cf ON cf.id = cn.node_type
+    WHERE t.node_id = v.node_id AND 'MINSECTOR' = ANY(cf.graph_delimiter);
 
     -- If we want to ignore open but broken valves (broken = TRUE cancel toArc if toArc IS NOT NULL and cannot be closed if toArc IS NULL)
     IF v_ignorebrokenvalves THEN
@@ -179,9 +158,13 @@ BEGIN
         WHERE n.graph_delimiter = 'minsector' AND n.closed = FALSE AND n.broken = TRUE;
     END IF;
 
-    -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
-    UPDATE temp_pgr_node n SET modif = TRUE
-    WHERE n.graph_delimiter = 'sector';
+    -- Set modif = TRUE for nodes where "graph_delimiter" = 'sector'
+    UPDATE temp_pgr_node t
+    SET graph_delimiter = 'sector', modif = TRUE
+    FROM node n
+    JOIN cat_node cn ON cn.id = n.nodecat_id
+    JOIN cat_feature_node cf ON cf.id = cn.node_type
+    WHERE t.node_id = n.node_id AND t.graph_delimiter = 'none' AND 'SECTOR' = ANY(cf.graph_delimiter);
 
     -- ARCS to be disconnected:
     --one of the two arcs that reach the valve
@@ -255,15 +238,21 @@ BEGIN
     SELECT seq, component, node FROM pgr_connectedcomponents(v_query);
 
     -- Update the mapzone_id field for arcs and nodes
-    UPDATE temp_pgr_node n SET mapzone_id = c.component
-    FROM temp_pgr_connectedcomponents c
+    UPDATE temp_pgr_node AS n
+    SET mapzone_id = agg.min_node
+    FROM (
+        SELECT component, MIN(node) AS min_node
+        FROM temp_pgr_connectedcomponents
+        GROUP BY component
+    ) AS agg
+    JOIN temp_pgr_connectedcomponents AS c ON c.component = agg.component
     WHERE n.pgr_node_id = c.node;
 
-    UPDATE temp_pgr_arc a SET mapzone_id = c.component
-    FROM temp_pgr_connectedcomponents c
-    WHERE a.pgr_node_1 = c.node
+    UPDATE temp_pgr_arc a SET mapzone_id = n.mapzone_id
+    FROM temp_pgr_node n
+    WHERE a.pgr_node_1 = n.pgr_node_id
     AND a.arc_id IS NOT NULL
-    AND a.pgr_node_1 IS NOT NULL AND a.pgr_node_2 IS NOT NULL;
+    AND a.pgr_node_2 IS NOT NULL;
 
     INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2)
     SELECT COALESCE(n1.node_id, n2.node_id), n1.mapzone_id, n2.mapzone_id
@@ -286,43 +275,70 @@ BEGIN
     WHERE mapzone_id > 0;
 
     -- Update minsector temporary num_border
-    UPDATE temp_pgr_minsector SET num_border = a.num FROM (
-        SELECT a.minsector_id, CASE WHEN COUNT(node_id) = 1 THEN 2 ELSE COUNT(node_id) END AS num
-        FROM node n, arc a
-        WHERE (a.node_1 = n.node_id OR a.node_2 = n.node_id) AND n.minsector_id = 0
-        GROUP BY a.minsector_id
-    ) a WHERE a.minsector_id = temp_pgr_minsector.minsector_id;
+    UPDATE temp_pgr_minsector t SET num_border = a.num
+    FROM (
+        SELECT a.mapzone_id, COUNT(*) AS num
+        FROM temp_pgr_node n
+        JOIN v_temp_node vn ON vn.node_id = n.node_id -- real nodes
+        JOIN v_temp_arc va ON vn.node_id IN (va.node_1, va.node_2)
+        JOIN temp_pgr_arc a ON va.arc_id = a.arc_id -- real arcs
+        WHERE n.mapzone_id = 0 AND a.mapzone_id > 0
+        GROUP BY a.mapzone_id
+    ) a WHERE a.mapzone_id = t.minsector_id;
+    UPDATE temp_pgr_minsector SET num_border = 0 WHERE num_border IS NULL;
 
     -- Update minsector temporary num_connec
-    UPDATE temp_pgr_minsector SET num_connec = b.c FROM (
-        SELECT minsector_id, COALESCE(COUNT(*), 0) AS c
-        FROM connec a GROUP BY minsector_id
-    ) b WHERE b.minsector_id = temp_pgr_minsector.minsector_id;
-    UPDATE minsector a SET num_connec = 0 WHERE num_connec IS NULL;
+    UPDATE temp_pgr_minsector t SET num_connec = c.num_connec
+    FROM (
+        SELECT a.mapzone_id, COUNT(*) AS num_connec
+        FROM v_temp_connec v
+        JOIN temp_pgr_arc a on v.arc_id = a.arc_id
+        WHERE a.mapzone_id > 0
+        GROUP BY a.mapzone_id
+    ) c WHERE c.mapzone_id = t.minsector_id;
+    UPDATE temp_pgr_minsector SET num_connec = 0 WHERE num_connec IS NULL;
 
     -- Update minsector temporary num_hydro
-    SELECT string_to_array(REPLACE(REPLACE('[1,2,3,4]', '[', ''), ']', ''), ',')::INT[]
-    INTO v_hydrometer_service FROM config_param_system WHERE parameter = 'admin_hydrometer_state';
+    SELECT ARRAY(SELECT jsonb_array_elements_text(value::jsonb->'1')::integer)
+    INTO v_hydrometer_service
+    FROM config_param_system
+    WHERE parameter = 'admin_hydrometer_state';
 
-    UPDATE temp_pgr_minsector SET num_hydro = a.c FROM (
-        SELECT minsector_id, COALESCE(COUNT(*), 0) AS c FROM (
-            SELECT hydrometer_id, minsector_id
-            FROM selector_hydrometer, rtc_hydrometer
-            LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::TEXT = rtc_hydrometer.hydrometer_id::TEXT
-            JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-            JOIN connec a ON a.customer_code::TEXT = ext_rtc_hydrometer.connec_id::TEXT
-            WHERE ext_rtc_hydrometer.state_id = ANY (v_hydrometer_service)
-            UNION
-            SELECT hydrometer_id, minsector_id
-            FROM selector_hydrometer, rtc_hydrometer
-            LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::TEXT = rtc_hydrometer.hydrometer_id::TEXT
-            JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-            JOIN man_netwjoin ON man_netwjoin.customer_code::TEXT = ext_rtc_hydrometer.connec_id::TEXT
-            JOIN node a ON a.node_id::TEXT = man_netwjoin.node_id::TEXT
-            WHERE ext_rtc_hydrometer.state_id = ANY (v_hydrometer_service)
-        ) a GROUP BY minsector_id
-    ) a WHERE a.minsector_id = temp_pgr_minsector.minsector_id;
-    UPDATE minsector a SET num_hydro = 0 WHERE num_hydro IS NULL;
+    WITH
+    	hydrometer AS (
+    		SELECT h.hydrometer_id, a.mapzone_id
+			FROM rtc_hydrometer_x_connec h
+			JOIN v_temp_connec c USING (connec_id)
+			JOIN temp_pgr_arc a USING (arc_id)
+			WHERE a.mapzone_id >0
+			UNION
+			SELECT h.hydrometer_id, n.mapzone_id
+			FROM rtc_hydrometer_x_node h
+			JOIN temp_pgr_node n USING (node_id)
+			WHERE n.mapzone_id >0
+		),
+		hydrometer_result AS (
+			SELECT h.mapzone_id, count(*) AS num_hydro
+			FROM hydrometer h
+			JOIN ext_rtc_hydrometer e ON e.id::TEXT = h.hydrometer_id::TEXT
+			JOIN selector_hydrometer s ON s.cur_user = CURRENT_USER AND s.state_id = e.state_id
+			WHERE s.state_id = ANY (v_hydrometer_service)
+			GROUP BY h.mapzone_id
+		)
+	UPDATE temp_pgr_minsector t
+	SET num_hydro = h.num_hydro
+	FROM hydrometer_result h
+	WHERE t.minsector_id = h.mapzone_id;
+    UPDATE temp_pgr_minsector SET num_hydro = 0 WHERE num_hydro IS NULL;
+
+	-- Update minsector temporary length
+    UPDATE temp_pgr_minsector SET length = b.length FROM (
+        SELECT mapzone_id AS minsector_id, SUM(st_length2d(va.the_geom)::NUMERIC(12,2)) AS length
+		FROM temp_pgr_arc ta
+		JOIN v_temp_arc va USING (arc_id)
+		WHERE ta.mapzone_id > 0
+        GROUP BY ta.mapzone_id
+    ) b WHERE b.minsector_id = temp_pgr_minsector.minsector_id;
 
     -- update geometry of mapzones
     IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
@@ -396,17 +412,23 @@ BEGIN
         EXECUTE v_querytext;
     END IF;
 
-	-- Update minsector temporary length
-    UPDATE temp_pgr_minsector SET length = b.length FROM (
-        SELECT minsector_id, SUM(st_length2d(a.the_geom)::NUMERIC(12,2)) AS length
-        FROM arc a GROUP BY minsector_id
-    ) b WHERE b.minsector_id = temp_pgr_minsector.minsector_id;
-
 	-- Update minsector temporary exploitation
     UPDATE temp_pgr_minsector t
     SET expl_id = sub.expl_id_arr
+    dma_id = sub.dma_id_arr,
+    dqa_id = sub.dqa_id_arr,
+    muni_id = sub.muni_id_arr,
+    sector_id = sub.sector_id_arr,
+    supplyzone_id = sub.supplyzone_id_arr
     FROM (
-        SELECT tn.mapzone_id AS minsector_id, array_agg(DISTINCT vn.expl_id) AS expl_id_arr
+        SELECT
+            tn.mapzone_id AS minsector_id,
+            array_agg(DISTINCT vn.expl_id) AS expl_id_arr,
+            array_agg(DISTINCT vn.dma_id) AS dma_id_arr,
+            array_agg(DISTINCT vn.dqa_id) AS dqa_id_arr,
+            array_agg(DISTINCT vn.muni_id) AS muni_id_arr,
+            array_agg(DISTINCT vn.sector_id) AS sector_id_arr,
+            array_agg(DISTINCT vn.supplyzone_id) AS supplyzone_id_arr
         FROM temp_pgr_node tn
 		JOIN v_temp_node vn USING (node_id)
         GROUP BY tn.mapzone_id
@@ -429,9 +451,8 @@ BEGIN
         v_result_polygon := CONCAT('{"geometryType":"Polygon", "features":', v_result, '}');
 
         -- Message
-    
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4020", "function":"2128","parameters":{"v_fid":"'||v_fid||'"}, "fid":"'||v_fid||'", "is_process":true}}$$)';
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4020", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001",	 "is_process":true}}$$)';
+
     ELSE
 
         -- Update minsector

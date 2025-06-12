@@ -146,7 +146,7 @@ BEGIN
             -- with psectors
             IF v_project_type = 'WS' THEN
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_arc AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), arc_psector AS (
@@ -178,6 +178,7 @@ BEGIN
                         a.presszone_id,
                         a.dma_id,
                         a.dqa_id,
+                        a.supplyzone_id,
                         a.muni_id,
                         a.minsector_id,
                         a.arccat_id,
@@ -191,7 +192,7 @@ BEGIN
                 SELECT * FROM arc_selected
                 WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_node AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), node_psector AS (
@@ -220,6 +221,7 @@ BEGIN
                     node.presszone_id,
                     node.dma_id,
                     node.dqa_id,
+                    node.supplyzone_id,
                     node.muni_id,
                     node.the_geom
                     FROM node_selector
@@ -231,7 +233,7 @@ BEGIN
                 )
                 SELECT * FROM node_selected n;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_connec AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), connec_psector AS (
@@ -271,6 +273,7 @@ BEGIN
                         connec.presszone_id,
                         connec.dma_id,
                         connec.dqa_id,
+                        connec.supplyzone_id,
                         connec.plot_code,
                         connec.muni_id,
                         connec.conneccat_id,
@@ -283,7 +286,7 @@ BEGIN
                 )
                 SELECT * FROM connec_selected;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_connec AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), link_psector AS (
@@ -325,6 +328,7 @@ BEGIN
                         l.presszone_id,
                         l.dma_id,
                         l.dqa_id,
+                        l.supplyzone_id,
                         l.muni_id,
                         l.the_geom
                     FROM link_selector
@@ -336,7 +340,7 @@ BEGIN
 
             ELSIF v_project_type = 'UD' THEN
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_arc AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
                 WITH sel_expl AS (
                     SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
                 ), sel_ps AS (
@@ -384,7 +388,7 @@ BEGIN
                 SELECT * FROM arc_selected
                 WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_node AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), node_psector AS (
@@ -423,7 +427,7 @@ BEGIN
                 )
                 SELECT * FROM node_selected;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_connec AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), connec_psector AS (
@@ -472,7 +476,7 @@ BEGIN
                 )
                 SELECT * FROM connec_selected;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_gully AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_gully AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), gully_psector AS (
@@ -520,7 +524,7 @@ BEGIN
                 )
                 SELECT * FROM gully_selected;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_connec AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ),link_psector AS (
@@ -573,7 +577,7 @@ BEGIN
                 )
                 SELECT * FROM link_selected;
 
-                CREATE TEMPORARY VIEW v_temp_link_gully AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
                 WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ),link_psector AS (
@@ -632,7 +636,7 @@ BEGIN
             -- without psectors
             IF v_project_type = 'WS' THEN
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_arc AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
                 SELECT
                     a.arc_id,
                     a.node_1,
@@ -643,6 +647,7 @@ BEGIN
                     a.presszone_id,
                     a.dma_id,
                     a.dqa_id,
+                    a.supplyzone_id,
                     a.muni_id,
                     a.arccat_id,
                     a.state,
@@ -652,7 +657,7 @@ BEGIN
                 WHERE a.state = 1 AND vst.is_operative = TRUE
                 AND node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_node AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
                 SELECT
                     n.node_id,
                     cf.graph_delimiter,
@@ -663,6 +668,7 @@ BEGIN
                     n.presszone_id,
                     n.dma_id,
                     n.dqa_id,
+                    n.supplyzone_id,
                     n.muni_id,
                     n.the_geom
                 FROM node n
@@ -671,7 +677,7 @@ BEGIN
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
                 WHERE n.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_connec AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
                 SELECT
                     c.connec_id,
                     c.arc_id,
@@ -683,6 +689,7 @@ BEGIN
                     c.dma_id,
                     c.dqa_id,
                     c.plot_code,
+                    c.supplyzone_id,
                     c.muni_id,
                     c.conneccat_id,
                     c.state,
@@ -691,7 +698,7 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = c.state_type
                 WHERE c.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_connec AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 SELECT
                     l.link_id,
                     c.arc_id,
@@ -702,6 +709,7 @@ BEGIN
                     l.presszone_id,
                     l.dma_id,
                     l.dqa_id,
+                    l.supplyzone_id,
                     l.muni_id,
                     l.the_geom
                 FROM link l
@@ -713,7 +721,7 @@ BEGIN
 
             ELSIF v_project_type = 'UD' THEN
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_arc AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
                 SELECT
                     a.arc_id,
                     a.node_1,
@@ -733,7 +741,7 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = a.state_type
                 WHERE a.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_node AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
                 SELECT
                     n.node_id,
                     cf.graph_delimiter,
@@ -751,7 +759,7 @@ BEGIN
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
                 WHERE n.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_connec AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
                 SELECT
                     c.connec_id,
                     c.arc_id,
@@ -770,7 +778,7 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = c.state_type
                 WHERE c.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_gully AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_gully AS
                 SELECT
                     g.gully_id,
                     g.arc_id,
@@ -786,7 +794,7 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = g.state_type
                 WHERE g.state = 1 AND vst.is_operative = TRUE;
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_connec AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 SELECT
                     l.link_id,
                     c.arc_id,
@@ -807,7 +815,7 @@ BEGIN
                 AND vst.is_operative = TRUE
                 AND l.feature_type = 'CONNEC';
 
-                CREATE TEMPORARY VIEW IF NOT EXISTS v_temp_link_gully AS
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
                 SELECT
                     l.link_id,
                     g.arc_id,

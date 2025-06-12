@@ -935,7 +935,7 @@ VALUES(4004, 'Initlevel of %v_count% tanks has been updated.', null, 0, true, 'u
 
 -- 11/06/2025
 UPDATE sys_function SET function_alias = 'CALCULATE COST OF RECONSTRUCTION' WHERE function_name = 'gw_fct_plan_result_recr';
-	
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4006, 'I1ST. STEP Result with this name is already defined on plan_result tables.', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -956,12 +956,10 @@ VALUES(4016, 'Amortized values using age,cost and acoeff have been calculated.',
 
 UPDATE sys_function SET function_alias = 'MINSECTOR DYNAMIC SECTORITZATION' WHERE function_name = 'gw_fct_graphanalytics_minsector';
 
-INSERT INTO sys_label (id, idval, label_type) VALUES (3021, 'DETAILS', 'header');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4018, 'Use psectors: %v_usepsector%', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4018, 'Use psectors:', null, 0, true, 'utils', 'core', 'AUDIT');
-
-    INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4020, 'INFO-%v_fid% : Minsector attribute on arc/node/connec/link features have NOT BEEN updated by this process.', null, 0, true, 'utils', 'core', 'AUDIT');    
+VALUES(4020, 'Minsector attribute on arc/node/connec/link features have NOT BEEN updated by this process.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 UPDATE sys_function SET function_alias = 'SET PSECTOR COST FOR REMOVED PIPES' WHERE function_name = 'gw_fct_setpsectorcostremovedpipes';
