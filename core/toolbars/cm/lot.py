@@ -536,6 +536,10 @@ class AddNewLot:
         if result and result.get("status") == "Accepted":
             self.lot_id = result["body"]["feature"]["id"]
             self.is_new_lot = False
+            print("remove selection")
+            tools_gw.remove_selection(True, layers=self.rel_layers)
+            tools_gw.reset_rubberband(self.rubber_band)
+            tools_qgis.force_refresh_map_canvas()
             # Only close dialog if this was a manual Accept, never for auto-save
             if not from_change_tab:
                 self.dlg_lot.accept()

@@ -387,6 +387,7 @@ class Campaign:
             self.is_new_campaign = False
             tools_gw.remove_selection(True, layers=self.rel_layers)
             tools_gw.reset_rubberband(self.rubber_band)
+            tools_qgis.force_refresh_map_canvas()
 
             # Update campaign ID in the dialog
             campaign_id = result.get("body", {}).get("campaign_id")
