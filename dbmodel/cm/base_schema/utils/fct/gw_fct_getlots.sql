@@ -35,6 +35,7 @@ DECLARE
     aux_json json;
     v_tab record;
     v_featureinfo JSON;
+    query_value text;
 
     -- Custom for lot types
     v_lot_mode text;
@@ -114,6 +115,29 @@ BEGIN
             aux_json := v_fields[array_index];
             IF (aux_json ->> 'columnname') = 'campaign_id' AND v_campaign_id IS NOT NULL THEN
                 v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'value', v_campaign_id);
+            END IF;
+            IF (aux_json ->> 'widgettype') = 'combo' THEN
+                IF (aux_json->>'widgetcontrols') IS NOT NULL THEN
+					IF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_value') THEN
+						IF (aux_json->>'widgetcontrols')::json->>'vdefault_value'::text in  (select a from json_array_elements_text(json_extract_path(v_fields[array_index],'comboIds'))a) THEN
+                            v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'selectedId', (aux_json->>'widgetcontrols')::json->>'vdefault_value');
+						END IF;
+					ELSEIF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
+						EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext' INTO query_value;
+						IF query_value in  (select a from json_array_elements_text(json_extract_path(v_fields[array_index],'comboIds'))a) THEN
+						    v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'selectedId', query_value);
+						END iF;
+					END IF;
+				END IF;
+            ELSE
+                IF (aux_json->>'widgetcontrols') IS NOT NULL THEN
+				    IF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_value') THEN
+					    v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'value', (aux_json->>'widgetcontrols')::json->>'vdefault_value');
+				    ELSEIF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
+					    EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext' INTO query_value;
+					    v_fields[array_index] := gw_fct_json_object_set_key_cm(aux_json, 'value', query_value);
+				    END IF;
+			    END IF;
             END IF;
         END LOOP;
 
