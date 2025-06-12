@@ -41,7 +41,7 @@
         <item row="3" column="3">
          <widget class="QCheckBox" name="campaign_chk_show_nulls">
           <property name="text">
-           <string>Mostrar valors buits</string>
+           <string>Show null values</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -54,14 +54,14 @@
         <item row="1" column="0">
          <widget class="QLabel" name="lbl_state">
           <property name="text">
-           <string>Estat:</string>
+           <string>State</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="lbl_column_filter_dates">
           <property name="text">
-           <string>Columna filtre dates:</string>
+           <string>Filter dates column</string>
           </property>
          </widget>
         </item>
@@ -85,7 +85,7 @@
              <enum>QFrame::Plain</enum>
             </property>
             <property name="text">
-             <string>Des de:</string>
+             <string>From:</string>
             </property>
             <property name="textFormat">
              <enum>Qt::AutoText</enum>
@@ -133,7 +133,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Fins:</string>
+             <string>Until:</string>
             </property>
             <property name="textFormat">
              <enum>Qt::AutoText</enum>
@@ -169,14 +169,14 @@
         <item>
          <widget class="QPushButton" name="campaign_btn_open">
           <property name="text">
-           <string>Obrir Campanya</string>
+           <string>Open Campaign</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="campaign_btn_delete">
           <property name="text">
-           <string>Eliminar Campanya</string>
+           <string>Delete Campaign</string>
           </property>
          </widget>
         </item>
@@ -213,7 +213,7 @@
      <item row="0" column="1">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Tancar</string>
+        <string>Close</string>
        </property>
       </widget>
      </item>

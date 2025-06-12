@@ -20,7 +20,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="LotTab">
          <attribute name="title">
@@ -43,7 +43,7 @@
         </widget>
         <widget class="QWidget" name="RelationsTab">
          <attribute name="title">
-          <string>Relació d'elements</string>
+          <string>Elements relations</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
@@ -174,7 +174,7 @@
         </widget>
         <widget class="QWidget" name="VisitsTab">
          <attribute name="title">
-          <string>Visites</string>
+          <string>Visits</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
@@ -182,7 +182,7 @@
             <item>
              <widget class="QLabel" name="lbl_filter">
               <property name="text">
-               <string>Filtre per element id:</string>
+               <string>Filter by element id:</string>
               </property>
              </widget>
             </item>
@@ -211,7 +211,7 @@
               <item>
                <widget class="QLabel" name="label_data_event_from">
                 <property name="text">
-                 <string>Des de:</string>
+                 <string>From:</string>
                 </property>
                </widget>
               </item>
@@ -229,7 +229,7 @@
               <item>
                <widget class="QLabel" name="label_data_event_to">
                 <property name="text">
-                 <string>Fins:</string>
+                 <string>Unitl:</string>
                 </property>
                </widget>
               </item>
@@ -256,14 +256,14 @@
             <item>
              <widget class="QPushButton" name="btn_open_visit">
               <property name="text">
-               <string>Obrir visita</string>
+               <string>Open visit</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_delete_visit">
               <property name="text">
-               <string>Eliminar visita</string>
+               <string>Delete view</string>
               </property>
              </widget>
             </item>
@@ -283,14 +283,14 @@
             <item>
              <widget class="QPushButton" name="btn_open_photo">
               <property name="text">
-               <string>Obrir foto</string>
+               <string>Open photo</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_validate_all">
               <property name="text">
-               <string>Validar totes</string>
+               <string>Validate all</string>
               </property>
              </widget>
             </item>
@@ -315,7 +315,7 @@
             <item>
              <widget class="QPushButton" name="btn_export_visits">
               <property name="text">
-               <string>Exportar a csv</string>
+               <string>Export to csv</string>
               </property>
              </widget>
             </item>
@@ -353,14 +353,14 @@
      <item row="0" column="1">
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
-        <string>Acceptar</string>
+        <string>Accept</string>
        </property>
       </widget>
      </item>
      <item row="0" column="2">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Cancel·lar</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>
