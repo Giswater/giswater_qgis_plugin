@@ -114,6 +114,7 @@ BEGIN
             ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN to_arc int4;
+            ALTER TABLE temp_pgr_node ADD COLUMN inlet_arc _int4;
             IF v_fct_name = 'MINCUT' THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN cost_mapzone int default 1;
                 ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mapzone int default 1;
