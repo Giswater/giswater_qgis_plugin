@@ -20,7 +20,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="CampaignTab">
          <attribute name="title">
@@ -161,7 +161,7 @@
                   <enum>QFrame::Plain</enum>
                  </property>
                  <property name="text">
-                  <string>Inici planificat:</string>
+                  <string>Planified start:</string>
                  </property>
                  <property name="textFormat">
                   <enum>Qt::AutoText</enum>
@@ -252,7 +252,7 @@
                   <enum>QFrame::Plain</enum>
                  </property>
                  <property name="text">
-                  <string>Final planificat:</string>
+                  <string>Planified end:</string>
                  </property>
                  <property name="textFormat">
                   <enum>Qt::AutoText</enum>

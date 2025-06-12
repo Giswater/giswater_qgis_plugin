@@ -250,7 +250,7 @@ class GwSchemaI18NManager:
 
             # Get the schema to update
             self.schema_org = self.project_type
-            if self.project_type != "am":
+            if self.project_type not in ["am", "cm"]:
                 self.schema_org = f"{self.project_type}{major_version}_trans"
 
             # Check if the schema exists
@@ -876,10 +876,12 @@ class GwSchemaI18NManager:
         keys = ["<string>", "<widget", 'name=']
         avoid_keys = ["<action name="]
         for file in files:
-            coincidencias = self._search_lines(file, keys[0], avoid_keys)
+            coincidencias = self._search_lines(file, keys[0])
             if coincidencias:
                 for num_line, content in coincidencias:
-                    dialog_name, toolbar_name, source = self._search_dialog_info(file, keys[1], keys[2], num_line)
+                    dialog_name, toolbar_name, source = self._search_dialog_info(file, keys[1], keys[2], num_line, avoid_keys)
+                    if source == False:
+                        continue
                     pattern = r'>(.*?)<'
                     match = re.search(pattern, content)
                     if match:
@@ -1111,8 +1113,6 @@ class GwSchemaI18NManager:
                                 # Begin multi-line
                                 in_multiline = True
                                 full_text = line
-                    elif avoid_keys and any(avoid_key in line for avoid_key in avoid_keys):
-                        continue
 
         except FileNotFoundError:
             msg = "File not found: {0}"
@@ -1144,7 +1144,7 @@ class GwSchemaI18NManager:
         return found_lines
     
 
-    def _search_dialog_info(self, file, key_row, key_text, num_line):
+    def _search_dialog_info(self, file, key_row, key_text, num_line, avoid_keys=None):
         """ Search for the dialog info in the file """
 
         with open(file, "r", encoding="utf-8") as f:
@@ -1158,6 +1158,8 @@ class GwSchemaI18NManager:
             
             # Search for the key in the file, starting from the given line
             while num_line >= 0 and key_row not in lines[num_line]:
+                if avoid_keys and any(avoid_key in lines[num_line] for avoid_key in avoid_keys):
+                    return dialog_name, toolbar_name, False
                 num_line -= 1  
             
             if num_line < 0:
