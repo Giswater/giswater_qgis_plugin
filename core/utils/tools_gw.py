@@ -4228,16 +4228,22 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
         model = widget.model()
         # Find column index for the field_id
         col_index = -1
-        for c in range(model.columnCount()):
-            header_item = model.horizontalHeaderItem(c)
-            if header_item and header_item.text() == field_id:
-                col_index = c
-                break
+        if isinstance(model, tools_qt.QSqlTableModel):
+            col_index = model.fieldIndex(field_id)
+        else:
+            for c in range(model.columnCount()):
+                header_item = model.horizontalHeaderItem(c)
+                if header_item and header_item.text() == field_id:
+                    col_index = c
+                    break
 
         if col_index != -1:
             for i in range(0, len(selected_list)):
                 row = selected_list[i].row()
-                id_feature = model.item(row, col_index).text()
+                if isinstance(model, tools_qt.QSqlTableModel):
+                    id_feature = model.record(row).value(col_index)
+                else:
+                    id_feature = model.item(row, col_index).text()
                 inf_text += f"{id_feature}, "
                 list_id += f"'{id_feature}', "
                 del_id.append(id_feature)
@@ -4289,13 +4295,19 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
             # Special handling for Campaign manager's QStandardItemModel
             model = widget.model()
             col_index = -1
-            for c in range(model.columnCount()):
-                header_item = model.horizontalHeaderItem(c)
-                if header_item and header_item.text() == extra_field:
-                    col_index = c
-                    break
+            if isinstance(model, tools_qt.QSqlTableModel):
+                col_index = model.fieldIndex(extra_field)
+            else:
+                for c in range(model.columnCount()):
+                    header_item = model.horizontalHeaderItem(c)
+                    if header_item and header_item.text() == extra_field:
+                        col_index = c
+                        break
             if col_index != -1:
-                state = model.item(selected_list[0].row(), col_index).text()
+                if isinstance(model, tools_qt.QSqlTableModel):
+                    state = model.record(selected_list[0].row()).value(col_index)
+                else:
+                    state = model.item(selected_list[0].row(), col_index).text()
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.rel_layers)
 
@@ -4305,13 +4317,19 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
             # Special handling for Lot manager's QStandardItemModel
             model = widget.model()
             col_index = -1
-            for c in range(model.columnCount()):
-                header_item = model.horizontalHeaderItem(c)
-                if header_item and header_item.text() == extra_field:
-                    col_index = c
-                    break
+            if isinstance(model, tools_qt.QSqlTableModel):
+                col_index = model.fieldIndex(extra_field)
+            else:
+                for c in range(model.columnCount()):
+                    header_item = model.horizontalHeaderItem(c)
+                    if header_item and header_item.text() == extra_field:
+                        col_index = c
+                        break
             if col_index != -1:
-                state = model.item(selected_list[0].row(), col_index).text()
+                if isinstance(model, tools_qt.QSqlTableModel):
+                    state = model.record(selected_list[0].row()).value(col_index)
+                else:
+                    state = model.item(selected_list[0].row(), col_index).text()
         _delete_feature_lot(dialog, feature_type, list_id, class_object.lot_id, state)
         load_tableview_lot(dialog, class_object.feature_type, class_object.lot_id, class_object.rel_layers)
     elif selection_mode == GwSelectionMode.FEATURE_END:
