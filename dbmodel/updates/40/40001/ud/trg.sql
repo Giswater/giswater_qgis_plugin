@@ -691,3 +691,6 @@ DELETE
 UPDATE
     ON
     v_edit_inp_virtual FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_virtual');
+
+CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('connec');

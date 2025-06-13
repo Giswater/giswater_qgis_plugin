@@ -6879,6 +6879,19 @@ AS SELECT cat_feature.id,
    FROM cat_feature
      JOIN cat_feature_node USING (id);
 
+CREATE OR REPLACE VIEW v_edit_cat_feature_connec
+AS SELECT cat_feature.id,
+    cat_feature.feature_class AS system_id,
+    cat_feature_connec.epa_default,
+    cat_feature.code_autofill,
+    cat_feature_connec.double_geom::text AS double_geom,
+    cat_feature.shortcut_key,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_connec USING (id);
+
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node
 AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,

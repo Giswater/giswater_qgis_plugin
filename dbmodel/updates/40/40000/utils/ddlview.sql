@@ -461,6 +461,8 @@ DROP VIEW IF EXISTS v_man_gully;
 DROP VIEW IF EXISTS ve_epa_virtual;
 DROP VIEW IF EXISTS v_edit_inp_virtual;
 
+DROP VIEW IF EXISTS v_edit_cat_feature_connec;
+
 -- 30/10/2024
 
 CREATE OR REPLACE VIEW vcv_times AS

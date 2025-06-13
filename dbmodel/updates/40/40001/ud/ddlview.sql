@@ -8168,37 +8168,14 @@ AS SELECT v_edit_arc.arc_id,
      JOIN inp_virtual USING (arc_id)
   WHERE v_edit_arc.is_operative IS TRUE;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+CREATE OR REPLACE VIEW v_edit_cat_feature_connec
+AS SELECT cat_feature.id,
+    cat_feature.feature_class AS system_id,
+    cat_feature.code_autofill,
+    cat_feature_connec.double_geom::text AS double_geom,
+    cat_feature.shortcut_key,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_connec USING (id);

@@ -38,15 +38,13 @@ BEGIN
 
 		ELSIF v_table='connec' THEN
 
+			-- control nulls
+			IF NEW.double_geom IS NULL THEN NEW.double_geom='{"activated":false,"value":1}'; END IF;
+
+			UPDATE cat_feature_connec SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
+
 			IF v_project_type='ws' THEN
 				UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
-
-			ELSIF v_project_type='ud' THEN
-
-				-- control nulls
-				IF NEW.double_geom IS NULL THEN NEW.double_geom='{"activated":false,"value":1}'; END IF;
-
-				UPDATE cat_feature_connec SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 			END IF;
 
 		ELSIF v_table='node' THEN
@@ -96,10 +94,10 @@ BEGIN
 
 		ELSIF v_table='connec' THEN
 
+			UPDATE cat_feature_connec SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
+
 			IF v_project_type='ws' THEN
 				UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
-			ELSIF v_project_type='ud' THEN
-				UPDATE cat_feature_connec SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 			END IF;
 
 		ELSIF v_table='node' THEN

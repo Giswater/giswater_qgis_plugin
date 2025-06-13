@@ -466,6 +466,9 @@ FROM (new.omzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('omzone');
 CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_node
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('node');
 
+CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('connec');
+
 CREATE TRIGGER gw_trg_edit_plan_netscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_plan_netscenario_valve
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_netscenario('VALVE');
 
