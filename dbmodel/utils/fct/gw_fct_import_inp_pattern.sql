@@ -39,10 +39,15 @@ BEGIN
 
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('IMPORT INP PATTERNS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('---------------------------'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Checking exisiting pattern id on table inp_pattern -> Done'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3048", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3922", "function":"3048", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3940", "function":"3048", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"4", "is_process":true}}$$)';
+
 
 	-- reset sequence
 	IF v_project_type = 'WS' THEN
@@ -57,20 +62,21 @@ BEGIN
 
 			IF rec_csv.csv1 NOT IN (SELECT pattern_id FROM inp_pattern) THEN
 
-				-- insert log				
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message, table_id) 
-				VALUES (v_fid, v_result_id, 1, concat('INFO: Pattern id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1);
-				
-				-- insert inp_pattern & inp_pattern_value	
+				-- insert log
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3942", "function":"3048", "parameters":{"rec_csv.csv1":"'||rec_csv.csv1||'"}, "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "table_id":"'||rec_csv.csv1||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
+
+
+				-- insert inp_pattern & inp_pattern_value
 				IF v_project_type = 'UD' THEN
 
-					INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id, log) VALUES (rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::integer, 
+					INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id, log) VALUES (rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::integer,
 					concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
-			
-					INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, 
+
+					INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12,
 					factor_13, factor_14, factor_15, factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24) VALUES
 					(rec_csv.csv1, rec_csv.csv5::float, rec_csv.csv6::float, rec_csv.csv7::float, rec_csv.csv8::float, rec_csv.csv9::float
-					, rec_csv.csv10::float, rec_csv.csv11::float, rec_csv.csv12::float, rec_csv.csv13::float, rec_csv.csv14::float, rec_csv.csv15::float, rec_csv.csv16::float, rec_csv.csv17::float 
+					, rec_csv.csv10::float, rec_csv.csv11::float, rec_csv.csv12::float, rec_csv.csv13::float, rec_csv.csv14::float, rec_csv.csv15::float, rec_csv.csv16::float, rec_csv.csv17::float
 					, rec_csv.csv18::float, rec_csv.csv19::float, rec_csv.csv20::float, rec_csv.csv21::float, rec_csv.csv22::float, rec_csv.csv23::float, rec_csv.csv24::float, rec_csv.csv25::float
 					, rec_csv.csv26::float, rec_csv.csv27::float, rec_csv.csv28::float);
 				ELSE
@@ -79,23 +85,24 @@ BEGIN
 
 			ELSIF rec_csv.csv1 IN (SELECT pattern_id FROM inp_pattern) AND rec_csv.csv1 IN (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user)   THEN
 
-				-- insert inp_pattern_value				
+				-- insert inp_pattern_value
 				IF v_project_type = 'WS' THEN
-				
-					INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, 
+
+					INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12,
 					factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) VALUES
 					(rec_csv.csv1, rec_csv.csv2::float, rec_csv.csv3::float, rec_csv.csv4::float, rec_csv.csv5::float, rec_csv.csv6::float, rec_csv.csv7::float, rec_csv.csv8::float, rec_csv.csv9::float
-					, rec_csv.csv10::float, rec_csv.csv11::float, rec_csv.csv12::float, rec_csv.csv13::float, rec_csv.csv14::float, rec_csv.csv15::float, rec_csv.csv16::float, rec_csv.csv17::float 
+					, rec_csv.csv10::float, rec_csv.csv11::float, rec_csv.csv12::float, rec_csv.csv13::float, rec_csv.csv14::float, rec_csv.csv15::float, rec_csv.csv16::float, rec_csv.csv17::float
 					, rec_csv.csv18::float, rec_csv.csv19::float);
 				END IF;
 
 			ELSE
-				IF rec_csv.csv1 IN (SELECT column_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user) THEN 
-				
-				ELSE 
+				IF rec_csv.csv1 IN (SELECT column_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user) THEN
+
+				ELSE
 					-- insert log
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message, column_id, cur_user) 
-					VALUES (v_fid, v_result_id, 2, concat('WARNING: Pattern id (',rec_csv.csv1,') already exists on inp_pattern -> Import have been canceled for this pattern'), rec_csv.csv1, current_user);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3944", "function":"3048", "parameters":{"rec_csv.csv1":"'||rec_csv.csv1||'"}, "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "column_id":"'||rec_csv.csv1||'", "cur_user":"'||current_user||'", "criticity":"2", "prefix_id":"1002", "is_process":true}}$$)';
+
 				END IF;
 			END IF;
 		END IF;
@@ -106,15 +113,15 @@ BEGIN
 
 
 	-- get log (fid: v_fid)
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid ORDER BY criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-			
+
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
- 
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"Process executed"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
