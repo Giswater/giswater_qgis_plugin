@@ -160,7 +160,7 @@ BEGIN
     -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR' or "graph_delimiter" = 'SECTOR'
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
--- NODES VALVES
+    -- NODES VALVES
     UPDATE temp_pgr_node t
     SET graph_delimiter = 'minsector'
 	FROM v_temp_node n
@@ -217,7 +217,7 @@ BEGIN
 
 	-- cost/reverse_cost for the valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 
--- Set modif = TRUE for nodes where "graph_delimiter" = 'sector'
+    -- Set modif = TRUE for nodes where "graph_delimiter" = 'sector'
     UPDATE temp_pgr_node t
     SET graph_delimiter = 'sector', modif = TRUE
     FROM v_temp_node n
@@ -234,12 +234,10 @@ BEGIN
     FROM man_source n
     WHERE t.node_id = n.node_id AND t.graph_delimiter = 'sector' AND n.inlet_arc IS NOT NULL;
 
-    /* falta activar el codi quan man_waterwell té el camp inlet_arc
     UPDATE temp_pgr_node t
     SET inlet_arc = n.inlet_arc
     FROM man_waterwell n
     WHERE t.node_id = n.node_id AND t.graph_delimiter = 'sector' AND n.inlet_arc IS NOT NULL;
-    */
 
     -- ARCS to be disconnected:
     -- ARCS VALVES
