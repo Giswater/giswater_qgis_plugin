@@ -591,6 +591,7 @@ class AddNewLot:
         self.load_lots_into_manager()
         self.init_filters()
 
+        self.dlg_lot_man.btn_cancel.clicked.connect(self.dlg_lot_man.reject)
         self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
         self.dlg_lot_man.date_event_to.dateChanged.connect(self.filter_lot)
         self.dlg_lot_man.cmb_date_filter_type.currentIndexChanged.connect(self.filter_lot)

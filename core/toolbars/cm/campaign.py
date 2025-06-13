@@ -64,6 +64,7 @@ class Campaign:
         tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_state, rows, index_to_show=1, add_empty=True)
 
         # Set filter events
+        self.manager_dialog.btn_cancel.clicked.connect(self.manager_dialog.reject)
         self.manager_dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
         self.manager_dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
         self.manager_dialog.date_event_from.dateChanged.connect(self.filter_campaigns)
