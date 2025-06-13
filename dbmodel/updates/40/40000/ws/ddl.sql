@@ -818,6 +818,7 @@ ALTER TABLE node ADD CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REF
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"automated", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"connection_type", "dataType":"integer", "isUtils":"False"}}$$);
 UPDATE man_valve SET connection_type=0 WHERE connection_type IS NULL;
+ALTER TABLE man_valve ALTER COLUMN connection_type SET DEFAULT 0;
 ALTER TABLE man_valve ALTER COLUMN connection_type SET NOT NULL;
 
 -- man_tank
@@ -828,6 +829,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"fence_type", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"fence_length", "dataType":"float", "isUtils":"False"}}$$);
 UPDATE man_tank SET shape=0 WHERE shape IS NULL;
+ALTER TABLE man_tank ALTER COLUMN shape SET DEFAULT 0;
 ALTER TABLE man_tank ALTER COLUMN shape SET NOT NULL;
 
 -- man_netelement
@@ -865,15 +867,19 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"subbasin_id", "dataType":"integer", "isUtils":"False"}}$$);
 
 UPDATE man_source SET source_type=0 WHERE source_type IS NULL;
+ALTER TABLE man_source ALTER COLUMN source_type SET DEFAULT 0;
 ALTER TABLE man_source ALTER COLUMN source_type SET NOT NULL;
 
 UPDATE man_source SET aquifer_type=0 WHERE aquifer_type IS NULL;
+ALTER TABLE man_source ALTER COLUMN aquifer_type SET DEFAULT 0;
 ALTER TABLE man_source ALTER COLUMN aquifer_type SET NOT NULL;
 
 UPDATE man_source SET basin_id=0 WHERE basin_id IS NULL;
+ALTER TABLE man_source ALTER COLUMN basin_id SET DEFAULT 0;
 ALTER TABLE man_source ALTER COLUMN basin_id SET NOT NULL;
 
 UPDATE man_source SET subbasin_id=0 WHERE subbasin_id IS NULL;
+ALTER TABLE man_source ALTER COLUMN subbasin_id SET DEFAULT 0;
 ALTER TABLE man_source ALTER COLUMN subbasin_id SET NOT NULL;
 
 
