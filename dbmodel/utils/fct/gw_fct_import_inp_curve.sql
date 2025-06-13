@@ -41,10 +41,15 @@ BEGIN
 
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('IMPORT INP CURVES'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('---------------------------'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Checking exisiting curve id on table inp_curve -> Done'));
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3044", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3922", "function":"3044", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3934", "function":"3044", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"4", "is_process":true}}$$)';
 
 	-- reset sequence
 	PERFORM setval('inp_curve_value_id_seq', (SELECT max(id) FROM inp_curve_value), true);
@@ -54,16 +59,16 @@ BEGIN
 	LOOP
 
 		IF rec_csv.csv1 IS NOT NULL THEN -- to control those null rows because user has a bad structured csv file (common last lines)
-			
+
 			IF rec_csv.csv1 NOT IN (SELECT id FROM inp_curve) THEN
 
 				-- insert log
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message, table_id) 
-				VALUES (v_fid, v_result_id, 1, concat('INFO: Curve id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3936", "function":"3044", "parameters":{"rec_csv.csv1":"'||rec_csv.csv1||'"}, "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "table_id":"'||rec_csv.csv1||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
 
 				-- insert inp_curve
 				INSERT INTO inp_curve VALUES (rec_csv.csv1, rec_csv.csv4, rec_csv.csv6, rec_csv.csv5::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
-					
+
 				-- insert into inp_curve_value
 				INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES
 				(rec_csv.csv1, rec_csv.csv2::float, rec_csv.csv3::float);
@@ -72,34 +77,35 @@ BEGIN
 			ELSIF rec_csv.csv1 IN (SELECT id FROM inp_curve) AND rec_csv.csv1 IN (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user)   THEN
 
 				-- insert into inp_curve_value
-				INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES	(rec_csv.csv1, rec_csv.csv2::float, rec_csv.csv3::float);			
+				INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES	(rec_csv.csv1, rec_csv.csv2::float, rec_csv.csv3::float);
 
 			ELSIF rec_csv.csv1 IN (SELECT id FROM inp_curve) THEN
 
-				IF rec_csv.csv1 IN (SELECT column_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user) THEN 
-				
-				ELSE 
+				IF rec_csv.csv1 IN (SELECT column_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user) THEN
+
+				ELSE
 					-- insert log
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message, column_id, cur_user) 
-					VALUES (v_fid, v_result_id, 2, concat('WARNING: Curve id (',rec_csv.csv1,') already exists on inp_curve -> Import have been canceled for this curve'), rec_csv.csv1, current_user);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3938", "function":"3044", "parameters":{"rec_csv.csv1":"'||rec_csv.csv1||'"}, "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"2", "column_id":"'||rec_csv.csv1||'", "cur_user":"'||current_user||'", "prefix_id":"1002", "is_process":true}}$$)';
 				END IF;
 			END IF;
 		END IF;
 	END LOOP;
 
 	-- manage log (fid: v_fid)
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('Process finished'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3926", "function":"3044", "fid":"'||v_fid||'", "result_id":"'||v_result_id||'", "criticity":"1", "is_process":true}}$$)';
 
 	-- get log (fid: v_fid)
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid ORDER BY criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-			
+
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
- 
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"Process executed"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||

@@ -2126,7 +2126,17 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3476, 'gw_trg_edit_view_campaign', 'utils', 'function', NULL, NULL, 'An INSTEAD OF UPDATE trigger for a view that redirects updates of status and observation fields to the appropriate underlying table (om_campaign_x_<feature>). NOTE: This trigger is critically flawed due to a hardcoded column name and will only function correctly for ''node'' features', NULL, NULL, 'core', NULL);
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3478, 'gw_trg_lot_x_feature_check_campaign', 'utils', 'function', NULL, NULL, 'A validation trigger that ensures a feature can only be added to a work lot if that same feature is also part of the lot''s parent campaign. If the feature is not in the campaign, the insertion into the lot is silently canceled', NULL, NULL, 'core', NULL);
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3480, 'gw_trg_lot_x_feature', 'utils', 'function', NULL, NULL, 'Automatically copies feature data to a denormalized table when a feature is added to a work lot, and deletes it upon removal. NOTE: The INSERT logic is flawed', NULL, NULL, 'core', NULL);
+UPDATE sys_function SET function_alias = 'IMPORT INP CURVES' WHERE function_name = 'gw_fct_import_inp_curve';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3934, 'Checking exisiting curve id on table inp_curve -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3936, 'Curve id (%rec_csv.csv1%) have been imported succesfully', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3938, 'Curve id (%rec_csv.csv1%) already exists on inp_curve -> Import have been canceled for this curve', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
-VALUES(3426, 'Integrate campaign into production', '{"featureType":[]}'::json, 
+VALUES(3426, 'Integrate campaign into production', '{"featureType":[]}'::json,
 '[{"widgetname": "campaignId", "label": "Campaign:", "widgettype": "combo", "datatype": "text", "tooltip": "Campaign to be inserted into production environment", "layoutname": "grl_option_parameters", "layoutorder": 1, "dvQueryText": "select campaign_id as id, name as idval from cm.om_campaign WHERE status = 8 order by name", "isNullValue": "true", "selectedId": ""}]', NULL, true, '{4}');
