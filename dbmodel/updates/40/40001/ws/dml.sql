@@ -966,3 +966,6 @@ UPDATE sys_function SET function_alias = 'SET PSECTOR COST FOR REMOVED PIPES' WH
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4022, 'Missing node_1 or node_2 on arcs: %v_arc_list%. Please check your data before continue', null, 2, true, 'ws', 'core', 'UI');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4024, 'Minsector attribute on arc/node/connec/link features have been updated by this process.', null, 0, true, 'utils', 'core', 'AUDIT');

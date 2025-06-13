@@ -126,35 +126,6 @@ BEGIN
             END IF;
         END IF;
 
-        -- For specific functions
-        IF v_fct_name = 'MINSECTOR' THEN
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
-                seq INT8 NOT NULL,
-                component INT8 NULL,
-                node INT8 NULL,
-                CONSTRAINT temp_pgr_connectedcomponents_pkey PRIMARY KEY (seq)
-            );
-            CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
-            CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
-
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
-
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_edges (
-                pgr_arc_id INT8 NOT NULL,
-                graph_delimiter VARCHAR(30),
-                mincut_id INT8,
-                minsector_1 INT8 NOT NULL,
-                minsector_2 INT8 NOT NULL,
-                "cost" FLOAT8,
-                reverse_cost FLOAT8,
-                CONSTRAINT temp_pgr_minsector_edges_pkey PRIMARY KEY (pgr_arc_id)
-            );
-            CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_1_idx ON temp_pgr_minsector_edges USING btree (minsector_1);
-            CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_2_idx ON temp_pgr_minsector_edges USING btree (minsector_2);
-
-        END IF;
 
         -- Create temporary views
         IF v_use_psector = 'true' THEN
@@ -854,18 +825,108 @@ BEGIN
 
         END IF;
 
+        -- For specific functions
         IF v_fct_name = 'MINSECTOR' THEN
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
+                seq INT8 NOT NULL,
+                component INT8 NULL,
+                node INT8 NULL,
+                CONSTRAINT temp_pgr_connectedcomponents_pkey PRIMARY KEY (seq)
+            );
+            CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
+            CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
+
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
+
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_edges (
+                pgr_arc_id INT8 NOT NULL,
+                graph_delimiter VARCHAR(30),
+                mincut_id INT8,
+                minsector_1 INT8 NOT NULL,
+                minsector_2 INT8 NOT NULL,
+                "cost" FLOAT8,
+                reverse_cost FLOAT8,
+                CONSTRAINT temp_pgr_minsector_edges_pkey PRIMARY KEY (pgr_arc_id)
+            );
+            CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_1_idx ON temp_pgr_minsector_edges USING btree (minsector_1);
+            CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_2_idx ON temp_pgr_minsector_edges USING btree (minsector_2);
+
             CREATE OR REPLACE TEMPORARY VIEW temp_pgr_minsector_old AS
             SELECT DISTINCT v.minsector_id
             FROM temp_pgr_arc t
             JOIN v_temp_arc v USING (arc_id)
             WHERE v.minsector_id IS NOT NULL;
+
+            CREATE OR REPLACE TEMPORARY VIEW v_temp_minsector_mincut AS
+            WITH mapzones AS (
+                SELECT
+                    t.mincut_minsector_id AS minsector_id,
+                    array_agg(DISTINCT t.dma_id) AS dma_id,
+                    array_agg(DISTINCT t.dqa_id) AS dqa_id,
+                    array_agg(DISTINCT t.presszone_id) AS presszone_id,
+                    array_agg(DISTINCT t.expl_id) AS expl_id,
+                    array_agg(DISTINCT t.sector_id) AS sector_id,
+                    array_agg(DISTINCT t.muni_id) AS muni_id,
+                    array_agg(DISTINCT t.supplyzone_id) AS supplyzone_id
+                FROM (
+                    SELECT
+                        m.minsector_id,
+                        mm.minsector_id AS mincut_minsector_id,
+                        unnest(m.dma_id) AS dma_id,
+                        unnest(m.dqa_id) AS dqa_id,
+                        unnest(m.presszone_id) AS presszone_id,
+                        unnest(m.expl_id) AS expl_id,
+                        unnest(m.sector_id) AS sector_id,
+                        unnest(m.muni_id) AS muni_id,
+                        unnest(m.supplyzone_id) AS supplyzone_id
+                    FROM minsector m
+                    JOIN minsector_mincut mm ON mm.mincut_minsector_id = m.minsector_id
+                ) t
+                GROUP BY t.mincut_minsector_id
+            ),
+            sums AS (
+                SELECT
+                    mm.minsector_id,
+                    SUM(m.num_border) AS num_border,
+                    SUM(m.num_connec) AS num_connec,
+                    SUM(m.num_hydro) AS num_hydro,
+                    SUM(m.length) AS length
+                FROM minsector_mincut mm
+                JOIN minsector m ON m.minsector_id = mm.mincut_minsector_id
+                GROUP BY mm.minsector_id
+            )
+            SELECT
+                m.minsector_id,
+                dma_id,
+                dqa_id,
+                presszone_id,
+                expl_id,
+                sector_id,
+                muni_id,
+                supplyzone_id,
+                num_border,
+                num_connec,
+                num_hydro,
+                length
+            FROM mapzones m JOIN sums s ON s.minsector_id = m.minsector_id;
         END IF;
 
 
 
         v_return_message = 'The temporary tables/views have been created successfully';
     ELSIF v_action = 'DROP' THEN
+
+        -- Drop temporary views
+        DROP VIEW IF EXISTS v_temp_node;
+        DROP VIEW IF EXISTS v_temp_arc;
+        DROP VIEW IF EXISTS v_temp_connec;
+        DROP VIEW IF EXISTS v_temp_gully;
+        DROP VIEW IF EXISTS v_temp_link_connec;
+        DROP VIEW IF EXISTS v_temp_link_gully;
+        DROP VIEW IF EXISTS v_temp_minsector_mincut;
+        DROP VIEW IF EXISTS temp_pgr_minsector_old;
 
         -- Drop temporary tables
         DROP TABLE IF EXISTS temp_pgr_mapzone;
@@ -876,19 +937,10 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_minsector_graph;
         DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
-        DROP TABLE IF EXISTS temp_minsector_mincut;
+        DROP TABLE IF EXISTS temp_pgr_minsector_mincut;
         DROP TABLE IF EXISTS temp_pgr_minsector_edges;
 
-        -- Drop temporary views
-        DROP VIEW IF EXISTS v_temp_node;
-        DROP VIEW IF EXISTS v_temp_arc;
-        DROP VIEW IF EXISTS v_temp_connec;
-        DROP VIEW IF EXISTS v_temp_gully;
-        DROP VIEW IF EXISTS v_temp_link_connec;
-        DROP VIEW IF EXISTS v_temp_link_gully;
-        DROP VIEW IF EXISTS temp_pgr_minsector_old;
-
-        v_return_message = 'The temporary tables have been dropped successfully';
+        v_return_message = 'The temporary tables/views have been dropped successfully';
     END IF;
 
     RETURN jsonb_build_object(

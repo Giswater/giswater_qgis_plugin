@@ -161,7 +161,7 @@ BEGIN
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
 -- NODES VALVES
-    UPDATE temp_pgr_node t 
+    UPDATE temp_pgr_node t
     SET graph_delimiter = 'minsector'
 	FROM v_temp_node n
 	WHERE t.node_id = n.node_id AND 'MINSECTOR' = ANY(n.graph_delimiter);
@@ -169,49 +169,49 @@ BEGIN
 	-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
 
 	-- CLOSED valves with or without to_arc
-	UPDATE temp_pgr_node t 
-    SET closed = v.closed, 
-        broken = v.broken, 
+	UPDATE temp_pgr_node t
+    SET closed = v.closed,
+        broken = v.broken,
         modif = TRUE
 	FROM man_valve v
-	WHERE t.node_id = v.node_id 
+	WHERE t.node_id = v.node_id
         AND t.graph_delimiter = 'minsector'
         AND v.closed = TRUE;
 
 	-- OPEN valves without to_arc
     IF v_ignorebrokenvalves THEN
-        UPDATE temp_pgr_node t 
+        UPDATE temp_pgr_node t
         SET closed = v.closed,
-            broken = v.broken, 
+            broken = v.broken,
             modif = TRUE
         FROM man_valve v
-        WHERE t.node_id = v.node_id 
+        WHERE t.node_id = v.node_id
             AND t.graph_delimiter = 'minsector'
-            AND v.closed = FALSE 
+            AND v.closed = FALSE
             AND v.to_arc IS NULL
             AND v.broken = FALSE ; -- only broken = false
     ELSE
-        UPDATE temp_pgr_node t 
+        UPDATE temp_pgr_node t
         SET closed = v.closed,
-            broken = v.broken, 
+            broken = v.broken,
             modif = TRUE
         FROM man_valve v
-        WHERE t.node_id = v.node_id 
+        WHERE t.node_id = v.node_id
             AND t.graph_delimiter = 'minsector'
-            AND v.closed = FALSE 
+            AND v.closed = FALSE
             AND v.to_arc IS NULL;
     END IF;
 
     -- OPEN valves WITH to_arc; only if broken = false
-	UPDATE temp_pgr_node t 
+	UPDATE temp_pgr_node t
     SET closed = v.closed,
-        broken = v.broken, 
+        broken = v.broken,
         to_arc = v.to_arc,
         modif = TRUE
 	FROM man_valve v
-	WHERE t.node_id = v.node_id 
+	WHERE t.node_id = v.node_id
         AND t.graph_delimiter = 'minsector'
-        AND v.closed = FALSE 
+        AND v.closed = FALSE
         AND v.to_arc IS NOT NULL
         AND v.broken = FALSE;
 
@@ -253,7 +253,7 @@ BEGIN
 			a.pgr_node_2
 		FROM temp_pgr_node n
 		JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter = 'minsector' AND n.modif = TRUE AND n.to_arc IS NULL 
+		WHERE n.graph_delimiter = 'minsector' AND n.modif = TRUE AND n.to_arc IS NULL
 	),
 	arcs_modif AS (
 		SELECT
@@ -344,20 +344,20 @@ BEGIN
 
     -- for open valves with to_arc
     UPDATE temp_pgr_arc a
-	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END, 
-		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END 
+	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END,
+		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END
 	FROM temp_pgr_node n
 	WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	AND a.graph_delimiter = 'minsector' 
+	AND a.graph_delimiter = 'minsector'
     AND n.to_arc IS NOT NULL;
 
     -- for SECTORS - only the inlet arcs
     UPDATE temp_pgr_arc a
-	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END, 
-		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END 
+	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END,
+		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END
 	FROM temp_pgr_node n
 	WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	AND a.graph_delimiter = 'sector' 
+	AND a.graph_delimiter = 'sector'
     AND a.old_arc_id = ANY (n.inlet_arc);
 
     -- Generate the minsectors
@@ -403,13 +403,13 @@ BEGIN
     -- table used for Massive Mincut; for SECTORS, mapzone_id=0 is replaced for node_id; the node_id for Sectors don't exist in temp_pgr_minsector)
     INSERT INTO temp_pgr_minsector_edges (pgr_arc_id, graph_delimiter, minsector_1, minsector_2, cost, reverse_cost)
     SELECT a.pgr_arc_id, a.graph_delimiter,
-    COALESCE (NULLIF(n1.mapzone_id,0), a.node_1) AS minsector_1, 
+    COALESCE (NULLIF(n1.mapzone_id,0), a.node_1) AS minsector_1,
     COALESCE (NULLIF(n2.mapzone_id,0), a.node_2) AS minsector_2,
     a.cost, a.reverse_cost
     FROM temp_pgr_arc a
-    JOIN temp_pgr_node n1 ON n1.pgr_node_id = a.pgr_node_1  
-    JOIN temp_pgr_node n2 ON n2.pgr_node_id = a.pgr_node_2 
-    WHERE arc_id IS NULL 
+    JOIN temp_pgr_node n1 ON n1.pgr_node_id = a.pgr_node_1
+    JOIN temp_pgr_node n2 ON n2.pgr_node_id = a.pgr_node_2
+    WHERE arc_id IS NULL
     AND  n1.mapzone_id <> n2.mapzone_id;
 
     -- Set mapzone_id to 0 for nodes at the border of minsectors
@@ -587,11 +587,30 @@ BEGIN
                 ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
                 ''properties'', to_jsonb(row) - ''the_geom''
             ) AS feature
-            FROM (SELECT * FROM temp_pgr_minsector) row
+            FROM (
+                SELECT 
+                    minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
+                    num_border, num_connec, num_hydro, length, the_geom, ''v_edit_minsector'' AS layer 
+                FROM temp_pgr_minsector
+            ) row
+            UNION
+            SELECT jsonb_build_object(
+                ''type'',       ''Feature'',
+                ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+                ''properties'', to_jsonb(row) - ''the_geom''
+            ) AS feature
+            FROM (
+                SELECT 
+                    minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
+                    num_border, num_connec, num_hydro, length, the_geom, ''v_edit_minsector_mincut'' AS layer 
+                FROM v_temp_minsector_mincut
+            ) row
         ) features' INTO v_result;
 
         v_result := COALESCE(v_result, '{}');
-        v_result_polygon := CONCAT('{"geometryType":"Polygon", "features":', v_result, '}');
+        v_result_polygon := CONCAT('{"geometryType":"Polygon", "layerName": "Minsector Analysis", "features":', v_result, '}');
+
+        v_visible_layer = NULL;
 
         -- Message
         EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4020", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001",	 "is_process":true}}$$)';
@@ -722,25 +741,14 @@ BEGIN
         ';
         EXECUTE v_querytext;
 
-
-        v_result := NULL;
-        v_result := COALESCE(v_result, '{}');
-        v_result_polygon := CONCAT('{"geometryType":"Polygon", "features":', v_result, '}');
-        v_visible_layer := NULL;
+        v_visible_layer ='"v_edit_minsector", "v_edit_minsector_mincut"';
 
         -- Message
-        INSERT INTO temp_audit_check_data (fid, error_message)
-        VALUES (v_fid, CONCAT('INFO-', v_fid, ': Minsector attribute on arc/node/connec/link features have been updated by this process'));
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4022", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001",	 "is_process":true}}$$)';
 
     END IF;
 
-    -- Control nulls
-    v_result_info := COALESCE(v_result_info, '{}');
-    v_result_point := COALESCE(v_result_point, '{}');
-    v_result_line := COALESCE(v_result_line, '{}');
-    v_result_polygon := COALESCE(v_result_polygon, '{}');
-
-	-- Info
+    -- Info
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
     FROM (
         SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user = current_user AND fid = v_fid ORDER BY id
@@ -748,15 +756,12 @@ BEGIN
     v_result := COALESCE(v_result, '{}');
     v_result_info := CONCAT('{"geometryType":"", "values":', v_result, '}');
 
-	-- Points
-    v_result := NULL;
-    v_result := COALESCE(v_result, '{}');
-    v_result_point := CONCAT('{"geometryType":"Point", "features":', v_result, '}');
+    -- Control nulls
+    v_result_info := COALESCE(v_result_info, '{}');
+    v_result_point := COALESCE(v_result_point, '{}');
+    v_result_line := COALESCE(v_result_line, '{}');
+    v_result_polygon := COALESCE(v_result_polygon, '{}');
 
-    -- Lines
-    v_result := NULL;
-    v_result := COALESCE(v_result, '{}');
-    v_result_line := CONCAT('{"geometryType":"LineString", "features":', v_result, '}');
 
 
 	-- Restore original disable lock level
@@ -771,7 +776,7 @@ BEGIN
         '"line":' || v_result_line || ',' ||
         '"polygon":' || v_result_polygon || '}' ||
         '}' ||
-        '}')::json, 2706, NULL, ('{"visible": ["' || v_visible_layer || '"]}')::json, NULL
+        '}')::json, 2706, NULL, ('{"visible": [' || v_visible_layer || ']}')::json, NULL
     );
 
 END;
