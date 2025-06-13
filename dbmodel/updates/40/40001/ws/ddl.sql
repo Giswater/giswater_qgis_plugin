@@ -88,6 +88,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"inlet_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"inlet_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"inlet_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_waterwell", "column":"inlet_arc", "dataType":"integer[]", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"to_arc", "dataType":"int4", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"length", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);

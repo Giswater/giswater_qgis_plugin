@@ -604,7 +604,7 @@ BEGIN
 				VALUES(NEW.node_id, NEW.name, NEW.source_type, NEW.source_code, NEW.aquifer_type, NEW.aquifer_name, NEW.wtp_id, NEW.registered_flow, NEW.auth_code, NEW.basin_id, NEW.subbasin_id, NEW.inlet_arc);
 
 		ELSIF v_man_table='man_waterwell' THEN
-			INSERT INTO man_waterwell (node_id, name) VALUES(NEW.node_id, NEW.name);
+			INSERT INTO man_waterwell (node_id, name, inlet_arc) VALUES(NEW.node_id, NEW.name, NEW.inlet_arc);
 
 		ELSIF v_man_table='man_filter' THEN
 			INSERT INTO man_filter (node_id) VALUES(NEW.node_id);
