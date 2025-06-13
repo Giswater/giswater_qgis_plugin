@@ -43,36 +43,45 @@ BEGIN
 
 	-- get system parameters
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-  
+
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, 'IMPORT HYDRO X DATA');
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----------------------'));
-   
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3168", "fid":"'||v_fid||'", "v_result_id":"'||v_result_id||'", "is_process":true, "is_header":"true"}}$$)';
+
+
  	-- starting process
 	FOR v_addfields IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
 	LOOP
 		i = i+1;
 		INSERT INTO ext_rtc_hydrometer_x_data (hydrometer_id, cat_period_id, sum, value_date, value_type, value_status, value_state) VALUES
-		(v_addfields.csv1, v_addfields.csv2, v_addfields.csv3::float, v_addfields.csv4::timestamp, v_addfields.csv5::integer, v_addfields.csv6::integer, v_addfields.csv7::integer);			
+		(v_addfields.csv1, v_addfields.csv2, v_addfields.csv3::float, v_addfields.csv4::timestamp, v_addfields.csv5::integer, v_addfields.csv6::integer, v_addfields.csv7::integer);
 	END LOOP;
 
 	-- manage log (fid: v_fid)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_rtc_hydrometer_x_data table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Deleting values from temp_csv -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished with ',i, ' rows inserted.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3922", "function":"3168", "fid":"'||v_fid||'", "v_result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3928", "function":"3168", "fid":"'||v_fid||'", "v_result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3930", "function":"3168", "fid":"'||v_fid||'", "v_result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3932", "function":"3168", "parameters":{"i":"'||i||'"}, "fid":"'||v_fid||'", "v_result_id":"'||v_result_id||'", "is_process":true}}$$)';
 
 	-- get log (fid: v_fid)
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
- 
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"Import hydrometer x data executed"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||

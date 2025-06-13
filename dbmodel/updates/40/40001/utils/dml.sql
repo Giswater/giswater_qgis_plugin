@@ -2085,3 +2085,18 @@ VALUES (3916, 'Process finished with %i% rows inserted.', null, 0, true, 'utils'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3918, 'Data from %v_count% scada tags have been imported.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+--13/06/2025
+
+UPDATE sys_function SET function_alias = 'IMPORT HYDRO X DATA' WHERE function_name = 'gw_fct_import_hydrometer_x_data';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3928, 'Inserting values on ext_rtc_hydrometer_x_data table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3930, 'Deleting values from temp_csv -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (3932, 'Process finished with %i% rows inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
