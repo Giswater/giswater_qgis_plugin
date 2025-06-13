@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: NEW CODE FOR THIS FUNCT
+--FUNCTION CODE: 3470
 
 CREATE OR REPLACE FUNCTION gw_fct_setcheckproject_cm(p_data json)
  RETURNS json

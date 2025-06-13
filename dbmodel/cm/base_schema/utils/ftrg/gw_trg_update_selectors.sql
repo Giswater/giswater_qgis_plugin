@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: xxxx
+--FUNCTION CODE: 3464
 
 CREATE OR REPLACE FUNCTION gw_trg_update_selectors()
   RETURNS json AS

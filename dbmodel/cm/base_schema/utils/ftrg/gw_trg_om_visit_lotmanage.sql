@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+--FUNCTION CODE: 3462
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_om_visit_lotmanage()
   RETURNS trigger AS

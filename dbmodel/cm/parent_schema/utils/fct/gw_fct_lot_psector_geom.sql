@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+--FUNCTION CODE: 3468
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_lot_psector_geom(p_lot_id integer)
   RETURNS integer AS
 $BODY$

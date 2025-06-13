@@ -5,8 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-
---FUNCTION CODE: NEW CODE FOR THIS FUNCTIN
+--FUNCTION CODE: 3478
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_lot_x_feature_check_campaign()
  RETURNS trigger

@@ -5,8 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+--FUNCTION CODE: 3476
 
---FUNCTION CODE: NEW CODE FOR THIS FUNCTIN
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_edit_view_campaign() CASCADE;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_view_campaign()
  RETURNS trigger AS

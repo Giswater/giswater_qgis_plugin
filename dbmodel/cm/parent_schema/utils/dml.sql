@@ -28,11 +28,3 @@ UPDATE SCHEMA_NAME.sys_version AS dst
      ORDER BY date DESC
      LIMIT 1
   ) AS src; 
-
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES (3426, 'gw_fct_cm_integrate_production', 'utils', 'function', NULL, 'json', 'Function to integrate an specific campaign from campaign manage into production schema', 'role_admin', NULL, 'core')
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
-VALUES(3426, 'Integrate campaign into production', '{"featureType":[]}'::json, 
-'[{"widgetname": "campaignId", "label": "Campaign:", "widgettype": "combo", "datatype": "text", "tooltip": "Campaign to be inserted into production environment", "layoutname": "grl_option_parameters", "layoutorder": 1, "dvQueryText": "select campaign_id as id, name as idval from cm.om_campaign WHERE status = 8 order by name", "isNullValue": "true", "selectedId": ""}]', NULL, true, '{4}');

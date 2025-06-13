@@ -576,7 +576,7 @@ CREATE TABLE om_campaign_lot_x_gully
 (
   id serial4 NOT NULL,
   lot_id integer NOT NULL, -- fk om_campaign_lot
-  connec_id int4 NOT NULL, -- fk connec
+  gully_id int4 NOT NULL, -- fk gully
   code character varying(30),
   status int2,
   org_observ text,
@@ -590,7 +590,7 @@ CREATE TABLE om_campaign_lot_x_gully
   action int2, 
   the_geom geometry(POINT, SRID_VALUE),
   CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_lot_x_gully_un UNIQUE (lot_id, connec_id),
+  CONSTRAINT om_campaign_lot_x_gully_un UNIQUE (lot_id, gully_id),
   CONSTRAINT om_campaign_lot_x_gully_lot_id_fkey FOREIGN KEY (lot_id)
     REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );

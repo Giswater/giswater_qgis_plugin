@@ -5,8 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-
---FUNCTION CODE: NEW CODE FOR THIS FUNCTIN
+--FUNCTION CODE: 3472
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_campaign_x_feature_validate_type() CASCADE;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_campaign_x_feature_validate_type()

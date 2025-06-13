@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: NEW CODE FOR THIS FUNCTION
+--FUNCTION CODE: 3440
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getlot(p_data json)
   RETURNS json AS

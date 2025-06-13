@@ -6,7 +6,7 @@ or (at your option) any later version.
 */
 
 
---FUNCTION CODE: NEW CODE FOR THIS FUNCTIN
+--FUNCTION CODE: 3454
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectorscm(p_data json)
   RETURNS json AS

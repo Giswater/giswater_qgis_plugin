@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+--FUNCTION CODE: 3466
 
 -- DROP FUNCTION if exists SCHEMA_NAME.cm_trg_edit_feature();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.cm_trg_edit_feature()

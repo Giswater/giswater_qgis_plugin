@@ -46,6 +46,12 @@ BEGIN
       );
 
       EXECUTE format('ALTER TABLE %s ADD CONSTRAINT %I UNIQUE (lot_id,%I);', tbl_name, constraint_name, feature_col);
+
+      EXECUTE format('ALTER TABLE %s ADD CONSTRAINT %I FOREIGN KEY (lot_id) REFERENCES om_campaign_lot (lot_id) ON UPDATE CASCADE ON DELETE CASCADE;',
+        tbl_name,
+        tbl_name || '_lot_id_fkey'
+      );
+
       EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', tbl_name);
     
     END LOOP;
