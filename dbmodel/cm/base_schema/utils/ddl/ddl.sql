@@ -632,7 +632,7 @@ CREATE TABLE cm_log (
 	CONSTRAINT cm_log_pkey PRIMARY KEY (table_name, mission_type, mission_id, feature_id, insert_at)
 );
 
-CREATE TABLE sys_fprocess_cm (
+CREATE TABLE sys_fprocess (
 	fid int4 NOT NULL,
 	fprocess_name varchar(100) NULL,
 	project_type varchar(6) NULL,
@@ -649,7 +649,7 @@ CREATE TABLE sys_fprocess_cm (
 	info_msg text NULL,
 	function_name text NULL,
 	active bool NULL,
-	CONSTRAINT sys_fprocess_cm_pkey PRIMARY KEY (fid)
+	CONSTRAINT sys_fprocess_pkey PRIMARY KEY (fid)
 );
 
 CREATE TABLE audit_check_data (

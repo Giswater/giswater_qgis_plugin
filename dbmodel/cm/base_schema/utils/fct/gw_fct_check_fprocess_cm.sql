@@ -55,7 +55,7 @@ BEGIN
 		v_process_except_msg,
 		v_process_fid,
 		v_process_except_level
-	FROM sys_fprocess_cm WHERE fid = v_check_fid;
+	FROM sys_fprocess WHERE fid = v_check_fid;
 	
 	-- replace variables (usando COALESCE para evitar NULLs)
 	v_exceptable_id = concat(replace (v_process_except_table, 'cm_', ''), '_id');

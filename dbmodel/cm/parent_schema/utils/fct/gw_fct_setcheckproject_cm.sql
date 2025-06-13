@@ -130,7 +130,7 @@ BEGIN
 	-- SECTION[epic=checkproject]: Get fprocesses
     v_querytext := '
         SELECT fid, fprocess_name
-        FROM SCHEMA_NAME.sys_fprocess_cm
+        FROM SCHEMA_NAME.sys_fprocess
         WHERE project_type = LOWER(' || quote_literal(v_project_type) || ')
         AND active
         AND query_text IS NOT NULL

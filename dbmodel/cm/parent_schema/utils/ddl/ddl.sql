@@ -40,6 +40,11 @@ BEGIN
       parent_s, rec.child_layer
       );
 
+      EXECUTE format(
+        'ALTER TABLE %s DROP COLUMN IF EXISTS the_geom;',
+        tbl_name
+      );
+
       EXECUTE format('ALTER TABLE %s ADD CONSTRAINT %I UNIQUE (lot_id,%I);', tbl_name, constraint_name, feature_col);
       EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', tbl_name);
     
