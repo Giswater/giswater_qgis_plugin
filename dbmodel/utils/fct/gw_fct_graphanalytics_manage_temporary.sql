@@ -110,19 +110,34 @@ BEGIN
         -- Create other additional temporary tables
         CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
-        -- Create temporary layers depending on the project type
+        -- Create temporary tables depending on the project type
         IF v_project_type = 'WS' THEN
             ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN to_arc int4;
             ALTER TABLE temp_pgr_node ADD COLUMN inlet_arc _int4;
-            IF v_fct_name = 'MINCUT' THEN
-                ALTER TABLE temp_pgr_arc ADD COLUMN cost_mapzone int default 1;
-                ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mapzone int default 1;
+            -- for specific functions
+            IF v_fct_name = 'MINCUT' OR v_fct_name = 'MINSECTOR' THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL DEFAULT FALSE;
-                -- "proposed"= FALSE AND mapzone_id <> '0' if it's in the mincut and it cannot be closed
-                -- "proposed" = TRUE if it's in the mincut and it has to be closed
+            END IF;
+            IF v_fct_name = 'MINSECTOR' THEN 
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
+                    seq INT8 NOT NULL,
+                    component INT8 NULL,
+                    node INT8 NULL,
+                    CONSTRAINT temp_pgr_connectedcomponents_pkey PRIMARY KEY (seq)
+                );
+                CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
+                CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
+
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
+                
+                -- used for MASSIVE MINCUT
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE SCHEMA_NAME.temp_pgr_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE SCHEMA_NAME.temp_pgr_arc INCLUDING ALL);
             END IF;
         END IF;
 
@@ -827,32 +842,6 @@ BEGIN
 
         -- For specific functions
         IF v_fct_name = 'MINSECTOR' THEN
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
-                seq INT8 NOT NULL,
-                component INT8 NULL,
-                node INT8 NULL,
-                CONSTRAINT temp_pgr_connectedcomponents_pkey PRIMARY KEY (seq)
-            );
-            CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
-            CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
-
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
-
-            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_edges (
-                pgr_arc_id INT8 NOT NULL,
-                graph_delimiter VARCHAR(30),
-                mincut_id INT8,
-                minsector_1 INT8 NOT NULL,
-                minsector_2 INT8 NOT NULL,
-                "cost" FLOAT8,
-                reverse_cost FLOAT8,
-                CONSTRAINT temp_pgr_minsector_edges_pkey PRIMARY KEY (pgr_arc_id)
-            );
-            CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_1_idx ON temp_pgr_minsector_edges USING btree (minsector_1);
-            CREATE INDEX IF NOT EXISTS temp_pgr_minsector_edges_minsector_2_idx ON temp_pgr_minsector_edges USING btree (minsector_2);
-
             CREATE OR REPLACE TEMPORARY VIEW temp_pgr_minsector_old AS
             SELECT DISTINCT v.minsector_id
             FROM temp_pgr_arc t
