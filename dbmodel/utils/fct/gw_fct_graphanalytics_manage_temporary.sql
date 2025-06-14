@@ -136,8 +136,8 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
                 
                 -- used for MASSIVE MINCUT
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE SCHEMA_NAME.temp_pgr_node INCLUDING ALL);
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE SCHEMA_NAME.temp_pgr_arc INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE temp_pgr_arc INCLUDING ALL);
             END IF;
         END IF;
 
