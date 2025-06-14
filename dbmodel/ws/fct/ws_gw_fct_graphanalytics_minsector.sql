@@ -44,7 +44,8 @@ DECLARE
 
     v_concavehull FLOAT = 0.85;
     v_visible_layer TEXT;
-    v_ignorebrokenvalves BOOLEAN = TRUE;
+    v_ignorebrokenvalves BOOLEAN;
+    v_useCheckValves INTEGER; -- 1 if they are used as mincut borders, 0 if not
 
     -- CHECKS
     v_arc_list TEXT;
@@ -74,6 +75,10 @@ BEGIN
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
+    v_ignorebrokenvalves = TRUE;
+	--v_ignorebrokenvalves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreBrokenOnlyMassiveMincut');
+	v_useCheckValves = TRUE::INT;
+	--v_useCheckValves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'useCheckValves')::int;
 
     -- it's not allowed to commit changes when psectors are used
  	IF v_usepsector = 'true' THEN
@@ -159,71 +164,28 @@ BEGIN
 
     -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR' or "graph_delimiter" = 'SECTOR'
 
-    -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
-    -- NODES VALVES
+    -- NODES TO MODIFY
+	-- VALVES with graph_delimiter = 'MINSECTOR'
     UPDATE temp_pgr_node t
-    SET graph_delimiter = 'minsector'
-	FROM v_temp_node n
-	WHERE t.node_id = n.node_id AND 'MINSECTOR' = ANY(n.graph_delimiter);
-
-	-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
-
-	-- CLOSED valves with or without to_arc
-	UPDATE temp_pgr_node t
-    SET closed = v.closed,
-        broken = v.broken,
-        modif = TRUE
-	FROM man_valve v
-	WHERE t.node_id = v.node_id
-        AND t.graph_delimiter = 'minsector'
-        AND v.closed = TRUE;
-
-	-- OPEN valves without to_arc
-    IF v_ignorebrokenvalves THEN
-        UPDATE temp_pgr_node t
-        SET closed = v.closed,
-            broken = v.broken,
-            modif = TRUE
-        FROM man_valve v
-        WHERE t.node_id = v.node_id
-            AND t.graph_delimiter = 'minsector'
-            AND v.closed = FALSE
-            AND v.to_arc IS NULL
-            AND v.broken = FALSE ; -- only broken = false
-    ELSE
-        UPDATE temp_pgr_node t
-        SET closed = v.closed,
-            broken = v.broken,
-            modif = TRUE
-        FROM man_valve v
-        WHERE t.node_id = v.node_id
-            AND t.graph_delimiter = 'minsector'
-            AND v.closed = FALSE
-            AND v.to_arc IS NULL;
-    END IF;
-
-    -- OPEN valves WITH to_arc; only if broken = false
-	UPDATE temp_pgr_node t
-    SET closed = v.closed,
+    SET
+        graph_delimiter = 'minsector', 
+        closed = v.closed,
         broken = v.broken,
         to_arc = v.to_arc,
         modif = TRUE
-	FROM man_valve v
-	WHERE t.node_id = v.node_id
-        AND t.graph_delimiter = 'minsector'
-        AND v.closed = FALSE
-        AND v.to_arc IS NOT NULL
-        AND v.broken = FALSE;
+	FROM v_temp_node n
+    JOIN man_valve v ON v.node_id = n.node_id
+	WHERE t.node_id = n.node_id AND 'MINSECTOR' = ANY(n.graph_delimiter);
 
-	-- cost/reverse_cost for the valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
+	-- cost/reverse_cost for the closed valves or with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 
-    -- Set modif = TRUE for nodes where "graph_delimiter" = 'sector'
+-- NODES "graph_delimiter" = 'SECTOR'
     UPDATE temp_pgr_node t
     SET graph_delimiter = 'sector', modif = TRUE
     FROM v_temp_node n
     WHERE t.node_id = n.node_id AND t.graph_delimiter = 'none' AND 'SECTOR' = ANY(n.graph_delimiter);
 
-    -- set inlet_arc
+-- set inlet_arc for TANK, SOURCE AND WATERWELL
     UPDATE temp_pgr_node t
     SET inlet_arc = n.inlet_arc
     FROM man_tank n
@@ -234,13 +196,14 @@ BEGIN
     FROM man_source n
     WHERE t.node_id = n.node_id AND t.graph_delimiter = 'sector' AND n.inlet_arc IS NOT NULL;
 
+    /* falta activar el codi quan man_waterwell té el camp inlet_arc
     UPDATE temp_pgr_node t
     SET inlet_arc = n.inlet_arc
     FROM man_waterwell n
     WHERE t.node_id = n.node_id AND t.graph_delimiter = 'sector' AND n.inlet_arc IS NOT NULL;
+    */
 
-    -- ARCS to be disconnected:
-    -- ARCS VALVES
+-- ARCS VALVES
 	-- for the valves without to_arc, one of the arcs that connect to the valve
 	WITH
 	arcs_selected AS (
@@ -251,7 +214,7 @@ BEGIN
 			a.pgr_node_2
 		FROM temp_pgr_node n
 		JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter = 'minsector' AND n.modif = TRUE AND n.to_arc IS NULL
+		WHERE n.graph_delimiter = 'minsector' AND n.to_arc IS NULL 
 	),
 	arcs_modif AS (
 		SELECT
@@ -278,7 +241,7 @@ BEGIN
 			a.pgr_node_2
 		FROM  temp_pgr_node n
 		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter = 'minsector' AND n.modif = TRUE AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
+		WHERE n.graph_delimiter = 'minsector' n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
 	),
 	arcs_modif AS (
 		SELECT
@@ -294,7 +257,6 @@ BEGIN
 	FROM arcs_modif s
 	WHERE t.pgr_arc_id= s.pgr_arc_id;
 
-
     -- all the arcs that connect to nodes SECTOR
     WITH
     arcs_selected AS (
@@ -305,7 +267,7 @@ BEGIN
             a.pgr_node_2
         FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-        WHERE n.modif = TRUE and n.graph_delimiter = 'sector'
+        WHERE n.graph_delimiter = 'sector'
     ),
 	arcs_modif AS (
 		SELECT
@@ -321,16 +283,14 @@ BEGIN
 	FROM arcs_modif s
 	WHERE t.pgr_arc_id= s.pgr_arc_id;
 
-
-    -- Generate new arcs and disconnect arcs with modif1 = TRUE OR modif2 = TRUE
+    -- Generate new arcs when n.modif = TRUE AND (a.modif1 = TRUE OR a.modif2 = TRUE)
+    -- cost i reverse cost for new arcs is 0, arc_id is NULL, old_arc_id = arc_id of the old arc
 	-- =======================
     SELECT gw_fct_graphanalytics_arrangenetwork() INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
         RETURN v_response;
     END IF;
-
-    -- update cost/reverse_cost for minsectors(to_arc) anf sector(inlet_arc); are used for massive mincut
 
     -- for closed valves
     UPDATE temp_pgr_arc a
@@ -340,24 +300,26 @@ BEGIN
     AND a.graph_delimiter = 'minsector'
 	AND n.closed = TRUE;
 
-    -- for open valves with to_arc
+-- for open valves with to_arc
     UPDATE temp_pgr_arc a
-	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END,
-		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END
+	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END, 
+		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END 
 	FROM temp_pgr_node n
 	WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	AND a.graph_delimiter = 'minsector'
-    AND n.to_arc IS NOT NULL;
+	AND a.graph_delimiter = 'minsector' 
+    AND n.to_arc IS NOT NULL
+    AND n.closed = FALSE
+    AND n.broken = FALSE;
 
-    -- for SECTORS - only the inlet arcs
+-- for SECTORS - only the inlet arcs
     UPDATE temp_pgr_arc a
-	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END,
-		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END
+	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END, 
+		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END 
 	FROM temp_pgr_node n
 	WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	AND a.graph_delimiter = 'sector'
+	AND a.graph_delimiter = 'sector' 
     AND a.old_arc_id = ANY (n.inlet_arc);
-
+    
     -- Generate the minsectors
     v_query :=
     'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 as cost 
@@ -398,17 +360,8 @@ BEGIN
     FROM temp_pgr_arc
     WHERE mapzone_id > 0;
 
-    -- table used for Massive Mincut; for SECTORS, mapzone_id=0 is replaced for node_id; the node_id for Sectors don't exist in temp_pgr_minsector)
-    INSERT INTO temp_pgr_minsector_edges (pgr_arc_id, graph_delimiter, minsector_1, minsector_2, cost, reverse_cost)
-    SELECT a.pgr_arc_id, a.graph_delimiter,
-    COALESCE (NULLIF(n1.mapzone_id,0), a.node_1) AS minsector_1,
-    COALESCE (NULLIF(n2.mapzone_id,0), a.node_2) AS minsector_2,
-    a.cost, a.reverse_cost
-    FROM temp_pgr_arc a
-    JOIN temp_pgr_node n1 ON n1.pgr_node_id = a.pgr_node_1
-    JOIN temp_pgr_node n2 ON n2.pgr_node_id = a.pgr_node_2
-    WHERE arc_id IS NULL
-    AND  n1.mapzone_id <> n2.mapzone_id;
+    -- table used for Massive Mincut; for SECTORS, mapzone_id=0 is replaced for node_id in the case of nodes-SECTOR 
+    -- !!! the node_id for Sectors don't exist in temp_pgr_minsector
 
     -- Set mapzone_id to 0 for nodes at the border of minsectors
     UPDATE temp_pgr_node n SET mapzone_id = 0
