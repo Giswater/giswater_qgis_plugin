@@ -919,6 +919,8 @@ BEGIN
 
         -- Drop temporary tables
         DROP TABLE IF EXISTS temp_pgr_mapzone;
+        DROP TABLE IF EXISTS temp_pgr_node_minsector;
+        DROP TABLE IF EXISTS temp_pgr_arc_minsector;
         DROP TABLE IF EXISTS temp_pgr_node;
         DROP TABLE IF EXISTS temp_pgr_arc;
         DROP TABLE IF EXISTS temp_audit_check_data;
@@ -927,8 +929,6 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_pgr_minsector_mincut;
-        DROP TABLE IF EXISTS temp_pgr_node_minsector;
-        DROP TABLE IF EXISTS temp_pgr_arc_minsector;
 
         v_return_message = 'The temporary tables/views have been dropped successfully';
     END IF;
