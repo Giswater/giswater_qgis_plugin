@@ -241,7 +241,7 @@ BEGIN
 			a.pgr_node_2
 		FROM  temp_pgr_node n
 		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter = 'minsector' n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
+		WHERE n.graph_delimiter = 'minsector' AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
 	),
 	arcs_modif AS (
 		SELECT
