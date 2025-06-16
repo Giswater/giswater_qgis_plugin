@@ -983,3 +983,13 @@ VALUES(3924, 'Inserting values on inp_dscenario_demand table -> Done', null, 0, 
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3926, 'Process finished', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'BUILT MISSING NODES USING START/END VERTICES' WHERE function_name = 'gw_fct_setnodefromarc';
+
+--16/06/2025
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4022, 'There are no nodes to be repaired.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4024, '%v_count% nodes have been created to repair topology.', null, 0, true, 'utils', 'core', 'AUDIT');

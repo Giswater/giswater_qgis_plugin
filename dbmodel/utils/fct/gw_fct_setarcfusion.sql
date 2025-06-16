@@ -127,6 +127,8 @@ BEGIN
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
    "data":{"function":"2112", "fid":"214", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+	
+
 
 	-- Check if the node exists
 	SELECT node_id INTO v_exists_node_id FROM v_edit_node WHERE node_id = v_node_id;
@@ -135,8 +137,9 @@ BEGIN
 	-- Compute proceed
 	IF FOUND THEN
 
+
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3372", "function":"2112", "parameters":{"v_exists_node_id":"'||v_exists_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3372", "function":"2112", "parameters":{"v_exists_node_id":"'||v_exists_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 
 		-- Find arcs sharing node
 		SELECT COUNT(*) INTO v_count FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id AND state > 0;
@@ -152,8 +155,9 @@ BEGIN
 			SELECT state INTO v_state_node FROM node WHERE node_id = v_node_id;
 			SELECT state INTO v_state_arc FROM arc WHERE arc_id = v_record1.arc_id;
 
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3374", "function":"2112", "parameters":{"arc_id1":"'||v_record1.arc_id||'", "arc_id2":"'||v_record2.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3374", "function":"2112", "parameters":{"arc_id1":"'||v_record1.arc_id||'", "arc_id2":"'||v_record2.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+
 
 
 			IF v_arccat_id IS NOT NULL THEN
@@ -208,9 +212,9 @@ BEGIN
 				v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
 
-
+			
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                "data":{"message":"3376", "function":"2112", "parameters":{"arc_id":"'||v_new_record.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3376", "function":"2112", "parameters":{"arc_id":"'||v_new_record.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 
 
 
@@ -298,9 +302,9 @@ BEGIN
 
 							IF v_query_string_update IS NOT NULL THEN
 								EXECUTE v_query_string_update;
-
+								
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                      			"data":{"message":"3378", "function":"2114", "parameters":{"column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'",  "is_process":true}}$$)';
+                      			 "data":{"message":"3378", "function":"2114", "parameters":{"column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'",  "is_process":true}}$$)';
 							END IF;
 
 						ELSIF rec_addfield1 IS NULL and rec_addfield2 IS NOT NULL THEN
@@ -312,6 +316,9 @@ BEGIN
 
 							IF v_query_string_update IS NOT NULL THEN
 								EXECUTE v_query_string_update;
+						
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3378", "function":"2114", "parameters":{"column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'",  "is_process":true}}$$)';
 
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        				"data":{"message":"3378", "function":"2114", "parameters":{"column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'",  "is_process":true}}$$)';
@@ -323,9 +330,9 @@ BEGIN
 
 							IF v_query_string_update IS NOT NULL THEN
 								EXECUTE v_query_string_update;
-
+								
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       			"data":{"message":"3378", "function":"2114", "parameters":{"column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'",  "is_process":true}}$$)';
+                       "data":{"message":"3378", "function":"2114", "parameters":{"column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'",  "is_process":true}}$$)';
 							END IF;
 						END IF;
 
@@ -350,16 +357,16 @@ BEGIN
 					IF v_count > 0 THEN
 						UPDATE node SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 
-
+				
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3380", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
-					END IF;
 					-- update operative connecs
 					SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 					IF v_count > 0 THEN
 						UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 
 
+						
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3440", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END IF;
@@ -370,9 +377,9 @@ BEGIN
 						IF v_count > 0 THEN
 							UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 
-
-							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       		"data":{"message":"3442", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+					
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3442", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 					END IF;
 
@@ -383,9 +390,10 @@ BEGIN
 					SELECT count(connec_id) INTO v_count FROM plan_psector_x_connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 					IF v_count > 0 THEN
 						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE (arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id) AND state = 1;
-
+		
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3444", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+					
 					END IF;
 
 					-- update planned gullies
@@ -393,10 +401,10 @@ BEGIN
 						SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
 							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE (arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id) AND state = 1;
-
+						
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       		"data":{"message":"3446", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
-
+                       "data":{"message":"3446", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+							
 						END IF;
 					END IF;
 
@@ -408,8 +416,9 @@ BEGIN
 							UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id
 							AND element_id not in (select element_id FROM element_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id);
 
-							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3448", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+							
+										EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3448", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 
 						-- update documents
@@ -424,8 +433,9 @@ BEGIN
 							DELETE FROM doc_x_arc
 							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
 
-							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       		"data":{"message":"3450", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+						
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3450", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 
 						-- update visits
@@ -433,8 +443,9 @@ BEGIN
 						IF v_count > 0 THEN
 							UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 
-							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       		"data":{"message":"3452", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+							
+									EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3452", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 
 						IF v_project_type = 'WS' THEN
@@ -464,18 +475,22 @@ BEGIN
 							IF v_state_type IS NULL THEN
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 								"data":{"message":"3134", "function":"2112","parameters":null, "is_process":true}}$$)' INTO v_audit_result;
-							END IF;
+							END IF;.
 
 
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 							"data":{"message":"3454", "function":"2112", "parameters":{"v_node_id":"'||v_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+							
 							UPDATE node SET state=0, state_type=v_state_type, workcat_id_end=v_workcat_id, enddate=v_enddate WHERE node_id = v_node_id;
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3454", "function":"2112", "parameters":{"v_node_id":"'||v_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 
 						-- Delete node if action is 'DELETE NODE'
 						IF v_action_mode = 2 THEN
+							
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       		"data":{"message":"3456", "function":"2112", "parameters":{"v_node_id":"'||v_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3456", "function":"2112", "parameters":{"v_node_id":"'||v_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 
 					ELSIF v_state_node = 2 THEN
@@ -485,8 +500,9 @@ BEGIN
 						DELETE FROM arc WHERE arc_id = v_record2.arc_id;
 
 						-- Delete node
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3458", "function":"2112", "parameters":{"v_node_id":"'||v_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+						
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3458", "function":"2112", "parameters":{"v_node_id":"'||v_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						DELETE FROM node WHERE node_id = v_node_id;
 
 					END IF;
@@ -500,30 +516,33 @@ BEGIN
 
 					UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
-					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
+					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) 
 					VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
 					-- orphan nodes with arc_id not null
 					SELECT count(*) INTO v_count FROM v_edit_node WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
 					IF v_count > 0 THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3460", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "prefix_id":"1002","fid":"214", "criticity":"1", "is_process":true}}$$)';
+						
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3460", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END IF;
 
 					-- links from connec related to node
 					FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = v_node_id AND feature_type = 'CONNEC' LOOP
 						INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable) VALUES (rec_link.feature_id, v_new_record.arc_id, v_psector_id, 1, false);
 
+						
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3462", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"},"prefix_id":"1002", "fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3462", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END LOOP;
 
 					-- links from gully related to node
 					FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = v_node_id AND feature_type = 'GULLY' LOOP
 						INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable) VALUES (rec_link.feature_id, v_new_record.arc_id, v_psector_id, 1, false);
 
+						
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3464", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"}, "prefix_id":"1002","fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3464", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END LOOP;
 
 					-- update operative connecs
@@ -538,6 +557,7 @@ BEGIN
 						SELECT v_psector_id, connec_id, arc_id, 1, false FROM connec c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1
 						ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
+						
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3466", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END IF;
@@ -553,11 +573,9 @@ BEGIN
 							ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 
 
-
-
-
-							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       		"data":{"message":"3470", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+							
+								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3470", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 					END IF;
 
@@ -566,8 +584,8 @@ BEGIN
 					IF v_count > 0 THEN
 						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id)
 						AND state = 1;
-
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3476", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END IF;
 
@@ -579,6 +597,9 @@ BEGIN
 							AND state = 1;
 
 
+						
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3474", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 					END IF;
 
@@ -602,8 +623,9 @@ BEGIN
 						INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node_id, 0)
 						ON CONFLICT (psector_id, node_id) DO NOTHING;
 					ELSE
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3458", "function":"2112", "parameters":{"v_node_id":"'||v_node_id|'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+						
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3468", "function":"2112", "parameters":{"v_node_id":"'||v_node_id|'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						DELETE FROM node WHERE node_id = v_node_id;
 					END IF;
 
@@ -618,9 +640,9 @@ BEGIN
 
 				END IF;
 
-
+				
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                "data":{"message":"3472", "function":"2112", "parameters":{"arc_id1":"'||v_record1.arc_id||'", "arc_id2":"'||v_record2.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+                       "data":{"message":"3472", "function":"2112", "parameters":{"arc_id1":"'||v_record1.arc_id||'", "arc_id2":"'||v_record2.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 
 			-- Arcs has different catalogs or exploitation or sector
 			ELSE
@@ -648,6 +670,10 @@ BEGIN
 		v_status = 'Accepted';
 		v_level = 3;
 		v_message = 'Arc fusion done successfully';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3478", "function":"", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
+
+
 	ELSE
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;

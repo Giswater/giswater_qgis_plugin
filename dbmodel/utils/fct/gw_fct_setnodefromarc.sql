@@ -94,9 +94,9 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user=current_user AND fid = 116;
 	DELETE FROM audit_check_data WHERE cur_user=current_user AND fid = 116;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (116, null, 4, concat('BUILT MISSING NODES USING START/END VERTICES'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (116, null, 4, '-------------------------------------------------------------');
-
+	
+EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2118", "fid":"116", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 	-- inserting all extrem nodes on temp_node
 	EXECUTE 'INSERT INTO temp_table (fid, text_column, geom_point)
 	SELECT 	116, arc_id, ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id='||v_expl||' and (state=1 or state=2) '||v_querytext||'
@@ -146,11 +146,13 @@ BEGIN
 	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=116;
 
 	IF v_count=0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (116,  'There are no nodes to be repaired.', 0);
+	
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4022", "function":"2118", "fid":"116", "fcount":"0", "is_process":true}}$$)';
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (116,  concat (v_count,' nodes have been created to repair topology'), v_count);
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4024", "function":"2118", "parameters":{"v_count":"'||v_count||'"}, "fid":"116", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 116,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count
