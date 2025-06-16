@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>514</width>
-    <height>225</height>
+    <height>239</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,6 +74,13 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="4">
+       <widget class="QPushButton" name="btn_cancel_task">
+        <property name="text">
+         <string>Cancel task</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="lbl_time">
         <property name="text">
@@ -82,16 +89,16 @@
        </widget>
       </item>
       <item row="0" column="5">
-       <widget class="QPushButton" name="btn_cancel_task">
+       <widget class="QPushButton" name="btn_close">
         <property name="text">
-         <string>Cancel task</string>
+         <string>Close</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="4">
-       <widget class="QPushButton" name="btn_accept">
+      <item row="0" column="1">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Accept</string>
+         <string>Schema name:</string>
         </property>
        </widget>
       </item>
@@ -107,20 +114,6 @@
          </size>
         </property>
        </spacer>
-      </item>
-      <item row="0" column="6">
-       <widget class="QPushButton" name="btn_close">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Schema name:</string>
-        </property>
-       </widget>
       </item>
      </layout>
     </item>
@@ -138,7 +131,6 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel_task</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>

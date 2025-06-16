@@ -37,10 +37,10 @@
            <property name="topMargin">
             <number>0</number>
            </property>
-           <item row="0" column="5">
-            <widget class="QPushButton" name="btn_organi_delete">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
              <property name="text">
-              <string>Delete</string>
+              <string>Filtrar por nombre: </string>
              </property>
             </widget>
            </item>
@@ -57,29 +57,8 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="3">
-            <widget class="QPushButton" name="btn_organi_create">
-             <property name="text">
-              <string>Create</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <widget class="QPushButton" name="btn_organi_update">
-             <property name="text">
-              <string>Update</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="1">
             <widget class="QLineEdit" name="txt_orgname"/>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Filtrar por nombre: </string>
-             </property>
-            </widget>
            </item>
           </layout>
          </item>

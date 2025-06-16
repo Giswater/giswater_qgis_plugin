@@ -15,7 +15,7 @@ from functools import partial
 import json
 
 from ...ui.ui_manager import TeamCreateUi, UserCreateUi, AddLotUi, LotManagementUi, \
-    ResourcesManagementUi, OrganizationCreateUi
+    ResourcesManagementUi
 
 from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
@@ -83,6 +83,11 @@ class AddNewLot:
 
         # Load dynamic form and apply fields
         self.load_lot_dialog(lot_id)
+
+        # Hide Visits tab
+        index = self.dlg_lot.tab_widget.indexOf(self.dlg_lot.VisitsTab)
+        if index > -1:
+            self.dlg_lot.tab_widget.removeTab(index)
 
         # Use findChild with the widget's objectName for a reliable connection.
         campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
@@ -873,13 +878,8 @@ class AddNewLot:
                 self.populate_tableview(table)
 
             # Set signals for manage organizations
-            self.dlg_resources_man.btn_organi_create.clicked.connect(partial(self.open_create_organization))
-            self.dlg_resources_man.btn_organi_update.clicked.connect(partial(self.open_create_organization, True))
-            self.dlg_resources_man.btn_organi_delete.clicked.connect(partial(self.delete_registers, "cat_organization"))
             self.dlg_resources_man.txt_orgname.textChanged.connect(partial(self.txt_org_name_changed))
             self.dlg_resources_man.cmb_orga.currentIndexChanged.connect(partial(self.filter_teams_table))
-            self.dict_tables["cat_organization"]["widget"].doubleClicked.connect(
-                partial(self.selected_row, "cat_organization"))
         else:
 
             # Remove tab organizations
@@ -1021,9 +1021,7 @@ class AddNewLot:
         """ Handle double click selected row """
 
         # Call open_create function depending of the table name
-        if table_name == "cat_organization":
-            self.open_create_organization(True)
-        elif table_name == "cat_team":
+        if table_name == "cat_team":
             self.open_create_team(True)
         else:
             self.open_create_user(True)
@@ -1083,44 +1081,6 @@ class AddNewLot:
                     # Create sql filter and populate table
                     sql_filter = f"WHERE ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']})"
                     self.populate_tableview(tablename, sql_filter)
-
-    def open_create_organization(self, is_update: Optional[bool] = False):
-        """ Open create organization dialog """
-
-        user = tools_db.current_user
-        form = {"formName": "generic", "formType": "create_organization"}
-        body = {"client": {"cur_user": user}, "form": form}
-
-        # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_getdialogcm', body, schema_name="cm")
-
-        # Create and open dialog
-        self.dlg_create_organization = OrganizationCreateUi(self)
-        tools_gw.load_settings(self.dlg_create_organization)
-        tools_gw.manage_dlg_widgets(self, self.dlg_create_organization, json_result)
-
-        if is_update:
-            # Get selected id from table
-
-            selected_ids = self.get_selected_ids("cat_organization")
-            if not selected_ids:
-                return
-
-            self.org_id = selected_ids[0]  # Get first selected id
-
-            # Get object_id from selected row
-            sql = f"SELECT orgname, descript, code, active FROM cm.cat_organization WHERE organization_id = '{self.org_id}'"
-
-            rows = tools_db.get_rows(sql)
-            if rows:
-                row = rows[0]
-                tools_qt.set_widget_text(self.dlg_create_organization, "tab_none_name", row[0])
-                tools_qt.set_widget_text(self.dlg_create_organization, "tab_none_descript", row[1])
-                if len(row) > 2:
-                    tools_qt.set_widget_text(self.dlg_create_organization, "tab_none_code", row[2])
-                    tools_qt.set_checked(self.dlg_create_organization, "tab_none_active", row[3])
-
-        tools_gw.open_dialog(self.dlg_create_organization, "organization_create")
 
     def open_create_team(self, is_update: Optional[bool] = False):
         """ Open create team dialog """
@@ -1243,56 +1203,6 @@ class AddNewLot:
             tools_qgis.show_warning(msg)
 
         return values
-
-
-def upsert_organization(**kwargs):
-    """ Create organization """
-
-    dlg = kwargs["dialog"]
-    this = kwargs["class"]
-    org_id = this.org_id
-
-    # Get input values
-    name = tools_qt.get_text(dlg, "tab_none_name")
-    descript = tools_qt.get_text(dlg, "tab_none_descript")
-    code = tools_qt.get_text(dlg, "tab_none_code")
-    active = tools_qt.get_widget_value(dlg, "tab_none_active")
-
-    # Validate input values
-    if name == "null" or descript == "null" or code == "null":
-        message = "Name, description and code are required fields"
-        tools_qt.show_info_box(message, "Info")
-        return
-
-    # Validate if name already exists
-    sql_name_exists = f"SELECT * FROM cm.cat_organization WHERE orgname = '{str(name)}'"
-
-    if not org_id:
-        sql = f"INSERT INTO cm.cat_organization (orgname, descript, code, active) VALUES ('{name}', '{descript}', '{code}', {active})"
-    else:
-        sql_name_exists += f" AND organization_id != {org_id}"
-        sql = f"UPDATE cm.cat_organization SET orgname = '{name}', descript = '{descript}', code = '{code}', active = {active} WHERE organization_id = {org_id}"
-        this.org_id = None
-
-    rows = tools_db.get_rows(sql_name_exists, commit=True)
-    if rows:
-        msg = "The organization name already exists"
-        tools_qt.show_info_box(msg, "Info", parameter=str(name))
-        return
-
-    # Execute SQL
-    status = tools_db.execute_sql(sql, commit=True)
-
-    if not status:
-        msg = "Error creating or updating organization"
-        tools_qgis.show_warning(msg, parameter=str(name))
-        return
-
-    # Close dialog
-    tools_gw.close_dialog(dlg)
-
-    # Reload table
-    this.populate_tableview("cat_organization")
 
 
 def upsert_team(**kwargs):

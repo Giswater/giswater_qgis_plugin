@@ -43,7 +43,6 @@ class GwCreateSchemaCmTask(GwTask):
         super().finished(result)
         # Enable dlg_readsql_create_cm_project buttons
         self.admin.dlg_readsql_create_cm_project.btn_cancel_task.hide()
-        self.admin.dlg_readsql_create_cm_project.btn_accept.show()
         self.admin.dlg_readsql_create_cm_project.btn_close.setEnabled(True)
         # Enable red 'X' from dlg_readsql_create_cm_project
         # self.admin.dlg_readsql_create_cm_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
