@@ -465,7 +465,8 @@ CREATE TABLE arc_add (
 	mincut_hydrometers int NULL,
 	mincut_length numeric(12, 3) NULL,
 	mincut_watervol numeric(12, 3) NULL,
-	mincut_criticity numeric(12, 3) NULL,
+	mincut_criticality numeric(12, 3) NULL,
+	hydraulic_criticality numeric(12, 3) NULL,
 	CONSTRAINT arc_add_pkey PRIMARY KEY (arc_id)
 );
 

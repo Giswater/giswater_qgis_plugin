@@ -220,7 +220,8 @@ AS WITH
       arc_add.mincut_hydrometers,
       arc_add.mincut_length,
       arc_add.mincut_watervol,
-      arc_add.mincut_criticity,
+      arc_add.mincut_criticality,
+      arc_add.hydraulic_criticality,
       arc_add.pipe_capacity,
       arc_add.mincut_impact,
       arc_add.mincut_affectation,
@@ -1024,6 +1025,70 @@ WHERE EXISTS (
   	SELECT 1
   	FROM sel_expl
   	WHERE sel_expl.expl_id = ANY (m.expl_id)
+);
+
+CREATE OR REPLACE VIEW v_edit_minsector_mincut AS
+WITH sel_expl AS (
+	SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+), minsector_mapzones AS (
+  SELECT
+    t.mincut_minsector_id AS minsector_id,
+    array_agg(DISTINCT t.dma_id) AS dma_id,
+    array_agg(DISTINCT t.dqa_id) AS dqa_id,
+    array_agg(DISTINCT t.presszone_id) AS presszone_id,
+    array_agg(DISTINCT t.expl_id) AS expl_id,
+    array_agg(DISTINCT t.sector_id) AS sector_id,
+    array_agg(DISTINCT t.muni_id) AS muni_id,
+    array_agg(DISTINCT t.supplyzone_id) AS supplyzone_id,
+    ST_Union(t.the_geom) AS the_geom
+  FROM (
+    SELECT
+      m.minsector_id,
+      mm.minsector_id AS mincut_minsector_id,
+      unnest(m.dma_id) AS dma_id,
+      unnest(m.dqa_id) AS dqa_id,
+      unnest(m.presszone_id) AS presszone_id,
+      unnest(m.expl_id) AS expl_id,
+      unnest(m.sector_id) AS sector_id,
+      unnest(m.muni_id) AS muni_id,
+      unnest(m.supplyzone_id) AS supplyzone_id,
+      m.the_geom
+    FROM minsector m
+    JOIN minsector_mincut mm ON mm.mincut_minsector_id = m.minsector_id
+  ) t
+  GROUP BY t.mincut_minsector_id
+),
+minsector_sums AS (
+  SELECT
+    mm.minsector_id,
+    SUM(m.num_border) AS num_border,
+    SUM(m.num_connec) AS num_connec,
+    SUM(m.num_hydro) AS num_hydro,
+    SUM(m.length) AS length
+  FROM minsector_mincut mm
+  JOIN minsector m ON m.minsector_id = mm.mincut_minsector_id
+  GROUP BY mm.minsector_id
+)
+SELECT
+	m.minsector_id,
+	dma_id,
+	dqa_id,
+	presszone_id,
+	expl_id,
+	sector_id,
+	muni_id,
+	supplyzone_id,
+	num_border,
+	num_connec,
+	num_hydro,
+	length,
+	the_geom
+FROM minsector_mapzones m
+JOIN minsector_sums s ON s.minsector_id = m.minsector_id
+WHERE EXISTS (
+  SELECT 1
+  FROM sel_expl
+  WHERE sel_expl.expl_id = ANY (m.expl_id)
 );
 
 CREATE OR REPLACE VIEW v_edit_samplepoint

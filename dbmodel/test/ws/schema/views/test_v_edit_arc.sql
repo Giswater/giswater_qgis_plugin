@@ -35,7 +35,7 @@ SELECT columns_are(
         'asset_id', 'pavcat_id', 'om_state', 'macroomzone_id', 'conserv_state', 'parent_id', 'expl_visibility', 'is_operative',
         'brand_id', 'model_id', 'serial_number', 'minsector_id',
         'flow_max', 'flow_min', 'flow_avg', 'vel_max', 'vel_min', 'vel_avg',
-        'tot_headloss_max', 'tot_headloss_min', 'mincut_connecs', 'mincut_hydrometers', 'mincut_length', 'mincut_watervol', 'mincut_criticity', 'result_id',
+        'tot_headloss_max', 'tot_headloss_min', 'mincut_connecs', 'mincut_hydrometers', 'mincut_length', 'mincut_watervol', 'mincut_criticality', 'hydraulic_criticality', 'result_id',
         'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'lock_level', 'inp_type', 'is_scadamap', 'omzone_id', 'omzone_type', 'pipe_capacity', 'mincut_impact', 'mincut_affectation'
     ],
