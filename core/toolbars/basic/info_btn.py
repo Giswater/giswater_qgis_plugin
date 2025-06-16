@@ -201,7 +201,7 @@ class GwInfoButton(GwMaptool):
         for layer in complet_list['body']['data']['layersNames']:
             for feature in layer['ids']:
                 points = []
-                list_coord = re.search('\((.*)\)', str(feature['geometry']))
+                list_coord = re.search('\(+([^)]+)\)+', str(feature['geometry']))
                 coords = list_coord.group(1)
                 polygon = coords.split(',')
                 for i in range(0, len(polygon)):
