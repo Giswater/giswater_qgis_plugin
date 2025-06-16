@@ -1390,7 +1390,7 @@ VALUES(3442, 'Reconnect operative: %v_count% gullies.', null, 0, true, 'utils', 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3444, 'Reconnect planned: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-<<<<<<< Updated upstream
+
 UPDATE sys_table SET addparam='{
   "pkey": "element_id"
 }'::json WHERE id='ve_genelem_estep';
@@ -2029,7 +2029,6 @@ VALUES(4132, 'All layers have been added by current user', null, 0, true, 'utils
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4134, 'Set feature state = 1 for addschema and user', null, 0, true, 'utils', 'core', 'AUDIT');
-<<<<<<< Updated upstream
 
 --11/06/2025
 UPDATE sys_function SET function_alias = 'RESET USER PROFILE FUNCTION' WHERE function_name = 'gw_fct_admin_role_resetuserprofile';
@@ -2199,7 +2198,6 @@ VALUES (3856, 'Data from %v_count% scada tags have been imported.', null, 0, tru
 
 
 =======
-=======
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3446, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -2251,5 +2249,4 @@ VALUES(3476, 'Reconnect planned: %v_count% connecs.', null, 0, true, 'utils', 'c
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3478, 'Arc fusion done successfully', null, 0, true, 'utils', 'core', 'UI');
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+
