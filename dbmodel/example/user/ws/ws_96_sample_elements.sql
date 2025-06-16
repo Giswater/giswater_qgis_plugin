@@ -7987,8 +7987,8 @@ INSERT INTO man_register VALUES ('134');
 
 INSERT INTO man_source (node_id, name, source_type, aquifer_type, basin_id, subbasin_id) VALUES ('1101', NULL, 0, 0, 0, 0);
 
-INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, shape) VALUES ('113766', NULL, NULL, NULL, NULL, 'false', NULL, 0);
-INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, shape) VALUES ('113952', NULL, NULL, NULL, NULL, NULL, NULL, 0);
+INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, shape, inlet_arc) VALUES ('113766', NULL, NULL, NULL, NULL, 'false', NULL, 0, '{113907,113905}');
+INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, shape, inlet_arc) VALUES ('113952', NULL, NULL, NULL, NULL, NULL, NULL, 0, '{114145}');
 
 INSERT INTO man_tap VALUES ('3301', '3301', NULL, NULL, NULL, NULL, NULL, NULL);
 
