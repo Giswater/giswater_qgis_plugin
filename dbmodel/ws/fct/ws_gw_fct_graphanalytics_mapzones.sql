@@ -551,25 +551,6 @@ BEGIN
 	FROM boundary AS s
 	WHERE n.node_id =s.node_id AND n.graph_delimiter = 'valve';
 
-	-- SECTION: recalculate staticpressure (fid=147)
-	IF v_fid=146 THEN
-		-- update on node table those elements connected on connectedcomponents
-		v_querytext = '
-			UPDATE temp_pgr_node SET staticpressure = (a.head - a.top_elev + (CASE WHEN a.depth IS NULL THEN 0 ELSE a.depth END)::float)
-			FROM (
-				SELECT n.node_id, p.head, vn.top_elev, vn.depth
-				FROM temp_pgr_node n
-				JOIN v_temp_node vn ON vn.node_id = n.node_id
-				JOIN '||v_mapzone_name||' p ON vn.mapzone_id = p.'||v_mapzone_field||'
-				JOIN temp_pgr_connectedcomponents cc ON cc.node = n.node_id::int
-			) a
-			WHERE temp_pgr_node.node_id = a.node_id;
-		';
-
-		RAISE NOTICE 'v_querytext update node table (only on-connectedcomponents nodes):: %', v_querytext;
-		EXECUTE v_querytext;
-	END IF;
-
 	IF v_updatemapzgeom > 0 THEN
 		-- message
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
@@ -684,7 +665,6 @@ BEGIN
 			)a 
 			WHERE a.mapzone_id = temp_pgr_mapzone.mapzone_id 
 			AND temp_pgr_mapzone.mapzone_id > 0';
-		RAISE NOTICE 'CONCAVE POLYGON v_querytext:: %', v_querytext;
 		EXECUTE v_querytext;
 
 	ELSIF  v_updatemapzgeom = 2 THEN
@@ -700,7 +680,6 @@ BEGIN
 				GROUP BY mapzone_id
 			) a 
 			WHERE a.mapzone_id = temp_pgr_mapzone.mapzone_id;';
-		RAISE NOTICE 'PIPE BUFFER v_querytext:: %', v_querytext;
 		EXECUTE v_querytext;
 
 	ELSIF  v_updatemapzgeom = 3 THEN
@@ -724,7 +703,6 @@ BEGIN
 				GROUP BY mapzone_id 
 			) b 
 			WHERE b.mapzone_id= temp_pgr_mapzone.mapzone_id;';
-		RAISE NOTICE 'PLOT AND PIPE BUFFER v_querytext:: %', v_querytext;
 		EXECUTE v_querytext;
 
 	ELSIF  v_updatemapzgeom = 4 THEN
@@ -751,7 +729,6 @@ BEGIN
 			) b
 			WHERE b.mapzone_id = temp_pgr_mapzone.mapzone_id;';
 
-		RAISE NOTICE 'LINK AND PIPE BUFFER v_querytext:: %', v_querytext;
 		EXECUTE v_querytext;
 	END IF;
 
@@ -863,7 +840,6 @@ BEGIN
 					AND ta.arc_id IS NOT NULL
 				) row 
 			) features';
-			RAISE NOTICE 'v_querytext:: %', v_querytext;
 			EXECUTE v_querytext INTO v_result;
 
 		ELSE
@@ -964,8 +940,6 @@ BEGIN
 			WHERE a.old_mapzone_id IS NOT NULL
 			AND a.old_mapzone_id > 0;
 
-			RAISE NOTICE 'v_old_mapzone_id_array:: %', v_old_mapzone_id_array;
-
 			v_querytext = '
 				WITH arcs AS (
 					SELECT 
@@ -980,7 +954,6 @@ BEGIN
 				WHERE arc.arc_id = arcs.arc_id
 				AND arc.'||quote_ident(v_mapzone_field)||' <> arcs.mapzone_id;
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE arc with temp_pgr_arc mapzone_id %', v_querytext;
 			EXECUTE v_querytext;
 
 			v_querytext = '
@@ -997,7 +970,6 @@ BEGIN
 				WHERE node.node_id = nodes.node_id
 				AND node.'||quote_ident(v_mapzone_field)||' <> nodes.mapzone_id;
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE node with temp_pgr_node mapzone_id %', v_querytext;
 			EXECUTE v_querytext;
 
 			v_querytext = '
@@ -1015,7 +987,6 @@ BEGIN
 				WHERE connec.connec_id = connecs.connec_id
 				AND connec.'||quote_ident(v_mapzone_field)||' <> connecs.mapzone_id;
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE connec with temp_pgr_arc join v_temp_connec mapzone_id %', v_querytext;
 			EXECUTE v_querytext;
 
 			v_querytext = '
@@ -1033,53 +1004,59 @@ BEGIN
 				WHERE link.link_id = links.link_id
 				AND link.'||quote_ident(v_mapzone_field)||' <> links.mapzone_id;
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE link with temp_pgr_arc join v_temp_link_connec mapzone_id %', v_querytext;
 			EXECUTE v_querytext;
 
 			IF v_old_mapzone_id_array IS NOT NULL THEN
 				v_querytext = 'UPDATE arc SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_arc tpa WHERE tpa.mapzone_id = arc.'||quote_ident(v_mapzone_field)||'
+						SELECT 1 FROM temp_pgr_arc tpa WHERE tpa.arc_id = arc.arc_id
 					)
 					AND arc.'||quote_ident(v_mapzone_field)||' <> 0;
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE arc old_mapzone_id not in temp_pgr_arc %', v_querytext;
 				EXECUTE v_querytext;
 
 				v_querytext = 'UPDATE node SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_node tpn WHERE tpn.mapzone_id = node.'||quote_ident(v_mapzone_field)||'
+						SELECT 1 FROM temp_pgr_node tpn WHERE tpn.node_id = node.node_id
 					)
 					AND node.'||quote_ident(v_mapzone_field)||' <> 0;
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE node old_mapzone_id not in temp_pgr_node %', v_querytext;
 				EXECUTE v_querytext;
 
 				v_querytext = 'UPDATE connec SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE vc.connec_id = connec.'||quote_ident(v_mapzone_field)||'
+						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE vc.connec_id = connec.connec_id
 					)
 					AND connec.'||quote_ident(v_mapzone_field)||' <> 0;
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE connec old_mapzone_id not in v_temp_connec join temp_pgr_arc %', v_querytext;
 				EXECUTE v_querytext;
 
 				v_querytext = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id) WHERE vc.link_id = link.'||quote_ident(v_mapzone_field)||'
+						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id) WHERE vc.link_id = link.link_id
 					)
 					AND link.'||quote_ident(v_mapzone_field)||' <> 0;
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE link old_mapzone_id not in v_temp_link_connec join temp_pgr_arc %', v_querytext;
 				EXECUTE v_querytext;
 			END IF;
 
 			-- static pressure for
 			IF v_class = 'PRESSZONE' THEN
+				v_querytext = '
+					UPDATE temp_pgr_node SET staticpressure = (a.head - a.top_elev + (CASE WHEN a.depth IS NULL THEN 0 ELSE a.depth END)::float)
+					FROM (
+						SELECT n.node_id, p.head, vn.top_elev, vn.depth
+						FROM temp_pgr_node n
+						JOIN v_temp_node vn ON vn.node_id = n.node_id
+						JOIN '||v_mapzone_name||' p ON vn.mapzone_id = p.'||v_mapzone_field||'
+					) a
+					WHERE temp_pgr_node.node_id = a.node_id;
+				';
+				EXECUTE v_querytext;
 				-- arcs
 				UPDATE arc SET staticpress1 = n.staticpressure FROM temp_pgr_node n WHERE node_id = node_1;
 				UPDATE arc SET staticpress2 = n.staticpressure FROM temp_pgr_node n WHERE node_id = node_2;
