@@ -121,7 +121,7 @@ BEGIN
                 ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL DEFAULT FALSE;
             END IF;
-            IF v_fct_name = 'MINSECTOR' THEN 
+            IF v_fct_name = 'MINSECTOR' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
                     seq INT8 NOT NULL,
                     component INT8 NULL,
@@ -134,7 +134,7 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
-                
+
                 -- used for MASSIVE MINCUT
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE temp_pgr_arc INCLUDING ALL);
@@ -849,7 +849,7 @@ BEGIN
             WHERE v.minsector_id IS NOT NULL;
 
             CREATE OR REPLACE TEMPORARY VIEW v_temp_minsector_mincut AS
-            WITH mapzones AS (
+            WITH minsector_mapzones AS (
                 SELECT
                     t.mincut_minsector_id AS minsector_id,
                     array_agg(DISTINCT t.dma_id) AS dma_id,
@@ -870,20 +870,20 @@ BEGIN
                         unnest(m.sector_id) AS sector_id,
                         unnest(m.muni_id) AS muni_id,
                         unnest(m.supplyzone_id) AS supplyzone_id
-                    FROM minsector m
-                    JOIN minsector_mincut mm ON mm.mincut_minsector_id = m.minsector_id
+                    FROM temp_pgr_minsector m
+                    JOIN temp_pgr_minsector_mincut mm ON mm.mincut_minsector_id = m.minsector_id
                 ) t
                 GROUP BY t.mincut_minsector_id
             ),
-            sums AS (
+            minsector_sums AS (
                 SELECT
                     mm.minsector_id,
                     SUM(m.num_border) AS num_border,
                     SUM(m.num_connec) AS num_connec,
                     SUM(m.num_hydro) AS num_hydro,
                     SUM(m.length) AS length
-                FROM minsector_mincut mm
-                JOIN minsector m ON m.minsector_id = mm.mincut_minsector_id
+                FROM temp_pgr_minsector_mincut mm
+                JOIN temp_pgr_minsector m ON m.minsector_id = mm.mincut_minsector_id
                 GROUP BY mm.minsector_id
             )
             SELECT
@@ -899,7 +899,8 @@ BEGIN
                 num_connec,
                 num_hydro,
                 length
-            FROM mapzones m JOIN sums s ON s.minsector_id = m.minsector_id;
+            FROM minsector_mapzones m
+            JOIN minsector_sums s ON s.minsector_id = m.minsector_id;
         END IF;
 
 
