@@ -57,7 +57,7 @@ v_arc_id integer;
 v_userdefined_geom boolean;
 v_end_state integer;
 v_init_state integer;
-v_pjoint_id text;
+v_pjoint_id integer;
 v_pjoint_type text;
 v_dsbl_error boolean;
 v_message text;
