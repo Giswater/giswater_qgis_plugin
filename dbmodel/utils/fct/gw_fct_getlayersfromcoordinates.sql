@@ -187,7 +187,7 @@ BEGIN
 		END IF;
 
 		-- Get element
-		IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
+		IF v_geometrytype IN ('ST_Polygon'::text, 'ST_Multipolygon'::text, 'ST_MultiPolygon'::text) THEN
 				--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)
 				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
 				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) 
