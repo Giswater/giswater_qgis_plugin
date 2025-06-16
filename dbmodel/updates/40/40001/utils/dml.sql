@@ -906,9 +906,6 @@ UPDATE sys_function SET function_alias = 'ARC FUSION' WHERE function_name = 'gw_
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3372, 'Fusion arcs using node: %v_exists_node_id% .', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3374, 'Arcs related to selected node have been removed: %arc_id1% , %arc_id2% .', null, 0, true, 'utils', 'core', 'AUDIT');
-
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3376, 'New arc have been inserted: %arc_id% .', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -920,16 +917,7 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3380, 'Reconnect: %v_count% nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 --27-05-2025
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3440, 'Reconnect operative: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3442, 'Reconnect operative: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3446, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3448, 'Copy: %v_count% elements from old arcs to new one.', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -981,13 +969,6 @@ VALUES(3478, 'Arc fusion done successfully', null, 0, true, 'utils', 'core', 'UI
 		
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3374, 'Arcs related to selected node have been removed: %arc_id1% , %arc_id2% .', null, 0, true, 'utils', 'core', 'AUDIT');
-
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3376, 'New arc have been inserted: %arc_id% .', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3378, 'Copy values for addfield: %column_name% to the new arc.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 UPDATE sys_function SET function_alias = 'FLOWTRACE ANALYTICS' WHERE function_name = 'gw_fct_graphanalytics_flowtrace';
 
@@ -1377,8 +1358,6 @@ ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
   linkedobject = EXCLUDED.linkedobject,
   hidden = EXCLUDED.hidden,
   web_layoutorder = EXCLUDED.web_layoutorder;
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3380, 'Reconnect: %v_count% nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 --27-05-2025
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
@@ -2193,60 +2172,13 @@ VALUES (3854, 'Process finished with %i% rows inserted.', null, 0, true, 'utils'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
 VALUES (3856, 'Data from %v_count% scada tags have been imported.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-
-
-
-
-
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3446, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3448, 'Copy: %v_count% elements from old arcs to new one.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3450, 'Copy: %v_count% documents from old arcs to new one.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3452, 'Copy: %v_count% visits from old arcs to new one.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3454, 'Change state of node: %v_node_id% to obsolete.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3456, 'Delete node: %v_node_id%.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3458, 'Delete planned node: %v_node_id%.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3460, 'Warning: There are: %v_count%  orphan nodes related to existing arcs. Column arc_id remains with initial value.', null, 0, true, 'utils', 'core', 'AUDIT');
-
 --28-05-2025
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3462, 'Warning: Connec: %feature_id% has been reconected with new arc_id but keeping the feature exit from initial node.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3464, 'Warning: Gully: %feature_id%  has been reconected with new arc_id but keeping the feature exit from initial node.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3466, 'Reconnect operative: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3468, 'Delete planned node: %v_node_id%.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3470, 'Reconnect operative: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3472, 'Delete arcs: %arc_id1% , %arc_id2% .', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3474, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3476, 'Reconnect planned: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3478, 'Arc fusion done successfully', null, 0, true, 'utils', 'core', 'UI');
 
