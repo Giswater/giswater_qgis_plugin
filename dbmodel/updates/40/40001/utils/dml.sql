@@ -2197,7 +2197,7 @@ VALUES (3856, 'Data from %v_count% scada tags have been imported.', null, 0, tru
 
 
 
-=======
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3446, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
