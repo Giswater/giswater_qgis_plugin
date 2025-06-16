@@ -378,14 +378,31 @@ class GwLoadProject(QObject):
 
         toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         if toolbars_order in (None, 'None'):
+            toolbars_order = tools_gw.get_config_parser('toolbars_position', '_toolbars_order', 'user', 'init')
+
+        if toolbars_order in (None, 'None'):
             msg = "Parameter '{0}' is None"
             msg_params = ("toolbars_order",)
             tools_log.log_info(msg, msg_params=msg_params)
             return
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
-        toolbars_order = toolbars_order.replace(' ', '').split(',')
-        for tb in toolbars_order:
+        toolbars_order_list = toolbars_order.replace(' ', '').split(',')
+        config_was_updated = False
+
+        # Check for optional toolbars
+        for toolbar_id in ('am', 'cm'):
+            is_active = tools_gw.get_config_parser('toolbars_add', f'{toolbar_id}_active', 'user', 'init', False)
+            if tools_os.set_boolean(is_active, False):
+                if toolbar_id not in toolbars_order_list:
+                    toolbars_order_list.append(toolbar_id)
+                    config_was_updated = True
+
+        if config_was_updated:
+            new_toolbars_order = ",".join(toolbars_order_list)
+            tools_gw.set_config_parser('toolbars_position', 'toolbars_order', new_toolbars_order, "user", "init")
+
+        for tb in toolbars_order_list:
             self._create_toolbar(tb)
 
         # Manage action group of every toolbar
