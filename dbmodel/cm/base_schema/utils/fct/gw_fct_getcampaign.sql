@@ -114,7 +114,7 @@ BEGIN
 
 	ELSE
 		-- If creating a new campaign
-		SELECT nextval('SCHEMA_NAME.om_campaign_campaign_id_seq') INTO v_id;
+		SELECT COALESCE(max(campaign_id),0) + 1 FROM SCHEMA_NAME.om_campaign INTO v_id;
 
 		FOR array_index IN array_lower(v_fields, 1)..array_upper(v_fields, 1) LOOP
 		    aux_json := v_fields[array_index];

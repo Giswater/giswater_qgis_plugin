@@ -108,7 +108,7 @@ BEGIN
 
     ELSE
         -- If creating a new lot
-        SELECT nextval('SCHEMA_NAME.om_campaign_lot_lot_id_seq') INTO v_id;
+        SELECT COALESCE(max(lot_id),0) + 1 FROM SCHEMA_NAME.om_campaign_lot INTO v_id;
 
         -- Loop through the fields and assign campaign_id if passed
         FOR array_index IN array_lower(v_fields, 1)..array_upper(v_fields, 1) LOOP
