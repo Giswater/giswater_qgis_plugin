@@ -157,10 +157,10 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
 	-- to use forceopen and forceclosed -> WHERE X IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::JSON))
-	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
+	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector')::BOOLEAN;
 	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
-	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
+	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges')::BOOLEAN;
 
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 	v_dscenario_valve = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_valve');
@@ -177,13 +177,13 @@ BEGIN
 
 
 	-- it's not allowed to commit changes when psectors are used
- 	IF v_usepsector = 'true' THEN
-		v_commitchanges = 'false';
+ 	IF v_usepsector THEN
+		v_commitchanges := FALSE;
 	END IF;
 
 	-- it's not allowed to commit changes when flood only mapzone is activated
 	IF v_floodonlymapzone IS NOT NULL THEN
-		v_commitchanges = 'false';
+		v_commitchanges := FALSE;
 	END IF;
 
 

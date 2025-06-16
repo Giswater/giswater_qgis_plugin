@@ -71,8 +71,8 @@ BEGIN
 
     -- Get variables from input JSON
 	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
-    v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
-	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
+    v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector')::BOOLEAN;
+	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges')::BOOLEAN;
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
     v_ignorebrokenvalves = TRUE;
@@ -81,8 +81,8 @@ BEGIN
 	--v_useCheckValves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'useCheckValves')::int;
 
     -- it's not allowed to commit changes when psectors are used
- 	IF v_usepsector = 'true' THEN
-		v_commitchanges = 'false';
+ 	IF v_usepsector THEN
+		v_commitchanges := FALSE;
 	END IF;
 
 	-- MANAGE EXPL ARR
@@ -168,7 +168,7 @@ BEGIN
 	-- VALVES with graph_delimiter = 'MINSECTOR'
     UPDATE temp_pgr_node t
     SET
-        graph_delimiter = 'minsector', 
+        graph_delimiter = 'minsector',
         closed = v.closed,
         broken = v.broken,
         to_arc = v.to_arc,
@@ -214,7 +214,7 @@ BEGIN
 			a.pgr_node_2
 		FROM temp_pgr_node n
 		JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter = 'minsector' AND n.to_arc IS NULL 
+		WHERE n.graph_delimiter = 'minsector' AND n.to_arc IS NULL
 	),
 	arcs_modif AS (
 		SELECT
@@ -302,24 +302,24 @@ BEGIN
 
 -- for open valves with to_arc
     UPDATE temp_pgr_arc a
-	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END, 
-		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END 
+	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END,
+		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END
 	FROM temp_pgr_node n
 	WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	AND a.graph_delimiter = 'minsector' 
+	AND a.graph_delimiter = 'minsector'
     AND n.to_arc IS NOT NULL
     AND n.closed = FALSE
     AND n.broken = FALSE;
 
 -- for SECTORS - only the inlet arcs
     UPDATE temp_pgr_arc a
-	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END, 
-		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END 
+	SET cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN -1 ELSE a.cost END,
+		reverse_cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN -1 ELSE a.reverse_cost END
 	FROM temp_pgr_node n
 	WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	AND a.graph_delimiter = 'sector' 
+	AND a.graph_delimiter = 'sector'
     AND a.old_arc_id = ANY (n.inlet_arc);
-    
+
     -- Generate the minsectors
     v_query :=
     'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 as cost 
@@ -360,7 +360,7 @@ BEGIN
     FROM temp_pgr_arc
     WHERE mapzone_id > 0;
 
-    -- table used for Massive Mincut; for SECTORS, mapzone_id=0 is replaced for node_id in the case of nodes-SECTOR 
+    -- table used for Massive Mincut; for SECTORS, mapzone_id=0 is replaced for node_id in the case of nodes-SECTOR
     -- !!! the node_id for Sectors don't exist in temp_pgr_minsector
 
     -- Set mapzone_id to 0 for nodes at the border of minsectors

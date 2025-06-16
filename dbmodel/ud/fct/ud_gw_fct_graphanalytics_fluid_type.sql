@@ -127,13 +127,13 @@ BEGIN
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'))::json;
 
 	-- it's not allowed to commit changes when psectors are used
- 	IF v_usepsector IS TRUE THEN
-		v_commitchanges = FALSE;
+ 	IF v_usepsector THEN
+		v_commitchanges := FALSE;
 	END IF;
 
 	v_result := COALESCE(v_result, '{}');
 	v_result_info := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info := concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 
 	-- MANAGE EXPL ARR
