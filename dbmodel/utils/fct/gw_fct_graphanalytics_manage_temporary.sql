@@ -842,7 +842,7 @@ BEGIN
 
         -- For specific functions
         IF v_fct_name = 'MINSECTOR' THEN
-            CREATE OR REPLACE TEMPORARY VIEW temp_pgr_minsector_old AS
+            CREATE OR REPLACE TEMPORARY VIEW v_temp_pgr_minsector_old AS
             SELECT DISTINCT v.minsector_id
             FROM temp_pgr_arc t
             JOIN v_temp_arc v USING (arc_id)
@@ -909,14 +909,14 @@ BEGIN
     ELSIF v_action = 'DROP' THEN
 
         -- Drop temporary views
+        DROP VIEW IF EXISTS v_temp_pgr_minsector_old;
+        DROP VIEW IF EXISTS v_temp_minsector_mincut;
         DROP VIEW IF EXISTS v_temp_node;
         DROP VIEW IF EXISTS v_temp_arc;
         DROP VIEW IF EXISTS v_temp_connec;
         DROP VIEW IF EXISTS v_temp_gully;
         DROP VIEW IF EXISTS v_temp_link_connec;
         DROP VIEW IF EXISTS v_temp_link_gully;
-        DROP VIEW IF EXISTS v_temp_minsector_mincut;
-        DROP VIEW IF EXISTS temp_pgr_minsector_old;
 
         -- Drop temporary tables
         DROP TABLE IF EXISTS temp_pgr_mapzone;

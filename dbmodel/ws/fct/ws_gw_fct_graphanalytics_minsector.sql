@@ -570,8 +570,8 @@ BEGIN
 
         -- Update minsector
         DELETE FROM minsector WHERE EXISTS (
-            SELECT 1 FROM temp_pgr_minsector_old
-            WHERE minsector.minsector_id = temp_pgr_minsector_old.minsector_id
+            SELECT 1 FROM v_temp_pgr_minsector_old
+            WHERE minsector.minsector_id = v_temp_pgr_minsector_old.minsector_id
         );
         INSERT INTO minsector SELECT * FROM temp_pgr_minsector;
 
@@ -643,8 +643,8 @@ BEGIN
         v_querytext = '
             UPDATE arc SET minsector_id = 0
             WHERE EXISTS (
-                SELECT 1 FROM temp_pgr_minsector_old
-                WHERE arc.minsector_id = temp_pgr_minsector_old.minsector_id
+                SELECT 1 FROM v_temp_pgr_minsector_old
+                WHERE arc.minsector_id = v_temp_pgr_minsector_old.minsector_id
             )
             AND NOT EXISTS (
                 SELECT 1 FROM temp_pgr_arc tpa WHERE tpa.mapzone_id = arc.minsector_id
@@ -656,8 +656,8 @@ BEGIN
         v_querytext = '
             UPDATE node SET minsector_id = 0
             WHERE EXISTS (
-                SELECT 1 FROM temp_pgr_minsector_old
-                WHERE node.minsector_id = temp_pgr_minsector_old.minsector_id
+                SELECT 1 FROM v_temp_pgr_minsector_old
+                WHERE node.minsector_id = v_temp_pgr_minsector_old.minsector_id
             )
             AND NOT EXISTS (
                 SELECT 1 FROM temp_pgr_node tpn WHERE tpn.mapzone_id = node.minsector_id
@@ -669,8 +669,8 @@ BEGIN
         v_querytext = '
             UPDATE connec SET minsector_id = 0
             WHERE EXISTS (
-                SELECT 1 FROM temp_pgr_minsector_old
-                WHERE connec.minsector_id = temp_pgr_minsector_old.minsector_id
+                SELECT 1 FROM v_temp_pgr_minsector_old
+                WHERE connec.minsector_id = v_temp_pgr_minsector_old.minsector_id
             )
             AND NOT EXISTS (
                 SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE vc.connec_id = connec.connec_id
@@ -682,8 +682,8 @@ BEGIN
         v_querytext = '
             UPDATE link SET minsector_id = 0
             WHERE EXISTS (
-                SELECT 1 FROM temp_pgr_minsector_old
-                WHERE link.minsector_id = temp_pgr_minsector_old.minsector_id
+                SELECT 1 FROM v_temp_pgr_minsector_old
+                WHERE link.minsector_id = v_temp_pgr_minsector_old.minsector_id
             )
             AND NOT EXISTS (
                 SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id) WHERE vc.link_id = link.link_id
