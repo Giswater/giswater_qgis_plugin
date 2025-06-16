@@ -32,6 +32,10 @@ WARNING! The name of the tables MUST be within the name of the schema.
 SELECT ud.gw_fct_cso_calculation($${"client":{"device":4, "lang":"es_ES", "epsg":25830}, "form":{}, "feature":{}, 
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"macroexplId":"5", "drainzoneId":null}}}$$);
 
+SELECT ud.gw_fct_cso_calculation(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+"data":{"filterFields":{}, "pageInfo":{},"parameters":{"macroexplId":"5", "drainzoneId":', drainzone_id, '}}}')::json)
+FROM ud.drainzone WHERE link IS NOT NULL;
+
 */
 
 DECLARE
@@ -213,7 +217,8 @@ BEGIN
 		select timser_id as rf_name, 60*v_tstep as rf_length, value as rf_volume, (value*6)::numeric as rf_intensity, "time" as rf_tstep
 		from inp_timeseries_value a 
 		join inp_timeseries t on a.timser_id = t.id 
-		where t.active is true;
+		where t.active is true
+		ORDER BY 1, 5;
 	
 	
 	-- CHECK INPUT DATA (before calc)

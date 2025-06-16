@@ -76,6 +76,7 @@ CREATE TABLE cso_subc_dwf (
 );
 
 
+ALTER TABLE cso_out_vol ADD CONSTRAINT cso_out_vol_rf_name_fkey FOREIGN KEY (rf_name) REFERENCES inp_timeseries(id);
 
 
 CREATE INDEX cso_out_vol_node_id ON cso_out_vol (node_id);
