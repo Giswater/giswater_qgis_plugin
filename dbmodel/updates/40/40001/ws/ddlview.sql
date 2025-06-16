@@ -8313,6 +8313,7 @@ AS SELECT om_mincut_valve.id,
     om_mincut_valve.broken,
     om_mincut_valve.unaccess,
     om_mincut_valve.proposed,
+    om_mincut_valve.to_arc,
     om_mincut_valve.the_geom
    FROM selector_mincut_result,
     om_mincut_valve

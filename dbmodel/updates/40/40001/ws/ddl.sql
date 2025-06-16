@@ -158,3 +158,7 @@ CREATE TABLE man_vlink (
 	CONSTRAINT man_vlink_pkey PRIMARY KEY (link_id),
 	CONSTRAINT man_vlink_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- 16/06/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut_valve", "column":"to_arc", "dataType":"int4", "isUtils":"False"}}$$);
+

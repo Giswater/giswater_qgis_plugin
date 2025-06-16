@@ -989,7 +989,13 @@ UPDATE sys_function SET function_alias = 'BUILT MISSING NODES USING START/END VE
 --16/06/2025
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4022, 'There are no nodes to be repaired.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4026, 'There are no nodes to be repaired.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4024, '%v_count% nodes have been created to repair topology.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4028, '%v_count% nodes have been created to repair topology.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
+VALUES('ignoreBrokenOnlyMassiveMincut', 'false', 'Ignore broken only on massive mincut', 'Ignore broken only on massive mincut:', NULL, NULL, false, NULL, 'ws', NULL, NULL, 'boolean', 'checkbox', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
+VALUES('ignoreCheckValvesMincut', 'false', 'Ignore check valves on mincut', 'Ignore check valves on mincut:', NULL, NULL, false, NULL, 'ws', NULL, NULL, 'boolean', 'checkbox', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
