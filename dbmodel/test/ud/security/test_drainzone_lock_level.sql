@@ -30,15 +30,15 @@ CREATE USER admin_user;
 GRANT role_admin to admin_user;
 INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_disable_locklevel', '{"update":"false", "delete":"false"}', 'admin_user');
 
-CREATE USER normal_user;
-GRANT role_edit to normal_user;
-INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_disable_locklevel', '{"update":"false", "delete":"false"}', 'normal_user');
+CREATE USER edit_user;
+GRANT role_edit to edit_user;
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_disable_locklevel', '{"update":"false", "delete":"false"}', 'edit_user');
 
 
 -- ===========================
--- normal_user
+-- edit_user
 -- ===========================
-SET role normal_user;
+SET role edit_user;
 
 -- lock_level is NULL
 SELECT lives_ok(
@@ -116,7 +116,7 @@ SELECT throws_ok(
 -- ===========================
 SET ROLE admin_user;
 
--- recreate the drainzone with lock_level = 1 deleted by normal_user
+-- recreate the drainzone with lock_level = 1 deleted by edit_user
 INSERT INTO drainzone (drainzone_id, name, lock_level) VALUES (-997, 'Drainzone997', 1);
 
 -- lock_level is NULL
