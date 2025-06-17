@@ -77,8 +77,9 @@ CREATE TABLE cso_subc_dwf (
 
 
 ALTER TABLE cso_out_vol ADD CONSTRAINT cso_out_vol_rf_name_fkey FOREIGN KEY (rf_name) REFERENCES inp_timeseries(id);
+ALTER TABLE cso_out_vol ADD CONSTRAINT node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id);
+ALTER TABLE cso_out_vol ADD CONSTRAINT drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
 
-
-CREATE INDEX cso_out_vol_node_id ON cso_out_vol (node_id);
-CREATE INDEX cso_out_vol_rf_name ON cso_out_vol (rf_name);
-CREATE INDEX cso_out_vol_rf_tstep ON cso_out_vol (rf_tstep);
+CREATE INDEX cso_out_vol_node_id ON cso_out_vol USING btree (node_id);
+CREATE INDEX cso_out_vol_rf_name ON cso_out_vol USING btree (rf_name);
+CREATE INDEX cso_out_vol_rf_tstep ON cso_out_vol USING btree (rf_tstep);
