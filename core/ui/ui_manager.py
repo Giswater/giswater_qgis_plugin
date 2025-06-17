@@ -1101,16 +1101,6 @@ class GwAdminVisitParamUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-# admin cm
-UINAME = "admin_cm_base"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwAdminCmBaseUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
 UINAME = "admin_cm_create"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
