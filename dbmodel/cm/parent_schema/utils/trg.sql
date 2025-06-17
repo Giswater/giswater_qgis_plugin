@@ -72,10 +72,6 @@ DROP TRIGGER IF EXISTS trg_lot_x_link_feature ON cm.om_campaign_lot_x_link;
 CREATE TRIGGER trg_lot_x_link_feature AFTER INSERT OR DELETE ON cm.om_campaign_lot_x_link
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature('link');
 
-DROP TRIGGER IF EXISTS trg_lot_x_gully_feature ON cm.om_campaign_lot_x_gully;
-CREATE TRIGGER trg_lot_x_gully_feature AFTER INSERT OR DELETE ON cm.om_campaign_lot_x_gully
-FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature('gully');
-
 DROP TRIGGER IF EXISTS trg_validate_lot_x_arc_feature ON cm.om_campaign_lot_x_arc;
 CREATE TRIGGER trg_validate_lot_x_arc_feature BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_arc
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature_check_campaign('arc');
@@ -92,10 +88,6 @@ DROP TRIGGER IF EXISTS trg_validate_lot_x_link_feature ON cm.om_campaign_lot_x_l
 CREATE TRIGGER trg_validate_lot_x_link_feature BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_link
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature_check_campaign('link');
 
-DROP TRIGGER IF EXISTS trg_validate_lot_x_gully_feature ON cm.om_campaign_lot_x_gully;
-CREATE TRIGGER trg_validate_lot_x_gully_feature BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_gully
-FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature_check_campaign('gully');
-
 DO $$
 DECLARE
     v_rec record;
@@ -104,15 +96,9 @@ DECLARE
     v_feature_type text;
 BEGIN
     FOR v_rec IN
-        SELECT id FROM PARENT_SCHEMA.cat_feature WHERE feature_type <> 'ELEMENT'
+        SELECT id FROM PARENT_SCHEMA.cat_feature WHERE feature_type NOT IN ('ELEMENT', 'GULLY')
     LOOP
         v_feature_type := lower(v_rec.id);
-
-        -- Conditional for gully, same as before
-        IF v_feature_type = 'gully' AND 'PARENT_TYPE' <> 'ud' THEN
-            CONTINUE;
-        END IF;
-
         -- Construct the view name exactly as in ddl.sql
         v_view_name := 've_' || 'PARENT_SCHEMA' || '_lot_' || v_feature_type;
         v_trigger_name := 'trg_PARENT_SCHEMA_edit_lot_' || v_feature_type;
