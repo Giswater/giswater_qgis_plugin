@@ -57,15 +57,17 @@ BEGIN
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node (
             pgr_node_id SERIAL NOT NULL,
             node_id int4,
+            old_node_id int4,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
             fluid_type INTEGER DEFAULT 0,
             modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
-            graph_delimiter VARCHAR(30) DEFAULT 'none',
+            graph_delimiter VARCHAR(30) DEFAULT 'NONE',
             staticpressure FLOAT DEFAULT 0,
             CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_node_node_id_idx ON temp_pgr_node USING btree (node_id);
+        CREATE INDEX IF NOT EXISTS temp_pgr_node_old_node_id_idx ON temp_pgr_node USING btree (old_node_id);
 
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc (
@@ -79,14 +81,15 @@ BEGIN
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER,
             fluid_type INTEGER DEFAULT 0,
-            graph_delimiter VARCHAR(30) DEFAULT 'none',
+            graph_delimiter VARCHAR(30) DEFAULT 'NONE',
             modif1 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_1
             modif2 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_2
             cost INT DEFAULT 1,
             reverse_cost INT DEFAULT 1,
             CONSTRAINT temp_pgr_arc_pkey PRIMARY KEY (pgr_arc_id)
         );
-        CREATE INDEX IF NOT EXISTS temp_pgr_arc_pgr_arc_id_idx ON temp_pgr_arc USING btree (pgr_arc_id);
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_arc_id_idx ON temp_pgr_arc USING btree (arc_id);
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_old_arc_id_idx ON temp_pgr_arc USING btree (old_arc_id);
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_pgr_node1_idx ON temp_pgr_arc USING btree (pgr_node_1);
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_pgr_node2_idx ON temp_pgr_arc USING btree (pgr_node_2);
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_node1_idx ON temp_pgr_arc USING btree (node_1);
@@ -114,12 +117,18 @@ BEGIN
         IF v_project_type = 'WS' THEN
             ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL;
-            ALTER TABLE temp_pgr_node ADD COLUMN to_arc int4;
-            ALTER TABLE temp_pgr_node ADD COLUMN inlet_arc _int4;
+            ALTER TABLE temp_pgr_node ADD COLUMN to_arc _int4;
+
+            ALTER TABLE temp_pgr_arc ADD COLUMN closed BOOL;
+            ALTER TABLE temp_pgr_arc ADD COLUMN broken BOOL;
+            ALTER TABLE temp_pgr_arc ADD COLUMN to_arc _int4;
+
             -- for specific functions
             IF v_fct_name = 'MINCUT' OR v_fct_name = 'MINSECTOR' THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL DEFAULT FALSE;
+                ALTER TABLE temp_pgr_arc ADD COLUMN cost_mincut INT DEFAULT 1;
+                ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mincut INT DEFAULT 1;
             END IF;
             IF v_fct_name = 'MINSECTOR' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (

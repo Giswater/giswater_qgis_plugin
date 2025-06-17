@@ -34,6 +34,7 @@ DECLARE
     v_mapzone_name TEXT;
 
     -- extra variables
+    v_graph_delimiter TEXT;
     v_cost INTEGER = 1;
     v_reverse_cost INTEGER = 1;
     v_querytext TEXT;
@@ -66,6 +67,12 @@ BEGIN
     END IF;
 
     IF v_project_type = 'UD' THEN v_reverse_cost = -1; END IF;
+
+    IF v_mapzone_name IN ('MINSECTOR', 'MINCUT') THEN
+        v_graph_delimiter := 'SECTOR';
+    ELSE
+        v_graph_delimiter := v_mapzone_name;
+    END IF;
 
     v_querytext = '
     WITH connectedcomponents AS (
@@ -119,48 +126,96 @@ BEGIN
 
         EXECUTE v_querytext;
 
-        -- NOTE: Not used in the current version
-        -- v_querytext = '
-        --     INSERT INTO temp_pgr_connec (connec_id, arc_id, old_mapzone_id)
-        --     (
-        --         SELECT DISTINCT ON (c.connec_id) c.connec_id, a.pgr_arc_id, ' || v_mapzone_name || '_id
-        --         FROM v_temp_connec c
-        --         JOIN temp_pgr_arc a ON c.arc_id = a.arc_id
-        --     )';
+        IF v_project_type = 'WS' THEN
+            -- VALVES
+            UPDATE temp_pgr_node t
+            SET
+                graph_delimiter = 'minsector',
+                closed = v.closed,
+                broken = v.broken,
+                to_arc = v.to_arc
+            FROM (
+                SELECT
+                n.node_id,
+                v.closed,
+                v.broken,
+                CASE
+                    WHEN to_arc IS NULL THEN NULL
+                    ELSE ARRAY[to_arc]
+                END AS to_arc
+                FROM v_temp_node n
+                JOIN man_valve v ON v.node_id = n.node_id
+                WHERE 'MINSECTOR' = ANY(n.graph_delimiter)
+            ) v
+            WHERE t.node_id = v.node_id;
+        END IF;
 
-        -- EXECUTE v_querytext;
+        UPDATE temp_pgr_node t
+        SET graph_delimiter = v_graph_delimiter
+        FROM v_temp_node n
+        WHERE t.node_id = n.node_id
+        AND t.graph_delimiter = 'NONE'
+        AND v_graph_delimiter = ANY(n.graph_delimiter);
 
-        -- v_querytext = '
-        --     INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, old_mapzone_id)
-        --     (
-        --         SELECT DISTINCT ON (l.link_id) l.link_id, l.feature_id, l.feature_type, ' || v_mapzone_name || '_id
-        --         FROM v_temp_link_connec l
-        --         JOIN temp_pgr_connec c ON l.feature_id=c.connec_id
-        --     )';
+        IF v_project_type = 'WS' THEN
+            UPDATE temp_pgr_node t
+            SET to_arc = a.to_arc
+            FROM  (
+                SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                FROM man_tank m
+                JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                GROUP BY m.node_id
+            ) a
+            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
 
-        -- EXECUTE v_querytext;
+            UPDATE temp_pgr_node t
+            SET to_arc = a.to_arc
+            FROM
+                (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                FROM man_source m
+                JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                GROUP BY m.node_id
+                )a
+            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
 
-        -- IF v_project_type = 'UD' THEN
-        --     v_querytext = '
-        --         INSERT INTO temp_pgr_gully (gully_id, arc_id, old_mapzone_id)
-        --         (
-        --             SELECT DISTINCT ON (g.gully_id) g.gully_id, a.pgr_arc_id, ' || v_mapzone_name || '_id
-        --             FROM v_temp_gully g
-        --             JOIN temp_pgr_arc a ON g.arc_id = a.arc_id
-        --         )';
+            UPDATE temp_pgr_node t
+            SET to_arc = a.to_arc
+            FROM
+                (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                FROM man_waterwell m
+                JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                GROUP BY m.node_id
+                )a
+            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
 
-        --     EXECUTE v_querytext;
+            -- SET TO_ARC from METER
+            UPDATE temp_pgr_node t
+            SET to_arc = a.to_arc
+            FROM
+                (SELECT node_id,
+                    CASE WHEN to_arc IS NULL THEN NULL
+                    ELSE ARRAY[to_arc]
+                    END AS to_arc
+                FROM man_meter m
+                ) a
+            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
 
-        --     v_querytext = '
-        --         INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, old_mapzone_id)
-        --         (
-        --             SELECT DISTINCT ON (l.link_id) l.link_id, l.feature_id, l.feature_type, ' || v_mapzone_name || '_id
-        --             FROM v_temp_link_gully l
-        --             JOIN temp_pgr_gully g ON l.feature_id = g.gully_id
-        --         )';
+            -- SET TO_ARC from PUMP
+            UPDATE temp_pgr_node t
+            SET to_arc = a.to_arc
+            FROM
+                (SELECT node_id,
+                    CASE WHEN to_arc IS NULL THEN NULL
+                    ELSE ARRAY[to_arc]
+                    END AS to_arc
+                FROM man_pump m
+                ) a
+            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+        END IF;
 
-        --     EXECUTE v_querytext;
-        -- END IF;
     END IF;
 
 
