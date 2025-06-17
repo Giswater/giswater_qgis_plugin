@@ -75,7 +75,7 @@ BEGIN
 	v_formtabs := '[';
 
 	-- Get dynamic fields
-	SELECT gw_fct_cm_getformfieldscm(
+	SELECT gw_fct_cm_getformfields(
 		v_formname,
 		'form_feature',
 		'data',

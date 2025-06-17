@@ -74,7 +74,7 @@ BEGIN
 	v_id = ((p_data ->>'form')::json->>'id');
 
     -- Get fields
-    SELECT gw_fct_cm_getformfieldscm(
+    SELECT gw_fct_cm_getformfields(
         v_formname,
         v_formtype,
         NULL,

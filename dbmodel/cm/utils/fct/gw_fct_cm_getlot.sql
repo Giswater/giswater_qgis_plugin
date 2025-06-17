@@ -70,7 +70,7 @@ BEGIN
     v_formtabs := '[';
 
     -- Get dynamic fields for lot (similar to get_campaign)
-    SELECT gw_fct_cm_getformfieldscm(
+    SELECT gw_fct_cm_getformfields(
         v_formname,
         'form_feature',
         'data',
