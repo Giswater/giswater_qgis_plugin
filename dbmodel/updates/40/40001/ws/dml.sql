@@ -1041,3 +1041,26 @@ VALUES(4036, 'Billed metered consumtion: %v_nrw% CMP', null, 0, true, 'utils', '
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4038, 'DMAs updated %v_day% days ago.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+--17/06/2025
+UPDATE sys_function SET function_alias = 'IMPORT CLOSED VALVE FOR NETSCENARIO' WHERE function_name = 'gw_fct_import_netscenario_valve_closed';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3858, 'Nothing to import', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3860, 'Reading values from temp_csv table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3862, 'Inserting values on cat_dscenario table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3864, 'Inserting values on inp_dscenario_shortpipe table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3868, 'Netscenario doesn''t exist.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+VALUES (3870, 'Data wasn''t imported.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+

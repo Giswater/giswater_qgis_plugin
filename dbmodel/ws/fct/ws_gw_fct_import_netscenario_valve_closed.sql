@@ -51,15 +51,15 @@ BEGIN
   
 	-- manage log (fid:  v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT CLOSED VALVE FOR NETSCENARIO'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------'));
-
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3278", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
 	
 	-- control of rows
 	SELECT count(*) INTO v_count FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
 
 	IF v_count =0 THEN
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Nothing to import'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+							"data":{"message":"3858", "function":"3278", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	ELSE
 
 		IF EXISTS (SELECT 1 FROM temp_csv WHERE cur_user=current_user AND fid = 514 AND csv1::integer IN (SELECT netscenario_id FROM plan_netscenario)) THEN
@@ -69,14 +69,20 @@ BEGIN
 			closed = EXCLUDED.closed;
 
 			-- manage log (fid: v_fid)
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on cat_dscenario table -> Done'));
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on inp_dscenario_shortpipe table -> Done'));
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+							"data":{"message":"3860", "function":"3278", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+							"data":{"message":"3862", "function":"3278", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+							"data":{"message":"3864", "function":"3278", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+							"data":{"message":"3866", "function":"3278", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 		ELSE
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Netscenario doesn''t exist.'));
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Data wasn''t imported.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+								"data":{"message":"3868", "function":"3278", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
+								"data":{"message":"3870", "function":"3278", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
 		
