@@ -131,12 +131,12 @@ class GwSelector:
 
         # Determine which function to call based on the campaign flag
         if selector_type == 'selector_campaign':
-            # For campaign, use the gw_fct_getselectorscm function
+            # For campaign, use the gw_fct_cm_getselectors function
             body = tools_gw.create_body(
                 form=f'"currentTab":"{current_tab}"',
                 extras=f'"selectorType":"{selector_type}", "filterText":"{text_filter}", "addSchema":"{lib_vars.project_vars["add_schema"]}"'
             )
-            json_result = tools_gw.execute_procedure('gw_fct_getselectorscm', body, schema_name='cm')
+            json_result = tools_gw.execute_procedure('gw_fct_cm_getselectors', body, schema_name='cm')
         else:
             # For non-campaign, use the gw_fct_getselectors function
             form = f'"currentTab":"{current_tab}"'

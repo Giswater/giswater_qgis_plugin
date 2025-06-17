@@ -250,7 +250,7 @@ class AddNewLot:
 
         if campaign_id_data:
             body = {"p_campaign_id": campaign_id_data}
-            response = tools_gw.execute_procedure("gw_fct_getcmteam", body, schema_name="cm", check_function=False)
+            response = tools_gw.execute_procedure("gw_fct_cm_getteam", body, schema_name="cm", check_function=False)
 
             if isinstance(response, str):
                 response = json.loads(response)
