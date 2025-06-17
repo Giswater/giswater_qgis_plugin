@@ -4220,43 +4220,10 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
 
     field_id = feature_type + "_id"
 
-    del_id = []
-    inf_text = ""
-    list_id = ""
+    del_id, inf_text, list_id = _get_selected_record_info(widget, field_id, selection_mode, selected_list)
+    if not del_id:
+        return
 
-    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.LOT):
-        model = widget.model()
-        # Find column index for the field_id
-        col_index = -1
-        if isinstance(model, tools_qt.QSqlTableModel):
-            col_index = model.fieldIndex(field_id)
-        else:
-            for c in range(model.columnCount()):
-                header_item = model.horizontalHeaderItem(c)
-                if header_item and header_item.text() == field_id:
-                    col_index = c
-                    break
-
-        if col_index != -1:
-            for i in range(0, len(selected_list)):
-                row = selected_list[i].row()
-                if isinstance(model, tools_qt.QSqlTableModel):
-                    id_feature = model.record(row).value(col_index)
-                else:
-                    id_feature = model.item(row, col_index).text()
-                inf_text += f"{id_feature}, "
-                list_id += f"'{id_feature}', "
-                del_id.append(id_feature)
-    else:
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_feature = widget.model().record(row).value(field_id)
-            inf_text += f"{id_feature}, "
-            list_id += f"'{id_feature}', "
-            del_id.append(id_feature)
-
-    inf_text = inf_text[:-2]
-    list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
     title = "Delete records"
     answer = tools_qt.show_question(message, title, inf_text)
@@ -4270,7 +4237,6 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     expr_filter = None
     expr = None
     if len(class_object.rel_ids) > 0:
-
         # Set expression filter with features in the list
         expr_filter = f'"{field_id}" IN ('
         for i in range(len(class_object.rel_ids)):
@@ -4283,6 +4249,71 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
             return
 
     # Update model of the widget with selected expr_filter
+    _perform_delete_and_refresh_view(class_object, dialog, table_object, feature_type, selection_mode, list_id,
+                                     expr_filter, lazy_widget, lazy_init_function, extra_field, selected_list, widget)
+
+    # Select features with previous filter
+    # Build a list of feature id's and select them
+    tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.rel_layers)
+
+    # Reset rubberband
+    reset_rubberband(class_object.rubber_band)
+
+    if selection_mode == GwSelectionMode.PSECTOR:
+        class_object.rel_layers = remove_selection(layers=class_object.rel_layers)
+
+    # Update list
+    class_object.rel_list_ids[feature_type] = class_object.rel_ids
+    enable_feature_type(dialog, table_object, ids=class_object.rel_ids)
+    if refresh_callback:
+        refresh_callback()
+
+
+def _get_selected_record_info(widget, field_id, selection_mode, selected_list):
+    """
+    From a widget, get information about selected records.
+    Returns a tuple of (list of ids to delete, display text of ids, string list of ids for query).
+    """
+    del_id = []
+    model = widget.model()
+
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.LOT):
+        col_index = -1
+        if isinstance(model, tools_qt.QSqlTableModel):
+            col_index = model.fieldIndex(field_id)
+        else:
+            for c in range(model.columnCount()):
+                header_item = model.horizontalHeaderItem(c)
+                if header_item and header_item.text() == field_id:
+                    col_index = c
+                    break
+
+        if col_index != -1:
+            for item in selected_list:
+                row = item.row()
+                if isinstance(model, tools_qt.QSqlTableModel):
+                    id_feature = model.record(row).value(col_index)
+                else:
+                    id_feature = model.item(row, col_index).text()
+                del_id.append(id_feature)
+    else:
+        for item in selected_list:
+            row = item.row()
+            id_feature = model.record(row).value(field_id)
+            del_id.append(id_feature)
+
+    if not del_id:
+        return [], "", ""
+
+    inf_text = ", ".join(map(str, del_id))
+    list_id = ", ".join(f"'{_id}'" for _id in del_id)
+
+    return del_id, inf_text, list_id
+
+
+def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature_type, selection_mode, list_id, expr_filter,
+                                     lazy_widget, lazy_init_function, extra_field, selected_list, widget):
+    """Perform the delete operation and refresh the corresponding view."""
     if selection_mode == GwSelectionMode.PSECTOR:
         state = None
         if extra_field is not None and len(selected_list) == 1:
@@ -4333,27 +4364,12 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
         _delete_feature_lot(dialog, feature_type, list_id, class_object.lot_id, state)
         load_tableview_lot(dialog, class_object.feature_type, class_object.lot_id, class_object.rel_layers)
     elif selection_mode == GwSelectionMode.FEATURE_END:
-        load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
+        load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type,
+                                   expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
-
-    # Select features with previous filter
-    # Build a list of feature id's and select them
-    tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.rel_layers)
-
-    # Reset rubberband
-    reset_rubberband(class_object.rubber_band)
-
-    if selection_mode == GwSelectionMode.PSECTOR:
-        class_object.rel_layers = remove_selection(layers=class_object.rel_layers)
-
-    # Update list
-    class_object.rel_list_ids[feature_type] = class_object.rel_ids
-    enable_feature_type(dialog, table_object, ids=class_object.rel_ids)
-    if refresh_callback:
-        refresh_callback()
 
 
 def get_parent_layers_visibility():
