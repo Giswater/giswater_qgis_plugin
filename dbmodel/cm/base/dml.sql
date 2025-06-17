@@ -191,7 +191,7 @@ GRANT ALL PRIVILEGES ON DATABASE BD_NAME TO role_cm_admin;
 GRANT ALL ON SCHEMA cm TO role_cm_field;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_field;
 GRANT ALL ON TABLE selector_lot TO role_cm_field;
-GRANT ALL ON TABLE cm_log TO role_cm_field;
+GRANT ALL ON TABLE cm_audit.log TO role_cm_field;
 
 GRANT ALL ON SCHEMA cm TO role_cm_manager;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_manager;

@@ -13,10 +13,10 @@ CREATE OR REPLACE FUNCTION cm.gw_fct_cm_create_logreturn(p_data json)
 AS $function$
 
 /*
-SELECT gw_fct_cm_create_logreturn_cm($${"data":{"parameters":{"type":"info"}}}$$);
-SELECT gw_fct_cm_create_logreturn_cm($${"data":{"parameters":{"type":"point"}}}$$);
-SELECT gw_fct_cm_create_logreturn_cm($${"data":{"parameters":{"type":"line"}}}$$);
-SELECT gw_fct_cm_create_logreturn_cm($${"data":{"parameters":{"type":"polygon"}}}$$);
+SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$);
+SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$);
+SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$);
+SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$);
 */
 
 DECLARE
@@ -107,7 +107,7 @@ $function$
 
 -- Permissions
 
-ALTER FUNCTION cm.gw_fct_cm_create_logreturn_cm(json) OWNER TO postgres;
-GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn_cm(json) TO public;
-GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn_cm(json) TO postgres;
-GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn_cm(json) TO role_basic;
+ALTER FUNCTION cm.gw_fct_cm_create_logreturn(json) OWNER TO postgres;
+GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn(json) TO public;
+GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn(json) TO postgres;
+GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn(json) TO role_basic;
