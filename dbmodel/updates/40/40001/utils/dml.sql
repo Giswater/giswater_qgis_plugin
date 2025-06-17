@@ -1734,7 +1734,7 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3698, 'ERROR: The table chosen does not fit with any epa dscenario. Please try another one.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3700, 'INFO: Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(3700, 'Process done successfully.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 -- 06/06/2025
 UPDATE config_toolbox SET inputparams='[

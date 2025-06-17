@@ -999,3 +999,20 @@ VALUES('ignoreBrokenOnlyMassiveMincut', 'false', 'Ignore broken only on massive 
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('ignoreCheckValvesMincut', 'false', 'Ignore check valves on mincut', 'Ignore check valves on mincut:', NULL, NULL, false, NULL, 'ws', NULL, NULL, 'boolean', 'checkbox', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
+--17/06/2025
+
+UPDATE sys_function SET function_alias = 'CREATE VALVE DSCENARIO FROM MINCUT' WHERE function_name = 'gw_fct_create_dscenario_from_mincut';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3954, 'New scenario %v_name% have been created with id:%v_scenarioid%.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3956, '%v_count% rows with features have been inserted on table inp_dscenario_shortpipe', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3958, '%v_count% rows with features have been inserted on table inp_dscenario_valve', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
