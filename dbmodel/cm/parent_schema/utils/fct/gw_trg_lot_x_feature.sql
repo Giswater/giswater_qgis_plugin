@@ -21,6 +21,9 @@ DECLARE
     v_feature_id_value INTEGER;
     v_lot_id INTEGER;
     v_row RECORD;
+    v_dest_table_name TEXT;
+    v_source_columns TEXT;
+    v_dest_columns TEXT;
 BEGIN
     v_feature_id_column := v_feature_type || '_id';
     v_feature_column := v_feature_type || '_type';
@@ -54,13 +57,28 @@ BEGIN
 
     -- Compose view/table name
     v_view_name := format('ve_%s_%s', v_feature_type, lower(v_feature_child_type));
-    -- Compose the final table name (SCHEMA_NAME.PARENT_SCHEMA_xxx)
+    v_dest_table_name := format('PARENT_SCHEMA_%s', lower(v_feature_child_type));
 
     IF TG_OP = 'INSERT' THEN
+        -- Get columns of the specific view, excluding the_geom
+        SELECT string_agg(quote_ident(column_name), ', '), string_agg('vn.' || quote_ident(column_name), ', ')
+        INTO v_dest_columns, v_source_columns
+        FROM information_schema.columns
+        WHERE table_schema = 'PARENT_SCHEMA'
+          AND table_name = v_view_name
+          AND column_name <> 'the_geom';
+
+        IF v_dest_columns IS NULL THEN
+            RETURN NEW;
+        END IF;
+
         v_querytext := format(
-            'INSERT INTO SCHEMA_NAME.PARENT_SCHEMA_%I SELECT (SELECT nextval(''SCHEMA_NAME.PARENT_SCHEMA_%I_id_seq''::regclass)), v.lot_id, vn.* FROM SCHEMA_NAME.om_campaign_lot_x_%s v JOIN PARENT_SCHEMA.%I vn ON vn.%I::integer = v.%I  WHERE v.lot_id = $1 AND v.%I = $2',
-            lower(v_feature_child_type),
-            lower(v_feature_child_type),
+            'INSERT INTO SCHEMA_NAME.%I (id, lot_id, %s) ' ||
+            'SELECT nextval(''SCHEMA_NAME.%I_id_seq''::regclass), v.lot_id, %s FROM SCHEMA_NAME.om_campaign_lot_x_%s v JOIN PARENT_SCHEMA.%I vn ON vn.%I::integer = v.%I WHERE v.lot_id = $1 AND v.%I = $2',
+            v_dest_table_name,
+            v_dest_columns,
+            v_dest_table_name,
+            v_source_columns,
             v_feature_type,
             v_view_name,
             v_feature_id_column,
@@ -70,8 +88,8 @@ BEGIN
         EXECUTE v_querytext USING v_lot_id, v_feature_id_value;
     ELSIF TG_OP = 'DELETE' THEN
         v_querytext := format(
-            'DELETE FROM SCHEMA_NAME.PARENT_SCHEMA_%I WHERE lot_id = $1 AND %I = $2',
-            lower(v_feature_child_type),
+            'DELETE FROM SCHEMA_NAME.%I WHERE lot_id = $1 AND %I = $2',
+            v_dest_table_name,
             v_feature_id_column
         );
         EXECUTE v_querytext USING v_lot_id, v_feature_id_value;
