@@ -12,7 +12,7 @@ character varying, character varying, character varying, character varying, char
 DROP FUNCTION IF EXISTS cm.gw_api_get_formfields(character varying, character varying, character varying,
 character varying, character varying, character varying, character varying, character varying, character varying, integer, json);
 
-CREATE OR REPLACE FUNCTION cm.gw_fct_cm_getformfield(
+CREATE OR REPLACE FUNCTION cm.gw_fct_cm_getformfields(
 	p_formname character varying,
 	p_formtype character varying,
 	p_tabname character varying,

@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3436
 
-CREATE OR REPLACE FUNCTION cm.gw_fct_cm_getdialog(p_data json)
+CREATE OR REPLACE FUNCTION cm.gw_fct_cm_get_dialog(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
