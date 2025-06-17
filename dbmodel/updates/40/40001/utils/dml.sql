@@ -966,7 +966,7 @@ VALUES(3476, 'Reconnect planned: %v_count% connecs.', null, 0, true, 'utils', 'c
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3478, 'Arc fusion done successfully', null, 0, true, 'utils', 'core', 'UI');
-		
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3374, 'Arcs related to selected node have been removed: %arc_id1% , %arc_id2% .', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -1362,7 +1362,7 @@ ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
 --27-05-2025
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3440, 'Reconnect operative: %v_count% connecs.', null, 0, true, 'utils', 'core', 'AUDIT');
-						
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3442, 'Reconnect operative: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
@@ -2151,25 +2151,25 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES (3944, 'Pattern id (%rec_csv.csv1%) already exists on inp_pattern -> Import have been canceled for this pattern', null, 0, true, 'utils', 'core', 'AUDIT');
 
 --13/06/2025
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3844, 'IMPORT SCADA VALUES FILE', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3846, 'IMPORT FLOWMETER DAILY VALUES FILE', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3848, 'Reading values from temp_csv table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3850, 'Inserting values on ext_rtc_scada_x_data table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3852, 'Deleting values from temp_csv -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3854, 'Process finished with %i% rows inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3856, 'Data from %v_count% scada tags have been imported.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
@@ -2177,8 +2177,15 @@ VALUES(3446, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'c
 
 --28-05-2025
 
-
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3474, 'Reconnect planned: %v_count% gullies.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+--17/06/2025
 
+UPDATE sys_function SET function_alias = 'IMPORT CAT FEATURE' WHERE function_name = 'gw_fct_import_cat_feature';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3946, 'Inserting values on cat_feature table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3948, 'Process finished', null, 0, true, 'utils', 'core', 'AUDIT');
