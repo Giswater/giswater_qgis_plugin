@@ -51,8 +51,10 @@ BEGIN
 
 	-- manage log (fid: 235)
 	DELETE FROM audit_check_data WHERE  fid = 235 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('IMPORT ELEMENTS FILE'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('------------------------------'));
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2514", "fid":"235", "result_id":"'||v_result_id||'", "is_process":true, "is_header":"true"}}$$)';
+
 
  	-- starting process
 	FOR v_element IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = 235
@@ -95,11 +97,21 @@ BEGIN
 	END LOOP;
 
 	-- manage log (fid: 235)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Inserting values on element table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Deleting values from temp_csv -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Process finished'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3908", "function":"2514", "fid":"235", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3950", "function":"2514", "fid":"235", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3952", "function":"2514", "parameters":{"v_featuretable":"'||v_featuretable||'"}, "fid":"235", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3852", "function":"2514", "fid":"235", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3948", "function":"2514", "fid":"235", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
+
 
 	-- get log (fid: 235)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result

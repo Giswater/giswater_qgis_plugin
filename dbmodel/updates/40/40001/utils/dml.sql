@@ -2189,3 +2189,14 @@ VALUES(3946, 'Inserting values on cat_feature table -> Done', null, 0, true, 'ut
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3948, 'Process finished', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'IMPORT ELEMENTS FILE' WHERE function_name = 'gw_fct_import_elements';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3950, 'Inserting values on element table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3952, 'Inserting values on %v_featuretable% table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
