@@ -667,7 +667,7 @@ BEGIN
 		-- Dem elevation
 		IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem AND v_idname IN ('node_id', 'connec_id', 'gully_id') THEN
 			v_elevation = (SELECT ST_Value(rast,1, v_reduced_geometry, true) FROM ext_raster_dem WHERE id =
-			(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, v_reduced_geometry, 1) LIMIT 1));
+			(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, v_reduced_geometry, 1) LIMIT 1) limit 1);
 		END IF;
 
 		-- plot code from connecs
