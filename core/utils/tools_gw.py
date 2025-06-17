@@ -60,7 +60,7 @@ from ..shared import psector  # noqa: F401
 from ..shared import audit  # noqa: F401
 from ..toolbars.utilities import snapshot_view  # noqa: F401
 from ..toolbars.edit import connect_link_btn  # noqa: F401
-from ..toolbars.cm import lot  # noqa: F401
+from ..toolbars.cm import lot, campaign  # noqa: F401
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 

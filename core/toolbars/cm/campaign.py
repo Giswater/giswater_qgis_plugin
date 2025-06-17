@@ -167,7 +167,7 @@ class Campaign:
 
         # Build widgets dynamically
         for field in form_fields:
-            widget = self.create_widget_from_field(field)
+            widget = self.create_widget_from_field(field, response)
             if not widget:
                 continue
 
@@ -179,6 +179,7 @@ class Campaign:
 
             if "columnname" in field:
                 widget.setProperty("columnname", field["columnname"])
+            
             if "widgetname" in field:
                 widget.setObjectName(field["widgetname"])
 
@@ -272,7 +273,7 @@ class Campaign:
                 sql = f"SELECT * FROM cm.{db_table} WHERE campaign_id = {campaign_id}"
                 self.populate_tableview(view, sql)
 
-    def create_widget_from_field(self, field):
+    def create_widget_from_field(self, field, response):
         """Create a Qt widget based on field metadata"""
 
         wtype = field.get("widgettype", "text")
@@ -305,13 +306,14 @@ class Campaign:
                 widget.setEnabled(False)
 
         elif wtype == "combo":
-            widget = QComboBox()
-            ids = field.get("comboIds", [])
-            names = field.get("comboNames", [])
-            for i, name in enumerate(names):
-                widget.addItem(name, ids[i] if i < len(ids) else name)
-            if not iseditable:
-                widget.setEnabled(False)
+            # Use the framework's builder to ensure widgetfunctions are connected
+            kwargs = {
+                "field": field,
+                "dialog": self.dialog,
+                "complet_result": response,
+                "class_info": self
+            }
+            widget = tools_gw.add_combo(**kwargs)
 
         return widget
 
@@ -835,3 +837,77 @@ class Campaign:
         except (ValueError, TypeError):
             msg = "Invalid campaign ID."
             tools_qgis.show_warning(msg)
+
+
+def update_expl_sector_combos(**kwargs):
+    """
+    Update exploitation and sector combos based on organization.
+    This function is designed to be called from a widgetfunction.
+    """
+
+    dialog = kwargs.get('dialog')
+    parent_widget = kwargs.get('widget') # The widget that emitted the signal
+
+    try:
+        if not dialog or not parent_widget:
+            return
+
+        # Find child widgets by their object name
+        expl_widget = dialog.findChild(QComboBox, 'tab_data_expl_id')
+        sector_widget = dialog.findChild(QComboBox, 'tab_data_sector_id')
+
+        # Get data from the currently selected item in the parent combo
+        current_index = parent_widget.currentIndex()
+        current_data = parent_widget.itemData(current_index) if current_index != -1 else None
+        
+        organization_id = None
+        if current_data and isinstance(current_data, list) and len(current_data) > 0:
+            organization_id = current_data[0]
+
+        expl_ids = None
+        sector_ids = None
+
+        # If a valid organization is selected, get its specific expl_id and sector_id lists from the database
+        if organization_id:
+            org_data_sql = f"SELECT expl_id, sector_id FROM cm.cat_organization WHERE organization_id = {organization_id}"
+            org_data_row = tools_db.get_row(org_data_sql)
+            if org_data_row:
+                expl_ids = org_data_row.get('expl_id')
+                sector_ids = org_data_row.get('sector_id')
+
+        schema = lib_vars.schema_name
+        
+        # --- Update exploitation combo ---
+        if expl_widget:
+            sql_expl = f"SELECT expl_id, name FROM {schema}.exploitation"
+            # If expl_ids is a list (even an empty one), we apply a filter.
+            # If it's None, we don't, which results in loading all.
+            if expl_ids is not None:
+                if expl_ids: # List has items
+                    expl_ids_str = ','.join(map(str, expl_ids))
+                    sql_expl += f" WHERE expl_id IN ({expl_ids_str})"
+                else: # List is empty, so select nothing
+                    sql_expl += " WHERE 1=0"
+            sql_expl += " ORDER BY name"
+            
+            rows_expl = tools_db.get_rows(sql_expl)
+            tools_qt.fill_combo_values(expl_widget, rows_expl, add_empty=True)
+
+        # --- Update sector combo ---
+        if sector_widget:
+            sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
+            # If sector_ids is a list, apply a filter. Otherwise, load all.
+            if sector_ids is not None:
+                if sector_ids: # List has items
+                    sector_ids_str = ','.join(map(str, sector_ids))
+                    sql_sector += f" WHERE sector_id IN ({sector_ids_str})"
+                else: # List is empty, so select nothing
+                    sql_sector += " WHERE 1=0"
+            sql_sector += " ORDER BY name"
+
+            rows_sector = tools_db.get_rows(sql_sector)
+            tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)
+
+    except Exception as e:
+        tools_qgis.show_warning(f"CRITICAL ERROR in update_expl_sector_combos: {e}", dialog=dialog)
+

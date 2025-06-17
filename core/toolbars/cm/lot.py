@@ -92,9 +92,9 @@ class AddNewLot:
         # Use findChild with the widget's objectName for a reliable connection.
         campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
         if campaign_combo:
-            campaign_combo.currentIndexChanged.connect(self._update_team_combo)
+            campaign_combo.currentIndexChanged.connect(self._on_campaign_changed)
             # Initial population when the dialog opens
-            self._update_team_combo()
+            self._on_campaign_changed()
         else:
             print("[DEBUG] Critical: Could not find 'tab_data_campaign_id' widget to connect signal.")
 
@@ -187,6 +187,90 @@ class AddNewLot:
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
+    def _on_campaign_changed(self):
+        """
+        Handles all UI updates when the campaign selection changes.
+        - Updates the exploitation and sector labels.
+        - Updates the team combo box with valid teams for the campaign.
+        """
+        campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
+        team_combo = self.dlg_lot.findChild(QComboBox, "tab_data_team_id")
+
+        if not campaign_combo or not team_combo:
+            return
+
+        # Get the selected campaign's data once.
+        campaign_id_data = campaign_combo.currentData()
+
+        # --- 1. UPDATE EXPLOITATION AND SECTOR LABELS ---
+        expl_label = self.dlg_lot.findChild(QLineEdit, "tab_data_expl_id")
+        sector_label = self.dlg_lot.findChild(QLineEdit, "tab_data_sector_id")
+        
+        # Extract the integer ID for queries
+        campaign_id_for_query = None
+        if campaign_id_data:
+            campaign_id_for_query = campaign_id_data[0] if isinstance(campaign_id_data, (list, tuple)) else campaign_id_data
+        print(f"[DEBUG] campaign_id_for_query: {campaign_id_for_query}")
+        print(f"[DEBUG] expl_label: {expl_label}")
+        print(f"[DEBUG] sector_label: {sector_label}")
+        if campaign_id_for_query and expl_label and sector_label:
+            print("entra")
+            sql = f"""
+                SELECT 
+                    e.name as expl_name, 
+                    s.name as sector_name 
+                FROM 
+                    cm.om_campaign c
+                    LEFT JOIN {self.schema_parent}.exploitation e ON c.expl_id = e.expl_id
+                    LEFT JOIN {self.schema_parent}.sector s ON c.sector_id = s.sector_id
+                WHERE 
+                    c.campaign_id = {campaign_id_for_query}
+            """
+            result = tools_db.get_row(sql)
+            if result:
+                expl_label.setText(result.get('expl_name', ''))
+                sector_label.setText(result.get('sector_name', ''))
+            else:
+                expl_label.setText("")
+                sector_label.setText("")
+        elif expl_label and sector_label:
+            # Clear labels if no campaign is selected
+            expl_label.setText("")
+            sector_label.setText("")
+
+
+        # UPDATE TEAM COMBO (ORIGINAL LOGIC) ---
+
+        # Preserve the currently selected team ID to restore the selection later.
+        current_team_id = team_combo.currentData()
+        if isinstance(current_team_id, (list, tuple)):
+            current_team_id = current_team_id[0]
+
+        team_combo.blockSignals(True)
+        team_combo.clear()
+        team_combo.addItem("", None)  # Add a blank item.
+
+        if campaign_id_data:
+            body = {"p_campaign_id": campaign_id_data}
+            response = tools_gw.execute_procedure("gw_fct_getcmteam", body, schema_name="cm", check_function=False)
+
+            if isinstance(response, str):
+                response = json.loads(response)
+
+            if response and response.get("status") == "Accepted":
+                teams = response.get("body", {}).get("data", [])
+                if teams:
+                    for team in teams:
+                        # Add item with the name as text and ONLY the ID as data.
+                        team_combo.addItem(str(team['idval']), team['id'])
+
+        # Restore the selection if possible.
+        if current_team_id is not None:
+            index = team_combo.findData(current_team_id)
+            if index > -1:
+                team_combo.setCurrentIndex(index)
+        team_combo.blockSignals(False)
+
     def load_lot_dialog(self, lot_id):
         """Dynamically load and populate lot dialog using gw_fct_cm_getlot"""
 
@@ -275,50 +359,6 @@ class AddNewLot:
             for row in rows:
                 result_relation.append(row[0])
         return widget
-
-    def _update_team_combo(self):
-        """
-        Update team combo based on selected campaign. This function manually
-        populates the combobox to ensure only the Team ID is stored as item data,
-        which is essential for saving the lot correctly.
-        """
-        campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
-        team_combo = self.dlg_lot.findChild(QComboBox, "tab_data_team_id")
-
-        if not campaign_combo or not team_combo:
-            return
-
-        # Preserve the currently selected team ID to restore the selection later.
-        current_team_id = team_combo.currentData()
-        if isinstance(current_team_id, (list, tuple)):
-            current_team_id = current_team_id[0]
-
-        campaign_id = campaign_combo.currentData()
-
-        team_combo.blockSignals(True)
-        team_combo.clear()
-        team_combo.addItem("", None)  # Add a blank item.
-
-        if campaign_id:
-            body = {"p_campaign_id": campaign_id}
-            response = tools_gw.execute_procedure("gw_fct_cm_getteam", body, schema_name="cm", check_function=False)
-
-            if isinstance(response, str):
-                response = json.loads(response)
-
-            if response and response.get("status") == "Accepted":
-                teams = response.get("body", {}).get("data", [])
-                if teams:
-                    for team in teams:
-                        # Add item with the name as text and ONLY the ID as data.
-                        team_combo.addItem(str(team['idval']), team['id'])
-
-        # Restore the selection if possible.
-        if current_team_id is not None:
-            index = team_combo.findData(current_team_id)
-            if index > -1:
-                team_combo.setCurrentIndex(index)
-        team_combo.blockSignals(False)
 
     def _on_tab_feature_changed(self):
         # Update self.feature_type just like in Campaign
@@ -522,6 +562,14 @@ class AddNewLot:
                 dialog=self.dlg_lot
             )
             return False
+
+        campaign_id = fields.get('campaign_id')
+        if campaign_id:
+            sql = f"SELECT expl_id, sector_id FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
+            id_row = tools_db.get_row(sql)
+            if id_row:
+                fields['expl_id'] = id_row.get('expl_id')
+                fields['sector_id'] = id_row.get('sector_id')
 
         feature_id = fields.get("lot_id")
 
