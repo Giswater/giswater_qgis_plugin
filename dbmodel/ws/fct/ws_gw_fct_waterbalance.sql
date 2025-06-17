@@ -112,8 +112,10 @@ BEGIN
 	DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WATER BALANCE BY EXPLOITATION AND PERIOD'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3142", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"temp", "is_process":true, "is_header":"true"}}$$)';
+	
 	
 	IF v_step = 1 THEN 
 		
@@ -603,23 +605,43 @@ v_queryhydro =
 		
 		IF v_days_past is null then
 
-			INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
-			VALUES ('ERROR: There are NULL values on updated_at or created_at on table dma. Please, update DMAs to fill these columns', v_fid, current_user, 3);
+			
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3143", "fid":"'||v_fid||'","criticity":"3", "is_process":true, "is_header":"true", "label_id":"1003"}}$$)';
 		
 		ELSIF v_days_past >= v_days_limiter then
 		
-			INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
-			VALUES ('ERROR: Water balance is not allowed having surpassed the threshold day limiter (parameter om_waterbalance_threshold_days)', v_fid, current_user, 3);
-			
+	
+	
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3143", "fid":"'||v_fid||'","criticity":"3", "is_process":true, "is_header":"true", "label_id":"1003"}}$$)';
 		else
 			
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of hydrometer processed: ', v_hydrometer));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', round(rec_nrw.tsi::numeric,2), ' CMP'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', round(rec_nrw.bmc::numeric,2), ' CMP'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', round(rec_nrw.nrw::numeric,2), ' CMP'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DMAs updated ',date_part('day', now() - v_current_date::timestamp), ' days ago.'));
+		
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4040", "function":"3142", "parameters":{"v_period":"'||v_period||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+
+			
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4042", "function":"3142", "parameters":{" v_count":"'|| v_count||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+			
+			
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4030", "function":"3142", "parameters":{" v_hydrometer":"'||v_hydrometer||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+
+			
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4032", "function":"3142", "parameters":{"round(rec_nrw.tsi::numeric,2)":"'||round(rec_nrw.tsi::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4034", "function":"3142", "parameters":{"round(rec_nrw.bmc::numeric,2)":"'||round(rec_nrw.bmc::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+
+			
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4036", "function":"3142", "parameters":{"round(rec_nrw.nrw::numeric,2)":"'||round(rec_nrw.nrw::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+
+		
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4038", "function":"3142", "parameters":{"date_part('day', now() - v_current_date::timestamp)":"'||date_part('day', now() - v_current_date::timestamp)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 		
 		end if;
