@@ -2416,6 +2416,11 @@ class GwAdminButton:
         if result:
             sql = f'DROP SCHEMA IF EXISTS {schema} CASCADE;'
             status = tools_db.execute_sql(sql)
+            
+            if schema == 'cm':
+                sql_audit = 'DROP SCHEMA IF EXISTS cm_audit CASCADE;'
+                tools_db.execute_sql(sql_audit)
+
             if status:
                 msg = "Process finished successfully: Delete schema"
                 tools_qt.show_info_box(msg, "Info")
