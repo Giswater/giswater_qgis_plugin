@@ -28,7 +28,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmBaseUi, GwAdminCmCreateUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmCreateUi
 
 from ..utils import tools_gw
 from ... import global_vars
