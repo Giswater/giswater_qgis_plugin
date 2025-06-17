@@ -1090,7 +1090,7 @@ class AddNewLot:
         body = {"client": {"cur_user": user}, "form": form}
 
         # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_getdialogcm', body, schema_name="cm")
+        json_result = tools_gw.execute_procedure('gw_fct_get_dialog_cm', body, schema_name="cm")
 
         # Create and open dialog
         self.dlg_create_team = TeamCreateUi(self)
@@ -1140,7 +1140,7 @@ class AddNewLot:
         body = {"client": {"cur_user": user}, "form": form}
 
         # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_getdialogcm', body, schema_name="cm")
+        json_result = tools_gw.execute_procedure('gw_fct_get_dialog_cm', body, schema_name="cm")
 
         # Create and open dialog
         self.dlg_create_team = UserCreateUi(self)

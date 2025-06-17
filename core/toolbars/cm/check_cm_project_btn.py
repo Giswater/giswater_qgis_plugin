@@ -35,7 +35,7 @@ class GwCheckCMProjectButton(GwAction):
         body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
 
         # Fetch dialog configuration from the database
-        json_result = tools_gw.execute_procedure('gw_fct_getdialogcm', body, schema_name='cm')
+        json_result = tools_gw.execute_procedure('gw_fct_get_dialog_cm', body, schema_name='cm')
 
         # Check for a valid result
         if not json_result or json_result.get("status") != "Accepted":
