@@ -11,13 +11,13 @@ SET search_path = PARENT_SCHEMA, public, pg_catalog;
 INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type, datatype) VALUES
 ('plugin_campaign', '{"campaignManage":"TRUE"}', 'External plugin to use functionality of planified campaign/lots review/visits', FALSE, 'utils', 'json') ON CONFLICT (parameter) DO NOTHING;
 
-INSERT INTO SCHEMA_NAME.cat_pschema (name) VALUES ('PARENT_SCHEMA');
+INSERT INTO cm.cat_pschema (name) VALUES ('PARENT_SCHEMA');
 
 UPDATE PARENT_SCHEMA.config_param_system
-   SET value = '{"schemaName":"SCHEMA_NAME"}'
+   SET value = '{"schemaName":"cm"}'
  WHERE parameter = 'admin_schema_cm';
 
-UPDATE SCHEMA_NAME.sys_version AS dst
+UPDATE cm.sys_version AS dst
    SET
      giswater  = src.giswater,
      "language" = src."language",
@@ -27,4 +27,4 @@ UPDATE SCHEMA_NAME.sys_version AS dst
       FROM PARENT_SCHEMA.sys_version
      ORDER BY date DESC
      LIMIT 1
-  ) AS src; 
+  ) AS src;

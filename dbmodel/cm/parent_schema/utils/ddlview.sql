@@ -6,7 +6,7 @@ or (at your option) any later version.
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = cm, public, pg_catalog;
 
 
 -- CAMPAIGN x FEATURE
@@ -102,7 +102,7 @@ om_campaign_lot_x_node.update_count,
 om_campaign_lot_x_node.update_log,
 qindex1,
 qindex2,
-action, 
+action,
 om_campaign_lot_x_node.the_geom
 FROM selector_lot, om_campaign_lot
 JOIN om_campaign_lot_x_node ON om_campaign_lot_x_node.lot_id = om_campaign_lot.lot_id
@@ -124,7 +124,7 @@ om_campaign_lot_x_arc.update_count,
 om_campaign_lot_x_arc.update_log,
 qindex1,
 qindex2,
-action, 
+action,
 om_campaign_lot_x_arc.the_geom
 FROM selector_lot, om_campaign_lot
 JOIN om_campaign_lot_x_arc ON om_campaign_lot_x_arc.lot_id = om_campaign_lot.lot_id
@@ -146,7 +146,7 @@ om_campaign_lot_x_connec.update_count,
 om_campaign_lot_x_connec.update_log,
 om_campaign_lot_x_connec.qindex1,
 om_campaign_lot_x_connec.qindex2,
-action, 
+action,
 om_campaign_lot_x_connec.the_geom
 FROM selector_lot, om_campaign_lot
 JOIN om_campaign_lot_x_connec ON om_campaign_lot_x_connec.lot_id = om_campaign_lot.lot_id
@@ -166,10 +166,10 @@ om_campaign_lot_x_link.team_observ,
 om_campaign_lot_x_link.update_at,
 om_campaign_lot_x_link.update_by,
 om_campaign_lot_x_link.update_count,
-om_campaign_lot_x_link.update_log, 	
+om_campaign_lot_x_link.update_log,
 om_campaign_lot_x_link.qindex1,
 om_campaign_lot_x_link.qindex2,
-action, 
+action,
 om_campaign_lot_x_link.the_geom
 FROM selector_lot, om_campaign_lot
 JOIN om_campaign_lot_x_link ON om_campaign_lot_x_link.lot_id = om_campaign_lot.lot_id
