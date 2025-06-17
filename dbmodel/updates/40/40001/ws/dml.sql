@@ -1016,3 +1016,28 @@ VALUES(3958, '%v_count% rows with features have been inserted on table inp_dscen
 
 
 
+VALUES(4024, '%v_count% nodes have been created to repair topology.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'WATER BALANCE BY EXPLOITATION AND PERIOD' WHERE function_name = 'gw_fct_waterbalance';
+
+--17/06/2025
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4040, 'Process done succesfully for period: %v_period%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4042, 'Number of DMA processed: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4030, 'Number of hydrometer processed: %v_hydrometer%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4032, 'Total System Input: %round(rec_nrw.tsi::numeric,2)% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4034, 'Billed metered consumtion: %round(rec_nrw.bmc::numeric,2)% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4036, 'Billed metered consumtion: %round(rec_nrw.nrw::numeric,2)% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4038, 'DMAs updated %date_part('day', now() - v_current_date::timestamp)% days ago.', null, 0, true, 'utils', 'core', 'AUDIT');
