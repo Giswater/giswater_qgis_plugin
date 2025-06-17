@@ -224,6 +224,7 @@ BEGIN
                     node.dqa_id,
                     node.supplyzone_id,
                     node.muni_id,
+                    node.minsector_id,
                     node.the_geom
                     FROM node_selector
                     JOIN node ON node.node_id::text = node_selector.node_id::text
@@ -279,6 +280,7 @@ BEGIN
                         connec.muni_id,
                         connec.conneccat_id,
                         connec.state,
+                        connec.minsector_id,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -331,6 +333,7 @@ BEGIN
                         l.dqa_id,
                         l.supplyzone_id,
                         l.muni_id,
+                        l.minsector_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -378,6 +381,7 @@ BEGIN
                         a.omzone_id,
                         a.fluid_type,
                         a.muni_id,
+                        a.minsector_id,
                         a.arccat_id,
                         a.state,
                         a.the_geom
@@ -418,6 +422,7 @@ BEGIN
                     node.omzone_id,
                     node.fluid_type,
                     node.muni_id,
+                    node.minsector_id,
                     node.the_geom
                     FROM node_selector
                     JOIN node ON node.node_id::text = node_selector.node_id::text
@@ -469,6 +474,7 @@ BEGIN
                         connec.muni_id,
                         connec.conneccat_id,
                         connec.state,
+                        connec.minsector_id,
                         connec.the_geom
                     FROM connec_selector
                     JOIN connec ON connec.connec_id::text = connec_selector.connec_id::text
@@ -517,6 +523,7 @@ BEGIN
                         gully.omzone_id,
                         gully.fluid_type,
                         gully.muni_id,
+                        gully.minsector_id,
                         gully.the_geom
                     FROM gully_selector
                     JOIN gully ON gully.gully_id::text = gully_selector.gully_id::text
@@ -569,6 +576,7 @@ BEGIN
                         l.omzone_id,
                         l.fluid_type,
                         l.muni_id,
+                        l.minsector_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -622,6 +630,7 @@ BEGIN
                         l.omzone_id,
                         l.fluid_type,
                         l.muni_id,
+                        l.minsector_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -671,6 +680,7 @@ BEGIN
                     n.dqa_id,
                     n.supplyzone_id,
                     n.muni_id,
+                    n.minsector_id,
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
@@ -692,6 +702,7 @@ BEGIN
                     c.plot_code,
                     c.supplyzone_id,
                     c.muni_id,
+                    c.minsector_id,
                     c.conneccat_id,
                     c.state,
                     c.the_geom
@@ -712,6 +723,7 @@ BEGIN
                     l.dqa_id,
                     l.supplyzone_id,
                     l.muni_id,
+                    l.minsector_id,
                     l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
@@ -735,6 +747,7 @@ BEGIN
                     a.omzone_id,
                     a.fluid_type,
                     a.muni_id,
+                    a.minsector_id,
                     a.arccat_id,
                     a.state,
                     a.the_geom
@@ -753,6 +766,7 @@ BEGIN
                     n.omzone_id,
                     n.fluid_type,
                     n.muni_id,
+                    n.minsector_id,
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
@@ -772,6 +786,7 @@ BEGIN
                     c.fluid_type,
                     c.plot_code,
                     c.muni_id,
+                    c.minsector_id,
                     c.conneccat_id,
                     c.state,
                     c.the_geom
@@ -790,6 +805,7 @@ BEGIN
                     g.omzone_id,
                     g.fluid_type,
                     g.muni_id,
+                    g.minsector_id,
                     g.the_geom
                 FROM gully g
                 JOIN value_state_type vst ON vst.id = g.state_type
@@ -808,6 +824,7 @@ BEGIN
                     l.omzone_id,
                     l.fluid_type,
                     l.muni_id,
+                    l.minsector_id,
                     l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
@@ -828,6 +845,8 @@ BEGIN
                     l.dwfzone_id,
                     l.omzone_id,
                     l.fluid_type,
+                    l.muni_id,
+                    l.minsector_id,
                     l.the_geom
                 FROM link l
                 JOIN gully g ON l.feature_id = g.gully_id
@@ -858,7 +877,8 @@ BEGIN
                     array_agg(DISTINCT t.expl_id) AS expl_id,
                     array_agg(DISTINCT t.sector_id) AS sector_id,
                     array_agg(DISTINCT t.muni_id) AS muni_id,
-                    array_agg(DISTINCT t.supplyzone_id) AS supplyzone_id
+                    array_agg(DISTINCT t.supplyzone_id) AS supplyzone_id,
+                    ST_Union(t.the_geom) AS the_geom
                 FROM (
                     SELECT
                         m.minsector_id,
@@ -869,7 +889,8 @@ BEGIN
                         unnest(m.expl_id) AS expl_id,
                         unnest(m.sector_id) AS sector_id,
                         unnest(m.muni_id) AS muni_id,
-                        unnest(m.supplyzone_id) AS supplyzone_id
+                        unnest(m.supplyzone_id) AS supplyzone_id,
+                        m.the_geom
                     FROM temp_pgr_minsector m
                     JOIN temp_pgr_minsector_mincut mm ON mm.mincut_minsector_id = m.minsector_id
                 ) t
@@ -888,17 +909,18 @@ BEGIN
             )
             SELECT
                 m.minsector_id,
-                dma_id,
-                dqa_id,
-                presszone_id,
-                expl_id,
-                sector_id,
-                muni_id,
-                supplyzone_id,
-                num_border,
-                num_connec,
-                num_hydro,
-                length
+                m.dma_id,
+                m.dqa_id,
+                m.presszone_id,
+                m.expl_id,
+                m.sector_id,
+                m.muni_id,
+                m.supplyzone_id,
+                s.num_border,
+                s.num_connec,
+                s.num_hydro,
+                s.length,
+                m.the_geom
             FROM minsector_mapzones m
             JOIN minsector_sums s ON s.minsector_id = m.minsector_id;
         END IF;

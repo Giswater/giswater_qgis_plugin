@@ -84,7 +84,7 @@ SELECT is(
             "parameters":{
                 "exploitation":"-902",
                 "usePlanPsector":"true",
-                "commitChanges":"true", -- forced to false in the function
+                "commitChanges":"true",
                 "updateMapZone":"2",
                 "geomParamUpdate":"15"
             }
