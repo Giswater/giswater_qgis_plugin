@@ -1031,13 +1031,13 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4030, 'Number of hydrometer processed: %v_hydrometer%', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4032, 'Total System Input: %round(rec_nrw.tsi::numeric,2)% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4032, 'Total System Input: %v_tsi% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4034, 'Billed metered consumtion: %round(rec_nrw.bmc::numeric,2)% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4034, 'Billed metered consumtion: %v_bmc% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4036, 'Billed metered consumtion: %round(rec_nrw.nrw::numeric,2)% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4036, 'Billed metered consumtion: %v_nrw% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4038, 'DMAs updated %date_part('day', now() - v_current_date::timestamp)% days ago.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4038, 'DMAs updated %v_day% days ago.', null, 0, true, 'utils', 'core', 'AUDIT');

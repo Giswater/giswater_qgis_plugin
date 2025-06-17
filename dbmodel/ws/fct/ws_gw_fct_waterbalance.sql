@@ -96,7 +96,7 @@ BEGIN
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	-- getting input data 	
+	-- getting input data
 	v_expl := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	v_period := ((p_data ->>'data')::json->>'parameters')::json->>'period';
 	v_executegraphdma := ((p_data ->>'data')::json->>'parameters')::json->>'executeGraphDma';
@@ -110,17 +110,17 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid;	
-	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid;
+
+
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"3142", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"temp", "is_process":true, "is_header":"true"}}$$)';
-	
-	
-	IF v_step = 1 THEN 
-		
+
+
+	IF v_step = 1 THEN
+
 		-- query calc proposed enddate
-v_queryhydro = 
+v_queryhydro =
 		'WITH 
 			hydrometer AS (
 				SELECT h.hydrometer_id, c.dma_id
@@ -180,14 +180,14 @@ v_queryhydro =
 		SELECT (last_end_date)
     	FROM hydro_estimated_statistic
     	WHERE (100*hydro_no_llegits/hydro_total::float) < '||v_percent_hydro||'';
-   
+
 		execute v_queryhydro INTO v_proposed_enddate;
-		
+
     	v_proposed_enddate = coalesce(v_proposed_enddate, '1800-01-01');
 
 		v_proposed_enddate = quote_literal(v_proposed_enddate)::date - INTERVAL '1 day';
-		v_proposed_enddate = v_proposed_enddate::date;	
-	
+		v_proposed_enddate = v_proposed_enddate::date;
+
 		v_propose_initdate = ((now() - interval '12 years')::date)::text;
 
 		EXECUTE '
@@ -197,21 +197,21 @@ v_queryhydro =
 
    		UPDATE temp_config_toolbox c SET inputparams = (replace (inputparams::text, '1111-12-12', ''))::json WHERE id = 3142; --enddate
  		UPDATE temp_config_toolbox c SET inputparams = (replace (inputparams::text, '9999-12-12', v_proposed_enddate))::json WHERE id = 3142; --enddate
- 		
+
    		RETURN '{"status":"Accepted"}';
 
 	ELSE
-		
+
 		IF v_expl = '-9' THEN -- ALL expls
 			EXECUTE 'SELECT string_agg(expl_id::text, '', '') FROM exploitation WHERE expl_id>0 AND ACTIVE = TRUE' INTO v_expl;
 		END IF;
-			
+
 		IF v_executegraphdma THEN
 
-			IF v_setmawithperiodmeters THEN 
+			IF v_setmawithperiodmeters THEN
 
 				EXECUTE 'UPDATE dma SET active = false, the_geom = null WHERE expl_id && ARRAY['||v_expl||']';
-				
+
 				EXECUTE '
 				UPDATE dma SET active = TRUE FROM 
 				(SELECT * FROM 
@@ -219,34 +219,34 @@ v_queryhydro =
 				(SELECT DISTINCT (node_id) FROM ext_cat_period, ext_rtc_scada_x_data JOIN node USING (node_id) WHERE  
 				node.expl_id in ('||v_expl||')AND start_date < value_date AND end_date > value_date) a USING (node_id))c
 				WHERE dma.dma_id = c.dma_id';
-				
+
 			END IF;
-			
+
 			v_updatemapzone = (SELECT (value::json->>'DMA')::json->>'updateMapZone' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
 			v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
-				
+
 			v_data =  concat ('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "',v_expl,'", "updateMapZone":',v_updatemapzone,
 			', "geomParamUpdate":',v_paramupdate,', "updateFeature":true}}}');
 
 			PERFORM gw_fct_graphanalytics_mapzones(v_data);
-		
+
 		END IF;
 
-	
+
 		IF v_method in ('CPW', 'DCW') THEN -- time method: period_id
-			v_descript = 'Time method: period_id';		
+			v_descript = 'Time method: period_id';
 			v_startdate = (SELECT start_date::date FROM ext_cat_period WHERE id = v_period);
 			v_enddate =  (SELECT end_date::date - 1 FROM ext_cat_period WHERE id = v_period);
-					
+
 		ELSIF v_method = 'CDI' THEN -- time METHOD: date interval
 			v_period = 'CUSTOM DATE INT.';
 			v_descript = 'Time method: Custom date interval';
-		
+
 		END IF;
-	
+
 		EXECUTE 'delete from om_waterbalance where expl_id && array['||v_expl||'] and startdate='||quote_literal(v_startdate)||'::date 
-		and enddate = '||quote_literal(v_enddate)||'::date';	
-	
+		and enddate = '||quote_literal(v_enddate)||'::date';
+
 		EXECUTE '
 		INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id, startdate, enddate, descript)
 		SELECT 
@@ -256,7 +256,7 @@ v_queryhydro =
 		FROM dma 
 		WHERE expl_id && ARRAY['||v_expl||']
 		AND dma_id > 0 AND active = TRUE';
-			
+
 		IF v_method = 'CPW' THEN -- static period or remote lecture period (1 day)
 
 			-- total inlet
@@ -328,7 +328,7 @@ v_queryhydro =
 			WHERE n.auth_bill_met_hydro is null 
 			AND n.cat_period_id ='||quote_literal(v_period)||'::text
 			AND n.expl_id && ARRAY['||v_expl||']';
-		
+
 			EXECUTE '
 			SELECT count(*) 
 			FROM om_waterbalance n
@@ -355,9 +355,9 @@ v_queryhydro =
 			AND n.cat_period_id = '||quote_literal(v_period) ||'::text 
 			AND d.cat_period_id = '||quote_literal(v_period) ||'::text 
 			AND n.expl_id && ARRAY['||v_expl||']' INTO v_hydrometer;
-				
+
 		ELSIF v_method = 'CDI' THEN -- custom date interval
-		
+
 			-- total inlet
 			EXECUTE '
 			UPDATE om_waterbalance n SET total_in =  value::numeric(12,3)
@@ -373,7 +373,7 @@ v_queryhydro =
 			WHERE n.dma_id = a.dma_id 
 			AND n.startdate = '||quote_literal(v_startdate)||'::date 
 			AND n.enddate = '||quote_literal(v_enddate)||'::date';
-		
+
 			-- total_inyected
 			EXECUTE '
 			UPDATE om_waterbalance n SET total_sys_input =  value::numeric(12,3)
@@ -511,7 +511,7 @@ v_queryhydro =
 			AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
 			AND n.enddate::date = '||quote_literal(v_enddate)||'::date 
 			AND n.expl_id && ARRAY['||v_expl||']' INTO v_hydrometer;
-			
+
 		END IF;
 
 		--n_connec and link_length
@@ -557,7 +557,7 @@ v_queryhydro =
 		(SELECT string_agg (node_id, '', '') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = -1 group by dma_id) a
 		WHERE a.dma_id = w.dma_id AND w.startdate::date = '||quote_literal(v_startdate)||'::date 
 		and w.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
-		
+
 		-- auth_bill
 		EXECUTE '
 		UPDATE om_waterbalance SET auth_bill = (COALESCE(auth_bill_met_export, 0::double precision) + 
@@ -573,7 +573,7 @@ v_queryhydro =
 		total = COALESCE(total_sys_input, 0::double precision) 
 		WHERE startdate::date = '||quote_literal(v_startdate)||'::date and enddate::date = '||quote_literal(v_enddate)||'::date 
 		AND expl_id && ARRAY['||v_expl||']';
-		
+
 		-- auth
 		EXECUTE '
 		UPDATE om_waterbalance SET auth =  (auth_bill + auth_unbill),
@@ -581,7 +581,7 @@ v_queryhydro =
 		nrw_eff = CASE WHEN total::double precision > 0::double precision THEN ((100::numeric * auth_bill)::double precision / total::double precision)::numeric
 		ELSE 0::numeric end, loss = (total::double precision - auth_bill::double precision - auth_unbill::double precision)
 		WHERE startdate::date = '||quote_literal(v_startdate)||'::date and enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
-					
+
 		-- get log data
 		EXECUTE '
 		SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc, (sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw
@@ -591,68 +591,68 @@ v_queryhydro =
 
 		--restrict water balance if threshold days after lastupdate DMA are surpassed
 		select value into v_days_limiter from config_param_system where parameter = 'om_waterbalance_threshold_days';
-		
+
 		EXECUTE 'select updated_at::text from dma where expl_id && ARRAY['||v_expl||'] and updated_at is not null order by created_at asc limit 1'  into v_current_date;
 
 		if v_current_date is null then
-		
+
 			EXECUTE 'select created_at::text from dma where expl_id && ARRAY['||v_expl||'] and created_at is not null order by created_at asc limit 1' into v_current_date;
-				
+
 		end if;
 
 		select date_part('day', now() - v_current_date::timestamp) into v_days_past;
-			
-		
+
+
 		IF v_days_past is null then
 
-			
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3143", "fid":"'||v_fid||'","criticity":"3", "is_process":true, "is_header":"true", "label_id":"1003"}}$$)';
-		
+
 		ELSIF v_days_past >= v_days_limiter then
-		
-	
-	
+
+
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3143", "fid":"'||v_fid||'","criticity":"3", "is_process":true, "is_header":"true", "label_id":"1003"}}$$)';
 		else
-			
-		
+
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"4040", "function":"3142", "parameters":{"v_period":"'||v_period||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
-			
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"4042", "function":"3142", "parameters":{" v_count":"'|| v_count||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
-			
-			
+
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"4030", "function":"3142", "parameters":{" v_hydrometer":"'||v_hydrometer||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
-			
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4032", "function":"3142", "parameters":{"round(rec_nrw.tsi::numeric,2)":"'||round(rec_nrw.tsi::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4034", "function":"3142", "parameters":{"round(rec_nrw.bmc::numeric,2)":"'||round(rec_nrw.bmc::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+                       "data":{"message":"4032", "function":"3142", "parameters":{"v_tsi":"'||round(rec_nrw.tsi::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
-			
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4036", "function":"3142", "parameters":{"round(rec_nrw.nrw::numeric,2)":"'||round(rec_nrw.nrw::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4034", "function":"3142", "parameters":{"v_bmc":"'||round(rec_nrw.bmc::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
-		
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4038", "function":"3142", "parameters":{"date_part('day', now() - v_current_date::timestamp)":"'||date_part('day', now() - v_current_date::timestamp)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+                       "data":{"message":"4036", "function":"3142", "parameters":{"v_nrw":"'||round(rec_nrw.nrw::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+
+
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4038", "function":"3142", "parameters":{"v_day":"'||date_part('day', now() - v_current_date::timestamp)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
-		
+
 		end if;
 
 		IF v_executegraphdma THEN
 
 			-- info
-			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 			FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (441, 145) order by criticity desc, id asc) row;
 
-			v_result := COALESCE(v_result, '{}'); 
+			v_result := COALESCE(v_result, '{}');
 			v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 			-- disconnected arcs
@@ -663,14 +663,14 @@ v_queryhydro =
 			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 			'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
-			FROM 
+			FROM
 			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0
 			UNION
 			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = -1
 			) row) features;
 
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+			v_result := COALESCE(v_result, '{}');
+			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 			-- disconnected connecs
 			v_result = null;
@@ -685,34 +685,34 @@ v_queryhydro =
 			FROM (SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = 0
 			UNION
 			SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = -1
-			UNION			
+			UNION
 			SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM v_edit_connec c WHERE dma_id = 0 AND arc_id IS NULL
 			) row) features;
 
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+			v_result := COALESCE(v_result, '{}');
+			v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 		ELSE
 
 			-- info
-			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 			FROM (SELECT * FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid) a order by  id asc) row;
-			v_result := COALESCE(v_result, '{}'); 
+			v_result := COALESCE(v_result, '{}');
 			v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-			
+
 		END IF;
 
 		-- Control nulls
-		v_result_info := COALESCE(v_result_info, '{}'); 
-		v_result_point := COALESCE(v_result_point, '{}'); 
-		v_result_line := COALESCE(v_result_line, '{}'); 
+		v_result_info := COALESCE(v_result_info, '{}');
+		v_result_point := COALESCE(v_result_point, '{}');
+		v_result_line := COALESCE(v_result_line, '{}');
 
-				
+
 		--  Return
 		RETURN  gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done succesfully"}, "version":"'||v_version||'"'||
 					',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					'"point":'||v_result_point||','||
 					'"line":'||v_result_line||'}'||'}}')::json, 3142, null, ('{"visible": ["v_edit_dma"]}')::json, null);
-	END IF;				
+	END IF;
 
 END;
 $function$
