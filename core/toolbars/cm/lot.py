@@ -190,53 +190,80 @@ class AddNewLot:
     def _on_campaign_changed(self):
         """
         Handles all UI updates when the campaign selection changes.
-        - Updates the exploitation and sector labels.
+        - Populates and updates exploitation and sector combo boxes based on the campaign's organization.
         - Updates the team combo box with valid teams for the campaign.
         """
         campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
         team_combo = self.dlg_lot.findChild(QComboBox, "tab_data_team_id")
+        expl_combo = self.dlg_lot.findChild(QComboBox, "tab_data_expl_id")
+        sector_combo = self.dlg_lot.findChild(QComboBox, "tab_data_sector_id")
 
-        if not campaign_combo or not team_combo:
+        if not all([campaign_combo, team_combo, expl_combo, sector_combo]):
             return
 
-        # Get the selected campaign's data once.
-        campaign_id_data = campaign_combo.currentData()
+        # Clear and disable dependent combos initially
+        for combo in [expl_combo, sector_combo]:
+            combo.clear()
+            combo.setEnabled(False)
 
-        # UPDATE EXPLOITATION AND SECTOR LABELS
-        expl_label = self.dlg_lot.findChild(QLineEdit, "tab_data_expl_id")
-        sector_label = self.dlg_lot.findChild(QLineEdit, "tab_data_sector_id")
-        
-        # Extract the integer ID for queries
-        campaign_id_for_query = None
-        if campaign_id_data:
-            campaign_id_for_query = campaign_id_data[0] if isinstance(campaign_id_data, (list, tuple)) else campaign_id_data
-        print(f"[DEBUG] campaign_id_for_query: {campaign_id_for_query}")
-        print(f"[DEBUG] expl_label: {expl_label}")
-        print(f"[DEBUG] sector_label: {sector_label}")
-        if campaign_id_for_query and expl_label and sector_label:
-            print("entra")
-            sql = f"""
-                SELECT 
-                    e.name as expl_name, 
-                    s.name as sector_name 
-                FROM 
-                    cm.om_campaign c
-                    LEFT JOIN {self.schema_parent}.exploitation e ON c.expl_id = e.expl_id
-                    LEFT JOIN {self.schema_parent}.sector s ON c.sector_id = s.sector_id
-                WHERE 
-                    c.campaign_id = {campaign_id_for_query}
-            """
-            result = tools_db.get_row(sql)
-            if result:
-                expl_label.setText(result.get('expl_name', ''))
-                sector_label.setText(result.get('sector_name', ''))
-            else:
-                expl_label.setText("")
-                sector_label.setText("")
-        elif expl_label and sector_label:
-            # Clear labels if no campaign is selected
-            expl_label.setText("")
-            sector_label.setText("")
+        campaign_id = campaign_combo.currentData()
+
+        # If no campaign is selected, we are done.
+        if not campaign_id:
+            return
+
+        # Get campaign details: its specific expl_id/sector_id and its organization_id
+        campaign_details_sql = f"SELECT organization_id, expl_id, sector_id FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
+        campaign_data = tools_db.get_row(campaign_details_sql)
+
+        if not campaign_data or campaign_data.get('organization_id') is None:
+            return  # No organization found for campaign, leave combos disabled.
+
+        org_id = campaign_data['organization_id']
+
+        # Get the lists of allowed expl_ids and sector_ids for the organization
+        allowed_ids_sql = f"SELECT expl_id, sector_id FROM cm.cat_organization WHERE organization_id = {org_id}"
+        allowed_ids_data = tools_db.get_row(allowed_ids_sql)
+
+        allowed_expl_ids = allowed_ids_data.get('expl_id') if allowed_ids_data else None
+        allowed_sector_ids = allowed_ids_data.get('sector_id') if allowed_ids_data else None
+
+        # --- Populate exploitation combo ---
+        sql_expl = f"SELECT expl_id, name FROM {self.schema_parent}.exploitation"
+        if allowed_expl_ids:  # Filter if list is not None and not empty
+            sql_expl += f" WHERE expl_id = ANY(ARRAY{allowed_expl_ids})"
+        elif isinstance(allowed_expl_ids, list):  # Handle empty list case
+            sql_expl += " WHERE 1=0"
+        sql_expl += " ORDER BY name"
+
+        rows_expl = tools_db.get_rows(sql_expl)
+        if rows_expl:
+            tools_qt.fill_combo_values(expl_combo, rows_expl, index_to_show=1, add_empty=False)
+            expl_combo.setEnabled(True)
+
+        # --- Populate sector combo ---
+        sql_sector = f"SELECT sector_id, name FROM {self.schema_parent}.sector"
+        if allowed_sector_ids:  # Filter if list is not None and not empty
+            sql_sector += f" WHERE sector_id = ANY(ARRAY{allowed_sector_ids})"
+        elif isinstance(allowed_sector_ids, list):  # Handle empty list case
+            sql_sector += " WHERE 1=0"
+        sql_sector += " ORDER BY name"
+
+        rows_sector = tools_db.get_rows(sql_sector)
+        if rows_sector:
+            tools_qt.fill_combo_values(sector_combo, rows_sector, index_to_show=1, add_empty=False)
+            sector_combo.setEnabled(True)
+
+        # Set pre-selected values from campaign and disable if they exist
+        campaign_expl_id = campaign_data.get('expl_id')
+        if campaign_expl_id is not None:
+            self.set_widget_value(expl_combo, campaign_expl_id)
+            expl_combo.setEnabled(False)
+
+        campaign_sector_id = campaign_data.get('sector_id')
+        if campaign_sector_id is not None:
+            self.set_widget_value(sector_combo, campaign_sector_id)
+            sector_combo.setEnabled(False)
 
         # UPDATE TEAM COMBO
         # Preserve the currently selected team ID to restore the selection later.
@@ -248,8 +275,8 @@ class AddNewLot:
         team_combo.clear()
         team_combo.addItem("", None)  # Add a blank item.
 
-        if campaign_id_data:
-            body = {"p_campaign_id": campaign_id_data}
+        if campaign_id:
+            body = {"p_campaign_id": campaign_id}
             response = tools_gw.execute_procedure("gw_fct_cm_getteam", body, schema_name="cm", check_function=False)
 
             if isinstance(response, str):
@@ -540,6 +567,7 @@ class AddNewLot:
 
             widget.setStyleSheet("")
 
+            # Get value from the widget using the correct method for its type
             if isinstance(widget, QComboBox):
                 value = widget.currentData()
             elif isinstance(widget, QDateEdit):
@@ -553,6 +581,15 @@ class AddNewLot:
                 widget.setStyleSheet("border: 1px solid red")
                 list_mandatory.append(field.get("widgetname"))
 
+        # Post-process fields to extract the integer ID from list values
+        expl_val = fields.get("expl_id")
+        if isinstance(expl_val, (list, tuple)) and expl_val:
+            fields['expl_id'] = expl_val[0]
+
+        sector_val = fields.get("sector_id")
+        if isinstance(sector_val, (list, tuple)) and sector_val:
+            fields['sector_id'] = sector_val[0]
+
         if list_mandatory:
             msg = "Some mandatory fields are missing. Please fill the required fields (marked in red)."
             tools_qgis.show_warning(
@@ -560,14 +597,6 @@ class AddNewLot:
                 dialog=self.dlg_lot
             )
             return False
-
-        campaign_id = fields.get('campaign_id')
-        if campaign_id:
-            sql = f"SELECT expl_id, sector_id FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
-            id_row = tools_db.get_row(sql)
-            if id_row:
-                fields['expl_id'] = id_row.get('expl_id')
-                fields['sector_id'] = id_row.get('sector_id')
 
         feature_id = fields.get("lot_id")
 
