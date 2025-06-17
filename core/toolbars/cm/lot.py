@@ -49,7 +49,7 @@ class AddNewLot:
         self.is_new_lot = True
 
     def manage_lot(self, lot_id=None, is_new=True):
-        """Open the AddLot dialog and load dynamic fields from gw_fct_getlot."""
+        """Open the AddLot dialog and load dynamic fields from gw_fct_cm_getlot."""
 
         self.lot_id = lot_id
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -188,7 +188,7 @@ class AddNewLot:
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
     def load_lot_dialog(self, lot_id):
-        """Dynamically load and populate lot dialog using gw_fct_getlot"""
+        """Dynamically load and populate lot dialog using gw_fct_cm_getlot"""
 
         p_data = {
             "feature": {"tableName": "om_campaign_lot", "idName": "lot_id"},
@@ -197,7 +197,7 @@ class AddNewLot:
         if lot_id:
             p_data["feature"]["id"] = lot_id
 
-        response = tools_gw.execute_procedure("gw_fct_getlot", p_data, schema_name="cm")
+        response = tools_gw.execute_procedure("gw_fct_cm_getlot", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
             msg = "Failed to load lot form."
             tools_qgis.show_warning(msg)
@@ -301,7 +301,7 @@ class AddNewLot:
 
         if campaign_id:
             body = {"p_campaign_id": campaign_id}
-            response = tools_gw.execute_procedure("gw_fct_getcmteam", body, schema_name="cm", check_function=False)
+            response = tools_gw.execute_procedure("gw_fct_cm_getteam", body, schema_name="cm", check_function=False)
 
             if isinstance(response, str):
                 response = json.loads(response)
@@ -489,7 +489,7 @@ class AddNewLot:
             self.update_workorder_fields()  # call once immediately
 
     def save_lot(self, from_change_tab=False):
-        """Save lot using gw_fct_setlot (dynamic form logic) with mandatory field validation."""
+        """Save lot using gw_fct_cm_setlot (dynamic form logic) with mandatory field validation."""
 
         fields = {}
         list_mandatory = []
@@ -536,7 +536,7 @@ class AddNewLot:
             }
         }
 
-        result = tools_gw.execute_procedure("gw_fct_setlot", body, schema_name="cm")
+        result = tools_gw.execute_procedure("gw_fct_cm_setlot", body, schema_name="cm")
 
         if result and result.get("status") == "Accepted":
             self.lot_id = result["body"]["feature"]["id"]
@@ -1047,7 +1047,7 @@ class AddNewLot:
             if login_names_rows:
                 login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
 
-        # Create message for the question        
+        # Create message for the question
         msg = f'''{tools_qt.tr("Are you sure you want to delete these records:")} ({ids})?'''
         if tablename == "cat_user" and login_names_to_drop:
             msg += f"\\n{tools_qt.tr('This will also delete the database user(s):')} {', '.join(login_names_to_drop)}"
@@ -1090,7 +1090,7 @@ class AddNewLot:
         body = {"client": {"cur_user": user}, "form": form}
 
         # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_get_dialog_cm', body, schema_name="cm")
+        json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name="cm")
 
         # Create and open dialog
         self.dlg_create_team = TeamCreateUi(self)
@@ -1140,7 +1140,7 @@ class AddNewLot:
         body = {"client": {"cur_user": user}, "form": form}
 
         # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_get_dialog_cm', body, schema_name="cm")
+        json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name="cm")
 
         # Create and open dialog
         self.dlg_create_team = UserCreateUi(self)
@@ -1310,7 +1310,7 @@ def upsert_user(**kwargs):
         create_sql = f'CREATE USER "{login_name}" WITH LOGIN'
         if password and password not in ('', 'null'):
             create_sql += f" PASSWORD '{password}'"
-        
+
         if not tools_db.execute_sql(f"{create_sql};", commit=True):
             msg = "Failed to create database user '{0}'. The user might already exist in the database."
             msg_params = (login_name,)
@@ -1336,7 +1336,7 @@ def upsert_user(**kwargs):
         user_data_row = tools_db.get_row(f"SELECT loginname, team_id FROM cm.cat_user WHERE user_id = {user_id}")
         original_login_name = user_data_row[0] if user_data_row else None
         old_team_id = user_data_row[1] if user_data_row else None
-        
+
         if not original_login_name:
             msg = "Could not find the original user to update."
             tools_qgis.show_warning(msg)

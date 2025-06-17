@@ -53,7 +53,7 @@ class Campaign:
         self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
 
         # Populate combo date type
-        
+
         rows = [['real_startdate', tools_qt.tr('Start date', 'cm')], ['real_enddate', tools_qt.tr('End date', 'cm')], ['startdate', tools_qt.tr('Planned start date', 'cm')],
                 ['enddate', tools_qt.tr('Planned end date', 'cm')]]
         tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
@@ -91,7 +91,7 @@ class Campaign:
         """
         Load and initialize the campaign dialog.
 
-        - Creates and sets up the form dynamically based on response from `gw_fct_getcampaign`.
+        - Creates and sets up the form dynamically based on response from `gw_fct_cm_getcampaign`.
         - Initializes rubberbands and layer lists.
         - Loads campaign relations if editing an existing campaign.
         - Sets icons, connections, tab visibility (e.g. hides gully tab for 'ws' projects), and widget behaviors.
@@ -139,7 +139,7 @@ class Campaign:
         self.is_new_campaign = campaign_id is None
         self.campaign_saved = False
 
-        response = tools_gw.execute_procedure("gw_fct_getcampaign", p_data, schema_name="cm")
+        response = tools_gw.execute_procedure("gw_fct_cm_getcampaign", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
             msg = "Failed to load campaign form."
             tools_qgis.show_warning(msg)
@@ -367,7 +367,7 @@ class Campaign:
                                     dialog=self.dialog)
             return False
 
-        result = tools_gw.execute_procedure("gw_fct_setcampaign", body, schema_name="cm")
+        result = tools_gw.execute_procedure("gw_fct_cm_setcampaign", body, schema_name="cm")
 
         if result.get("status") == "Accepted":
             msg = "Campaign saved successfully."

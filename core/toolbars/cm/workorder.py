@@ -147,7 +147,7 @@ class Workorder:
                 return
 
         p_data = tools_gw.create_body(body=body)
-        res = tools_gw.execute_procedure('gw_fct_getworkorder', p_data, schema_name='cm')
+        res = tools_gw.execute_procedure('gw_fct_cm_getworkorder', p_data, schema_name='cm')
         if not res or res.get('status') != 'Accepted':
             msg = "Failed to load workorder form."
             tools_qgis.show_warning(msg)
@@ -184,7 +184,7 @@ class Workorder:
     def save_workorder(self, from_manager=True):
         """
         Read back all widgets, convert empty strings to None,
-        then call cm.gw_fct_setworkorder.
+        then call cm.gw_fct_cm_setworkorder.
         """
         fields = {}
         missing = []
@@ -245,7 +245,7 @@ class Workorder:
 
         # 5) Execute the set-function
         result = tools_gw.execute_procedure(
-            "gw_fct_setworkorder",
+            "gw_fct_cm_setworkorder",
             payload,
             schema_name="cm"
         )

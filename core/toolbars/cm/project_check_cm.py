@@ -49,7 +49,7 @@ class GwProjectCheckCMTask(GwTask):
                 f'"parameters": {{"functionFid": {function_fid}, "project_type": "{project_type}"}}'
             )
             body = tools_gw.create_body(extras=extras)
-            self.result_data = tools_gw.execute_procedure('gw_fct_setcheckproject_cm', body, schema_name='cm', aux_conn=self.aux_conn)
+            self.result_data = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, schema_name='cm', aux_conn=self.aux_conn)
             if self.result_data['status'] == 'Accepted':
                 return True
             else:
@@ -115,7 +115,7 @@ class GwProjectCheckCMTask(GwTask):
                 fields += '"fid":101, '
                 fields += f'"table_user":"{table_user}"}}, '
         fields = fields[:-2] + ']'
-        # Execute function 'gw_fct_setcheckproject'
+        # Execute function 'gw_fct_cm_setcheckproject'
         self.result = self._execute_check_project_function(init_project, fields)
 
         return True, self.result
@@ -123,7 +123,7 @@ class GwProjectCheckCMTask(GwTask):
     # region private functions
 
     def _execute_check_project_function(self, init_project, fields_to_insert):
-        """ Execute function 'gw_fct_setcheckproject' with checkbox selections passed from project_check_btn.py """
+        """ Execute function 'gw_fct_cm_setcheckproject' with checkbox selections passed from project_check_btn.py """
         # Retrieve checkbox values from params
         show_versions = self.params.get("show_versions", False)
         show_qgis_project = self.params.get("show_qgis_project", False)
@@ -164,7 +164,7 @@ class GwProjectCheckCMTask(GwTask):
 
         # Execute procedure
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_setcheckproject_cm', body, is_thread=True, aux_conn=self.aux_conn)
+        result = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
         if result:
             open_curselectors = tools_gw.get_config_parser('dialogs_actions', 'curselectors_open_loadproject', "user", "init")
             open_curselectors = tools_os.set_boolean(open_curselectors, False)
@@ -218,7 +218,7 @@ class GwProjectCheckCMTask(GwTask):
                     if layer:
                         extras = f'"style_id":"{style_id}"'
                         body = tools_gw.create_body(extras=extras)
-                        style = tools_gw.execute_procedure('gw_fct_getstyle', body)
+                        style = tools_gw.execute_procedure('gw_fct_cm_getstyle', body)
                         if not style or style['status'] == 'Failed':
                             return
                         if 'styles' in style['body']:
