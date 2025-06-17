@@ -25,6 +25,10 @@ DECLARE
     v_id INTEGER;
     v_newid INTEGER;
     v_exists INTEGER;
+    v_cols TEXT;
+    v_vals TEXT;
+    v_sets TEXT;
+    v_rec RECORD;
 
 BEGIN
     -- Set search path
@@ -39,9 +43,9 @@ BEGIN
     v_client := (p_data ->> 'client')::json;
     v_fields := (p_data -> 'data' ->> 'fields')::json;
     v_campaign_type := (p_data -> 'data' ->> 'campaign_type')::int;
-	IF (p_data -> 'data' -> 'fields' ->> 'campaign_id') IS NOT NULL THEN
-    v_id := (p_data -> 'data' -> 'fields' ->> 'campaign_id')::int;
-	END IF;
+    IF (p_data -> 'data' -> 'fields' ->> 'campaign_id') IS NOT NULL THEN
+        v_id := (p_data -> 'data' -> 'fields' ->> 'campaign_id')::int;
+    END IF;
 
     -- Parse class ID
     IF v_campaign_type = 1 THEN
@@ -51,63 +55,87 @@ BEGIN
     END IF;
 
     -- Check if the campaign ID exists
-	SELECT campaign_id INTO v_exists FROM om_campaign WHERE campaign_id = v_id;
+    SELECT campaign_id INTO v_exists FROM om_campaign WHERE campaign_id = v_id;
 
+    -- DYNAMICALLY BUILD THE QUERY
+    v_cols := '';
+    v_vals := '';
+    v_sets := '';
+
+    FOR v_rec IN SELECT * FROM json_each_text(v_fields)
+    LOOP
+        -- Exclude subtype-specific fields and campaign_type, which are handled manually
+        IF v_rec.key IN ('reviewclass_id', 'visitclass_id', 'campaign_type') THEN
+            CONTINUE;
+        END IF;
+
+        -- For INSERT
+        v_cols := v_cols || ', ' || v_rec.key;
+        
+        -- Handle data types for values
+        IF v_rec.key IN ('startdate', 'enddate', 'real_startdate', 'real_enddate') THEN
+            v_vals := v_vals || ', ' || quote_nullable(v_rec.value) || '::date';
+        ELSIF v_rec.key = 'active' THEN
+             v_vals := v_vals || ', ' || (v_rec.value)::boolean;
+        ELSE
+            v_vals := v_vals || ', ' || quote_nullable(v_rec.value);
+        END IF;
+
+        -- For UPDATE
+        IF v_rec.key != 'campaign_id' THEN
+            IF v_rec.key IN ('startdate', 'enddate', 'real_startdate', 'real_enddate') THEN
+                v_sets := v_sets || ', ' || v_rec.key || ' = ' || quote_nullable(v_rec.value) || '::date';
+            ELSIF v_rec.key = 'active' THEN
+                v_sets := v_sets || ', ' || v_rec.key || ' = ' || (v_rec.value)::boolean;
+            ELSE
+                v_sets := v_sets || ', ' || v_rec.key || ' = ' || quote_nullable(v_rec.value);
+            END IF;
+        END IF;
+    END LOOP;
+
+    -- Remove leading commas
+    v_cols := substr(v_cols, 3);
+    v_vals := substr(v_vals, 3);
+    v_sets := substr(v_sets, 3);
+
+    -- Add campaign_type, which is handled outside the loop
+    v_cols := v_cols || ', campaign_type';
+    v_vals := v_vals || ', ' || v_campaign_type;
+    v_sets := v_sets || ', campaign_type = ' || v_campaign_type;
 
     IF v_exists IS NULL THEN
-	    -- INSERT
-	    v_querytext := 'INSERT INTO om_campaign (
-	        campaign_id, name, startdate, enddate, real_startdate, real_enddate, campaign_type,
-	        descript, active, organization_id, duration, status
-	    ) VALUES (' ||
-	        v_id || ', ' ||
-	        quote_nullable(v_fields ->> 'name') || ', ' ||
-	        quote_nullable(v_fields ->> 'startdate') || '::date, ' ||
-	        quote_nullable(v_fields ->> 'enddate') || '::date, ' ||
-	        quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
-	        quote_nullable(v_fields ->> 'real_enddate') || '::date, ' ||
-	        v_campaign_type || ', ' ||
-	        quote_nullable(v_fields ->> 'descript') || ', ' ||
-	        (v_fields ->> 'active')::bool || ', ' ||
-	        quote_nullable(v_fields ->> 'organization_id') || ', ' ||
-	        quote_nullable(v_fields ->> 'duration') || ', ' ||
-	        quote_nullable(v_fields ->> 'status') || ') RETURNING campaign_id';
-	    EXECUTE v_querytext INTO v_newid;
+        -- INSERT
+        v_querytext := 'INSERT INTO om_campaign (' || v_cols || ') VALUES (' || v_vals || ') RETURNING campaign_id';
+        EXECUTE v_querytext INTO v_newid;
 
-	    -- Insert into subtype table
-	    IF v_campaign_type = 1 THEN
-	        INSERT INTO om_campaign_review (campaign_id, reviewclass_id)
-	        VALUES (v_newid, v_reviewclass_id);
-	    ELSIF v_campaign_type = 2 THEN
-	        INSERT INTO om_campaign_visit (campaign_id, visitclass_id)
-	        VALUES (v_newid, v_visitclass_id);
-	    END IF;
+        -- Insert into subtype table
+        IF v_campaign_type = 1 THEN
+            INSERT INTO om_campaign_review (campaign_id, reviewclass_id)
+            VALUES (v_newid, v_reviewclass_id);
+        ELSIF v_campaign_type = 2 THEN
+            INSERT INTO om_campaign_visit (campaign_id, visitclass_id)
+            VALUES (v_newid, v_visitclass_id);
+        END IF;
 
-	ELSE
-	    -- UPDATE
-	    v_querytext := 'UPDATE om_campaign SET ' ||
-	    	'name = ' || quote_nullable(v_fields ->> 'name') || ', ' ||
-	        'startdate = ' || quote_nullable(v_fields ->> 'startdate') || '::date, ' ||
-	        'enddate = ' || quote_nullable(v_fields ->> 'enddate') || '::date, ' ||
-	        'real_startdate = ' || quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
-	        'real_enddate = ' || quote_nullable(v_fields ->> 'real_enddate') || '::date, ' ||
-	        'campaign_type = ' || v_campaign_type || ', ' ||
-	        'descript = ' || quote_nullable(v_fields ->> 'descript') || ', ' ||
-	        'active = ' || (v_fields ->> 'active')::bool || ', ' ||
-	        'organization_id = ' || quote_nullable(v_fields ->> 'organization_id') || ', ' ||
-	        'duration = ' || quote_nullable(v_fields ->> 'duration') || ', ' ||
-	        'status = ' || quote_nullable(v_fields ->> 'status') ||
-	        ' WHERE campaign_id = ' || v_id || ' RETURNING campaign_id';
-		RAISE NOTICE 'v_querytext de update % ', v_querytext;
-	    EXECUTE v_querytext INTO v_newid;
-	END IF;
+    ELSE
+        -- UPDATE
+        v_querytext := 'UPDATE om_campaign SET ' || v_sets || ' WHERE campaign_id = ' || v_id || ' RETURNING campaign_id';
+        EXECUTE v_querytext INTO v_newid;
 
-	-- Update selector_campaign for manager users for selected organization and admin users
+        -- For updates, we might need to update the subtype table as well
+        IF v_campaign_type = 1 THEN
+            UPDATE om_campaign_review SET reviewclass_id = v_reviewclass_id WHERE campaign_id = v_newid;
+        ELSIF v_campaign_type = 2 THEN
+            UPDATE om_campaign_visit SET visitclass_id = v_visitclass_id WHERE campaign_id = v_newid;
+        END IF;
+    END IF;
+
+    -- Update selector_campaign for manager users for selected organization and admin users
     EXECUTE 'INSERT INTO selector_campaign (campaign_id, cur_user)
     select '|| v_newid ||', username from cat_user
     join cat_team using (team_id) 
-	where (role_id=''role_cm_manager'' and organization_id = ' || quote_nullable(v_fields ->> 'organization_id') || ')
-	OR (role_id=''role_cm_admin'')
+    where (role_id=''role_cm_manager'' and organization_id = ' || quote_nullable(v_fields ->> 'organization_id') || ')
+    OR (role_id=''role_cm_admin'')
     ON CONFLICT DO NOTHING;';
 
     -- Return success response
