@@ -202,7 +202,7 @@ class AddNewLot:
         # Get the selected campaign's data once.
         campaign_id_data = campaign_combo.currentData()
 
-        # --- 1. UPDATE EXPLOITATION AND SECTOR LABELS ---
+        # UPDATE EXPLOITATION AND SECTOR LABELS
         expl_label = self.dlg_lot.findChild(QLineEdit, "tab_data_expl_id")
         sector_label = self.dlg_lot.findChild(QLineEdit, "tab_data_sector_id")
         
@@ -238,9 +238,7 @@ class AddNewLot:
             expl_label.setText("")
             sector_label.setText("")
 
-
-        # UPDATE TEAM COMBO (ORIGINAL LOGIC) ---
-
+        # UPDATE TEAM COMBO
         # Preserve the currently selected team ID to restore the selection later.
         current_team_id = team_combo.currentData()
         if isinstance(current_team_id, (list, tuple)):

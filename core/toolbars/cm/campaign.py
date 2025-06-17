@@ -846,7 +846,7 @@ def update_expl_sector_combos(**kwargs):
     """
 
     dialog = kwargs.get('dialog')
-    parent_widget = kwargs.get('widget') # The widget that emitted the signal
+    parent_widget = kwargs.get('widget')
 
     try:
         if not dialog or not parent_widget:
@@ -883,10 +883,11 @@ def update_expl_sector_combos(**kwargs):
             # If expl_ids is a list (even an empty one), we apply a filter.
             # If it's None, we don't, which results in loading all.
             if expl_ids is not None:
-                if expl_ids: # List has items
+                if expl_ids:
                     expl_ids_str = ','.join(map(str, expl_ids))
                     sql_expl += f" WHERE expl_id IN ({expl_ids_str})"
-                else: # List is empty, so select nothing
+                else: 
+                    # List is empty, so select nothing
                     sql_expl += " WHERE 1=0"
             sql_expl += " ORDER BY name"
             
@@ -898,10 +899,11 @@ def update_expl_sector_combos(**kwargs):
             sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
             # If sector_ids is a list, apply a filter. Otherwise, load all.
             if sector_ids is not None:
-                if sector_ids: # List has items
+                if sector_ids:
                     sector_ids_str = ','.join(map(str, sector_ids))
                     sql_sector += f" WHERE sector_id IN ({sector_ids_str})"
-                else: # List is empty, so select nothing
+                else: 
+                    # List is empty, so select nothing
                     sql_sector += " WHERE 1=0"
             sql_sector += " ORDER BY name"
 
