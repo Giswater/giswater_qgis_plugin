@@ -114,7 +114,7 @@ BEGIN
 
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3142", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"temp", "is_process":true, "is_header":"true"}}$$)';
+                       "data":{"function":"3142", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 
 	IF v_step = 1 THEN

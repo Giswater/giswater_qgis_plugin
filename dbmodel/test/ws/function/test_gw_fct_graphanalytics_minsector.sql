@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(10);
 
-SELECT has_function('gw_fct_graphanalytics_minsector', 'function', 'Check if gw_fct_graphanalytics_minsector function exists');
+SELECT has_function('gw_fct_graphanalytics_minsector', ARRAY['json'], 'Check if gw_fct_graphanalytics_minsector function exists');
 
 SELECT is(
     (gw_fct_graphanalytics_minsector($${
