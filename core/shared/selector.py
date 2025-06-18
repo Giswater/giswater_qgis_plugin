@@ -373,7 +373,7 @@ class GwSelector:
         if selector_type == 'selector_campaign':
             # If it's a campaign, use the gw_fct_setselectocm procedure
             body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_setselectorscm', body, schema_name='cm')
+            json_result = tools_gw.execute_procedure('gw_fct_cm_setselectors', body, schema_name='cm')
         else:
             # If not campaign, use the original gw_fct_setselectors procedure
             body = tools_gw.create_body(extras=extras)
