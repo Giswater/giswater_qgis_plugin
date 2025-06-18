@@ -750,7 +750,7 @@ class GwInfo(QObject):
             
             if field.get('hidden'):
                 continue
-            if tab != field['tabname']:
+            if tab != field.get('tabname'):
                 continue
             if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
                     and field.get('value') in (None, ''):
