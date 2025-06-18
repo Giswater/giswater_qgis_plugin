@@ -729,16 +729,9 @@ BEGIN
 				END IF;
 			ELSE
 				-- when arc_id comes from connec table
-				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
+				UPDATE connec SET arc_id=COALESCE(NEW.arc_id, OLD.arc_id) where connec_id=NEW.connec_id RETURNING arc_id INTO v_arc_id;
 
-				IF NEW.arc_id IS NOT NULL THEN
-
-					-- when link exists
-					IF (SELECT link_id FROM link WHERE state = 1 and feature_id =  NEW.connec_id) IS NOT NULL THEN
-						EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forceEndPoint":"true",  "forcedArcs":["'||NEW.arc_id||'"]}}$$)';
-					END IF;
-
+				IF v_arc_id IS NOT NULL THEN
 					-- recover values in order to do not disturb this workflow
 					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
 					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id;
@@ -868,7 +861,7 @@ BEGIN
 		END IF;
 
 		UPDATE connec
-			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, datasource=NEW.datasource, "depth"=NEW.depth, conneccat_id=NEW.conneccat_id, sector_id=NEW.sector_id,
+			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, datasource=NEW.datasource, "depth"=NEW.depth, conneccat_id=NEW.conneccat_id, sector_id=COALESCE(NEW.sector_id, OLD.sector_id),
 			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszone_id=NEW.presszone_id,
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=NEW.streetaxis2_id,
