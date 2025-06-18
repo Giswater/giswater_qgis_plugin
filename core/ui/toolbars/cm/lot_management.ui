@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Administrador de Lots</string>
+   <string>Lot Management</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>

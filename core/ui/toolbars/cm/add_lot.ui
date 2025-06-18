@@ -43,7 +43,7 @@
         </widget>
         <widget class="QWidget" name="RelationsTab">
          <attribute name="title">
-          <string>Elements relations</string>
+          <string>Element relations</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
@@ -229,7 +229,7 @@
               <item>
                <widget class="QLabel" name="label_data_event_to">
                 <property name="text">
-                 <string>Unitl:</string>
+                 <string>Until:</string>
                 </property>
                </widget>
               </item>
@@ -263,7 +263,7 @@
             <item>
              <widget class="QPushButton" name="btn_delete_visit">
               <property name="text">
-               <string>Delete view</string>
+               <string>Delete visit</string>
               </property>
              </widget>
             </item>

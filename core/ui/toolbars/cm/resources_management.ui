@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Administrador de Recursos</string>
+   <string>Resource Management</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -40,7 +40,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>Filtrar por nombre: </string>
+              <string>Filter by name: </string>
              </property>
             </widget>
            </item>
@@ -91,7 +91,7 @@
            <item row="1" column="0">
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Filtrar por organización:</string>
+              <string>Filter by organization:</string>
              </property>
             </widget>
            </item>
@@ -149,7 +149,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Dilter by teams:</string>
+              <string>Filter by teams:</string>
              </property>
             </widget>
            </item>

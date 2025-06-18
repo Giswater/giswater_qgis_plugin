@@ -21,7 +21,7 @@ class GwAddCampaignButton(GwAction):
         self.new_campaign = Campaign(icon_path, action_name, text, toolbar, action_group)
 
         # Fetch and parse the campaign type configuration from the database
-        config_query = "SELECT value FROM cm.config_param_system WHERE parameter = 'create_campaign_type'"
+        config_query = "SELECT value FROM cm.config_param_system WHERE parameter = 'admin_campaign_type'"
         config_result = tools_db.get_row(config_query)
         
         show_review = True

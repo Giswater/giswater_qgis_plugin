@@ -34,7 +34,7 @@
         </widget>
         <widget class="QWidget" name="tab_relations">
          <attribute name="title">
-          <string>Elements relations</string>
+          <string>Element relations</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
