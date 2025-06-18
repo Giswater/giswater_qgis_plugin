@@ -35,8 +35,7 @@ class GwSelector:
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
                 aux_params = tools_gw.get_config_parser("selector_mincut", "aux_params", "user", "session")
             elif selector_type == "selector_campaign":
-                current_tab = tools_gw.get_config_parser('dialogs_tab_cm', "dlg_selector_campaign", "user", "session")
-                print(current_tab)
+                current_tab = reload_dlg.main_tab.widget(reload_dlg.main_tab.currentIndex()).objectName()
             else:
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
@@ -50,7 +49,10 @@ class GwSelector:
         dlg_selector.setProperty('GwSelector', self)
 
         # Get the name of the last tab used by the user
-        current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
+        if selector_type == 'selector_campaign':
+            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_campaign", "user", "session")
+        else:
+            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab)
         tools_qt.manage_translation('selector', dlg_selector)
         if lib_vars.session_vars['dialog_docker']:
@@ -72,8 +74,12 @@ class GwSelector:
         # Manage tab focus
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
         # Save the name of current tab used by the user
-        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
-            tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
+        if selector_type == 'selector_campaign':
+            dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
+                tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'campaign'))
+        else:
+            dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
+                tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
 
         # Set typeahead focus if configured
         self._set_focus(dlg_selector)
