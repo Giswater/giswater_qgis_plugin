@@ -55,7 +55,7 @@ BEGIN
 
     v_formname := 'workorder';
 
-    SELECT cm.gw_fct_cm_getformfield(
+    SELECT cm.gw_fct_cm_getformfields(
         v_formname,
         'form_feature',
         'data',
