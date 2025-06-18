@@ -151,7 +151,7 @@ BEGIN
     FOR v_record IN
 	    SELECT n.graph_delimiter AS n_graph_delimiter, n.node_id, a.graph_delimiter AS a_graph_delimiter, a.pgr_arc_id, a.arc_id, a.pgr_node_1, a.node_1
 	    FROM temp_pgr_node n
-	    JOIN temp_pgr_arc a ON n.pgr_node_id =a.pgr_node_1
+	    JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1
 	    WHERE n.modif AND a.modif1
     LOOP
 	    INSERT INTO temp_pgr_node (old_node_id, modif, graph_delimiter) VALUES (v_record.node_id, FALSE, v_record.n_graph_delimiter);

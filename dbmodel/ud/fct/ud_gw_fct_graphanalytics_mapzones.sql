@@ -203,6 +203,10 @@ BEGIN
 		"data":{"message":"3090", "function":"2710","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 	END IF;
 
+	v_mapzone_name = LOWER(v_class);
+    v_mapzone_field = v_mapzone_name || '_id';
+	v_visible_layer = 'v_edit_' || v_mapzone_name;
+	v_mapzone_name = UPPER(v_mapzone_name);
 
 	-- MANAGE EXPL ARR
 
@@ -259,7 +263,6 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
 
-	v_mapzone_name = LOWER(v_class);
 
 	-- Initialize process
 	-- =======================
@@ -270,9 +273,7 @@ BEGIN
         RETURN v_response;
     END IF;
 
-	-- get mapzone field name
-    v_mapzone_field = v_mapzone_name || '_id';
-	v_visible_layer = 'v_edit_' || v_mapzone_name;
+
 
 	-- NODES MAPZONES
 	-- Nodes that are the final points of mapzones
@@ -303,9 +304,9 @@ BEGIN
 
 	-- ARCS TO MODIFY
 	-- arcs with initoverflowpath TRUE
-	IF v_mapzone_name = 'dwfzone' THEN
+	IF v_mapzone_name = 'DWFZONE' THEN
 		UPDATE temp_pgr_arc
-		SET modif1 = true, graph_delimiter = 'initoverflowpath', cost = -1, reverse_cost = -1
+		SET modif1 = true, graph_delimiter = 'INITOVERFLOWPATH', cost = -1, reverse_cost = -1
 		FROM v_temp_arc v
 		WHERE v.arc_id = temp_pgr_arc.arc_id AND v.initoverflowpath;
 	END IF;
@@ -325,7 +326,7 @@ BEGIN
 		EXECUTE v_querytext;
 
 		v_querytext =
-			'UPDATE temp_pgr_arc a SET modif1 = TRUE, graph_delimiter = ''forceClosed'', cost = -1, reverse_cost = -1
+			'UPDATE temp_pgr_arc a SET modif1 = TRUE, graph_delimiter = ''FORCECLOSED'', cost = -1, reverse_cost = -1
 			FROM (
 				SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) AS arc_id
 				FROM ' || v_mapzone_name || ' 
@@ -336,7 +337,7 @@ BEGIN
 		EXECUTE v_querytext;
 
 		v_querytext =
-			'UPDATE temp_pgr_arc a SET modif1 = FALSE, graph_delimiter = ''ignore'', cost = 1, reverse_cost = -1
+			'UPDATE temp_pgr_arc a SET modif1 = FALSE, graph_delimiter = ''IGNORE'', cost = 1, reverse_cost = -1
 			FROM (
 				SELECT json_array_elements_text((graphconfig->>''ignore'')::json) AS arc_id
 				FROM ' || v_mapzone_name || ' 
@@ -348,11 +349,11 @@ BEGIN
 	END IF;
 
 	-- Arcs forceClosed acording init parameters
-	UPDATE temp_pgr_arc a SET modif1 = TRUE, graph_delimiter = 'forceClosed', cost = -1, reverse_cost = -1
+	UPDATE temp_pgr_arc a SET modif1 = TRUE, graph_delimiter = 'FORCECLOSED', cost = -1, reverse_cost = -1
 	WHERE a.arc_id IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
 
 	-- Arcs forceOpen acording init parameters
-	UPDATE temp_pgr_arc a SET modif1 = FALSE, graph_delimiter = 'ignore', cost = 1, reverse_cost = 1
+	UPDATE temp_pgr_arc a SET modif1 = FALSE, graph_delimiter = 'IGNORE', cost = 1, reverse_cost = 1
 	WHERE a.arc_id IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
 
 	-- TODO: revise this json
@@ -1060,12 +1061,12 @@ BEGIN
 
 
 	-- SECTION[epic=mapzones]: calculate drainzone with dwfzones
-	-- IF v_mapzone_name = 'dwfzone' THEN
+	-- IF v_mapzone_name = 'DWFZONE' THEN
 	-- 	EXECUTE 'TRUNCATE TABLE temp_pgr_drivingdistance';
 	-- 	v_querytext = '
 	-- 		UPDATE temp_pgr_arc SET cost = 1, reverse_cost = -1
 	-- 		FROM temp_pgr_arc ta
-	-- 		WHERE ta.graph_delimiter = ''initoverflowpath''
+	-- 		WHERE ta.graph_delimiter = ''INITOVERFLOWPATH''
 	-- 		AND ta.arc_id IS NOT NULL
 	-- 		AND ta.arc_id = arc.arc_id;
 	-- 	';

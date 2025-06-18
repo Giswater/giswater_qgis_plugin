@@ -204,6 +204,7 @@ BEGIN
 	v_mapzone_name = LOWER(v_class);
     v_mapzone_field = v_mapzone_name || '_id';
 	v_visible_layer = 'v_edit_' || v_mapzone_name;
+	v_mapzone_name = UPPER(v_mapzone_name);
 
 
 	-- MANAGE EXPL ARR
@@ -277,13 +278,13 @@ BEGIN
 	-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
 
 	-- closed valves - with or without to_arc
-	UPDATE temp_pgr_node t SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, modif = TRUE
+	UPDATE temp_pgr_node t SET graph_delimiter = 'VALVE', closed = v.closed, broken = v.broken, modif = TRUE
 	FROM v_temp_node n
 	JOIN man_valve v ON n.node_id = v.node_id
 	WHERE t.node_id = n.node_id AND 'MINSECTOR' = ANY(n.graph_delimiter) AND v.closed = TRUE;
 
 	-- valves with to_arc NOT NULL and with the property to_arc valid ( broken = FALSE, v.closed = FALSE )
-	UPDATE temp_pgr_node n SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
+	UPDATE temp_pgr_node n SET graph_delimiter = 'VALVE', closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
 	FROM man_valve v
 	WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.closed = FALSE AND v.broken = FALSE;
 
@@ -306,7 +307,7 @@ BEGIN
 
 	-- Nodes forceClosed
     v_querytext =
-		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''forceClosed'' 
+		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''FORCECLOSED'' 
 		FROM (
 			SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::int4 AS node_id
 			FROM ' || v_mapzone_name || ' 
@@ -318,7 +319,7 @@ BEGIN
 
 	-- Nodes "ignore", should not be disconnected
     v_querytext =
-		'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''ignore'' 
+		'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''IGNORE'' 
 		FROM (
 			SELECT (json_array_elements_text((graphconfig->>''ignore'')::json))::int4 AS node_id
 			FROM ' || v_mapzone_name || ' 
@@ -329,11 +330,11 @@ BEGIN
     EXECUTE v_querytext;
 
 	-- Nodes forceClosed acording init parameters
-	UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'forceClosed'
+	UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'FORCECLOSED'
 	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
 
 	-- Nodes forceOpen acording init parameters
-	UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'ignore'
+	UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'IGNORE'
 	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
 
 	-- ARCS TO MODIFY
@@ -348,7 +349,7 @@ BEGIN
 			a.pgr_node_2
 		FROM temp_pgr_node n
 		JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter = 'valve' AND n.closed = TRUE
+		WHERE n.graph_delimiter = 'VALVE' AND n.closed = TRUE
 	),
 	arcs_modif AS (
 		SELECT
@@ -375,7 +376,7 @@ BEGIN
 			a.pgr_node_2
 		FROM  temp_pgr_node n
 		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter = 'valve' AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
+		WHERE n.graph_delimiter = 'VALVE' AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
 	),
 	arcs_modif AS (
 		SELECT
@@ -439,7 +440,7 @@ BEGIN
 				a.pgr_node_2
 			FROM temp_pgr_node n
 			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-			WHERE n.graph_delimiter = 'forceClosed'
+			WHERE n.graph_delimiter = 'FORCECLOSED'
 		),
 		arcs_modif AS (
 			SELECT
@@ -476,7 +477,7 @@ BEGIN
 		cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN 0 ELSE a.cost END -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 	FROM temp_pgr_node n
 	WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	AND a.graph_delimiter = 'valve' AND n.to_arc IS NOT NULL;
+	AND a.graph_delimiter = 'VALVE' AND n.to_arc IS NOT NULL;
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
     INTO v_pgr_distance;
@@ -543,13 +544,13 @@ BEGIN
 		FROM temp_pgr_arc a
 		JOIN temp_pgr_node n1 on a.pgr_node_1 = n1.pgr_node_id
 		JOIN temp_pgr_node n2 on a.pgr_node_2 = n2.pgr_node_id
-		WHERE a.graph_delimiter = 'valve'
+		WHERE a.graph_delimiter = 'VALVE'
 		AND n1.mapzone_id <> 0 AND n2.mapzone_id <> 0
 		AND n1.mapzone_id <> n2.mapzone_id
 		)
 	UPDATE temp_pgr_node n SET mapzone_id = 0
 	FROM boundary AS s
-	WHERE n.node_id =s.node_id AND n.graph_delimiter = 'valve';
+	WHERE n.node_id = s.node_id AND n.graph_delimiter = 'VALVE';
 
 	IF v_updatemapzgeom > 0 THEN
 		-- message
@@ -568,7 +569,7 @@ BEGIN
 				-- log
 				IF v_arcs_count > 0 OR v_connecs_count > 0 THEN
 					INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_mapzone_name),'''s (',v_mapzones_count,') with ',v_arcs_count,' arc(s) and ',v_connecs_count,' connec(s) affected.'));
+					VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',v_mapzone_name,'''s (',v_mapzones_count,') with ',v_arcs_count,' arc(s) and ',v_connecs_count,' connec(s) affected.'));
 				END IF;
 		END IF;
 	END IF;

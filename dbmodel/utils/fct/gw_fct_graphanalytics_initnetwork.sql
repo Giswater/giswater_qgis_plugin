@@ -130,7 +130,7 @@ BEGIN
             -- VALVES
             UPDATE temp_pgr_node t
             SET
-                graph_delimiter = 'minsector',
+                graph_delimiter = 'MINSECTOR',
                 closed = v.closed,
                 broken = v.broken,
                 to_arc = v.to_arc

@@ -305,12 +305,12 @@ BEGIN
     SELECT array_agg(DISTINCT d.node)::INT[]
     INTO v_pgr_root_vids
     FROM temp_pgr_drivingdistance d
-    WHERE d.edge <> -1 AND
-    EXISTS (
-			SELECT 1
-			FROM temp_pgr_node n
-        	WHERE d.node = n.pgr_node_id
-       	 	AND n.graph_delimiter = 'SECTOR'
+    WHERE d.edge <> -1
+	AND EXISTS (
+		SELECT 1
+		FROM temp_pgr_node n
+		WHERE d.node = n.pgr_node_id
+		AND n.graph_delimiter = 'SECTOR'
     );
 
     TRUNCATE temp_pgr_drivingdistance;
