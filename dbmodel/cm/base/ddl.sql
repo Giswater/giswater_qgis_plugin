@@ -45,7 +45,7 @@ CREATE TABLE sys_table (
 	id text NOT NULL,
 	descript text NULL,
 	sys_role varchar(30) NULL,
-	criticity int2 NULL,
+	project_template jsonb NULL,
 	context varchar(500) NULL,
 	orderby int2 NULL,
 	alias text NULL,
