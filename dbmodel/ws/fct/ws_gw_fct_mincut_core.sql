@@ -66,13 +66,7 @@ v_result_arc jsonb;
 
 
 -- MINCUT VARIABLES
-v_record record;
-v_pgr_node_id INTEGER;
-v_id integer=0;
-v_return_text text;
-v_cost integer=1;
-v_reverse_cost integer=1;
-v_mapzone_name text ='minsector';
+v_mapzone_name text ='MINSECTOR';
 
 -- general variables
 v_query_text TEXT;
@@ -84,9 +78,7 @@ v_ignore_check_valves BOOLEAN;
 
 
 v_vids_checkvalve int[];
-v_arc_id INTEGER;
 v_mincut_id INTEGER;
-v_flood INTEGER;
 
 
 
