@@ -765,10 +765,10 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
 
         # Apply styles to layer
-        if style_id in (None, "-1"):
+        if style_id in (None, "-1") and schema_name != 'cm':
             set_layer_styles(tablename_og, layer, schema_name)
 
-        if tablename and schema != 'am':
+        if tablename and schema != 'am' and schema != 'cm':
             # Set layer config
             feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
             extras = '"infoType":"' + str(lib_vars.project_vars['info_type']) + '"'

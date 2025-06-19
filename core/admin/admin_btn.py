@@ -21,7 +21,7 @@ from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
     QGridLayout, QTabWidget
-from qgis.core import QgsProject, QgsApplication, QgsMessageLog
+from qgis.core import QgsProject, QgsApplication, QgsMessageLog, Qgis
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
@@ -78,6 +78,7 @@ class GwAdminButton:
         self.current_sql_file = 0   # Current number of SQL file
         self.progress_value = 0     # (current_sql_file / total_sql_files) * 100
         self.progress_ratio = 0.8   # Ratio to apply to 'progress_value'
+        self.is_cm_project = False
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
         """ Button 100: Execute SQL. Info show info """
@@ -1157,7 +1158,11 @@ class GwAdminButton:
 
         gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-                                                    roletype, layer_project_type=tools_qt.get_combo_value(self.dlg_create_gis_project, 'cmb_project_type', 1))
+                                                    roletype, layer_project_type=tools_qt.get_combo_value(self.dlg_create_gis_project, 'cmb_project_type', 1),
+                                                    is_cm=self.is_cm_project)
+
+        if self.is_cm_project:
+            self.is_cm_project = False
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
@@ -1953,18 +1958,9 @@ class GwAdminButton:
         self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
 
     def on_btn_pschema_qgis_file_clicked(self):
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        msg = "You are about to load some CM layers to the following file: {0}\n\nAre you sure you want to continue?"
-        msg_params = (schema_name,)
-        title = "Add layers to schema"
-        answer = tools_qt.show_question(msg, title, msg_params=msg_params)
-
-        if not answer:
-            return
-
-        self.example_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        self.project_example_name = schema_name
-        self._run_create_cm_task(['load_layers'], 'Add layers to schema')
+        """ Sets the project to be created as a 'CM' project. """
+        self.is_cm_project = True
+        tools_qgis.show_info("Layer of CM project will be added to the project", dialog=self.dlg_readsql_create_cm_project)
         self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
     def _open_rename(self):

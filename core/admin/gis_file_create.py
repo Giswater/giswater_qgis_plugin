@@ -23,7 +23,7 @@ class GwGisFileCreate:
         self.srid = None
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
-                             export_passwd=False, roletype='admin', layer_source=None, layer_project_type=None):
+                             export_passwd=False, roletype='admin', layer_source=None, layer_project_type=None, is_cm=False):
 
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
@@ -72,12 +72,16 @@ class GwGisFileCreate:
         auth_id = self._replace_spatial_parameters(self.layer_source['srid'])
 
         # Get project layers
-        extras = f'"project_type":"{layer_project_type}"'
+        extras = f'"project_type":"{layer_project_type}", "is_cm":{str(is_cm).lower()}'
         body = tools_gw.create_body(extras=extras)
         layers = tools_gw.execute_procedure('gw_fct_get_project_layers', body, schema_name=schema)
         if layers:
             for layer in layers['body']['data']['layers']:
-                depth = layer.get('template').get('levels_to_read')
+                template = layer.get('project_template')
+                if not template:
+                    continue
+
+                depth = template.get('levels_to_read')
                 if layer.get('context') is not None:
                     context = json.loads(layer['context'])
                     levels = context.get('levels')
@@ -92,8 +96,8 @@ class GwGisFileCreate:
                     rectangle = tools_gw._get_extent_parameters(schema)
                     # Add project layer
                     tools_gw.add_layer_database(layer['tableName'], layer['geomField'], layer['tableId'], levels[0], levels[1] if len(levels) > 1 else None, style_id='-1', alias=layer['layerName'],
-                                                sub_sub_group=levels[2] if len(levels) > 2 else None, schema=schema, visibility=layer.get('template').get('visibility'), auth_id=auth_id,
-                                                extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True)
+                                                 sub_sub_group=levels[2] if len(levels) > 2 else None, schema=layer['tableSchema'], visibility=template.get('visibility'), auth_id=auth_id,
+                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True)
 
         # Set project CRS
         project.setCrs(QgsCoordinateReferenceSystem(auth_id))
