@@ -61,6 +61,14 @@ DECLARE
 	-- LOCK LEVEL LOGIC
 	v_original_disable_locklevel json;
 
+    -- MINCUT VARIABLES
+    
+    -- parameters
+    v_pgr_distance INTEGER;
+    v_pgr_root_vids int[];
+    v_cost_field TEXT;
+    v_reverse_cost_field TEXT;
+
 BEGIN
 
 	-- Search path
@@ -177,30 +185,7 @@ BEGIN
         RETURN v_response;
     END IF;
 
-    -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
-    -- for arcs-MINSECTOR
-    -- closed valves
-    UPDATE temp_pgr_arc a
-    SET cost_mincut = -1, reverse_cost_mincut = -1
-    WHERE graph_delimiter = 'MINSECTOR'
-    AND a.closed = TRUE;
-
-    -- open valves that can be closed and the checkvalves
-    UPDATE temp_pgr_arc a
-    SET cost_mincut = -1, reverse_cost_mincut = -1
-    WHERE graph_delimiter = 'MINSECTOR'
-    AND a.closed = FALSE;
-
-    -- check valves
-    IF v_ignore_check_valves = FALSE THEN
-        UPDATE temp_pgr_arc a
-        SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
-        WHERE a.graph_delimiter = 'MINSECTOR'
-        AND a.closed = FALSE 
-        AND a.to_arc IS NOT NULL;
-    END IF;
-
-    -- v_ignore_broken_valves
+    -- the broken valves
      IF v_ignore_broken_valves THEN
         UPDATE temp_pgr_arc a
         SET cost = 0, reverse_cost = 0
@@ -208,19 +193,29 @@ BEGIN
         AND a.closed = FALSE 
         AND a.to_arc IS NOT NULL
         AND a.broken = TRUE;
+    END IF; 
 
-        UPDATE temp_pgr_arc a
-        SET cost_mincut = 0, reverse_cost_mincut = 0
-        WHERE a.graph_delimiter = 'MINSECTOR'
-        AND a.closed = FALSE 
-        AND a.broken = TRUE;
-    END IF;
-
-    -- for arcs-SECTOR
+    -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
+    -- new arcs MINSECTOR AND SECTOR
     UPDATE temp_pgr_arc a
     SET cost_mincut = -1, reverse_cost_mincut = -1
-    WHERE graph_delimiter = 'SECTOR';
+    WHERE graph_delimiter IN ('MINSECTOR', 'SECTOR') ;
 
+    -- check valves
+    IF v_ignore_check_valves THEN
+        v_cost_field = '0';
+        v_reverse_cost_field = '0';
+    ELSE 
+        v_cost_field = 'cost';
+        v_reverse_cost_field = 'reverse_cost';
+    END IF;
+
+    v_query_text = 'UPDATE temp_pgr_arc a
+        SET cost_mincut = ' || v_cost_field || ', reverse_cost_mincut = ' || v_reverse_cost_field || '
+        WHERE a.graph_delimiter = ''MINSECTOR''
+        AND a.closed = FALSE 
+        AND a.to_arc IS NOT NULL';
+    EXECUTE v_query_text;
 
     -- Generate the minsectors
     v_query :=
