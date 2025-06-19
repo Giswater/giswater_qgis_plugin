@@ -2478,3 +2478,7 @@ VALUES (3876, 'Deleting values from temp_csv -> Done', null, 0, true, 'utils', '
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3878, 'Process finished with %i% rows inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+-- 19/06/2025
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3482, 'gw_trg_update_lot_action', 'utils', 'function', NULL, NULL, 'CM function that checks if the insert in the om_campaign_lot_x_feature the user is role field, in that case inserts value 1 (insert) or 2 (update) in action camp', NULL, NULL, 'core', NULL);

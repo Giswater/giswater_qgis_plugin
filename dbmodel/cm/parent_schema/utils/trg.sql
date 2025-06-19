@@ -88,6 +88,23 @@ DROP TRIGGER IF EXISTS trg_validate_lot_x_link_feature ON cm.om_campaign_lot_x_l
 CREATE TRIGGER trg_validate_lot_x_link_feature BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_link
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature_check_campaign('link');
 
+DROP TRIGGER IF EXISTS trg_update_action_arc ON cm.om_campaign_lot_x_arc;
+CREATE TRIGGER trg_update_action_arc BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_arc
+FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_update_lot_action();
+
+DROP TRIGGER IF EXISTS trg_update_action_connec ON cm.om_campaign_lot_x_connec;
+CREATE TRIGGER trg_update_action_connec BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_connec
+FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_update_lot_action();
+
+DROP TRIGGER IF EXISTS trg_update_action_node ON cm.om_campaign_lot_x_node;
+CREATE TRIGGER trg_update_action_node BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_node
+FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_update_lot_action();
+
+DROP TRIGGER IF EXISTS trg_update_action_link ON cm.om_campaign_lot_x_link;
+CREATE TRIGGER trg_update_action_link BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_link
+FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_update_lot_action();
+
+
 DO $$
 DECLARE
     v_rec record;

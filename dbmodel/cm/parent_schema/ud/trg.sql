@@ -17,6 +17,10 @@ DROP TRIGGER IF EXISTS trg_validate_lot_x_gully_feature ON cm.om_campaign_lot_x_
 CREATE TRIGGER trg_validate_lot_x_gully_feature BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_gully
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature_check_campaign('gully');
 
+DROP TRIGGER IF EXISTS trg_update_action_gully ON cm.om_campaign_lot_x_gully;
+CREATE TRIGGER trg_update_action_gully BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_gully
+FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_update_lot_action(); 
+
 DO $$
 DECLARE
     v_rec record;
