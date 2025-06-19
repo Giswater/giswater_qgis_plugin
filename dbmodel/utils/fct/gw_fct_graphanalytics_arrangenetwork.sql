@@ -13,7 +13,7 @@ RETURNS json AS
 $BODY$
 
 /* Example:
-SELECT gw_fct_graphanalytics_arrangenetwork('{"data":{"mapzone_name":"MINSECTOR", "ignoreBrokenValve":true}}');
+SELECT gw_fct_graphanalytics_arrangenetwork('{"data":{"mapzone_name":"MINSECTOR"}}');
 It is an auxiliary process used by macro_minsector, minsector, or mapzone that generates additional arcs.
 */
 
@@ -25,7 +25,6 @@ DECLARE
 
     -- parameters
     v_mapzone_name TEXT;
-    v_ignore_broken_valves BOOLEAN := TRUE;
     -- extra variables
     v_graph_delimiter TEXT;
     v_record RECORD;
@@ -43,8 +42,6 @@ BEGIN
 
 	-- Get variables from input JSON
     v_mapzone_name = (SELECT (p_data::json->>'data')::json->>'mapzone_name');
-    v_ignore_broken_valves = (SELECT (p_data::json->>'data')::json->>'ignoreBrokenValves');
-
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -195,24 +192,24 @@ BEGIN
         -- closed valves
         UPDATE temp_pgr_arc a
         SET cost = -1, reverse_cost = -1
-        WHERE a.graph_delimiter  = 'MINSECTOR' AND a.closed = TRUE;
+        WHERE a.graph_delimiter  = 'MINSECTOR' 
+        AND a.closed = TRUE;
 
-        IF v_ignore_broken_valves THEN
-            UPDATE temp_pgr_arc a
-            SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
-                reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-            WHERE a.graph_delimiter  = 'MINSECTOR'
-            AND a.to_arc IS NOT NULL
-            AND a.closed = FALSE
-            AND a.broken = FALSE;
-        ELSE
-            UPDATE temp_pgr_arc a
-            SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
-                reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-            WHERE a.graph_delimiter  = 'MINSECTOR'
-            AND a.to_arc IS NOT NULL
-            AND a.closed = FALSE;
+        -- checkvalves 
+        UPDATE temp_pgr_arc a
+        SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
+            reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
+        WHERE a.graph_delimiter  = 'MINSECTOR'
+        AND a.to_arc IS NOT NULL
+        AND a.closed = FALSE;
         END IF;
+
+        -- for SECTORS - only the inlet arcs
+        UPDATE temp_pgr_arc a
+        SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
+            reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
+        WHERE a.graph_delimiter = 'SECTOR'
+        AND a.old_arc_id <> ALL (a.to_arc);
     END IF;
 
     RETURN jsonb_build_object(

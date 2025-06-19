@@ -173,25 +173,27 @@ BEGIN
     -- Generate new arcs when n.modif = TRUE AND (a.modif1 = TRUE OR a.modif2 = TRUE)
     -- cost i reverse cost for new arcs is 0, arc_id is NULL, old_arc_id = arc_id of the old arc
 	-- =======================
-    v_data := '{"data":{"mapzone_name":"MINSECTOR", "ignoreBrokenValve":"'||v_ignore_broken_valves||'"}}';
+    v_data := '{"data":{"mapzone_name":"MINSECTOR"}}';
     SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
         RETURN v_response;
     END IF;
 
-    -- for SECTORS - only the inlet arcs
-    UPDATE temp_pgr_arc a
-    SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
-        reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-	WHERE a.graph_delimiter = 'SECTOR'
-    AND a.old_arc_id <> ALL (a.to_arc);
-
+    IF v_ignore_broken_valves THEN
+        UPDATE temp_pgr_arc a
+        SET cost = 0, reverse_cost = 0
+            WHERE a.graph_delimiter  = 'MINSECTOR'
+            AND a.to_arc IS NOT NULL
+            AND a.closed = FALSE
+            AND a.broken = TRUE;
+    END IF;
     -- update cost_mincut/reverse_cost_mincut for the new arcs - are used for establishing the borders of the mincut
     -- for arcs-MINSECTOR
     UPDATE temp_pgr_arc a
     SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
-    WHERE graph_delimiter = 'MINSECTOR';
+    WHERE graph_delimiter = 'MINSECTOR'
+    AND a.broken = FALSE;
 
     -- open valves that can be closed
     IF v_ignore_broken_valves THEN
