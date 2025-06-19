@@ -8,11 +8,11 @@ or (at your option) any later version.
 from .project_check_cm import GwProjectCheckCMTask
 from ..dialog import GwAction
 
-from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QWidget, QTextEdit
+from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QWidget, QTextEdit, QComboBox
 from qgis.core import QgsApplication
 
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt
+from ....libs import tools_qgis, tools_qt, tools_db
 from ...ui.ui_manager import CheckProjectCmUi
 
 
@@ -49,6 +49,18 @@ class GwCheckCMProjectButton(GwAction):
         # Populate the dialog with fields
         tools_gw.populate_dynamic_widgets(self.dialog, json_result, self)
 
+        # Find widgets
+        self.campaign_combo = self.dialog.findChild(QComboBox, "tab_data_campaign")
+        self.lot_combo = self.dialog.findChild(QComboBox, "tab_data_lot")
+
+        # Set listeners
+        self.dialog.btn_accept.clicked.connect(self._on_accept_clicked)
+        if self.campaign_combo:
+            self.campaign_combo.currentIndexChanged.connect(self._on_campaign_changed)
+
+        # Initial population of the lot combo
+        self._on_campaign_changed()
+
         # Disable the "Log" tab initially
         tools_gw.disable_tab_log(self.dialog)
 
@@ -58,11 +70,41 @@ class GwCheckCMProjectButton(GwAction):
         if lbl_time:
             lbl_time.setVisible(False)
 
-        # Set listeners
-        self.dialog.btn_accept.clicked.connect(self._on_accept_clicked)
-
         # Open the dialog
         tools_gw.open_dialog(self.dialog, dlg_name=form_type)
+
+    def _on_campaign_changed(self):
+        """Populates the lot combo based on the selected campaign."""
+        if not self.campaign_combo or not self.lot_combo:
+            return
+
+        # Block signals to prevent unwanted events while we modify the combo
+        self.lot_combo.blockSignals(True)
+
+        try:
+            self.lot_combo.clear()
+            self.lot_combo.addItem("", None)  # Always add an empty option first
+
+            current_data = self.campaign_combo.currentData()
+            if not current_data:
+                return  # No campaign selected, lot combo should just have the empty option
+
+            # currentData is a list [id, name], we only need the id
+            campaign_id = current_data[0]
+            if not campaign_id:
+                return  # The selected campaign has no ID, so nothing to do
+
+            # Fetch lots for the selected campaign
+            query = f"SELECT lot_id AS id, name AS idval FROM cm.om_campaign_lot WHERE campaign_id = {campaign_id} ORDER BY name"
+            result = tools_db.get_rows(query)
+
+            # Populate the lot combo box with results
+            if result:
+                for row in result:
+                    self.lot_combo.addItem(str(row['idval']), row['id'])
+        finally:
+            # Always unblock signals when we are done
+            self.lot_combo.blockSignals(False)
 
     def _on_accept_clicked(self):
         """Handles the Accept button click event and starts the project check task."""

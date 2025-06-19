@@ -21,7 +21,7 @@ from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
     QGridLayout, QTabWidget
-from qgis.core import QgsProject, QgsApplication, QgsMessageLog, Qgis
+from qgis.core import QgsProject, QgsApplication, QgsMessageLog
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
