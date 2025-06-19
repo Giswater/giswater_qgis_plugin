@@ -1753,3 +1753,15 @@ UPDATE config_typevalue SET addparam='{"orderBy":5}'::json WHERE typevalue='sys_
 UPDATE config_typevalue SET addparam='{"orderBy":6}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "CONNEC"]}';
 UPDATE config_typevalue SET addparam='{"orderBy":7}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "GULLY"]}';
 UPDATE config_typevalue SET addparam='{"orderBy":8}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "NODE"]}';
+
+-- 19/06/2025
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec_cjoin' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_node_netgully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='v_edit_gully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_gully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_gully_gully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_gully_pgully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_gully_vgully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_gully_ginlet' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';

@@ -2198,5 +2198,7 @@ VALUES(3950, 'Inserting values on element table -> Done', null, 0, true, 'utils'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3952, 'Inserting values on %v_featuretable% table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
-
-
+-- 19/06/2025
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='v_edit_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec_vconnec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';

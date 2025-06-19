@@ -1063,4 +1063,9 @@ VALUES (3868, 'Netscenario doesn''t exist.', null, 0, true, 'utils', 'core', 'AU
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
 VALUES (3870, 'Data wasn''t imported.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-
+-- 19/06/2025
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_node_water_connection' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec_wjoin' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec_fountain' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec_tap' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec_greentap' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
