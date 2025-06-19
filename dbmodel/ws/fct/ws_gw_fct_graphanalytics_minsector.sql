@@ -45,7 +45,6 @@ DECLARE
     v_concavehull FLOAT = 0.85;
     v_visible_layer TEXT;
     v_ignore_broken_valves BOOLEAN;
-    v_use_check_valves INTEGER; -- 1 if they are used as mincut borders, 0 if not
     v_ignore_check_valves BOOLEAN;
 
     -- CHECKS
@@ -77,10 +76,8 @@ BEGIN
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
     v_ignore_broken_valves = TRUE;
-	v_use_check_valves = TRUE::INT;
 	v_ignore_check_valves = TRUE;
 	--v_ignore_broken_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreBrokenOnlyMassiveMincut');
-	--v_use_check_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreCheckValvesMincut')::int;
 	--v_ignore_check_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreCheckValvesMincut')::BOOLEAN;
 
     -- it's not allowed to commit changes when psectors are used
@@ -180,40 +177,43 @@ BEGIN
         RETURN v_response;
     END IF;
 
-    IF v_ignore_broken_valves THEN
+    -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
+    -- for arcs-MINSECTOR
+    -- closed valves
+    UPDATE temp_pgr_arc a
+    SET cost_mincut = -1, reverse_cost_mincut = -1
+    WHERE graph_delimiter = 'MINSECTOR'
+    AND a.closed = TRUE;
+
+    -- open valves that can be closed and the checkvalves
+    UPDATE temp_pgr_arc a
+    SET cost_mincut = -1, reverse_cost_mincut = -1
+    WHERE graph_delimiter = 'MINSECTOR'
+    AND a.closed = FALSE;
+
+    -- check valves
+    IF v_ignore_check_valves = FALSE THEN
+        UPDATE temp_pgr_arc a
+        SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
+        WHERE a.graph_delimiter = 'MINSECTOR'
+        AND a.closed = FALSE 
+        AND a.to_arc IS NOT NULL;
+    END IF;
+
+    -- v_ignore_broken_valves
+     IF v_ignore_broken_valves THEN
         UPDATE temp_pgr_arc a
         SET cost = 0, reverse_cost = 0
-            WHERE a.graph_delimiter  = 'MINSECTOR'
-            AND a.to_arc IS NOT NULL
-            AND a.closed = FALSE
-            AND a.broken = TRUE;
-    END IF;
-    -- update cost_mincut/reverse_cost_mincut for the new arcs - are used for establishing the borders of the mincut
-    -- for arcs-MINSECTOR
-    UPDATE temp_pgr_arc a
-    SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
-    WHERE graph_delimiter = 'MINSECTOR'
-    AND a.broken = FALSE;
-
-    -- open valves that can be closed
-    IF v_ignore_broken_valves THEN
-        UPDATE temp_pgr_arc a
-        SET cost_mincut = -1, reverse_cost_mincut = -1
         WHERE a.graph_delimiter = 'MINSECTOR'
-        AND a.closed = FALSE AND a.to_arc IS NULL AND a.broken = FALSE;
-    ELSE
-        UPDATE temp_pgr_arc a
-        SET cost_mincut = -1, reverse_cost_mincut = -1
-        WHERE a.graph_delimiter = 'MINSECTOR'
-        AND a.closed = FALSE AND a.to_arc IS NULL;
-    END IF;
+        AND a.closed = FALSE 
+        AND a.to_arc IS NOT NULL
+        AND a.broken = TRUE;
 
-    -- ignoreCheckValve as limit for mincut (cost and reverse_cost was calculates according to v_ignore_broken_valves)
-    IF v_ignore_check_valves THEN
         UPDATE temp_pgr_arc a
         SET cost_mincut = 0, reverse_cost_mincut = 0
         WHERE a.graph_delimiter = 'MINSECTOR'
-        AND a.cost <> a.reverse_cost;
+        AND a.closed = FALSE 
+        AND a.broken = TRUE;
     END IF;
 
     -- for arcs-SECTOR
