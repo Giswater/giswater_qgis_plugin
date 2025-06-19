@@ -120,6 +120,7 @@ BEGIN
         FROM arcs_modif s
         WHERE t.pgr_arc_id= s.pgr_arc_id;
 
+        -- for the nodes with v_graph_delimiter
         WITH arcs_selected AS (
         SELECT
             a.pgr_arc_id,
@@ -203,7 +204,7 @@ BEGIN
         AND a.to_arc IS NOT NULL
         AND a.closed = FALSE;
 
-        -- for v_graph_delimiter - only the inlet arcs
+        -- for mapzone graph_delimiter - only the inlet arcs
         UPDATE temp_pgr_arc a
         SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
             reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
