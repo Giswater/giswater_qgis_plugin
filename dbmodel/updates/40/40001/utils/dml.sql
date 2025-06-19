@@ -2465,16 +2465,16 @@ UPDATE sys_style
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(3694, 'Any node was found at these coordinates.', 'Please select a node to place your element.', 1, true, 'ud', 'core', 'UI');
 
 -- 19/06/2025
-UPDATE sys_function SET function_alias = 'IMPORT CAT-PERIOD VALUES WHERE' function_name = 'gw_fct_import_cat_period';
+UPDATE sys_function SET function_alias = 'IMPORT CAT-PERIOD VALUES' WHERE function_name = 'gw_fct_import_cat_period';
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3872, 'Reading values from temp_csv table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3874, 'Inserting values on ext_cat_period table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3876, 'Deleting values from temp_csv -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)  
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3878, 'Process finished with %i% rows inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
