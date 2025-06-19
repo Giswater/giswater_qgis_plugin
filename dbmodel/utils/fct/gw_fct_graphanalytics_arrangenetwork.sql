@@ -204,11 +204,11 @@ BEGIN
         AND a.closed = FALSE;
         END IF;
 
-        -- for SECTORS - only the inlet arcs
+        -- for v_graph_delimiter - only the inlet arcs
         UPDATE temp_pgr_arc a
         SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
             reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-        WHERE a.graph_delimiter = 'SECTOR'
+        WHERE a.graph_delimiter = v_graph_delimiter
         AND a.old_arc_id <> ALL (a.to_arc);
     END IF;
 
