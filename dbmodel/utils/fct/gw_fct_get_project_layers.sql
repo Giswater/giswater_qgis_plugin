@@ -38,33 +38,120 @@ v_result_info json;
 v_fields_array json;
 item json;
 v_final json;
+v_is_cm boolean;
 
 BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
 	v_project_type := (p_data ->> 'data')::json->> 'project_type';
+	v_is_cm := COALESCE(((p_data ->> 'data')::json->>'is_cm')::boolean, FALSE);
 
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	SELECT id INTO project_type_id FROM config_typevalue WHERE typevalue = 'project_type' AND idval = v_project_type;
 
+	IF v_is_cm IS TRUE THEN
+		-- For CM projects, get all base layers plus the CM-specific layers
+		SELECT COALESCE(array_to_json(array_agg(row_to_json(d))), '[]'::json)
+		FROM (
+			-- Base layers from main schema
+			SELECT
+				st.project_template,
+				st.context,
+				st.alias AS "layerName",
+				st.id AS "tableName",
+				COALESCE(c.table_schema, 'SCHEMA_NAME') AS "tableSchema",
+				CASE
+					WHEN c.column_name IS NULL THEN 'None'
+					WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
+					ELSE c.column_name
+				END AS "geomField",
+				CASE
+					WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
+					ELSE st.addparam->>'pkey'
+				END AS "tableId"
+			FROM sys_table st
+			JOIN config_typevalue ct ON ct.id = st.context
+			LEFT JOIN (
+				SELECT column_name, table_name, table_schema FROM information_schema.columns
+				WHERE udt_name='geometry' and table_schema IN ('SCHEMA_NAME', 'am')
+			) c ON st.id = c.table_name
+			LEFT JOIN (
+				SELECT column_name, table_name FROM information_schema.columns
+				WHERE ordinal_position=1 and table_schema IN ('SCHEMA_NAME', 'am')
+			) i ON st.id = i.table_name
+			WHERE
+				ct.typevalue = 'sys_table_context' AND
+				(c.column_name IS NULL OR c.column_name != 'link_the_geom') AND
+				st.project_template IS NOT NULL
 
-	SELECT array_to_json((WITH geomtable AS (SELECT column_name, table_name from information_schema.columns WHERE udt_name='geometry' and table_schema in ('SCHEMA_NAME', 'am')),
-	idtable AS (SELECT column_name, table_name from information_schema.columns WHERE ordinal_position=1 and table_schema in ('SCHEMA_NAME', 'am'))
-	SELECT array_agg(row_to_json(d)) FROM (SELECT project_template AS template, context, alias as "layerName", st.id as "tableName",
-	CASE WHEN c.column_name IS NULL THEN 'None'
-	WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
-	ELSE c.column_name END AS "geomField",
-	CASE WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
-	ELSE st.addparam->>'pkey' END AS "tableId"
-	FROM sys_table st
-	join config_typevalue ct ON ct.id= context
-	left join geomtable c ON st.id =c.table_name
-	left join idtable i ON st.id =i.table_name
-	WHERE typevalue = 'sys_table_context' and (c.column_name IS null or c.column_name != 'link_the_geom') and project_template->'template' @> to_jsonb(ARRAY[project_type_id])
-	ORDER BY json_extract_path_text(ct.addparam,'orderBy')::integer, orderby, alias)d)) into v_final;
+			UNION ALL
 
+			-- Additional layers from 'cm' schema
+			SELECT
+				st.project_template,
+				st.context,
+				COALESCE(st.alias, st.id) as "layerName",
+				st.id as "tableName",
+				'cm' AS "tableSchema",
+				CASE
+					WHEN c.column_name IS NULL THEN 'None'
+					WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
+					ELSE c.column_name
+				END AS "geomField",
+				CASE
+					WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
+					ELSE st.addparam->>'pkey'
+				END AS "tableId"
+			FROM cm.sys_table st
+			LEFT JOIN (
+				SELECT column_name, table_name FROM information_schema.columns
+				WHERE udt_name = 'geometry' AND table_schema = 'cm'
+			) c ON st.id = c.table_name
+			LEFT JOIN (
+				SELECT column_name, table_name FROM information_schema.columns
+				WHERE ordinal_position = 1 AND table_schema = 'cm'
+			) i ON st.id = i.table_name
+			WHERE st.project_template IS NOT NULL
+		) d INTO v_final;
+
+	ELSE
+		-- Standard logic for non-CM projects
+		SELECT COALESCE(array_to_json(array_agg(row_to_json(d))), '[]'::json)
+		FROM (
+			SELECT
+				st.project_template,
+				st.context,
+				st.alias AS "layerName",
+				st.id AS "tableName",
+				COALESCE(c.table_schema, 'SCHEMA_NAME') AS "tableSchema",
+				CASE
+					WHEN c.column_name IS NULL THEN 'None'
+					WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
+					ELSE c.column_name
+				END AS "geomField",
+				CASE
+					WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
+					ELSE st.addparam->>'pkey'
+				END AS "tableId"
+			FROM sys_table st
+			JOIN config_typevalue ct ON ct.id = st.context
+			LEFT JOIN (
+				SELECT column_name, table_name, table_schema FROM information_schema.columns
+				WHERE udt_name='geometry' and table_schema IN ('SCHEMA_NAME', 'am')
+			) c ON st.id = c.table_name
+			LEFT JOIN (
+				SELECT column_name, table_name FROM information_schema.columns
+				WHERE ordinal_position=1 and table_schema IN ('SCHEMA_NAME', 'am')
+			) i ON st.id = i.table_name
+			WHERE
+				ct.typevalue = 'sys_table_context' AND
+				(c.column_name IS NULL OR c.column_name != 'link_the_geom') AND
+				st.project_template->'template' @> to_jsonb(ARRAY[project_type_id]) AND
+				st.project_template IS NOT NULL
+		) d INTO v_final;
+	END IF;
 
 	v_result_info := v_final;
 	
