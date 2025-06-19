@@ -123,7 +123,7 @@ BEGIN
         IF v_mapzone_name <> 'MINCUT' THEN
             v_querytext = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_node t WHERE n.node_id = t.node_id';
             EXECUTE v_querytext;
-            v_querytext = 'UPDATE temp_pgr_arc a SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_arc t WHERE a.node_id = t.node_id';
+            v_querytext = 'UPDATE temp_pgr_arc a SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
             EXECUTE v_querytext;
         END IF;
 
