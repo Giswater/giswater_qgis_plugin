@@ -2479,6 +2479,12 @@ VALUES (3876, 'Deleting values from temp_csv -> Done', null, 0, true, 'utils', '
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (3878, 'Process finished with %i% rows inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
 
--- 19/06/2025
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
+VALUES('edit_connec_linkcat_vdefault', 'config', 'Value default catalog for link connected to connec', 'role_edit', NULL, 'Default catalog for linkcat:', 'SELECT DISTINCT ON (cl.id) cl.id, cl.id AS idval FROM link l JOIN cat_link cl ON l.linkcat_id = cl.id WHERE l.link_type = ''CONDUITLINK''', NULL, true, 20, 'ud', false, NULL, 'linkcat_id', NULL, false, 'text', 'combo', true, NULL, 'CC040_I', 'lyt_connec', true, true, false, NULL, NULL, NULL);
+
+UPDATE sys_param_user
+SET vdefault='CC040_I',"label"='Default catalog for linkcat:', dv_querytext='SELECT cat_link.id, cat_link.id AS idval FROM cat_link JOIN cat_feature ON cat_feature.id = cat_link.link_type WHERE cat_link.link_type = ''CONDUITLINK''', descript='Value default catalog for link', feature_field_id='linkcat_id', ismandatory=true, dv_isnullvalue=false, project_type='ud'
+WHERE id='edit_connec_linkcat_vdefault';
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3482, 'gw_trg_update_lot_action', 'utils', 'function', NULL, NULL, 'CM function that checks if the insert in the om_campaign_lot_x_feature the user is role field, in that case inserts value 1 (insert) or 2 (update) in action camp', NULL, NULL, 'core', NULL);
