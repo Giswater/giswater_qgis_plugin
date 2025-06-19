@@ -2197,3 +2197,7 @@ VALUES(3950, 'Inserting values on element table -> Done', null, 0, true, 'utils'
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3952, 'Inserting values on %v_featuretable% table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+-- 19/06/2025
+UPDATE sys_table SET descript='Specific view for general elements', project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}', orderby=1, alias='General Elements', "source"='core', addparam='{"pkey": "element_id"}'::json WHERE id='ve_genelem';
+UPDATE sys_table SET descript='Specific view for flowregulator elements', project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}', orderby=2, alias='Flow regulator Elements', "source"='core', addparam='{"pkey": "element_id"}'::json WHERE id='ve_frelem';
