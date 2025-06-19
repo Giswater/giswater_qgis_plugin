@@ -29,7 +29,6 @@ v_old_value_param text;
 v_customfeature text;
 v_featurecat text;
 v_matfromcat boolean = false;
-v_sys_type text;
 v_doublegeometry boolean;
 v_length float;
 v_width float;
@@ -218,11 +217,6 @@ BEGIN
 
 		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
 
-		-- get sys type for parent table
-		IF v_man_table = 'parent' THEN
-			v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
-		END IF;
-
 		-- Node type
 		IF NEW.node_type IS NULL THEN
 			IF ((SELECT COUNT(*) FROM cat_feature_node JOIN cat_feature USING (id) WHERE active IS TRUE)  = 0 ) THEN
@@ -245,7 +239,7 @@ BEGIN
 			END IF;
 
 			IF NEW.node_type IS NULL AND v_man_table !='parent' THEN
-				NEW.node_type:= (SELECT id FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
+				NEW.node_type:= (SELECT id FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
 			END IF;
 		END IF;
 
@@ -589,7 +583,7 @@ BEGIN
 			asset_id, drainzone_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
 			drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
-			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,
+			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,coalesce(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.district_id,NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
@@ -605,7 +599,7 @@ BEGIN
 			asset_id, drainzone_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
 			drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
-			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,
+			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,coalesce(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.district_id, NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
@@ -685,7 +679,7 @@ BEGIN
 
 		ELSIF v_man_table='parent' THEN
 
-			v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id=NEW.node_type);
+			v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id=NEW.node_type);
 			v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
 			EXECUTE v_sql;
 		END IF;
@@ -785,8 +779,8 @@ BEGIN
 
 		-- node type
 		IF (NEW.node_type <> OLD.node_type) THEN
-			v_new_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = NEW.node_type);
-			v_old_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = OLD.node_type);
+			v_new_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = NEW.node_type);
+			v_old_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = OLD.node_type);
 			IF v_new_v_man_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||v_old_v_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
 				EXECUTE v_sql;
@@ -884,7 +878,7 @@ BEGIN
 		IF v_matfromcat THEN
 			UPDATE node
 			SET code=NEW.code, sys_code=NEW.sys_code, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation,
-			"observ"=NEW.observ, "comment"=NEW.comment, omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=NEW.fluid_type,
+			"observ"=NEW.observ, "comment"=NEW.comment, omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=coalesce(NEW.fluid_type, 0),
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, muni_id=NEW.muni_id,
 			streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, district_id=NEW.district_id,
@@ -900,7 +894,7 @@ BEGIN
 		ELSE
 			UPDATE node
 			SET code=NEW.code, sys_code=NEW.sys_code, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation,
-			"observ"=NEW.observ, "comment"=NEW.comment, omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=NEW.fluid_type,
+			"observ"=NEW.observ, "comment"=NEW.comment, omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=coalesce(NEW.fluid_type, 0),
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, muni_id=NEW.muni_id,
 			streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, district_id=NEW.district_id,
