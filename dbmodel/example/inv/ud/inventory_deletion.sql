@@ -24,7 +24,7 @@ UPDATE sector s SET the_geom = e.the_geom FROM exploitation e WHERE s.sector_id 
 
 UPDATE inp_junction SET y0=null, ysur=null, apond=null, outfallparam=null;
 UPDATE inp_conduit SET q0=null, qmax=null;
-UPDATE inp_storage SET storage_type =null, curve_id = null, y0=null, ysur=null, apond=null;
+UPDATE inp_storage SET storage_type =null, curve_id = null, y0=null, ysur=null;
 UPDATE inp_outfall SET outfall_type = null;
 
 DELETE FROM inp_frweir;
