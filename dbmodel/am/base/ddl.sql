@@ -41,7 +41,7 @@ CREATE TABLE dma_nrw (
 );
 
 CREATE TABLE arc_input (
-    arc_id character varying(60) NOT NULL,
+    arc_id int4 NOT NULL,
     longevity numeric(12,3),
     rleak numeric(12,3),
     flow numeric(12,3),
@@ -175,7 +175,7 @@ CREATE TABLE config_engine (
 );
 
 CREATE TABLE arc_engine_sh (
-    arc_id character varying(16) NOT NULL,
+    arc_id int4 NOT NULL,
     result_id integer NOT NULL,
     cost_repmain numeric(12,2),
     cost_constr numeric(12,2),
@@ -190,7 +190,7 @@ CREATE TABLE arc_engine_sh (
 );
 
 CREATE TABLE arc_engine_wm (
-    arc_id character varying(16) NOT NULL,
+    arc_id int4 NOT NULL,
     result_id integer NOT NULL,
     rleak integer,
     longevity integer,
@@ -205,7 +205,7 @@ CREATE TABLE arc_engine_wm (
 );
 
 CREATE TABLE arc_output (
-    arc_id character varying(16) NOT NULL,
+    arc_id int4 NOT NULL,
     result_id integer NOT NULL,
     sector_id integer,
     macrosector_id integer,
