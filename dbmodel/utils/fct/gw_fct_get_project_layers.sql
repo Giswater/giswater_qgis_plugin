@@ -53,74 +53,100 @@ BEGIN
 
 	IF v_is_cm IS TRUE THEN
 		-- For CM projects, get all base layers plus the CM-specific layers
-		SELECT COALESCE(array_to_json(array_agg(row_to_json(d))), '[]'::json)
+		SELECT COALESCE((SELECT array_to_json(array_agg(row_to_json(d)))
 		FROM (
-			-- Base layers from main schema
 			SELECT
-				st.project_template,
-				st.context,
-				st.alias AS "layerName",
-				st.id AS "tableName",
-				COALESCE(c.table_schema, 'SCHEMA_NAME') AS "tableSchema",
-				CASE
-					WHEN c.column_name IS NULL THEN 'None'
-					WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
-					ELSE c.column_name
-				END AS "geomField",
-				CASE
-					WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
-					ELSE st.addparam->>'pkey'
-				END AS "tableId"
-			FROM sys_table st
-			JOIN config_typevalue ct ON ct.id = st.context
-			LEFT JOIN (
-				SELECT column_name, table_name, table_schema FROM information_schema.columns
-				WHERE udt_name='geometry' and table_schema IN ('SCHEMA_NAME', 'am')
-			) c ON st.id = c.table_name
-			LEFT JOIN (
-				SELECT column_name, table_name FROM information_schema.columns
-				WHERE ordinal_position=1 and table_schema IN ('SCHEMA_NAME', 'am')
-			) i ON st.id = i.table_name
-			WHERE
-				ct.typevalue = 'sys_table_context' AND
-				(c.column_name IS NULL OR c.column_name != 'link_the_geom') AND
-				st.project_template IS NOT NULL
+				orderby,
+				group_order,
+				project_template,
+				context,
+				"layerName",
+				"tableName",
+				"tableSchema",
+				"geomField",
+				"tableId"
+			FROM (
+				-- Base layers from main schema
+				SELECT
+					st.orderby,
+					(ct.addparam->>'orderBy')::integer as group_order,
+					st.project_template,
+					st.context,
+					st.alias AS "layerName",
+					st.id AS "tableName",
+					COALESCE(c.table_schema, 'SCHEMA_NAME') AS "tableSchema",
+					CASE
+						WHEN c.column_name IS NULL THEN 'None'
+						WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
+						ELSE c.column_name
+					END AS "geomField",
+					CASE
+						WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
+						ELSE st.addparam->>'pkey'
+					END AS "tableId"
+				FROM sys_table st
+				JOIN config_typevalue ct ON ct.id = st.context
+				LEFT JOIN (
+					SELECT column_name, table_name, table_schema FROM information_schema.columns
+					WHERE udt_name='geometry' and table_schema IN ('SCHEMA_NAME', 'am')
+				) c ON st.id = c.table_name
+				LEFT JOIN (
+					SELECT column_name, table_name FROM information_schema.columns
+					WHERE ordinal_position=1 and table_schema IN ('SCHEMA_NAME', 'am')
+				) i ON st.id = i.table_name
+				WHERE
+					ct.typevalue = 'sys_table_context' AND
+					(c.column_name IS NULL OR c.column_name != 'link_the_geom') AND
+					st.project_template->'template' @> to_jsonb(ARRAY[project_type_id]) AND
+					st.project_template IS NOT NULL
 
-			UNION ALL
+				UNION ALL
 
-			-- Additional layers from 'cm' schema
-			SELECT
-				st.project_template,
-				st.context,
-				COALESCE(st.alias, st.id) as "layerName",
-				st.id as "tableName",
-				'cm' AS "tableSchema",
-				CASE
-					WHEN c.column_name IS NULL THEN 'None'
-					WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
-					ELSE c.column_name
-				END AS "geomField",
-				CASE
-					WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
-					ELSE st.addparam->>'pkey'
-				END AS "tableId"
-			FROM cm.sys_table st
-			LEFT JOIN (
-				SELECT column_name, table_name FROM information_schema.columns
-				WHERE udt_name = 'geometry' AND table_schema = 'cm'
-			) c ON st.id = c.table_name
-			LEFT JOIN (
-				SELECT column_name, table_name FROM information_schema.columns
-				WHERE ordinal_position = 1 AND table_schema = 'cm'
-			) i ON st.id = i.table_name
-			WHERE st.project_template IS NOT NULL
-		) d INTO v_final;
+				-- Additional layers from 'cm' schema
+				SELECT
+					st.orderby,
+					999 as group_order, -- CM layers go last
+					st.project_template,
+					st.context,
+					COALESCE(st.alias, st.id) as "layerName",
+					st.id as "tableName",
+					'cm' AS "tableSchema",
+					CASE
+						WHEN c.column_name IS NULL THEN 'None'
+						WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
+						ELSE c.column_name
+					END AS "geomField",
+					CASE
+						WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
+						ELSE st.addparam->>'pkey'
+					END AS "tableId"
+				FROM cm.sys_table st
+				LEFT JOIN (
+					SELECT column_name, table_name FROM information_schema.columns
+					WHERE udt_name = 'geometry' AND table_schema = 'cm'
+				) c ON st.id = c.table_name
+				LEFT JOIN (
+					SELECT column_name, table_name FROM information_schema.columns
+					WHERE ordinal_position = 1 AND table_schema = 'cm'
+				) i ON st.id = i.table_name
+				WHERE st.project_template IS NOT NULL
+			) as layers
+			ORDER BY
+				CASE "tableSchema"
+					WHEN 'cm' THEN 2
+					ELSE 1
+				END,
+				group_order,
+				orderby
+		) d), '[]'::json) INTO v_final;
 
 	ELSE
 		-- Standard logic for non-CM projects
-		SELECT COALESCE(array_to_json(array_agg(row_to_json(d))), '[]'::json)
+		SELECT COALESCE((SELECT array_to_json(array_agg(row_to_json(d)))
 		FROM (
 			SELECT
+				st.orderby,
+				(ct.addparam->>'orderBy')::integer as group_order,
 				st.project_template,
 				st.context,
 				st.alias AS "layerName",
@@ -150,7 +176,8 @@ BEGIN
 				(c.column_name IS NULL OR c.column_name != 'link_the_geom') AND
 				st.project_template->'template' @> to_jsonb(ARRAY[project_type_id]) AND
 				st.project_template IS NOT NULL
-		) d INTO v_final;
+			ORDER BY group_order, st.orderby
+		) d), '[]'::json) INTO v_final;
 	END IF;
 
 	v_result_info := v_final;
