@@ -192,17 +192,16 @@ BEGIN
         -- closed valves
         UPDATE temp_pgr_arc a
         SET cost = -1, reverse_cost = -1
-        WHERE a.graph_delimiter  = 'MINSECTOR' 
+        WHERE a.graph_delimiter  = 'MINSECTOR'
         AND a.closed = TRUE;
 
-        -- checkvalves 
+        -- checkvalves
         UPDATE temp_pgr_arc a
         SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
             reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
         WHERE a.graph_delimiter  = 'MINSECTOR'
         AND a.to_arc IS NOT NULL
         AND a.closed = FALSE;
-        END IF;
 
         -- for v_graph_delimiter - only the inlet arcs
         UPDATE temp_pgr_arc a
