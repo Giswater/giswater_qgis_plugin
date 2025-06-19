@@ -784,12 +784,12 @@ BEGIN
 		SELECT (a->>'vdef'), (a->>'param') INTO v_catalog, v_catalogtype FROM json_array_elements(v_values_array) AS a
 			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'conneccat_id' OR (a->>'param') = 'gullycat_id';
 
-		IF v_project_type ='WS' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type != 'LINK' THEN
+		IF v_project_type ='WS' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type NOT IN ('LINK', 'ELEMENT') THEN
 			v_querystring = concat('SELECT pnom::integer, dnom::integer, matcat_id FROM cat_',lower(v_catfeature.feature_type),' WHERE id=',quote_nullable(v_catalog));
 
 			EXECUTE v_querystring INTO v_pnom, v_dnom, v_matcat_id;
 
-		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type not in ('LINK', 'ELEMENT') THEN
+		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type NOT IN ('LINK', 'ELEMENT') THEN
 			IF (v_catfeature.feature_type) ='GULLY' THEN
 				v_querystring = concat('SELECT matcat_id FROM cat_gully WHERE id=',quote_nullable(v_catalog));
 
