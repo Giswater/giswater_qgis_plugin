@@ -711,7 +711,7 @@ BEGIN
 			annotation, observ, comment, descript, link, num_value, drainzone_outfall, dwfzone_outfall)
 			VALUES (NEW.link_id, NEW.code, NEW.sys_code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype::integer, v_omzone,
 			NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource,
-			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, 'LINK', NEW.location_type, NEW.epa_type,
+			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, NEW.link_type, NEW.location_type, NEW.epa_type,
 			NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, NEW.drainzone_outfall, NEW.dwfzone_outfall);
 
 			INSERT INTO man_conduitlink VALUES (NEW.link_id);

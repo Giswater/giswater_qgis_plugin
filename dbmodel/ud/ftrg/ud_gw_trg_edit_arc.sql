@@ -415,7 +415,7 @@ BEGIN
 			meandering, conserv_state, om_state, last_visitdate, negative_offset, drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2,
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment,
-			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,
+			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, COALESCE(NEW.fluid_type, 0),
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id,  NEW.postcode, NEW.district_id, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.label_x,
@@ -431,7 +431,7 @@ BEGIN
 			meandering, conserv_state, om_state, last_visitdate, negative_offset, drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2,
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment,
-			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,
+			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, COALESCE(NEW.fluid_type, 0),
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id,  NEW.postcode, NEW.district_id, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.label_x,
@@ -691,7 +691,7 @@ BEGIN
 			UPDATE arc
 			SET arc_type=NEW.arc_type, sys_code=NEW.sys_code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, custom_length=NEW.custom_length, omzone_id=NEW.omzone_id,
-			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type,
+			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=COALESCE(NEW.fluid_type, 0),location_type=NEW.location_type,
 			workcat_id=NEW.workcat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,
 			postcode=NEW.postcode, district_id = NEW.district_id, streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement,
 			postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link,
@@ -707,7 +707,7 @@ BEGIN
 			UPDATE arc
 			SET arc_type=NEW.arc_type, sys_code=NEW.sys_code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, custom_length=NEW.custom_length, omzone_id=NEW.omzone_id,
-			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type,
+			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=COALESCE(NEW.fluid_type, 0),location_type=NEW.location_type,
 			workcat_id=NEW.workcat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,
 			postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber,
 			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified,label_x=NEW.label_x,

@@ -583,7 +583,7 @@ BEGIN
 			asset_id, drainzone_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
 			drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
-			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,coalesce(NEW.fluid_type, 0),NEW.location_type,
+			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.district_id,NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
@@ -599,7 +599,7 @@ BEGIN
 			asset_id, drainzone_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
 			drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
-			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,coalesce(NEW.fluid_type, 0),NEW.location_type,
+			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.district_id, NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
@@ -878,7 +878,7 @@ BEGIN
 		IF v_matfromcat THEN
 			UPDATE node
 			SET code=NEW.code, sys_code=NEW.sys_code, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation,
-			"observ"=NEW.observ, "comment"=NEW.comment, omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=coalesce(NEW.fluid_type, 0),
+			"observ"=NEW.observ, "comment"=NEW.comment, omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=COALESCE(NEW.fluid_type, 0),
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, muni_id=NEW.muni_id,
 			streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, district_id=NEW.district_id,
@@ -894,7 +894,7 @@ BEGIN
 		ELSE
 			UPDATE node
 			SET code=NEW.code, sys_code=NEW.sys_code, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation,
-			"observ"=NEW.observ, "comment"=NEW.comment, omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=coalesce(NEW.fluid_type, 0),
+			"observ"=NEW.observ, "comment"=NEW.comment, omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=COALESCE(NEW.fluid_type, 0),
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, muni_id=NEW.muni_id,
 			streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, district_id=NEW.district_id,

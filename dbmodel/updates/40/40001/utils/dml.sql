@@ -2199,6 +2199,9 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(3952, 'Inserting values on %v_featuretable% table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
 -- 19/06/2025
-UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='v_edit_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='ve_connec_vconnec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false, iseditable=false WHERE formname = 'v_edit_arc' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false, iseditable=false WHERE formname ILIKE 've_arc%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false, iseditable=false WHERE formname = 'v_edit_node' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false, iseditable=false WHERE formname ILIKE 've_node%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname = 'v_edit_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname ILIKE 've_connec%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
