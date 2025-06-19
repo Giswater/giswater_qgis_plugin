@@ -115,14 +115,17 @@ BEGIN
     ELSE
         -- Dynamic column name for old_mapzone_id: %I_id -> dma_id, presszone_id, etc.
         -- node because we need to inform old mapzone_id for this nodes that is_operative is false.
-        v_querytext = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_node t WHERE n.node_id = t.node_id';
-        EXECUTE v_querytext;
-
-        v_querytext = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, old_mapzone_id)
-            SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ' || v_mapzone_name || '_id
+        v_querytext = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+            SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
             FROM v_temp_arc a
             JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
             JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
+        IF v_mapzone_name <> 'MINCUT' THEN
+            v_querytext = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_node t WHERE n.node_id = t.node_id';
+            EXECUTE v_querytext;
+            v_querytext = 'UPDATE temp_pgr_arc a SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_arc t WHERE a.node_id = t.node_id';
+            EXECUTE v_querytext;
+        END IF;
 
         EXECUTE v_querytext;
 
