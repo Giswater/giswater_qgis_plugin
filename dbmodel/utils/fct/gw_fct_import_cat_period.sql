@@ -42,8 +42,8 @@ BEGIN
    
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT CAT-PERIOD VALUES'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-------------------------------'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3170", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
    
  	-- starting process
 	FOR v_addfields IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
@@ -54,10 +54,14 @@ BEGIN
 	END LOOP;
 
 	-- manage log (fid: v_fid)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_cat_period table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Deleting values from temp_csv -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished with ',i, ' rows inserted.'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1,"lang":"ES"}, "feature":{}, 
+						"data":{"message":"3872", "function":"3170", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1,"lang":"ES"}, "feature":{}, 
+						"data":{"message":"3874", "function":"3170", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
+						"data":{"message":"3876","function":"3170","fid":'||v_fid||',"result_id":"'||quote_nullable(v_result_id)||'","is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1,"lang":"ES"}, "feature":{}, 
+						"data":{"message":"3878", "function":"3170", "parameters":{"i":"'||i||'"}, "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 	-- get log (fid: v_fid)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
