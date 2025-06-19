@@ -1755,6 +1755,12 @@ UPDATE config_typevalue SET addparam='{"orderBy":7}'::json WHERE typevalue='sys_
 UPDATE config_typevalue SET addparam='{"orderBy":8}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "NODE"]}';
 
 -- 19/06/2025
+UPDATE config_form_fields SET ismandatory=false, iseditable=false WHERE formname = 'v_edit_arc' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false, iseditable=false WHERE formname ILIKE 've_arc%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false, iseditable=false WHERE formname = 'v_edit_node' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false, iseditable=false WHERE formname ILIKE 've_node%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname = 'v_edit_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname ILIKE 've_connec%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname='v_edit_gully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields SET ismandatory=true, iseditable=true WHERE formname ILIKE 've_gully%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 
