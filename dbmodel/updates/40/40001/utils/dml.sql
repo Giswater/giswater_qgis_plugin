@@ -2461,3 +2461,5 @@ UPDATE sys_style
   <layerGeometryType>1</layerGeometryType>
 </qgis>'
 	WHERE layername='v_ext_streetaxis' AND styleconfig_id=101;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(3694, 'Any node was found at these coordinates.', 'Please select a node to place your element.', 1, true, 'ud', 'core', 'UI');

@@ -805,8 +805,6 @@ VALUES(3424, 'Fluid type analysis', '{"featureType":[]}'::json, '[
 UPDATE config_form_tableview SET visible=true WHERE objectname='tbl_element_x_gully' AND columnname='gully_id';
 
 -- 04/06/2025
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(3694, 'Any node was found at these coordinates.', 'Please select a node to place your element.', 1, true, 'ud', 'core', 'UI');
-
 INSERT INTO cat_element (id, element_type, matcat_id, geometry, descript, link, brand, "type", model, svg, active, geom1, geom2, isdoublegeom) VALUES('GATE-01', 'EGATE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
 
 -- CONFIG_FORM_FIELDS
