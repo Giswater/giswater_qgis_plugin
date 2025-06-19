@@ -1811,6 +1811,8 @@ class GwInfo(QObject):
                 is_inserting = False
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
+                    if new_feature is not None:
+                        self.layer_new_feature.commitChanges()
                     # Force a map refresh
                     tools_qgis.refresh_map_canvas()  # First refresh all the layers
                     global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
