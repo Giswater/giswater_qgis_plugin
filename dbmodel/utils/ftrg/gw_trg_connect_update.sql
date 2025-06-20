@@ -33,7 +33,7 @@ yvar float;
 v_dma_autoupdate boolean;
 v_fluidtype_autoupdate boolean;
 v_pol_id text;
-v_fluidtype_value text;
+v_fluidtype_value integer;
 v_dma_value integer;
 v_arc record;
 v_trace_featuregeom boolean;
