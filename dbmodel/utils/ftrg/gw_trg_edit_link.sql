@@ -913,7 +913,7 @@ BEGIN
 			UPDATE man_pipelink SET link_id = NEW.link_id WHERE link_id = OLD.link_id;
 		ELSIF v_man_table='parent' THEN
 			v_man_table := (SELECT man_table FROM cat_feature_link c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = NEW.link_type);
-			v_sql:= 'UPDATE '||v_man_table||' SET link_id = NEW.link_id WHERE link_id = OLD.link_id';
+			v_sql:= 'UPDATE '||v_man_table||' SET link_id = '||quote_literal(NEW.link_id)||' WHERE link_id = '||quote_literal(OLD.link_id);
 			EXECUTE v_sql;
 		END IF;
 
