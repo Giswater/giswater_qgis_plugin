@@ -182,3 +182,6 @@ INSERT INTO man_type_location VALUES (4, 'St. Location', 'ELEMENT', NULL, NULL, 
 INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
 SELECT id, 'PIPELINK' AS link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
 FROM cat_connec ON CONFLICT DO NOTHING;
+
+INSERT INTO cat_link (id, link_type, description) VALUES('VIRTUAL', 'VLINK', 'Virtual link')
+ON CONFLICT (id) DO UPDATE SET link_type='VLINK', description='Virtual link';

@@ -196,3 +196,5 @@ INSERT INTO cat_element (id, element_type, active) VALUES ('PUMP-01', 'EPUMP', T
 INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
 SELECT id, 'CONDUITLINK' as link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
 FROM cat_connec ON CONFLICT DO NOTHING;
+
+UPDATE cat_link SET link_type='VLINK' WHERE id='VIRTUAL';

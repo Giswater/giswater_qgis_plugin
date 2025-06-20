@@ -17,6 +17,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
 CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');
+
 CREATE TRIGGER gw_trg_edit_element_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_element
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element_pol();
 
@@ -130,10 +133,6 @@ ON dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dqa_id');
 
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('supplyzone_id');
-
-
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
 
 CREATE TRIGGER gw_trg_edit_plan_netscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON
 v_edit_plan_netscenario_presszone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_netscenario('PRESSZONE');

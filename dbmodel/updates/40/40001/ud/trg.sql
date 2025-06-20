@@ -23,6 +23,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
 
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');
+
 CREATE TRIGGER gw_trg_edit_element_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_element
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element_pol();
 
@@ -124,9 +127,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_conduit');
 
 CREATE TRIGGER gw_trg_edit_pol_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_gully_pol();
-
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
 
 CREATE TRIGGER gw_trg_edit_omzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_omzone
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_omzone('omzone');

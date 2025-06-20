@@ -41,6 +41,7 @@ After that the trg_edit_link can update geometry and enpoint. By updating endpoi
 
 DECLARE
 v_man_table varchar;
+v_customfeature varchar;
 v_projectype varchar;
 v_arc record;
 v_connect record;
@@ -94,6 +95,10 @@ BEGIN
 	v_currentpsector = (SELECT value::integer from config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_current');
 	v_check_arcdnom_status:= (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
 	v_check_arcdnom:= (SELECT value::json->>'diameter' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
+
+	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'LINK') THEN
+		v_customfeature := v_man_table;
+	END IF;
 
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
@@ -662,10 +667,14 @@ BEGIN
 		-- insert into link table
 		IF v_projectype = 'WS' THEN
 			IF NEW.linkcat_id IS NULL THEN
-				IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-					NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				IF v_customfeature IS NOT NULL THEN
+					NEW.linkcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat('feat_',v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 				ELSE
-					NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
+					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
+						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSE
+						NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
+					END IF;
 				END IF;
 			END IF;
 
@@ -719,6 +728,10 @@ BEGIN
 			INSERT INTO man_conduitlink VALUES (NEW.link_id);
 		ELSIF v_man_table = 'PIPELINK' THEN
 			INSERT INTO man_pipelink VALUES (NEW.link_id);
+		ELSIF v_man_table='parent' THEN
+			v_man_table := (SELECT man_table FROM cat_feature_link c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = NEW.link_type);
+			v_sql:= 'INSERT INTO '||v_man_table||' (link_id) VALUES ('||quote_literal(NEW.link_id)||')';
+			EXECUTE v_sql;
 		END IF;
 
 		-- update feature
@@ -891,6 +904,18 @@ BEGIN
 		datasource = NEW.datasource, location_type=NEW.location_type, epa_type=NEW.epa_type, annotation=NEW.annotation, observ=NEW.observ, comment=NEW.comment,
 		descript=NEW.descript, link=NEW.link, num_value=NEW.num_value, state_type=NEW.state_type
 		WHERE link_id=NEW.link_id;
+
+		IF v_man_table = 'VLINK' THEN
+			UPDATE man_vlink SET link_id = NEW.link_id WHERE link_id = OLD.link_id;
+		ELSIF v_man_table = 'CONDUITLINK' THEN
+			UPDATE man_conduitlink SET link_id = NEW.link_id WHERE link_id = OLD.link_id;
+		ELSIF v_man_table = 'PIPELINK' THEN
+			UPDATE man_pipelink SET link_id = NEW.link_id WHERE link_id = OLD.link_id;
+		ELSIF v_man_table='parent' THEN
+			v_man_table := (SELECT man_table FROM cat_feature_link c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = NEW.link_type);
+			v_sql:= 'UPDATE '||v_man_table||' SET link_id = NEW.link_id WHERE link_id = OLD.link_id';
+			EXECUTE v_sql;
+		END IF;
 
 
 		-- Update state_type if edit_connect_update_statetype is TRUE
