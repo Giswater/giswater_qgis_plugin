@@ -1884,6 +1884,7 @@ class GwAdminButton:
                 self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
             else:
                 self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
+            self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(True)
         else:
             self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
             self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
@@ -1960,7 +1961,7 @@ class GwAdminButton:
     def on_btn_pschema_qgis_file_clicked(self):
         """ Sets the project to be created as a 'CM' project. """
         self.is_cm_project = True
-        tools_qgis.show_info("Layer of CM project will be added to the project", dialog=self.dlg_readsql_create_cm_project)
+        tools_qgis.show_info("Layer of CM project will be added to the project when create", dialog=self.dlg_readsql_create_cm_project)
         self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
     def _open_rename(self):
