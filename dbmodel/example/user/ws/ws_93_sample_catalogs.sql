@@ -183,5 +183,5 @@ INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_
 SELECT id, 'PIPELINK' AS link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
 FROM cat_connec ON CONFLICT DO NOTHING;
 
-INSERT INTO cat_link (id, link_type, description) VALUES('VIRTUAL', 'VLINK', 'Virtual link')
-ON CONFLICT (id) DO UPDATE SET link_type='VLINK', description='Virtual link';
+INSERT INTO cat_link (id, link_type, descript) VALUES('VIRTUAL', 'VLINK', 'Virtual link')
+ON CONFLICT (id) DO UPDATE SET link_type='VLINK', descript='Virtual link';
