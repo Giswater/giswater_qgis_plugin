@@ -37,7 +37,7 @@ DECLARE
 
     v_hydrometer_service INT[];
     v_fid INTEGER = 134;
-    v_querytext TEXT;
+    v_query_text TEXT;
 
     v_version TEXT;
     v_srid INTEGER;
@@ -62,7 +62,7 @@ DECLARE
 	v_original_disable_locklevel json;
 
     -- MINCUT VARIABLES
-    
+
     -- parameters
     v_pgr_distance INTEGER;
     v_pgr_root_vids int[];
@@ -190,10 +190,10 @@ BEGIN
         UPDATE temp_pgr_arc a
         SET cost = 0, reverse_cost = 0
         WHERE a.graph_delimiter = 'MINSECTOR'
-        AND a.closed = FALSE 
+        AND a.closed = FALSE
         AND a.to_arc IS NOT NULL
         AND a.broken = TRUE;
-    END IF; 
+    END IF;
 
     -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
     -- new arcs MINSECTOR AND SECTOR
@@ -205,7 +205,7 @@ BEGIN
     IF v_ignore_check_valves THEN
         v_cost_field = '0';
         v_reverse_cost_field = '0';
-    ELSE 
+    ELSE
         v_cost_field = 'cost';
         v_reverse_cost_field = 'reverse_cost';
     END IF;
@@ -338,7 +338,7 @@ BEGIN
     ELSIF  v_updatemapzgeom = 1 THEN
 
         -- concave polygon
-        v_querytext = '
+        v_query_text = '
             UPDATE temp_pgr_minsector SET the_geom = ST_Multi(b.the_geom) 
                 FROM (
                     WITH polygon AS (
@@ -356,12 +356,12 @@ BEGIN
                 ) b 
             WHERE b.minsector_id = temp_pgr_minsector.minsector_id
         ';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
     ELSIF  v_updatemapzgeom = 2 THEN
 
         -- pipe buffer
-        v_querytext = '
+        v_query_text = '
             UPDATE temp_pgr_minsector SET the_geom = ST_Multi(geom) 
             FROM (
                 SELECT t.mapzone_id AS minsector_id, (ST_Buffer(ST_Collect(v.the_geom),'||v_geomparamupdate||')) AS geom 
@@ -372,12 +372,12 @@ BEGIN
             ) b 
             WHERE b.minsector_id = temp_pgr_minsector.minsector_id;
         ';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
     ELSIF  v_updatemapzgeom = 3 THEN
 
         -- use plot and pipe buffer
-        v_querytext = '
+        v_query_text = '
             UPDATE temp_pgr_minsector SET the_geom = geom 
             FROM (
                 SELECT minsector_id, ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom 
@@ -400,7 +400,7 @@ BEGIN
             ) b 
             WHERE b.minsector_id = temp_pgr_minsector.minsector_id
         ';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
     END IF;
 
 	-- Update minsector temporary exploitation
@@ -475,7 +475,7 @@ BEGIN
         INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)
         SELECT node_id, minsector_1, minsector_2 FROM temp_pgr_minsector_graph;
 
-        v_querytext = '
+        v_query_text = '
             WITH arcs AS (
                 SELECT 
                     arc_id,
@@ -488,9 +488,9 @@ BEGIN
             FROM arcs
             WHERE arc.arc_id = arcs.arc_id
             AND arc.minsector_id IS DISTINCT FROM arcs.mapzone_id;';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
-        v_querytext = '
+        v_query_text = '
             WITH nodes AS (
                 SELECT 
                     node_id,
@@ -503,9 +503,9 @@ BEGIN
             FROM nodes
             WHERE node.node_id = nodes.node_id
             AND node.minsector_id IS DISTINCT FROM nodes.mapzone_id;';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
-        v_querytext = '
+        v_query_text = '
             WITH connecs AS (
                 SELECT 
                     connec_id,
@@ -519,9 +519,9 @@ BEGIN
             FROM connecs
             WHERE connec.connec_id = connecs.connec_id
             AND connec.minsector_id IS DISTINCT FROM connecs.mapzone_id;';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
-        v_querytext = '
+        v_query_text = '
             WITH links AS (
                 SELECT 
                     link_id,
@@ -535,9 +535,9 @@ BEGIN
             FROM links
             WHERE link.link_id = links.link_id
             AND link.minsector_id IS DISTINCT FROM links.mapzone_id;';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
-        v_querytext = '
+        v_query_text = '
             UPDATE arc SET minsector_id = 0
             WHERE EXISTS (
                 SELECT 1 FROM v_temp_pgr_minsector_old
@@ -548,9 +548,9 @@ BEGIN
             )
             AND arc.minsector_id IS DISTINCT FROM 0;
         ';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
-        v_querytext = '
+        v_query_text = '
             UPDATE node SET minsector_id = 0
             WHERE EXISTS (
                 SELECT 1 FROM v_temp_pgr_minsector_old
@@ -561,9 +561,9 @@ BEGIN
             )
             AND node.minsector_id IS DISTINCT FROM 0;
         ';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
-        v_querytext = '
+        v_query_text = '
             UPDATE connec SET minsector_id = 0
             WHERE EXISTS (
                 SELECT 1 FROM v_temp_pgr_minsector_old
@@ -574,9 +574,9 @@ BEGIN
             )
             AND connec.minsector_id IS DISTINCT FROM 0;
         ';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
-        v_querytext = '
+        v_query_text = '
             UPDATE link SET minsector_id = 0
             WHERE EXISTS (
                 SELECT 1 FROM v_temp_pgr_minsector_old
@@ -587,7 +587,7 @@ BEGIN
             )
             AND link.minsector_id IS DISTINCT FROM 0;
         ';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
         v_visible_layer ='"v_edit_minsector", "v_edit_minsector_mincut"';
 
