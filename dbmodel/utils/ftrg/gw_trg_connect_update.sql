@@ -33,7 +33,7 @@ yvar float;
 v_dma_autoupdate boolean;
 v_fluidtype_autoupdate boolean;
 v_pol_id text;
-v_fluidtype_value integer;
+v_fluidtype_value text;
 v_dma_value integer;
 v_arc record;
 v_trace_featuregeom boolean;
@@ -98,13 +98,13 @@ BEGIN
 					WHERE connec_id=v_link.feature_id;
 
 				ELSIF v_projectype = 'UD' THEN
-					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, omzone_id = NEW.omzone_id, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
+					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, omzone_id = NEW.omzone_id, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value::integer
 					WHERE connec_id=v_link.feature_id;
 				END IF;
 
 			ELSIF v_link.feature_type='GULLY' THEN
 
-				UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= v_dma_value, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
+				UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= v_dma_value, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value::integer
 				WHERE gully_id=v_link.feature_id;
 			END IF;
 		END LOOP;
@@ -119,7 +119,7 @@ BEGIN
 				WHERE link_id=v_link.link_id;
 			ELSE
 				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, omzone_id = NEW.omzone_id,
-				fluid_type = v_fluidtype_value
+				fluid_type = v_fluidtype_value::integer
 				WHERE link_id=v_link.link_id;
 
 				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE link_id = v_link.link_id;
@@ -183,7 +183,7 @@ BEGIN
 					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= v_dma_value, omzone_id = NEW.omzone_id, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
 					WHERE connec_id=v_link.feature_id;
 				ELSE
-					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, omzone_id = NEW.omzone_id, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
+					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, omzone_id = NEW.omzone_id, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value::integer
 					WHERE connec_id=v_link.feature_id;
 				END IF;
 
@@ -193,7 +193,7 @@ BEGIN
 					UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= v_dma_value, omzone_id = NEW.omzone_id, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
 					WHERE gully_id=v_link.feature_id;
 				ELSE
-					UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, omzone_id = NEW.omzone_id, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
+					UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, omzone_id = NEW.omzone_id, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value::integer
 					WHERE gully_id=v_link.feature_id;
 				END IF;
 			END IF;
@@ -206,7 +206,7 @@ BEGIN
 				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = v_dma_value, omzone_id = NEW.omzone_id, fluid_type = v_fluidtype_value
 				WHERE link_id=v_link.link_id;
 			ELSE
-				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, omzone_id = NEW.omzone_id, fluid_type = v_fluidtype_value
+				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, omzone_id = NEW.omzone_id, fluid_type = v_fluidtype_value::integer
 				WHERE link_id=v_link.link_id;
 			END IF;
 
