@@ -29,8 +29,6 @@ CREATE TABLE om_campaign_lot_x_gully (
 	status int2,
 	org_observ text,
 	team_observ text,
-	update_at timestamp,
-	update_by text,
 	update_count integer,
 	update_log jsonb,
 	qindex1 numeric(12,3),

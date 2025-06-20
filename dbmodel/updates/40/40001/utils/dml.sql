@@ -2485,6 +2485,3 @@ VALUES('edit_connec_linkcat_vdefault', 'config', 'Value default catalog for link
 UPDATE sys_param_user
 SET vdefault='CC040_I',"label"='Default catalog for linkcat:', dv_querytext='SELECT cat_link.id, cat_link.id AS idval FROM cat_link JOIN cat_feature ON cat_feature.id = cat_link.link_type WHERE cat_link.link_type = ''CONDUITLINK''', descript='Value default catalog for link', feature_field_id='linkcat_id', ismandatory=true, dv_isnullvalue=false, project_type='ud'
 WHERE id='edit_connec_linkcat_vdefault';
-
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
-VALUES(3482, 'gw_trg_update_lot_action', 'utils', 'function', NULL, NULL, 'CM function that checks if the insert in the om_campaign_lot_x_feature the user is role field, in that case inserts value 1 (insert) or 2 (update) in action camp', NULL, NULL, 'core', NULL);

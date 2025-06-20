@@ -10,7 +10,7 @@ SET search_path = cm, public, pg_catalog;
 
 
 DROP TRIGGER IF EXISTS trg_lot_x_gully_feature ON cm.om_campaign_lot_x_gully;
-CREATE TRIGGER trg_lot_x_gully_feature AFTER INSERT OR DELETE ON cm.om_campaign_lot_x_gully
+CREATE TRIGGER trg_lot_x_gully_feature AFTER INSERT OR DELETE OR UPDATE ON cm.om_campaign_lot_x_gully
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature('gully');
 
 DROP TRIGGER IF EXISTS trg_validate_lot_x_gully_feature ON cm.om_campaign_lot_x_gully;

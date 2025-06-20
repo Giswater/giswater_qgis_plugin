@@ -76,11 +76,13 @@ BEGIN
 		SELECT distinct
 		    v.relname AS vista,
 		    t.relname AS table_name,
+		    n_table.nspname AS table_schema,
 		    a.attname AS columna
 		FROM pg_rewrite r
 		JOIN pg_class v ON r.ev_class = v.oid
 		JOIN pg_depend d ON r.oid = d.objid
 		JOIN pg_class t ON d.refobjid = t.oid
+		JOIN pg_namespace n_table ON t.relnamespace = n_table.oid
 		JOIN pg_attribute a ON a.attrelid = t.oid
 		JOIN pg_namespace n ON v.relnamespace = n.oid
 		WHERE v.relname = '||quote_literal(v_origin_table)||'
@@ -89,7 +91,7 @@ BEGIN
 	    AND t.relkind = ''r''
  		AND n.nspname = '||quote_literal(current_schema)||'
 	)
-	SELECT b.table_name, a.* FROM aaa a JOIN bbb b ON a.col = b.columna;
+	SELECT b.table_name, b.table_schema, a.* FROM aaa a JOIN bbb b ON a.col = b.columna;
 	';
 
 	EXECUTE v_sql;
@@ -125,15 +127,29 @@ BEGIN
 
 	ELSEIF v_action = 'UPDATE' THEN
 
+		-- EXCLUDE PRIMARY KEY FROM UPDATE
+		DELETE FROM temp_new_vals t
+		WHERE EXISTS (
+			SELECT 1
+			FROM pg_constraint con
+			JOIN pg_class c ON c.oid = con.conrelid
+			JOIN pg_namespace n ON n.oid = c.relnamespace
+			JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = ANY(con.conkey)
+			WHERE con.contype = 'p'
+			AND n.nspname = t.table_schema
+			AND c.relname = t.table_name
+			AND a.attname = t.col
+		);
+
 		v_sql = 'SELECT CONCAT(
-		''UPDATE '', table_name, '' SET '', string_agg(concat(col, '' = '', val, data_type), '', ''), '' WHERE '', '||quote_literal(v_update_where)||') AS trigger_sentence 
-		FROM temp_new_vals GROUP BY table_name, exec_order ORDER BY exec_order';
+		''UPDATE '', table_schema, ''.'', table_name, '' SET '', string_agg(concat(col, '' = '', val, data_type), '', ''), '' WHERE '', '||quote_literal(v_update_where)||') AS trigger_sentence 
+		FROM temp_new_vals GROUP BY table_schema, table_name, exec_order ORDER BY exec_order';
 
 	ELSEIF v_action = 'DELETE' THEN
 
 		v_sql = 'SELECT CONCAT(
-		''DELETE FROM '', table_name, '' WHERE '', '||quote_literal(v_update_where)||') AS trigger_sentence 
-		FROM temp_new_vals GROUP BY table_name, exec_order ORDER BY exec_order';
+		''DELETE FROM '', table_schema, ''.'', table_name, '' WHERE '', '||quote_literal(v_update_where)||') AS trigger_sentence 
+		FROM temp_new_vals GROUP BY table_schema, table_name, exec_order ORDER BY exec_order';
 
 	END IF;
 

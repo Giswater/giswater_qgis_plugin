@@ -10,7 +10,7 @@ SET search_path = cm, public, pg_catalog;
 
 INSERT INTO cat_role VALUES ('role_cm_admin');
 INSERT INTO cat_role VALUES ('role_cm_org');
-INSERT INTO cat_role VALUES ('role_cm_team');
+INSERT INTO cat_role VALUES ('role_cm_field');
 
 INSERT INTO config_param_system VALUES ('basic_selector_tab_lot',
 '{"table":"temp_om_campaign_lot","selector":"selector_lot","table_id":"lot_id","selector_id":"lot_id","label":"lot_id, '' - '', name","orderBy":"lot_id","manageAll":true,"typeaheadFilter":" AND lower(concat(lot_id, '' - '', name))","query_filter":"AND active is true ","typeaheadForced":true,"selectionMode":"keepPreviousUsingShift"}',

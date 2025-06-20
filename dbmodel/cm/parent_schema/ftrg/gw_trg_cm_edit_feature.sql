@@ -118,7 +118,7 @@ BEGIN
             )
         );
 
-        PERFORM PARENT_SCHEMA.gw_fct_cm_admin_dynamic_trigger(v_input_json);
+        PERFORM cm.gw_fct_cm_admin_dynamic_trigger(v_input_json);
 
 
 
