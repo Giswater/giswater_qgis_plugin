@@ -40,7 +40,7 @@ After that the trg_edit_link can update geometry and enpoint. By updating endpoi
 */
 
 DECLARE
-v_mantable varchar;
+v_man_table varchar;
 v_projectype varchar;
 v_arc record;
 v_connect record;
@@ -83,7 +83,7 @@ v_sql varchar;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	v_mantable:= TG_ARGV[0];
+	v_man_table:= TG_ARGV[0];
 
 	-- getting system values
 	SELECT value::boolean INTO v_dma_autoupdate FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
