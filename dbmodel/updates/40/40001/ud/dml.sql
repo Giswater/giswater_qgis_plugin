@@ -492,12 +492,15 @@ minelev, muni_id
 FROM _inp_subcatchment;
 
 -- 16/05/2025
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('dwfzone_type', '0', 'UNDEFINED', NULL, NULL) ON CONFLICT DO NOTHING;
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('dwfzone_type', '1', 'TREATED', NULL, NULL) ON CONFLICT DO NOTHING;
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('dwfzone_type', '2', 'UNTREATED', NULL, NULL) ON CONFLICT DO NOTHING;
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('dwfzone_type', '3', 'MIXED', NULL, NULL) ON CONFLICT DO NOTHING;
+DELETE FROM edit_typevalue WHERE typevalue IN('dwfzone_type', 'drainzone_type') AND id='UNDEFINED';
 
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'dwfzone_type', 'dwfzone', 'dwfzone_type', NULL, true) ON CONFLICT DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_dwf_drain_type', '0', 'UNDEFINED', NULL, NULL) ON CONFLICT DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_dwf_drain_type', '1', 'TREATED', NULL, NULL) ON CONFLICT DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_dwf_drain_type', '2', 'UNTREATED', NULL, NULL) ON CONFLICT DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_dwf_drain_type', '3', 'MIXED', NULL, NULL) ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_dwf_drain_type', 'dwfzone', 'dwfzone_type', NULL, true) ON CONFLICT DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_dwf_drain_type', 'drainzone', 'drainzone_type', NULL, true) ON CONFLICT DO NOTHING;
 
 -- 19/05/2025
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_dwfzone', 'Shows editable information about dwfzone.', 'role_edit', '{"template": [1]}', '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 1, 'DWFZONE', NULL, NULL, NULL, 'core', NULL);
