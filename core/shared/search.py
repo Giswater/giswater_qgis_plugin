@@ -213,6 +213,7 @@ class GwSearch:
     def _init_dialog(self):
         """ Initialize dialog. Make it dockable in left dock widget area """
 
+        tools_gw.add_btn_help(self.dlg_search)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self._close_search)
