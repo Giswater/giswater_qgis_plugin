@@ -109,21 +109,33 @@ BEGIN
 
 
 		IF rec_cat_label IS NULL THEN
-
-			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
-			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(COALESCE(v_function_alias, ''))||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||quote_nullable(v_cur_user)||');';
+			IF v_cur_user IS NOT NULL THEN
+				v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
+				VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(COALESCE(v_function_alias, ''))||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||v_cur_user||');';
+			ELSE
+				v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id)
+				VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(COALESCE(v_function_alias, ''))||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||');';
+			END IF;
 		ELSE
-
-			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
-			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(rec_cat_label.idval)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||quote_nullable(v_cur_user)||');';
+			IF v_cur_user IS NOT NULL THEN
+				v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
+				VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(rec_cat_label.idval)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||v_cur_user||');';
+			ELSE
+				v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id)
+				VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(rec_cat_label.idval)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||');';
+			END IF;
 		END IF;
 
 		EXECUTE v_querytext;
 
 		SELECT idval INTO v_separator FROM sys_label WHERE id = COALESCE(v_header_separator_id, 2030);
-
-		v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
-		VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||quote_nullable(v_cur_user)||');';
+		IF v_cur_user IS NOT NULL THEN
+			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||v_cur_user||');';
+		ELSE
+			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||');';
+		END IF;
 
 		EXECUTE v_querytext;
 
@@ -136,8 +148,13 @@ BEGIN
 	IF v_header_separator_id IS NOT NULL THEN
         SELECT idval INTO v_separator FROM sys_label WHERE id = COALESCE(v_header_separator_id, 2030);
 
-        v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
-        VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||quote_nullable(v_cur_user)||');';
+		IF v_cur_user IS NOT NULL THEN
+			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||v_cur_user||');';
+		ELSE
+			v_querytext := 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id)
+        	VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||quote_nullable(v_criticity)||','||quote_literal(v_separator)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||');';
+		END IF;
 
         EXECUTE v_querytext;
 
@@ -316,8 +333,13 @@ BEGIN
             rec_cat_error.log_level = v_criticity;
         END IF;
 
-        v_querytext = 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
-        VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||rec_cat_error.log_level||','||quote_literal(rec_cat_error.error_message)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||quote_nullable(v_cur_user)||');';
+		IF v_cur_user IS NOT NULL THEN
+			v_querytext = 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id, cur_user)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||rec_cat_error.log_level||','||quote_literal(rec_cat_error.error_message)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||', '||v_cur_user||');';
+		ELSE
+			v_querytext = 'INSERT INTO '||COALESCE(v_temp_table, '')||'audit_check_data (fid, result_id, criticity, error_message, fcount, table_id, column_id)
+			VALUES ('||v_fid||','||quote_nullable(v_result_id)||','||rec_cat_error.log_level||','||quote_literal(rec_cat_error.error_message)||', '||quote_nullable(v_fcount)||', '||quote_nullable(v_table_id)||', '||quote_nullable(v_column_id)||');';
+		END IF;
 
         EXECUTE v_querytext;
 
