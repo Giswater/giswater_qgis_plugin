@@ -114,9 +114,7 @@ class GwSchemaI18NUpdate:
         rows = tools_db.get_rows(sql, commit=self.dev_commit)
         if rows is None:
             return
-        
-        print(filter_)
-
+    
         result_list = []
         for row in rows:
             sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "

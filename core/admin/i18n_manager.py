@@ -380,8 +380,6 @@ class GwSchemaI18NManager:
                 update_values_str = ", ".join(update_values)
                 query_insert += f"""INSERT INTO {table_i18n} ({columns_to_insert}) VALUES ({values_str}) 
                                 ON CONFLICT ({pk_columns_str}) DO UPDATE SET {update_values_str};\n"""
-                if k == 0:
-                    print(f"query_insert: {query_insert}")
         return query_insert
 
 

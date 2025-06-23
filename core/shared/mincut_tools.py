@@ -182,7 +182,6 @@ def close_mincut_manager(**kwargs):
 
 def mincut_selector(**kwargs):
     """ Manage mincut selector """
-    print(kwargs)
     dialog = kwargs['dialog']
     class_obj = kwargs['class']
     qtable = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")

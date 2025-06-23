@@ -672,7 +672,6 @@ class GwDocument(QObject):
         extras = f'"parameters":{json.dumps(parameters)}'
         body = tools_gw.create_body(extras=extras)
         # Execute function
-        print(body)
         json_result = tools_gw.execute_procedure('gw_fct_manage_relations', body, self.schema_name, log_sql=True)
 
         if json_result['status'] == 'Accepted':
