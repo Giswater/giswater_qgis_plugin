@@ -671,7 +671,7 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
         field_id = ["element", "element"]
 
     # Adding auto-completion to a QLineEdit
-    if feature_id_widget_name:
+    if isinstance(feature_id_widget_name, str):
         feature_id = dialog.findChild(QLineEdit, feature_id_widget_name)
     else:
         feature_id = dialog.findChild(QLineEdit, 'feature_id')
@@ -3679,7 +3679,7 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         class_object.rel_layers = layers
         load_tableview_lot(dialog, feature_type, class_object.lot_id, class_object.rel_layers)
     elif selection_mode == GwSelectionMode.FEATURE_END:
-        load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
+        load_tableview_feature_end(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     elif selection_mode == GwSelectionMode.ELEMENT:
         _insert_feature_elements(dialog, class_object.feature_id, feature_type, ids=selected_ids)
