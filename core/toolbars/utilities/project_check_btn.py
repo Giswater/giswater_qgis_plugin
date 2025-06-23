@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from functools import partial
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QCheckBox
@@ -63,6 +64,7 @@ class GwProjectCheckButton(GwAction):
 
         # Set listeners
         self.dialog.btn_accept.clicked.connect(self._on_accept_clicked)
+        self.dialog.rejected.connect(partial(tools_gw.close_dialog, self.dialog))
 
         # Open the dialog
         tools_gw.open_dialog(self.dialog, dlg_name=form_type)
