@@ -1291,3 +1291,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
     "columnfind": "element_id"
   }
 }'::json, 'tbl_element_x_link', false, 1);
+
+--23/06/2025
+UPDATE inp_typevalue SET idval='TRIMMED NETWORK' WHERE typevalue='inp_options_networkmode' AND id='3';UPDATE inp_typevalue SET idval='TRIMMED NETWORK' WHERE typevalue='inp_options_networkmode' AND id='3';
