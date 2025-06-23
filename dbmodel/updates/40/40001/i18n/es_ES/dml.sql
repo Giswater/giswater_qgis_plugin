@@ -5963,7 +5963,7 @@ UPDATE sys_table SET alias = 'Shows the detalied budget of current psector', des
 UPDATE sys_table SET alias = 'View to show budget of every node related to a psector', descript = '' WHERE id = 'v_plan_psector_budget_node';
 UPDATE sys_table SET alias = '"Editable view to manage scenario for rules"', descript = 'Rules Dscenario' WHERE id = 'v_edit_inp_dscenario_rules';
 UPDATE sys_table SET alias = 'View to manage dscenario for virtualvalves', descript = 'Virtual Valve Dscenario' WHERE id = 'v_edit_inp_dscenario_virtualvalve';
-UPDATE sys_table SET alias = 'Table with polygonal geometry to relate connecs to a map zone about crm', descript = '' WHERE id = 'crm_zone';
+UPDATE sys_table SET alias = 'Table with polygonal geometry to relate connecs to a map zone about crm', descript = '' WHERE id = 'crmzone';
 UPDATE sys_table SET alias = 'Editable view for epa junction', descript = '' WHERE id = 've_epa_connec';
 UPDATE sys_table SET alias = 'Table to manage water balance values according IWA standards by period and DMA', descript = '' WHERE id = 'om_waterbalance';
 UPDATE sys_table SET alias = 'View to manage dscenario for additional pumps', descript = 'Pump Additional Dscenario' WHERE id = 'v_edit_inp_dscenario_pump_additional';

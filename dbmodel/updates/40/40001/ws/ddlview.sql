@@ -863,7 +863,7 @@ AS WITH
             ELSE link_planned.omzone_type
           END AS omzone_type,
           connec.crmzone_id,
-          crm_zone.name AS crmzone_name,
+          crmzone.name AS crmzone_name,
           CASE
             WHEN link_planned.minsector_id IS NULL THEN connec.minsector_id
             ELSE link_planned.minsector_id
@@ -993,7 +993,7 @@ AS WITH
         LEFT JOIN dqa_table ON dqa_table.dqa_id = connec.dqa_id
         LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = connec.supplyzone_id
         LEFT JOIN omzone_table ON omzone_table.omzone_id = connec.omzone_id
-        LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
+        LEFT JOIN crmzone ON crmzone.id::text = connec.crmzone_id::text
         LEFT JOIN link_planned USING (link_id)
         LEFT JOIN connec_add ON connec_add.connec_id = connec.connec_id
         LEFT JOIN value_state_type vst ON vst.id = connec.state_type

@@ -293,4 +293,4 @@ INSERT INTO plan_psector VALUES (2, 'Masterplan 02', 1, 'Expanding the capacity 
 
 INSERT INTO supplyzone VALUES (0, 'Undefined', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL);
 
-INSERT INTO crm_zone VALUES (0, 'Undefined', NULL, NULL, true);
+INSERT INTO crmzone VALUES (0, 'Undefined', NULL, NULL, true);

@@ -977,7 +977,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc"
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"closed", "dataType":"boolean", "isUtils":"False"}}$$);
 
-
+ALTER TABLE crm_zone RENAME TO crmzone;
 
 -- 13/03/2025
 -- arc
@@ -1228,7 +1228,6 @@ ALTER TABLE _pool_ DROP CONSTRAINT pool_connec_id_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_cat_valve_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_connecat_id_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_buildercat_id_fkey;
-ALTER TABLE _connec DROP CONSTRAINT connec_crmzone_id_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_district_id_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_expl_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_expl_id2_fkey;
@@ -1365,7 +1364,7 @@ CREATE TABLE connec (
 	CONSTRAINT connec_pjoint_type_check CHECK (((pjoint_type)::text = ANY (ARRAY['NODE'::text, 'ARC'::text, 'CONNEC'::text]))),
 	CONSTRAINT connec_pkey PRIMARY KEY (connec_id),
 	CONSTRAINT connec_connecat_id_fkey FOREIGN KEY (conneccat_id) REFERENCES cat_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT connec_crmzone_id_fkey FOREIGN KEY (crmzone_id) REFERENCES crm_zone(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_crmzone_id_fkey FOREIGN KEY (crmzone_id) REFERENCES crmzone(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,

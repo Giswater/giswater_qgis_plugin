@@ -5801,7 +5801,7 @@ UPDATE sys_table SET alias = 'Shows the results of the alternative result (to co
 UPDATE sys_table SET alias = 'Shows the results of the alternative result (to compare on  QGIS project) related to arc information', descript = 'Arc Maximum Values Compare' WHERE id = 'v_rpt_comp_arc';
 UPDATE sys_table SET alias = 'Defines all additional pump links contained in the network', descript = 'Pump Additional' WHERE id = 'inp_pump_additional';
 UPDATE sys_table SET alias = '"Editable view to manage scenario for rules"', descript = 'Rules Dscenario' WHERE id = 'v_edit_inp_dscenario_rules';
-UPDATE sys_table SET alias = 'Table with polygonal geometry to relate connecs to a map zone about crm', descript = '' WHERE id = 'crm_zone';
+UPDATE sys_table SET alias = 'Table with polygonal geometry to relate connecs to a map zone about crm', descript = '' WHERE id = 'crmzone';
 UPDATE sys_table SET alias = 'Table to manage scada assets', descript = '' WHERE id = 'ext_rtc_scada';
 UPDATE sys_table SET alias = 'Table to manage water balance values according IWA standards by period and DMA', descript = '' WHERE id = 'om_waterbalance';
 UPDATE sys_table SET alias = 'View to show water balance values according IWA standards by period and DMA', descript = '' WHERE id = 'v_om_waterbalance';

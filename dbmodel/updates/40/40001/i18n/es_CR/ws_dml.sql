@@ -5801,7 +5801,7 @@ UPDATE sys_table SET alias = 'Muestra los resultados del resultado alternativo (
 UPDATE sys_table SET alias = 'Muestra los resultados del resultado alternativo (para comparar en el proyecto QGIS) relacionados con la información del arco', descript = 'Comparación de valores máximos de arco' WHERE id = 'v_rpt_comp_arc';
 UPDATE sys_table SET alias = 'Define todos los enlaces de bombeo adicionales contenidos en la red', descript = 'Bomba adicional' WHERE id = 'inp_pump_additional';
 UPDATE sys_table SET alias = '"Vista editable para gestionar el escenario de las normas"', descript = 'Rules Dscenario' WHERE id = 'v_edit_inp_dscenario_rules';
-UPDATE sys_table SET alias = 'Tabla con geometría poligonal para relacionar conecs a una zona del mapa sobre crm', descript = '' WHERE id = 'crm_zone';
+UPDATE sys_table SET alias = 'Tabla con geometría poligonal para relacionar conecs a una zona del mapa sobre crm', descript = '' WHERE id = 'crmzone';
 UPDATE sys_table SET alias = 'Tabla de gestión de activos scada', descript = '' WHERE id = 'ext_rtc_scada';
 UPDATE sys_table SET alias = 'Tabla de gestión de los valores del balance hídrico según las normas IWA por periodo y DMA', descript = '' WHERE id = 'om_waterbalance';
 UPDATE sys_table SET alias = 'Vista para mostrar los valores del balance hídrico según las normas IWA por periodo y DMA', descript = '' WHERE id = 'v_om_waterbalance';

@@ -3419,3 +3419,8 @@ ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 DROP TRIGGER gw_trg_typevalue_fk ON sys_table;
 DELETE FROM sys_foreignkey WHERE typevalue_table = 'config_typevalue' AND typevalue_name = 'sys_table_context' AND target_table = 'sys_table' AND target_field = 'context';
 
+UPDATE sys_table SET id = 'crmzone'	WHERE id = 'crm_zone';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'crm_zone', 'crmzone')
+WHERE dv_querytext ILIKE '%crm_zone%';
