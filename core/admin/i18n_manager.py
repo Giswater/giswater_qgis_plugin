@@ -12,6 +12,9 @@ import psycopg2.extras
 from functools import partial
 from datetime import datetime, date
 from itertools import product
+import sys
+from collections import defaultdict
+from typing import List, Dict, Any
 
 
 from ..ui.ui_manager import GwSchemaI18NManagerUi
@@ -26,6 +29,11 @@ class GwSchemaI18NManager:
         self.plugin_dir = lib_vars.plugin_dir
         self.schema_name = lib_vars.schema_name
         self.project_type_selected = None
+        self.no_beautify_keys = []
+        self.primary_keys_no_project_type_i18n = []
+        self.primary_keys_no_project_type_org = []
+        self.values_en_us = []
+        self.conflict_project_type = []
 
     def init_dialog(self):
         """ Constructor """
@@ -221,7 +229,7 @@ class GwSchemaI18NManager:
         self.py_messages = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_messages)
         self.py_dialogs = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_dialogs)
         self.delete_old_keys = False
-        self.schema_i18n = "i18n"
+        self.schema_i18n = "i18n_proves_1"
 
         if self.project_types:
             self._update_db_tables()
@@ -231,6 +239,9 @@ class GwSchemaI18NManager:
 
         if self.py_dialogs:
             self._update_py_dialogs()
+
+        msg = "Process completed"
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
 
 
     # region Missing DB Dialogs
@@ -274,7 +285,7 @@ class GwSchemaI18NManager:
                 # Check if the table has already been determined as not existing
                 if table_i18n not in no_repeat_table:
                     #Get basic information about the table and project
-                    table_exists = self.detect_table_func(table_i18n)
+                    table_exists = self.detect_table_func(table_i18n, self.cursor_i18n)
                     correct_lang = self._verify_lang()
                     self._change_table_lyt(table_i18n.split(".")[1])
 
@@ -290,7 +301,8 @@ class GwSchemaI18NManager:
                         text_error += self._update_tables(table_i18n)
 
                         # check for all primary keys reapeted, but project_types
-                        text_error += self._update_project_type(table_i18n)
+                        if self.project_type == 'ud':
+                            text_error += self._rewrite_project_type(table_i18n)
                         self._vacuum_commit(table_i18n, self.conn_i18n, self.cursor_i18n)
                     else:
                         msg = "Incorrect languages, make sure to have the giswater project in english"
@@ -298,7 +310,7 @@ class GwSchemaI18NManager:
                         break
 
         self.dlg_qm.lbl_info.clear()
-        tools_qt.show_info_box(text_error)
+        self.save_and_open_text_error(text_error)
 
     def _update_tables(self, table_i18n):
         """ Update the table """
@@ -310,7 +322,13 @@ class GwSchemaI18NManager:
         # Set the query message
         query = ""
         for table_org in tables_org:
-            if "json" in table_i18n:
+            table_exists = self.detect_table_func(f"{self.schema_org}.{table_org}", self.cursor_org)
+            if not table_exists:
+                msg = "The table ({0}) does not exists"
+                msg_params = (table_i18n,)
+                tools_qt.show_info_box(msg, msg_params=msg_params)
+                return f"The table ({table_org}) does not exists\n"
+            elif "json" in table_i18n:
                 query += self._json_update(table_i18n, table_org)
             elif "dbconfig_form_fields_feat" in table_i18n:
                 query += self._dbconfig_form_fields_feat_update(table_i18n)
@@ -319,293 +337,239 @@ class GwSchemaI18NManager:
 
         # Determine the return message acording to the query message 
         if query == '':
-            return f'{table_i18n.split(".")[1]}: 1- No update needed. '
+            text_return = f'{table_i18n.split(".")[1]}: 1- No update needed. '
+            
         else:
             try:
                 self.cursor_i18n.execute(query)
                 self.conn_i18n.commit()
-                return f'{table_i18n.split(".")[1]}: 1- Succesfully updated table. '
+                text_return = f'{table_i18n.split(".")[1]}: 1- Succesfully updated table. '
             except Exception as e:
                 self.conn_i18n.rollback()
-                print(query)
-                return f"\nAn error occured while translating {table_i18n}: {e}\n"
+                text_return = f"\nAn error occured while translating {table_i18n}: {e}\n"
+        if self.project_type != 'ud':
+            text_return += "\n"
+        return text_return
+
 
     def _update_any_table(self, table_i18n, table_org):
-        """ Update table with the classical format (no %json and no config_form_fields_feat) """
+        """Insert and update rows in a classical translation table."""
 
-        # Get the columns and rows to compare
-        columns_i18n, columns_org, names = self._get_rows_to_compare(table_i18n, table_org)
+        diff_rows, columns_i18n = self._rows_to_update(table_i18n, table_org)
+
+        if not diff_rows:
+            return ""
+
+        columns_org = diff_rows[0].keys()
+        columns_to_insert = ", ".join(columns_i18n)
+        pk_columns = [col for col in columns_i18n if not col.endswith("_en_us")]
+        pk_columns_str = ", ".join(pk_columns)
+
+        query_insert = ""
+        if diff_rows:
+            for k, row in enumerate(diff_rows):
+                values = []
+                update_values = []
+                for col in columns_org:
+                    val = row.get(col)
+                    values.append("NULL" if val in [None, ''] else f"'{str(val).replace("'", "''")}'")
+                for col in self.values_en_us:
+                    update_values.append(f"{col} = EXCLUDED.{col}")
+
+                values_str = ", ".join(values)
+                update_values_str = ", ".join(update_values)
+                query_insert += f"""INSERT INTO {table_i18n} ({columns_to_insert}) VALUES ({values_str}) 
+                                ON CONFLICT ({pk_columns_str}) DO UPDATE SET {update_values_str};\n"""
+                if k == 0:
+                    print(f"query_insert: {query_insert}")
+        return query_insert
+
+
+    def _get_columns_to_compare(self, table_i18n, table_org):
+        """ Get the columns and rows to compare """
+
+        # Set the columns and rows to compare
+        # Columns_i18n (columns translation DB), Colums_org (columns original DB), names (colums to translate in original DB)
+        if 'dbconfig_form_fields' in table_i18n:
+            columns_i18n = ["formname", "formtype", "source", "lb_en_us", "tt_en_us"]
+            columns_org = ["formname", "formtype", "columnname", "label", "tooltip"]
+
+        elif 'dbparam_user' in table_i18n:
+            columns_i18n = ["source", "formname", "lb_en_us", "tt_en_us"]
+            columns_org = ["id", "formname", "label", "descript"]
+
+        elif 'dbconfig_param_system' in table_i18n:
+            columns_i18n = ["source", "lb_en_us", "tt_en_us"]
+            columns_org = ["parameter", "label", "descript"]
+
+        elif 'dbconfig_typevalue' in table_i18n:
+            columns_i18n = ["formname", "formtype", "source", "tt_en_us"]
+            columns_org = ["typevalue", "id", "idval"]
+
+        elif 'dbmessage' in table_i18n:
+            columns_i18n = ["CAST(source AS INTEGER) AS source", "CAST(log_level AS INTEGER) AS log_level",
+                             "ms_en_us", "ht_en_us"]
+            columns_org = ["id", "log_level", "error_message", "hint_message"]
+
+        elif 'dbfprocess' in table_i18n:
+            columns_i18n = ["CAST(source AS INTEGER) AS source", "ex_en_us", "in_en_us", "na_en_us"]
+            columns_org = ["fid", "except_msg", "info_msg", "fprocess_name"]
+
+        elif 'dbconfig_csv' in table_i18n:
+            columns_i18n = ["CAST(source AS INTEGER) AS source", "al_en_us", "ds_en_us"]
+            columns_org = ["fid", "alias", "descript"]
+
+        elif 'dbconfig_form_tabs' in table_i18n:
+            columns_i18n = ["formname", "source", "lb_en_us", "tt_en_us"]
+            columns_org = ["formname", "tabname", "label", "tooltip"]
+
+        elif 'dbconfig_report' in table_i18n:
+            columns_i18n = ["CAST(source AS INTEGER) AS source", "al_en_us", "ds_en_us"]
+            columns_org = ["id", "alias", "descript"]
+
+        elif 'dbconfig_toolbox' in table_i18n:
+            columns_i18n = ["CAST(source AS INTEGER) AS source", "al_en_us", "ob_en_us"]
+            columns_org = ["id", "alias", "observ"]
+
+        elif 'dbfunction' in table_i18n:
+            columns_i18n = ["CAST(source AS INTEGER) AS source", "ds_en_us"]
+            columns_org = ["id", "descript"]
+
+        elif 'dbtypevalue' in table_i18n:
+            columns_i18n = ["typevalue", "source", "vl_en_us", "ds_en_us"]
+            columns_org = ["typevalue", "id", "idval", "descript"]
+    
+        elif 'dbconfig_form_tableview' in table_i18n:
+            columns_i18n = ["location_type", "columnname", "source", "al_en_us"]
+            columns_org = ["location_type", "columnname", "objectname", "alias"]
+
+        elif 'dbtable' in table_i18n:
+            columns_i18n = ["source", "ds_en_us", "al_en_us"]
+            columns_org = ["id", "descript", "alias"]
+
+        # Update the su_basic_tables table (It has a different format, more than one table_org)
+        elif 'su_basic_tables' in table_i18n:
+            columns_i18n = ["source", "na_en_us", "ob_en_us"]
+            columns_org = ["id", "name"]            
+            if table_org == "value_state" and self.project_type in ["ud", "ws"]:
+                columns_org = ["id", "name", "observ"]      
+            elif table_org == "sys_label":
+                columns_org = ["id", "idval"]
+            elif self.project_type == "am":
+                columns_org = ["id", "idval"]
+
+        elif 'su_feature' in table_i18n:
+            columns_i18n = ["feature_class", "feature_type", "lb_en_us", "ds_en_us"]
+            columns_org = ["feature_class", "feature_type", "id", "descript"]
+
+        elif 'dbconfig_engine' in table_i18n:
+            columns_i18n = ["parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
+            columns_org = ["parameter", "method", "label", "descript", "placeholder"]
+
+        columns_i18n = columns_i18n + ["project_type", "source_code", "context"]
+
+        return columns_i18n, columns_org
+
+    # endregion
+    # region functions to get the rows to update
+    def _rows_to_update(self, table_i18n, table_org):
+        """Get the rows to update."""
+
+        self.primary_keys_no_project_type_i18n = []
+        self.values_en_us = []
+        self.conflict_project_type = []
+
+        columns_i18n, columns_org = self._get_columns_to_compare(table_i18n, table_org)
+        rows_i18n, rows_org = self._get_rows_to_compare(table_i18n, columns_i18n, columns_org, table_org)
+
+        for i, column in enumerate(columns_i18n):
+            if "CAST(" in column:
+                columns_i18n[i] = column[5:].split(" ")[0]
+            if column not in ["project_type"]:
+                self.conflict_project_type.append(columns_i18n[i])
+                if "en_us" not in columns_i18n[i]:
+                    self.primary_keys_no_project_type_i18n.append(columns_i18n[i])
+                else:
+                    self.values_en_us.append(columns_i18n[i])
+
+        if rows_i18n:
+            cleaned_i18n = []
+            for i, row in enumerate(rows_i18n):
+                clean_row = row.copy()
+                for col in columns_i18n:
+                    col_name = col
+                    value = clean_row.get(col_name, '')
+                    if value is None:
+                        clean_row[col_name] = ''
+                    if col_name == "project_type" and ((value == "utils" and self.project_type in ['ws', 'ud']) or value == None):
+                        clean_row[col_name] = self.project_type
+                cleaned_i18n.append(clean_row)
+            rows_i18n = cleaned_i18n
+
+        if rows_org:
+            cleaned_org = []
+            extra_columns = {"project_type": self.project_type, "source_code": "giswater", "context": table_org}
+            for row in rows_org:
+                clean_row = row.copy()
+                for key, value in extra_columns.items():
+                    columns_org.append(key)
+                    clean_row[key] = value
+                for col in columns_org:
+                    value = clean_row.get(col, '')
+                    if value is None:
+                        clean_row[col] = ''
+                cleaned_org.append(clean_row)
+            rows_org = cleaned_org
+        
+        # Efficient diff using set of tuples
+        diff_rows = self._set_operation_on_dict(rows_org, rows_i18n, op='-', compare='values')
+
+        return diff_rows, columns_i18n
+
+
+    def _get_rows_to_compare(self, table_i18n, columns_i18n, columns_org, table_org):
+        """ Get the rows to compare """
 
         columns = ", ".join(columns_i18n)
-        query = f"SELECT {columns} FROM {table_i18n};"
+        query = f"SELECT {columns} FROM {table_i18n}"
+        if self.project_type in ["cm", "am"]:
+            query += f" WHERE project_type = '{self.project_type}' OR project_type = 'utils'"
+        query += ";"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
 
         columns = ", ".join(columns_org)
         query = f"SELECT {columns} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
 
-        # Change None values to "" t be able to compare them
-        query = ""
-        if rows_i18n:
-            for row_i18n in rows_i18n:
-                for column_i18n in columns_i18n:
-                    if "CAST(" in column_i18n:
-                        column_i18n = column_i18n[5:].split(" ")[0]
-                    if row_i18n[column_i18n] is None:
-                        row_i18n[column_i18n] = ''
-
-        for row_org in rows_org:
-            # Change None values to "" t be able to compare them
-            for column_org in columns_org:
-                if row_org[column_org] is None:
-                    row_org[column_org] = ''
-
-            row_org_com = row_org
-
-            # Add the project type to the row if org does not have it
-            no_project_type = ["dbconfig_form_fields", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", "dbconfig_toolbox",
-                               "edit_typevalue", "plan_typevalue", "om_typevalue", "dbtable", "su_feature", "su_basic_tables"]
-            if table_i18n in no_project_type:
-               row_org_com.append(self.project_type)
-
-            # Check if the row from org doesn't exist in i18n, and construct the query
-            if rows_i18n is None or row_org_com not in rows_i18n:
-                # Safely handle NULL values and extrange charcaters and avoid SQL injection
-                texts = []
-                for name in names:
-                    value = f"'{row_org[name].replace("'", "''")}'" if row_org[name] not in [None, ''] else 'NULL'
-                    texts.append(value)
-
-                # Construct the query
-                if 'dbconfig_form_fields' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us) 
-                                    VALUES ('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}',
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (context, source_code, project_type, source, formname, formtype) 
-                                    DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
-
-                elif 'dbparam_user' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, source, formname, project_type, lb_en_us, tt_en_us) 
-                                    VALUES ('{table_org}', 'giswater', '{row_org['id']}', '{row_org['formname']}', '{row_org['project_type']}',
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (context, source_code, project_type, source, formname) 
-                                    DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
-
-                elif 'dbconfig_param_system' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, lb_en_us, tt_en_us) 
-                                    VALUES ('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['parameter']}',
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (context, source_code, project_type, source) 
-                                    DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
-
-                elif 'dbconfig_typevalue' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, tt_en_us) 
-                                    VALUES ('{table_org}', 'giswater', '{self.project_type}', '{row_org['id']}', '{row_org['typevalue']}', 
-                                    'form_feature', {texts[0]}) 
-                                    ON CONFLICT (context, source_code, project_type, source, formname, formtype) 
-                                    DO UPDATE SET tt_en_us = {texts[0]};\n"""
-
-                elif 'dbmessage' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, log_level, source, ms_en_us, ht_en_us) 
-                                    VALUES ('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['log_level']}','{row_org['id']}', 
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, project_type, context, log_level, source)  
-                                    DO UPDATE SET ms_en_us = {texts[0]}, ht_en_us = {texts[1]};\n"""
-
-                elif 'dbfprocess' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, ex_en_us, in_en_us, na_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{row_org['project_type']}', '{row_org['fid']}', 
-                                    {texts[0]}, {texts[1]}, {texts[2]}) 
-                                    ON CONFLICT (source_code, project_type, context, source) 
-                                    DO UPDATE SET ex_en_us = {texts[0]}, in_en_us = {texts[1]}, na_en_us = {texts[2]};\n"""
-
-                elif 'dbconfig_csv' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, al_en_us, ds_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['fid']}', 
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, project_type, context, source) 
-                                    DO UPDATE SET al_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""
-
-                elif 'dbconfig_form_tabs' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, formname, source, lb_en_us, tt_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['formname']}', '{row_org['tabname']}', 
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, project_type, context, formname, source) 
-                                    DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
-
-                elif 'dbconfig_report' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, al_en_us, ds_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', 
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, project_type, context, source) 
-                                    DO UPDATE SET al_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""
-
-                elif 'dbconfig_toolbox' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, al_en_us, ob_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', 
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, project_type, context, source) 
-                                    DO UPDATE SET al_en_us = {texts[0]}, ob_en_us = {texts[1]};\n"""
-
-                elif 'dbfunction' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, ds_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', 
-                                    {texts[0]}) 
-                                    ON CONFLICT (source_code, project_type, context, source) 
-                                    DO UPDATE SET ds_en_us = {texts[0]};\n"""
-
-                elif 'dbtypevalue' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, typevalue, source, vl_en_us, ds_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['typevalue']}', '{row_org['id']}', 
-                                    {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, project_type, context, typevalue, source) 
-                                    DO UPDATE SET vl_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""
-
-                elif 'dbconfig_form_tableview' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, location_type, columnname, source, al_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{row_org['project_type']}', '{row_org['location_type']}', '{row_org['columnname']}', '{row_org['objectname']}', 
-                                    {texts[0]}) 
-                                    ON CONFLICT (source_code, context, project_type, location_type, columnname, source) 
-                                    DO UPDATE SET al_en_us = {texts[0]};\n"""
-
-                elif 'dbtable' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, ds_en_us, al_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, context, project_type, source) 
-                                    DO UPDATE SET ds_en_us = {texts[0]}, al_en_us = {texts[1]};\n"""
-
-                elif 'su_basic_tables' in table_i18n:
-                    source = row_org["id"]
-                    if table_org in ["value_state_type", "sys_label"] or self.project_type == "am":
-                        texts.append('null')
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, na_en_us, ob_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{source}', {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, context, project_type, source) 
-                                    DO UPDATE SET na_en_us = {texts[0]}, ob_en_us = {texts[1]};\n"""
-
-                elif 'su_feature' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, feature_class, feature_type, lb_en_us, ds_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org["feature_class"]}', '{row_org["feature_type"]}', {texts[0]}, {texts[1]}) 
-                                    ON CONFLICT (source_code, context, project_type, feature_class, feature_type, lb_en_us) 
-                                    DO UPDATE SET lb_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""
-
-                elif 'dbconfig_engine' in table_i18n:
-                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, parameter, method, lb_en_us, ds_en_us, pl_en_us) 
-                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org["parameter"]}', '{row_org["method"]}', {texts[0]}, {texts[1]}, {texts[2]}) 
-                                    ON CONFLICT (source_code, context, project_type, parameter, method) 
-                                    DO UPDATE SET lb_en_us = {texts[0]}, ds_en_us = {texts[1]}, pl_en_us = {texts[2]};\n"""
-
-                query += query_row
-        return query
-
-    def _get_rows_to_compare(self, table_i18n, table_org):
-        """ Get the columns and rows to compare """
-
-        # Set the columns and rows to compare
-        # Columns_i18n (columns translation DB), Colums_org (columns original DB), names (colums to translate in original DB)
-        if 'dbconfig_form_fields' in table_i18n:
-            columns_i18n = ["formname", "formtype", "source", "lb_en_us", "tt_en_us", "project_type"]
-            columns_org = ["formname", "formtype", "columnname", "label", "tooltip"]
-            names = ["label", "tooltip"]
-
-        elif 'dbparam_user' in table_i18n:
-            columns_i18n = ["project_type", "source", "formname", "lb_en_us", "tt_en_us"]
-            columns_org = ["project_type", "id", "formname", "label", "descript"]
-            names = ["label", "descript"]
-
-        elif 'dbconfig_param_system' in table_i18n:
-            columns_i18n = ["project_type", "source", "lb_en_us", "tt_en_us"]
-            columns_org = ["project_type", "parameter", "label", "descript"]
-            names = ["label", "descript"]
-
-        elif 'dbconfig_typevalue' in table_i18n:
-            columns_i18n = ["formname", "source", "tt_en_us"]
-            columns_org = ["typevalue", "id", "idval"]
-            names = ["idval"]
-
-        elif 'dbmessage' in table_i18n:
-            columns_i18n = ["project_type", "CAST(source AS INTEGER) AS source", 
-                            "CAST(log_level AS INTEGER) AS log_level", "ms_en_us", "ht_en_us"]
-            columns_org = ["project_type", "id", "log_level", "error_message", "hint_message"]
-            names = ["error_message", "hint_message"]
-
-        elif 'dbfprocess' in table_i18n:
-            columns_i18n = ["project_type", "CAST(source AS INTEGER) AS source", "ex_en_us", "in_en_us", "na_en_us"]
-            columns_org = ["project_type", "fid", "except_msg", "info_msg", "fprocess_name"]
-            names = ["except_msg", "info_msg", "fprocess_name"]
-
-        elif 'dbconfig_csv' in table_i18n:
-            columns_i18n = ["project_type", "source", "al_en_us", "ds_en_us"]
-            columns_org = ["fid", "alias", "descript"]
-            names = ["alias", "descript"]
-
-        elif 'dbconfig_form_tabs' in table_i18n:
-            columns_i18n = ["project_type", "formname", "source", "lb_en_us", "tt_en_us"]
-            columns_org = ["formname", "tabname", "label", "tooltip"]
-            names = ["label", "tooltip"]
-
-        elif 'dbconfig_report' in table_i18n:
-            columns_i18n = ["project_type", "source", "al_en_us", "ds_en_us"]
-            columns_org = ["id", "alias", "descript"]
-            names = ["alias", "descript"]
-
-        elif 'dbconfig_toolbox' in table_i18n:
-            columns_i18n = ["project_type", "source", "al_en_us", "ob_en_us"]
-            columns_org = ["id", "alias", "observ"]
-            names = ["alias", "observ"]
-
-        elif 'dbfunction' in table_i18n:
-            columns_i18n = ["project_type", "source", "ds_en_us"]
-            columns_org = ["project_type", "id", "descript"]
-            names = ["descript"]
-
-        elif 'dbtypevalue' in table_i18n:
-            columns_i18n = ["project_type", "typevalue", "source", "vl_en_us"]
-            columns_org = ["typevalue", "id", "idval", "descript"]
-            names = ["idval", "descript"]
-
-        elif 'dbconfig_form_tableview' in table_i18n:
-            columns_i18n = ["project_type", "location_type", "source", "al_en_us"]
-            columns_org = ["project_type", "location_type", "objectname", "columnname", "alias"]
-            names = ["columnname"]
-
-        elif 'dbtable' in table_i18n:
-            columns_i18n = ["project_type", "source", "ds_en_us", "al_en_us"]
-            columns_org = ["id", "descript", "alias"]
-            names = ["descript", "alias"]
-
-        # Update the su_basic_tables table (It has a different format, more than one table_org)
-        elif 'su_basic_tables' in table_i18n:
-            columns_i18n = ["project_type", "source", "na_en_us", "ob_en_us"]
-            columns_org = ["id", "name"]
-            names = ["name"]
-            if table_org == "value_state" and self.project_type in ["ud", "ws"]:
-                columns_org = ["id", "name", "observ"]
-                names = ["name", "observ"]
-            elif table_org == "sys_label":
-                columns_org = ["id", "idval"]
-                names = ["idval"]
-            elif self.project_type == "am":
-                columns_org = ["id", "idval"]
-                names = ["idval"]
-
-        elif 'su_feature' in table_i18n:
-            columns_i18n = ["project_type", "feature_class", "feature_type", "lb_en_us", "ds_en_us"]
-            columns_org = ["feature_class", "feature_type", "id", "descript"]
-            names = ["id", "descript"]
-
-        elif 'dbconfig_engine' in table_i18n:
-            columns_i18n = ["project_type", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
-            columns_org = ["parameter", "method", "label", "descript", "placeholder"]
-            names = ["label", "descript", "placeholder"]
-
-        return columns_i18n, columns_org, names
+        return rows_i18n, rows_org
+    
+    def _get_pk_rows(self, table_i18n):
+        """ Get the primary key columns from the table """
+        query = f"""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = '{table_i18n.split('.')[1]}'
+            AND table_schema = '{table_i18n.split('.')[0]}'
+            AND is_primary_key = true;"""
+        self.cursor_i18n.execute(query)
+        pk_columns = [row[0] for row in self.cursor_i18n.fetchall()]
+        query = f"SELECT {', '.join(pk_columns)} FROM {table_i18n};"
+        self.cursor_i18n.execute(query)
+        return self.cursor_i18n.fetchall()
 
     # endregion
     # region Json
 
     def _json_update(self, table_i18n, table_org):
         """ Update the table with the json format """
+
+        if table_i18n.split('.')[1] == "dbconfig_form_fields_json":
+            self.conflict_project_type = ["source_code", "context", "formname", "formtype", "source", "hint", "text", "lb_en_us"]
+        elif table_i18n.split('.')[1] == "dbjson":
+            self.conflict_project_type = ["source_code", "context", "hint", "text", "source", "lb_en_us"]
+        
+        self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
+        self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
 
         # Set the column to update in the table_org (filterparam, inputparams, widgetcontrols)
         column = ""
@@ -727,154 +691,303 @@ class GwSchemaI18NManager:
 
     # endregion
     # region Rewrite Project_type
-    def _update_project_type(self, table):
-        """Function to rewrite the repeated rows with different project_type to only one with project_type = 'utils'"""
+        
+    def _rewrite_project_type(self, table):
+        """Rewrite the project_type to the correct value"""
 
-        # Step 1: Determine column names
-        try:
-            self._detect_column_names(table)
-        except Exception as e:
-            return f"Error detecting primary keys (Rename proj.type): {e}"
+        text = self._update_fake_utils(table)
+        if text:
+            return text
 
-        # Step 2: Get the duplicated rows
         query = self._get_duplicates_rows(table)
-        print(query)
         try:
             self.cursor_i18n.execute(query)
-            initial_rows = self.cursor_i18n.fetchall()
+            duplicated_rows = self.cursor_i18n.fetchall()
         except Exception as e:
-            return f"Error getting dupplicates (Rename proj.type): {e}"
+            return f"Error getting dupplicates (Rename proj.type): {e}\n\n"
 
-        # Step 3: Create the rows with the correct project_type
-        final_rows = []
-        primary_rows = []
-        final_rows_no_utils = []
-        for row in initial_rows:
-            primary_row = [row[primary_key] for primary_key in self.primary_keys if primary_key != 'project_type']
-            if row['project_type'] in ['ws', 'ud', 'utils']:
-                if primary_row not in primary_rows:
-                    final_rows.append(row)
-                    primary_rows.append(primary_row)
-            elif row['project_type'] not in [None, 'None', '']:
-                final_rows_no_utils.append(row)
+        if duplicated_rows:
+            delete_query, update_query = self._update_project_type(table, duplicated_rows)
+            try:
+                self.cursor_i18n.execute(delete_query)
+                self.conn_i18n.commit()
+            except Exception as e:
+                self.conn_i18n.rollback()
+                return f"Error deleting repeated rows (Rename proj.type): {e}\n\n"
 
-        # Step 4: Delete the initial rows that are duplicates (those that will be replaced by final_rows)
-        delete_query = self._delete_duplicates_rows(table)
+            try:
+                self.cursor_i18n.execute(update_query)
+                self.conn_i18n.commit()
+            except Exception as e:
+                self.conn_i18n.rollback()
+                return f"Error updating project_type (Rename proj.type): {e}, {update_query}\n\n\n\n {delete_query}"
+        else:
+            return "No repeated rows found (Rename proj.type)\n"
+
+        return "Rows updated succesfully (Rename proj.type)\n"
+
+
+    def _update_fake_utils(self, table):
+        """Update labels of old utils rows"""
+
+        values_en_us_ud = []
+        values_en_us_ws = []
+        values_en_us_utils = []
+        # Agafar els valors de %_en_us
+        fake_pks_ud = self._get_fake_primary_keys(table, "ud")
+        if fake_pks_ud:
+            values_en_us_ud = self._get_values_en_us(table, fake_pks_ud, "ud")
+
+        fake_pks_ws = self._get_fake_primary_keys(table, "ws")
+        if fake_pks_ws:
+            values_en_us_ws = self._get_values_en_us(table, fake_pks_ws, "ws")
+        
+        fake_pks_utils = self._get_fake_primary_keys(table, "utils")
+        if fake_pks_utils:
+            values_en_us_utils = self._get_values_en_us(table, fake_pks_utils, "utils")
+
+        if values_en_us_ud or values_en_us_ws or values_en_us_utils:
+            new_values_en_us = self._set_operation_on_dict(values_en_us_ud, values_en_us_ws, op='&')
+            delete_values_en_us = self._set_operation_on_dict(values_en_us_ud, values_en_us_ws, op='^')
+            values_utils_to_ud = self._set_operation_on_dict(values_en_us_ws, delete_values_en_us, op='&')
+            values_utils_to_ws = self._set_operation_on_dict(values_en_us_ud, delete_values_en_us, op='&')
+
+            if new_values_en_us:
+               self._update_values_en_us(table, new_values_en_us)
+
+            if values_utils_to_ws:
+                self._update_utils_values(table, values_utils_to_ws, 'ws')
+
+            if values_utils_to_ud:
+                self._update_utils_values(table, values_utils_to_ud, 'ud')
+
+            if delete_values_en_us:
+               self._delete_fake_utils(table, delete_values_en_us)
+        
+
+    def _get_values_en_us(self, table, fake_pks, project_type):
+        """Get the values of the en_us column using a single query"""
+
+        if not fake_pks:
+            return []
+
+        pk_columns = self.primary_keys_no_project_type_i18n
+        all_columns = self.values_en_us + pk_columns if project_type != 'utils' else pk_columns + ['project_type']
+        columns = ", ".join(all_columns)
+
+        value_tuples = []
+        for row in fake_pks:
+            values = []
+            for col in pk_columns:
+                if row[col] is None:
+                    values.append(f"{col} IS NULL")
+                elif row[col].startswith("[{'") and row[col].endswith("}]") or row[col].startswith("{'") and row[col].endswith("}"):
+                    values.append(f"{col} = $${row[col]}$$")
+                else:
+                    values.append(f"{col} = '{row[col]}'")
+            values.append(f"project_type = '{project_type}'")
+            value_tuples.append(f"({" AND ".join(values)})")
+
+        where_clause = " OR ".join(value_tuples)
+
+        query = f"SELECT {columns} FROM {table} WHERE {where_clause};"
+
+        # Execute single query
+        rows = self._get_rows(query, self.cursor_i18n)
+
+        return rows
+
+
+    def _update_utils_values(self, table, rows_values_en_us, project_type):
+        """Update the project_type values when two similar rows (ws and utils) no longer have the same en_us value"""
+
+        # Build WHERE clause from existing values
+        clause_sql = []
+        for row in rows_values_en_us:
+            text = []
+            for column in self.primary_keys_no_project_type_i18n:
+                if row[column] is None:
+                    text.append(f"{column} IS NULL")
+                else:
+                    escaped_value = str(row[column]).replace("'", "''")
+                    text.append(f"{column} = '{escaped_value}'")
+            clause_sql.append(f"({' AND '.join(text)} AND project_type = 'utils')")
+        
+        where_clause = ' OR '.join(clause_sql)
+
+        # Fetch full matching rows
+        query = f"SELECT * FROM {table} WHERE {where_clause}"
+        complete_rows = self._get_rows(query, self.cursor_i18n)
+
+        if not complete_rows:
+            return  # Nothing to update
+
+        # Build INSERT statement
+        values_sql = []
+        columns = list(complete_rows[0].keys())  # assumes all rows have the same keys
+
+        for row in complete_rows:
+            row_values = []
+            for col in columns:
+                if col == 'project_type':
+                    val = project_type
+                else:
+                    val = row.get(col)
+                if val is None:
+                    row_values.append("NULL")
+                else:
+                    escaped_val = str(val).replace("'", "''")
+                    row_values.append(f"'{escaped_val}'")
+            values_sql.append(f"({', '.join(row_values)})")
+
+        values_block = ',\n'.join(values_sql)
+        query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES {values_block} ON CONFLICT DO NOTHING"
+
+        self.cursor_i18n.execute(query)
+        self.conn_i18n.commit()
+
+
+    def _update_values_en_us(self, table, rows_values_en_us):
+        """Bulk update the values of the en_us columns for rows with project_type = 'utils' and matching primary keys, using a single optimized query."""
+        if not rows_values_en_us:
+            return
+
+        # All columns to use in VALUES: primary keys + en_us columns
+        pk_cols = self.primary_keys_no_project_type_i18n
+        en_us_cols = self.values_en_us
+        all_cols = pk_cols + en_us_cols
+
+        # Build the VALUES part
+        values_sql = []
+        for row in rows_values_en_us:
+            row_values = []
+            for col in all_cols:
+                val = row.get(col, None)
+                if val is None:
+                    row_values.append('NULL')
+                else:
+                    row_values.append(f"'{str(val).replace("'", "''")}'")
+            values_sql.append(f"({', '.join(row_values)})")
+        values_block = ',\n'.join(values_sql)
+
+        # Build the SET clause
+        set_clauses = [f"{col} = v.{col}" for col in en_us_cols]
+        set_clause = ', '.join(set_clauses)
+
+        # Build the join condition for primary keys
+        join_conditions = [f"t.{col} = v.{col}" for col in pk_cols]
+        join_condition = ' AND '.join(join_conditions)
+
+        # Compose the full query
+        query = f"""
+            UPDATE {table} AS t
+            SET {set_clause}
+            FROM (
+            VALUES {values_block} 
+            )AS v ({', '.join(all_cols)})
+            WHERE t.project_type = 'utils' AND {join_condition};
+        """
+        self.cursor_i18n.execute(query)
+        self.conn_i18n.commit()
+
+
+    def _get_fake_primary_keys(self, table, project_type):
+        columns = ",".join(self.primary_keys_no_project_type_i18n)
+        in_project_type = project_type if project_type != 'utils' else "ws', 'ud"
+        query = f"""
+            SELECT {columns}
+            FROM {table}
+            WHERE TRIM(project_type) IN ('{in_project_type}', 'utils')
+            GROUP BY {columns}
+            HAVING
+                COUNT(*) > 1
+                AND SUM(CASE WHEN project_type = '{project_type}' THEN 1 ELSE 0 END) > 0
+                AND SUM(CASE WHEN project_type = 'utils' THEN 1 ELSE 0 END) > 0;
+        """
+        duplicated_rows = self._get_rows(query, self.cursor_i18n)
+
+        query = f"SELECT {columns} FROM {table} WHERE project_type = '{project_type}';"
+        all_rows = self._get_rows(query, self.cursor_i18n)
+
+        fake_rows = self._set_operation_on_dict(all_rows, duplicated_rows, op='&', compare='values')
+
+        all_values = {tuple(row[col] for col in self.primary_keys_no_project_type_i18n) for row in all_rows}
+        duplicated_values = {tuple(row[col] for col in self.primary_keys_no_project_type_i18n) for row in duplicated_rows}
+        fake_values = all_values & duplicated_values
+        fake_rows = [dict(zip(self.primary_keys_no_project_type_i18n, values)) for values in fake_values]
+
+        return fake_rows
+    
+    
+    def _get_duplicates_rows(self, table):
+        """Get the duplicated rows"""
+        columns = ",".join(self.conflict_project_type)
+        query = f"""
+            SELECT {columns}
+            FROM {table}
+            WHERE project_type IN ('ws', 'ud', 'utils')
+            GROUP BY {columns}
+            HAVING COUNT(*) > 1;
+        """
+        return query
+    
+
+    def _update_project_type(self, table, duplicated_rows):
+        """Update the project_type to the correct value"""
+        
+        all_columns = self._get_all_columns(table)
+        pk_columns = []
+        update_query = ""
+        delete_query = ""
+        for k, row in enumerate(duplicated_rows):
+            text = []
+            for column in self.conflict_project_type:
+                if k == 0:
+                    pk_columns.append(column)
+
+                if row[column] is None:
+                    text.append(f"{column} IS NULL")
+                else:
+                    text.append(f"{column} = '{str(row[column]).replace("'", "''")}'")
+
+            where_clause = " AND ".join(text)
+            pk_colums_str = ", ".join(pk_columns)
+            
+            delete_query += f"""
+                WITH Ranked AS (SELECT ctid, ROW_NUMBER() OVER (PARTITION BY {pk_colums_str} ORDER BY lastupdate ASC) AS rn 
+                FROM {table} WHERE {where_clause})
+                DELETE FROM {table} WHERE ctid IN (SELECT ctid FROM Ranked WHERE rn > 1);
+                """
+
+            update_query += f"""
+                UPDATE {table} SET project_type = 'utils' WHERE {where_clause};\n
+            """
+        return delete_query, update_query
+
+    def _delete_fake_utils(self, table, fake_rows):
+        """Delete the fake utils rows"""
+        
+        delete_query = ""
+        columns = self.primary_keys_no_project_type_i18n
+        for k, row in enumerate(fake_rows):
+            text = []
+            for column in columns:
+                if row[column] is None:
+                    text.append(f"{column} IS NULL")
+                else:
+                    text.append(f"{column} = '{str(row[column]).replace("'", "''")}'")
+
+            where_clause = " AND ".join(text)
+            where_clause += f" AND project_type = 'utils'"
+            
+            delete_query += f"""
+                DELETE FROM {table} WHERE {where_clause};\n
+                """
         try:
             self.cursor_i18n.execute(delete_query)
-            self.conn_i18n.commit() 
+            self.conn_i18n.commit()
         except Exception as e:
             self.conn_i18n.rollback()
-            return f"Error deleting rows (Rename proj.type): {e}"
-
-        # Step 5: Insert the unique final rows back into the table
-        final_rows_tot = final_rows + final_rows_no_utils if final_rows_no_utils else final_rows
-        insert_query = self._add_duplicates_rows(table, final_rows_tot, final_rows)
-        if insert_query == "":
-            return "No rows to unify\n"
-        try:
-            self.cursor_i18n.execute(insert_query)
-        except Exception as e:
-            self.conn_i18n.rollback()
-            return f"Error inserting rows: {e}"
-
-        self.conn_i18n.commit()
-        return "2- Rows updated successfully.\n"
-
-    def _get_duplicates_rows(self, table):
-        """Create query to determine the duplicated rows"""
-
-        query = """WITH duplicates AS (
-                SELECT """
-        query += ", ".join([pk for pk in self.primary_keys if pk != 'project_type'])
-        query += f""", COUNT(*) AS duplicate_count
-                    FROM {table}
-                    GROUP BY """
-        query += ", ".join([pk for pk in self.primary_keys if pk != 'project_type'])
-        query += f"""
-                    HAVING COUNT(*) > 1
-                )
-                SELECT t.*, d.duplicate_count
-                FROM {table} t
-                JOIN duplicates d
-                ON """
-        
-        query += " AND ".join(f"t.{pk} = d.{pk}" for pk in self.primary_keys if pk != 'project_type')
-        query += """ ORDER BY duplicate_count DESC, (project_type = 'utils') DESC, project_type;"""
-        
-        return query
-
-    def _delete_duplicates_rows(self, table):
-        """Create query to delete the duplicated rows"""
-
-        delete_query = """
-            WITH duplicates AS (
-                SELECT """
-        delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
-        delete_query += f""", COUNT(*) AS duplicate_count
-                FROM {table}
-                GROUP BY """
-        delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
-        delete_query += f"""\nHAVING COUNT(*) > 1
-            )
-            DELETE FROM {table} WHERE ("""
-        delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
-        delete_query += """) IN (SELECT """
-        delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
-        delete_query += """  FROM duplicates);"""
-        return delete_query
-
-    def _add_duplicates_rows(self, table, final_rows_tot, final_rows):
-        """Create query to add the correct rows to the table"""
-
-        pk_query = f"""
-            SELECT a.attname
-            FROM   pg_index i
-            JOIN   pg_attribute a ON a.attrelid = i.indrelid
-                                 AND a.attnum = ANY(i.indkey)
-            WHERE  i.indrelid = '{table}'::regclass
-            AND    i.indisprimary;
-        """
-        pk_rows = self._get_rows(pk_query, self.cursor_i18n)
-        primary_keys = [row[0] for row in pk_rows] if pk_rows else []
-
-        if not primary_keys:
-            print(f"Warning: No primary key found for table {table}. Cannot generate ON CONFLICT clause.")
-            return ""
-
-        queries = []
-        for k, row in enumerate(final_rows_tot):
-            row_keys = list(row.keys())[:-1]
-            if 'project_type' in row_keys:
-                row_keys.remove('project_type')
-            
-            columns = row_keys + ['project_type']
-            
-            values = []
-            for row_key in row_keys:
-                value = row[row_key]
-                if isinstance(value, str):
-                    values.append(f"'{value.replace("'", "''")}'")
-                elif isinstance(value, (datetime, date)):
-                    values.append(f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'")
-                elif value in [None, 'None', '']:
-                    values.append("NULL")
-                else:
-                    values.append(str(value))
-
-            project_type_val = "'utils'" if k < len(final_rows) else f"'{row.get('project_type', '')}'"
-            values.append(project_type_val)
-
-            update_columns = [col for col in columns if col not in primary_keys]
-            update_expressions = [f"{col} = EXCLUDED.{col}" for col in update_columns]
-
-            query = (
-                f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({', '.join(values)}) "
-                f"ON CONFLICT ({', '.join(primary_keys)}) DO UPDATE SET {', '.join(update_expressions)};"
-            )
-            queries.append(query)
-            
-        return "\n".join(queries)
 
     # endregion
 
@@ -906,7 +1019,10 @@ class GwSchemaI18NManager:
                     if match:
                         message_text = match.group(1)
                         # Determine actual_source (which is stored in pydialog.source)
-                        actual_source = f"dlg_{dialog_name}" if source.startswith('dlg_') else source
+                        if source.startswith('dlg_') or source == dialog_name:
+                            actual_source = f"dlg_{dialog_name}"
+                        else:
+                            actual_source = source
                         # Key for de-duplication and DB matching
                         db_key = (actual_source, dialog_name, toolbar_name)
                         processed_entries[db_key] = message_text
@@ -927,7 +1043,8 @@ class GwSchemaI18NManager:
             for row in rows:
                 primary_keys_org.append((row["source"], row["dialog_name"], row["toolbar_name"]))
         except Exception as e:
-            print(f"Error fetching existing primary keys: {e}")
+            msg = tools_qt.tr("Error fetching existing primary keys: {0}")
+            tools_qt.manage_exception_db(msg.format(e), query, pause_on_exception=True)
 
         # Delete removed widgets
         old_keys = set(primary_keys_org) - set(primary_keys_final)
@@ -935,6 +1052,8 @@ class GwSchemaI18NManager:
         if old_keys and self.delete_old_keys:
             delete_values = []
             for actual_source, dialog_name, toolbar_name in old_keys:
+                if actual_source == "dlg_admin":
+                    continue
                 # Escape single quotes
                 esc_actual_source = actual_source.replace("'", "''")
                 esc_dialog_name = dialog_name.replace("'", "''") 
@@ -947,10 +1066,12 @@ class GwSchemaI18NManager:
                 try:
                     self.cursor_i18n.execute(delete_query)
                 except Exception as e:
-                    print(f"Error deleting rows: {e}")
+                    msg = tools_qt.tr("Error deleting rows: {0}")
+                    tools_qt.manage_exception_db(msg.format(e), delete_query, pause_on_exception=True)
 
         # Update the table
         text_error = ""
+        query_error = ""
         values_list = []
         # Iterate over de-duplicated entries
         for (actual_source, dialog_name, toolbar_name), message in processed_entries.items():
@@ -979,11 +1100,12 @@ class GwSchemaI18NManager:
             try:
                 self.cursor_i18n.execute(query)
             except Exception as e:
-                text_error = f"Error updating table: {str(e)}"
-                print(e)
+                msg = tools_qt.tr("Error updating table: {0}\n")
+                text_error += msg.format(e)
+                query_error += query + '\n'
 
         if text_error:
-            tools_qt.show_info_box(text_error)
+            tools_qt.manage_exception_db(text_error, query_error, pause_on_exception=True)
         else:
             msg = "All dialogs updated correctly"
             tools_qt.show_info_box(msg)
@@ -998,7 +1120,6 @@ class GwSchemaI18NManager:
         path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "..")
         )
-        print(path)
         files = self._find_files(path, ".py")
         
         messages = []
@@ -1019,8 +1140,6 @@ class GwSchemaI18NManager:
                         match = re.search(rf'{re.escape(key)}(.*?){key[-1]}', content)
                         if match:
                             message = self._search_for_lines(match.group(1))
-                            if len(message) > 1:
-                                print(f'message- {message}')
                             messages.extend(message)
 
         # Determine existing primary keys from the database
@@ -1031,7 +1150,10 @@ class GwSchemaI18NManager:
             for row in rows:
                 primary_keys_org.append(row["source"])
         except Exception as e:
-            print(f"Error fetching existing primary keys: {e}")
+            msg = "Error fetching existing primary keys: {0}"
+            msg_params = (e,)
+            title = "Error fetching existing primary keys"
+            tools_qt.show_exception_message(title, msg, msg_params=msg_params)
 
         # Delete removed widgets
         primary_keys_org_set = set(primary_keys_org)
@@ -1046,7 +1168,10 @@ class GwSchemaI18NManager:
                     try:
                         self.cursor_i18n.execute(query)
                     except Exception as e:
-                        print(f"Error deleting row: {e} - Query: {query}")
+                        msg = "Error deleting row: {0} - Query: {1}"
+                        msg_params = (e, query,)
+                        title = "Error deleting row"
+                        tools_qt.show_exception_message(title, msg, msg_params=msg_params)
 
         # Insert new messages
         
@@ -1063,15 +1188,12 @@ class GwSchemaI18NManager:
                 try:
                     self.cursor_i18n.execute(query)
                 except Exception:
-                    msg = "Error updating: {0}.\n"
-                    msg_params = (message,)
-                    title = "Error updating message"
-                    tools_qt.show_exception_message(title, msg, msg_params=msg_params)
-                    print(query)
+                    msg += f"{tools_qt.tr('Error updating')}: {e}.\n"
                     break
 
         if len(msg) > 1:
-            tools_qt.show_info_box(msg, msg_params=msg_params)
+            title = "Error updating messages"
+            tools_qt.show_exception_message(title, msg)
         else:
             msg = "All messages updated correctly"
             tools_qt.show_info_box(msg)
@@ -1082,7 +1204,6 @@ class GwSchemaI18NManager:
     #region python functions
     def _search_for_lines(self, message):
         if '\\n' in message:
-            print(f'message- {message.split('\\n')}')
             return message.split('\\n')
         else:
             return [message]
@@ -1198,6 +1319,45 @@ class GwSchemaI18NManager:
     
     #endregion
     # region Global funcitons
+
+    def _beautify_text(self, text):
+        """
+        Replace underscores with spaces and capitalize each word, preserving specific keywords from no_beautify_keys.
+        """
+        if not isinstance(text, str) or not text:
+            return text
+
+        # Only initialize keys if not already cached
+        if not hasattr(self, 'no_beautify_keys'):
+            self._no_beautify_keys()
+
+        no_beautify_set = set(self.no_beautify_keys)
+
+        # Precompiled regex for efficiency
+        if not hasattr(self, '_no_beautify_regex'):
+            sorted_keys = sorted(no_beautify_set, key=len, reverse=True)
+            pattern = '|'.join(re.escape(k) for k in sorted_keys)
+            self._no_beautify_regex = re.compile(f'({pattern})')
+
+        parts = self._no_beautify_regex.split(text)
+
+        result_parts = []
+        capitalize_next = True
+        for part in parts:
+            if part in no_beautify_set:
+                result_parts.append(part)
+                capitalize_next = False
+            elif part:
+                processed = part.replace('_', ' ')
+                if capitalize_next:
+                    processed = processed[0].upper() + processed[1:] if processed else ''
+                    capitalize_next = False
+                result_parts.append(processed)
+
+        result = ''.join(result_parts)
+        return result
+
+
     def _detect_schema(self, schema_name):
         """ Detect if the schema exists """
 
@@ -1214,11 +1374,11 @@ class GwSchemaI18NManager:
 
         return existing_schema
 
-    def detect_table_func(self, table):
+    def detect_table_func(self, table, cursor):
         """ Detect if the table exists """
 
-        self.cursor_i18n.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
-        result = self.cursor_i18n.fetchone()
+        cursor.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
+        result = cursor.fetchone()
         existing_table = result[0] > 0  # Check if count is greater than 0
         return existing_table
 
@@ -1233,10 +1393,12 @@ class GwSchemaI18NManager:
         tables_org = []
         # Process the table name based on its prefix
         if "dbtypevalue" in table_i18n:
-            if self.project_type == "am":
+            if self.project_type in ["am", "cm"]:
                 tables_org = ["sys_typevalue"]
             if self.project_type in ["ws", "ud"]:
                 tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue"]
+        elif "dbfprocess" in table_i18n and self.project_type == "cm":
+            tables_org = ["sys_fprocess_cm"]
         elif "dbjson" in table_i18n:
             tables_org = ["config_report", "config_toolbox"]
         elif "dbconfig_form_fields_json" in table_i18n:
@@ -1266,7 +1428,6 @@ class GwSchemaI18NManager:
                 seen_contexts.add(context) # Use .get() to avoid KeyError if 'context' doesn't exist
         if tables_org is None:
             return None  # Or some fallback behavior
-
         return tables_org
 
     def _get_rows(self, sql, cursor):
@@ -1277,7 +1438,7 @@ class GwSchemaI18NManager:
             cursor.execute(sql)
             rows = cursor.fetchall()
         except Exception as e:
-            print(f"Error: {e}")
+            tools_qt.manage_exception_db(e, sql, pause_on_exception=True)
         finally:
             return rows
 
@@ -1298,23 +1459,6 @@ class GwSchemaI18NManager:
         msg_params = (self.project_type, table)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
-
-    def _detect_column_names(self, table):
-        """ Detect the column names of the table """
-        query = f"""
-            SELECT a.attname AS column_name
-            FROM pg_index i
-            JOIN pg_attribute a ON a.attrelid = i.indrelid
-                                 AND a.attnum = ANY(i.indkey)
-            WHERE i.indrelid = '{table}'::regclass
-            AND    i.indisprimary;
-            """
-
-        self.cursor_i18n.execute(query)
-        results = self.cursor_i18n.fetchall()
-        self.primary_keys = [row['column_name'] for row in results]
-        if "dbfunction" in table:
-            self.primary_keys.append("ds_en_us")
 
     def extract_and_update_strings(self, data):
         """Recursively extract and return list of dictionaries with translatable keys."""
@@ -1344,24 +1488,108 @@ class GwSchemaI18NManager:
     def _verify_lang(self):
         """ Verify if the language is en_US """
 
-        if self.project_type in ["ws", "ud"]:
-            query = f"SELECT language from {self.schema_org}.sys_version"
-            self.cursor_org.execute(query)
-            language_org = self.cursor_org.fetchone()[0]
-            if language_org != 'en_US':
-                return False
+        query = f"SELECT language from {self.schema_org}.sys_version"
+        self.cursor_org.execute(query)
+        language_org = self.cursor_org.fetchone()[0]
+        if language_org != 'en_US':
+            return False
         return True
+    
+
+    def save_and_open_text_error(self, text_error, filename="i18n_error_log.txt"):
+        # Save the text_error to a file in the user's home directory or temp directory
+        file_path = os.path.join(os.path.expanduser("~"), filename)
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(text_error)
+        # Open the file with the default text editor
+        if sys.platform.startswith("win"):
+            os.startfile(file_path)
+        elif sys.platform.startswith("darwin"):
+            os.system(f"open '{file_path}'")
+        else:
+            os.system(f"xdg-open '{file_path}'")
+
+    def _is_subset_dict(self, d1: Dict[str, Any], d2: Dict[str, Any]) -> bool:
+        return all(d1.get(k) == v for k, v in d2.items())
+
+    def _unique_dicts(self, dicts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        seen = set()
+        result = []
+        for d in dicts:
+            t = tuple(sorted(d.items()))
+            if t not in seen:
+                seen.add(t)
+                result.append(d)
+        return result
+
+    def _dict_to_comparable(self, d, mode):
+        if mode == 'items':
+            return tuple(d.items())
+        elif mode == 'keys':
+            return tuple(d.keys())
+        elif mode == 'values':
+            return tuple(d.values())
+        else:
+            raise ValueError(f"Unsupported compare mode: {mode}")
+
+    def _set_operation_on_dict(self,rows1, rows2, op='&', compare='items'):
+        """
+        Perform set-like operations on lists of dictionaries, with optional partial matching.
+        """
+        set1 = set(self._dict_to_comparable(d, compare) for d in rows1)
+        set2 = set(self._dict_to_comparable(d, compare) for d in rows2)
+
+        if op == '&':
+            result = set1 & set2
+        elif op == '|':
+            result = set1 | set2
+        elif op == '-':
+            result = set1 - set2
+        elif op == '^':
+            result = set1 ^ set2
+        else:
+            raise ValueError(f"Unsupported operation: {op}")
+
+        if compare == 'items':
+            return [dict(t) for t in result]
+        elif compare == 'values':
+            return [dict(zip(rows1[0].keys(), t)) for t in result]
+        else:
+            raise ValueError(f"Unsupported compare mode: {compare}")
+
+
+    def _get_all_columns(self, table_i18n):
+        """ Get all columns from the table """
+        query = f"""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = '{table_i18n.split('.')[1]}'
+            AND table_schema = '{table_i18n.split('.')[0]}'
+            ORDER BY ordinal_position;"""   
+        self.cursor_i18n.execute(query)
+        return [row[0] for row in self.cursor_i18n.fetchall()]
+
 
     def tables_dic(self, schema_type):
         """ Define the tables to be translated in a dictionary """
         dbtables_dic = {
             "ws": {
-                "dbtables": ["dbconfig_form_fields_json"],
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbtable", "dbconfig_form_fields_feat", "dbjson",
+                    "dbconfig_form_fields_json"],
+                "dbtables": ["dbconfig_typevalue"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
-                "dbtables": ["dbconfig_form_fields_json"],
-                 "sutables": ["su_basic_tables", "su_feature"]
+                "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbtable", "dbconfig_form_fields_feat", "dbjson",
+                    "dbconfig_form_fields_json"],
+                "dbtables": ["dbconfig_typevalue"],
+                "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
                 "dbtables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"],
@@ -1369,11 +1597,23 @@ class GwSchemaI18NManager:
             },
             "cm": {
                 "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json"],
+                             "dbtypevalue", "dbconfig_form_fields_json", "dbfprocess",
+                             "dbtable", "dbconfig_form_tableview"],
+                "dbtables": ["dbconfig_param_system", "dbtypevalue", "dbconfig_form_fields_json"],
                 "sutables": []
             },
         }
         return dbtables_dic[schema_type]['dbtables'], dbtables_dic[schema_type]['sutables']
+
+    def _no_beautify_keys(self):
+        """ Define the tables to be translated in a dictionary """
+        try:
+            query = f"SELECT table_name FROM information_schema.tables WHERE table_schema = '{self.schema_org}';"
+            self.cursor_org.execute(query)
+            table_names = self.cursor_org.fetchall()
+            self.no_beautify_keys = [table_name[0] for table_name in table_names]
+        except Exception:
+            self.no_beautify_keys = []
 
     # endregion
 
@@ -1487,4 +1727,6 @@ class GwSchemaI18NManager:
         message = "Language"
         message = "Date of creation"
         message = "Date of last update"
+        message = "In schema"
+
         message = "In schema"

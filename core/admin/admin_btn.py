@@ -118,7 +118,7 @@ class GwAdminButton:
         self.other_project = project
 
         msg = "This process will take time (few minutes). Are you sure to continue?"
-        title = "Create {project} schema"
+        title = "Create {0} schema"
         title_params = (project,)
         answer = tools_qt.show_question(msg, title=title, title_params=title_params)
         if not answer:

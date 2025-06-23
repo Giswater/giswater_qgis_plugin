@@ -870,8 +870,7 @@ class GwI18NGenerator:
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
-                    "dbconfig_form_fields_json"
-                 ]  # "su_feature",
+                    "dbconfig_form_fields_json"]
             },
             "i18n_ud": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}i18n{os.sep}{self.language}{os.sep}",
@@ -882,8 +881,7 @@ class GwI18NGenerator:
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
-                    "dbconfig_form_fields_json"
-                 ]  # "su_feature",
+                    "dbconfig_form_fields_json"]
             },
             "am": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}am{os.sep}i18n{os.sep}",
