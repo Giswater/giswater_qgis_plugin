@@ -39,7 +39,19 @@ VALUES(9997, 'CSO Algorithm', '{"featureType":[]}'::json, '[
     "layoutname": "grl_option_parameters",
     "layoutorder": 16,
     "isMandatory": false,
-    "placeholder": "5,456,589",
+    "placeholder": "5,456,589 - Leave null to use all drainzones of the selected macroexpl",
+    "value": ""
+  },
+  {
+    "widgetname": "inflowsDscenarioName",
+    "label": "Create Inflow dscenario: ",
+    "widgettype": "text",
+    "datatype": "text",
+    "tooltip": "Type the name of the dscenario of inflows",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 17,
+    "isMandatory": false,
+    "placeholder": " Leave null to not create an inflow dscenario",
     "value": ""
   }
 ]'::json, NULL, true);
