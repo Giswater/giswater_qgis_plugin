@@ -534,6 +534,7 @@ class GwAdminButton:
         # Populate combo with all locales
         status, sqlite_cur = tools_gw.create_sqlite_conn("config")
         list_locale = self._select_active_locales(sqlite_cur)
+        list_locale.append(["no_TR", "Z_English (No translation)"])
         tools_qt.fill_combo_values(self.cmb_locale, list_locale)
         locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False, force_reload=True)
         tools_qt.set_combo_value(self.cmb_locale, locale, 0, add_new=False)
@@ -594,7 +595,10 @@ class GwAdminButton:
         folder_locale = os.path.join(self.sql_dir, 'i18n', lang)
 
         if self._process_folder(folder_locale) is False:
-            self.load_locale('en_US')
+            if lang == 'no_TR':
+                return True
+            else:
+                self.load_locale('en_US')
         else:
             status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
             if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
