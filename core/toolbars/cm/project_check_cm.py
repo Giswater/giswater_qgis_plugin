@@ -45,8 +45,21 @@ class GwProjectCheckCMTask(GwTask):
             project_type = "cm"
             function_fid = 0
 
+            campaign_id = self.params.get("campaign_id")
+            lot_id = self.params.get("lot_id")
+
+            # Extract the actual ID values if they are lists [id, name]
+            if isinstance(campaign_id, list) and len(campaign_id) > 0:
+                campaign_id = campaign_id[0]
+            if isinstance(lot_id, list) and len(lot_id) > 0:
+                lot_id = lot_id[0]
+
             extras = (
-                f'"parameters": {{"functionFid": {function_fid}, "project_type": "{project_type}"}}'
+                f'"parameters": {{'
+                f'"functionFid": {function_fid}, "project_type": "{project_type}", '
+                f'"campaignId": {campaign_id if campaign_id is not None else "null"}, '
+                f'"lotId": {lot_id if lot_id is not None else "null"}'
+                f'}}'
             )
             body = tools_gw.create_body(extras=extras)
             self.result_data = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, schema_name='cm', aux_conn=self.aux_conn)

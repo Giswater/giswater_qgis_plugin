@@ -50,8 +50,8 @@ class GwCheckCMProjectButton(GwAction):
         tools_gw.populate_dynamic_widgets(self.dialog, json_result, self)
 
         # Find widgets
-        self.campaign_combo = self.dialog.findChild(QComboBox, "tab_data_campaign")
-        self.lot_combo = self.dialog.findChild(QComboBox, "tab_data_lot")
+        self.campaign_combo = self.dialog.findChild(QComboBox, "tab_data_campaign_id")
+        self.lot_combo = self.dialog.findChild(QComboBox, "tab_data_lot_id")
 
         # Set listeners
         self.dialog.btn_accept.clicked.connect(self._on_accept_clicked)
@@ -121,7 +121,7 @@ class GwCheckCMProjectButton(GwAction):
 
         # Set parameters and re-run the project check task.
         params = {"layers": layers, "init_project": "false", "dialog": self.dialog,
-                  "log_widget": log_widget}
+                  "log_widget": log_widget, "campaign_id": self.campaign_combo.currentData(), "lot_id": self.lot_combo.currentData()}
 
         self.project_check_task = GwProjectCheckCMTask('check_project_cm', params)
 
