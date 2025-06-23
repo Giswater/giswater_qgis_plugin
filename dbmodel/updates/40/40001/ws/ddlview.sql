@@ -863,6 +863,7 @@ AS WITH
             ELSE link_planned.omzone_type
           END AS omzone_type,
           connec.crmzone_id,
+          crmzone.macrocrmzone_id,
           crmzone.name AS crmzone_name,
           CASE
             WHEN link_planned.minsector_id IS NULL THEN connec.minsector_id

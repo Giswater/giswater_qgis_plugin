@@ -2147,3 +2147,25 @@ CREATE TABLE IF NOT EXISTS omzone (
     CONSTRAINT omzone_macroomzone_id_fkey FOREIGN KEY (macroomzone_id) REFERENCES macroomzone (macroomzone_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
+
+CREATE TABLE macrocrmzone (
+	macrocrmzone_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	descript text NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+	CONSTRAINT macrocrmzone_pkey PRIMARY KEY (macrocrmzone_id)
+);
+
+ALTER TABLE crmzone ADD COLUMN macrocrmzone_id integer;
+ALTER TABLE crmzone ADD CONSTRAINT crmzone_macrocrmzone_id_fkey FOREIGN KEY (macrocrmzone_id) REFERENCES macrocrmzone (macrocrmzone_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE crmzone ADD COLUMN created_at timestamp with time zone DEFAULT now() NULL;
+ALTER TABLE crmzone ADD COLUMN created_by varchar(50) DEFAULT CURRENT_USER NULL;
+ALTER TABLE crmzone ADD COLUMN updated_at timestamp with time zone NULL;
+ALTER TABLE crmzone ADD COLUMN updated_by varchar(50) NULL;

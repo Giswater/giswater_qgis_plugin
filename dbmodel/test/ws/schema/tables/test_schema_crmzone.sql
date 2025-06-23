@@ -20,7 +20,7 @@ SELECT has_table('crmzone'::name, 'Table crmzone should exist');
 SELECT columns_are(
     'crmzone',
     ARRAY[
-        'id', 'name', 'descript', 'the_geom', 'active'
+        'id', 'name', 'descript', 'the_geom', 'active', 'macrocrmzone_id', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table crmzone should have the correct columns'
 );
@@ -34,9 +34,15 @@ SELECT col_type_is('crmzone', 'name', 'text', 'Column name should be text');
 SELECT col_type_is('crmzone', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('crmzone', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('crmzone', 'active', 'boolean', 'Column active should be boolean');
+SELECT col_type_is('crmzone', 'macrocrmzone_id', 'integer', 'Column macrocrmzone_id should be integer');
+SELECT col_type_is('crmzone', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
+SELECT col_type_is('crmzone', 'created_by', 'character varying(50)', 'Column created_by should be varchar(50)');
+SELECT col_type_is('crmzone', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
+SELECT col_type_is('crmzone', 'updated_by', 'character varying(50)', 'Column updated_by should be varchar(50)');
 
 -- Check foreign keys
-SELECT hasnt_fk('crmzone', 'Table crmzone should have no foreign keys');
+SELECT has_fk('crmzone', 'Table crmzone should have foreign keys');
+SELECT fk_ok('crmzone', 'macrocrmzone_id', 'macrocrmzone', 'macrocrmzone_id', 'FK crmzone_macrocrmzone_id_fkey should exist');
 
 -- Check triggers
 
