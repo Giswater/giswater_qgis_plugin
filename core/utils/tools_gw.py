@@ -3422,9 +3422,12 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
 
     # Retrieve the correct table widget
-    table_widget = dialog.findChildren(QTableView, QRegularExpression(f"{expected_table_name}$"))[0]
-    if not table_widget:
+
+    # Find all matching table widgets and get the first one if any exist
+    table_widgets = dialog.findChildren(QTableView, QRegularExpression(f"{expected_table_name}$"))
+    if not table_widgets:
         return
+    table_widget = table_widgets[0]
 
     model = table_widget.model()
     selection_model = table_widget.selectionModel()
