@@ -891,3 +891,26 @@ AS SELECT dimensions.id,
      LEFT JOIN selector_municipality m USING (muni_id)
      JOIN selector_sector s USING (sector_id)
   WHERE (m.cur_user = CURRENT_USER::text OR dimensions.muni_id IS NULL) AND s.cur_user = CURRENT_USER::text AND dimensions.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+-- 23/06/2025
+CREATE OR REPLACE VIEW v_ui_om_event
+AS SELECT id,
+    event_code,
+    visit_id,
+    position_id,
+    position_value,
+    parameter_id,
+    value,
+    value1,
+    value2,
+    geom1,
+    geom2,
+    geom3,
+    xcoord,
+    ycoord,
+    compass,
+    tstamp,
+    text,
+    index_val,
+    is_last
+   FROM om_visit_event;

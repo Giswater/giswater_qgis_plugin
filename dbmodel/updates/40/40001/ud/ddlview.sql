@@ -6343,27 +6343,6 @@ AS SELECT review_gully.gully_id,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_gully.expl_id = selector_expl.expl_id;
 
-CREATE OR REPLACE VIEW v_ui_om_event
-AS SELECT id,
-    event_code,
-    visit_id,
-    position_id,
-    position_value,
-    parameter_id,
-    value,
-    value1,
-    value2,
-    geom1,
-    geom2,
-    geom3,
-    xcoord,
-    ycoord,
-    compass,
-    tstamp,
-    text,
-    index_val,
-    is_last
-   FROM om_visit_event;
 
 CREATE OR REPLACE VIEW ve_visit_gully_singlevent
 AS SELECT om_visit_x_gully.visit_id,
