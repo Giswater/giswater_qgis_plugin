@@ -542,3 +542,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('to_arc', 'arc', 'arc_
 
 CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON man_waterwell
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('inlet_arc', 'arc', 'arc_id');
+
+CREATE TRIGGER gw_trg_edit_plot INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ext_plot
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plot();

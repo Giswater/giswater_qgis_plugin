@@ -162,3 +162,7 @@ CREATE TABLE man_vlink (
 -- 16/06/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut_valve", "column":"to_arc", "dataType":"int4", "isUtils":"False"}}$$);
 
+-- 23/06/2025
+DROP VIEW IF EXISTS v_ext_plot;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_plot", "column":"plot_code", "dataType":"varchar(100)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_rtc_hydrometer", "column":"plot_code", "dataType":"varchar(100)", "isUtils":"False"}}$$);

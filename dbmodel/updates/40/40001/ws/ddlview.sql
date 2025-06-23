@@ -8446,3 +8446,21 @@ AS SELECT review_connec.connec_id,
    FROM review_connec,
     selector_expl
   WHERE selector_expl.cur_user = CURRENT_USER AND review_connec.expl_id = selector_expl.expl_id;
+
+CREATE OR REPLACE VIEW v_ext_plot
+AS SELECT ext_plot.id,
+    ext_plot.plot_code,
+    ext_plot.muni_id,
+    ext_plot.postcode,
+    ext_plot.streetaxis_id,
+    ext_plot.postnumber,
+    ext_plot.complement,
+    ext_plot.placement,
+    ext_plot.square,
+    ext_plot.observ,
+    ext_plot.text,
+    ext_plot.the_geom,
+    ext_plot.expl_id
+   FROM selector_municipality s,
+    ext_plot
+  WHERE ext_plot.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;

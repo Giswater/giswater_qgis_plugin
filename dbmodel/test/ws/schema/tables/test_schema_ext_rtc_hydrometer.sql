@@ -45,7 +45,7 @@ SELECT col_type_is('ext_rtc_hydrometer', 'state_id', 'smallint', 'Column state_i
 SELECT col_type_is('ext_rtc_hydrometer', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('ext_rtc_hydrometer', 'connec_id', 'varchar(30)', 'Column connec_id should be varchar(30)');
 SELECT col_type_is('ext_rtc_hydrometer', 'hydrometer_customer_code', 'varchar(30)', 'Column hydrometer_customer_code should be varchar(30)');
-SELECT col_type_is('ext_rtc_hydrometer', 'plot_code', 'varchar(30)', 'Column plot_code should be varchar(30)');
+SELECT col_type_is('ext_rtc_hydrometer', 'plot_code', 'varchar(100)', 'Column plot_code should be varchar(100)');
 SELECT col_type_is('ext_rtc_hydrometer', 'priority_id', 'integer', 'Column priority_id should be integer');
 SELECT col_type_is('ext_rtc_hydrometer', 'catalog_id', 'integer', 'Column catalog_id should be integer');
 SELECT col_type_is('ext_rtc_hydrometer', 'category_id', 'integer', 'Column category_id should be integer');

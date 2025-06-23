@@ -30,7 +30,7 @@ SELECT col_is_pk('ext_plot', ARRAY['id'], 'Column id should be primary key');
 
 -- Check column types
 SELECT col_type_is('ext_plot', 'id', 'varchar(16)', 'Column id should be varchar(16)');
-SELECT col_type_is('ext_plot', 'plot_code', 'varchar(30)', 'Column plot_code should be varchar(30)');
+SELECT col_type_is('ext_plot', 'plot_code', 'varchar(100)', 'Column plot_code should be varchar(100)');
 SELECT col_type_is('ext_plot', 'muni_id', 'integer', 'Column muni_id should be integer');
 SELECT col_type_is('ext_plot', 'postcode', 'varchar(16)', 'Column postcode should be varchar(16)');
 SELECT col_type_is('ext_plot', 'streetaxis_id', 'varchar(16)', 'Column streetaxis_id should be varchar(16)');
