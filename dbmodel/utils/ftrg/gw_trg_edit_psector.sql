@@ -210,7 +210,7 @@ BEGIN
 				INSERT INTO archived_psector_node_traceability (
 					id, psector_id, psector_state, doable, addparam, audit_tstamp, audit_user, "action",
 					node_id, code, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", dma_id,
-					soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
+					soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, conserv_state, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
 					streetaxis2_id, postnumber2, postcomplement2, descript, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory, xyz_date, uncertain, unconnected,
 					expl_id, num_value, feature_type, tstamp, arc_id, lastupdate, lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id, expl_visibility, adate, adescript,
 					placement_type, access_type, label_quadrant, minsector_id, brand_id, model_id, serial_number, streetname, streetname2, dwfzone_id, datasource, omunit_id, lock_level, pavcat_id
@@ -218,7 +218,7 @@ BEGIN
 				SELECT
 					nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), pn.psector_id, pn.state, pn.doable, pn.addparam, now(), current_user, 'Execute psector',
 					n.node_id, n.code, n.top_elev, n.ymax, n.elev, n.custom_top_elev, n.custom_ymax, n.custom_elev, n.node_type, n.nodecat_id, n.epa_type, n.sector_id, n.state, n.state_type, n.annotation, n.observ,
-					n.comment, n.dma_id, n.soilcat_id, n.function_type, n.category_type, n.fluid_type, n.location_type, n.workcat_id, n.workcat_id_end, n.builtdate, n.enddate, n.ownercat_id,
+					n.comment, n.dma_id, n.soilcat_id, n.function_type, n.category_type, n.fluid_type, n.location_type, n.workcat_id, n.workcat_id_end, n.builtdate, n.enddate, n.ownercat_id, n.conserv_state,
 					n.muni_id, n.postcode, n.streetaxis_id, n.postnumber, n.postcomplement, n.streetaxis2_id, n.postnumber2, n.postcomplement2, n.descript, n.rotation, n.link, n.verified, n.the_geom,
 					n.label_x, n.label_y, n.label_rotation, n.publish, n.inventory, n.xyz_date, n.uncertain, n.unconnected, n.expl_id, n.num_value, n.feature_type, n.tstamp, n.arc_id, n.lastupdate, n.lastupdate_user,
 					n.insert_user, n.matcat_id, n.district_id, n.workcat_id_plan, n.asset_id, n.drainzone_id, n.parent_id, n.expl_visibility, n.adate, n.adescript, n.placement_type, n.access_type,

@@ -909,6 +909,7 @@ CREATE TABLE node (
 	builtdate date NULL,
 	enddate date NULL,
 	ownercat_id varchar(30) NULL,
+	conserv_state text NULL,
 	access_type text NULL,
 	placement_type varchar(50) NULL,
 	brand_id varchar(50) NULL,
@@ -1809,6 +1810,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_ps
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"omunit_id", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"pavcat_id", "dataType":"varchar(30)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_gully_traceability", "column":"connec_arccat_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_gully_traceability", "column":"connec_matcat_id"}}$$);
