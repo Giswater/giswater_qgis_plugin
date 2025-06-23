@@ -21,7 +21,7 @@ INSERT INTO config_param_system VALUES ('basic_selector_tab_campaign',
 '{"table":"temp_om_campaign","selector":"selector_campaign","table_id":"campaign_id","selector_id":"campaign_id","label":"campaign_id, '' - '', name","orderBy":"campaign_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(id'' - '', name))","selectionMode":"keepPreviousUsingShift", "orderbyCheck":false}',
 'Variable to configura all options related to search for the specificic tab','Selector variables',null, null, true, null, 'utils', null, null, 'json','text');
 
-INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('admin_campaign_type', '{"campaignReview":"true","campaignVisit":"false"}', 'Variable to specify wich type of campaign we whant to see when create', NULL, NULL, NULL, true, NULL, 'utils', NULL, NULL, 'json', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO config_form_tabs VALUES ('selector_campaign','tab_campaign','Campaign','Campaign','role_basic',null, null, 1, '{4}');
@@ -245,3 +245,5 @@ widgetcontrols = '{"vdefault_value":
 "Esta función tiene por objetivo pasar el control de calidad de una campaña, pudiendo escoger de forma concreta un lote especifico.<br><br>Se analizan diferentes aspectos siendo lo más destacado que se configura para que los datos esten operativos en el conjunto de una campaña para que el modelo hidraulico funcione."}'
 WHERE formtype ='check_project_cm' and columnname ='txt_info';
 
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active) VALUES(100, 'Check nulls consistence', 'cm', NULL, 'core', true, 'Check cm', NULL, 3, 'a null value on the column %check_column% of %table_name%.%feature_column% = %feature_id%', NULL, NULL, 'SELECT * FROM %table_name% WHERE %feature_column% = %feature_id% AND %check_column% IS NULL ', 'The %check_column% on %table_name%.%feature_column% = %feature_id% have correct values.', '[gw_fct_cm_check_dynamic]', true);

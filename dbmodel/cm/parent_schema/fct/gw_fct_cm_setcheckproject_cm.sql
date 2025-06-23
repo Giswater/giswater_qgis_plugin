@@ -29,11 +29,17 @@ DECLARE
 
 	-- dialog variables
     v_fid integer;
+	v_campaign_id integer;
+	v_lot_id integer;
+	v_lot_id_array integer[];
 
 	-- variables
     v_querytext text;
     v_rec record;
     v_check_result json;
+
+	v_check_mandatory_fid integer := 100;
+	v_check_fkeys_fid integer := 101;
 
 	-- return variables
     v_results jsonb := '[]'::jsonb;
@@ -47,8 +53,14 @@ DECLARE
 	v_qgis_layers_setpropierties boolean;
 	v_qgis_init_guide_map boolean;
 	v_return json;
-	v_campaign integer;
-	v_lot integer;
+
+	v_features_array text[] := array['node', 'arc', 'connec', 'link'];
+	v_feature_view_name text;
+	v_feature_table_name text;
+	v_feature_id_column text;
+	v_feature_cm_table text;
+	v_rec_id integer;
+	v_rec_check record;
 
 BEGIN
 
@@ -60,12 +72,16 @@ BEGIN
 
     v_fid := (p_data->'data'->'parameters'->>'functionFid')::integer;
     v_project_type := COALESCE(p_data->'data'->'parameters'->>'project_type', 'cm');
-    v_campaign := p_data->'data'->'parameters'->>'campaignId';
-	v_lot := p_data->'data'->'parameters'->>'lotId';
+    v_campaign_id := p_data->'data'->'parameters'->>'campaignId';
+	v_lot_id := p_data->'data'->'parameters'->>'lotId';
 
     IF v_fid IS NULL THEN
         RETURN json_build_object('status', 'error', 'message', 'Missing parameter: functionFid');
     END IF;
+
+	IF v_campaign_id IS NULL THEN
+		RETURN json_build_object('status', 'error', 'message', 'Missing parameter: campaignId');
+	END IF;
 
 	-- SECTION[epic=checkproject]: Manage temporary tables
 	DROP TABLE IF EXISTS t_audit_check_data;
@@ -101,10 +117,10 @@ BEGIN
 		descript text
 	);
 
-	DROP TABLE IF EXISTS t_cm_connec;
-	CREATE TEMP TABLE t_cm_connec (
-		connec_id integer primary key,
-		conneccat_id varchar,
+	DROP TABLE IF EXISTS t_cm_link;
+	CREATE TEMP TABLE t_cm_link (
+		link_id integer primary key,
+		linkcat_id varchar,
 		expl_id integer,
 		fid integer,
 		the_geom geometry,
@@ -127,6 +143,63 @@ BEGIN
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 1, '-------');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, '');
 
+	-- SECTION[epic=checkproject]: Check mandatory fields and foreign keys constraints
+	-- get lot_id_array
+	IF v_lot_id IS NOT NULL THEN
+		v_lot_id_array := array[v_lot_id];
+	ELSE
+		SELECT array_agg(lot_id) INTO v_lot_id_array FROM cm.om_campaign_lot WHERE campaign_id = v_campaign_id GROUP BY campaign_id;
+	END IF;
+
+	-- get node, arc, connec, link ids from campaign_lot_x_table
+	FOR i IN 1..array_length(v_features_array, 1) LOOP
+		v_feature_table_name := v_features_array[i];
+		v_feature_id_column := v_feature_table_name || '_id';
+		v_feature_cm_table := 'om_campaign_lot_x_' || v_feature_table_name;
+
+		-- get all ids from campaign_lot_x_table
+		v_querytext := '
+			SELECT '|| v_feature_id_column || ' FROM ' || v_feature_cm_table || '
+			WHERE lot_id = ANY($1)
+		';
+		FOR v_rec_id IN EXECUTE v_querytext USING v_lot_id_array LOOP
+			v_querytext := '
+				SELECT lower(cf.id) FROM PARENT_SCHEMA.' || v_feature_table_name || ' t
+				JOIN PARENT_SCHEMA.cat_' || v_feature_table_name || ' c ON c.id = t.' || v_feature_table_name || 'cat_id 
+				JOIN PARENT_SCHEMA.cat_feature_' || v_feature_table_name || ' cf ON cf.id = c.' || v_feature_table_name || '_type
+				WHERE ' || v_feature_table_name || '_id = ' || v_rec_id || ';
+			';
+			EXECUTE v_querytext INTO v_feature_view_name;
+			v_feature_view_name := 'PARENT_SCHEMA_' || v_feature_view_name;
+
+			v_querytext := '
+				SELECT DISTINCT columnname FROM PARENT_SCHEMA.config_form_fields
+				WHERE ismandatory
+				AND formname ILIKE ''%v_edit_'||v_feature_table_name||'%''
+			';
+
+			FOR v_rec_check IN EXECUTE v_querytext LOOP
+				EXECUTE '
+					SELECT cm.gw_fct_cm_check_fprocess($${
+					"data":{
+						"parameters":{
+							"functionFid":' || v_fid || ',
+							"checkFid":' || v_check_mandatory_fid || ', 
+							"replaceParams": {
+								"table_name": "' || v_feature_view_name || '", 
+								"feature_column": "' || v_feature_id_column || '",
+								"feature_id": "' || v_rec_id || '",
+								"check_column": "' || v_rec_check.columnname || '"
+								}
+							}
+						}
+					}$$)
+				' INTO v_check_result;
+			END LOOP;
+		END LOOP;
+	END LOOP;
+	-- ENDSECTION
+
 	-- SECTION[epic=checkproject]: Get fprocesses
     v_querytext := '
         SELECT fid, fprocess_name
@@ -135,6 +208,7 @@ BEGIN
         AND active
         AND query_text IS NOT NULL
         AND (addparam IS NULL)
+		AND function_name ILIKE ''%gw_fct_cm_check_project%''
         ORDER BY fid ASC
     ';
 

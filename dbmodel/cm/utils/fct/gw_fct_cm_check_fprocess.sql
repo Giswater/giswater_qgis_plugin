@@ -14,6 +14,7 @@ AS $function$
 DECLARE
 	v_function_fid integer;
 	v_check_fid integer;
+	v_replace_params jsonb;
 
 	v_count integer;
 	v_text_aux text;
@@ -45,7 +46,7 @@ BEGIN
 
     v_check_fid := (p_data->'data'->'parameters'->>'checkFid')::integer;
     v_function_fid := (p_data->'data'->'parameters'->>'functionFid')::integer;
-
+	v_replace_params := (p_data->'data'->'parameters'->>'replaceParams')::json;
 
 	-- get fprocess data
 	SELECT
@@ -70,8 +71,27 @@ BEGIN
 	v_exceptable_id = concat(replace (v_process_except_table, 'cm_', ''), '_id');
 	v_exceptable_catalog = concat(replace (v_process_except_table, 'cm_', ''), 'cat_id');
 
+	IF v_replace_params IS NOT NULL THEN
+		-- SELECT * FROM ws_40_sample_cm.%table_name% WHERE %feature_column% = %feature_id% AND %check_column% IS NULL
+		v_process_query_text = replace(v_process_query_text, '%table_name%', v_replace_params->>'table_name');
+		v_process_query_text = replace(v_process_query_text, '%feature_column%', v_replace_params->>'feature_column');
+		v_process_query_text = replace(v_process_query_text, '%feature_id%', v_replace_params->>'feature_id');
+		v_process_query_text = replace(v_process_query_text, '%check_column%', v_replace_params->>'check_column');
+
+		-- a null value on the column %check_column% of %table_name%.%feature_column% = %feature_id%
+		v_process_except_msg = replace(v_process_except_msg, '%table_name%', v_replace_params->>'table_name');
+		v_process_except_msg = replace(v_process_except_msg, '%feature_column%', v_replace_params->>'feature_column');
+		v_process_except_msg = replace(v_process_except_msg, '%feature_id%', v_replace_params->>'feature_id');
+		v_process_except_msg = replace(v_process_except_msg, '%check_column%', v_replace_params->>'check_column');
+
+		-- The %check_column% on %table_name%.%feature_column% = %feature_id% have correct values.
+		v_process_info_msg = replace(v_process_info_msg, '%table_name%', v_replace_params->>'table_name');
+		v_process_info_msg = replace(v_process_info_msg, '%feature_column%', v_replace_params->>'feature_column');
+		v_process_info_msg = replace(v_process_info_msg, '%feature_id%', v_replace_params->>'feature_id');
+		v_process_info_msg = replace(v_process_info_msg, '%check_column%', v_replace_params->>'check_column');
+	END IF;
+
     -- manage query count
-	RAISE NOTICE 'hola v_check_fid %', v_check_fid;
 	IF v_process_query_text ILIKE '%string_agg%' THEN
 		EXECUTE 'WITH mec AS ('||v_process_query_text||'),
 		b AS (SELECT unnest(string_to_array("string_agg", ''; '')) AS "string_agg" FROM mec)
