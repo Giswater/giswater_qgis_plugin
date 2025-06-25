@@ -2485,3 +2485,11 @@ VALUES('edit_connec_linkcat_vdefault', 'config', 'Value default catalog for link
 UPDATE sys_param_user
 SET vdefault='CC040_I',"label"='Default catalog for linkcat:', dv_querytext='SELECT cat_link.id, cat_link.id AS idval FROM cat_link JOIN cat_feature ON cat_feature.id = cat_link.link_type WHERE cat_link.link_type = ''CONDUITLINK''', descript='Value default catalog for link', feature_field_id='linkcat_id', ismandatory=true, dv_isnullvalue=false, project_type='ud'
 WHERE id='edit_connec_linkcat_vdefault';
+
+--25/06/2025
+
+UPDATE sys_function SET function_alias = 'IMPORT CATALOG' WHERE function_name = 'gw_fct_import_catalog';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3954, 'Nothing to import', null, 0, true, 'utils', 'core', 'AUDIT');
+
