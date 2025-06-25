@@ -415,11 +415,11 @@ BEGIN
 
 		-- update mincut details
 		INSERT INTO om_mincut_arc (arc_id, result_id, the_geom)
-		SELECT arc_id, v_mincutid, the_geom FROM temp_anl_arc WHERE fid = 131 AND cur_user = current_user AND result_id = '-2'
+		SELECT arc_id::int4, v_mincutid, the_geom FROM temp_anl_arc WHERE fid = 131 AND cur_user = current_user AND result_id = '-2'
 		ON CONFLICT (arc_id, result_id) DO NOTHING;
 
 		INSERT INTO om_mincut_connec (connec_id, result_id, the_geom)
-		SELECT connec_id, v_mincutid, the_geom FROM temp_anl_connec WHERE fid = 131 AND cur_user = current_user AND result_id = '-2'
+		SELECT connec_id::int4, v_mincutid, the_geom FROM temp_anl_connec WHERE fid = 131 AND cur_user = current_user AND result_id = '-2'
 		ON CONFLICT (connec_id, result_id) DO NOTHING;
 
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)

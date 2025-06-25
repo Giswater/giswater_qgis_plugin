@@ -63,7 +63,7 @@ BEGIN
 		SELECT gw_fct_rpt2pg_import_rpt(p_data) INTO v_import;
 
 		-- Reverse geometries where flow is negative and updating flow values with absolute value
-		UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=v_result;
+		UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id::text=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=v_result;
 		UPDATE rpt_arc SET flow=(-1)*flow WHERE flow<0 and result_id=v_result;
 
 		-- set result on result selector
@@ -80,7 +80,7 @@ BEGIN
 
 		-- insert into values in table of stats values to enhance performance for big systems
 		INSERT INTO rpt_arc_stats
-		   SELECT arc.arc_id,
+		   SELECT arc.arc_id::int4,
 		    selector_rpt_main.result_id,
 		    arc.arc_type,
 		    arc.sector_id,
@@ -111,7 +111,7 @@ BEGIN
 		   ORDER BY arc.arc_id;
 
 		INSERT INTO rpt_node_stats
-		SELECT node.node_id,
+		SELECT node.node_id::int4,
 		    selector_rpt_main.result_id,
 		    node.node_type,
 		    node.sector_id,

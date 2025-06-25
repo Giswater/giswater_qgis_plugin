@@ -187,7 +187,7 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM v_edit_arc WHERE arc_id IN
+  	FROM (SELECT arc_id::text, arccat_id, state, expl_id, descript, the_geom FROM v_edit_arc WHERE arc_id IN
 	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)) row) features;
 
 	v_result := COALESCE(v_result, '{}');
