@@ -56,16 +56,12 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=110;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=110;
 
-	--INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, concat('ARC INVERTED ANALYSIS'));
-	--INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '--------------------------------------------------');
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"2204", "fid":"110", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
-	--INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'INFO: The analysis have been executed skipping arcs with TRUE value on ''inverted_slope'' column');
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3968", "function":"2204", "fid":"110", "criticity":"4", "prefix_id":"1001", "is_process":true}}$$)';
 
-	--INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'If some resultant arc is really an arc with inverted slope, please set this value to TRUE');
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3970", "function":"2204", "fid":"110", "criticity":"4", "is_process":true}}$$)';
 

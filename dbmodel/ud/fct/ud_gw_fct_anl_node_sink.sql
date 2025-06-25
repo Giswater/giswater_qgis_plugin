@@ -8,14 +8,14 @@ or (at your option) any later version.
 --FUNCTION CODE: 2210
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_sink(p_data json);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_sink(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_sink(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 SELECT gw_fct_anl_node_sink($${
-"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}}}$$);
 -- fid: 113
 
@@ -36,7 +36,7 @@ v_error_context text;
 v_count integer;
 rec_node record;
 v_selectionmode text;
- 
+
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -46,22 +46,23 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=113;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=113;	
-	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, concat('OUTFALL NODE ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, '----------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, 'INFO: The analysis have been executed skipping nodes with ''VERIFIED'' on colum verified');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, 'If you are looking to remove results please set column verified with this value');
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=113;
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2210", "fid":"113", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3972", "function":"2210", "fid":"113", "criticity":"4", "prefix_id":"1001", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3974", "function":"2210", "fid":"113", "criticity":"4", "is_process":true}}$$)';
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, '');
-	
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
-	
+
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		v_sql := 'SELECT * FROM '||v_worklayer||' AS a WHERE state=1 
@@ -78,15 +79,15 @@ BEGIN
 	LOOP
 		-- Insert in analytics table  (note: expl_id have been removed because not all tables node have exp_id defined)
 		INSERT INTO anl_node (node_id, num_arcs, fid, the_geom, nodecat_id, state)
-		VALUES(rec_node.node_id, (SELECT COUNT(*) FROM arc WHERE state = 1 AND (node_1 = rec_node.node_id OR node_2 = rec_node.node_id)), 
+		VALUES(rec_node.node_id, (SELECT COUNT(*) FROM arc WHERE state = 1 AND (node_1 = rec_node.node_id OR node_2 = rec_node.node_id)),
 		113, rec_node.the_geom, rec_node.nodecat_id, rec_node.state);
-		
+
 	END LOOP;
 
 	-- set selector
 	DELETE FROM selector_audit WHERE fid=113 AND cur_user=current_user;
 	INSERT INTO selector_audit (fid,cur_user) VALUES (113, current_user);
-   
+
 	-- get results
 	--points
 	v_result = null;
@@ -100,8 +101,8 @@ BEGIN
   	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
   	FROM  anl_node WHERE cur_user="current_user"() AND fid=113) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
 	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=113;
 
@@ -113,20 +114,20 @@ BEGIN
 		VALUES (113,  concat ('There are ',v_count,' outfall nodes.'), v_count);
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 113,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
+		SELECT 113,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count
 		FROM anl_node WHERE cur_user="current_user"() AND fid=113;
 
 	END IF;
-	
+
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=113 order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

@@ -2063,4 +2063,20 @@ VALUES(3968, 'The analysis have been executed skipping arcs with TRUE value on '
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3970, 'If some resultant arc is really an arc with inverted slope, please set this value to TRUE', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'OUTFALL NODE ANALYSIS' WHERE function_name = 'gw_fct_anl_node_sink';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3972, 'The analysis have been executed skipping nodes with ''VERIFIED'' on colum verified', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3974, 'If you are looking to remove results please set column verified with this value', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'NODE ELEVATION ANALYSIS' WHERE function_name = 'gw_fct_anl_node_elev';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3976, 'There are no nodes with all values of top_elev, ymax and elev inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3978, 'There are %v_count% nodes with all values of top_elev, ymax and elev inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
+
 
