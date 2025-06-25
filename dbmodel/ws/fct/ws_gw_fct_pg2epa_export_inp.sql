@@ -185,28 +185,28 @@ BEGIN
 	    inp_tank.mixing_model,
 	    inp_tank.mixing_fraction
 	   FROM inp_tank
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_tank.node_id::text = temp_t_node.node_id
 	  WHERE inp_tank.mixing_model IS NOT NULL OR inp_tank.mixing_fraction IS NOT NULL
 	UNION
 	 SELECT inp_dscenario_tank.node_id,
 	    inp_dscenario_tank.mixing_model,
 	    inp_dscenario_tank.mixing_fraction
 	   FROM inp_dscenario_tank
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_dscenario_tank.node_id::text = temp_t_node.node_id
 	  WHERE inp_dscenario_tank.mixing_model IS NOT NULL OR inp_dscenario_tank.mixing_fraction IS NOT NULL
 	UNION
 	 SELECT inp_inlet.node_id,
 	    inp_inlet.mixing_model,
 	    inp_inlet.mixing_fraction
 	   FROM inp_inlet
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_inlet.node_id::text = temp_t_node.node_id
 	  WHERE (inp_inlet.mixing_model IS NOT NULL OR inp_inlet.mixing_fraction IS NOT NULL) AND temp_t_node.epa_type::text = 'TANK'::text
 	UNION
 	 SELECT inp_dscenario_inlet.node_id,
 	    inp_dscenario_inlet.mixing_model,
 	    inp_dscenario_inlet.mixing_fraction
 	   FROM inp_dscenario_inlet
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_dscenario_inlet.node_id::text = temp_t_node.node_id
 	  WHERE (inp_dscenario_inlet.mixing_model IS NOT NULL OR inp_dscenario_inlet.mixing_fraction IS NOT NULL) AND temp_t_node.epa_type::text = 'TANK'::text;
 
 
@@ -365,25 +365,25 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_quality AS
-	 SELECT inp_junction.node_id,inp_junction.init_quality FROM inp_junction LEFT JOIN temp_t_node USING (node_id) WHERE inp_junction.init_quality IS NOT NULL
+	 SELECT inp_junction.node_id,inp_junction.init_quality FROM inp_junction LEFT JOIN temp_t_node ON inp_junction.node_id::text = temp_t_node.node_id WHERE inp_junction.init_quality IS NOT NULL
 	UNION
-	 SELECT inp_dscenario_junction.node_id,inp_dscenario_junction.init_quality FROM inp_dscenario_junction  LEFT JOIN temp_t_node USING (node_id) WHERE inp_dscenario_junction.init_quality IS NOT NULL
+	 SELECT inp_dscenario_junction.node_id,inp_dscenario_junction.init_quality FROM inp_dscenario_junction  LEFT JOIN temp_t_node ON inp_dscenario_junction.node_id::text = temp_t_node.node_id WHERE inp_dscenario_junction.init_quality IS NOT NULL
 	UNION
-	 SELECT inp_inlet.node_id, inp_inlet.init_quality FROM inp_inlet LEFT JOIN temp_t_node USING (node_id) WHERE inp_inlet.init_quality IS NOT NULL
+	 SELECT inp_inlet.node_id, inp_inlet.init_quality FROM inp_inlet LEFT JOIN temp_t_node ON inp_inlet.node_id::text = temp_t_node.node_id WHERE inp_inlet.init_quality IS NOT NULL
 	 UNION
-	  SELECT inp_dscenario_inlet.node_id, inp_dscenario_inlet.init_quality FROM inp_dscenario_inlet LEFT JOIN temp_t_node USING (node_id) WHERE inp_dscenario_inlet.init_quality IS NOT NULL
+	  SELECT inp_dscenario_inlet.node_id, inp_dscenario_inlet.init_quality FROM inp_dscenario_inlet LEFT JOIN temp_t_node ON inp_dscenario_inlet.node_id::text = temp_t_node.node_id WHERE inp_dscenario_inlet.init_quality IS NOT NULL
 	UNION
-	 SELECT inp_tank.node_id, inp_tank.init_quality FROM inp_tank LEFT JOIN temp_t_node USING (node_id) WHERE inp_tank.init_quality IS NOT NULL
+	 SELECT inp_tank.node_id, inp_tank.init_quality FROM inp_tank LEFT JOIN temp_t_node ON inp_tank.node_id::text = temp_t_node.node_id WHERE inp_tank.init_quality IS NOT NULL
 	 UNION
-	 SELECT inp_dscenario_tank.node_id,inp_dscenario_tank.init_quality FROM inp_dscenario_tank LEFT JOIN temp_t_node USING (node_id) WHERE inp_dscenario_tank.init_quality IS NOT NULL
+	 SELECT inp_dscenario_tank.node_id,inp_dscenario_tank.init_quality FROM inp_dscenario_tank LEFT JOIN temp_t_node ON inp_dscenario_tank.node_id::text = temp_t_node.node_id WHERE inp_dscenario_tank.init_quality IS NOT NULL
 	UNION
-	 SELECT inp_reservoir.node_id,inp_reservoir.init_quality FROM inp_reservoir LEFT JOIN temp_t_node USING (node_id) WHERE inp_reservoir.init_quality IS NOT NULL
+	 SELECT inp_reservoir.node_id,inp_reservoir.init_quality FROM inp_reservoir LEFT JOIN temp_t_node ON inp_reservoir.node_id::text = temp_t_node.node_id WHERE inp_reservoir.init_quality IS NOT NULL
 	 UNION
-	 SELECT inp_dscenario_reservoir.node_id, inp_dscenario_reservoir.init_quality FROM inp_dscenario_reservoir LEFT JOIN temp_t_node USING (node_id) WHERE inp_dscenario_reservoir.init_quality IS NOT NULL
+	 SELECT inp_dscenario_reservoir.node_id, inp_dscenario_reservoir.init_quality FROM inp_dscenario_reservoir LEFT JOIN temp_t_node ON inp_dscenario_reservoir.node_id::text = temp_t_node.node_id WHERE inp_dscenario_reservoir.init_quality IS NOT NULL
 	UNION
-	 SELECT inp_virtualvalve.arc_id AS node_id, inp_virtualvalve.init_quality FROM inp_virtualvalve LEFT JOIN temp_t_arc USING (arc_id) WHERE inp_virtualvalve.init_quality IS NOT NULL
+	 SELECT inp_virtualvalve.arc_id AS node_id, inp_virtualvalve.init_quality FROM inp_virtualvalve LEFT JOIN temp_t_arc ON inp_virtualvalve.arc_id::text = temp_t_arc.arc_id WHERE inp_virtualvalve.init_quality IS NOT NULL
 	 UNION
-	  SELECT inp_dscenario_virtualvalve.arc_id AS node_id, inp_dscenario_virtualvalve.init_quality FROM inp_dscenario_virtualvalve LEFT JOIN temp_t_arc USING (arc_id) WHERE inp_dscenario_virtualvalve.init_quality IS NOT NULL;
+	  SELECT inp_dscenario_virtualvalve.arc_id AS node_id, inp_dscenario_virtualvalve.init_quality FROM inp_dscenario_virtualvalve LEFT JOIN temp_t_arc ON inp_dscenario_virtualvalve.arc_id::text = temp_t_arc.arc_id WHERE inp_dscenario_virtualvalve.init_quality IS NOT NULL;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_reactions AS
@@ -434,7 +434,7 @@ BEGIN
 	    inp_junction.source_quality,
 	    inp_junction.source_pattern_id
 	   FROM inp_junction
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_junction.node_id::text = temp_t_node.node_id
 	  WHERE inp_junction.source_type IS NOT NULL OR inp_junction.source_quality IS NOT NULL OR inp_junction.source_pattern_id IS NOT NULL
 	UNION
 	 SELECT inp_dscenario_junction.node_id,
@@ -442,7 +442,7 @@ BEGIN
 	    inp_dscenario_junction.source_quality,
 	    inp_dscenario_junction.source_pattern_id
 	   FROM inp_dscenario_junction
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_dscenario_junction.node_id::text = temp_t_node.node_id
 	  WHERE inp_dscenario_junction.source_type IS NOT NULL OR inp_dscenario_junction.source_quality IS NOT NULL OR inp_dscenario_junction.source_pattern_id IS NOT NULL
 	UNION
 	 SELECT inp_tank.node_id,
@@ -450,7 +450,7 @@ BEGIN
 	    inp_tank.source_quality,
 	    inp_tank.source_pattern_id
 	   FROM inp_tank
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_tank.node_id::text = temp_t_node.node_id
 	  WHERE inp_tank.source_type IS NOT NULL OR inp_tank.source_quality IS NOT NULL OR inp_tank.source_pattern_id IS NOT NULL
 	UNION
 	 SELECT inp_dscenario_tank.node_id,
@@ -458,7 +458,7 @@ BEGIN
 	    inp_dscenario_tank.source_quality,
 	    inp_dscenario_tank.source_pattern_id
 	   FROM inp_dscenario_tank
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_dscenario_tank.node_id::text = temp_t_node.node_id
 	  WHERE inp_dscenario_tank.source_type IS NOT NULL OR inp_dscenario_tank.source_quality IS NOT NULL OR inp_dscenario_tank.source_pattern_id IS NOT NULL
 	UNION
 	 SELECT inp_reservoir.node_id,
@@ -466,7 +466,7 @@ BEGIN
 	    inp_reservoir.source_quality,
 	    inp_reservoir.source_pattern_id
 	   FROM inp_reservoir
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_reservoir.node_id::text = temp_t_node.node_id
 	  WHERE inp_reservoir.source_type IS NOT NULL OR inp_reservoir.source_quality IS NOT NULL OR inp_reservoir.source_pattern_id IS NOT NULL
 	UNION
 	 SELECT inp_dscenario_reservoir.node_id,
@@ -474,7 +474,7 @@ BEGIN
 	    inp_dscenario_reservoir.source_quality,
 	    inp_dscenario_reservoir.source_pattern_id
 	   FROM inp_dscenario_reservoir
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_dscenario_reservoir.node_id::text = temp_t_node.node_id
 	  WHERE inp_dscenario_reservoir.source_type IS NOT NULL OR inp_dscenario_reservoir.source_quality IS NOT NULL OR inp_dscenario_reservoir.source_pattern_id IS NOT NULL
 	UNION
 	 SELECT inp_inlet.node_id,
@@ -482,7 +482,7 @@ BEGIN
 	    inp_inlet.source_quality,
 	    inp_inlet.source_pattern_id
 	   FROM inp_inlet
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_inlet.node_id::text = temp_t_node.node_id
 	  WHERE inp_inlet.source_type IS NOT NULL OR inp_inlet.source_quality IS NOT NULL OR inp_inlet.source_pattern_id IS NOT NULL
 	UNION
 	 SELECT inp_dscenario_inlet.node_id,
@@ -490,7 +490,7 @@ BEGIN
 	    inp_dscenario_inlet.source_quality,
 	    inp_dscenario_inlet.source_pattern_id
 	   FROM inp_dscenario_inlet
-	     LEFT JOIN temp_t_node USING (node_id)
+	     LEFT JOIN temp_t_node ON inp_dscenario_inlet.node_id::text = temp_t_node.node_id
 	  WHERE inp_dscenario_inlet.source_type IS NOT NULL OR inp_dscenario_inlet.source_quality IS NOT NULL OR inp_dscenario_inlet.source_pattern_id IS NOT NULL;
 
 

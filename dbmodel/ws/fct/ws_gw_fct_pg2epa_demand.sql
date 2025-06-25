@@ -42,16 +42,16 @@ BEGIN
 		INTO v_epaunits;
 
 	-- Reset values
-	UPDATE temp_t_node t SET demand = 0 FROM node n WHERE n.node_id = t.node_id AND n.epa_type != 'INLET';
-	UPDATE temp_t_node t SET pattern_id = null FROM node n WHERE n.node_id = t.node_id AND n.epa_type != 'INLET';
+	UPDATE temp_t_node t SET demand = 0 FROM node n WHERE n.node_id::text = t.node_id AND n.epa_type != 'INLET';
+	UPDATE temp_t_node t SET pattern_id = null FROM node n WHERE n.node_id::text = t.node_id AND n.epa_type != 'INLET';
 	
 	IF v_networkmode = 2 THEN -- NETWORK
 
 		-- update patterns for nodes
-		UPDATE temp_t_node SET pattern_id=a.pattern_id FROM v_edit_inp_junction a WHERE temp_t_node.node_id=a.node_id;
+		UPDATE temp_t_node SET pattern_id=a.pattern_id FROM v_edit_inp_junction a WHERE temp_t_node.node_id=a.node_id::text;
 
 		-- demand on nodes
-		UPDATE temp_t_node SET demand=inp_junction.demand FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;
+		UPDATE temp_t_node SET demand=inp_junction.demand FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id::text;
 
 		-- pattern
 		IF v_patternmethod = 11 THEN -- GLOBAL PATTERN
@@ -59,11 +59,11 @@ BEGIN
 
 		ELSIF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
 			UPDATE temp_t_node SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id
-			WHERE temp_t_node.node_id=node.node_id AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
+			WHERE temp_t_node.node_id=node.node_id::text AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 
 		ELSIF v_patternmethod = 13 THEN -- DMA PATTERN (NODE)
 			UPDATE temp_t_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id
-			WHERE temp_t_node.node_id=node.node_id AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
+			WHERE temp_t_node.node_id=node.node_id::text AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (NODE)
 			-- do nothing
