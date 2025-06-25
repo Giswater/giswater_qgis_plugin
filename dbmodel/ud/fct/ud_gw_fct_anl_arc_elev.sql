@@ -51,8 +51,9 @@
 		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=390;
 		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=390;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (390, null, 4, concat('ARC ELEVATION ANALYSIS'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (390, null, 4, '-------------------------------------------------------------');
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3066", "fid":"390", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
 
 		-- Computing process - check y1*elev1
 		IF v_selectionmode = 'previousSelection' THEN
@@ -169,11 +170,11 @@
 		SELECT count(DISTINCT arc_id) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=390;
 
 		IF v_count = 0 THEN
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (390,  'There are no arcs with both values of y and elev inserted.', v_count);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3960", "function":"3066", "fid":"390", "fcount":"'||v_count||'", "is_process":true}}$$)';
 		ELSE
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (390,  concat ('There are ',v_count,' arcs with both values of y and elev inserted.'), v_count);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3962", "function":"3066", "parameters":{"v_count":"'||v_count||'"}, "fid":"390", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 390,  concat ('Arc_id: ',string_agg(distinct arc_id, ', '), '.' ), v_count
