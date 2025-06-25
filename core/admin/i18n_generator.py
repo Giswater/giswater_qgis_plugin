@@ -374,7 +374,7 @@ class GwI18NGenerator:
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbconfig_typevalue':
-            colums = ["source", "formname", "formtype", "project_type", "context", "source_code", "tt_en_us"]
+            colums = ["source", "formname", "project_type", "context", "source_code", "tt_en_us"]
             lang_colums = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbmessage':

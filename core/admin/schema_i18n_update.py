@@ -260,7 +260,7 @@ class GwSchemaI18NUpdate:
                             f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif 'dbconfig_typevalue' in table:
-            columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "tt_en_us"]
+            columns = ["source", "formname", "project_type", "context", "source_code", "tt_en_us"]
             lang_columns = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif 'dbmessage' in table:

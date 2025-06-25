@@ -34,6 +34,8 @@ class GwSchemaI18NManager:
         self.primary_keys_no_project_type_org = []
         self.values_en_us = []
         self.conflict_project_type = []
+        self.schema_i18n = "i18n_proves_1"
+        self.delete_old_keys = False
 
     def init_dialog(self):
         """ Constructor """
@@ -50,7 +52,7 @@ class GwSchemaI18NManager:
     def _set_signals(self):
         # Mysteriously without the partial the function check_connection is not called
         self.dlg_qm.btn_connection.clicked.connect(partial(self._check_connection))
-        self.dlg_qm.btn_search.clicked.connect(self._update_i18n_databse)
+        self.dlg_qm.btn_search.clicked.connect(self._update_i18n_datbase)
         self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
         self.dlg_qm.btn_close.clicked.connect(partial(self._close_db_i18n))
         self.dlg_qm.btn_close.clicked.connect(partial(self._close_db_org))
@@ -215,7 +217,7 @@ class GwSchemaI18NManager:
         self.project_version = schema_info['project_version']
 
     # endregion
-    def _update_i18n_databse(self):
+    def _update_i18n_datbase(self):
         """ Determine which part of the database update (ws, ud, am, pyhton...) """
         self.project_types = []
             
@@ -228,8 +230,6 @@ class GwSchemaI18NManager:
 
         self.py_messages = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_messages)
         self.py_dialogs = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_dialogs)
-        self.delete_old_keys = False
-        self.schema_i18n = "i18n_proves_1"
 
         if self.project_types:
             self._update_db_tables()
@@ -276,38 +276,39 @@ class GwSchemaI18NManager:
             if self.check_for_su_tables:
                 tables_i18n.extend(sutables_i18n)
 
+            # Check if the languages are correct
+            correct_lang = self._verify_lang()
+            if not correct_lang:
+                msg = "Incorrect languages, make sure to have the giswater project in english"
+                tools_qt.show_info_box(msg)
+                continue
+
             # Loop through the tables to update
             text_error += f'\n{self.project_type}:\n'
-            self.dlg_qm.lbl_info.clear()
+            self.dlg_qm.lbl_info.clear()            
             for table_i18n in tables_i18n:
                 table_i18n = f"{self.schema_i18n}.{table_i18n}"
 
                 # Check if the table has already been determined as not existing
                 if table_i18n not in no_repeat_table:
-                    #Get basic information about the table and project
-                    table_exists = self.detect_table_func(table_i18n, self.cursor_i18n)
-                    correct_lang = self._verify_lang()
-                    self._change_table_lyt(table_i18n.split(".")[1])
-
                     # Check if the table exists
+                    table_exists = self.detect_table_func(table_i18n, self.cursor_i18n)
                     if not table_exists:
                         msg = "The table ({0}) does not exists"
                         msg_params = (table_i18n,)
                         tools_qt.show_info_box(msg, msg_params=msg_params)
                         no_repeat_table.append(table_i18n)
-                    # Check if the table exists
-                    elif correct_lang:
-                        # Update the table
-                        text_error += self._update_tables(table_i18n)
+                
+                    # Change the table layout
+                    self._change_table_lyt(table_i18n.split(".")[1])
 
-                        # check for all primary keys reapeted, but project_types
-                        if self.project_type == 'ud':
-                            text_error += self._rewrite_project_type(table_i18n)
-                        self._vacuum_commit(table_i18n, self.conn_i18n, self.cursor_i18n)
-                    else:
-                        msg = "Incorrect languages, make sure to have the giswater project in english"
-                        tools_qt.show_info_box(msg)
-                        break
+                    # Update the table
+                    text_error += self._update_tables(table_i18n)
+
+                    # check for all primary keys reapeted, but project_types
+                    if self.project_type == 'ud':
+                        text_error += self._rewrite_project_type(table_i18n)
+                    self._vacuum_commit(table_i18n, self.conn_i18n, self.cursor_i18n)
 
         self.dlg_qm.lbl_info.clear()
         self.save_and_open_text_error(text_error)
@@ -355,27 +356,37 @@ class GwSchemaI18NManager:
     def _update_any_table(self, table_i18n, table_org):
         """Insert and update rows in a classical translation table."""
 
+        # Get the rows to update
         diff_rows, columns_i18n = self._rows_to_update(table_i18n, table_org)
 
         if not diff_rows:
             return ""
 
+        # Get the columns to insert
         columns_org = diff_rows[0].keys()
         columns_to_insert = ", ".join(columns_i18n)
+
+        # Get the primary keys
         pk_columns = [col for col in columns_i18n if not col.endswith("_en_us")]
         pk_columns_str = ", ".join(pk_columns)
-
+        
+        # Insert the rows
         query_insert = ""
         if diff_rows:
-            for k, row in enumerate(diff_rows):
+            for row in diff_rows:
                 values = []
                 update_values = []
+
+                # Get the values to insert
                 for col in columns_org:
                     val = row.get(col)
                     values.append("NULL" if val in [None, ''] else f"'{str(val).replace("'", "''")}'")
+
+                # Get the values to update
                 for col in self.values_en_us:
                     update_values.append(f"{col} = EXCLUDED.{col}")
 
+                # Get the query to insert
                 values_str = ", ".join(values)
                 update_values_str = ", ".join(update_values)
                 query_insert += f"""INSERT INTO {table_i18n} ({columns_to_insert}) VALUES ({values_str}) 
@@ -389,8 +400,8 @@ class GwSchemaI18NManager:
         # Set the columns and rows to compare
         # Columns_i18n (columns translation DB), Colums_org (columns original DB), names (colums to translate in original DB)
         if 'dbconfig_form_fields' in table_i18n:
-            columns_i18n = ["formname", "formtype", "source", "lb_en_us", "tt_en_us"]
-            columns_org = ["formname", "formtype", "columnname", "label", "tooltip"]
+            columns_i18n = ["formname", "formtype", "tabname", "source", "lb_en_us", "tt_en_us"]
+            columns_org = ["formname", "formtype", "tabname", "columnname", "label", "tooltip"]
 
         elif 'dbparam_user' in table_i18n:
             columns_i18n = ["source", "formname", "lb_en_us", "tt_en_us"]
@@ -401,7 +412,7 @@ class GwSchemaI18NManager:
             columns_org = ["parameter", "label", "descript"]
 
         elif 'dbconfig_typevalue' in table_i18n:
-            columns_i18n = ["formname", "formtype", "source", "tt_en_us"]
+            columns_i18n = ["formname", "source", "tt_en_us"]
             columns_org = ["typevalue", "id", "idval"]
 
         elif 'dbmessage' in table_i18n:
@@ -477,9 +488,11 @@ class GwSchemaI18NManager:
         self.values_en_us = []
         self.conflict_project_type = []
 
+        # Get the columns and rows to compare
         columns_i18n, columns_org = self._get_columns_to_compare(table_i18n, table_org)
         rows_i18n, rows_org = self._get_rows_to_compare(table_i18n, columns_i18n, columns_org, table_org)
 
+        # Rewrite the columns to get the name. Also determine diferent kinds of columns useful in the future
         for i, column in enumerate(columns_i18n):
             if "CAST(" in column:
                 columns_i18n[i] = column[5:].split(" ")[0]
@@ -490,6 +503,7 @@ class GwSchemaI18NManager:
                 else:
                     self.values_en_us.append(columns_i18n[i])
 
+        # Clean the rows i18n (remove None values and unify project_type)
         if rows_i18n:
             cleaned_i18n = []
             for i, row in enumerate(rows_i18n):
@@ -504,6 +518,7 @@ class GwSchemaI18NManager:
                 cleaned_i18n.append(clean_row)
             rows_i18n = cleaned_i18n
 
+        # Clean the rows org (add extra columns and remove None values)
         if rows_org:
             cleaned_org = []
             extra_columns = {"project_type": self.project_type, "source_code": "giswater", "context": table_org}
@@ -521,6 +536,7 @@ class GwSchemaI18NManager:
         
         # Efficient diff using set of tuples
         diff_rows = self._set_operation_on_dict(rows_org, rows_i18n, op='-', compare='values')
+        print(f"diff_rows: {diff_rows}")
 
         return diff_rows, columns_i18n
 
@@ -528,32 +544,20 @@ class GwSchemaI18NManager:
     def _get_rows_to_compare(self, table_i18n, columns_i18n, columns_org, table_org):
         """ Get the rows to compare """
 
+        # Create the query to get the rows from the i18n table
         columns = ", ".join(columns_i18n)
         query = f"SELECT {columns} FROM {table_i18n}"
         if self.project_type in ["cm", "am"]:
             query += f" WHERE project_type = '{self.project_type}' OR project_type = 'utils'"
         query += ";"
-        rows_i18n = self._get_rows(query, self.cursor_i18n)
+        rows_i18n = self._get_rows(query, self.cursor_i18n) 
 
+        # Create the query to get the rows from the original table
         columns = ", ".join(columns_org)
         query = f"SELECT {columns} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
 
         return rows_i18n, rows_org
-    
-    def _get_pk_rows(self, table_i18n):
-        """ Get the primary key columns from the table """
-        query = f"""
-            SELECT column_name 
-            FROM information_schema.columns 
-            WHERE table_name = '{table_i18n.split('.')[1]}'
-            AND table_schema = '{table_i18n.split('.')[0]}'
-            AND is_primary_key = true;"""
-        self.cursor_i18n.execute(query)
-        pk_columns = [row[0] for row in self.cursor_i18n.fetchall()]
-        query = f"SELECT {', '.join(pk_columns)} FROM {table_i18n};"
-        self.cursor_i18n.execute(query)
-        return self.cursor_i18n.fetchall()
 
     # endregion
     # region Json
@@ -693,10 +697,12 @@ class GwSchemaI18NManager:
     def _rewrite_project_type(self, table):
         """Rewrite the project_type to the correct value"""
 
+        # Determine which rows that although they share primary keys but different project_type must not be converted to utils
         text = self._update_fake_utils(table)
         if text:
             return text
 
+        # Get the duplicated rows
         query = self._get_duplicates_rows(table)
         try:
             self.cursor_i18n.execute(query)
@@ -705,7 +711,10 @@ class GwSchemaI18NManager:
             return f"Error getting dupplicates (Rename proj.type): {e}\n\n"
 
         if duplicated_rows:
+            # Get rows to delete and rows to update
             delete_query, update_query = self._update_project_type(table, duplicated_rows)
+
+            # Delete the rows
             try:
                 self.cursor_i18n.execute(delete_query)
                 self.conn_i18n.commit()
@@ -713,6 +722,7 @@ class GwSchemaI18NManager:
                 self.conn_i18n.rollback()
                 return f"Error deleting repeated rows (Rename proj.type): {e}\n\n"
 
+            # Update the rows
             try:
                 self.cursor_i18n.execute(update_query)
                 self.conn_i18n.commit()
@@ -731,7 +741,8 @@ class GwSchemaI18NManager:
         values_en_us_ud = []
         values_en_us_ws = []
         values_en_us_utils = []
-        # Agafar els valors de %_en_us
+        
+
         fake_pks_ud = self._get_fake_primary_keys(table, "ud")
         if fake_pks_ud:
             values_en_us_ud = self._get_values_en_us(table, fake_pks_ud, "ud")
@@ -1575,18 +1586,18 @@ class GwSchemaI18NManager:
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_typevalue"],
+                "dbtables": ["dbconfig_form_fields"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_typevalue"],
+                "dbtables": ["dbconfig_form_fields"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
