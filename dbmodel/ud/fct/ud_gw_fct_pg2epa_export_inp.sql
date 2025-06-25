@@ -492,7 +492,7 @@ BEGIN
 	    temp_t_node_other.timser_id,
 	    'FLOW'::text AS format,
 	    1::numeric(12,4) AS mfactor,
-	    temp_t_node_other.sfactor,
+		1::numeric(12,4) AS sfactor,
 	    temp_t_node_other.base,
 	    temp_t_node_other.pattern_id
 	   FROM temp_t_node_other
