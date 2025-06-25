@@ -152,7 +152,7 @@ class GwSnapshotViewButton(GwAction):
         except Exception as e:
             msg = "Failed to load layers"
             param = str(e)
-            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
+            tools_qgis.show_warning(msg, dialog=self.dlg_snapshot_view, parameter=param)
 
     def _update_current_polygon(self, origin, id_name=None, id=None):
         """ Update polygon """
