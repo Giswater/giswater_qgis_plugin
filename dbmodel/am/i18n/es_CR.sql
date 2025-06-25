@@ -35,8 +35,8 @@ UPDATE value_result_type AS t
 SET idval = v.idval
 FROM (
     VALUES
-    ('GLOBAL', 'GLOBAL'),
-    ('SELECTION', 'SELECCIÓN')
+    ('SELECTION', 'SELECCIÓN'),
+    ('GLOBAL', 'GLOBAL')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 
@@ -44,8 +44,8 @@ UPDATE value_status AS t
 SET idval = v.idval
 FROM (
     VALUES
-    ('FINISHED', 'ACABADO'),
     ('ON PLANNING', 'EN PLANIFICACIÓN'),
+    ('FINISHED', 'ACABADO'),
     ('CANCELED', 'CANCELADO')
 ) AS v(id, idval)
 WHERE t.id = v.id;
