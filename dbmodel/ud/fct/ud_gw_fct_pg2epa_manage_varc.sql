@@ -35,7 +35,7 @@ BEGIN
 		RAISE NOTICE 'rec_virtual %', rec_virtual;
 
 		-- Taking values from inp_virtual arc
-		SELECT fusion_node, add_length INTO fusion_node_aux, add_length_bool FROM inp_virtual WHERE arc_id=rec_virtual.arc_id;
+		SELECT fusion_node, add_length INTO fusion_node_aux, add_length_bool FROM inp_virtual WHERE arc_id::text=rec_virtual.arc_id;
 
 		IF fusion_node_aux IS NULL THEN
 			fusion_node_aux:=(SELECT node_id FROM temp_t_node WHERE (node_id=rec_virtual.node_1 AND node_type='JUNCTION')
@@ -43,7 +43,7 @@ BEGIN
 		END IF;
 
 		-- Taking values from the fusion node (as node1)
-		FOR rec_arc IN SELECT * FROM temp_t_arc WHERE node_1=rec_virtual.node_2 AND node_1=fusion_node_aux
+		FOR rec_arc IN SELECT * FROM temp_t_arc WHERE node_1=rec_virtual.node_2 AND node_1=fusion_node_aux::text
 		LOOP
 
 			-- Looking for add or not the length of virtual arc to the destination arc
@@ -69,7 +69,7 @@ BEGIN
 		END LOOP;
 
 		-- Taking values from the fusion node (as node2)
-		FOR rec_arc IN SELECT * FROM temp_t_arc WHERE node_2=rec_virtual.node_1 AND node_2=fusion_node_aux
+		FOR rec_arc IN SELECT * FROM temp_t_arc WHERE node_2=rec_virtual.node_1 AND node_2=fusion_node_aux::text
 		LOOP
 
 			-- Looking for add or not the length of virtual arc to the destination arc

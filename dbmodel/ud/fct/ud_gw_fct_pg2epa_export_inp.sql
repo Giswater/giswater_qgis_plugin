@@ -135,7 +135,7 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_conduits AS
-	 SELECT arc_id,
+	 SELECT t.arc_id,
 	    t.node_1,
 	    t.node_2,
 	    t.length,
@@ -146,7 +146,7 @@ BEGIN
 	    t.qmax::numeric(12,4) AS qmax,
 	    concat(';', t.sector_id, ' ', t.arccat_id, ' ', t.age) AS other
 	   FROM temp_t_arc t
-	     JOIN inp_conduit USING (arc_id)
+	     JOIN inp_conduit ON t.arc_id = inp_conduit.arc_id::text
 	UNION
 	 SELECT t.arc_id,
 	    t.node_1,
@@ -671,7 +671,7 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_orifices AS
-	 SELECT arc_id,
+	 SELECT temp_t_arc.arc_id,
 	    temp_t_arc.node_1,
 	    temp_t_arc.node_2,
 	    f.ori_type,
@@ -680,7 +680,7 @@ BEGIN
 	    f.flap,
 	    f.orate
 	   FROM temp_t_arc_flowregulator f
-	     JOIN temp_t_arc USING (arc_id)
+	     JOIN temp_t_arc ON f.arc_id::text = temp_t_arc.arc_id
 	  WHERE f.type::text = 'ORIFICE'::text;
 
 
@@ -719,7 +719,7 @@ BEGIN
 
 
 	 CREATE OR REPLACE TEMP VIEW vi_t_outlets AS
-	 SELECT arc_id,
+	 SELECT temp_t_arc.arc_id,
 	    temp_t_arc.node_1,
 	    temp_t_arc.node_2,
 		CASE
@@ -734,7 +734,7 @@ BEGIN
 	    f.cd2::text AS other2,
 	    f.flap::character varying AS other3
 	   FROM temp_t_arc_flowregulator f
-	     JOIN temp_t_arc USING (arc_id)
+	     JOIN temp_t_arc ON f.arc_id::text = temp_t_arc.arc_id
 	  WHERE f.type::text = 'OUTLET'::text;
 
 
@@ -761,7 +761,7 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_pumps AS
-	 SELECT arc_id,
+	 SELECT temp_t_arc.arc_id,
 	    temp_t_arc.node_1,
 	    temp_t_arc.node_2,
 	    temp_t_arc_flowregulator.curve_id,
@@ -769,7 +769,7 @@ BEGIN
 	    temp_t_arc_flowregulator.startup,
 	    temp_t_arc_flowregulator.shutoff
 	   FROM temp_t_arc_flowregulator
-	     JOIN temp_t_arc USING (arc_id)
+	     JOIN temp_t_arc ON temp_t_arc_flowregulator.arc_id::text = temp_t_arc.arc_id
 	  WHERE temp_t_arc_flowregulator.type::text = 'PUMP'::text;
 
 	CREATE OR REPLACE TEMP VIEW vi_t_raingages AS
@@ -819,15 +819,15 @@ BEGIN
 		union
 		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id
 		from config_param_user where parameter = 'inp_report_nodes' and cur_user=current_user)a
-		join temp_t_node n on n.node_id = a.node_id::int4
+		join temp_t_node n on n.node_id = a.node_id::text
 		UNION
 		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id
 		from config_param_user where parameter = 'inp_report_nodes_2' and cur_user=current_user)a
-		join temp_t_node n on n.node_id = a.node_id::int4
+		join temp_t_node n on n.node_id = a.node_id::text
 		union
 		select 'LINKS', replace(replace(replace(array_agg(a.arc_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as arc_id
 		from config_param_user where parameter = 'inp_report_link' and cur_user=current_user)a
-		join temp_t_arc n on n.arc_id = a.arc_id::int4)a
+		join temp_t_arc n on n.arc_id = a.arc_id::text)a
 		where value is not null
 		ORDER BY 1;
 
@@ -987,7 +987,7 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_weirs AS
-	 SELECT arc_id,
+	 SELECT temp_t_arc.arc_id,
 	    temp_t_arc.node_1,
 	    temp_t_arc.node_2,
 	    f.weir_type,
@@ -1001,7 +1001,7 @@ BEGIN
 	    f.road_surf,
 	    f.coef_curve
 	   FROM temp_t_arc_flowregulator f
-	     JOIN temp_t_arc USING (arc_id)
+	     JOIN temp_t_arc ON f.arc_id::text = temp_t_arc.arc_id
 	  WHERE f.type::text = 'WEIR'::text;
 
 
@@ -1017,7 +1017,7 @@ BEGIN
 	   FROM temp_t_arc
 	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
 	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-	  WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id
+	  WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id::text
 		   FROM temp_t_arc_flowregulator))
 	UNION
 	 SELECT temp_t_arc.arc_id,
@@ -1031,7 +1031,7 @@ BEGIN
 	   FROM temp_t_arc
 	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
 	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-	  WHERE (cat_arc_shape.epa::text <> ALL (ARRAY['CUSTOM'::text, 'IRREGULAR'::text])) AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id
+	  WHERE (cat_arc_shape.epa::text <> ALL (ARRAY['CUSTOM'::text, 'IRREGULAR'::text])) AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id::text
 		   FROM temp_t_arc_flowregulator))
 	UNION
 	 SELECT temp_t_arc.arc_id,
@@ -1045,10 +1045,10 @@ BEGIN
 	   FROM temp_t_arc
 	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
 	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-	  WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id
+	  WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id::text
 		   FROM temp_t_arc_flowregulator))
 	UNION
-	 SELECT temp_t_arc_flowregulator.arc_id,
+	 SELECT temp_t_arc_flowregulator.arc_id::text,
 	    temp_t_arc_flowregulator.shape,
 	    temp_t_arc_flowregulator.geom1::text AS other1,
 	    temp_t_arc_flowregulator.geom2::text AS other2,
