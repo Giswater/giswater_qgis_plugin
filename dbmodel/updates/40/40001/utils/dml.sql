@@ -2491,5 +2491,5 @@ WHERE id='edit_connec_linkcat_vdefault';
 UPDATE sys_function SET function_alias = 'IMPORT CATALOG' WHERE function_name = 'gw_fct_import_catalog';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3954, 'Nothing to import', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4136, 'Nothing to import', null, 0, true, 'utils', 'core', 'AUDIT');
 

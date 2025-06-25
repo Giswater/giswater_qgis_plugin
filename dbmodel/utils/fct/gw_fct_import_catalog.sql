@@ -62,7 +62,7 @@ BEGIN
 
 	IF v_count =0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3954", "function":"3150", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"4136", "function":"3150", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		;
 	ELSE
 		--check if shortcut_key is duplicated with excisting data
