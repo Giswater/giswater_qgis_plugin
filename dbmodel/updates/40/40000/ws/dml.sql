@@ -2986,7 +2986,7 @@ UPDATE config_form_fields
 	WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='cancel_mincut';
 
 UPDATE config_form_fields
-	SET widgetcontrols='{"saveValue":false,"text":"Cancel mincut", "onContextMenu":"Delete mincut"}'::json
+	SET widgetcontrols='{"saveValue":false,"text":"Delete mincut", "onContextMenu":"Delete mincut"}'::json
 	WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='delete';
 
 UPDATE config_function SET "style"='{
