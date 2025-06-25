@@ -96,7 +96,7 @@ BEGIN
 	CREATE TEMP TABLE IF NOT EXISTS temp_config_toolbox AS SELECT*FROM config_toolbox;
 
 	IF v_projectype = 'ws' then
-	
+
 		v_mincut = (SELECT result_id FROM selector_mincut_result WHERE cur_user = current_user limit 1 );
 
 		if v_function_id in (3142, 3110) then
@@ -217,19 +217,20 @@ BEGIN
 			EXECUTE v_querytext INTO v_queryresult;
 
 			IF v_queryresult IS NOT NULL THEN
-				v_querytext = concat('SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', "comboNames":'',
-				array_to_json(array_agg(to_json(idval::text)))) FROM (',v_querytext_mod,')a');
-				v_debug_vars := json_build_object('v_querytext_mod', v_querytext_mod);
-				v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 70);
-				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				v_querytext = concat(
+					'SELECT json_build_object(',
+					'''comboIds'', array_agg(id::text), ',
+					'''comboNames'', array_agg(idval::text)',
+					') FROM (', v_querytext_mod, ')a'
+				);
 				EXECUTE v_querytext INTO v_queryresult;
 			ELSE
-				v_queryresult = '"comboIds":[], "comboNames":[]';
+				v_queryresult = '{"comboIds":[], "comboNames":[]}';
 			END IF;
 
-			v_rec_replace = (REPLACE(rec.inputparams::text, concat('"dvQueryText":"', rec.inputparams::json->>'dvQueryText','"') , v_queryresult))::json;
-			v_rec_replace = (REPLACE(v_rec_replace::text, concat('"selectedId":"', rec.inputparams::json->>'selectedId','"'), v_selectedid))::json;
-			v_rec_replace := v_rec_replace::jsonb || concat('{',v_queryresult,'}')::jsonb;
+			-- Remove dvQueryText and merge with v_queryresult
+			v_rec_replace := ((rec.inputparams::jsonb) #- '{dvQueryText}') || (v_queryresult::jsonb);
+
 			v_fields = (REPLACE(v_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
 
 		ELSIF v_value ilike '$user%' THEN
