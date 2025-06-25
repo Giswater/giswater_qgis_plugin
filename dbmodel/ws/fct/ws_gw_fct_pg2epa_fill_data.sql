@@ -155,6 +155,7 @@ BEGIN
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
 			||v_statetype||' AND v_edit_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
+			AND ''ARC'' = ANY(cat_material.feature_type)
 			AND epa_type != ''UNDEFINED''
 			AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0
 			AND st_length(v_edit_arc.the_geom) >= '||v_minlength;
@@ -212,14 +213,14 @@ BEGIN
 	-- update addparam for inp_shortpipe (step 1)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
-	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a USING (node_id)
-	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id;
+	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id::text = v_edit_inp_shortpipe.node_id
+	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id::text;
 
 	-- update addparam for inp_shortpipe (step 2)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
-	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a USING (node_id)
-	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id;
+	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id::text = v_edit_inp_shortpipe.node_id
+	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id::text;
 
 
 	RETURN 1;

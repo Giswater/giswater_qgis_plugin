@@ -442,33 +442,3 @@ ALTER TABLE temp_anlgraph ALTER COLUMN node_1 TYPE integer USING node_1::integer
 ALTER TABLE temp_anlgraph ALTER COLUMN node_2 TYPE integer USING node_2::integer;
 
 ALTER TABLE inp_virtual ALTER COLUMN fusion_node TYPE integer USING fusion_node::integer;
-
-ALTER TABLE temp_arc ADD COLUMN code text;
-ALTER TABLE temp_node ADD COLUMN code text;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

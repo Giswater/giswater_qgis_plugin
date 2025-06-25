@@ -516,12 +516,6 @@ ALTER TABLE plan_netscenario_connec ALTER COLUMN connec_id TYPE int4 USING conne
 
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 
-ALTER TABLE temp_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE temp_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-ALTER TABLE temp_arc ALTER COLUMN arcparent TYPE int4 USING arcparent::int4;
-ALTER TABLE temp_arc ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
-ALTER TABLE temp_arc ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
-
 ALTER TABLE inp_dscenario_demand ALTER COLUMN feature_id TYPE int4 USING feature_id::int4;
 
 ALTER TABLE plan_rec_result_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
@@ -554,11 +548,6 @@ ALTER TABLE om_mincut_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::i
 
 ALTER TABLE om_mincut_valve_unaccess ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE om_mincut_valve ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-
-
-ALTER TABLE temp_node ADD COLUMN code text;
-ALTER TABLE temp_node ALTER COLUMN nodeparent TYPE int4 USING nodeparent::int4;
-ALTER TABLE temp_arc ADD COLUMN code text;
 
 ALTER TABLE temp_demand ALTER COLUMN feature_id TYPE int4 USING feature_id::int4;
 

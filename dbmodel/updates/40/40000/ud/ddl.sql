@@ -342,7 +342,7 @@ DROP INDEX IF EXISTS temp_node_result_id;
 CREATE TABLE temp_node (
 	id serial4 NOT NULL,
 	result_id varchar(30) NULL,
-	node_id int4 NOT NULL,
+	node_id text NOT NULL,
 	top_elev numeric(12, 3) NULL,
 	ymax numeric(12, 3) NULL,
 	elev numeric(12, 3) NULL,
@@ -394,9 +394,9 @@ DROP INDEX IF EXISTS temp_arc_result_id;
 CREATE TABLE temp_arc (
 	id serial4 NOT NULL,
 	result_id varchar(30) NULL,
-	arc_id int4 NOT NULL,
-	node_1 int4 NULL,
-	node_2 int4 NULL,
+	arc_id text NOT NULL,
+	node_1 text NULL,
+	node_2 text NULL,
 	elevmax1 numeric(12, 3) NULL,
 	elevmax2 numeric(12, 3) NULL,
 	arc_type varchar(30) NULL,

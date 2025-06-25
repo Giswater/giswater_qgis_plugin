@@ -34,7 +34,7 @@ SELECT col_is_pk('temp_node', ARRAY['id'], 'Column id should be primary key');
 -- Check column types
 SELECT col_type_is('temp_node', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('temp_node', 'result_id', 'character varying(30)', 'Column result_id should be character varying(30)');
-SELECT col_type_is('temp_node', 'node_id', 'integer', 'Column node_id should be integer');
+SELECT col_type_is('temp_node', 'node_id', 'text', 'Column node_id should be text');
 SELECT col_type_is('temp_node', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('temp_node', 'top_elev', 'numeric(12,3)', 'Column top_elev should be numeric(12,3)');
 SELECT col_type_is('temp_node', 'elev', 'numeric(12,3)', 'Column elev should be numeric(12,3)');
@@ -50,7 +50,7 @@ SELECT col_type_is('temp_node', 'the_geom', 'geometry(Point,25831)', 'Column the
 SELECT col_type_is('temp_node', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('temp_node', 'pattern_id', 'character varying(16)', 'Column pattern_id should be character varying(16)');
 SELECT col_type_is('temp_node', 'addparam', 'text', 'Column addparam should be text');
-SELECT col_type_is('temp_node', 'nodeparent', 'integer', 'Column nodeparent should be integer');
+SELECT col_type_is('temp_node', 'nodeparent', 'text', 'Column nodeparent should be text');
 SELECT col_type_is('temp_node', 'arcposition', 'smallint', 'Column arcposition should be smallint');
 SELECT col_type_is('temp_node', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('temp_node', 'presszone_id', 'text', 'Column presszone_id should be text');
