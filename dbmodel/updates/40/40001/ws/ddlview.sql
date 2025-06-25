@@ -1729,8 +1729,8 @@ CREATE OR REPLACE VIEW v_rtc_period_hydrometer
 AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     v_edit_connec.connec_id,
     NULL::int4 AS pjoint_id,
-    temp_arc.node_1,
-    temp_arc.node_2,
+    temp_arc.node_1::int4,
+    temp_arc.node_2::int4,
     ext_cat_period.id AS period_id,
     ext_cat_period.period_seconds,
     c.dma_id,
@@ -1759,7 +1759,7 @@ AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
 UNION
  SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     v_edit_connec.connec_id,
-    temp_node.node_id AS pjoint_id,
+    temp_node.node_id::int4 AS pjoint_id,
     NULL::int4 AS node_1,
     NULL::int4 AS node_2,
     ext_cat_period.id AS period_id,
@@ -1790,7 +1790,7 @@ UNION
 UNION
  SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     v_edit_connec.connec_id,
-    temp_node.node_id AS pjoint_id,
+    temp_node.node_id::int4 AS pjoint_id,
     NULL::int4 AS node_1,
     NULL::int4 AS node_2,
     ext_cat_period.id AS period_id,
@@ -1813,7 +1813,7 @@ UNION
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
      LEFT JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
-     JOIN temp_node ON v_edit_connec.pjoint_id = temp_node.node_id
+     JOIN temp_node ON v_edit_connec.pjoint_id::text = temp_node.node_id::text
      JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
   WHERE v_edit_connec.pjoint_type::text = 'NODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
            FROM config_param_user
