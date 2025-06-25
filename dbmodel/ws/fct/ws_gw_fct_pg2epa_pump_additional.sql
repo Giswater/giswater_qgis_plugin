@@ -46,18 +46,18 @@ BEGIN
     SELECT * INTO rec FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- assign value for record_new_arc
-	SELECT * INTO record_new_arc FROM arc LIMIT 1;
+	SELECT * INTO record_new_arc FROM temp_t_arc LIMIT 1;
 
 	--  Start process
     RAISE NOTICE 'Starting additional pumps process.';
 
 	--  Loop for pumping stations
-    FOR node_id_aux IN (SELECT DISTINCT a.node_id FROM inp_pump_additional a JOIN temp_t_arc ON concat(node_id,'_n2a')=code JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'POWERPUMP')
+    FOR node_id_aux IN (SELECT DISTINCT a.node_id FROM inp_pump_additional a JOIN temp_t_arc ON concat(node_id,'_n2a')=arc_id JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'POWERPUMP')
     LOOP
-		SELECT * INTO arc_rec FROM temp_t_arc WHERE code=concat(node_id_aux,'_n2a');
+		SELECT * INTO arc_rec FROM temp_t_arc WHERE arc_id=concat(node_id_aux,'_n2a');
 
 		-- Loop for additional pumps
-		FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id=node_id_aux
+		FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id::text=node_id_aux
 		LOOP
 
 			-- Id creation from pattern arc

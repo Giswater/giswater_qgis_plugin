@@ -104,7 +104,7 @@ BEGIN
 	-- update child param for inp_tank
 	UPDATE temp_t_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
-	FROM inp_tank WHERE temp_t_node.node_id=inp_tank.node_id;
+	FROM inp_tank WHERE temp_t_node.node_id=inp_tank.node_id::text;
 
 	-- update child param for inp_inlet
 	UPDATE temp_t_node SET
@@ -112,25 +112,25 @@ BEGIN
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'", "mixing_model":"',mixing_model,'", "mixing_fraction":"',mixing_fraction,'", "reaction_coeff":"',reaction_coeff,'", 
 	"init_quality":"',init_quality,'", "source_type":"',source_type,'", "source_quality":"',source_quality,'", "source_pattern_id":"',source_pattern_id,'",
 	"demand":"',i.demand,'", "demand_pattern_id":"',demand_pattern_id,'","emitter_coeff":"',emitter_coeff,'"}')
-	FROM inp_inlet i WHERE temp_t_node.node_id=i.node_id;
+	FROM inp_inlet i WHERE temp_t_node.node_id=i.node_id::text;
 
 	-- update child param for inp_junction
 	UPDATE temp_t_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
-	FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;
+	FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id::text;
 
 	UPDATE temp_t_node SET demand=inp_connec.demand, pattern_id=inp_connec.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
-	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id;
+	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id::text;
 
 	-- update child param for inp_valve
 	UPDATE temp_t_node SET addparam=concat('{"valve_type":"',valve_type,'", "setting":"',setting,'", "diameter":"',custom_dint,
 	'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
 	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
-	FROM v_edit_inp_valve v WHERE temp_t_node.node_id=v.node_id;
+	FROM v_edit_inp_valve v WHERE temp_t_node.node_id=v.node_id::text;
 
 	-- update addparam for inp_pump
 	UPDATE temp_t_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',p.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
 	'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"',pump_type,'"}')
-	FROM v_edit_inp_pump p WHERE temp_t_node.node_id=p.node_id;
+	FROM v_edit_inp_pump p WHERE temp_t_node.node_id=p.node_id::text;
 
 	raise notice 'inserting arcs on temp_t_arc table';
 
@@ -195,7 +195,7 @@ BEGIN
 	minorloss = inp_pipe.minorloss,
 	status = (CASE WHEN inp_pipe.status IS NULL THEN 'OPEN' ELSE inp_pipe.status END),
 	addparam=concat('{"reactionparam":"',inp_pipe.reactionparam, '","reactionvalue":"',inp_pipe.reactionvalue,'"}')
-	FROM inp_pipe WHERE temp_t_arc.arc_id=inp_pipe.arc_id;
+	FROM inp_pipe WHERE temp_t_arc.arc_id=inp_pipe.arc_id::text;
 
 	-- update child param for inp_virtualvalve
 	UPDATE temp_t_arc SET
@@ -203,23 +203,23 @@ BEGIN
 	diameter = inp_virtualvalve.diameter,
 	status = inp_virtualvalve.status,
 	addparam=concat('{"valve_type":"',valve_type,'", "setting":"',setting,'", "curve_id":"',curve_id,'"}')
-	FROM inp_virtualvalve WHERE temp_t_arc.arc_id=inp_virtualvalve.arc_id;
+	FROM inp_virtualvalve WHERE temp_t_arc.arc_id=inp_virtualvalve.arc_id::text;
 
 	-- update addparam for inp_virtualpump
 	UPDATE temp_t_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',p.pattern_id,'", "status":"',p.status,'",
 	"effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"POWERPUMP"}')
-	FROM inp_virtualpump p WHERE temp_t_arc.arc_id=p.arc_id;
+	FROM inp_virtualpump p WHERE temp_t_arc.arc_id=p.arc_id::text;
 
 	-- update addparam for inp_shortpipe (step 1)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
-	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id::text = v_edit_inp_shortpipe.node_id
+	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id = v_edit_inp_shortpipe.node_id::text
 	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id::text;
 
 	-- update addparam for inp_shortpipe (step 2)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
-	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id::text = v_edit_inp_shortpipe.node_id
+	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id = v_edit_inp_shortpipe.node_id::text
 	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id::text;
 
 

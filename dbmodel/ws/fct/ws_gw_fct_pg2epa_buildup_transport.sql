@@ -28,7 +28,7 @@ BEGIN
 	FOR rec_node IN SELECT * FROM temp_t_node WHERE epa_type = 'INLET'
 	LOOP
 		-- getting the sector of the inlet
-		v_inletsector = (SELECT sector_id FROM node WHERE node_id =  rec_node.node_id);
+		v_inletsector = (SELECT sector_id FROM node WHERE node_id::text =  rec_node.node_id);
 
 		-- get how many sectors are attached
 		SELECT count(*) INTO v_count FROM (
