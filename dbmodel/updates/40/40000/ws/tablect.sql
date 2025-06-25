@@ -504,12 +504,6 @@ ALTER TABLE rpt_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE rpt_arc_stats ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE archived_rpt_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE archived_rpt_arc_stats ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-ALTER TABLE rpt_inp_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE rpt_inp_node ALTER COLUMN nodeparent TYPE int4 USING nodeparent::int4;
-ALTER TABLE rpt_inp_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-ALTER TABLE rpt_inp_arc ALTER COLUMN arcparent TYPE int4 USING arcparent::int4;
-ALTER TABLE rpt_inp_arc ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
-ALTER TABLE rpt_inp_arc ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
 ALTER TABLE plan_netscenario_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE plan_netscenario_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE plan_netscenario_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
@@ -522,20 +516,6 @@ ALTER TABLE plan_rec_result_node ALTER COLUMN node_id TYPE int4 USING node_id::i
 ALTER TABLE plan_rec_result_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE plan_rec_result_arc ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
 ALTER TABLE plan_rec_result_arc ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
-
-
-ALTER TABLE anl_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE anl_node ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-ALTER TABLE anl_node ALTER COLUMN node_id_aux TYPE int4 USING node_id_aux::int4;
-ALTER TABLE anl_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-ALTER TABLE anl_connec ALTER COLUMN connec_id_aux TYPE int4 USING connec_id_aux::int4;
-ALTER TABLE anl_arc ALTER COLUMN node_1 TYPE int4 USING node_1::int4;
-ALTER TABLE anl_arc ALTER COLUMN node_2 TYPE int4 USING node_2::int4;
-ALTER TABLE anl_arc ALTER COLUMN arc_id_aux TYPE int4 USING arc_id_aux::int4;
-ALTER TABLE anl_arc_x_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE anl_arc_x_node ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-
-ALTER TABLE anl_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;
 
 ALTER TABLE temp_anlgraph ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE temp_anlgraph ALTER COLUMN node_1 TYPE int4 USING node_1::int4;

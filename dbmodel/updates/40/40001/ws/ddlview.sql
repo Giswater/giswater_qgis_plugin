@@ -2114,7 +2114,7 @@ AS SELECT rpt_node.id,
     node.the_geom
    FROM selector_rpt_main,
     rpt_inp_node node
-     JOIN rpt_node ON rpt_node.node_id = node.node_id
+     JOIN rpt_node ON rpt_node.node_id::text = node.node_id
   WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = CURRENT_USER AND node.result_id::text = selector_rpt_main.result_id::text
   ORDER BY rpt_node.press, node.node_id;
 
@@ -2164,7 +2164,7 @@ AS SELECT rpt_arc.id,
     arc.the_geom
    FROM selector_rpt_main,
    rpt_inp_arc arc
-   JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+   JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id
    WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = CURRENT_USER AND arc.result_id::text = selector_rpt_main.result_id::text
    ORDER BY rpt_arc.setting, arc.arc_id;
 
@@ -4443,7 +4443,7 @@ CREATE OR REPLACE VIEW vcp_pipes AS
     p.minorloss,
     p.dint, p.dscenario_id
    FROM config_param_user c, selector_inp_result r, rpt_inp_arc rpt
-   JOIN inp_dscenario_pipe p ON rpt.arc_id = p.arc_id
+   JOIN inp_dscenario_pipe p ON rpt.arc_id = p.arc_id::text
    WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = p.dscenario_id::text
    AND c.cur_user = CURRENT_USER AND r.result_id = rpt.result_id AND r.cur_user = CURRENT_USER;
 
@@ -4725,7 +4725,7 @@ CREATE OR REPLACE VIEW v_rpt_comp_node_hourly  AS
     FROM selector_rpt_main,
          selector_rpt_main_tstep,
          rpt_inp_node node
-         JOIN rpt_node ON rpt_node.node_id = node.node_id
+         JOIN rpt_node ON rpt_node.node_id::text = node.node_id
    WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text
      AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text
      AND selector_rpt_main.cur_user = CURRENT_USER
@@ -4747,7 +4747,7 @@ compare AS (
     FROM selector_rpt_compare,
          selector_rpt_compare_tstep,
          rpt_inp_node node
-         JOIN rpt_node ON rpt_node.node_id = node.node_id
+         JOIN rpt_node ON rpt_node.node_id::text = node.node_id
    WHERE rpt_node.result_id::text = selector_rpt_compare.result_id::text
      AND rpt_node."time"::text = selector_rpt_compare_tstep.timestep::text
      AND selector_rpt_compare.cur_user = CURRENT_USER
@@ -4796,7 +4796,7 @@ WITH main AS (
     FROM selector_rpt_main,
          selector_rpt_main_tstep,
          rpt_inp_arc arc
-         JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+         JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id
    WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text
      AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text
      AND selector_rpt_main.cur_user = CURRENT_USER
@@ -4818,7 +4818,7 @@ compare AS (
     FROM selector_rpt_compare,
          selector_rpt_compare_tstep,
          rpt_inp_arc arc
-         JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+         JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id
    WHERE rpt_arc.result_id::text = selector_rpt_compare.result_id::text
      AND rpt_arc."time"::text = selector_rpt_compare_tstep.timestep::text
      AND selector_rpt_compare.cur_user = CURRENT_USER
@@ -5076,7 +5076,7 @@ AS SELECT p.arc_id,
    FROM config_param_user c,
     selector_inp_result r,
     rpt_inp_arc rpt
-     JOIN inp_dscenario_pipe p ON rpt.arc_id = p.arc_id
+     JOIN inp_dscenario_pipe p ON rpt.arc_id = p.arc_id::text
   WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = p.dscenario_id::text AND c.cur_user::text = CURRENT_USER AND r.result_id::text = rpt.result_id::text AND r.cur_user = CURRENT_USER;
 
 CREATE OR REPLACE VIEW vcv_demands
@@ -7831,7 +7831,7 @@ AS SELECT rpt_arc.id,
    FROM selector_rpt_main,
     selector_rpt_main_tstep,
     rpt_inp_arc arc
-     JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id
   WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = "current_user"()::text AND selector_rpt_main_tstep.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
   ORDER BY rpt_arc."time", arc.arc_id;
 
@@ -7852,7 +7852,7 @@ AS WITH main AS (
            FROM selector_rpt_main,
             selector_rpt_main_tstep,
             rpt_inp_arc arc
-             JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+             JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id
           WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = CURRENT_USER AND selector_rpt_main_tstep.cur_user = CURRENT_USER AND arc.result_id::text = selector_rpt_main.result_id::text
         ), compare AS (
          SELECT rpt_arc.id,
@@ -7869,7 +7869,7 @@ AS WITH main AS (
            FROM selector_rpt_compare,
             selector_rpt_compare_tstep,
             rpt_inp_arc arc
-             JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+             JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id
           WHERE rpt_arc.result_id::text = selector_rpt_compare.result_id::text AND rpt_arc."time"::text = selector_rpt_compare_tstep.timestep::text AND selector_rpt_compare.cur_user = CURRENT_USER AND selector_rpt_compare_tstep.cur_user = CURRENT_USER AND arc.result_id::text = selector_rpt_compare.result_id::text
         )
  SELECT main.arc_id,
@@ -8017,7 +8017,7 @@ AS WITH main AS (
            FROM selector_rpt_main,
             selector_rpt_main_tstep,
             rpt_inp_node node
-             JOIN rpt_node ON rpt_node.node_id = node.node_id
+             JOIN rpt_node ON rpt_node.node_id::text = node.node_id
           WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = CURRENT_USER AND selector_rpt_main_tstep.cur_user = CURRENT_USER AND node.result_id::text = selector_rpt_main.result_id::text
         ), compare AS (
          SELECT rpt_node.id,
@@ -8034,7 +8034,7 @@ AS WITH main AS (
            FROM selector_rpt_compare,
             selector_rpt_compare_tstep,
             rpt_inp_node node
-             JOIN rpt_node ON rpt_node.node_id = node.node_id
+             JOIN rpt_node ON rpt_node.node_id::text = node.node_id
           WHERE rpt_node.result_id::text = selector_rpt_compare.result_id::text AND rpt_node."time"::text = selector_rpt_compare_tstep.timestep::text AND selector_rpt_compare.cur_user = CURRENT_USER AND selector_rpt_compare_tstep.cur_user = CURRENT_USER AND node.result_id::text = selector_rpt_compare.result_id::text
         )
  SELECT main.node_id,
@@ -8171,7 +8171,7 @@ AS SELECT rpt_node.id,
    FROM selector_rpt_main,
     selector_rpt_main_tstep,
     rpt_inp_node node
-     JOIN rpt_node ON rpt_node.node_id = node.node_id
+     JOIN rpt_node ON rpt_node.node_id::text = node.node_id
   WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = "current_user"()::text AND selector_rpt_main_tstep.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_main.result_id::text
   ORDER BY rpt_node."time", node.node_id;
 

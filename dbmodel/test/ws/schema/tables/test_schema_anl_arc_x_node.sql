@@ -36,8 +36,8 @@ SELECT has_index('anl_arc_x_node', 'anl_arc_x_node_node_id', 'Table should have 
 
 -- Check column types
 SELECT col_type_is('anl_arc_x_node', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('anl_arc_x_node', 'arc_id', 'integer', 'Column arc_id should be integer');
-SELECT col_type_is('anl_arc_x_node', 'node_id', 'integer', 'Column node_id should be integer');
+SELECT col_type_is('anl_arc_x_node', 'arc_id', 'text', 'Column arc_id should be text');
+SELECT col_type_is('anl_arc_x_node', 'node_id', 'text', 'Column node_id should be text');
 SELECT col_type_is('anl_arc_x_node', 'arccat_id', 'character varying(30)', 'Column arccat_id should be varchar(30)');
 SELECT col_type_is('anl_arc_x_node', 'state', 'integer', 'Column state should be integer');
 SELECT col_type_is('anl_arc_x_node', 'expl_id', 'integer', 'Column expl_id should be integer');
