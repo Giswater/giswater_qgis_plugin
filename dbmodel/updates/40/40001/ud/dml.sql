@@ -2046,3 +2046,21 @@ VALUES(3960, 'There are no arcs with both values of y and elev inserted.', null,
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3962, 'There are %v_count% arcs with both values of y and elev inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'ARC INTERSECTION ANALYSIS' WHERE function_name = 'gw_fct_anl_arc_intersection';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3964, 'There are no intersected arcs.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3966, 'There are %v_count% intersected arcs.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'ARC INVERTED ANALYSIS' WHERE function_name = 'gw_fct_anl_arc_inverted';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3968, 'The analysis have been executed skipping arcs with TRUE value on ''inverted_slope'' column', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3970, 'If some resultant arc is really an arc with inverted slope, please set this value to TRUE', null, 0, true, 'utils', 'core', 'AUDIT');
+
+

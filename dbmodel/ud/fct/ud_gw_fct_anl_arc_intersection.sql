@@ -55,8 +55,9 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=109;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (109, null, 4, concat('ARC INTERSECTION ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (109, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2202", "fid":"109", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
@@ -98,11 +99,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
 
 	IF v_count = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (109,  'There are no intersected arcs.', v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3964", "function":"2202", "fid":"109", "fcount":"'||v_count||'", "is_process":true}}$$)';
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (109,  concat ('There are ',v_count,' intersected arcs.'), v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3966", "function":"2202", "parameters":{"v_count":"'||v_count||'"}, "fid":"109", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 113,  concat ('Arc_id: ',string_agg(node_id, ', '), '.' ), v_count
