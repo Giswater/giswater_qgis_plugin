@@ -195,6 +195,17 @@ BEGIN
                 )a
             WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
 
+            UPDATE temp_pgr_node t
+            SET to_arc = a.to_arc
+            FROM
+                (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                FROM man_wtp m
+                JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                GROUP BY m.node_id
+                )a
+            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+
             -- SET TO_ARC from METER
             UPDATE temp_pgr_node t
             SET to_arc = a.to_arc
