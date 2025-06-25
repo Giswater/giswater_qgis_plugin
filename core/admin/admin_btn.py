@@ -70,6 +70,7 @@ class GwAdminButton:
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
+        self.enable_translation_files = True
         self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir)
                                             .replace('.', ''))
         self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '14.99', lib_vars.plugin_dir)
@@ -147,15 +148,26 @@ class GwAdminButton:
         self.descript = project_descript
         self.schema_type = project_type
         self.project_epsg = project_srid
-        self.locale = project_locale
         self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
         self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
+        self.enable_translation_files = True
+
+        # If the locale is no_TR, act as if it was en_US, but disable translation files
+        self.locale = project_locale
+        if self.locale == 'no_TR':
+            self.project_epsg = '25831'
+            project_srid = '25831'
+            self.locale = 'en_US'
+            project_locale = 'en_US'
+            self.folder_locale = os.path.join(self.sql_dir, 'i18n', project_locale)
+            tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', '25831')
+            tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
+            self.enable_translation_files = False
 
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
         tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}', prefix=False)
-        locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
-        tools_gw.set_config_parser('btn_admin', 'project_locale', f'{locale}', prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'project_locale', f'{self.locale}', prefix=False)
 
         # Check if project name is valid
         if not self._check_project_name(project_name_schema, project_descript):
@@ -176,7 +188,7 @@ class GwAdminButton:
 
         msg = "Create schema of type '{0}': '{1}'"
         msg_params = (project_type, project_name_schema,)
-        tools_log.log_info(msg, msg_params=msg_params)
+        tools_log.log_info(msg, msg_params=msg_params)      
 
         if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
@@ -374,7 +386,7 @@ class GwAdminButton:
 
         # Get current locale
         if not locale:
-            locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
+            locale = self.locale
 
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
@@ -595,14 +607,14 @@ class GwAdminButton:
         folder_locale = os.path.join(self.sql_dir, 'i18n', lang)
 
         if self._process_folder(folder_locale) is False:
-            if lang == 'no_TR':
+            self.load_locale('en_US')
+        else:
+            if self.enable_translation_files is False:
                 return True
             else:
-                self.load_locale('en_US')
-        else:
-            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
-            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
+                status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
+                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
+                    return False
 
         return True
 
