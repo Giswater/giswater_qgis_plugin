@@ -137,20 +137,20 @@ BEGIN
 	-- update child param for divider
 	UPDATE temp_t_node SET addparam=concat('{"divider_type":"',divider_type,'", "arc_id":"',arc_id,'", "curve_id":"',curve_id,'", "qmin":"',
 	qmin,'", "ht":"',ht,'", "cd":"',cd,'"}')
-	FROM inp_divider WHERE temp_t_node.node_id=inp_divider.node_id;
+	FROM inp_divider WHERE temp_t_node.node_id=inp_divider.node_id::text;
 
 	-- update child param for storage
 	UPDATE temp_t_node SET addparam=concat('{"storage_type":"',storage_type,'", "curve_id":"',curve_id,'", "a1":"',a1,'", "a2":"',a2,'", "a0":"',a0,'", "fevap":"',fevap,'", "sh":"',sh,'", "hc":"',hc,'", 
 	"imd":"',imd,'"}')
-	FROM inp_storage WHERE temp_t_node.node_id=inp_storage.node_id;
+	FROM inp_storage WHERE temp_t_node.node_id=inp_storage.node_id::text;
 
 	-- update child param for outfall
 	UPDATE temp_t_node SET addparam=concat('{"outfall_type":"',outfall_type,'", "state":"',state,'", "curve_id":"',curve_id,'", "timser_id":"',timser_id,'", "gate":"',gate,'"}')
-	FROM inp_outfall WHERE temp_t_node.node_id=inp_outfall.node_id;
+	FROM inp_outfall WHERE temp_t_node.node_id=inp_outfall.node_id::text;
 
-	UPDATE temp_t_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction USING (node_id)
+	UPDATE temp_t_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction ON a.node_id = inp_junction.node_id::text
 	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user
-	AND temp_t_node.node_id=a.node_id;
+	AND temp_t_node.node_id=a.node_id::text;
 
 	INSERT INTO temp_t_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id)
 	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id FROM v_edit_inp_inflows;
