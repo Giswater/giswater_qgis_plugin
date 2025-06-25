@@ -405,7 +405,7 @@ BEGIN
         UPDATE temp_pgr_node n SET mapzone_id = 2 
         FROM temp_pgr_arc a 
         WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-        AND a.arc_id IS NULL -- border arcs
+        AND a.graph_delimiter <> 'NONE' -- border arcs
         AND n.mapzone_id = 0 
         AND a.mapzone_id > 0;
     END IF;
