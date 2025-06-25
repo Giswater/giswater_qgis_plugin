@@ -884,7 +884,7 @@ class GwAdminButton:
 
         # Audit buttons
         self.dlg_readsql.btn_create_audit.clicked.connect(partial(self.create_project_data_other_schema, 'audit'))
-        self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit))
+        self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit, 'audit'))
         self.dlg_readsql.btn_reload_audit_triggers.clicked.connect(partial(self._reload_audit_triggers))
         self.dlg_readsql.btn_delete_audit.clicked.connect(partial(self._delete_other_schema, 'audit'))
 
@@ -893,12 +893,13 @@ class GwAdminButton:
         self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
         self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
 
-    def _activate_audit(self):
+    def _activate_audit(self, other_project):
         """ Activate audit functionality """
 
         sql = ("SELECT schema_name, schema_name FROM information_schema.schemata "
                "WHERE schema_name = 'audit'")
         rows = tools_db.get_rows(sql, commit=False)
+        self.other_project = other_project
 
         if rows is not None:
             msg = "This process will active snapshot. Are you sure to continue?"
