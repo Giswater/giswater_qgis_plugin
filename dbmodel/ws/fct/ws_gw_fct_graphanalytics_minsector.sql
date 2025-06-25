@@ -32,7 +32,6 @@ DECLARE
     v_geomparamupdate FLOAT;
     v_commitchanges BOOLEAN;
 
-    v_query TEXT;
     v_data JSON;
 
     v_hydrometer_service INT[];
@@ -218,12 +217,12 @@ BEGIN
     EXECUTE v_query_text;
 
     -- Generate the minsectors
-    v_query :=
+    v_query_text :=
     'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 as cost 
     FROM temp_pgr_arc a
     WHERE a.arc_id IS NOT NULL';
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
-    SELECT seq, component, node FROM pgr_connectedcomponents(v_query);
+    SELECT seq, component, node FROM pgr_connectedcomponents(v_query_text);
 
     -- Update the mapzone_id field for arcs and nodes
     UPDATE temp_pgr_node AS n
