@@ -33,9 +33,9 @@ SELECT col_is_pk('rpt_inp_arc', ARRAY['id'], 'Column id should be primary key');
 -- Check column types
 SELECT col_type_is('rpt_inp_arc', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('rpt_inp_arc', 'result_id', 'character varying(30)', 'Column result_id should be character varying(30)');
-SELECT col_type_is('rpt_inp_arc', 'arc_id', 'text', 'Column arc_id should be text');
-SELECT col_type_is('rpt_inp_arc', 'node_1', 'text', 'Column node_1 should be text');
-SELECT col_type_is('rpt_inp_arc', 'node_2', 'text', 'Column node_2 should be text');
+SELECT col_type_is('rpt_inp_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('rpt_inp_arc', 'node_1', 'character varying(16)', 'Column node_1 should be varchar(16)');
+SELECT col_type_is('rpt_inp_arc', 'node_2', 'character varying(16)', 'Column node_2 should be varchar(16)');
 SELECT col_type_is('rpt_inp_arc', 'arc_type', 'character varying(30)', 'Column arc_type should be character varying(30)');
 SELECT col_type_is('rpt_inp_arc', 'arccat_id', 'character varying(30)', 'Column arccat_id should be character varying(30)');
 SELECT col_type_is('rpt_inp_arc', 'epa_type', 'character varying(16)', 'Column epa_type should be character varying(16)');
@@ -52,7 +52,7 @@ SELECT col_type_is('rpt_inp_arc', 'expl_id', 'integer', 'Column expl_id should b
 SELECT col_type_is('rpt_inp_arc', 'flw_code', 'text', 'Column flw_code should be text');
 SELECT col_type_is('rpt_inp_arc', 'minorloss', 'numeric(12,6)', 'Column minorloss should be numeric(12,6)');
 SELECT col_type_is('rpt_inp_arc', 'addparam', 'text', 'Column addparam should be text');
-SELECT col_type_is('rpt_inp_arc', 'arcparent', 'integer', 'Column arcparent should be integer');
+SELECT col_type_is('rpt_inp_arc', 'arcparent', 'character varying(16)', 'Column arcparent should be varchar(16)');
 SELECT col_type_is('rpt_inp_arc', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('rpt_inp_arc', 'presszone_id', 'text', 'Column presszone_id should be text');
 SELECT col_type_is('rpt_inp_arc', 'dqa_id', 'integer', 'Column dqa_id should be integer');

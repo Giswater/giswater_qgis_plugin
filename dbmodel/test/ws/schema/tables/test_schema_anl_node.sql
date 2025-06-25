@@ -38,11 +38,11 @@ SELECT has_index('anl_node', 'anl_node_node_id_index', 'Table should have index 
 
 -- Check column types
 SELECT col_type_is('anl_node', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('anl_node', 'node_id', 'text', 'Column node_id should be text');
+SELECT col_type_is('anl_node', 'node_id', 'character varying(16)', 'Column node_id should be varchar(16)');
 SELECT col_type_is('anl_node', 'nodecat_id', 'character varying(30)', 'Column nodecat_id should be varchar(30)');
 SELECT col_type_is('anl_node', 'state', 'integer', 'Column state should be integer');
 SELECT col_type_is('anl_node', 'num_arcs', 'integer', 'Column num_arcs should be integer');
-SELECT col_type_is('anl_node', 'node_id_aux', 'text', 'Column node_id_aux should be text');
+SELECT col_type_is('anl_node', 'node_id_aux', 'character varying(16)', 'Column node_id_aux should be varchar(16)');
 SELECT col_type_is('anl_node', 'nodecat_id_aux', 'character varying(30)', 'Column nodecat_id_aux should be varchar(30)');
 SELECT col_type_is('anl_node', 'state_aux', 'integer', 'Column state_aux should be integer');
 SELECT col_type_is('anl_node', 'expl_id', 'integer', 'Column expl_id should be integer');
@@ -50,7 +50,7 @@ SELECT col_type_is('anl_node', 'fid', 'integer', 'Column fid should be integer')
 SELECT col_type_is('anl_node', 'cur_user', 'character varying(50)', 'Column cur_user should be varchar(50)');
 SELECT col_type_is('anl_node', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
 SELECT col_type_is('anl_node', 'arc_distance', 'numeric(12,3)', 'Column arc_distance should be numeric(12,3)');
-SELECT col_type_is('anl_node', 'arc_id', 'text', 'Column arc_id should be text');
+SELECT col_type_is('anl_node', 'arc_id', 'character varying(16)', 'Column arc_id should be varchar(16)');
 SELECT col_type_is('anl_node', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('anl_node', 'result_id', 'character varying(16)', 'Column result_id should be varchar(16)');
 SELECT col_type_is('anl_node', 'total_distance', 'numeric(12,3)', 'Column total_distance should be numeric(12,3)');

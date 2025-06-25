@@ -17,7 +17,7 @@ example:
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_hydrant($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{"tableName":"ve_node_hydrant", "featureType":"NODE", "id":["1054"]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{"distance":"50"}}}$$);
-
+
 -- fid: 463, 464
 
 */
@@ -80,12 +80,12 @@ SET search_path = "SCHEMA_NAME", public;
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--create temp tables
-	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"3160", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"temp_", "is_process":true, "is_header":"true"}}$$)';
@@ -307,11 +307,11 @@ SET search_path = "SCHEMA_NAME", public;
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 	IF v_use_propsal is true then
-		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id, expl_id,the_geom
+		v_query='SELECT DISTINCT ON (node_id)  node_id::text, nodecat_id, expl_id,the_geom
 		 	FROM node WHERE node_id::integer =ANY(ARRAY['||v_hidrant_array||'])
-		 	UNION SELECT node_id, ''HYDRANT PROPOSAL'',expl_id, the_geom FROM temp_anl_node WHERE fid='||v_fid_proposal||' AND cur_user=current_user';
+		 	UNION SELECT node_id::text, ''HYDRANT PROPOSAL'',expl_id, the_geom FROM temp_anl_node WHERE fid='||v_fid_proposal||' AND cur_user=current_user';
 	else
-		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id, expl_id,the_geom
+		v_query='SELECT DISTINCT ON (node_id)  node_id::text, nodecat_id, expl_id,the_geom
 		 	FROM node WHERE node_id::integer =ANY(ARRAY['||v_hidrant_array||'])';
 	end if;
 	--points-hydrants

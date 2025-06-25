@@ -64,14 +64,14 @@ BEGIN
 	END IF;
 	raise notice 'v_distance_left,%',v_distance_left;
 	-- Check if the node is already computed
-	SELECT node_id INTO v_exists_id FROM temp_anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fid = v_fid;
+	SELECT node_id INTO v_exists_id FROM temp_anl_node WHERE node_id = v_node_id::text AND cur_user="current_user"() AND fid = v_fid;
 
 	-- Compute proceed
 	IF NOT FOUND THEN
 
 		-- Update value
 		INSERT INTO temp_anl_node (node_id, state, fid, the_geom)
-		SELECT node_id, 1, v_fid, the_geom FROM temp_t_node WHERE node_id = v_node_id;
+		SELECT node_id, 1, v_fid, the_geom FROM temp_t_node WHERE node_id = v_node_id::text;
 
 		v_query='SELECT flag, arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' AND (flag IS false or flag IS null) and result_id='''||v_fid||''' UNION
 		SELECT flag,arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_2 = '||quote_literal(v_node_id)||' AND (flag IS false or flag IS null)  and result_id='''||v_fid||'''';
@@ -80,9 +80,9 @@ BEGIN
 		FOR rec_table IN EXECUTE v_query LOOP
 
 			--check if node_id is one at the street crossing - recuperate the saved distance and remove the node if all street options where used
-			IF v_node_id in (SELECT node_id from temp_anl_node where fid=v_fid_cross) THEN
+			IF v_node_id::text in (SELECT node_id from temp_anl_node where fid=v_fid_cross) THEN
 
-				SELECT total_distance into v_distance_left from temp_anl_node where fid=v_fid_cross AND node_id=v_node_id and cur_user="current_user"();
+				SELECT total_distance into v_distance_left from temp_anl_node where fid=v_fid_cross AND node_id=v_node_id::text and cur_user="current_user"();
 
 				EXECUTE 'SELECT count(distinct arc_id) FROM (
 				SELECT arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
@@ -90,7 +90,7 @@ BEGIN
 				INTO v_count;
 
 				IF v_count = 1 THEN
-					DELETE FROM temp_anl_node WHERE node_id=v_node_id AND fid=v_fid_cross and cur_user="current_user"();
+					DELETE FROM temp_anl_node WHERE node_id=v_node_id::text AND fid=v_fid_cross and cur_user="current_user"();
 				END IF;
 			END IF;
 
@@ -102,7 +102,7 @@ BEGIN
 
 			IF v_count  > 0 THEN
 					INSERT INTO temp_anl_node (fid, node_id, total_distance)
-					VALUES (v_fid_cross, v_node_id, v_distance_left);
+					VALUES (v_fid_cross, v_node_id::text, v_distance_left);
 				END IF;
 
 			v_arclength = st_length(rec_table.the_geom);
@@ -116,7 +116,7 @@ BEGIN
 			raise notice 'rec_table.arc_id,v_distance_left,%-%',rec_table.arc_id,v_distance_left;
 			v_currentDistance=v_currentDistance+v_arclength;
 
-			UPDATE temp_anl_node set total_distance=v_currentDistance WHERE node_id=v_node_id AND fid=v_fid and cur_user="current_user"();
+			UPDATE temp_anl_node set total_distance=v_currentDistance WHERE node_id=v_node_id::text AND fid=v_fid and cur_user="current_user"();
 
 			UPDATE temp_t_arc SET flag=true where arc_id=rec_table.arc_id;
 
@@ -148,7 +148,7 @@ BEGIN
 				WHERE ST_DWithin(ST_startpoint(rec_table.the_geom), n.the_geom,2) AND result_id=v_fid::text
 				ORDER BY ST_Distance(n.the_geom, ST_startpoint(rec_table.the_geom)) LIMIT 1;
 
-				IF v_checkstart!=v_node_id then
+				IF v_checkstart!=v_node_id::integer then
 
 					rec_table.the_geom=ST_Reverse(rec_table.the_geom);
 				end if;
@@ -170,7 +170,7 @@ BEGIN
 				SELECT arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
 				INTO v_count;
 				IF v_count = 0 THEN
-					DELETE FROM temp_anl_node WHERE node_id=v_node_id AND fid=v_fid_cross and cur_user="current_user"();
+					DELETE FROM temp_anl_node WHERE node_id=v_node_id::text AND fid=v_fid_cross and cur_user="current_user"();
 				END IF;
 
 				IF v_distance_left IS NULL THEN

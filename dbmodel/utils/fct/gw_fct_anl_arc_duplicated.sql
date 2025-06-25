@@ -38,7 +38,7 @@ v_fid integer = 479;
 BEGIN
 
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_40_sample_25062025_fixing", public;
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -87,8 +87,8 @@ BEGIN
 			FROM  '||v_worklayer||'  WHERE  arc_id IN ('||v_array||') AND  CONCAT(node_1,'':'',node_2) IN
 			(SELECT CONCAT(node_1,'':'',node_2) FROM '||v_worklayer||' WHERE arc_id IN ('||v_array||') GROUP BY node_1, node_2  HAVING count(*) >1))a';
 
-			EXECUTE 'UPDATE anl_arc aa SET arc_id_aux=va.arc_id FROM '||v_worklayer||' va
-			WHERE aa.node_1 = va.node_1 and aa.node_2=va.node_2 AND  aa.arc_id!=va.arc_id AND va.arc_id IN ('||v_array||') ;';
+			EXECUTE 'UPDATE anl_arc aa SET arc_id_aux=va.arc_id::text FROM '||v_worklayer||' va
+			WHERE aa.node_1 = va.node_1::text and aa.node_2=va.node_2::text AND  aa.arc_id!=va.arc_id::text AND va.arc_id IN ('||v_array||') ;';
 
 		ELSE
 			EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, the_geom)
@@ -96,8 +96,8 @@ BEGIN
 			FROM  '||v_worklayer||'  WHERE CONCAT(node_1,'':'',node_2) IN
 			(SELECT CONCAT(node_1,'':'',node_2) FROM '||v_worklayer||' GROUP BY node_1, node_2  HAVING count(*) >1))a';
 
-			EXECUTE 'UPDATE anl_arc aa SET arc_id_aux=va.arc_id FROM '||v_worklayer||' va
-			WHERE aa.node_1 = va.node_1 and aa.node_2=va.node_2 AND  aa.arc_id!=va.arc_id;';
+			EXECUTE 'UPDATE anl_arc aa SET arc_id_aux=va.arc_id::text FROM '||v_worklayer||' va
+			WHERE aa.node_1 = va.node_1::text and aa.node_2=va.node_2::text AND  aa.arc_id!=va.arc_id::text;';
 		END IF;
 	END IF;
 
@@ -163,7 +163,7 @@ BEGIN
 	-- Exception control
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM,  'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM,  'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE,
 	'SQLCONTEXT', v_error_context)::json;
 
 

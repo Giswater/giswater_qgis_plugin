@@ -35,10 +35,10 @@ SELECT has_index('anl_connec', 'anl_connec_index', 'Table should have spatial in
 
 -- Check column types
 SELECT col_type_is('anl_connec', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('anl_connec', 'connec_id', 'text', 'Column connec_id should be text');
+SELECT col_type_is('anl_connec', 'connec_id', 'character varying(16)', 'Column connec_id should be varchar(16)');
 SELECT col_type_is('anl_connec', 'conneccat_id', 'character varying(30)', 'Column conneccat_id should be varchar(30)');
 SELECT col_type_is('anl_connec', 'state', 'integer', 'Column state should be integer');
-SELECT col_type_is('anl_connec', 'connec_id_aux', 'text', 'Column connec_id_aux should be text');
+SELECT col_type_is('anl_connec', 'connec_id_aux', 'character varying(16)', 'Column connec_id_aux should be varchar(16)');
 SELECT col_type_is('anl_connec', 'connecat_id_aux', 'character varying(30)', 'Column connecat_id_aux should be varchar(30)');
 SELECT col_type_is('anl_connec', 'state_aux', 'integer', 'Column state_aux should be integer');
 SELECT col_type_is('anl_connec', 'expl_id', 'integer', 'Column expl_id should be integer');

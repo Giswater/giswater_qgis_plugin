@@ -1021,12 +1021,12 @@ except_level = 3,
 except_msg = 'Controls with links (arc o nodarc) are not present on this result',
 info_msg = 'All Controls has correct link id (arc or nodarc) values.',
 query_text = '
-		SELECT * FROM (SELECT a.id, a.code as controls, b.code as templayer FROM 
-		(SELECT substring(split_part(text,''LINK '', 2) FROM ''[^ ]+''::text) code, id, sector_id FROM inp_controls WHERE active is true)a
-		LEFT JOIN temp_t_arc b USING (code)
-		WHERE b.code IS NULL AND a.code IS NOT NULL 
-		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
-		OR a.sector_id::text != b.sector_id::text) a',
+        SELECT * FROM (SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
+        (SELECT substring(split_part(text,''LINK '', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_controls WHERE active is true)a
+        LEFT JOIN temp_t_arc b USING (arc_id)
+        WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 
+        AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
+        OR a.sector_id::text != b.sector_id::text) a',
 except_table = null,
 function_name = '[gw_fct_pg2epa_check_result]',
 active = true
@@ -1041,10 +1041,10 @@ except_level = 3,
 except_msg = 'Controls with nodes are not present on this result',
 info_msg = 'All Controls has correct node id values.',
 query_text = '
-SELECT * FROM (SELECT a.id, a.code as controls, b.code as templayer FROM 
-(SELECT substring(split_part(text,''NODE '', 2) FROM ''[^ ]+''::text) code, id, sector_id FROM inp_controls WHERE active is true)a
-LEFT JOIN temp_t_node b USING (code)
-WHERE b.code IS NULL AND a.code IS NOT NULL 
+SELECT * FROM (SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
+(SELECT substring(split_part(text,''NODE '', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
+LEFT JOIN temp_t_node b USING (node_id)
+WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
 AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 OR a.sector_id::text != b.sector_id::text) a',
 except_table = null,

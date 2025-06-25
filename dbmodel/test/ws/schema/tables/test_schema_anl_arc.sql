@@ -37,10 +37,10 @@ SELECT has_index('anl_arc', 'anl_arc_index', 'Table should have spatial index');
 
 -- Check column types
 SELECT col_type_is('anl_arc', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('anl_arc', 'arc_id', 'text', 'Column arc_id should be text');
+SELECT col_type_is('anl_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be varchar(16)');
 SELECT col_type_is('anl_arc', 'arccat_id', 'character varying(30)', 'Column arccat_id should be varchar(30)');
 SELECT col_type_is('anl_arc', 'state', 'integer', 'Column state should be integer');
-SELECT col_type_is('anl_arc', 'arc_id_aux', 'text', 'Column arc_id_aux should be text');
+SELECT col_type_is('anl_arc', 'arc_id_aux', 'character varying(16)', 'Column arc_id_aux should be varchar(16)');
 SELECT col_type_is('anl_arc', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('anl_arc', 'fid', 'integer', 'Column fid should be integer');
 SELECT col_type_is('anl_arc', 'cur_user', 'character varying(50)', 'Column cur_user should be varchar(50)');
@@ -48,8 +48,8 @@ SELECT col_type_is('anl_arc', 'the_geom', 'geometry(LineString,25831)', 'Column 
 SELECT col_type_is('anl_arc', 'the_geom_p', 'geometry(Point,25831)', 'Column the_geom_p should be geometry(Point,25831)');
 SELECT col_type_is('anl_arc', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('anl_arc', 'result_id', 'character varying(16)', 'Column result_id should be varchar(16)');
-SELECT col_type_is('anl_arc', 'node_1', 'text', 'Column node_1 should be text');
-SELECT col_type_is('anl_arc', 'node_2', 'text', 'Column node_2 should be text');
+SELECT col_type_is('anl_arc', 'node_1', 'character varying(16)', 'Column node_1 should be varchar(16)');
+SELECT col_type_is('anl_arc', 'node_2', 'character varying(16)', 'Column node_2 should be varchar(16)');
 SELECT col_type_is('anl_arc', 'sys_type', 'character varying(30)', 'Column sys_type should be varchar(30)');
 SELECT col_type_is('anl_arc', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('anl_arc', 'cat_geom1', 'double precision', 'Column cat_geom1 should be double precision');
