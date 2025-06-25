@@ -4877,7 +4877,7 @@ AS SELECT rpt_node.id,
     node.the_geom
    FROM selector_rpt_main,
     rpt_inp_node node
-     JOIN rpt_node ON rpt_node.node_id = node.node_id
+     JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
   WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_main.result_id::text
   GROUP BY rpt_node.id, node.node_id, node.node_type, node.nodecat_id, selector_rpt_main.result_id, node.the_geom
   ORDER BY node.node_id;
@@ -4896,7 +4896,7 @@ AS SELECT rpt_arc.id,
     arc.the_geom
    FROM selector_rpt_main,
     rpt_inp_arc arc
-     JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id
   WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
   ORDER BY arc.arc_id;
 
@@ -6778,7 +6778,7 @@ AS  WITH main AS (
     rpt_inp_node.the_geom
 	FROM selector_rpt_main,
     rpt_inp_node
-	JOIN rpt_nodedepth_sum ON rpt_nodedepth_sum.node_id = rpt_inp_node.node_id
+	JOIN rpt_nodedepth_sum ON rpt_nodedepth_sum.node_id::text = rpt_inp_node.node_id
 	WHERE rpt_nodedepth_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::text),
 compare AS (
 	SELECT rpt_nodedepth_sum.id,
@@ -6796,7 +6796,7 @@ compare AS (
     rpt_inp_node.the_geom
 	FROM selector_rpt_compare,
     rpt_inp_node
-    JOIN rpt_nodedepth_sum ON rpt_nodedepth_sum.node_id = rpt_inp_node.node_id
+    JOIN rpt_nodedepth_sum ON rpt_nodedepth_sum.node_id::text = rpt_inp_node.node_id
 	WHERE rpt_nodedepth_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::text)
 
 SELECT main.node_id,
@@ -6845,7 +6845,7 @@ SELECT main.node_id,
     main.time_hour AS time_hour_main,
     compare.time_hour AS time_hour_compare,
     compare.the_geom
-	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
+	FROM main RIGHT JOIN compare ON main.node_id::text = compare.node_id::text;
 
 --v_rpt_comp_nodeinflow_sum
 CREATE OR REPLACE VIEW v_rpt_comp_nodeinflow_sum
@@ -6868,7 +6868,7 @@ WITH main AS (
     rpt_inp_node.the_geom
    FROM selector_rpt_main,
     rpt_inp_node
-     JOIN rpt_nodeinflow_sum ON rpt_nodeinflow_sum.node_id = rpt_inp_node.node_id
+     JOIN rpt_nodeinflow_sum ON rpt_nodeinflow_sum.node_id::text = rpt_inp_node.node_id
   WHERE rpt_nodeinflow_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::text),
 
  compare AS (
@@ -6889,7 +6889,7 @@ WITH main AS (
     rpt_inp_node.the_geom
 	FROM selector_rpt_compare,
     rpt_inp_node
-    JOIN rpt_nodeinflow_sum ON rpt_nodeinflow_sum.node_id = rpt_inp_node.node_id
+    JOIN rpt_nodeinflow_sum ON rpt_nodeinflow_sum.node_id::text = rpt_inp_node.node_id
 	WHERE rpt_nodeinflow_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::text)
  SELECT
     main.node_id,
@@ -6951,7 +6951,7 @@ WITH main AS (
     main.time_hour AS time_hour_main,
     compare.time_hour AS time_hour_compare,
     compare.the_geom
-	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
+	FROM main RIGHT JOIN compare ON main.node_id::text = compare.node_id::text;
 
 -- v_rpt_comp_nodeflooding_sum
 CREATE OR REPLACE VIEW v_rpt_comp_nodeflooding_sum
@@ -6972,7 +6972,7 @@ WITH main AS (
     rpt_inp_node.the_geom
 	FROM selector_rpt_main,
     rpt_inp_node
-    JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id = rpt_inp_node.node_id
+    JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id::text = rpt_inp_node.node_id
 	WHERE rpt_nodeflooding_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT),
 
  compare AS (
@@ -6991,7 +6991,7 @@ WITH main AS (
     rpt_inp_node.the_geom
 	FROM selector_rpt_compare,
     rpt_inp_node
-	JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id = rpt_inp_node.node_id
+	JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id::text = rpt_inp_node.node_id
 	WHERE rpt_nodeflooding_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::text)
 
  SELECT
@@ -7046,7 +7046,7 @@ WITH main AS (
     main.time_hour AS time_hour_main,
     compare.time_hour AS time_hour_compare,
     compare.the_geom
-	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
+	FROM main RIGHT JOIN compare ON main.node_id::text = compare.node_id::text;
 
 --v_rpt_comp_nodesurcharge_sum
 CREATE OR REPLACE VIEW v_rpt_comp_nodesurcharge_sum
@@ -7065,7 +7065,7 @@ WITH main AS (
     rpt_inp_node.the_geom
 	FROM selector_rpt_main,
     rpt_inp_node
-    JOIN rpt_nodesurcharge_sum ON rpt_nodesurcharge_sum.node_id = rpt_inp_node.node_id
+    JOIN rpt_nodesurcharge_sum ON rpt_nodesurcharge_sum.node_id::text = rpt_inp_node.node_id
 	WHERE rpt_nodesurcharge_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT),
  compare AS (
 	SELECT rpt_nodesurcharge_sum.id,
@@ -7081,7 +7081,7 @@ WITH main AS (
     rpt_inp_node.the_geom
 	FROM selector_rpt_compare,
     rpt_inp_node
-    JOIN rpt_nodesurcharge_sum ON rpt_nodesurcharge_sum.node_id = rpt_inp_node.node_id
+    JOIN rpt_nodesurcharge_sum ON rpt_nodesurcharge_sum.node_id::text = rpt_inp_node.node_id
 	WHERE rpt_nodesurcharge_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::text)
 
  SELECT
@@ -7124,7 +7124,7 @@ WITH main AS (
     compare.min_depth AS min_depth_compare,
     main.min_depth - compare.min_depth AS min_depth_diff,
     compare.the_geom
-	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
+	FROM main RIGHT JOIN compare ON main.node_id::text = compare.node_id::text;
 
 -- v_rpt_comp_arcflow_sum
 CREATE OR REPLACE VIEW v_rpt_comp_arcflow_sum
@@ -7154,7 +7154,7 @@ WITH main AS (
     rpt_arcflow_sum.time_min
    	FROM selector_rpt_main,
     rpt_inp_arc
-    JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = rpt_inp_arc.arc_id
+    JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = rpt_inp_arc.arc_id
    	WHERE rpt_arcflow_sum.result_id::text = selector_rpt_main.result_id::text AND
    	selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT),
 
@@ -7183,7 +7183,7 @@ compare AS (
     rpt_inp_arc.the_geom
    	FROM selector_rpt_compare,
     rpt_inp_arc
-    JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = rpt_inp_arc.arc_id
+    JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = rpt_inp_arc.arc_id
   	WHERE rpt_arcflow_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_compare.result_id::TEXT)
 
   	SELECT
@@ -7231,12 +7231,12 @@ compare AS (
     main.time_hour AS time_hour_main,
     compare.time_hour AS time_hour_compare,
     main.the_geom
-    FROM main LEFT JOIN compare ON main.arc_id = compare.arc_id
+    FROM main LEFT JOIN compare ON main.arc_id = compare.arc_id::text
 
 	UNION
 
 	SELECT
-    compare.arc_id,
+    compare.arc_id::text,
     compare.sector_id,
     compare.arc_type,
     compare.arccat_id,
@@ -7280,7 +7280,7 @@ compare AS (
     main.time_hour AS time_hour_main,
     compare.time_hour AS time_hour_compare,
     compare.the_geom
-    FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id;
+    FROM main RIGHT JOIN compare ON main.arc_id::text = compare.arc_id::text;
 
 
 ----v_rpt_comp_condsurcharge_sum
@@ -7301,7 +7301,7 @@ WITH main AS (
     rpt_condsurcharge_sum.hour_limit
    	FROM selector_rpt_main,
     rpt_inp_arc
-    JOIN rpt_condsurcharge_sum ON rpt_condsurcharge_sum.arc_id = rpt_inp_arc.arc_id
+    JOIN rpt_condsurcharge_sum ON rpt_condsurcharge_sum.arc_id::text = rpt_inp_arc.arc_id
   	WHERE rpt_condsurcharge_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT),
 
 compare AS (
@@ -7319,7 +7319,7 @@ compare AS (
     rpt_inp_arc.the_geom
     FROM selector_rpt_compare,
     rpt_inp_arc
-    JOIN rpt_condsurcharge_sum ON rpt_condsurcharge_sum.arc_id = rpt_inp_arc.arc_id
+    JOIN rpt_condsurcharge_sum ON rpt_condsurcharge_sum.arc_id::text = rpt_inp_arc.arc_id
     WHERE rpt_condsurcharge_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_compare.result_id::text)
 
     SELECT
@@ -7345,12 +7345,12 @@ compare AS (
     compare.hour_limit AS hour_limit_compare,
     main.hour_limit - compare.hour_limit AS hour_limit_diff,
     main.the_geom
-    FROM main LEFT JOIN compare ON main.arc_id = compare.arc_id
+    FROM main LEFT JOIN compare ON main.arc_id = compare.arc_id::text
 
     UNION
 
     SELECT
-    compare.arc_id,
+    compare.arc_id::text,
     compare.sector_id,
     compare.arc_type,
     compare.arccat_id,
@@ -7372,7 +7372,7 @@ compare AS (
     compare.hour_limit AS hour_limit_compare,
     main.hour_limit - compare.hour_limit AS hour_limit_diff,
     compare.the_geom
-    FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id;
+    FROM main RIGHT JOIN compare ON main.arc_id::text = compare.arc_id::text;
 
 
 ---- v_rpt_comp_pumping_sum
@@ -7396,7 +7396,7 @@ AS WITH main AS (
     rpt_inp_arc.the_geom
 	FROM selector_rpt_main,
     rpt_inp_arc
-    JOIN rpt_pumping_sum ON rpt_pumping_sum.arc_id = rpt_inp_arc.arc_id
+    JOIN rpt_pumping_sum ON rpt_pumping_sum.arc_id::text = rpt_inp_arc.arc_id
 	WHERE rpt_pumping_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT),
 
  compare AS (
@@ -7418,7 +7418,7 @@ AS WITH main AS (
     rpt_inp_arc.the_geom
 	FROM selector_rpt_compare,
     rpt_inp_arc
-    JOIN rpt_pumping_sum ON rpt_pumping_sum.arc_id = rpt_inp_arc.arc_id
+    JOIN rpt_pumping_sum ON rpt_pumping_sum.arc_id::text = rpt_inp_arc.arc_id
 	WHERE rpt_pumping_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_compare.result_id::text)
 
   SELECT
@@ -7495,7 +7495,7 @@ AS WITH main AS (
     compare.timoff_max AS timoff_max_compare,
     main.timoff_max - compare.timoff_max AS timoff_max_diff,
     compare.the_geom
-    FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id; ;
+    FROM main RIGHT JOIN compare ON main.arc_id::text = compare.arc_id::text; ;
 
 ---- v_rpt_comp_flowclass_sum
 CREATE OR REPLACE VIEW v_rpt_comp_flowclass_sum
@@ -7516,7 +7516,7 @@ AS WITH main AS (
     rpt_inp_arc.the_geom
    	FROM selector_rpt_main,
     rpt_inp_arc
-    JOIN rpt_flowclass_sum ON rpt_flowclass_sum.arc_id = rpt_inp_arc.arc_id
+    JOIN rpt_flowclass_sum ON rpt_flowclass_sum.arc_id::text = rpt_inp_arc.arc_id
 	WHERE rpt_flowclass_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT),
 
  compare AS (
@@ -7536,7 +7536,7 @@ AS WITH main AS (
     rpt_inp_arc.the_geom
    	FROM selector_rpt_compare,
     rpt_inp_arc
-    JOIN rpt_flowclass_sum ON rpt_flowclass_sum.arc_id = rpt_inp_arc.arc_id
+    JOIN rpt_flowclass_sum ON rpt_flowclass_sum.arc_id::text = rpt_inp_arc.arc_id
   	WHERE rpt_flowclass_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_compare.result_id::text)
 
 SELECT
@@ -7601,7 +7601,7 @@ SELECT
     compare.up_crit AS up_crit_compare,
     main.up_crit - compare.up_crit AS up_crit_diff,
     compare.the_geom
-	FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id;
+	FROM main RIGHT JOIN compare ON main.arc_id::text = compare.arc_id::text;
 
 
 CREATE OR REPLACE VIEW v_rpt_arcflow_sum
@@ -7661,7 +7661,7 @@ AS SELECT inp_conduit.arc_id,
     v_rpt_arcflow_sum.day_min,
     v_rpt_arcflow_sum.time_min
    FROM inp_conduit
-     LEFT JOIN v_rpt_arcflow_sum USING (arc_id);
+     LEFT JOIN v_rpt_arcflow_sum ON inp_conduit.arc_id::text = v_rpt_arcflow_sum.arc_id::text;
 
 CREATE OR REPLACE VIEW v_rpt_arcpolload_sum
 AS SELECT rpt_inp_arc.id,
@@ -7754,7 +7754,7 @@ AS SELECT inp_pump.arc_id,
     v_rpt_pumping_sum.timoff_min,
     v_rpt_pumping_sum.timoff_max
    FROM inp_pump
-     LEFT JOIN v_rpt_pumping_sum USING (arc_id);
+     LEFT JOIN v_rpt_pumping_sum ON inp_pump.arc_id::text = v_rpt_pumping_sum.arc_id::text;
 
 CREATE OR REPLACE VIEW ve_epa_frpump
 AS SELECT inp_frpump.element_id,
@@ -7854,9 +7854,9 @@ AS SELECT inp_junction.node_id,
     f.tot_flood AS flood_total,
     f.max_ponded AS flood_max_ponded
    FROM inp_junction
-     LEFT JOIN v_rpt_nodedepth_sum d USING (node_id)
-     LEFT JOIN v_rpt_nodesurcharge_sum s USING (node_id)
-     LEFT JOIN v_rpt_nodeflooding_sum f USING (node_id);
+     LEFT JOIN v_rpt_nodedepth_sum d ON inp_junction.node_id::text = d.node_id::text
+     LEFT JOIN v_rpt_nodesurcharge_sum s ON d.node_id::text = s.node_id::text
+     LEFT JOIN v_rpt_nodeflooding_sum f ON s.node_id::text = f.node_id::text;
 
 CREATE OR REPLACE VIEW ve_epa_netgully
 AS SELECT inp_netgully.node_id,
@@ -7886,9 +7886,9 @@ AS SELECT inp_netgully.node_id,
     f.tot_flood AS flood_total,
     f.max_ponded AS flood_max_ponded
    FROM inp_netgully
-     LEFT JOIN v_rpt_nodedepth_sum d USING (node_id)
-     LEFT JOIN v_rpt_nodesurcharge_sum s USING (node_id)
-     LEFT JOIN v_rpt_nodeflooding_sum f USING (node_id);
+     LEFT JOIN v_rpt_nodedepth_sum d ON inp_netgully.node_id::text = d.node_id::text
+     LEFT JOIN v_rpt_nodesurcharge_sum s ON d.node_id::text = s.node_id::text
+     LEFT JOIN v_rpt_nodeflooding_sum f ON s.node_id::text = f.node_id::text;
 
 CREATE OR REPLACE VIEW v_rpt_nodeinflow_sum
 AS SELECT rpt_inp_node.id,
@@ -7962,7 +7962,7 @@ AS SELECT inp_outfall.node_id,
     v_rpt_outfallflow_sum.max_flow,
     v_rpt_outfallflow_sum.total_vol
    FROM inp_outfall
-     LEFT JOIN v_rpt_outfallflow_sum USING (node_id);
+     LEFT JOIN v_rpt_outfallflow_sum ON inp_outfall.node_id::text = v_rpt_outfallflow_sum.node_id::text;
 
 CREATE OR REPLACE VIEW v_rpt_comp_outfallload_sum
 AS SELECT rpt_outfallload_sum.id,
@@ -8081,7 +8081,7 @@ AS SELECT inp_storage.node_id,
     v_rpt_storagevol_sum.time_hour,
     v_rpt_storagevol_sum.max_out
    FROM inp_storage
-     LEFT JOIN v_rpt_storagevol_sum USING (node_id);
+     LEFT JOIN v_rpt_storagevol_sum ON inp_storage.node_id::text = v_rpt_storagevol_sum.node_id::text;
 
 
 CREATE OR REPLACE VIEW v_rpt_node_compare_all
@@ -8146,7 +8146,7 @@ AS SELECT v_edit_arc.arc_id,
     inp_virtual.add_length,
     v_edit_arc.the_geom
    FROM v_edit_arc
-     JOIN inp_virtual USING (arc_id)
+     JOIN inp_virtual ON v_edit_arc.arc_id::text = inp_virtual.arc_id::text
   WHERE v_edit_arc.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_cat_feature_connec

@@ -343,10 +343,7 @@ ALTER TABLE plan_rec_result_arc ALTER COLUMN arc_id TYPE integer USING arc_id::i
 ALTER TABLE plan_rec_result_arc ALTER COLUMN node_1 TYPE integer USING node_1::integer;
 ALTER TABLE plan_rec_result_arc ALTER COLUMN node_2 TYPE integer USING node_2::integer;
 
-ALTER TABLE anl_arc ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
-ALTER TABLE anl_arc ALTER COLUMN arc_id_aux TYPE integer USING arc_id_aux::integer;
 ALTER TABLE anl_arc_x_node ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
-ALTER TABLE anl_node ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
 ALTER TABLE archived_psector_arc_traceability ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
 ALTER TABLE archived_psector_connec_traceability ALTER COLUMN connec_id TYPE integer USING connec_id::integer;
 ALTER TABLE archived_psector_gully_traceability ALTER COLUMN gully_id TYPE integer USING gully_id::integer;
@@ -367,7 +364,6 @@ ALTER TABLE rpt_arcpolload_sum ALTER COLUMN arc_id TYPE integer USING arc_id::in
 ALTER TABLE rpt_arcpollutant_sum ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
 ALTER TABLE rpt_condsurcharge_sum ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
 ALTER TABLE rpt_flowclass_sum ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
-ALTER TABLE rpt_inp_arc ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
 ALTER TABLE rpt_pumping_sum ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
 ALTER TABLE rpt_summary_arc ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
 ALTER TABLE rpt_summary_crossection ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
@@ -377,9 +373,6 @@ ALTER TABLE temp_go2epa ALTER COLUMN arc_id TYPE integer USING arc_id::integer;
 
 
 
-ALTER TABLE anl_arc_x_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
-ALTER TABLE anl_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
-ALTER TABLE anl_node ALTER COLUMN node_id_aux TYPE integer USING node_id_aux::integer;
 ALTER TABLE archived_psector_node_traceability ALTER COLUMN node_id TYPE integer USING node_id::integer;
 ALTER TABLE archived_rpt_inp_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
 ALTER TABLE archived_rpt_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
@@ -387,7 +380,6 @@ ALTER TABLE audit_arc_traceability ALTER COLUMN node_id TYPE integer USING node_
 ALTER TABLE ext_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
 ALTER TABLE ext_rtc_scada_x_data ALTER COLUMN node_id TYPE integer USING node_id::integer;
 ALTER TABLE plan_reh_result_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
-ALTER TABLE rpt_inp_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
 ALTER TABLE rpt_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
 ALTER TABLE rpt_nodedepth_sum ALTER COLUMN node_id TYPE integer USING node_id::integer;
 ALTER TABLE rpt_nodeflooding_sum ALTER COLUMN node_id TYPE integer USING node_id::integer;
@@ -400,14 +392,11 @@ ALTER TABLE rpt_summary_node ALTER COLUMN node_id TYPE integer USING node_id::in
 ALTER TABLE rtc_scada_node ALTER COLUMN node_id TYPE integer USING node_id::integer;
 ALTER TABLE temp_node_other ALTER COLUMN node_id TYPE integer USING node_id::integer;
 
-ALTER TABLE anl_connec ALTER COLUMN connec_id TYPE integer USING connec_id::integer;
-ALTER TABLE anl_connec ALTER COLUMN connec_id_aux TYPE integer USING connec_id_aux::integer;
 ALTER TABLE archived_psector_connec_traceability ALTER COLUMN connec_id TYPE integer USING connec_id::integer;
 ALTER TABLE review_audit_connec ALTER COLUMN connec_id TYPE integer USING connec_id::integer;
 ALTER TABLE review_connec ALTER COLUMN connec_id TYPE integer USING connec_id::integer;
 ALTER TABLE rtc_hydrometer_x_connec ALTER COLUMN connec_id TYPE integer USING connec_id::integer;
 
-ALTER TABLE anl_gully ALTER COLUMN gully_id TYPE integer USING gully_id::integer;
 ALTER TABLE archived_psector_gully_traceability ALTER COLUMN gully_id TYPE integer USING gully_id::integer;
 ALTER TABLE review_audit_gully ALTER COLUMN gully_id TYPE integer USING gully_id::integer;
 ALTER TABLE review_gully ALTER COLUMN gully_id TYPE integer USING gully_id::integer;
@@ -424,18 +413,12 @@ ALTER TABLE archived_psector_link_traceability ALTER COLUMN exit_id TYPE integer
 
 
 
-ALTER TABLE rpt_inp_arc ALTER COLUMN node_1 TYPE integer USING node_1::integer;
-ALTER TABLE rpt_inp_arc ALTER COLUMN node_2 TYPE integer USING node_2::integer;
-ALTER TABLE anl_arc ALTER COLUMN node_1 TYPE integer USING node_1::integer;
-ALTER TABLE anl_arc ALTER COLUMN node_2 TYPE integer USING node_2::integer;
 ALTER TABLE archived_psector_arc_traceability ALTER COLUMN node_1 TYPE integer USING node_1::integer;
 ALTER TABLE archived_psector_arc_traceability ALTER COLUMN node_2 TYPE integer USING node_2::integer;
 ALTER TABLE archived_rpt_inp_arc ALTER COLUMN node_1 TYPE integer USING node_1::integer;
 ALTER TABLE archived_rpt_inp_arc ALTER COLUMN node_2 TYPE integer USING node_2::integer;
 ALTER TABLE plan_reh_result_arc ALTER COLUMN node_1 TYPE integer USING node_1::integer;
 ALTER TABLE plan_reh_result_arc ALTER COLUMN node_2 TYPE integer USING node_2::integer;
-ALTER TABLE rpt_inp_arc ALTER COLUMN node_1 TYPE integer USING node_1::integer;
-ALTER TABLE rpt_inp_arc ALTER COLUMN node_2 TYPE integer USING node_2::integer;
 ALTER TABLE rpt_summary_arc ALTER COLUMN node_1 TYPE integer USING node_1::integer;
 ALTER TABLE rpt_summary_arc ALTER COLUMN node_2 TYPE integer USING node_2::integer;
 ALTER TABLE temp_anlgraph ALTER COLUMN node_1 TYPE integer USING node_1::integer;
