@@ -1751,7 +1751,7 @@ AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
      JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
-     JOIN temp_arc ON v_edit_connec.arc_id = temp_arc.arc_id
+     JOIN temp_arc ON v_edit_connec.arc_id::text = temp_arc.arc_id
      JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_edit_connec.dma_id
   WHERE ext_cat_period.id::text = (( SELECT config_param_user.value
            FROM config_param_user
