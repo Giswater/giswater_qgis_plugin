@@ -374,30 +374,6 @@ BEGIN
                 UPDATE temp_pgr_arc a SET mapzone_id = 2
                 WHERE a.mapzone_id = 3;
             END IF; 
-
-
-
-            /*
-            -- border valves that don't have a water source on the other side on the STEP 4 flood
-            -- update mapzone_id with value 2
-            -- for the nodes
-            UPDATE temp_pgr_node n SET mapzone_id = 2
-            FROM temp_pgr_drivingdistance d
-            WHERE d.start_vid <> ALL (v_valve_water)
-            AND n.pgr_node_id =d.node
-            AND n.mapzone_id = 0;
-    
-            -- for the arcs that connect with the nodes;    
-            UPDATE temp_pgr_arc a set mapzone_id = 2
-            WHERE a.mapzone_id = 0
-            AND EXISTS 
-                (SELECT  1 FROM temp_pgr_node n 
-                WHERE n.mapzone_id = 2
-                AND n.pgr_node_id  IN (a.pgr_node_1, a.pgr_node_2));
-            
-            */
-
-
         END IF;
 
         -- STEP 7 FINISHING
