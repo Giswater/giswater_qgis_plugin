@@ -143,6 +143,10 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
+
+                -- used for MASSIVE MINCUT
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE temp_pgr_arc INCLUDING ALL);
             END IF;
         END IF;
 
@@ -947,6 +951,8 @@ BEGIN
 
         -- Drop temporary tables
         DROP TABLE IF EXISTS temp_pgr_mapzone;
+        DROP TABLE IF EXISTS temp_pgr_node_minsector;
+        DROP TABLE IF EXISTS temp_pgr_arc_minsector;
         DROP TABLE IF EXISTS temp_pgr_node;
         DROP TABLE IF EXISTS temp_pgr_arc;
         DROP TABLE IF EXISTS temp_audit_check_data;
