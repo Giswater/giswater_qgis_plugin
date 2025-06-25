@@ -38,7 +38,7 @@ v_fid integer = 479;
 BEGIN
 
 	-- Search path
-	SET search_path = "ws_40_sample_25062025_fixing", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
