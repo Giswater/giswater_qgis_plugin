@@ -256,9 +256,6 @@ BEGIN
     FROM temp_pgr_arc
     WHERE mapzone_id > 0;
 
-    -- table used for Massive Mincut; for SECTORS, mapzone_id=0 is replaced for node_id in the case of nodes-SECTOR
-    -- !!! the node_id for Sectors don't exist in temp_pgr_minsector
-
     -- Set mapzone_id to 0 for nodes at the border of minsectors
     UPDATE temp_pgr_node n SET mapzone_id = 0
     FROM temp_pgr_minsector_graph s
