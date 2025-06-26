@@ -449,6 +449,7 @@ BEGIN
 						-- Delete node if action is 'DELETE NODE'
 						IF v_action_mode = 2 THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3456", "function":"2112", "parameters":{"v_node_id":"'||v_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+							DELETE FROM node WHERE node_id = v_node_id;
 						END IF;
 
 					ELSIF v_state_node = 2 THEN
