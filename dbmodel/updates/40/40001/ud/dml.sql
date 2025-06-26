@@ -2151,3 +2151,4 @@ VALUES(4016, 'Total WWTP volume: %v_wwtp%  10^6 LTS', null, 0, true, 'utils', 'c
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4018, 'Hydraulic performance for this result: %(100*v_performance)::numeric(12,2)% %', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO dwfzone (dwfzone_id, code, name) VALUES(0, '0', 'Undefined');

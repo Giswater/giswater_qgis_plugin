@@ -1306,3 +1306,13 @@ UPDATE config_param_system SET value='UPDATE v_table set the_geom = geom FROM
         group by v_field
         )a group by v_field)b 
         WHERE b.v_field::text=v_table.v_fieldmp::text' WHERE "parameter"='utils_graphanalytics_custom_geometry_constructor';
+
+INSERT INTO supplyzone VALUES (0, 'Undefined', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL);
+
+INSERT INTO macroomzone (macroomzone_id, code, "name", expl_id, descript, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by) VALUES(0, '0', 'Undefined', 0, NULL, NULL, true, NULL, '2025-04-14 12:57:25.809', current_user, NULL, NULL);
+
+INSERT INTO omzone (omzone_id, code, "name", descript, omzone_type, expl_id, macroomzone_id, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by) VALUES(0, '0', 'Undefined', NULL, NULL, NULL, 0, NULL, true, NULL, '2025-04-14 12:57:25.809', current_user, NULL, NULL);
+
+INSERT INTO crmzone VALUES (0, 'Undefined', NULL, NULL, true);
+
+INSERT INTO macrocrmzone (macrocrmzone_id, name, active) VALUES(0, 'Undefined', true);
