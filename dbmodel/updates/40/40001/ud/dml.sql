@@ -2128,14 +2128,26 @@ VALUES(4002, 'There are no slope inconsistencies.', null, 0, true, 'utils', 'cor
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4004, 'There are %v_count% arcs with slope inconsistency.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'HYDRAULIC PERFORMANCE FOR SPECIFIC RESULT' WHERE function_name = 'gw_fct_epa_hydraulic_performance';
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4006, 'Result_id: %v_eparesult%', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4008, 'WWTP outfall_id''s: %v_wwtpoutfalls%', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4010, 'Total precipitation volume: %v_rain%  10^6 LTS', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4012, 'Total DWF volume: %v_dwf%  10^6 LTS', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4014, 'Total infil.losses volume: %v_inf%  10^6 LTS', null, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4016, 'Total WWTP volume: %v_wwtp%  10^6 LTS', null, 0, true, 'utils', 'core', 'AUDIT');
 
-
-
-
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4018, 'Hydraulic performance for this result: %(100*v_performance)::numeric(12,2)% %', null, 0, true, 'utils', 'core', 'AUDIT');
 
