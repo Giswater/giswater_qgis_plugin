@@ -273,7 +273,6 @@ class AddNewLot:
 
         team_combo.blockSignals(True)
         team_combo.clear()
-        team_combo.addItem("", None)  # Add a blank item.
 
         if campaign_id:
             body = {"p_campaign_id": campaign_id}
