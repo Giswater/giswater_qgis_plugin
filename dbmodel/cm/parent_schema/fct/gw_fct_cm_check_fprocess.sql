@@ -72,22 +72,18 @@ BEGIN
 	v_exceptable_catalog = concat(replace (v_process_except_table, 'cm_', ''), 'cat_id');
 
 	IF v_replace_params IS NOT NULL THEN
-		-- SELECT * FROM ws_40_sample_cm.%table_name% WHERE %feature_column% = %feature_id% AND %check_column% IS NULL
+		-- SELECT * FROM %table_name% WHERE %feature_column% IN (%feature_ids%) AND %check_column% IS NULL
 		v_process_query_text = replace(v_process_query_text, '%table_name%', v_replace_params->>'table_name');
 		v_process_query_text = replace(v_process_query_text, '%feature_column%', v_replace_params->>'feature_column');
-		v_process_query_text = replace(v_process_query_text, '%feature_id%', v_replace_params->>'feature_id');
+		v_process_query_text = replace(v_process_query_text, '%feature_ids%', v_replace_params->>'feature_ids');
 		v_process_query_text = replace(v_process_query_text, '%check_column%', v_replace_params->>'check_column');
 
-		-- a null value on the column %check_column% of %table_name%.%feature_column% = %feature_id%
+		-- value/s on column '%check_column%' in the '%table_name%' table.
 		v_process_except_msg = replace(v_process_except_msg, '%table_name%', v_replace_params->>'table_name');
-		v_process_except_msg = replace(v_process_except_msg, '%feature_column%', v_replace_params->>'feature_column');
-		v_process_except_msg = replace(v_process_except_msg, '%feature_id%', v_replace_params->>'feature_id');
 		v_process_except_msg = replace(v_process_except_msg, '%check_column%', v_replace_params->>'check_column');
 
-		-- The %check_column% on %table_name%.%feature_column% = %feature_id% have correct values.
+		-- The '%check_column%' column on '%table_name%' have correct values.
 		v_process_info_msg = replace(v_process_info_msg, '%table_name%', v_replace_params->>'table_name');
-		v_process_info_msg = replace(v_process_info_msg, '%feature_column%', v_replace_params->>'feature_column');
-		v_process_info_msg = replace(v_process_info_msg, '%feature_id%', v_replace_params->>'feature_id');
 		v_process_info_msg = replace(v_process_info_msg, '%check_column%', v_replace_params->>'check_column');
 	END IF;
 
@@ -104,17 +100,12 @@ BEGIN
 
 	-- get text variables according to singular/plural values
 	IF v_count = 1 THEN
-		v_text_aux = 'There is ';
-		v_process_except_msg =
-		concat(
-			substring(split_part(v_process_except_msg, ' ', 1) FROM 1 FOR length(split_part(v_process_except_msg, ' ', 1)) - 1),
-			' ',
-			substring(v_process_except_msg FROM length(split_part(v_process_except_msg, ' ', 1)) + 2)
-		);
+		EXECUTE 'SELECT PARENT_SCHEMA.gw_fct_getmessage($${"data":{"message":"5000", "function":"3428", "is_process":true}}$$)::JSON->>''text''' INTO v_text_aux;
 	ELSIF v_count > 1 THEN
-		v_text_aux = 'There are ';
+		EXECUTE 'SELECT PARENT_SCHEMA.gw_fct_getmessage($${"data":{"message":"5002", "function":"3428", "is_process":true}}$$)::JSON->>''text''' INTO v_text_aux;
 	END IF;
-	RAISE NOTICE 'v_count %', v_count;
+	v_text_aux := concat(substring(v_text_aux, 1, 1), lower(substring(v_text_aux, 2, char_length(v_text_aux) -1)));
+
 	-- manage result (audit_check_data)
 	IF v_count > 0 AND v_process_except_level > 1 THEN
 

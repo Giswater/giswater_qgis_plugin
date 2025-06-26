@@ -2493,6 +2493,11 @@ UPDATE sys_function SET function_alias = 'IMPORT CATALOG' WHERE function_name = 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4136, 'Nothing to import', null, 0, true, 'utils', 'core', 'AUDIT');
 
+-- 26/06/2025
+-- messages reserved for singular/plural logic on dynamic checks
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(5000, 'There is ', NULL, 0, true, 'utils', 'core', 'UI');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(5002, 'There are ', NULL, 0, true, 'utils', 'core', 'UI');
+
 UPDATE sys_function SET function_alias = 'IMPORT DB PRICES FILE' WHERE function_name = 'gw_fct_import_dbprices';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
@@ -2503,3 +2508,5 @@ VALUES(3926, 'Process finished', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4138, 'Inserting values on plan_price table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
+
+DELETE FROM config_form_fields WHERE forname ILIKE '%node%' AND columname = 'tstamp';

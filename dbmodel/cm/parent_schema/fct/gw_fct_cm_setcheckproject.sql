@@ -35,6 +35,7 @@ DECLARE
 
 	-- variables
     v_querytext text;
+	v_querytext_cfg text;
     v_rec record;
     v_check_result json;
 
@@ -159,26 +160,25 @@ BEGIN
 
 		-- get all ids from campaign_lot_x_table
 		v_querytext := '
-			SELECT '|| v_feature_id_column || ' FROM ' || v_feature_cm_table || '
+			SELECT lower(cf.id) AS feature_type, array_agg(ocl.'|| v_feature_id_column || ') AS feature_ids
+			FROM ' || v_feature_cm_table || ' ocl
+			JOIN PARENT_SCHEMA.' || v_feature_table_name || ' t ON t.' || v_feature_id_column || ' = ocl.' || v_feature_id_column || '
+			JOIN PARENT_SCHEMA.cat_' || v_feature_table_name || ' c ON c.id = t.' || v_feature_table_name || 'cat_id 
+			JOIN PARENT_SCHEMA.cat_feature_' || v_feature_table_name || ' cf ON cf.id = c.' || v_feature_table_name || '_type
 			WHERE lot_id = ANY($1)
+			GROUP BY lower(cf.id)
 		';
-		FOR v_rec_id IN EXECUTE v_querytext USING v_lot_id_array LOOP
-			v_querytext := '
-				SELECT lower(cf.id) FROM PARENT_SCHEMA.' || v_feature_table_name || ' t
-				JOIN PARENT_SCHEMA.cat_' || v_feature_table_name || ' c ON c.id = t.' || v_feature_table_name || 'cat_id 
-				JOIN PARENT_SCHEMA.cat_feature_' || v_feature_table_name || ' cf ON cf.id = c.' || v_feature_table_name || '_type
-				WHERE ' || v_feature_table_name || '_id = ' || v_rec_id || ';
-			';
-			EXECUTE v_querytext INTO v_feature_view_name;
-			v_feature_view_name := 'PARENT_SCHEMA_' || v_feature_view_name;
 
-			v_querytext := '
+		FOR v_rec IN EXECUTE v_querytext USING v_lot_id_array LOOP
+			v_feature_view_name := 'PARENT_SCHEMA_' || v_rec.feature_type;
+
+			v_querytext_cfg := '
 				SELECT DISTINCT columnname FROM PARENT_SCHEMA.config_form_fields
 				WHERE ismandatory
-				AND formname ILIKE ''%v_edit_'||v_feature_table_name||'%''
+				AND formname ILIKE ''%ve_'||v_feature_table_name||'_'||v_rec.feature_type||'%''
 			';
 
-			FOR v_rec_check IN EXECUTE v_querytext LOOP
+			FOR v_rec_check IN EXECUTE v_querytext_cfg LOOP
 				EXECUTE '
 					SELECT cm.gw_fct_cm_check_fprocess($${
 					"data":{
@@ -188,7 +188,7 @@ BEGIN
 							"replaceParams": {
 								"table_name": "' || v_feature_view_name || '", 
 								"feature_column": "' || v_feature_id_column || '",
-								"feature_id": "' || v_rec_id || '",
+								"feature_ids": "' || array_to_string(v_rec.feature_ids, ',') || '",
 								"check_column": "' || v_rec_check.columnname || '"
 								}
 							}
