@@ -6,14 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from enum import Enum
-from functools import partial
 
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication, QActionGroup, QWidget, QAction, QMenu
 from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsFeatureRequest
 
 from ..maptool import GwMaptool
-from ...ui.ui_manager import GwDialogShowInfoUi
 from ...utils import tools_gw
 from ....libs import tools_qgis, tools_qt, tools_db
 from ...threads.connect_link import GwConnectLink
