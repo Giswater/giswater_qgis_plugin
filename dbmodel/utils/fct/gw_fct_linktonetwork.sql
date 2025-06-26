@@ -183,12 +183,9 @@ BEGIN
 
 	-- Starting process
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1103","fid": 217,"v_temp_table": false,"v_criticity": 4}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1103","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 
-	--INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (217, null, 4, 'CONNECT TO NETWORK');
-
-	EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1105","fid": 217,"v_temp_table": false,"v_criticity": 4}}$$);';
-	--INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (217, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1105","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 
 	-- Main loop
 	IF v_feature_array IS NOT NULL THEN
@@ -231,23 +228,15 @@ BEGIN
 		END IF;
 
 		IF v_check_status IS TRUE and v_projecttype = 'WS' THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1107","fid": 217,"v_temp_table": false,"v_criticity": 4, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1107","function":"3188","fid": 217,"v_criticity": 4, 
 			"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "check_arcdnom":"'||v_check_arcdnom||'", 
 			"max_distance":"'||v_check_maxdistance||'"}}}$$);';
-			--INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			--VALUES (217, null, 4,
-			--concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,' to an arc with a diameter smaller than ',v_check_arcdnom,' and at maximum distance of ',v_check_maxdistance,' meters.'));
 		ELSIF v_check_status IS TRUE and v_projecttype = 'UD' THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1109","fid": 217,"v_temp_table": false,"v_criticity": 4, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1109","function":"3188","fid": 217,"v_criticity": 4, 
 			"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "max_distance":"'||v_check_maxdistance||'"}}}$$);';
-			-- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			-- VALUES (217, null, 4,
-			-- concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,' to an arc at a maximum distance of ',v_check_maxdistance,' meters.'));
 		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1111","fid": 217,"v_temp_table": false,"v_criticity": 4, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1111","function":"3188","fid": 217,"v_criticity": 4, 
 			"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'"}}}$$);';
-			-- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			-- VALUES (217, null, 4, concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
 		END IF;
 
 		-- get feature information
@@ -297,17 +286,14 @@ BEGIN
 			IF v_projecttype = 'WS' then
 				if (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_status IS TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3232", "function":"3188","parameters"{"diameter":'||v_check_arcdnom||'}:, "is_process":true}}$$);';
+					"data":{"message":"3232", "function":"3188", "fid": 217, "parameters"{"diameter":'||v_check_arcdnom||'}:, "is_process":true}}$$);';
 				end if;
 			END IF;
 		END IF;
 
 		IF v_arc.arc_id IS NOT NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1113","fid": 217,"v_temp_table": false,"v_criticity": 4, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1113","function":"3188","fid": 217,"v_criticity": 4, 
 			"parameters":{"connect_id":"'||v_connect_id||'", "arc_id":"'||v_arc.arc_id||'"}}}$$);';
-
-			-- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			-- VALUES (217, null, 4, concat('FAILED: Link not created because connect ',v_connect_id,' is over arc ', v_arc.arc_id));
 		ELSE
 
 			-- Use check arc diameter variable
@@ -349,7 +335,7 @@ BEGIN
 				-- state control
 				IF v_arc.state=2 AND v_connect.state=1 AND v_isarcdivide is false THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3050", "function":"2124","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
+					"data":{"message":"3050", "function":"2124","fid": 217, "parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 				END IF;
 
 				-- get endfeature attributes
@@ -444,26 +430,18 @@ BEGIN
 							v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), SRID_VALUE);
 
 							IF  v_check_status IS TRUE THEN
-								EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1115","fid": 217,"v_temp_table": false,"v_criticity": 4}}$$);';
-								-- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-								-- VALUES (217, null, 4, concat('Create new link connected to the closest arc with the appropriate conditions.'));
+								EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1115","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 							ELSE
 							    IF v_isforcedarcs THEN
-									EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1117","fid": 217,"v_temp_table": false,"v_criticity": 4, 
+									EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1117","function":"3188","fid": 217,"v_criticity": 4, 
 									"parameters":{"arc_id":"'||v_connect.arc_id||'"}}}$$);';
-							        -- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-							        -- VALUES (217, null, 4, concat('Create new link connected to the selected arc: ', v_connect.arc_id, '.'));
 							    ELSE
-									EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1119","fid": 217,"v_temp_table": false,"v_criticity": 4}}$$);';
-							        -- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-							        -- VALUES (217, null, 4, concat('Create new link connected to the closest arc.'));
+									EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1119","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 							    END IF;
 							END IF;
 						ELSE
 							v_link.state = 2; -- because it is copied from existing one but related to psector
-							EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1121","fid": 217,"v_temp_table": false,"v_criticity": 4}}$$);';
-							-- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-							-- VALUES (217, null, 4, concat('Creating new link by using geometry of existing one.'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1121","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 						END IF;
 
 					ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype='ARC' THEN
@@ -473,9 +451,7 @@ BEGIN
 							v_point_aux := St_closestpoint(v_endfeature_geom, St_startpoint(v_link.the_geom));
 							v_link.the_geom = ST_SetPoint(v_link.the_geom, 0, v_point_aux) ;
 
-							EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1123","fid": 217,"v_temp_table": false,"v_criticity": 4}}$$);';
-							-- INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-							-- VALUES (217, null, 4, concat('Reverse the direction of drawn link.'));
+							EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1123","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 						ELSE
 							v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux);
 						END IF;
