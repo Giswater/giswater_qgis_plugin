@@ -2509,4 +2509,4 @@ VALUES(3926, 'Process finished', null, 0, true, 'utils', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4138, 'Inserting values on plan_price table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
-DELETE FROM config_form_fields WHERE forname ILIKE '%node%' AND columname = 'tstamp';
+DELETE FROM config_form_fields WHERE formname ILIKE '%node%' AND columnname = 'tstamp';
