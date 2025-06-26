@@ -1437,6 +1437,8 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
     qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
 
     btn_accept = dialog.findChild(QPushButton, 'btn_accept')
+    if btn_accept is None:
+        btn_accept = dialog.findChild(QPushButton, 'tab_none_btn_accept')
     if btn_accept and hide_btn_accept:
         btn_accept.hide()
 
