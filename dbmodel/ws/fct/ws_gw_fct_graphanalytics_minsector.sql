@@ -666,7 +666,7 @@ BEGIN
             v_response := gw_fct_mincut_core(v_data);
 
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
-            SELECT v_record_minsector.minsector_id, n.mapzone_id
+            SELECT v_record_minsector.minsector_id, n.pgr_node_id
             FROM temp_pgr_node n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
