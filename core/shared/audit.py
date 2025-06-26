@@ -157,11 +157,11 @@ class GwAudit:
         layout = self.dlg_audit.centralwidget.findChild(QScrollArea).findChild(QWidget).findChild(QGridLayout)
 
         # Create label headers
-        label = QLabel("Old value")
+        label = QLabel(tools_qt.tr("Old value"))
         label.setStyleSheet("font-weight: bold;")
         layout.addWidget(label, 0, 1)
 
-        label = QLabel("New value")
+        label = QLabel(tools_qt.tr("New value"))
         label.setStyleSheet("font-weight: bold;")
         layout.addWidget(label, 0, 2)
 
