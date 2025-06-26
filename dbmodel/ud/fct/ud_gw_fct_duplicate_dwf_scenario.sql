@@ -74,43 +74,50 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DUPLICATE DWF SCENARIO'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Id_val: ',v_idval));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Descript: ',v_startdate));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Parent: ',v_enddate));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Type: ',v_observ));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('active: ',v_active));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Expl_id: ',v_expl_id));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3898", "function":"3156", "parameters":{"v_idval":"'||v_idval||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3900", "function":"3156", "parameters":{"v_startdate":"'||v_startdate||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"4302", "function":"3156", "parameters":{"v_enddate":"'||v_enddate||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"4304", "function":"3156", "parameters":{"v_observ":"'||v_observ||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"4306", "function":"3156", "parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"4308", "function":"3156", "parameters":{"v_expl_id":"'||v_expl_id||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                        "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"3", "is_process":true,"is_header":"true", "prefix_id":"3003"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                        "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"2", "is_process":true,"is_header":"true", "prefix_id":"3002"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                        "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"2", "is_process":true,"is_header":"true", "prefix_id":"3001"}}$$)';
 
 	-- process
 	-- Create empty dwf scenario
 	EXECUTE 'SELECT gw_fct_create_dwf_scenario_empty($$'||p_data||'$$);';
 	SELECT id INTO v_scenarioid FROM cat_dwf where idval = v_idval;
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, null, 1, concat('INFO: Dwf scenario named "',v_idval,'" created with values from Dwf scenario ( ',v_copyfrom,' ).'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"4310", "function":"3156", "parameters":{"v_idval":"'||v_idval||'", "v_copyfrom":"'||v_copyfrom||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 	-- Copy values from Dwf scenario to copy from
 	EXECUTE 'SELECT gw_fct_manage_dwf_values($${"client": '||(p_data ->>'client')::json||', "data": {"parameters": {"target": '||v_scenarioid||', "copyFrom": '||v_copyfrom||', "action": '||quote_ident(v_action)||', "sector":-998}}}$$);';
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, null, 1, concat('INFO: Copied values from Dwf scenario ( ',v_copyfrom,' ) to new Dwf scenario ( ',v_scenarioid,' ).'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{},
+						"data":{"message":"4312","function":"3156","parameters":{"v_copyfrom":"'||v_copyfrom||'","v_scenarioid":"'||v_scenarioid||'"},"fid":"'||v_fid||'","criticity":"1","is_process":true, "prefix_id":"1001"}}$$)';
 
 	-- setting current dwf for user
 	UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_dwfscenario_current';
 
 	-- manage log (fid: v_fid)
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('This DWF scenario is now your current scenario.'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
+						"data":{"message":"4314","function":"3156", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"1","is_process":true}}$$)';
 
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
