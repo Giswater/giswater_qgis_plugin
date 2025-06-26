@@ -449,9 +449,6 @@ def accept(**kwargs):
     # Cancel map tool if no features are selected or the layer is not visible
     this.cancel_map_tool()
 
-    # Close dialog
-    #tools_gw.close_dialog(this.dlg_connect_link)
-
 
 def snapping(**kwargs):
     """ Accept button clicked event """
