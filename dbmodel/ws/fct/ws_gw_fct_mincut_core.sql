@@ -19,16 +19,16 @@ SELECT gw_fct_mincut_core('{"data":{
 	"ignoreCheckValvesMincut":true
 }}') INTO v_response;
 
-The mincut arcs: 
+The mincut arcs:
 
-SELECT p.*, a.the_geom 
+SELECT p.*, a.the_geom
 FROM ws_github.temp_pgr_arc p
 JOIN ws_github.arc a on p.arc_id =a.arc_id
 WHERE p.mapzone_id <>0;
 
 The mincut valves MINCUT:
 
-SELECT a.*, n.the_geom 
+SELECT a.*, n.the_geom
 FROM ws_github.temp_pgr_arc a
 JOIN ws_github.node n ON n.node_id = COALESCE(a.node_1, a.node_2)
 WHERE a.graph_delimiter = 'MINSECTOR' AND a.mapzone_id <>0;
@@ -71,6 +71,9 @@ v_srid integer;
 v_project_type varchar;
 
 -- result variables
+v_message text;
+v_level integer;
+v_response jsonb;
 v_result jsonb;
 v_result_init jsonb;
 v_result_valve jsonb;
@@ -82,6 +85,7 @@ v_result_arc jsonb;
 -- MINCUT VARIABLES
 v_mapzone_name text ='MINSECTOR';
 v_mincut_id INTEGER;
+v_water_source int[];
 
 -- general variables
 v_query_text TEXT;
@@ -89,7 +93,7 @@ v_query_text TEXT;
 -- parameters
 v_pgr_distance INTEGER;
 v_pgr_root_vids int[];
-v_ignore_check_valves BOOLEAN; 
+v_ignore_check_valves BOOLEAN;
 
 
 -- core variables
@@ -100,11 +104,6 @@ v_valve_water int[];
 v_valve_chk int[];
 v_cost_field TEXT;
 v_reverse_cost_field TEXT;
-
-
-
-
-
 
 -- !SECTION
 
@@ -118,10 +117,10 @@ BEGIN
 
 	-- Parameters
 	v_pgr_distance = (SELECT (p_data::json->>'data')::json->>'pgrDistance');
-	v_pgr_root_vids = (SELECT (p_data::json->>'data')::json->>'pgrRootVids');
+	v_pgr_root_vids = ARRAY(SELECT json_array_elements_text(((p_data::json->>'data')::json->>'pgrRootVids')::json))::int[];
 	v_ignore_check_valves = (SELECT (p_data::json->>'data')::json->>'ignoreCheckValvesMincut');
 
--- STEP 1 flood with INVERTED cost_mincut/reverse_cost_mincut for finding the borders 
+    -- STEP 1 flood with INVERTED cost_mincut/reverse_cost_mincut for finding the borders
     -- the flood is reversed; the one-way valves that don't stop the water will stay inside the minsector, they cannot be borders because they cannot be closed
     v_query_text='SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, reverse_cost_mincut as cost, cost_mincut as reverse_cost
     FROM temp_pgr_arc
@@ -129,7 +128,7 @@ BEGIN
     ';
     TRUNCATE temp_pgr_drivingdistance;
     INSERT INTO  temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
-    (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost 
+    (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost
     FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
     );
 
@@ -138,12 +137,12 @@ BEGIN
     UPDATE temp_pgr_node n SET mapzone_id = 1
     FROM temp_pgr_drivingdistance d
     WHERE n.pgr_node_id =d.node;
-   
-   	-- for the arcs that connect with the nodes;    
+
+   	-- for the arcs that connect with the nodes;
     UPDATE temp_pgr_arc a set mapzone_id = 1
     FROM temp_pgr_drivingdistance d
     WHERE d.node IN  (a.pgr_node_1, a.pgr_node_2);
- 
+
     -- open valves (if v_ignore_check_valves =FALSE, check_valves also)
     SELECT COALESCE(array_agg(n.pgr_node_id), ARRAY[]::int[])
     INTO v_pgr_root_vids
@@ -151,9 +150,9 @@ BEGIN
     WHERE n.graph_delimiter = 'MINSECTOR'
     AND n.mapzone_id = 0
     AND EXISTS
-        (SELECT 1 FROM temp_pgr_arc a 
+        (SELECT 1 FROM temp_pgr_arc a
         WHERE a.mapzone_id = 1 -- from STEP 1
-        AND a.graph_delimiter ='MINSECTOR' 
+        AND a.graph_delimiter ='MINSECTOR'
         AND a.closed = FALSE
         AND n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
         );
@@ -162,11 +161,11 @@ BEGIN
     IF cardinality(v_pgr_root_vids) >0 THEN
 
         -- save cost/reverse_cost fot checkvalves using the fields cost_mincut/reverse_cost/mincut
-        UPDATE temp_pgr_arc 
+        UPDATE temp_pgr_arc
         SET cost_mincut = "cost", reverse_cost_mincut = reverse_cost,
         "cost" = 0, reverse_cost = 0
         WHERE graph_delimiter = 'MINSECTOR'
-        AND "cost" <> reverse_cost; 
+        AND "cost" <> reverse_cost;
 
         -- query pgr_drivingdistance
         v_query_text='SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, 
@@ -175,7 +174,7 @@ BEGIN
                 WHERE a.mapzone_id = 0
                 AND a.graph_delimiter <> ''SECTOR''
                 ';
-        TRUNCATE temp_pgr_drivingdistance; 
+        TRUNCATE temp_pgr_drivingdistance;
         INSERT INTO temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
         (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
         );
@@ -189,7 +188,7 @@ BEGIN
         AND d.edge <> -1
         AND (d.node = a.pgr_node_1 AND a.reverse_cost = 0 OR d.node = a.pgr_node_2 AND a."cost" = 0);
 
-        -- the water source 
+        -- the water source
         SELECT COALESCE(array_agg(DISTINCT node), ARRAY[]::int[])
         INTO v_water_source
         FROM temp_pgr_drivingdistance d
@@ -197,7 +196,7 @@ BEGIN
         WHERE a.graph_delimiter ='SECTOR'
         AND d.edge <> -1
         AND (d.node = a.pgr_node_1 AND a.reverse_cost = 0 OR d.node = a.pgr_node_2 AND a."cost" = 0);
-        
+
         -- border valves that have on the other side a checkvalve
         SELECT COALESCE(array_agg(DISTINCT start_vid), ARRAY[]::int[])
         INTO v_valve_chk
@@ -212,32 +211,32 @@ BEGIN
         WHERE a.graph_delimiter = 'MINSECTOR'
         AND closed = FALSE and to_arc IS NULL
         AND (a.pgr_node_1 = ANY (v_valve_water) OR a.pgr_node_2 = ANY (v_valve_water))
-        AND a.pgr_node_1 <> ALL (v_valve_chk) AND a.pgr_node_2 <> ALL (v_valve_chk); 
+        AND a.pgr_node_1 <> ALL (v_valve_chk) AND a.pgr_node_2 <> ALL (v_valve_chk);
 
         -- update mapzone_id with value 2 for the zones without water and without any checkvalve (also for border checkvalves)
         UPDATE temp_pgr_node n SET mapzone_id = 2
         FROM (
-            SELECT * 
+            SELECT *
             FROM temp_pgr_drivingdistance
-            WHERE start_vid <> ALL (v_valve_water) 
+            WHERE start_vid <> ALL (v_valve_water)
             AND start_vid <> ALL (v_valve_chk)
         ) d
         WHERE n.pgr_node_id =d.node
         AND n.mapzone_id = 0;
-   
-        -- for the arcs that connect with the nodes; 
+
+        -- for the arcs that connect with the nodes;
         UPDATE temp_pgr_arc a set mapzone_id = 2
         FROM (
-            SELECT * 
+            SELECT *
             FROM temp_pgr_drivingdistance
-            WHERE start_vid <> ALL (v_valve_water) 
+            WHERE start_vid <> ALL (v_valve_water)
             AND start_vid <> ALL (v_valve_chk)
         ) d
         WHERE d.node IN  (a.pgr_node_1, a.pgr_node_2)
         AND a.mapzone_id = 0;
 
          -- recover cost/reverse_cost for checkvalves with the correct values saved in cost_mincut/reverse_cost_mincut
-        UPDATE temp_pgr_arc 
+        UPDATE temp_pgr_arc
         SET "cost" = cost_mincut, reverse_cost = reverse_cost_mincut,
         cost_mincut = 0, reverse_cost_mincut = 0
         WHERE graph_delimiter = 'MINSECTOR'
@@ -265,7 +264,7 @@ BEGIN
                         WHERE a.mapzone_id = 0
                         AND a.graph_delimiter <> ''SECTOR''
                         ';
-            TRUNCATE temp_pgr_drivingdistance; 
+            TRUNCATE temp_pgr_drivingdistance;
             INSERT INTO temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
             (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
             );
@@ -276,13 +275,13 @@ BEGIN
             FROM temp_pgr_drivingdistance d
             WHERE n.pgr_node_id =d.node
             AND n.mapzone_id = 0;
-        
-            -- for the arcs that connect with the nodes;    
+
+            -- for the arcs that connect with the nodes;
             UPDATE temp_pgr_arc a set mapzone_id = 2
             FROM temp_pgr_drivingdistance d
             WHERE d.node  IN (a.pgr_node_1, a.pgr_node_2)
             AND a.mapzone_id = 0;
-        END IF; 
+        END IF;
 
         -- STEP 4 INVERTED flood with cost/reverse_cost for the borders that have wet zones with checkvalves inside
         IF  cardinality (v_pgr_root_vids_chk_water) > 0 THEN
@@ -294,7 +293,7 @@ BEGIN
                     WHERE a.mapzone_id = 0
                     AND a.graph_delimiter <> ''SECTOR''
                     ';
-            TRUNCATE temp_pgr_drivingdistance; 
+            TRUNCATE temp_pgr_drivingdistance;
             INSERT INTO temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
             (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
             );
@@ -307,16 +306,16 @@ BEGIN
             WHERE a.graph_delimiter ='SECTOR'
             AND d.edge <> -1
             AND (d.node = a.pgr_node_1 AND a.cost = 0 OR d.node = a.pgr_node_2 AND a.reverse_cost = 0);
-            
+
             -- close the valves that have on the other side a water source
             UPDATE temp_pgr_arc a SET proposed = TRUE
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND closed = FALSE and to_arc IS NULL
-            AND (a.pgr_node_1 = ANY (v_valve_water) OR a.pgr_node_2 = ANY (v_valve_water)); 
+            AND (a.pgr_node_1 = ANY (v_valve_water) OR a.pgr_node_2 = ANY (v_valve_water));
 
-             /*  -- **** substituted by STEP 5 AND 6; 
+             /*  -- **** substituted by STEP 5 AND 6;
                 --without the steps 5 and 6, the result is not the expected one if there is more then 1 checkvalve in row
-                
+
             -- border valves that don't have a water source on the other side on the STEP 4 flood
             -- update mapzone_id with value 2
             -- for the nodes
@@ -325,12 +324,12 @@ BEGIN
             WHERE d.start_vid <> ALL (v_valve_water)
             AND n.pgr_node_id =d.node
             AND n.mapzone_id = 0;
-    
-            -- for the arcs that connect with the nodes;    
+
+            -- for the arcs that connect with the nodes;
             UPDATE temp_pgr_arc a set mapzone_id = 2
             WHERE a.mapzone_id = 0
-            AND EXISTS 
-                (SELECT  1 FROM temp_pgr_node n 
+            AND EXISTS
+                (SELECT  1 FROM temp_pgr_node n
                 WHERE n.mapzone_id = 2
                 AND n.pgr_node_id  IN (a.pgr_node_1, a.pgr_node_2));
             */
@@ -350,24 +349,24 @@ BEGIN
                             WHERE a.mapzone_id = 0
                             AND a.graph_delimiter <> ''SECTOR''
                             ';
-                TRUNCATE temp_pgr_drivingdistance; 
+                TRUNCATE temp_pgr_drivingdistance;
                 INSERT INTO temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
                 (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
                 );
 
-                -- update mapzone_id with value 3 
+                -- update mapzone_id with value 3
                 -- for the nodes
                 UPDATE temp_pgr_node n SET mapzone_id = 3
                 FROM temp_pgr_drivingdistance d
                 WHERE n.pgr_node_id =d.node
                 AND n.mapzone_id = 0;
-            
-                -- for the arcs that connect with the nodes; 
+
+                -- for the arcs that connect with the nodes;
                 UPDATE temp_pgr_arc a set mapzone_id = 3
                 FROM temp_pgr_drivingdistance d
                 WHERE d.node  IN (a.pgr_node_1, a.pgr_node_2)
-                AND a.mapzone_id = 0;   
-                
+                AND a.mapzone_id = 0;
+
                  -- STEP 6 DIRECT flood from the water sources saved before (STEP 1)
                  v_pgr_root_vids = v_water_source;
 
@@ -378,19 +377,19 @@ BEGIN
                             WHERE a.mapzone_id = 3
                             AND a.graph_delimiter <> ''SECTOR''
                             ';
-                TRUNCATE temp_pgr_drivingdistance; 
+                TRUNCATE temp_pgr_drivingdistance;
                 INSERT INTO temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
                 (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
                 );
 
-                -- update mapzone_id with value 0 - remove it from the mincut area 
+                -- update mapzone_id with value 0 - remove it from the mincut area
                 -- for the nodes
                 UPDATE temp_pgr_node n SET mapzone_id = 0
                 FROM temp_pgr_drivingdistance d
                 WHERE n.pgr_node_id =d.node
                 AND n.mapzone_id = 3;
-            
-                -- for the arcs that connect with the nodes;    
+
+                -- for the arcs that connect with the nodes;
                 UPDATE temp_pgr_arc a set mapzone_id = 0
                 WHERE a.mapzone_id = 3
                 AND EXISTS (
@@ -408,64 +407,47 @@ BEGIN
 
                 UPDATE temp_pgr_arc a SET mapzone_id = 2
                 WHERE a.mapzone_id = 3;
-            END IF; 
+            END IF;
         END IF;
     END IF;
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	-- SECTION[epic=mincut]: Controll Nulls
 	v_message = COALESCE(v_message, '{}');
 	v_version = COALESCE(v_version, '');
 	v_mincut = COALESCE(v_mincut, 0);
-	v_result_info = COALESCE(v_result_info, '{}');
-	v_result_point = COALESCE(v_result_point, '{}');
-	v_result_line = COALESCE(v_result_line, '{}');
-	v_result_polygon = COALESCE(v_result_polygon, '{}');
 	v_level = COALESCE(v_level, 0);
-	v_netscenario = COALESCE(v_netscenario, '');
 
 	-- SECTION[epic=mincut]: Return result
-		v_response := jsonb_build_object(
-			'status', 'Accepted',
-			'message', v_message,
-			'version', v_version,
-			'body', jsonb_build_object(
-				'form', jsonb_build_object(),
-				'feature', jsonb_build_object(),
-				'data', jsonb_build_object(
-					'mincutId', v_mincut,
-					'mincutInit', v_result_init,
-					'valve', v_result_valve,
-					'mincutNode', v_result_node,
-					'mincutConnec', v_result_connec,
-					'mincutArc', v_result_arc,
-					'tiled', v_tiled
-				)
-			)
-		);
-		return v_response;
+    v_response := jsonb_build_object(
+        'status', 'Accepted',
+        'message', v_message,
+        'version', v_version,
+        'body', jsonb_build_object(
+            'form', jsonb_build_object(),
+            'feature', jsonb_build_object(),
+            'data', jsonb_build_object(
+                'mincutId', v_mincut,
+                'mincutInit', v_result_init,
+                'valve', v_result_valve,
+                'mincutNode', v_result_node,
+                'mincutConnec', v_result_connec,
+                'mincutArc', v_result_arc,
+                'tiled', v_tiled
+            )
+        )
+    );
+    return v_response;
 
 
-	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
-	',"body":{"form":{}'||
-			',"data":{ '||
-			'  "info":'||v_result_info||
-			', "geometry":"'||v_geometry||'"'||
-			', "mincutDetails":'||v_mincutdetails||'}'||
-			'}'
-	'}')::json;
+	-- RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	-- ',"body":{"form":{}'||
+	-- 		',"data":{ '||
+	-- 		'  "info":'||v_result_info||
+	-- 		', "geometry":"'||v_geometry||'"'||
+	-- 		', "mincutDetails":'||v_mincutdetails||'}'||
+	-- 		'}'
+	-- '}')::json;
 
 END;
 $BODY$

@@ -61,6 +61,8 @@ DECLARE
 	v_original_disable_locklevel json;
 
     -- MINCUT VARIABLES
+    v_record_minsector RECORD;
+    v_execute_massive_mincut BOOLEAN;
 
     -- parameters
     v_pgr_distance INTEGER;
@@ -86,6 +88,7 @@ BEGIN
 	v_ignore_check_valves = TRUE;
 	--v_ignore_broken_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreBrokenOnlyMassiveMincut');
 	--v_ignore_check_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreCheckValvesMincut')::BOOLEAN;
+    v_execute_massive_mincut = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'executeMassiveMincut')::BOOLEAN;
 
     -- it's not allowed to commit changes when psectors are used
  	IF v_usepsector THEN
@@ -592,73 +595,84 @@ BEGIN
 
     END IF;
 
-    -- PREPARE tables for Massive Mincut 
 
-    --ARCS - keep only the new arcs
-    DELETE FROM temp_pgr_arc WHERE graph_delimiter = 'NONE';
+    IF v_execute_massive_mincut THEN
+        -- PREPARE tables for Massive Mincut
 
-    -- ARCS-VALVE (MINSECTOR)
-    -- delete the valves that are not minsector borders
-    DELETE FROM temp_pgr_arc a
-    WHERE 
-    a.graph_delimiter = 'MINSECTOR'
-    AND NOT EXISTS (
-        SELECT 1 FROM temp_pgr_minsector_graph g
-        WHERE g.node_id = COALESCE (a.node_1 , a.node_2)
-    );
+        --ARCS - keep only the new arcs
+        DELETE FROM temp_pgr_arc WHERE graph_delimiter = 'NONE';
 
-    -- change pgr_node_1 and pgr_node_2 for their minsector value
-    UPDATE temp_pgr_arc a
-    SET pgr_node_1 = g.minsector_1, pgr_node_2 = g.minsector_2
-    FROM temp_pgr_minsector_graph g
-    WHERE g.node_id = COALESCE (a.node_1 , a.node_2);
+        -- ARCS-VALVE (MINSECTOR)
+        -- delete the valves that are not minsector borders
+        DELETE FROM temp_pgr_arc a
+        WHERE
+        a.graph_delimiter = 'MINSECTOR'
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_minsector_graph g
+            WHERE g.node_id = COALESCE (a.node_1 , a.node_2)
+        );
 
-    -- ARCS-SECTOR
-    UPDATE temp_pgr_arc a
-    SET pgr_node_1 = COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
-    FROM temp_pgr_node n
-    WHERE a.graph_delimiter = 'SECTOR'
-    AND n.graph_delimiter = 'SECTOR'
-    AND n.pgr_node_id = a.pgr_node_1;
+        -- change pgr_node_1 and pgr_node_2 for their minsector value
+        UPDATE temp_pgr_arc a
+        SET pgr_node_1 = g.minsector_1, pgr_node_2 = g.minsector_2
+        FROM temp_pgr_minsector_graph g
+        WHERE g.node_id = COALESCE (a.node_1 , a.node_2);
 
-    UPDATE temp_pgr_arc a
-    SET pgr_node_2 =COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
-    FROM temp_pgr_node n
-    WHERE a.graph_delimiter = 'SECTOR'
-    AND n.graph_delimiter = 'SECTOR'
-    AND n.pgr_node_id = a.pgr_node_2;
+        -- ARCS-SECTOR
+        UPDATE temp_pgr_arc a
+        SET pgr_node_1 = COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
+        FROM temp_pgr_node n
+        WHERE a.graph_delimiter = 'SECTOR'
+        AND n.graph_delimiter = 'SECTOR'
+        AND n.pgr_node_id = a.pgr_node_1;
 
-    -- NODES - keep only the nodes-SECTOR that have mapzone_id = 0 (node_id is not NULL); they don't exist in the table temp_pgr_minsector
-    DELETE FROM temp_pgr_node tpn 
-    WHERE graph_delimiter <> 'SECTOR' OR mapzone_id > 0;
+        UPDATE temp_pgr_arc a
+        SET pgr_node_2 =COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
+        FROM temp_pgr_node n
+        WHERE a.graph_delimiter = 'SECTOR'
+        AND n.graph_delimiter = 'SECTOR'
+        AND n.pgr_node_id = a.pgr_node_2;
 
-    -- update mapzone_id with the node_id
-    UPDATE temp_pgr_node SET pgr_node_id = node_id;
+        -- NODES - keep only the nodes-SECTOR that have mapzone_id = 0 (node_id is not NULL); they don't exist in the table temp_pgr_minsector
+        DELETE FROM temp_pgr_node tpn
+        WHERE graph_delimiter <> 'SECTOR' OR mapzone_id > 0;
 
-    -- insert the MINSECTORS as nodes
-    INSERT INTO temp_pgr_node (pgr_node_id, mapzone_id, graph_delimiter)
-    SELECT minsector_id, 0, 'MINSECTOR'
-    FROM temp_pgr_minsector m;
-    
-    -- FINISH preparing
+        -- update mapzone_id with the node_id
+        UPDATE temp_pgr_node SET pgr_node_id = node_id;
 
-    /*
-     * CORE MASSIVE MINCUT
-     *
-     *
-     *
-     *  v_data := '{"data":{"pgrDistance":'||v_pgr_distance||', "pgrRootVids":['||v_pgr_root_vids||'], "ignoreCheckValvesMincut":'||v_ignore_check_valves||'}}';
-     *  PERFORM gw_fct_mincut_core(v_data) INTO v_response;
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-    */
+        -- insert the MINSECTORS as nodes
+        INSERT INTO temp_pgr_node (pgr_node_id, mapzone_id, graph_delimiter)
+        SELECT minsector_id, 0, 'MINSECTOR'
+        FROM temp_pgr_minsector m;
+
+        -- FINISH preparing
+
+        -- CORE MASSIVE MINCUT
+        v_query_text = '
+            SELECT minsector_id FROM temp_pgr_minsector
+        ';
+
+        SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc;
+
+        FOR v_record_minsector IN EXECUTE v_query_text LOOP
+            v_pgr_root_vids := ARRAY[v_record_minsector.minsector_id];
+
+            UPDATE temp_pgr_arc SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_node SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_arc SET proposed = FALSE WHERE proposed;
+
+            v_data := '{"data":{"pgrDistance":'||v_pgr_distance||', "pgrRootVids":['||array_to_string(v_pgr_root_vids, ',')||'], "ignoreCheckValvesMincut":'||v_ignore_check_valves||'}}';
+            RAISE NOTICE 'v_data: %', v_data;
+            v_response := gw_fct_mincut_core(v_data);
+
+            INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
+            SELECT v_record_minsector.minsector_id, n.mapzone_id
+            FROM temp_pgr_node n
+            WHERE n.graph_delimiter = 'MINSECTOR'
+            AND n.mapzone_id <> 0;
+            RAISE NOTICE 'v_response: %', v_response;
+        END LOOP;
+    END IF;
 
     -- Info
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
