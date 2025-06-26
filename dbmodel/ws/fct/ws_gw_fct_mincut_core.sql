@@ -300,6 +300,27 @@ BEGIN
             AND closed = FALSE and to_arc IS NULL
             AND (a.pgr_node_1 = ANY (v_valve_water) OR a.pgr_node_2 = ANY (v_valve_water)); 
 
+             /*  -- **** substituted by STEP 5 AND 6; 
+                --without the steps 5 and 6, the result is not the expected one if there is more then 1 checkvalve in row
+                
+            -- border valves that don't have a water source on the other side on the STEP 4 flood
+            -- update mapzone_id with value 2
+            -- for the nodes
+            UPDATE temp_pgr_node n SET mapzone_id = 2
+            FROM temp_pgr_drivingdistance d
+            WHERE d.start_vid <> ALL (v_valve_water)
+            AND n.pgr_node_id =d.node
+            AND n.mapzone_id = 0;
+    
+            -- for the arcs that connect with the nodes;    
+            UPDATE temp_pgr_arc a set mapzone_id = 2
+            WHERE a.mapzone_id = 0
+            AND EXISTS 
+                (SELECT  1 FROM temp_pgr_node n 
+                WHERE n.mapzone_id = 2
+                AND n.pgr_node_id  IN (a.pgr_node_1, a.pgr_node_2));
+            */
+
             -- border valves that don't have a water source on the other side on the STEP 4 flood
             SELECT COALESCE(array_agg(start_vid), ARRAY[]::int[])
             INTO v_pgr_root_vids
@@ -375,15 +396,6 @@ BEGIN
                 WHERE a.mapzone_id = 3;
             END IF; 
         END IF;
-
-        -- STEP 7 FINISHING
-        -- actualitzar zone_id per els nodes de les fronteres que no estan actualitzats   
-        UPDATE temp_pgr_node n SET mapzone_id = 2 
-        FROM temp_pgr_arc a 
-        WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-        AND a.graph_delimiter <> 'NONE' -- border arcs
-        AND n.mapzone_id = 0 
-        AND a.mapzone_id > 0;
     END IF;
 
 
