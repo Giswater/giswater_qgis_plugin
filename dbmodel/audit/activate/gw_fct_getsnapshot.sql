@@ -79,7 +79,7 @@ BEGIN
 
 			-- Get column names from v_table
 		    SELECT string_agg(
-	        'PARENT_SCHEMA.' || v_table || '.' || column_name || ' IS NOT DISTINCT FROM row.' || column_name, ' AND ')
+	        'PARENT_SCHEMA.' || v_table || '.' || column_name || '::text IS NOT DISTINCT FROM row.' || column_name|| '::text ',' AND ')
 		    INTO v_columns
 		    FROM information_schema.columns
 		    WHERE table_name = v_table AND table_schema = 'PARENT_SCHEMA';
@@ -96,7 +96,7 @@ BEGIN
 			                    ELSE ''yellow''
 			                  END
 			    )) 
-			    FROM (SELECT * FROM %I WHERE ST_Within(the_geom, %L)) row',
+			    FROM (SELECT * FROM %I WHERE ST_Intersects(the_geom, %L)) row',
 			    v_table, v_idname, v_idname, v_table, v_columns, v_temp_table_name, v_polygon
 			) INTO v_features;
 
