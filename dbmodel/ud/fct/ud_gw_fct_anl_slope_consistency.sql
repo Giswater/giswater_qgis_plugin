@@ -7,15 +7,15 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2986
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_slope_consistency(p_data json) RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_slope_consistency(p_data json) RETURNS json AS
 $BODY$
 /*EXAMPLE
 
-SELECT gw_fct_anl_slope_consistency($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":["18920", "18945", "18921", "18922", "18944", "18923"]}, 
+SELECT gw_fct_anl_slope_consistency($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":["18920", "18945", "18921", "18922", "18944", "18923"]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{}}}$$);
 
-SELECT gw_fct_anl_slope_consistency($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+SELECT gw_fct_anl_slope_consistency($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{},
  "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}}}$$);
 -- fid: 250
@@ -23,7 +23,7 @@ SELECT gw_fct_anl_slope_consistency($${"client":{"device":4, "infoType":1, "lang
 */
 
 DECLARE
-    
+
 v_id json;
 v_expl_id integer;
 v_selectionmode text;
@@ -46,8 +46,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_expl_id :=  ((p_data ->>'feature')::json->>'expl_id')::json;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
@@ -62,10 +62,11 @@ BEGIN
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=250;
 	DELETE FROM temp_arc WHERE  result_id = '250';
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=250;	
-	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (250, null, 4, concat('SLOPE CONSISTENCY ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (250, null, 4, '-------------------------------------------------------------');
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=250;
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"2986", "fid":"250", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
 
 	-- Computing process
 	IF v_selectionmode !='previousSelection' THEN
@@ -78,7 +79,7 @@ BEGIN
 		END AS geom
 		FROM '||v_worklayer||';';
 	ELSE
-	
+
 		EXECUTE 'INSERT INTO temp_arc (arc_id, arccat_id, state, expl_id, result_id, elevmax1, elevmax2, sector_id, the_geom)
 		SELECT arc_id,arccat_id,state, expl_id, ''250'', sys_elev1, sys_elev2, sector_id,
 		CASE WHEN sys_elev1 > sys_elev2 THEN the_geom
@@ -116,33 +117,34 @@ BEGIN
 		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, elev1, elev2, fid, the_geom
 		FROM  anl_arc WHERE cur_user="current_user"() AND fid=250) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
 	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=250;
 
 	IF v_count = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (250,  'There are no slope inconsistencies.', v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4002", "function":"2986", "fid":"250", "fcount":"'||v_count||'", "is_process":true}}$$)';
+
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (250,  concat ('There are ',v_count,' arcs with slope inconsistency.'), v_count);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4004", "function":"2986", "parameters":{"v_count":"'||v_count||'"}, "fid":"250", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 250,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count 
+		SELECT 250,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count
 		FROM anl_arc WHERE cur_user="current_user"() AND fid=250;
 
 	END IF;
-	
+
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=250 order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

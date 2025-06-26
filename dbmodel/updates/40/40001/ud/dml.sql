@@ -2120,5 +2120,22 @@ VALUES(3998, 'There are no arcs with unconsistent sections.', null, 0, true, 'ut
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4000, 'There are %v_count% arcs with section (geom1) bigger than the section of the following arc.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'SLOPE CONSISTENCY ANALYSIS' WHERE function_name = 'gw_fct_anl_slope_consistency';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4002, 'There are no slope inconsistencies.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4004, 'There are %v_count% arcs with slope inconsistency.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
+
+
+
+
+
 
 
