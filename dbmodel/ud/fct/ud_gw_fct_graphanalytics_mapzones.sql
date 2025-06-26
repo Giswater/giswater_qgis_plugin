@@ -380,7 +380,7 @@ BEGIN
 		SELECT array_agg(pgr_node_id)::INT[] 
 		FROM temp_pgr_node 
 		WHERE graph_delimiter = ''' || v_mapzone_name || ''' 
-		AND node_id IS NOT NULL';
+		AND modif = TRUE';
 	RAISE NOTICE 'v_querytext:: %', v_querytext;
 	EXECUTE v_querytext INTO v_pgr_root_vids;
 
