@@ -14,7 +14,7 @@ from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
-from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, GwSelectorUi
+from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi
 from ...shared.selector import GwSelector
 
 
@@ -27,6 +27,8 @@ class Campaign:
         self.iface = global_vars.iface
         self.campaign_date_format = 'yyyy-MM-dd'
         self.schema_parent = lib_vars.schema_name
+        # self.cm_schema = lib_vars.project_vars['cm_schema']
+        # self.cm_schema = self.cm_schema.strip("'")
         self.project_type = tools_gw.get_project_type()
         self.dialog = None
         self.campaign_type = None
@@ -51,8 +53,9 @@ class Campaign:
         self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
 
         # Populate combo date type
-        rows = [['real_startdate', 'Data inici'], ['real_enddate', 'Data fi'], ['startdate', 'Data inici planificada'],
-                ['enddate', 'Data final planificada']]
+
+        rows = [['real_startdate', tools_qt.tr('Start date', 'cm')], ['real_enddate', tools_qt.tr('End date', 'cm')], ['startdate', tools_qt.tr('Planned start date', 'cm')],
+                ['enddate', tools_qt.tr('Planned end date', 'cm')]]
         tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
 
         # Fill combo values for campaign status (based on sys_typevalue table)
@@ -61,6 +64,7 @@ class Campaign:
         tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_state, rows, index_to_show=1, add_empty=True)
 
         # Set filter events
+        self.manager_dialog.btn_cancel.clicked.connect(self.manager_dialog.reject)
         self.manager_dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
         self.manager_dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
         self.manager_dialog.date_event_from.dateChanged.connect(self.filter_campaigns)
@@ -77,29 +81,17 @@ class Campaign:
 
     def open_campaign_selector(self):
         """ Open the campaign-specific selector when the button is clicked """
-
-        # Set is_campaign flag to True to trigger the campaign logic
-        campaignSelector = GwSelector()
-
-        dlg_selector = GwSelectorUi(self)
-        tools_gw.load_settings(dlg_selector)
-        current_tab = tools_gw.get_config_parser('dialogs_tab_cm', "dlg_selector_campaign", "user", "session")
-        selector_values = "selector_campaign"
-
-        dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
-        dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
-        dlg_selector.rejected.connect(
-            partial(tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'campaign'))
-
-        campaignSelector.get_selector(dlg_selector, selector_values, current_tab=current_tab)
-
-        tools_gw.open_dialog(dlg_selector, dlg_name='selector')
+        selector_type = "selector_campaign"
+        # Show form in docker
+        tools_gw.init_docker('qgis_form_docker')
+        selector = GwSelector()
+        selector.open_selector(selector_type)
 
     def load_campaign_dialog(self, campaign_id=None, mode="review"):
         """
         Load and initialize the campaign dialog.
 
-        - Creates and sets up the form dynamically based on response from `gw_fct_getcampaign`.
+        - Creates and sets up the form dynamically based on response from `gw_fct_cm_getcampaign`.
         - Initializes rubberbands and layer lists.
         - Loads campaign relations if editing an existing campaign.
         - Sets icons, connections, tab visibility (e.g. hides gully tab for 'ws' projects), and widget behaviors.
@@ -108,6 +100,7 @@ class Campaign:
         :param campaign_id: ID of the campaign to load. If None, creates a new campaign.
         :param mode: Type of campaign dialog to load. Options: 'review', 'visit'.
         """
+        self.campaign_id = campaign_id
 
         # In the edit_typevalue or another cm.edit_typevalue
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '1', 'Review', NULL, NULL);
@@ -117,14 +110,14 @@ class Campaign:
         # Setting lists
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.ids = []
-        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
-        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
-        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
-        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
-        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.rel_list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
+        self.rel_layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
+        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         if self.project_type == 'ud':
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
-        self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
+            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+        self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
         self.excluded_layers = [
             "v_edit_arc", "v_edit_node", "v_edit_connec",
             "v_edit_gully", "v_edit_link"
@@ -146,7 +139,7 @@ class Campaign:
         self.is_new_campaign = campaign_id is None
         self.campaign_saved = False
 
-        response = tools_gw.execute_procedure("gw_fct_getcampaign", p_data, schema_name="cm")
+        response = tools_gw.execute_procedure("gw_fct_cm_getcampaign", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
             msg = "Failed to load campaign form."
             tools_qgis.show_warning(msg)
@@ -163,7 +156,6 @@ class Campaign:
                 widget.setText(str(campaign_id))
                 widget.setProperty("columnname", "campaign_id")
                 widget.setObjectName("campaign_id")
-                self.campaign_id = campaign_id
 
         tools_gw.load_settings(self.dialog)
 
@@ -175,14 +167,19 @@ class Campaign:
 
         # Build widgets dynamically
         for field in form_fields:
-            widget = self.create_widget_from_field(field)
+            widget = self.create_widget_from_field(field, response)
             if not widget:
                 continue
 
-            if "value" in field:
+            # Prioritize selectedId for combos, otherwise use value
+            if isinstance(widget, QComboBox) and "selectedId" in field:
+                self.set_widget_value(widget, field["selectedId"])
+            elif "value" in field:
                 self.set_widget_value(widget, field["value"])
+
             if "columnname" in field:
                 widget.setProperty("columnname", field["columnname"])
+            
             if "widgetname" in field:
                 widget.setObjectName(field["widgetname"])
 
@@ -198,7 +195,7 @@ class Campaign:
         tools_gw.add_icon(self.dialog.btn_expr_select, '178')
 
         self.dialog.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-        self.dialog.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.layers))
+        self.dialog.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.rel_layers))
 
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
@@ -239,6 +236,17 @@ class Campaign:
         self.dialog.tbl_campaign_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                  self.dialog.tbl_campaign_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
 
+        for table_name in [
+            "tbl_campaign_x_arc",
+            "tbl_campaign_x_node",
+            "tbl_campaign_x_connec",
+            "tbl_campaign_x_gully",
+            "tbl_campaign_x_link",
+        ]:
+            view = getattr(self.dialog, table_name, None)
+            if view:
+                tools_qt.set_tableview_config(view)
+
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
     def _load_campaign_relations(self, campaign_id):
@@ -246,13 +254,11 @@ class Campaign:
         Load related elements into campaign relation tabs for the given ID.
         Includes 'gully' only if project type is UD.
         """
-
         relation_tabs = {
             "tbl_campaign_x_arc": ("om_campaign_x_arc", "arc_id"),
             "tbl_campaign_x_node": ("om_campaign_x_node", "node_id"),
             "tbl_campaign_x_connec": ("om_campaign_x_connec", "connec_id"),
             "tbl_campaign_x_link": ("om_campaign_x_link", "link_id")
-
         }
 
         # Only include gully and link if project type is 'ud'
@@ -267,7 +273,7 @@ class Campaign:
                 sql = f"SELECT * FROM cm.{db_table} WHERE campaign_id = {campaign_id}"
                 self.populate_tableview(view, sql)
 
-    def create_widget_from_field(self, field):
+    def create_widget_from_field(self, field, response):
         """Create a Qt widget based on field metadata"""
 
         wtype = field.get("widgettype", "text")
@@ -300,13 +306,14 @@ class Campaign:
                 widget.setEnabled(False)
 
         elif wtype == "combo":
-            widget = QComboBox()
-            ids = field.get("comboIds", [])
-            names = field.get("comboNames", [])
-            for i, name in enumerate(names):
-                widget.addItem(name, ids[i] if i < len(ids) else name)
-            if not iseditable:
-                widget.setEnabled(False)
+            # Use the framework's builder to ensure widgetfunctions are connected
+            kwargs = {
+                "field": field,
+                "dialog": self.dialog,
+                "complet_result": response,
+                "class_info": self
+            }
+            widget = tools_gw.add_combo(**kwargs)
 
         return widget
 
@@ -325,7 +332,7 @@ class Campaign:
         elif isinstance(widget, QCheckBox):
             widget.setChecked(str(value).lower() in ["true", "1"])
         elif isinstance(widget, QComboBox):
-            index = widget.findData(value)
+            index = widget.findData(str(value))
             if index >= 0:
                 widget.setCurrentIndex(index)
 
@@ -362,14 +369,16 @@ class Campaign:
                                     dialog=self.dialog)
             return False
 
-        result = tools_gw.execute_procedure("gw_fct_setcampaign", body, schema_name="cm")
+        result = tools_gw.execute_procedure("gw_fct_cm_setcampaign", body, schema_name="cm")
 
         if result.get("status") == "Accepted":
-            tools_qgis.show_info("Campaign saved successfully.", dialog=self.dialog)
+            msg = "Campaign saved successfully."
+            tools_qgis.show_info(msg, dialog=self.dialog)
             self.campaign_saved = True
             self.is_new_campaign = False
-            tools_gw.remove_selection(True, layers=self.layers)
+            tools_gw.remove_selection(True, layers=self.rel_layers)
             tools_gw.reset_rubberband(self.rubber_band)
+            tools_qgis.force_refresh_map_canvas()
 
             # Update campaign ID in the dialog
             campaign_id = result.get("body", {}).get("campaign_id")
@@ -387,7 +396,8 @@ class Campaign:
                 self.dialog.accept()
 
         else:
-            tools_qgis.show_warning(result.get("message", "Failed to save campaign."))
+            msg = "Failed to save campaign"
+            tools_qgis.show_warning(result.get("message", msg))
 
     def extract_campaign_fields(self, dialog):
         """Build a JSON string of field values from the campaign dialog"""
@@ -461,33 +471,36 @@ class Campaign:
         self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
 
         self.dialog.tab_feature.currentChanged.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
         )
 
         self.dialog.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None),
+            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None)
         )
         self.dialog.btn_insert.clicked.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
+        )
+
+        self.dialog.btn_delete.clicked.connect(
+            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None)
         )
         self.dialog.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None),
+            partial(self._update_feature_completer, self.dialog)
         )
-        self.dialog.btn_delete.clicked.connect(
-            lambda: self._update_feature_completer(self.dialog)
-        )
+
         self.dialog.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN),
         )
         self.dialog.btn_snapping.clicked.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
         )
+
         self.dialog.btn_expr_select.clicked.connect(
             partial(tools_gw.select_with_expression_dialog, self, self.dialog, table_object,
                     selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN),
         )
         self.dialog.btn_expr_select.clicked.connect(
-            lambda: self._update_feature_completer(self.dialog)
+            partial(self._update_feature_completer, self.dialog)
         )
 
     def _on_tab_feature_changed(self):
@@ -778,8 +791,10 @@ class Campaign:
 
         # Confirm deletion
         count = len(selected)
-        msg = f"Are you sure you want to delete {count} campaign(s)?"
-        if not tools_qt.show_question(msg):
+
+        msg = "Are you sure you want to delete {0} campaign(s)?"
+        msg_params = (count,)
+        if not tools_qt.show_question(msg, msg_params=msg_params):
             return
 
         success = 0
@@ -790,9 +805,9 @@ class Campaign:
             sql = f"DELETE FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
             if tools_db.execute_sql(sql):
                 success += 1
-
-        msg = f"{count} campaign(s) deleted."
-        tools_qgis.show_info(msg, dialog=self.manager_dialog)
+        msg = "{0} campaign(s) deleted."
+        msg_params = (count,)
+        tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.manager_dialog)
         self.filter_campaigns()
 
     def open_campaign(self, index=None):
@@ -809,7 +824,8 @@ class Campaign:
         else:
             selected = self.manager_dialog.tbl_campaign.selectionModel().selectedRows()
             if not selected:
-                tools_qgis.show_warning("No campaign selected.", dialog=self.manager_dialog)
+                msg = "No campaign selected."
+                tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
 
             campaign_id = selected[0].data()
@@ -821,3 +837,79 @@ class Campaign:
         except (ValueError, TypeError):
             msg = "Invalid campaign ID."
             tools_qgis.show_warning(msg)
+
+
+def update_expl_sector_combos(**kwargs):
+    """
+    Update exploitation and sector combos based on organization.
+    This function is designed to be called from a widgetfunction.
+    """
+
+    dialog = kwargs.get('dialog')
+    parent_widget = kwargs.get('widget')
+
+    try:
+        if not dialog or not parent_widget:
+            return
+
+        # Find child widgets by their object name
+        expl_widget = dialog.findChild(QComboBox, 'tab_data_expl_id')
+        sector_widget = dialog.findChild(QComboBox, 'tab_data_sector_id')
+
+        # Get data from the currently selected item in the parent combo
+        current_index = parent_widget.currentIndex()
+        current_data = parent_widget.itemData(current_index) if current_index != -1 else None
+        
+        organization_id = None
+        if current_data and isinstance(current_data, list) and len(current_data) > 0:
+            organization_id = current_data[0]
+
+        expl_ids = None
+        sector_ids = None
+
+        # If a valid organization is selected, get its specific expl_id and sector_id lists from the database
+        if organization_id:
+            org_data_sql = f"SELECT expl_id, sector_id FROM cm.cat_organization WHERE organization_id = {organization_id}"
+            org_data_row = tools_db.get_row(org_data_sql)
+            if org_data_row:
+                expl_ids = org_data_row.get('expl_id')
+                sector_ids = org_data_row.get('sector_id')
+
+        schema = lib_vars.schema_name
+        
+        # --- Update exploitation combo ---
+        if expl_widget:
+            sql_expl = f"SELECT expl_id, name FROM {schema}.exploitation"
+            # If expl_ids is a list (even an empty one), we apply a filter.
+            # If it's None, we don't, which results in loading all.
+            if expl_ids is not None:
+                if expl_ids:
+                    expl_ids_str = ','.join(map(str, expl_ids))
+                    sql_expl += f" WHERE expl_id IN ({expl_ids_str})"
+                else: 
+                    # List is empty, so select nothing
+                    sql_expl += " WHERE 1=0"
+            sql_expl += " ORDER BY name"
+            
+            rows_expl = tools_db.get_rows(sql_expl)
+            tools_qt.fill_combo_values(expl_widget, rows_expl, add_empty=True)
+
+        # --- Update sector combo ---
+        if sector_widget:
+            sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
+            # If sector_ids is a list, apply a filter. Otherwise, load all.
+            if sector_ids is not None:
+                if sector_ids:
+                    sector_ids_str = ','.join(map(str, sector_ids))
+                    sql_sector += f" WHERE sector_id IN ({sector_ids_str})"
+                else: 
+                    # List is empty, so select nothing
+                    sql_sector += " WHERE 1=0"
+            sql_sector += " ORDER BY name"
+
+            rows_sector = tools_db.get_rows(sql_sector)
+            tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)
+
+    except Exception as e:
+        tools_qgis.show_warning(f"CRITICAL ERROR in update_expl_sector_combos: {e}", dialog=dialog)
+

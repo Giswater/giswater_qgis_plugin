@@ -123,7 +123,8 @@ class Workorder:
             # On update, take the first selected row
             selected = self.manager_dialog.tbl_workorder.selectionModel().selectedRows()
             if not selected:
-                tools_qgis.show_warning("Please select a workorder to open.", dialog=self.manager_dialog)
+                msg = "Please select a workorder to open."
+                tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
             workorder_id = selected[0].data()
             self.is_new_workorder = False
@@ -141,13 +142,15 @@ class Workorder:
             try:
                 body["feature"]["id"] = int(workorder_id)
             except (TypeError, ValueError):
-                tools_qgis.show_warning("Invalid workorder ID.", dialog=self.manager_dialog)
+                msg = "Invalid workorder ID."
+                tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
 
         p_data = tools_gw.create_body(body=body)
-        res = tools_gw.execute_procedure('gw_fct_getworkorder', p_data, schema_name='cm')
+        res = tools_gw.execute_procedure('gw_fct_cm_getworkorder', p_data, schema_name='cm')
         if not res or res.get('status') != 'Accepted':
-            tools_qgis.show_warning('Failed to load workorder form.')
+            msg = "Failed to load workorder form."
+            tools_qgis.show_warning(msg)
             return
 
         # Populate and show dialog as before...
@@ -181,7 +184,7 @@ class Workorder:
     def save_workorder(self, from_manager=True):
         """
         Read back all widgets, convert empty strings to None,
-        then call cm.gw_fct_setworkorder.
+        then call cm.gw_fct_cm_setworkorder.
         """
         fields = {}
         missing = []
@@ -217,8 +220,8 @@ class Workorder:
         if missing:
             QMessageBox.warning(
                 self.dialog,
-                "Missing Data",
-                "Please fill all mandatory fields (highlighted in red)."
+                tools_qt.tr("Missing Data", context_name="cm"),
+                tools_qt.tr("Please fill all mandatory fields (highlighted in red).", context_name="cm")
             )
             return False
 
@@ -242,7 +245,7 @@ class Workorder:
 
         # 5) Execute the set-function
         result = tools_gw.execute_procedure(
-            "gw_fct_setworkorder",
+            "gw_fct_cm_setworkorder",
             payload,
             schema_name="cm"
         )
@@ -258,8 +261,8 @@ class Workorder:
         else:
             QMessageBox.critical(
                 self.dialog,
-                "Error",
-                "An error occurred saving the workorder."
+                tools_qt.tr("Error", context_name="cm"),
+                tools_qt.tr("An error occurred saving the workorder.", context_name="cm")
             )
             return False
 
@@ -267,10 +270,12 @@ class Workorder:
         """Delete selected workorder with confirmation"""
         sel = self.manager_dialog.tbl_workorder.selectionModel().selectedRows()
         if not sel:
-            tools_qgis.show_warning("Select a workorder to delete.", dialog=self.manager_dialog)
+            msg = "Select a workorder to delete."
+            tools_qgis.show_warning(msg, dialog=self.manager_dialog)
             return
-
-        msg = f"Are you sure you want to delete {len(sel)} workorder(s)?"
+        msg = "Are you sure you want to delete {0} workorder(s)?"
+        msg_params = (len(sel),)
+        msg = msg.format(*msg_params)
         if not tools_qt.show_question(msg, title="Delete Workorder(s)"):
             return
 
@@ -283,8 +288,10 @@ class Workorder:
             sql = f"DELETE FROM cm.workorder WHERE workorder_id = {wid}"
             if tools_db.execute_sql(sql):
                 deleted += 1
-
-        tools_qgis.show_info(f"{deleted} workorder(s) deleted.", dialog=self.manager_dialog)
+        msg = "{0} workorder(s) deleted."
+        msg_params = (deleted,)
+        msg = msg.format(*msg_params)
+        tools_qgis.show_info(msg, dialog=self.manager_dialog)
         self.load_workorders_into_manager()
 
     def create_widget_from_field(self, field):

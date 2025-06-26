@@ -27,38 +27,38 @@ class GwFeatureEndButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.list_tabs = list_tabs
-        self.feature_type = feature_type
+        self.rel_feature_type = feature_type
 
     def clicked_event(self):
 
         # Get layers of every feature_type
 
         # Setting lists
-        self.ids = []
-        self.list_ids = {}
-        self.list_ids['arc'] = []
-        self.list_ids['node'] = []
-        self.list_ids['connec'] = []
-        self.list_ids['gully'] = []
-        self.list_ids['element'] = []
-        self.list_ids['link'] = []
+        self.rel_ids = []
+        self.rel_list_ids = {}
+        self.rel_list_ids['arc'] = []
+        self.rel_list_ids['node'] = []
+        self.rel_list_ids['connec'] = []
+        self.rel_list_ids['gully'] = []
+        self.rel_list_ids['element'] = []
+        self.rel_list_ids['link'] = []
 
         # Setting layers
-        self.layers = {}
-        self.layers['arc'] = []
-        self.layers['node'] = []
-        self.layers['connec'] = []
-        self.layers['gully'] = []
-        self.layers['element'] = []
-        self.layers['link'] = []
+        self.rel_layers = {}
+        self.rel_layers['arc'] = []
+        self.rel_layers['node'] = []
+        self.rel_layers['connec'] = []
+        self.rel_layers['gully'] = []
+        self.rel_layers['element'] = []
+        self.rel_layers['link'] = []
 
-        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
-        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
-        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        self.layers['element'] = [tools_qgis.get_layer_by_tablename('v_edit_element')]
-        self.layers['link'] = [tools_qgis.get_layer_by_tablename('v_edit_link')]
+        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.rel_layers['element'] = [tools_qgis.get_layer_by_tablename('v_edit_element')]
+        self.rel_layers['link'] = [tools_qgis.get_layer_by_tablename('v_edit_link')]
 
-        self.layers = tools_gw.remove_selection(True, layers=self.layers)
+        self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
@@ -88,7 +88,7 @@ class GwFeatureEndButton(GwAction):
             if self.project_type != 'ud':
                 tools_qt.remove_tab(self.dlg_work_end.tab_feature, 'tab_gully')
             else:
-                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+                self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_work_end.btn_insert, "111")
@@ -114,11 +114,11 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self._new_workcat))
 
         self.dlg_work_end.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT, False, None, None))
+            partial(tools_gw.insert_feature, self, self.dlg_work_end, self.table_object, GwSelectionMode.FEATURE_END, False, None, None))
         self.dlg_work_end.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_work_end, self.table_object, GwSelectionMode.FEATURE_END, None, None))
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT))
+            partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, GwSelectionMode.FEATURE_END))
         self.dlg_work_end.btn_expr_select.clicked.connect(
             partial(tools_gw.select_with_expression_dialog, self, self.dlg_work_end, self.table_object, None))
 
@@ -145,10 +145,10 @@ class GwFeatureEndButton(GwAction):
         self._fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        if self.feature_type is None:
-            self.feature_type = "arc"
-        viewname = f"v_edit_{self.feature_type}"
-        tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.feature_type + "_id"))
+        if self.rel_feature_type is None:
+            self.rel_feature_type = "arc"
+        viewname = f"v_edit_{self.rel_feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.rel_feature_type + "_id"))
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
@@ -520,7 +520,7 @@ class GwFeatureEndButton(GwAction):
                        "WHERE fid = 128 AND cur_user = current_user")
                 tools_db.execute_sql(sql)
         self._set_edit_arc_downgrade_force('False')
-        tools_gw.remove_selection(True, layers=self.layers)
+        tools_gw.remove_selection(True, layers=self.rel_layers)
         self.canvas.refresh()
 
     def _new_workcat(self):

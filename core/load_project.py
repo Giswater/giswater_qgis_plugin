@@ -332,11 +332,12 @@ class GwLoadProject(QObject):
         if len(repeated_layers) > 1:
             if lib_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
                     or lib_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
-                msg = ("QGIS project has more than one v_edit_node layer coming from different schemas. "
+                msg = ("QGIS project has more than one {0} layer coming from different schemas. "
                       "If you are looking to manage two schemas, it is mandatory to define which is the master and "
                       "which isn't. To do this, you need to configure the QGIS project setting this project's "
-                      "variables: gwMainSchema and gwAddSchema.")
-                tools_qt.show_info_box(msg)
+                      "variables: {1} and {2}.")
+                msg_params = ("v_edit_node", "gwMainSchema", "gwAddSchema")
+                tools_qt.show_info_box(msg, msg_params=msg_params)
                 return False
 
             # If there are layers with a different schema, the one that the user has in the project variable
@@ -377,14 +378,31 @@ class GwLoadProject(QObject):
 
         toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         if toolbars_order in (None, 'None'):
+            toolbars_order = tools_gw.get_config_parser('toolbars_position', '_toolbars_order', 'user', 'init')
+
+        if toolbars_order in (None, 'None'):
             msg = "Parameter '{0}' is None"
             msg_params = ("toolbars_order",)
             tools_log.log_info(msg, msg_params=msg_params)
             return
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
-        toolbars_order = toolbars_order.replace(' ', '').split(',')
-        for tb in toolbars_order:
+        toolbars_order_list = toolbars_order.replace(' ', '').split(',')
+        config_was_updated = False
+
+        # Check for optional toolbars
+        for toolbar_id in ('am', 'cm'):
+            is_active = tools_gw.get_config_parser('toolbars_add', f'{toolbar_id}_active', 'user', 'init', False)
+            if tools_os.set_boolean(is_active, False):
+                if toolbar_id not in toolbars_order_list:
+                    toolbars_order_list.append(toolbar_id)
+                    config_was_updated = True
+
+        if config_was_updated:
+            new_toolbars_order = ",".join(toolbars_order_list)
+            tools_gw.set_config_parser('toolbars_position', 'toolbars_order', new_toolbars_order, "user", "init")
+
+        for tb in toolbars_order_list:
             self._create_toolbar(tb)
 
         # Manage action group of every toolbar

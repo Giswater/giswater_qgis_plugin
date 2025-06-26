@@ -61,7 +61,7 @@ class GwMincutTools:
         tools_gw.load_settings(self.dlg_mincut_man)
 
         self._manage_dlg_widgets(self.complet_result)
-        self.load_connections(self.complet_result)
+        self.load_tableviews(self.complet_result)
 
         self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "tab_none_tbl_mincut_edit")
         tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager')
@@ -70,7 +70,7 @@ class GwMincutTools:
         self.tbl_mincut_edit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tbl_mincut_edit.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, self.tbl_mincut_edit, self.dlg_mincut_man))
 
-    def load_connections(self, complet_result, filter_fields=''):
+    def load_tableviews(self, complet_result, filter_fields=''):
         list_tables = self.dlg_mincut_man.findChildren(QTableView)
         complet_list = []
         for table in list_tables:
@@ -182,7 +182,6 @@ def close_mincut_manager(**kwargs):
 
 def mincut_selector(**kwargs):
     """ Manage mincut selector """
-    print(kwargs)
     dialog = kwargs['dialog']
     class_obj = kwargs['class']
     qtable = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
@@ -243,14 +242,19 @@ def delete_mincut(**kwargs):
     title = "Delete mincut"
 
     # Check for mincuts not allowed to be deleted
-    sql = (f"SELECT * FROM {table_name}"
-           f" WHERE {column_id} IN ({list_id}) AND (anl_user != current_user OR mincut_state != 0)")
-    rows = tools_db.execute_returning(sql, show_exception=False)
-    if rows:
-        msg = ("You can't delete these mincuts because they aren't planified \n"
-                  "or they were created by another user:")
-        tools_qt.show_info_box(msg, title, inf_text)
-        return
+    row = tools_gw.get_config_value('om_mincut_settings', table='config_param_system')
+    om_mincut_settings = row[0] if row else None
+    if om_mincut_settings:
+        om_mincut_settings = json.loads(om_mincut_settings)
+    if (om_mincut_settings is None or not om_mincut_settings.get('deleteUsers') or om_mincut_settings['deleteUsers'] == 'creator'):
+        sql = (f"SELECT * FROM {table_name}"
+            f" WHERE {column_id} IN ({list_id}) AND (anl_user != current_user OR mincut_state != 0)")
+        rows = tools_db.execute_returning(sql, show_exception=False)
+        if rows:
+            msg = ("You can't delete these mincuts because they aren't planified \n"
+                    "or they were created by another user:")
+            tools_qt.show_info_box(msg, title, inf_text)
+            return
 
     answer = tools_qt.show_question(msg, title, inf_text)
     if answer:

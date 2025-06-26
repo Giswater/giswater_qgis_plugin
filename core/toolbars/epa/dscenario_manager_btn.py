@@ -98,8 +98,8 @@ class GwDscenarioManagerButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [['Dscenario', '_open_dscenario_manager'], ['Hydrology scenario', '_open_hydrology_manager'],
-                   ['DWF scenario', '_open_dwf_manager']]
+        buttons = [[tools_qt.tr('Dscenario'), '_open_dscenario_manager'], [tools_qt.tr('Hydrology scenario'), '_open_hydrology_manager'],
+                   [tools_qt.tr('DWF scenario'), '_open_dwf_manager']]
 
         for button in buttons:
             button_name = button[0]
@@ -172,8 +172,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_hydrology_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
-        self.dlg_hydrology_manager.setWindowTitle('Hydrology scenario manager')
         tools_gw.open_dialog(self.dlg_hydrology_manager, 'dscenario_manager')
+        self.dlg_hydrology_manager.setWindowTitle(tools_qt.tr('Hydrology scenario'))
 
     def _open_dwf_manager(self):
         """"""
@@ -233,8 +233,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dwf_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
-        self.dlg_dwf_manager.setWindowTitle('DWF scenario manager')
         tools_gw.open_dialog(self.dlg_dwf_manager, 'dscenario_manager')
+        self.dlg_dwf_manager.setWindowTitle(tools_qt.tr('DWF scenario manager'))
 
     def _open_dscenario_manager(self):
         """ Open dscenario manager """
@@ -294,8 +294,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
-        self.dlg_dscenario_manager.setWindowTitle('Dscenario manager')
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
+        self.dlg_dscenario_manager.setWindowTitle(tools_qt.tr('Dscenario'))
 
     def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """

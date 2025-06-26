@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>512</width>
-    <height>706</height>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,7 @@
         </widget>
         <widget class="QWidget" name="tab_relations">
          <attribute name="title">
-          <string>Relació d'elements</string>
+          <string>Element relations</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
@@ -173,14 +173,14 @@
      <item row="0" column="1">
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
-        <string>Acceptar</string>
+        <string>Accept</string>
        </property>
       </widget>
      </item>
      <item row="0" column="2">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Cancel·lar</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>

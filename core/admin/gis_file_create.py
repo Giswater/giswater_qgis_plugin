@@ -6,10 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import shutil
+import json
 # TODO: Check this - do not delete this import for the moment
 from ..utils import tools_gw  # noqa: F401
+from ... import global_vars
 from ...libs import tools_log, tools_qt, tools_db, tools_qgis
+from qgis.core import QgsProject, QgsCoordinateReferenceSystem, QgsLayerTreeLayer
 
 
 class GwGisFileCreate:
@@ -21,28 +23,15 @@ class GwGisFileCreate:
         self.srid = None
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
-                             export_passwd=False, roletype='admin', layer_source=None):
+                             export_passwd=False, roletype='admin', layer_source=None, layer_project_type=None, is_cm=False):
 
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
 
-        # Get folder with QGS templates
+        # Get folder
         gis_extension = "qgs"
         gis_folder = self.plugin_dir + os.sep + "resources" + os.sep + "templates" + os.sep + "qgisproject"
         gis_locale_path = gis_folder + os.sep + locale
-
-        # If QGIS template locale folder not found, use English one
-        if not os.path.exists(gis_locale_path):
-            msg = "Locale gis folder not found"
-            tools_log.log_info(msg, parameter=gis_locale_path)
-            gis_locale_path = gis_folder + os.sep + "en_US"
-
-        # Check if template_path and folder_path exists
-        template_path = f"{gis_locale_path}{os.sep}{project_type}_{roletype}.{gis_extension}"
-        if not os.path.exists(template_path):
-            msg = "Template GIS file not found"
-            tools_qgis.show_warning(msg, parameter=template_path, duration=20)
-            return False, None
 
         # Manage default parameters
         if folder_path is None:
@@ -53,6 +42,13 @@ class GwGisFileCreate:
 
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
+
+        # Get database parameters from layer source
+        self.layer_source = layer_source
+        if self.layer_source is None:
+            status, self.layer_source = self._get_database_parameters(schema)
+            if not status:
+                return False, None
 
         # Set QGS file path
         qgs_path = folder_path + os.sep + filename + "." + gis_extension
@@ -67,41 +63,67 @@ class GwGisFileCreate:
         msg = "Creating GIS file... {0}"
         msg_params = (qgs_path)
         tools_log.log_info(msg, msg_params=msg_params)
-        shutil.copyfile(template_path, qgs_path)
 
-        # Get database parameters from layer source
-        self.layer_source = layer_source
-        if self.layer_source is None:
-            status, self.layer_source = self._get_database_parameters(schema)
-            if not status:
-                return False, None
+        # Create project
+        project = QgsProject.instance()
+        QgsProject.instance().clear()
 
-        # Read file content
-        with open(qgs_path) as f:
-            content = f.read()
+        root = project.layerTreeRoot()
+        auth_id = self._replace_spatial_parameters(self.layer_source['srid'])
 
-        # Replace spatialrefsys, extent parameters, connection parameters and schema name
-        content = self._replace_spatial_parameters(self.layer_source['srid'], content)
-        content = self._replace_extent_parameters(schema, content)
-        content = self._replace_connection_parameters(content, export_passwd)
-        content = self._set_project_vars(content, export_passwd)
-        content = content.replace("SCHEMA_NAME", schema)
+        # Get project layers
+        extras = f'"project_type":"{layer_project_type}", "is_cm":{str(is_cm).lower()}'
+        body = tools_gw.create_body(extras=extras)
+        layers = tools_gw.execute_procedure('gw_fct_get_project_layers', body, schema_name=schema)
+        if layers:
+            for layer in layers['body']['data']['layers']:
+                template = layer.get('project_template')
+                if not template:
+                    continue
 
-        # Write contents and show message
+                depth = template.get('levels_to_read')
+                if layer.get('context') is not None:
+                    context = json.loads(layer['context'])
+                    levels = context.get('levels')
+                    if levels is not None:
+                        level = root
+                        for i in range(0, depth):
+                            if levels[i] is not None:
+                                old_level = level.findGroup(levels[i])
+                                if old_level is None:
+                                    old_level = level.addGroup(levels[i])
+                                level = old_level
+                    rectangle = tools_gw._get_extent_parameters(schema)
+                    # Add project layer
+                    tools_gw.add_layer_database(layer['tableName'], layer['geomField'], layer['tableId'], levels[0], levels[1] if len(levels) > 1 else None, style_id='-1', alias=layer['layerName'],
+                                                 sub_sub_group=levels[2] if len(levels) > 2 else None, schema=layer['tableSchema'], visibility=template.get('visibility'), auth_id=auth_id,
+                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True)
+
+        # Set project CRS
+        project.setCrs(QgsCoordinateReferenceSystem(auth_id))
+
+        # Set project variables
+        project = self._set_project_vars(project, export_passwd)
+
+        # Collapse all layers
+        groups = root.findLayers()
+        for group in groups:
+            if isinstance(group, QgsLayerTreeLayer):
+                group.setExpanded(False)
+
+        # Set camera position on v_edit_node
+        global_vars.iface.mapCanvas().setExtent(tools_gw._get_extent_parameters(schema))
+
+        # Save project
         try:
-            with open(qgs_path, "w") as f:
-                f.write(content)
+            project.write(qgs_path)
             msg = "GIS file generated successfully"
             tools_qgis.show_info(msg, parameter=qgs_path)
-            msg = "Do you want to open GIS project?"
-            title = "GIS file generated successfully"
-            answer = tools_qt.show_question(msg, title, force_action=True)
-            if answer:
-                return True, qgs_path
-            return False, qgs_path
+            return True, qgs_path
         except IOError:
             msg = "File cannot be created. Check if it is already opened"
             tools_qgis.show_warning(msg, parameter=qgs_path)
+            return False, qgs_path
 
     # region private functions
 
@@ -117,77 +139,24 @@ class GwGisFileCreate:
             layer_source['srid'] = tools_db.get_srid('v_edit_node', schema)
             return True, layer_source
 
-    def _replace_spatial_parameters(self, srid, content):
+    def _replace_spatial_parameters(self, srid):
 
-        aux = content
         sql = (f"SELECT 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id "
                f"FROM spatial_ref_sys "
                f"WHERE srid = '{srid}'")
         row = tools_db.get_row(sql)
 
         if row:
-            aux = aux.replace("__SRSID__", str(row[0]))
-            aux = aux.replace("__SRID__", str(row[1]))
-            aux = aux.replace("__AUTHID__", row[2])
+            return row[2]
 
-        return aux
+        return None
 
-    def _replace_extent_parameters(self, schema_name, content):
+    def _set_project_vars(self, project, export_passwd):
 
-        aux = content
-        table_name = "node"
-        geom_name = "the_geom"
-        sql = (f"SELECT ST_XMax(gometries) AS xmax, ST_XMin(gometries) AS xmin, "
-               f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
-               f"FROM "
-               f"(SELECT ST_Collect({geom_name}) AS gometries FROM {schema_name}.{table_name}) AS foo")
-        row = tools_db.get_row(sql)
-        if row:
-            valor = row["xmin"]
-            if valor is None:
-                valor = -1.555992
-            aux = aux.replace("__XMIN__", str(valor))
+        project_type = tools_gw.get_project_type()
+        project.setCustomVariables({'gwAddSchema': '', 'gwInfoType': 'full', 'gwMainSchema': '', 'gwProjectRole': 'role_admin', 'gwProjectType': project_type,
+                                     'gwStoreCredentials': f"{export_passwd}", 'svg_path': 'C:/Users/usuario/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/svg'})
 
-            valor = row["ymin"]
-            if valor is None:
-                valor = -1.000000
-            aux = aux.replace("__YMIN__", str(valor))
-
-            valor = row["xmax"]
-            if valor is None:
-                valor = 1.555992
-            aux = aux.replace("__XMAX__", str(valor))
-
-            valor = row["ymax"]
-            if valor is None:
-                valor = 1.000000
-            aux = aux.replace("__YMAX__", str(valor))
-
-        return aux
-
-    def _replace_connection_parameters(self, content, export_passwd):
-
-        if self.layer_source['service']:
-            datasource = f"service='{self.layer_source['service']}'"
-
-        else:
-            datasource = (f"dbname='{self.layer_source['db']}' host={self.layer_source['host']} "
-                          f"port={self.layer_source['port']}")
-
-            if export_passwd:
-                username = self.layer_source['user']
-                password = self.layer_source['password']
-                datasource += f" username={username} password={password}"
-
-        content = content.replace("__SSLMODE__", self.layer_source['sslmode'])
-        content = content.replace("__DATASOURCE__", datasource)
-
-        return content
-
-    def _set_project_vars(self, content, export_passwd):
-
-        content = content.replace("__STORECREDENTIALS__", f"{export_passwd}")
-
-        return content
+        return project
 
     # endregion

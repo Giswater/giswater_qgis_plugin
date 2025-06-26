@@ -15,59 +15,84 @@ from qgis.core import Qgis
 
 from ...threads.task import GwTask
 from ...utils import tools_gw
-from ....libs import lib_vars, tools_qgis, tools_log, tools_qt, tools_os
+from ....libs import lib_vars, tools_qgis, tools_log, tools_os, tools_qt
 
 
 class GwProjectCheckCMTask(GwTask):
+    """
+    Task to check project health in the background for Campaign Management.
+    It executes a database function and passes the result back.
+    """
+    task_started = pyqtSignal()
+    task_finished = pyqtSignal()
 
-    task_finished = pyqtSignal(list)
-
-    def __init__(self, description='', params=None, timer=None):
-
+    def __init__(self, description, params=None):
         super().__init__(description)
         self.params = params if params else {}
-        self.result = None
-        self.dlg_audit_project = None
-        self.timer = timer
+        self.dialog = self.params.get('dialog')
+        self.log_widget = self.params.get('log_widget')
+        self.result_data = None
 
     def run(self):
-
+        """
+        Executes the main task.
+        """
         super().run()
+        self.task_started.emit()
+        try:
+            # Prepare the data and execute the database function to check the project.
+            # Use hardcoded parameters based on user's working SQL call.
+            project_type = "cm"
+            function_fid = 0
 
-        layers = self.params['layers']
-        init_project = self.params['init_project']
-        self.dlg_audit_project = self.params['dialog']
-        tools_log.log_info("Task 'Check project' execute function 'fill_check_project_table'")
-        status, self.result = self.fill_check_project_table(layers, init_project)
-        if not status:
-            tools_log.log_info("Function fill_check_project_table returned False")
-            return False
+            campaign_id = self.params.get("campaign_id")
+            lot_id = self.params.get("lot_id")
 
-        return True
+            # Extract the actual ID values if they are lists [id, name]
+            if isinstance(campaign_id, list) and len(campaign_id) > 0:
+                campaign_id = campaign_id[0]
+            if isinstance(lot_id, list) and len(lot_id) > 0:
+                lot_id = lot_id[0]
+
+            extras = (
+                f'"parameters": {{'
+                f'"functionFid": {function_fid}, "project_type": "{project_type}", '
+                f'"campaignId": {campaign_id if campaign_id is not None else "null"}, '
+                f'"lotId": {lot_id if lot_id is not None else "null"}'
+                f'}}'
+            )
+            body = tools_gw.create_body(extras=extras)
+            self.result_data = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, schema_name='cm', aux_conn=self.aux_conn)
+            if self.result_data['status'] == 'Accepted':
+                return True
+            else:
+                return False
+        except Exception as e:
+            msg = "EXCEPTION: {0}, {1}"
+            msg_params = (type(e).__name__, str(e),)
+            tools_log.log_warning(msg, msg_params=msg_params)
 
     def finished(self, result):
+        """
+        Handles the task completion.
+        """
 
         super().finished(result)
 
-        self.dlg_audit_project.progressBar.setVisible(False)
-        if self.timer:
-            self.timer.stop()
-        if self.isCanceled():
-            self.setProgress(100)
-            return
+        self.dialog.progressBar.setVisible(False)
 
         # Handle exception
         if self.exception is not None:
-            msg = f"<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"
-            msg += f"<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"
-            msg += f"<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"
-            msg += f"<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"
+            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
+            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
+            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
+            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
             return
 
         # Show dialog with audit check project result
-        self._show_check_project_result(self.result)
+        self._show_check_project_result(self.result_data)
 
         self.setProgress(100)
 
@@ -103,16 +128,15 @@ class GwProjectCheckCMTask(GwTask):
                 fields += '"fid":101, '
                 fields += f'"table_user":"{table_user}"}}, '
         fields = fields[:-2] + ']'
+        # Execute function 'gw_fct_cm_setcheckproject'
+        self.result = self._execute_check_project_function(init_project, fields)
 
-        # Execute function 'gw_fct_setcheckproject'
-        result = self._execute_check_project_function(init_project, fields)
-
-        return True, result
+        return True, self.result
 
     # region private functions
 
     def _execute_check_project_function(self, init_project, fields_to_insert):
-        """ Execute function 'gw_fct_setcheckproject' with checkbox selections passed from project_check_btn.py """
+        """ Execute function 'gw_fct_cm_setcheckproject' with checkbox selections passed from project_check_btn.py """
         # Retrieve checkbox values from params
         show_versions = self.params.get("show_versions", False)
         show_qgis_project = self.params.get("show_qgis_project", False)
@@ -153,7 +177,7 @@ class GwProjectCheckCMTask(GwTask):
 
         # Execute procedure
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
+        result = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
         if result:
             open_curselectors = tools_gw.get_config_parser('dialogs_actions', 'curselectors_open_loadproject', "user", "init")
             open_curselectors = tools_os.set_boolean(open_curselectors, False)
@@ -162,7 +186,9 @@ class GwProjectCheckCMTask(GwTask):
             if not result or (result['body']['variables']['hideForm'] is True):
                 return result
         except KeyError as e:
-            tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
+            msg = "EXCEPTION: {0}, {1}"
+            msg_params = (type(e).__name__, e,)
+            tools_log.log_warning(msg, msg_params=msg_params)
             return result
 
         return result
@@ -176,7 +202,7 @@ class GwProjectCheckCMTask(GwTask):
             return False
 
         # Call `fill_tab_log()` directly, no need to store variables
-        tools_gw.fill_tab_log(self.dlg_audit_project, result['body']['data'], reset_text=False)
+        tools_gw.fill_tab_log(self.dialog, result['body']['data'], reset_text=False)
 
     def _add_selected_layers(self, dialog, m_layers):
         """ Receive a list of layers, look for the checks associated with each layer and if they are checked,
@@ -205,7 +231,7 @@ class GwProjectCheckCMTask(GwTask):
                     if layer:
                         extras = f'"style_id":"{style_id}"'
                         body = tools_gw.create_body(extras=extras)
-                        style = tools_gw.execute_procedure('gw_fct_getstyle', body)
+                        style = tools_gw.execute_procedure('gw_fct_cm_getstyle', body)
                         if not style or style['status'] == 'Failed':
                             return
                         if 'styles' in style['body']:
@@ -214,6 +240,6 @@ class GwProjectCheckCMTask(GwTask):
                             tools_qgis.create_qml(layer, qml)
                 tools_qgis.set_layer_visible(layer)
 
-        tools_gw.close_dialog(self.dlg_audit_project)
+        tools_gw.close_dialog(self.dialog)
 
     # endregion

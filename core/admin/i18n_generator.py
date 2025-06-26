@@ -17,7 +17,7 @@ import psycopg2.extras
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_log
 
 from PyQt5.QtWidgets import QApplication
 
@@ -101,23 +101,22 @@ class GwI18NGenerator:
         if py_msg:
             status_py_msg = self._create_py_files()
             if status_py_msg is True:
-                msg += f"{tools_qt.tr('Python translation successful')}\n"
+                msg += f'''{tools_qt.tr('Python translation successful')}\n'''
             elif status_py_msg is False:
-                msg += f"{tools_qt.tr('Python translation failed')}\n"
+                msg += f'''{tools_qt.tr('Python translation failed')}\n'''
             elif status_py_msg is None:
-                msg += f"{tools_qt.tr('Python translation canceled')}\n"
+                msg += f'''{tools_qt.tr('Python translation canceled')}\n'''
 
         self._create_path_dic()
         for type_db_file in self.path_dic:
-
             if tools_qt.is_checked(self.dlg_qm, self.path_dic[type_db_file]['checkbox']):
                 status_all_db_msg, dbtable = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
                 if status_all_db_msg is True:
-                    msg += f"{type_db_file} {tools_qt.tr('translation successful')}\n"
+                    msg += f'''{type_db_file} {tools_qt.tr('translation successful')}\n'''
                 elif status_all_db_msg is False:
-                    msg += f"{type_db_file} {tools_qt.tr('translation failed in table')}: {dbtable}\n"
+                    msg += f'''{type_db_file} {tools_qt.tr('translation failed in table')}: {dbtable}\n'''
                 elif status_all_db_msg is None:
-                    msg += f"{type_db_file} {tools_qt.tr('translation canceled')}\n"
+                    msg += f'''{type_db_file} {tools_qt.tr('translation canceled')}\n'''
 
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
@@ -267,10 +266,35 @@ class GwI18NGenerator:
         del ts_file
 
         lrelease_path = f"{self.plugin_dir}{os.sep}resources{os.sep}i18n{os.sep}lrelease.exe"
-        status = subprocess.call([lrelease_path, ts_path], shell=False)
-        if status == 0:
-            return True
-        else:
+        try:
+            tools_log.log_info(f"Running lrelease: {lrelease_path} {ts_path}")
+            
+            # Use subprocess.run to capture output and errors
+            process = subprocess.run(
+                [lrelease_path, ts_path],
+                shell=False,
+                capture_output=True,  # Capture stdout and stderr
+                text=True  # Decode stdout/stderr as text
+            )
+
+            status = process.returncode
+            stdout = process.stdout
+            stderr = process.stderr
+
+            tools_log.log_info(f"lrelease completed with status: {status}")
+            if stdout:
+                tools_log.log_info(f"lrelease stdout:\n{stdout}")
+
+            if status == 0:
+                tools_log.log_info("lrelease succeeded")
+                return True
+            else:
+                tools_log.log_warning(f"lrelease failed with status {status}")
+                if stderr:
+                    tools_log.log_warning(f"lrelease stderr:\n{stderr}")
+                return False
+        except Exception as e:
+            tools_log.log_warning(f"Error running lrelease: {str(e)}")
             return False
 
     def _get_title(self, py_dialogs, name, key_label):
@@ -350,7 +374,7 @@ class GwI18NGenerator:
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbconfig_typevalue':
-            colums = ["source", "formname", "formtype", "project_type", "context", "source_code", "tt_en_us"]
+            colums = ["source", "formname", "project_type", "context", "source_code", "tt_en_us"]
             lang_colums = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbmessage':
@@ -846,8 +870,7 @@ class GwI18NGenerator:
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
-                    "dbconfig_form_fields_json"
-                 ]  # "su_feature",
+                    "dbconfig_form_fields_json"]
             },
             "i18n_ud": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}i18n{os.sep}{self.language}{os.sep}",
@@ -858,8 +881,7 @@ class GwI18NGenerator:
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
-                    "dbconfig_form_fields_json"
-                 ]  # "su_feature",
+                    "dbconfig_form_fields_json"]
             },
             "am": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}am{os.sep}i18n{os.sep}",
@@ -869,12 +891,12 @@ class GwI18NGenerator:
                 "tables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"]
             },
             "cm": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}updates{os.sep}{major_version}{os.sep}{ver_build}"
-                        f"{os.sep}i18n{os.sep}{self.language}{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}cm{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
-                "tables": []  # ["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
+                "tables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
+                             "dbtypevalue", "dbconfig_form_fields_json"]
             }
         }
 

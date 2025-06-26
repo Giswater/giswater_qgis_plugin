@@ -94,10 +94,10 @@ class GwAutoMincutTask(GwTask):
 
         # Handle python exception
         elif self.exception is not None:
-            msg = f"<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"
-            msg += f"<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"
-            msg += f"<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"
-            msg += f"<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"
+            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
+            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
+            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
+            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
             self.task_finished.emit([False, self.complet_result])

@@ -81,7 +81,9 @@ class GwInpConfig:
             try:
                 data = json.load(file)
             except json.JSONDecodeError as e:
-                tools_log.log_error(f"Error reading configuration file: {e}")
+                msg = "Error reading configuration file: {0}"
+                msg_params = (e,)
+                tools_log.log_error(msg, msg_params=msg_params)
                 return
         self.deserialize(data)
 
@@ -147,9 +149,9 @@ def toolsdb_execute_values(
     sql, argslist, template=None, page_size=100, fetch=False, commit=True
 ):
     if tools_db.dao is None:
-        tools_log.log_warning(
-            "The connection to the database is broken.", parameter=sql
-        )
+        msg = "The connection to the database is broken: {0}"
+        msg_params = (sql,)
+        tools_log.log_warning(msg, msg_params=msg_params)
         return None
 
     tools_db.dao.last_error = None
@@ -230,7 +232,9 @@ def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[
         config = GwInpConfig(file_path=self_cls.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
                                 municipality=municipality, dscenario=dscenario, raingage=raingage, catalogs=catalogs)
         config.write_to_file(config_path)
-        tools_log.log_info(f"Configuration saved to {config_path}")
+        msg = "Configuration saved to {0}"
+        msg_params = (config_path,)
+        tools_log.log_info(msg, msg_params=msg_params)
     except Exception as e:
         msg = "Error saving the configuration"
         param = str(e)
@@ -281,25 +285,25 @@ def fill_txt_info(self_cls, dialog):
     """Fill the text information in the dialog"""
 
     epa_software = "EPANET" if global_vars.project_type == ProjectType.WS.value else "SWMM"
-    info_str = f"<h3>{tools_qt.tr('IMPORT INP')} ({epa_software})</h3>"
+    info_str = f'''<h3>{tools_qt.tr('IMPORT INP')} ({epa_software})</h3>'''
     info_str += "<p>"
-    info_str += f"{tools_qt.tr('This wizard will help with the process of importing a network from a {0} INP file into the Giswater database.', list_params=(epa_software,))}<br><br>"
-    info_str += f"{tools_qt.tr('There are multple tabs in order to configure all the necessary catalogs.')}<br><br>"
-    info_str += f"{tools_qt.tr("The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.")}<br><br>"
-    info_str += f"{tools_qt.tr("The second tab is the 'Features' tab, where you can select the corresponding feature classes for each type of feature on the network.")}<br>"
+    info_str += f'''{tools_qt.tr('This wizard will help with the process of importing a network from a {0} INP file into the Giswater database.', list_params=(epa_software,))}<br><br>'''
+    info_str += f'''{tools_qt.tr('There are multple tabs in order to configure all the necessary catalogs.')}<br><br>'''
+    info_str += f'''{tools_qt.tr("The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.")}<br><br>'''
+    info_str += f'''{tools_qt.tr("The second tab is the 'Features' tab, where you can select the corresponding feature classes for each type of feature on the network.")}<br>'''
     if epa_software == "EPANET":
-        info_str += f"{tools_qt.tr('Here you can choose how the pumps and valves will be imported, either left as arcs (virual arcs) or converted to nodes.')}<br><br>"
-        info_str += f"{tools_qt.tr("The third tab is the 'Materials' tab, where you can select the corresponding material for each roughness value.")}<br><br>"
+        info_str += f'''{tools_qt.tr('Here you can choose how the pumps and valves will be imported, either left as arcs (virual arcs) or converted to nodes.')}<br><br>'''
+        info_str += f'''{tools_qt.tr("The third tab is the 'Materials' tab, where you can select the corresponding material for each roughness value.")}<br><br>'''
     elif epa_software == "SWMM":
-        info_str += f"{tools_qt.tr('Here you can choose how the pumps, weirs, orifices, and outlets will be imported, either left as arcs (virual arcs) or converted to flwreg.')}<br><br>"
-        info_str += f"{tools_qt.tr("The third tab is the 'Materials' tab, where you can select the corresponding roughness value for each material.")}<br><br>"
-    info_str += f"{tools_qt.tr("The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.")}<br><br>"
-    info_str += f"{tools_qt.tr("The fifth tab is the 'Arcs' tab, where you can select the catalog for each type of arc on the network.")}<br><br>"
+        info_str += f'''{tools_qt.tr('Here you can choose how the pumps, weirs, orifices, and outlets will be imported, either left as arcs (virual arcs) or converted to flwreg.')}<br><br>'''
+        info_str += f'''{tools_qt.tr("The third tab is the 'Materials' tab, where you can select the corresponding roughness value for each material.")}<br><br>'''
+    info_str += f'''{tools_qt.tr("The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.")}<br><br>'''
+    info_str += f'''{tools_qt.tr("The fifth tab is the 'Arcs' tab, where you can select the catalog for each type of arc on the network.")}<br><br>'''
     if epa_software == "SWMM":
-        info_str += f"{tools_qt.tr('If you chose to import the flow regulators as flwreg objects, the sixth tab is where you can select the catalog for each flow regulator (pumps, weirs, orifices, outlets) on the network.')}<br>{tools_qt.tr('If not, you can ignore the tab.')}<br><br>"
-    info_str += f"{tools_qt.tr("Once you have configured all the necessary catalogs, you can click on the 'Accept' button to start the import process.")}<br>{tools_qt.tr('It will then show the log of the process in the last tab.')}<br><br>"
-    info_str += f"{tools_qt.tr('You can save the current configuration to a file and load it later, or load the last saved configuration.')}<br><br>"
-    info_str += f"{tools_qt.tr('If you have any questions, please contact the Giswater team via')}<a href='https://github.com/Giswater/giswater_qgis_plugin/issues'>{tools_qt.tr('GitHub Issues')}</a> {tools_qt.tr('or')}<a href='https://giswater.org/contact/'>{tools_qt.tr('our website')}</a>.<br>"
+        info_str += f'''{tools_qt.tr('If you chose to import the flow regulators as flwreg objects, the sixth tab is where you can select the catalog for each flow regulator (pumps, weirs, orifices, outlets) on the network.')}<br>{tools_qt.tr('If not, you can ignore the tab.')}<br><br>'''
+    info_str += f'''{tools_qt.tr("Once you have configured all the necessary catalogs, you can click on the 'Accept' button to start the import process.")}<br>{tools_qt.tr('It will then show the log of the process in the last tab.')}<br><br>'''
+    info_str += f'''{tools_qt.tr('You can save the current configuration to a file and load it later, or load the last saved configuration.')}<br><br>'''
+    info_str += f'''{tools_qt.tr('If you have any questions, please contact the Giswater team via')}<a href='https://github.com/Giswater/giswater_qgis_plugin/issues'>{tools_qt.tr('GitHub Issues')}</a> {tools_qt.tr('or')}<a href='https://giswater.org/contact/'>{tools_qt.tr('our website')}</a>.<br>'''
     info_str += "</p>"
     tools_qt.set_widget_text(dialog, 'txt_info', info_str)
 

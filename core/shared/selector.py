@@ -35,8 +35,7 @@ class GwSelector:
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
                 aux_params = tools_gw.get_config_parser("selector_mincut", "aux_params", "user", "session")
             elif selector_type == "selector_campaign":
-                current_tab = tools_gw.get_config_parser('dialogs_tab_cm', "dlg_selector_campaign", "user", "session")
-                print(current_tab)
+                current_tab = reload_dlg.main_tab.widget(reload_dlg.main_tab.currentIndex()).objectName()
             else:
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
@@ -50,7 +49,10 @@ class GwSelector:
         dlg_selector.setProperty('GwSelector', self)
 
         # Get the name of the last tab used by the user
-        current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
+        if selector_type == 'selector_campaign':
+            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_campaign", "user", "session")
+        else:
+            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab)
         tools_qt.manage_translation('selector', dlg_selector)
         if lib_vars.session_vars['dialog_docker']:
@@ -72,8 +74,12 @@ class GwSelector:
         # Manage tab focus
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
         # Save the name of current tab used by the user
-        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
-            tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
+        if selector_type == 'selector_campaign':
+            dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
+                tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'campaign'))
+        else:
+            dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
+                tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
 
         # Set typeahead focus if configured
         self._set_focus(dlg_selector)
@@ -131,12 +137,12 @@ class GwSelector:
 
         # Determine which function to call based on the campaign flag
         if selector_type == 'selector_campaign':
-            # For campaign, use the gw_fct_getselectorscm function
+            # For campaign, use the gw_fct_cm_getselectors function
             body = tools_gw.create_body(
                 form=f'"currentTab":"{current_tab}"',
                 extras=f'"selectorType":"{selector_type}", "filterText":"{text_filter}", "addSchema":"{lib_vars.project_vars["add_schema"]}"'
             )
-            json_result = tools_gw.execute_procedure('gw_fct_getselectorscm', body, schema_name='cm')
+            json_result = tools_gw.execute_procedure('gw_fct_cm_getselectors', body, schema_name='cm')
         else:
             # For non-campaign, use the gw_fct_getselectors function
             form = f'"currentTab":"{current_tab}"'
@@ -224,7 +230,7 @@ class GwSelector:
                     if not tools_os.set_boolean(field.get('value'), default=False):
                         self.checkall = False
 
-                if tools_qt.get_widget(dialog, "chk_all_") is None:
+                if tools_qt.get_widget(dialog, f"chk_all_{tab_name}") is None:
                     widget = QCheckBox()
                     widget.setObjectName('chk_all_' + str(tab_name))
                     widget.toggled.connect(partial(self._manage_all, dialog, widget))
@@ -232,7 +238,7 @@ class GwSelector:
                     chk_all_tooltip = tools_qt.tr("Shift+Click to uncheck all")
                     widget.setToolTip(chk_all_tooltip)
                 else:
-                    widget = tools_qt.get_widget(dialog, "chk_all_")
+                    widget = tools_qt.get_widget(dialog, f"chk_all_{tab_name}")
                 widget.setText(tools_qt.tr('chk_all_', 'selector', default='Check all'))
                 if self.checkall is not None:
                     widget.blockSignals(True)
@@ -299,14 +305,14 @@ class GwSelector:
         tab_name = dialog.main_tab.widget(index).objectName()
         selection_mode = selection_modes[tab_name]
 
-        msg = f"{tools_qt.tr('Clicking an item will check/uncheck it.')}"
+        msg = f'''{tools_qt.tr('Clicking an item will check/uncheck it.')}'''
         if selection_mode == 'keepPrevious':
-            msg += f"{tools_qt.tr('Checking any item will not uncheck any other item.')}\n"
+            msg += f'''{tools_qt.tr('Checking any item will not uncheck any other item.')}\n'''
         elif selection_mode == 'keepPreviousUsingShift':
-            msg += f"{tools_qt.tr('Checking any item will uncheck all other items unless Shift is pressed.')}\n"
+            msg += f'''{tools_qt.tr('Checking any item will uncheck all other items unless Shift is pressed.')}\n'''
         elif selection_mode == 'removePrevious':
-            msg += f"{tools_qt.tr('Checking any item will uncheck all other items.')}\n"
-        msg += f"""{tools_qt.tr("This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector")}_{tab_name}')."""
+            msg += f'''{tools_qt.tr('Checking any item will uncheck all other items.')}\n'''
+        msg += f'''{tools_qt.tr("This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector")}_{tab_name}').'''
         title = "Selector help"
         tools_qt.show_info_box(msg, title)
 
@@ -373,7 +379,7 @@ class GwSelector:
         if selector_type == 'selector_campaign':
             # If it's a campaign, use the gw_fct_setselectocm procedure
             body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_setselectorscm', body, schema_name='cm')
+            json_result = tools_gw.execute_procedure('gw_fct_cm_setselectors', body, schema_name='cm')
         else:
             # If not campaign, use the original gw_fct_setselectors procedure
             body = tools_gw.create_body(extras=extras)

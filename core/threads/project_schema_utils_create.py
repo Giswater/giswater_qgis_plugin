@@ -41,35 +41,37 @@ class GwCreateSchemaUtilsTask(GwTask):
 
             # After create schema utils:
             # execute gw_fct_admin_schema_utils_fk for mains schema
-            msg = "Task 'Create schema' execute sql: '{0}'"
+            msg = "Task '{0}' execute sql: '{1}'"
 
             sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_schema_utils_fk();"
-            msg_params = (sql,)
+            msg_params = ("Create schema", sql,)
             tools_log.log_info(msg, msg_params=msg_params)
             tools_db.execute_sql(sql)
             
             sql = f"SELECT {self.params['schema_ud']}.gw_fct_admin_schema_utils_fk();"
-            msg_params = (sql,)
+            msg_params = ("Create schema", sql,)
             tools_log.log_info(msg, msg_params=msg_params)
             tools_db.execute_sql(sql)
 
             # execute gw_fct_admin_role_permissions
             sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_role_permissions();"
-            msg_params = (sql,)
+            msg_params = ("Create schema", sql,)
             tools_log.log_info(msg, msg_params=msg_params)
             tools_db.execute_sql(sql)
 
             # Insert into config_param_system utils schema version
             sql = f"INSERT INTO utils.config_param_system (id, parameter, value, data_type, descript)" \
                   f" VALUES (10, 'utils_version', '{self.params['main_project_version']}', 'text', 'UTILS')"
-            msg_params = (sql,)
+            msg_params = ("Create schema", sql,)
             tools_log.log_info(msg, msg_params=msg_params)
             tools_db.execute_sql(sql)
 
             return True
 
         except KeyError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
+            msg = "{0} --> {1}"
+            msg_params = (type(e).__name__, e,)
+            tools_log.log_info(msg, msg_params=msg_params)
             self.exception = e
             return False
 
@@ -82,10 +84,10 @@ class GwCreateSchemaUtilsTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f"<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"
-            msg += f"<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"
-            msg += f"<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"
-            msg += f"<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"
+            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
+            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
+            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
+            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
 

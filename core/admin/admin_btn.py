@@ -28,7 +28,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmBaseUi, GwAdminCmCreateUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmCreateUi
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -46,6 +46,7 @@ from ..threads.project_schema_cm_create import GwCreateSchemaCmTask
 from ..threads.project_schema_update import GwUpdateSchemaTask
 from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
+from ..threads.project_schema_vacuum import GwVacuumSchemaTask
 
 
 class GwAdminButton:
@@ -69,6 +70,7 @@ class GwAdminButton:
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
+        self.enable_translation_files = True
         self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir)
                                             .replace('.', ''))
         self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '14.99', lib_vars.plugin_dir)
@@ -77,6 +79,7 @@ class GwAdminButton:
         self.current_sql_file = 0   # Current number of SQL file
         self.progress_value = 0     # (current_sql_file / total_sql_files) * 100
         self.progress_ratio = 0.8   # Ratio to apply to 'progress_value'
+        self.is_cm_project = False
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
         """ Button 100: Execute SQL. Info show info """
@@ -116,7 +119,7 @@ class GwAdminButton:
         self.other_project = project
 
         msg = "This process will take time (few minutes). Are you sure to continue?"
-        title = "Create {project} schema"
+        title = "Create {0} schema"
         title_params = (project,)
         answer = tools_qt.show_question(msg, title=title, title_params=title_params)
         if not answer:
@@ -145,15 +148,26 @@ class GwAdminButton:
         self.descript = project_descript
         self.schema_type = project_type
         self.project_epsg = project_srid
-        self.locale = project_locale
         self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
         self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
+        self.enable_translation_files = True
+
+        # If the locale is no_TR, act as if it was en_US, but disable translation files
+        self.locale = project_locale
+        if self.locale == 'no_TR':
+            self.project_epsg = '25831'
+            project_srid = '25831'
+            self.locale = 'en_US'
+            project_locale = 'en_US'
+            self.folder_locale = os.path.join(self.sql_dir, 'i18n', project_locale)
+            tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', '25831')
+            tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
+            self.enable_translation_files = False
 
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
         tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}', prefix=False)
-        locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
-        tools_gw.set_config_parser('btn_admin', 'project_locale', f'{locale}', prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'project_locale', f'{self.locale}', prefix=False)
 
         # Check if project name is valid
         if not self._check_project_name(project_name_schema, project_descript):
@@ -174,7 +188,7 @@ class GwAdminButton:
 
         msg = "Create schema of type '{0}': '{1}'"
         msg_params = (project_type, project_name_schema,)
-        tools_log.log_info(msg, msg_params=msg_params)
+        tools_log.log_info(msg, msg_params=msg_params)      
 
         if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
@@ -246,14 +260,15 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
-    def _run_create_cm_task(self, steps):
+    def _run_create_cm_task(self, steps, process_name):
         self.cm_error_count = 0
         self.t0 = time()
         self.timer = QTimer()
         self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_cm_project))
         self.timer.start(1000)
-        description = "Create CM schema"
-        self.task = GwCreateSchemaCmTask(self, description, timer=self.timer, list_process=steps)
+        process_name = process_name.capitalize()
+        description = process_name
+        self.task = GwCreateSchemaCmTask(self, description, timer=self.timer, list_process=steps, process_name=process_name)
         QgsApplication.taskManager().addTask(self.task)
         QgsApplication.taskManager().triggerTask(self.task)
 
@@ -300,11 +315,11 @@ class GwAdminButton:
             msg = "A rollback on schema will be done."
             tools_qgis.show_info(msg)
 
-    def manage_cm_process_result(self):
+    def manage_cm_process_result(self, process_name):
         """"""
 
         status = (self.cm_error_count == 0)
-        self._manage_result_message(status, parameter="Create cm schema")
+        self._manage_result_message(status, parameter=f"CM Task: {process_name.capitalize()}")
         if status:
             tools_db.dao.commit()
         else:
@@ -371,7 +386,7 @@ class GwAdminButton:
 
         # Get current locale
         if not locale:
-            locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
+            locale = self.locale
 
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
@@ -381,6 +396,31 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
 
         return result
+
+    def _vacuum_project_data_schema(self, verbose=False):
+        """ Execute task to vacuum schema """
+        description = "Vacuum schema"
+        params = {'schema_name': self.schema_name, 'logs': True, 'verbose': verbose}
+
+        self.task_vacuum_schema = GwVacuumSchemaTask(description, params)
+        QgsApplication.taskManager().addTask(self.task_vacuum_schema)
+        QgsApplication.taskManager().triggerTask(self.task_vacuum_schema)
+
+    def execute_vacuum(self, ask_confirm=False, verbose=False):
+        """ Ask confirmation to execute vacuum using a separate database connection """
+        if ask_confirm:
+            msg = "Are you sure to execute vacuum on selected schema?"
+            title = "Warning"
+            result = tools_qt.show_question(msg, title)
+            if result is True:
+                self._vacuum_project_data_schema(verbose=verbose)
+                return True
+            else:
+                return False
+        else:
+            self._vacuum_project_data_schema(verbose=verbose)
+
+        return True
 
     def cancel_task(self, task_name: str):
         if hasattr(self, task_name):
@@ -506,6 +546,8 @@ class GwAdminButton:
         # Populate combo with all locales
         status, sqlite_cur = tools_gw.create_sqlite_conn("config")
         list_locale = self._select_active_locales(sqlite_cur)
+        if global_vars.gw_dev_mode is True:
+            list_locale.append(["no_TR", "Hardcoded (No translation)"])
         tools_qt.fill_combo_values(self.cmb_locale, list_locale)
         locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False, force_reload=True)
         tools_qt.set_combo_value(self.cmb_locale, locale, 0, add_new=False)
@@ -568,9 +610,12 @@ class GwAdminButton:
         if self._process_folder(folder_locale) is False:
             self.load_locale('en_US')
         else:
-            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
-            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
+            if self.enable_translation_files is False:
+                return True
+            else:
+                status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
+                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
+                    return False
 
         return True
 
@@ -725,6 +770,8 @@ class GwAdminButton:
 
         # Declare all file variables
         self.file_pattern_ddl = "ddl"
+        self.file_pattern_utils = "utils"
+        self.file_pattern_i18n = "i18n"
         self.file_pattern_fct = "fct"
         self.file_pattern_ftrg = "ftrg"
         self.file_pattern_schema_model = "schema_model"
@@ -735,15 +782,15 @@ class GwAdminButton:
         else:
             self.folder_software = ""
 
-        self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
-        self.folder_utils = os.path.join(self.sql_dir, 'utils')
+        self.folder_locale = os.path.join(self.sql_dir, self.file_pattern_i18n, self.locale)
+        self.folder_utils = os.path.join(self.sql_dir, self.file_pattern_utils)
         self.folder_updates = os.path.join(self.sql_dir, 'updates')
         self.folder_example = os.path.join(self.sql_dir, 'example')
 
         # Declare asset db folders
         self.sql_asset_dir = os.path.join(self.sql_dir, 'am')
         self.folder_base = os.path.join(self.sql_asset_dir, 'base')
-        self.folder_i18n = os.path.join(self.sql_asset_dir, 'i18n')
+        self.folder_i18n = os.path.join(self.sql_asset_dir, self.file_pattern_i18n)
         self.folder_asset_updates = os.path.join(self.sql_asset_dir, 'updates')
 
         # Declare audit db folders
@@ -753,9 +800,11 @@ class GwAdminButton:
 
         # Declare cm db folders
         self.sql_cm_dir = os.path.join(self.sql_dir, 'cm')
-        self.folder_base_schema = os.path.join(self.sql_cm_dir, 'base_schema')
-        self.folder_parent_schema = os.path.join(self.sql_cm_dir, 'parent_schema')
-        self.folder_example_cm = os.path.join(self.sql_cm_dir, 'example')
+        self.folder_cm_utils = os.path.join(self.sql_cm_dir, self.file_pattern_utils)
+        self.folder_cm_locale = os.path.join(self.sql_cm_dir, self.file_pattern_i18n, self.locale)
+        self.folder_cm_base = os.path.join(self.sql_cm_dir, 'base')
+        self.folder_cm_parent_schema = os.path.join(self.sql_cm_dir, 'parent_schema')
+        self.folder_cm_example = os.path.join(self.sql_cm_dir, 'example')
 
         # Variable to commit changes even if schema creation fails
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
@@ -809,6 +858,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
             partial(self._load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
         self.dlg_readsql.btn_reload_fct_ftrg.clicked.connect(partial(self._reload_fct_ftrg))
+        self.dlg_readsql.btn_vacuum.clicked.connect(partial(self.execute_vacuum, True, True))
         self.dlg_readsql.btn_info.clicked.connect(partial(self._open_update_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._set_info_project))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._update_manage_ui))
@@ -847,7 +897,7 @@ class GwAdminButton:
 
         # Audit buttons
         self.dlg_readsql.btn_create_audit.clicked.connect(partial(self.create_project_data_other_schema, 'audit'))
-        self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit))
+        self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit, 'audit'))
         self.dlg_readsql.btn_reload_audit_triggers.clicked.connect(partial(self._reload_audit_triggers))
         self.dlg_readsql.btn_delete_audit.clicked.connect(partial(self._delete_other_schema, 'audit'))
 
@@ -856,12 +906,13 @@ class GwAdminButton:
         self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
         self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
 
-    def _activate_audit(self):
+    def _activate_audit(self, other_project):
         """ Activate audit functionality """
 
         sql = ("SELECT schema_name, schema_name FROM information_schema.schemata "
                "WHERE schema_name = 'audit'")
         rows = tools_db.get_rows(sql, commit=False)
+        self.other_project = other_project
 
         if rows is not None:
             msg = "This process will active snapshot. Are you sure to continue?"
@@ -1125,7 +1176,11 @@ class GwAdminButton:
 
         gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-                                                    roletype)
+                                                    roletype, layer_project_type=tools_qt.get_combo_value(self.dlg_create_gis_project, 'cmb_project_type', 1),
+                                                    is_cm=self.is_cm_project)
+
+        if self.is_cm_project:
+            self.is_cm_project = False
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
@@ -1166,6 +1221,15 @@ class GwAdminButton:
         qgis_file_export = tools_gw.get_config_parser('btn_admin', 'qgis_file_export', "user", "session", prefix=False,
                                                       force_reload=True)
         qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
+
+        list_project_type = tools_db.execute_returning(f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'")
+        try:
+            result = {list_project_type[i]: list_project_type[i + 1] for i in range(0, len(list_project_type), 2)}
+        except Exception:
+            result = {}
+        tools_qt.fill_combo_values(self.dlg_create_gis_project.cmb_project_type, list(result.items()))
+        if len(list(result.items())) <= 1:
+            self.dlg_create_gis_project.cmb_project_type.setEnabled(False)
         self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
         self.dlg_create_gis_project.txt_gis_folder.setEnabled(False)
         if self.is_service:
@@ -1206,8 +1270,9 @@ class GwAdminButton:
 
         # Check if project name is valid
         if project_name == 'null':
-            msg = "The 'Project_name' field is required."
-            tools_qt.show_info_box(msg, "Info")
+            msg = "The '{0}' field is required."
+            msg_params = ("Project_name")
+            tools_qt.show_info_box(msg, "Info", msg_params=msg_params)
             return False
         elif any(c.isupper() for c in project_name) is True:
             msg = "The project name can't have any upper-case characters"
@@ -1657,20 +1722,21 @@ class GwAdminButton:
             project_date_update = last_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
             if project_date_create == project_date_update:
                 project_date_update = ''
-            msg = (f'PostgreSQL version: {self.postgresql_version}\n'
-                   f'PostGis version: {self.postgis_version}\n'
-                   f'PgRouting version: {self.pgrouting_version}\n \n'
-                   f'Schema name: {schema_name}\n'
-                   f'Version: {self.project_version}\n'
-                   f'EPSG: {self.project_epsg}\n'
-                   f'Language: {self.project_language}\n'
-                   f'Date of creation: {project_date_create}\n'
-                   f'Date of last update: {project_date_update}\n')
+            msg = (f'''{tools_qt.tr("PostgreSQL version")}: {self.postgresql_version}\n'''
+                   f'''{tools_qt.tr("PostGis version")}: {self.postgis_version}\n'''
+                   f'''{tools_qt.tr("PgRouting version")}: {self.pgrouting_version}\n \n'''
+                   f'''{tools_qt.tr("Schema name")}: {schema_name}\n'''
+                   f'''{tools_qt.tr("Version")}: {self.project_version}\n'''
+                   f'''EPSG: {self.project_epsg}\n'''
+                   f'''{tools_qt.tr("Language")}: {self.project_language}\n'''
+                   f'''{tools_qt.tr("Date of creation")}: {project_date_create}\n'''
+                   f'''{tools_qt.tr("Date of last update")}: {project_date_update}\n''')
 
             self.software_version_info.setText(msg)
 
             # Set label schema name
             self.lbl_schema_name.setText(str(schema_name))
+            self.schema_name = schema_name
 
         # Update windowTitle
         window_title = f'Giswater ({self.plugin_version})'
@@ -1831,45 +1897,30 @@ class GwAdminButton:
                     f"SELECT 1 FROM {self.cm_schema}.cat_organization LIMIT 1"
                 )
             )
-            # If both exist, disable the “Create example” button
+            # If both exist, disable the "Create example" button
             if has_team and has_org:
                 self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
             else:
                 self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
+            self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(True)
         else:
             self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
             self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+            self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
         self.dlg_readsql_create_cm_project.btn_base_schema.clicked.connect(self.on_btn_create_base_clicked)
         self.dlg_readsql_create_cm_project.btn_parent_schema.clicked.connect(self.on_btn_create_parent_clicked)
         self.dlg_readsql_create_cm_project.btn_example.clicked.connect(self.on_btn_create_example_clicked)
+        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.clicked.connect(self.on_btn_pschema_qgis_file_clicked)
 
         self.dlg_readsql_create_cm_project.setWindowTitle("Create CM Project")
-        tools_gw.open_dialog(self.dlg_readsql_create_cm_project, dlg_name='admin_cmdbproject')
+        tools_gw.open_dialog(self.dlg_readsql_create_cm_project, dlg_name='admin_cm_create')
 
     def on_btn_create_base_clicked(self):
         """Handle the 'Create Base Schema' button click."""
 
-        self.dlg_cm_base = GwAdminCmBaseUi(self)
-
-        # Pre-fill fields from config
-        self.dlg_cm_base.project_name.setText(
-            tools_gw.get_config_parser('btn_admin', 'project_name_cm_schema', "user", "session", force_reload=True))
-        self.dlg_cm_base.project_descript.setText(
-            tools_gw.get_config_parser('btn_admin', 'cm_project_descript', "user", "session", force_reload=True))
-
-        # Connect buttons
-        self.dlg_cm_base.btn_accept.clicked.connect(self._on_accept_create_base)
-        self.dlg_cm_base.btn_close.clicked.connect(self.dlg_cm_base.reject)
-        self.dlg_cm_base.btn_cancel_task.clicked.connect(self.dlg_cm_base.reject)
-
-        tools_gw.open_dialog(self.dlg_cm_base, dlg_name='admin_cm_base')
-
-    def _on_accept_create_base(self):
-        """Execute logic when Accept is clicked in Create Base Schema dialog."""
-
-        name = tools_qt.get_text(self.dlg_cm_base, 'project_name')
-        description = tools_qt.get_text(self.dlg_cm_base, 'project_descript')
+        name = 'cm'
+        description = 'cm'
 
         tools_gw.set_config_parser('btn_admin', 'project_name_cm_schema', name, prefix=False)
         tools_gw.set_config_parser('btn_admin', 'cm_project_descript', description, prefix=False)
@@ -1877,7 +1928,7 @@ class GwAdminButton:
         if not self._check_project_name(name, description):
             return
 
-        msg = "This process will take time (few minutes). Are you sure to continue?"
+        msg = "This process will take a few seconds. Are you sure to continue?"
         title = "Create base schema"
         answer = tools_qt.show_question(msg, title)
         if not answer:
@@ -1887,18 +1938,17 @@ class GwAdminButton:
         self.cm_schema_description = description
         self.base_schema_created = True
 
-        self._run_create_cm_task(['load_base_schema'])
+        self._run_create_cm_task(['load_base_schema'], 'Create cm base schema')
 
-        self.dlg_readsql_create_cm_project.lbl_schema_name.setText(name)
-        self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
-        self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
-        self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
-
-        self.dlg_cm_base.accept()
+        if self.dlg_readsql_create_cm_project is not None:
+            self.dlg_readsql_create_cm_project.lbl_schema_name.setText(name)
+            self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
+            self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
+            self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
 
     def on_btn_create_parent_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        msg = "You are about to perform this action aiming to the following file: {0}\n\nAre you sure you want to continue?"
+        msg = "You are about to perform this action aiming to the following schema: {0}\n\nAre you sure you want to continue?"
         msg_params = (schema_name,)
         title = "Create parent schema"
         answer = tools_qt.show_question(msg, title, msg_params=msg_params)
@@ -1908,12 +1958,12 @@ class GwAdminButton:
 
         self.parent_schema_created = True
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        self._run_create_cm_task(['load_parent_schema'])
+        self._run_create_cm_task(['load_parent_schema'], 'Link to parent schema')
         self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
 
     def on_btn_create_example_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        msg = "You are about to perform this action aiming to the following file: {0}\n\nAre you sure you want to continue?"
+        msg = "You are about to perform this action aiming to the following schema: {0}\n\nAre you sure you want to continue?"
         msg_params = (schema_name,)
         title = "Create parent schema"
         answer = tools_qt.show_question(msg, title, msg_params=msg_params)
@@ -1923,8 +1973,14 @@ class GwAdminButton:
 
         self.example_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         self.project_example_name = schema_name
-        self._run_create_cm_task(['load_example'])
+        self._run_create_cm_task(['load_example'], 'Load example data')
         self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+
+    def on_btn_pschema_qgis_file_clicked(self):
+        """ Sets the project to be created as a 'CM' project. """
+        self.is_cm_project = True
+        tools_qgis.show_info("Layer of CM project will be added to the project when create", dialog=self.dlg_readsql_create_cm_project)
+        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
     def _open_rename(self):
         """"""
@@ -2083,6 +2139,7 @@ class GwAdminButton:
                 if file.endswith(".sql"):
                     filepath = os.path.join(dirpath, file)
                     self.current_sql_file += 1
+                    tools_log.log_info(filepath)
                     status = self._read_execute_cm_file(filepath, set_progress_bar, schema_option)
 
                     # If execution fails and dev_commit is False, stop processing
@@ -2096,7 +2153,6 @@ class GwAdminButton:
 
         status = False
         f = None
-
         PARENT_SCHEMA = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         SCHEMA_SRID = str(self.project_epsg)
         if schema_option in ('load_parent_schema', 'load_example'):
@@ -2120,7 +2176,12 @@ class GwAdminButton:
             if f:
                 file_content = f.read()
                 f_to_read = file_content.replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
-                    "PARENT_SCHEMA", PARENT_SCHEMA)
+                    "PARENT_SCHEMA", PARENT_SCHEMA).replace("PARENT_TYPE", self.project_type_selected)
+                if "BD_NAME" in f_to_read:
+                    BD_NAME = self._get_current_db_name()
+                    if BD_NAME:
+                        f_to_read = f_to_read.replace("BD_NAME", BD_NAME)
+
                 status = tools_db.execute_sql(f_to_read, filepath=filepath, commit=self.dev_commit, is_thread=False)
 
                 if tools_os.set_boolean(status, False) is False:
@@ -2153,6 +2214,23 @@ class GwAdminButton:
                 f.close()
             return status
 
+    def _get_current_db_name(self):
+        """
+        Gets the database name from the currently selected connection in the admin dialog.
+        """
+        if not hasattr(self, 'dlg_readsql') or isdeleted(self.dlg_readsql):
+            return None
+
+        connection_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
+        if not connection_name or connection_name == 'null':
+            return None
+
+        settings = QSettings()
+        settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
+        db_name = settings.value("database", "")
+        settings.endGroup()
+        return db_name
+
     def _execute_sql_files(self, filedir, set_progress_bar=False):
         """"""
 
@@ -2160,7 +2238,7 @@ class GwAdminButton:
             msg = "Folder not found"
             tools_log.log_info(msg, parameter=filedir)
             return True
-        
+
         msg = "Processing folder"
         tools_log.log_info(msg, parameter=filedir)
 
@@ -2329,8 +2407,10 @@ class GwAdminButton:
             tools_qt.show_info_box(msg, "Warning", msg_params=msg_params)
             return
 
-        msg = f"Are you sure you want delete schema '{project_name}' ?"
-        result = tools_qt.show_question(msg, "Info", force_action=True)
+        msg = "Are you sure you want delete schema '{0}'?"
+        msg_params = (project_name,)
+        title = "Info"
+        result = tools_qt.show_question(msg, title, force_action=True, msg_params=msg_params)
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = tools_db.execute_sql(sql)
@@ -2350,6 +2430,11 @@ class GwAdminButton:
         if result:
             sql = f'DROP SCHEMA IF EXISTS {schema} CASCADE;'
             status = tools_db.execute_sql(sql)
+            
+            if schema == 'cm':
+                sql_audit = 'DROP SCHEMA IF EXISTS cm_audit CASCADE;'
+                tools_db.execute_sql(sql_audit)
+
             if status:
                 msg = "Process finished successfully: Delete schema"
                 tools_qt.show_info_box(msg, "Info")
@@ -3220,12 +3305,12 @@ class GwAdminButton:
             lib_vars.session_vars['dialog_docker'] = GwDocker(self)
             lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
             tools_gw.manage_docker_options('admin_position')
-            tools_gw.docker_dialog(self.dlg_readsql, dlg_name='admin_ui')
+            tools_gw.docker_dialog(self.dlg_readsql, dlg_name='admin')
             self.dlg_readsql.dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
             self._set_buttons_enabled()
         except Exception as e:
             tools_log.log_info(str(e))
-            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin')
 
     def _set_buttons_enabled(self):
         """ Disable/enable buttons """

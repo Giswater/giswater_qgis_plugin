@@ -261,7 +261,6 @@ class GwGo2EpaManagerButton(GwAction):
             last_status = status
         if not selected_rows:
             set_corporate_enabled, archive_enabled = False, False
-        print(f"set_corporate_enabled -> {set_corporate_enabled}")
         self.dlg_manager.btn_set_corporate.setEnabled(set_corporate_enabled)
         self.dlg_manager.btn_archive.setEnabled(archive_enabled)
 

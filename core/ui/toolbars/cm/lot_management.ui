@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Administrador de Lots</string>
+   <string>Lot Management</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
@@ -25,14 +25,14 @@
         <item row="3" column="0">
          <widget class="QLabel" name="lbl_column_filter">
           <property name="text">
-           <string>Columna filtre dates:</string>
+           <string>Filter dates column:</string>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="lbl_state">
           <property name="text">
-           <string>Estat:</string>
+           <string>State:</string>
           </property>
          </widget>
         </item>
@@ -49,7 +49,7 @@
         <item row="4" column="1">
          <widget class="QCheckBox" name="chk_show_nulls">
           <property name="text">
-           <string>Mostrar valors buits</string>
+           <string>Show null values</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -102,7 +102,7 @@
              <enum>QFrame::Plain</enum>
             </property>
             <property name="text">
-             <string>Des de:</string>
+             <string>From:</string>
             </property>
             <property name="textFormat">
              <enum>Qt::AutoText</enum>
@@ -150,7 +150,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Fins:</string>
+             <string>Until:</string>
             </property>
             <property name="textFormat">
              <enum>Qt::AutoText</enum>
@@ -186,14 +186,14 @@
         <item>
          <widget class="QPushButton" name="btn_open">
           <property name="text">
-           <string>Obrir Lot</string>
+           <string>Open Lot</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btn_delete">
           <property name="text">
-           <string>Eliminar Lot</string>
+           <string>Delete Lot</string>
           </property>
          </widget>
         </item>
@@ -227,7 +227,7 @@
      <item row="0" column="1">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Tancar</string>
+        <string>Close</string>
        </property>
       </widget>
      </item>

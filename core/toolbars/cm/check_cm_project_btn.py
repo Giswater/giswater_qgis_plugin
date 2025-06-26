@@ -8,11 +8,11 @@ or (at your option) any later version.
 from .project_check_cm import GwProjectCheckCMTask
 from ..dialog import GwAction
 
-from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QCheckBox
+from qgis.PyQt.QtWidgets import QLabel, QTabWidget, QWidget, QTextEdit, QComboBox
 from qgis.core import QgsApplication
 
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt
+from ....libs import tools_qgis, tools_qt, tools_db
 from ...ui.ui_manager import CheckProjectCmUi
 
 
@@ -21,7 +21,6 @@ class GwCheckCMProjectButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.check_cm = GwProjectCheckCMTask()
 
     def clicked_event(self):
         self._open_check_project()
@@ -36,7 +35,7 @@ class GwCheckCMProjectButton(GwAction):
         body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
 
         # Fetch dialog configuration from the database
-        json_result = tools_gw.execute_procedure('gw_fct_getdialogcm', body, schema_name='cm')
+        json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name='cm')
 
         # Check for a valid result
         if not json_result or json_result.get("status") != "Accepted":
@@ -48,7 +47,19 @@ class GwCheckCMProjectButton(GwAction):
         tools_gw.load_settings(self.dialog)
 
         # Populate the dialog with fields
-        self._populate_dynamic_widgets(self.dialog, json_result)
+        tools_gw.populate_dynamic_widgets(self.dialog, json_result, self)
+
+        # Find widgets
+        self.campaign_combo = self.dialog.findChild(QComboBox, "tab_data_campaign_id")
+        self.lot_combo = self.dialog.findChild(QComboBox, "tab_data_lot_id")
+
+        # Set listeners
+        self.dialog.btn_accept.clicked.connect(self._on_accept_clicked)
+        if self.campaign_combo:
+            self.campaign_combo.currentIndexChanged.connect(self._on_campaign_changed)
+
+        # Initial population of the lot combo
+        self._on_campaign_changed()
 
         # Disable the "Log" tab initially
         tools_gw.disable_tab_log(self.dialog)
@@ -59,120 +70,87 @@ class GwCheckCMProjectButton(GwAction):
         if lbl_time:
             lbl_time.setVisible(False)
 
-        # Set listeners
-        self.dialog.btn_accept.clicked.connect(self._on_accept_clicked)
-
         # Open the dialog
         tools_gw.open_dialog(self.dialog, dlg_name=form_type)
 
-    def _populate_dynamic_widgets(self, dialog, complet_result):
-        """Creates and populates all widgets dynamically into the dialog layout."""
+    def _on_campaign_changed(self):
+        """Populates the lot combo based on the selected campaign."""
+        if not self.campaign_combo or not self.lot_combo:
+            return
 
-        # Retrieve the tablename from the JSON response if available
-        tablename = complet_result['body']['form'].get('tableName', 'default_table')
-        old_widget_pos = 0
+        # Block signals to prevent unwanted events while we modify the combo
+        self.lot_combo.blockSignals(True)
 
-        # Loop through fields and add them to the appropriate layouts
-        for field in complet_result['body']['data']['fields']:
-            # Skip hidden fields
-            if field.get('hidden'):
-                continue
+        try:
+            self.lot_combo.clear()
+            self.lot_combo.addItem("", None)  # Always add an empty option first
 
-            # Pass required parameters (dialog, result, field, tablename, class_info)
-            label, widget = tools_gw.set_widgets(dialog, complet_result, field, tablename, self)
+            current_data = self.campaign_combo.currentData()
+            if not current_data:
+                return  # No campaign selected, lot combo should just have the empty option
 
-            if widget is None:
-                continue
+            # currentData is a list [id, name], we only need the id
+            campaign_id = current_data[0]
+            if not campaign_id:
+                return  # The selected campaign has no ID, so nothing to do
 
-            # Add widgets to the layout
-            old_widget_pos = tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
+            # Fetch lots for the selected campaign
+            query = f"SELECT lot_id AS id, name AS idval FROM cm.om_campaign_lot WHERE campaign_id = {campaign_id} ORDER BY name"
+            result = tools_db.get_rows(query)
+
+            # Populate the lot combo box with results
+            if result:
+                for row in result:
+                    self.lot_combo.addItem(str(row['idval']), row['id'])
+        finally:
+            # Always unblock signals when we are done
+            self.lot_combo.blockSignals(False)
 
     def _on_accept_clicked(self):
         """Handles the Accept button click event and starts the project check task."""
-
-        # Enable the "Log" tab after pressing Accept
-        qtabwidget = self.dialog.findChild(QTabWidget, 'mainTab')
-        if qtabwidget:
-            tools_qt.enable_tab_by_tab_name(qtabwidget, "tab_log", True)  # Enable Log tab
-
         self._start_project_check()
 
     def _start_project_check(self):
         """Re-executes the project check process after Accept is pressed."""
 
-        # Show progress bar and timer when execution starts
-        self.dialog.progressBar.setVisible(True)
-        lbl_time = self.dialog.findChild(QLabel, "lbl_time")
-        if lbl_time:
-            lbl_time.setVisible(True)
-
         # Retrieve layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
-        print("layers: ", layers)
-        show_versions = tools_qt.is_checked(self.dialog, "tab_data_versions_check")
-        show_qgis_project = tools_qt.is_checked(self.dialog, "tab_data_qgisproj_check")
 
-        # Set parameters and re-run the project check task
+        # Find the log widget and pass it directly to the task for reliability
+        log_widget = self.dialog.findChild(QTextEdit, "tab_log_txt_infolog")
+
+        # Set parameters and re-run the project check task.
         params = {"layers": layers, "init_project": "false", "dialog": self.dialog,
-                  "show_versions": show_versions, "show_qgis_project": show_qgis_project}
+                  "log_widget": log_widget, "campaign_id": self.campaign_combo.currentData(), "lot_id": self.lot_combo.currentData()}
 
-        self.project_check_task = GwProjectCheckCMTask('check_project', params)
+        self.project_check_task = GwProjectCheckCMTask('check_project_cm', params)
 
-        # After `GwProjectCheckTask` completes, execute `gw_fct_setcheckdatabase`
-        # self._execute_checkdatabase()
+        # Connect task signals to UI updates
+        self.project_check_task.task_started.connect(self._on_task_started)
+        self.project_check_task.task_finished.connect(self._on_task_finished)
 
         QgsApplication.taskManager().addTask(self.project_check_task)
-        QgsApplication.taskManager().triggerTask(self.project_check_task)
 
-    def _execute_checkdatabase(self):
-        """Executes `gw_fct_setcheckdatabase` and updates the Log tab with results."""
+    def _on_task_started(self):
+        """Disables controls and shows progress indicators when the task starts."""
+        self.dialog.btn_accept.setEnabled(False)
 
-        # Collect selected checkboxes
-        check_parameters = self._get_selected_checks()
-        if not any(check_parameters.values()):
-            print("No checkboxes selected. Skipping gw_fct_setcheckdatabase.")
-            return
+        # Find the QTabWidget and the specific tab to switch to
+        tab_widget = self.dialog.findChild(QTabWidget, "mainTab")
+        log_tab = self.dialog.findChild(QWidget, "tab_log")
+        if tab_widget and log_tab:
+            tab_widget.setCurrentWidget(log_tab)
 
-        # Format parameters properly
-        parameters = ', '.join([f'"{key}": {str(value).lower()}' for key, value in check_parameters.items()])
-        extras = f'"parameters": {{{parameters}}}'
-        body = tools_gw.create_body(extras=extras)
-
-        # Execute procedure
-        json_result = tools_gw.execute_procedure('gw_fct_setcheckdatabase', body)
-
-        if not json_result or json_result.get("status") != "Accepted":
-            print(f"Failed to execute gw_fct_setcheckdatabase: {json_result}")
-            return
-        tools_gw.fill_tab_log(self.dialog, json_result['body']['data'], reset_text=False)
-
-    def _get_selected_checks(self):
-        """Returns a dictionary of the selected checkboxes using `is_checked` from tools_qt,
-        excluding system health checkboxes.
-        """
-        result_json = {}
-
-        # Find all QCheckBox widgets inside the dialog
-        list_widgets = self.dialog.findChildren(QCheckBox)
-
-        for widget in list_widgets:
-            widget_name = widget.objectName()  # Get the checkbox name
-            checked_value = tools_qt.is_checked(self.dialog, widget)
-
-            # Exclude "versions_check" and "qgisproj_check"
-            if widget_name in ["tab_data_versions_check", "tab_data_qgisproj_check"]:
-                continue  # Skip these checkboxes
-
-            # Store only checkboxes with valid names
-            if widget_name and checked_value:
-                result_json[widget_name] = checked_value
-
-        return result_json
+        tools_qt.enable_tab_by_tab_name(self.dialog.mainTab, "tab_data", False)
+        self.dialog.progressBar.setVisible(True)
+        self.dialog.lbl_time.setVisible(True)
 
     def _on_task_finished(self):
-        """Hides progress indicators when the project check is complete."""
+        """Enables controls and hides progress indicators when the task is complete."""
+        self.dialog.btn_accept.setEnabled(True)
+        tools_qt.enable_tab_by_tab_name(self.dialog.mainTab, "tab_data", True)
         self.dialog.progressBar.setVisible(False)
-        lbl_time = self.dialog.findChild(QLabel, "lbl_time")
-        if lbl_time:
-            lbl_time.setVisible(False)
+        self.dialog.lbl_time.setVisible(False)
+
+    # endregion
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="bg_BG">
+<TS version="2.0" language="ja_JA">
 	<!-- TOOLBARS AND ACTIONS -->
 	<context>
 		<name>giswater</name>
@@ -30,139 +30,139 @@
 		</message>
 		<message>
 			<source>Dscenario</source>
-			<translation>Управител на Dscenario</translation>
+			<translation>シナリオ・マネージャー</translation>
 		</message>
 		<message>
 			<source>Hydrology scenario</source>
-			<translation>Управител на Dscenario</translation>
+			<translation>シナリオ・マネージャー</translation>
 		</message>
 		<message>
 			<source>DWF scenario</source>
-			<translation>Управител на Dscenario</translation>
+			<translation>シナリオ・マネージャー</translation>
 		</message>
 		<message>
 			<source>38_text</source>
-			<translation>Разходи за нова мрежа</translation>
+			<translation>新しいネットワーク・コスト</translation>
 		</message>
 		<message>
 			<source>Get help</source>
-			<translation>Потърсете помощ</translation>
+			<translation>助けを求める</translation>
 		</message>
 		<message>
 			<source>GwSearchButton</source>
-			<translation>Търсене плюс</translation>
+			<translation>検索プラス</translation>
 		</message>
 		<message>
 			<source>19_text</source>
-			<translation>Топографски инструменти</translation>
+			<translation>トポツール</translation>
 		</message>
 		<message>
 			<source>GwFeatureDeleteButton</source>
-			<translation>Изтриване на функцията</translation>
+			<translation>削除機能</translation>
 		</message>
 		<message>
 			<source>GwArcAddButton</source>
-			<translation>Вмъкване на лък</translation>
+			<translation>ボウインサート</translation>
 		</message>
 		<message>
 			<source>GwPriceManagerButton</source>
-			<translation>Ръководител на разходите за мрежата</translation>
+			<translation>ネットワーク・コスト・マネージャー</translation>
 		</message>
 		<message>
 			<source>Mapzones manager</source>
-			<translation>Мениджър на инструменти</translation>
+			<translation>ユーティリティ・マネージャー</translation>
 		</message>
 		<message>
 			<source>Workcat manager</source>
-			<translation>Мениджър на инструменти</translation>
+			<translation>ユーティリティ・マネージャー</translation>
 		</message>
 		<message>
 			<source>Style manager</source>
-			<translation>Мениджър на инструменти</translation>
+			<translation>ユーティリティ・マネージャー</translation>
 		</message>
 		<message>
 			<source>Fast print</source>
-			<translation>Fastprint</translation>
+			<translation>ファストプリント</translation>
 		</message>
 		<message>
 			<source>Massive composer</source>
-			<translation>Fastprint</translation>
+			<translation>ファストプリント</translation>
 		</message>
 		<message>
 			<source>Show current selectors</source>
-			<translation>Показване на текущите селектори</translation>
+			<translation>現在のセレクタを表示</translation>
 		</message>
 		<message>
 			<source>Reset dialogs</source>
-			<translation>Нулиране на диалоговите прозорци</translation>
+			<translation>ダイアログのリセット</translation>
 		</message>
 		<message>
 			<source>Reset plugin</source>
-			<translation>Нулиране на приставката</translation>
+			<translation>リセットプラグイン</translation>
 		</message>
 		<message>
 			<source>Open plugin folder</source>
-			<translation>Отваряне на папката с приставки</translation>
+			<translation>プラグインフォルダを開く</translation>
 		</message>
 		<message>
 			<source>menu_name</source>
-			<translation>Giswater</translation>
+			<translation>ジスウォーター</translation>
 		</message>
 		<message>
 			<source>GwFlowExitButton</source>
-			<translation>Изход на потока</translation>
+			<translation>フロー出口</translation>
 		</message>
 		<message>
 			<source>GwDateSelectorButton</source>
-			<translation>Селектор за дата</translation>
+			<translation>日付セレクタ</translation>
 		</message>
 		<message>
 			<source>GwLayerStyleChangeButton</source>
-			<translation>Стилове на Giswater</translation>
+			<translation>ジスウォーター・スタイル</translation>
 		</message>
 		<message>
 			<source>GwMincutButton</source>
-			<translation>Нов mincut</translation>
+			<translation>新しいミンカット</translation>
 		</message>
 		<message>
 			<source>GwFeatureTypeChangeButton</source>
-			<translation>Промяна на типа на функцията</translation>
+			<translation>フィーチャー・タイプの変更</translation>
 		</message>
 		<message>
 			<source>toolbar_edit_name</source>
-			<translation>Giswater - Редактиране</translation>
+			<translation>ジスウォーター - 編集</translation>
 		</message>
 		<message>
 			<source>GwConnectLinkButton</source>
-			<translation>Свързване с мрежата</translation>
+			<translation>ネットワークに接続する</translation>
 		</message>
 		<message>
 			<source>toolbar_om_name</source>
-			<translation>Giswater - OM</translation>
+			<translation>ジスウォーター - OM</translation>
 		</message>
 		<message>
 			<source>toolbar_basic_name</source>
-			<translation>Giswater - Основни</translation>
+			<translation>ジスウォーター - ベーシック</translation>
 		</message>
 		<message>
 			<source>18_text</source>
-			<translation>Търговска връзка</translation>
+			<translation>商用接続</translation>
 		</message>
 		<message>
 			<source>82_text</source>
-			<translation>Ръководител на сектор</translation>
+			<translation>部門マネージャー</translation>
 		</message>
 		<message>
 			<source>GwFeatureEndButton</source>
-			<translation>Крайна функция</translation>
+			<translation>エンド機能</translation>
 		</message>
 		<message>
 			<source>GwWorkspaceManagerButton</source>
-			<translation>Мениджър на работното пространство</translation>
+			<translation>ワークスペース・マネージャー</translation>
 		</message>
 		<message>
 			<source>toolbar_custom_name</source>
-			<translation>Giswater - По поръчка</translation>
+			<translation>ジスウォーター - カスタム</translation>
 		</message>
 		<message>
 			<source>Calibration</source>
@@ -170,67 +170,67 @@
 		</message>
 		<message>
 			<source>GwDimensioningButton</source>
-			<translation>Оразмеряване</translation>
+			<translation>寸法測定</translation>
 		</message>
 		<message>
 			<source>GwDocumentButton</source>
-			<translation>Добавяне на документ</translation>
+			<translation>文書の追加</translation>
 		</message>
 		<message>
 			<source>GwCSVButton</source>
-			<translation>Импортиране на CSV</translation>
+			<translation>CSVインポート</translation>
 		</message>
 		<message>
 			<source>GwVisitButton</source>
-			<translation>Добавяне на посещение</translation>
+			<translation>訪問を追加する</translation>
 		</message>
 		<message>
 			<source>301_text</source>
-			<translation>Годишно планиране</translation>
+			<translation>年間プランナー</translation>
 		</message>
 		<message>
 			<source>GwProjectCheckButton</source>
-			<translation>Проверка на проекта</translation>
+			<translation>プロジェクトをチェック</translation>
 		</message>
 		<message>
 			<source>toolbar_plan_name</source>
-			<translation>Giswater - Генерален план</translation>
+			<translation>ジスウォーター - マスタープラン</translation>
 		</message>
 		<message>
 			<source>Advanced</source>
-			<translation>Разширени</translation>
+			<translation>上級</translation>
 		</message>
 		<message>
 			<source>GwElementButton</source>
-			<translation>Добавяне на елемент</translation>
+			<translation>要素を追加する</translation>
 		</message>
 		<message>
 			<source>GwArcDivideButton</source>
-			<translation>Разделяне на дъгата</translation>
+			<translation>アークディバイド</translation>
 		</message>
 		<message>
 			<source>GwSelectorButton</source>
-			<translation>Селектори</translation>
+			<translation>セレクタ</translation>
 		</message>
 		<message>
 			<source>GwGo2EpaManagerButton</source>
-			<translation>Мениджър на резултатите на Epa</translation>
+			<translation>EPA結果マネージャー</translation>
 		</message>
 		<message>
 			<source>GwFeatureReplaceButton</source>
-			<translation>Функция за замяна</translation>
+			<translation>置換機能</translation>
 		</message>
 		<message>
 			<source>Actions</source>
-			<translation>Действия</translation>
+			<translation>行動</translation>
 		</message>
 		<message>
 			<source>Toggle Log DB</source>
-			<translation>Превключване на DB на дневника</translation>
+			<translation>ログDBの切り替え</translation>
 		</message>
 		<message>
 			<source>GwDocumentManagerButton</source>
-			<translation>Мениджър на документи</translation>
+			<translation>ドキュメント・マネージャー</translation>
 		</message>
 		<message>
 			<source>Review</source>
@@ -238,47 +238,47 @@
 		</message>
 		<message>
 			<source>GwMincutManagerButton</source>
-			<translation>Мениджър на Mincut</translation>
+			<translation>ミニカットマネージャー</translation>
 		</message>
 		<message>
 			<source>GwElementManagerButton</source>
-			<translation>Мениджър на елементи</translation>
+			<translation>エレメント・マネージャー</translation>
 		</message>
 		<message>
 			<source>75_text</source>
-			<translation>Управител на партида</translation>
+			<translation>ロットマネージャー</translation>
 		</message>
 		<message>
 			<source>AmBreakage</source>
-			<translation>Административен инструмент</translation>
+			<translation>管理ツール</translation>
 		</message>
 		<message>
 			<source>GwVisitManagerButton</source>
-			<translation>Посещение на мениджър</translation>
+			<translation>支配人訪問</translation>
 		</message>
 		<message>
 			<source>GwPointAddButton</source>
-			<translation>Вмъкване на точка</translation>
+			<translation>ポイント挿入</translation>
 		</message>
 		<message>
 			<source>47_text</source>
-			<translation>Селектор на сектори</translation>
+			<translation>セクターセレクター</translation>
 		</message>
 		<message>
 			<source>81_text</source>
-			<translation>Нов псектор</translation>
+			<translation>新しいセクター</translation>
 		</message>
 		<message>
 			<source>302_text</source>
-			<translation>Месечен планшет</translation>
+			<translation>マンスリープランナー</translation>
 		</message>
 		<message>
 			<source>305_text</source>
-			<translation>Планиране на звено</translation>
+			<translation>ユニット・プランナー</translation>
 		</message>
 		<message>
 			<source>GwAmBreakageButton</source>
-			<translation>Административен инструмент</translation>
+			<translation>管理ツール</translation>
 		</message>
 		<message>
 			<source>Additional demand check</source>
@@ -294,11 +294,11 @@
 		</message>
 		<message>
 			<source>toolbar_am_name</source>
-			<translation>Giswater - Мениджър на активи</translation>
+			<translation>ジスウォーター - アセット・マネージャー</translation>
 		</message>
 		<message>
 			<source>GwAmPriorityButton</source>
-			<translation>Избор на приоритети и изчисляване</translation>
+			<translation>優先順位の選択と計算</translation>
 		</message>
 		<message>
 			<source>GwAddCampaignButton</source>
@@ -318,43 +318,43 @@
 		</message>
 		<message>
 			<source>36_text</source>
-			<translation>Giswater</translation>
+			<translation>ジスウォーター</translation>
 		</message>
 		<message>
 			<source>toolbar_epa_name</source>
-			<translation>Giswater - Epa</translation>
+			<translation>ジスウォーター - Epa</translation>
 		</message>
 		<message>
 			<source>GwPsectorButton</source>
-			<translation>Нов псектор</translation>
+			<translation>新しいセクター</translation>
 		</message>
 		<message>
 			<source>303_text</source>
-			<translation>Генератор на цени</translation>
+			<translation>価格ジェネレーター</translation>
 		</message>
 		<message>
 			<source>ResultSelector</source>
-			<translation>Селектор на резултати</translation>
+			<translation>結果セレクタ</translation>
 		</message>
 		<message>
 			<source>AmPriority</source>
-			<translation>Избор на приоритети и изчисляване</translation>
+			<translation>優先順位の選択と計算</translation>
 		</message>
 		<message>
 			<source>GwResultSelectorButton</source>
-			<translation>Селектор на резултати</translation>
+			<translation>結果セレクタ</translation>
 		</message>
 		<message>
 			<source>Forced arcs</source>
-			<translation>Свързване с мрежата</translation>
+			<translation>ネットワークに接続する</translation>
 		</message>
 		<message>
 			<source>Forced arcs (selecting only arcs)</source>
-			<translation>Свързване с мрежата</translation>
+			<translation>ネットワークに接続する</translation>
 		</message>
 		<message>
 			<source>Closest arcs</source>
-			<translation>Свързване с мрежата</translation>
+			<translation>ネットワークに接続する</translation>
 		</message>
 		<message>
 			<source>GwSnapshotViewButton</source>
@@ -378,35 +378,35 @@
 		</message>
 		<message>
 			<source>GwUtilsManagerButton</source>
-			<translation>Мениджър на инструменти</translation>
+			<translation>ユーティリティ・マネージャー</translation>
 		</message>
 		<message>
 			<source>GwDscenarioManagerButton</source>
-			<translation>Управител на Dscenario</translation>
+			<translation>シナリオ・マネージャー</translation>
 		</message>
 		<message>
 			<source>309_text</source>
-			<translation>Ръководител на инциденти</translation>
+			<translation>インシデント・マネージャー</translation>
 		</message>
 		<message>
 			<source>GwNonVisualManagerButton</source>
-			<translation>Мениджър на невизуални обекти</translation>
+			<translation>非ビジュアル・オブジェクト・マネージャー</translation>
 		</message>
 		<message>
 			<source>GwAuxPointAddButton</source>
-			<translation>Създаване на точка</translation>
+			<translation>ポイント作成</translation>
 		</message>
 		<message>
 			<source>GwAuxCircleAddButton</source>
-			<translation>Създаване на кръг</translation>
+			<translation>円を作る</translation>
 		</message>
 		<message>
 			<source>GwInfoButton</source>
-			<translation>Информация за Giswater</translation>
+			<translation>インフォ・ギスウォーター</translation>
 		</message>
 		<message>
 			<source>GwPsectorManagerButton</source>
-			<translation>Ръководител на сектор</translation>
+			<translation>部門マネージャー</translation>
 		</message>
 		<message>
 			<source>Import INP file</source>
@@ -426,47 +426,47 @@
 		</message>
 		<message>
 			<source>Open user folder</source>
-			<translation>Отваряне на потребителската папка</translation>
+			<translation>ユーザーフォルダを開く</translation>
 		</message>
 		<message>
 			<source>GwPrintButton</source>
-			<translation>Fastprint</translation>
+			<translation>ファストプリント</translation>
 		</message>
 		<message>
 			<source>24_text</source>
-			<translation>Go2Epa express</translation>
+			<translation>Go2Epaエクスプレス</translation>
 		</message>
 		<message>
 			<source>GwFlowTraceButton</source>
-			<translation>Проследяване на потока</translation>
+			<translation>フロートレース</translation>
 		</message>
 		<message>
 			<source>GwToolBoxButton</source>
-			<translation>Кутия с инструменти</translation>
+			<translation>ツールボックス</translation>
 		</message>
 		<message>
 			<source>GwGo2EpaButton</source>
-			<translation>Go2Epa</translation>
+			<translation>ゴーツーエパ</translation>
 		</message>
 		<message>
 			<source>76_text</source>
-			<translation>Филтър за партиди</translation>
+			<translation>ロットフィルター</translation>
 		</message>
 		<message>
 			<source>GwArcFusionButton</source>
-			<translation>Сливане на дъги</translation>
+			<translation>アーク融合</translation>
 		</message>
 		<message>
 			<source>74_text</source>
-			<translation>Добавяне на нова партида</translation>
+			<translation>新規ロットの追加</translation>
 		</message>
 		<message>
 			<source>GwNetscenarioManagerButton</source>
-			<translation>Мениджър на Netscenario</translation>
+			<translation>ネットシナリオ・マネージャー</translation>
 		</message>
 		<message>
 			<source>GwAddChildLayerButton</source>
-			<translation>Зареждане на слой Giswater</translation>
+			<translation>ジスウォーター層の読み込み</translation>
 		</message>
 		<message>
 			<source>Add drain GPKG project</source>
@@ -474,27 +474,27 @@
 		</message>
 		<message>
 			<source>98_text</source>
-			<translation>Редактор на конфигурацията</translation>
+			<translation>コンフィグエディタ</translation>
 		</message>
 		<message>
 			<source>toolbar_utilities_name</source>
-			<translation>Giswater - Комунални услуги</translation>
+			<translation>ジスウォーター - ユーティリティ</translation>
 		</message>
 		<message>
 			<source>ResultManager</source>
-			<translation>Мениджър на резултатите</translation>
+			<translation>リザルトマネージャー</translation>
 		</message>
 		<message>
 			<source>Priority Calculation (Global)</source>
-			<translation>Изчисляване на приоритета (глобално)</translation>
+			<translation>優先順位計算（グローバル）</translation>
 		</message>
 		<message>
 			<source>GwConfigButton</source>
-			<translation>Конфигурация</translation>
+			<translation>コンフィグ</translation>
 		</message>
 		<message>
 			<source>304_text</source>
-			<translation>Добавяне на посещение</translation>
+			<translation>訪問を追加する</translation>
 		</message>
 		<message>
 			<source>Analytics</source>
@@ -502,15 +502,15 @@
 		</message>
 		<message>
 			<source>GwProfileButton</source>
-			<translation>Инструмент за профил</translation>
+			<translation>プロフィールツール</translation>
 		</message>
 		<message>
 			<source>GwResultManagerButton</source>
-			<translation>Мениджър на резултатите</translation>
+			<translation>リザルトマネージャー</translation>
 		</message>
 		<message>
 			<source>GwEpaTools</source>
-			<translation>Go2Epa</translation>
+			<translation>ゴーツーエパ</translation>
 		</message>
 		<message>
 			<source>Emitter calibration</source>
@@ -518,7 +518,7 @@
 		</message>
 		<message>
 			<source>GwGo2EpaSelectorButton</source>
-			<translation>Селектор за резултати на Epa</translation>
+			<translation>EPA結果セレクタ</translation>
 		</message>
 		<!-- PYTHON MESSAGES -->
 		<message>
@@ -531,7 +531,7 @@
 		</message>
 		<message>
 			<source>GLOBAL</source>
-			<translation>GLOBAL</translation>
+			<translation>グローバル</translation>
 		</message>
 		<message>
 			<source>There is no data in table anl_arc for fid=493 and current user.</source>
@@ -555,63 +555,63 @@
 		</message>
 		<message>
 			<source>Error updating table</source>
-			<translation>Грешка при актуализиране на таблицата</translation>
+			<translation>テーブル更新エラー</translation>
 		</message>
 		<message>
 			<source>Column not found</source>
-			<translation>Колоната не е намерена</translation>
+			<translation>カラムが見つかりません</translation>
 		</message>
 		<message>
 			<source>Expression Error</source>
-			<translation>Грешка при изразяване</translation>
+			<translation>表現エラー</translation>
 		</message>
 		<message>
 			<source>First iteration</source>
-			<translation>Първа итерация</translation>
+			<translation>最初の反復</translation>
 		</message>
 		<message>
 			<source>Any record selected</source>
-			<translation>Всеки избран запис</translation>
+			<translation>選択されたすべてのレコード</translation>
 		</message>
 		<message>
 			<source>Record deleted</source>
-			<translation>Изтрит запис</translation>
+			<translation>レコード削除</translation>
 		</message>
 		<message>
 			<source>Records deleted</source>
-			<translation>Изтрити записи</translation>
+			<translation>削除された記録</translation>
 		</message>
 		<message>
 			<source>Repair cost</source>
-			<translation>Разходи за ремонт</translation>
+			<translation>修理費用</translation>
 		</message>
 		<message>
 			<source>Replacement cost</source>
-			<translation>Разходи за подмяна</translation>
+			<translation>代替コスト</translation>
 		</message>
 		<message>
 			<source>Oldest leak</source>
-			<translation>Най-старият теч</translation>
+			<translation>最古のリーク</translation>
 		</message>
 		<message>
 			<source>Parameter not found: {parameter}</source>
-			<translation>Параметърът не е намерен: {параметър}</translation>
+			<translation>パラメータが見つかりません：{パラメータ｝</translation>
 		</message>
 		<message>
 			<source>Any of the snapped features belong to selected layer</source>
-			<translation>Някой от прихванатите елементи принадлежи към избран слой</translation>
+			<translation>スナップされたフィーチャーのどれかが選択されたレイヤーに属する</translation>
 		</message>
 		<message>
 			<source>Adress configuration. Field not found</source>
-			<translation>Конфигурация на адреса. Полето не е намерено</translation>
+			<translation>アドレス設定。フィールドが見つかりません</translation>
 		</message>
 		<message>
 			<source>Any connec_id found with this customer_code</source>
-			<translation>Всички намерени connec_id с този код на клиента</translation>
+			<translation>このcustomer_codeで見つかったすべてのconnec_id</translation>
 		</message>
 		<message>
 			<source>Delete records</source>
-			<translation>Изтриване на записи</translation>
+			<translation>レコードの削除</translation>
 		</message>
 		<message>
 			<source>A style already exists for the layer '{0}' in the selected style group.</source>
@@ -659,43 +659,43 @@
 		</message>
 		<message>
 			<source>Id already selected</source>
-			<translation>Id вече е избран</translation>
+			<translation>すでに選択されているID</translation>
 		</message>
 		<message>
 			<source>Event deleted</source>
-			<translation>Изтрито събитие</translation>
+			<translation>イベント削除</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to overwrite this file?</source>
-			<translation>Сигурни ли сте, че искате да презапишете този файл?</translation>
+			<translation>本当にこのファイルを上書きしますか？</translation>
 		</message>
 		<message>
 			<source>Executing</source>
-			<translation>Изпълнение на</translation>
+			<translation>実行</translation>
 		</message>
 		<message>
 			<source>Are you sure to update the project schema to last version?</source>
-			<translation>Сигурни ли сте, че сте актуализирали схемата на проекта до последната версия?</translation>
+			<translation>プロジェクト・スキーマを最終バージョンに更新しましたか？</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to cancel these mincuts?</source>
-			<translation>Сигурни ли сте, че искате да отмените тези миниатюри?</translation>
+			<translation>本当にこのミンカットをキャンセルしたいのか？</translation>
 		</message>
 		<message>
 			<source>Selected node</source>
-			<translation>Избран възел</translation>
+			<translation>選択ノード</translation>
 		</message>
 		<message>
 			<source>Year</source>
-			<translation>Година</translation>
+			<translation>年</translation>
 		</message>
 		<message>
 			<source>Cannot get giswater folder from windows registry</source>
-			<translation>Не мога да получа папката giswater от регистъра на Windows</translation>
+			<translation>Windowsレジストリからgiswaterフォルダを取得できない</translation>
 		</message>
 		<message>
 			<source>Cannot get giswater major version from windows registry</source>
-			<translation>Не мога да получа основната версия на giswater от регистъра на Windows</translation>
+			<translation>Windowsレジストリからgiswaterのメジャーバージョンを取得できない</translation>
 		</message>
 		<message>
 			<source>Error: '{0}' or '{1}' field is missing in the result.</source>
@@ -731,31 +731,31 @@
 		</message>
 		<message>
 			<source>Empty coordinate list</source>
-			<translation>Празен списък с координати</translation>
+			<translation>空の座標リスト</translation>
 		</message>
 		<message>
 			<source>Select file</source>
-			<translation>Изберете файл</translation>
+			<translation>ファイルを選択</translation>
 		</message>
 		<message>
 			<source>Failed to update category:</source>
-			<translation>Не успя да актуализира категорията:</translation>
+			<translation>カテゴリの更新に失敗しました：</translation>
 		</message>
 		<message>
 			<source>Execute epa model</source>
-			<translation>Изпълнение на модела на epa</translation>
+			<translation>epaモデルの実行</translation>
 		</message>
 		<message>
 			<source>Click on node, that joins two pipes, in order to remove it</source>
-			<translation>Щракнете върху възела, който свързва две тръби, за да го премахнете.</translation>
+			<translation>2つのパイプを結合しているノードをクリックして削除する。</translation>
 		</message>
 		<message>
 			<source>Diameter</source>
-			<translation>Диаметър</translation>
+			<translation>直径</translation>
 		</message>
 		<message>
 			<source>GSW file not found</source>
-			<translation>GSW файл не е намерен</translation>
+			<translation>GSW ファイルが見つかりません</translation>
 		</message>
 		<message>
 			<source>Try again</source>
@@ -763,39 +763,39 @@
 		</message>
 		<message>
 			<source>Exception while moving/deleting old user config files</source>
-			<translation>Изключение при преместване/изтриване на стари потребителски конфигурационни файлове</translation>
+			<translation>古いユーザー設定ファイルの移動/削除時の例外</translation>
 		</message>
 		<message>
 			<source>Cannot get giswater build version from windows registry</source>
-			<translation>Не мога да получа версията за изграждане на giswater от регистъра на Windows</translation>
+			<translation>Windowsレジストリからgiswaterのビルド・バージョンを取得できない</translation>
 		</message>
 		<message>
 			<source>Incompatible version of PostgreSQL</source>
-			<translation>Несъвместима версия на PostgreSQL</translation>
+			<translation>PostgreSQLの互換性のないバージョン</translation>
 		</message>
 		<message>
 			<source>In order to create a qgis project you have to create a schema first .</source>
-			<translation>За да създадете проект qgis, първо трябва да създадете схема.</translation>
+			<translation>qgisプロジェクトを作成するには、まずスキーマを作成する必要があります。</translation>
 		</message>
 		<message>
 			<source>Invalid arccat_ids: {list}.</source>
-			<translation>Невалидни arccat_ids: {list}.</translation>
+			<translation>無効な arccat_ids です：{list}です。</translation>
 		</message>
 		<message>
 			<source>Invalid buffer value. Please enter an integer less than 1000.</source>
-			<translation>Невалидна стойност на буфера. Моля, въведете цяло число, по-малко от 1000.</translation>
+			<translation>バッファ値が無効です。1000未満の整数を入力してください。</translation>
 		</message>
 		<message>
 			<source>Invalid buffer value. Please enter an valid integer.</source>
-			<translation>Невалидна стойност на буфера. Моля, въведете валидно цяло число.</translation>
+			<translation>バッファ値が無効です。有効な整数を入力してください。</translation>
 		</message>
 		<message>
 			<source>Invalid compliance value for diameter</source>
-			<translation>Невалидна стойност за съответствие за диаметър</translation>
+			<translation>直径のコンプライアンス値が無効</translation>
 		</message>
 		<message>
 			<source>Leaks assigned by material and diameter: {leaks}.</source>
-			<translation>Течове, разпределени по материал и диаметър: {leaks}.</translation>
+			<translation>材質と直径によって割り当てられたリーク： {リーク}。</translation>
 		</message>
 		<message>
 			<source>This graph's edges have no preexisting 'maxspeed' attribute values so you must pass `hwy_speeds` or `fallback` arguments.</source>
@@ -823,43 +823,43 @@
 		</message>
 		<message>
 			<source>File name is required</source>
-			<translation>Името на файла е задължително</translation>
+			<translation>ファイル名は必須</translation>
 		</message>
 		<message>
 			<source>File not found</source>
-			<translation>Файлът не е намерен</translation>
+			<translation>ファイルが見つかりません</translation>
 		</message>
 		<message>
 			<source>Parameter not found</source>
-			<translation>Параметърът не е намерен</translation>
+			<translation>パラメータが見つかりません</translation>
 		</message>
 		<message>
 			<source>Select one</source>
-			<translation>Изберете един</translation>
+			<translation>1つ選択</translation>
 		</message>
 		<message>
 			<source>Select a Custom node Type</source>
-			<translation>Изберете потребителски тип възел</translation>
+			<translation>カスタム・ノード・タイプを選択する</translation>
 		</message>
 		<message>
 			<source>Select CSV file</source>
-			<translation>Изберете CSV файл</translation>
+			<translation>CSVファイルを選択</translation>
 		</message>
 		<message>
 			<source>Warning</source>
-			<translation>Предупреждение</translation>
+			<translation>警告</translation>
 		</message>
 		<message>
 			<source>Click on 2 places on the map, creating a line, then set a location of a point</source>
-			<translation>Кликнете върху 2 места на картата, като създадете линия, след което задайте местоположение на точка</translation>
+			<translation>地図上の2箇所をクリックして線を作り、点の位置を設定する。</translation>
 		</message>
 		<message>
 			<source>Click on node to change it's type</source>
-			<translation>Щракнете върху възел, за да промените типа му</translation>
+			<translation>ノードをクリックしてタイプを変更する。</translation>
 		</message>
 		<message>
 			<source>Click on node to computed its upstream network</source>
-			<translation>Щракнете върху възел, за да изчислите неговата мрежа нагоре по веригата</translation>
+			<translation>ノードをクリックして、その上流のネットワークを計算する。</translation>
 		</message>
 		<message>
 			<source>Function {0} returned False</source>
@@ -911,47 +911,47 @@
 		</message>
 		<message>
 			<source>Please</source>
-			<translation>Моля, изберете проект, който да изтриете</translation>
+			<translation>削除するプロジェクトを選択してください。</translation>
 		</message>
 		<message>
 			<source>File INP not found</source>
-			<translation>Файлът INP не е намерен</translation>
+			<translation>ファイルINPが見つからない</translation>
 		</message>
 		<message>
 			<source>CSV not generated. Check fields from table or view</source>
-			<translation>CSV не е генериран. Проверка на полета от таблица или изглед</translation>
+			<translation>CSVが生成されない。テーブルまたはビューからフィールドをチェックする</translation>
 		</message>
 		<message>
 			<source>Current node is not located over an arc. Please</source>
-			<translation>Текущият възел не е разположен над дъга. Моля, изберете опцията 'DRAG-DROP'</translation>
+			<translation>現在のノードが円弧上にありません。DRAG-DROP' オプションを選択してください。</translation>
 		</message>
 		<message>
 			<source>Layers of your role not found</source>
-			<translation>Не са открити слоевете на вашата роля</translation>
+			<translation>役割のレイヤーが見つかりません</translation>
 		</message>
 		<message>
 			<source>This Workcat already exist</source>
-			<translation>Този Workcat вече съществува</translation>
+			<translation>このワークキャットは既に存在する</translation>
 		</message>
 		<message>
 			<source>Min. Longevity</source>
-			<translation>Мин. Дълъг живот</translation>
+			<translation>Min.寿命</translation>
 		</message>
 		<message>
 			<source>Warnings:</source>
-			<translation>Предупреждения:</translation>
+			<translation>警告</translation>
 		</message>
 		<message>
 			<source>Custom mincut executed successfully</source>
-			<translation>Успешно изпълнена персонализирана миниатюра</translation>
+			<translation>カスタム・ミンカットが成功</translation>
 		</message>
 		<message>
 			<source>File path doesn't exist</source>
-			<translation>Пътят на файла не съществува</translation>
+			<translation>ファイルパスが存在しない</translation>
 		</message>
 		<message>
 			<source>Select folder</source>
-			<translation>Изберете папка</translation>
+			<translation>フォルダを選択</translation>
 		</message>
 		<message>
 			<source>Remove layer from project?</source>
@@ -1039,35 +1039,35 @@
 		</message>
 		<message>
 			<source>Cannot create file, check if its open</source>
-			<translation>Не мога да създам файл, проверете дали е отворен</translation>
+			<translation>ファイルを作成できません。</translation>
 		</message>
 		<message>
 			<source>Document PDF created in</source>
-			<translation>Документ PDF, създаден в</translation>
+			<translation>で作成されたドキュメントPDF</translation>
 		</message>
 		<message>
 			<source>Cannot get current Java version from windows registry</source>
-			<translation>Не мога да получа текущата версия на Java от регистъра на Windows</translation>
+			<translation>Windowsレジストリから現在のJavaバージョンを取得できない</translation>
 		</message>
 		<message>
 			<source>Click on 2 places on the map</source>
-			<translation>Кликнете върху 2 места на картата, като създадете линия, след което задайте местоположението на точка</translation>
+			<translation>地図上の2カ所をクリックして線を作り、点の位置を設定する。</translation>
 		</message>
 		<message>
 			<source>Click on node</source>
-			<translation>Щракнете върху възела, който свързва две тръби, за да го премахнете и да слеете тръбите.</translation>
+			<translation>2つのパイプを結合しているノードをクリックして、そのノードを削除し、パイプを結合する。</translation>
 		</message>
 		<message>
 			<source>INP file not found</source>
-			<translation>Не е намерен INP файл</translation>
+			<translation>INPファイルが見つかりません</translation>
 		</message>
 		<message>
 			<source>Newest leak</source>
-			<translation>Най-новото изтичане</translation>
+			<translation>最新リーク</translation>
 		</message>
 		<message>
 			<source>Cannot create file, check if selected composer is the correct composer</source>
-			<translation>Не може да се създаде файл, проверете дали избраният композитор е правилният композитор</translation>
+			<translation>ファイルを作成できません。</translation>
 		</message>
 		<message>
 			<source>This functionality is only allowed with the locality 'en_US' and SRID 25831.\nDo you want change it and continue?</source>
@@ -1103,59 +1103,59 @@
 		</message>
 		<message>
 			<source>Error deleting data</source>
-			<translation>Грешка при изтриване на данни</translation>
+			<translation>データ削除エラー</translation>
 		</message>
 		<message>
 			<source>Draw a point on the map inside created map zones</source>
-			<translation>Нарисувайте точка на картата в създадените зони на картата</translation>
+			<translation>作成された地図ゾーン内の地図上に点を描く</translation>
 		</message>
 		<message>
 			<source>Error deleting profile</source>
-			<translation>Грешка при изтриване на профил</translation>
+			<translation>プロファイルの削除エラー</translation>
 		</message>
 		<message>
 			<source>Error deleting records</source>
-			<translation>Грешка при изтриване на записи</translation>
+			<translation>レコード削除エラー</translation>
 		</message>
 		<message>
 			<source>Error getting pgRouting version</source>
-			<translation>Грешка при получаване на версията на pgRouting</translation>
+			<translation>pgRoutingバージョンの取得エラー</translation>
 		</message>
 		<message>
 			<source>Error inserting node</source>
-			<translation>Грешка при вмъкване на възел</translation>
+			<translation>ノードの挿入エラー</translation>
 		</message>
 		<message>
 			<source>No document selected.</source>
-			<translation>Не е избран документ.</translation>
+			<translation>ドキュメントが選択されていません。</translation>
 		</message>
 		<message>
 			<source>No function associated to</source>
-			<translation>Няма функция, свързана с</translation>
+			<translation>に関連する機能はない。</translation>
 		</message>
 		<message>
 			<source>No help file found</source>
-			<translation>Не е намерен помощен файл</translation>
+			<translation>ヘルプファイルが見つかりません</translation>
 		</message>
 		<message>
 			<source>Select INP file</source>
-			<translation>Изберете INP файл</translation>
+			<translation>INPファイルを選択</translation>
 		</message>
 		<message>
 			<source>The name is current in use</source>
-			<translation>Името се използва в момента</translation>
+			<translation>現在使用中の名前</translation>
 		</message>
 		<message>
 			<source>The project name has invalid character</source>
-			<translation>Името на проекта има невалиден символ</translation>
+			<translation>プロジェクト名に無効な文字がある</translation>
 		</message>
 		<message>
 			<source>This Workcat is already exist</source>
-			<translation>Този Workcat вече съществува</translation>
+			<translation>このワークキャットは既に存在する</translation>
 		</message>
 		<message>
 			<source>Epa2data execution failed. See logs for more details...</source>
-			<translation>Изпълнението на Epa2data е неуспешно. За повече подробности вижте дневниците...</translation>
+			<translation>Epa2data の実行に失敗しました。詳細はログをご覧ください。</translation>
 		</message>
 		<message>
 			<source>SQL File</source>
@@ -1211,15 +1211,15 @@
 		</message>
 		<message>
 			<source>SELECTION</source>
-			<translation>ИЗБОР</translation>
+			<translation>セレクション</translation>
 		</message>
 		<message>
 			<source>Delete profile</source>
-			<translation>Изтриване на профил</translation>
+			<translation>プロフィール削除</translation>
 		</message>
 		<message>
 			<source>Error creating composer</source>
-			<translation>Грешка при създаването на композитор</translation>
+			<translation>コンポーザーの作成エラー</translation>
 		</message>
 		<message>
 			<source>IVI</source>
@@ -1227,31 +1227,31 @@
 		</message>
 		<message>
 			<source>Error replacing feature</source>
-			<translation>Функция за заместване на грешки</translation>
+			<translation>エラー置換機能</translation>
 		</message>
 		<message>
 			<source>Feature replaced successfully</source>
-			<translation>Функцията е заменена успешно</translation>
+			<translation>機能の置き換えに成功</translation>
 		</message>
 		<message>
 			<source>Please, introduce a result name</source>
-			<translation>Моля, въведете име на резултата</translation>
+			<translation>結果名を紹介してください</translation>
 		</message>
 		<message>
 			<source>Java executable file not found</source>
-			<translation>Изпълнимият файл на Java не е намерен</translation>
+			<translation>Java実行ファイルが見つからない</translation>
 		</message>
 		<message>
 			<source>Key on returned json from ddbb is missed</source>
-			<translation>Ключът на върнатия json от ddbb е пропуснат</translation>
+			<translation>ddbbから返されたjsonのキーが見つからない。</translation>
 		</message>
 		<message>
 			<source>Leak Assignation</source>
-			<translation>Присвояване на течове</translation>
+			<translation>リーク割り当て</translation>
 		</message>
 		<message>
 			<source>Leaks assigned by diameter only: {leaks}.</source>
-			<translation>Течове, определени само по диаметър: {leaks}.</translation>
+			<translation>リークは直径のみで割り当てられる： {リーク}。</translation>
 		</message>
 		<message>
 			<source>There is a partially completed file for this folder/file name. Would you like to resume the process?</source>
@@ -1307,43 +1307,43 @@
 		</message>
 		<message>
 			<source>More than one feature selected. Only the first one will be processed!</source>
-			<translation>Избрана е повече от една функция. Ще бъде обработена само първата!</translation>
+			<translation>複数の機能が選択されています。最初のものだけが処理されます！</translation>
 		</message>
 		<message>
 			<source>Calculate Priority</source>
-			<translation>Изчисляване на приоритета</translation>
+			<translation>優先順位の計算</translation>
 		</message>
 		<message>
 			<source>Material</source>
-			<translation>Материал</translation>
+			<translation>素材</translation>
 		</message>
 		<message>
 			<source>Import failed</source>
-			<translation>Импортирането е неуспешно</translation>
+			<translation>インポート失敗</translation>
 		</message>
 		<message>
 			<source>Epa2data execution successful.</source>
-			<translation>Изпълнението на Epa2data е успешно.</translation>
+			<translation>Epa2data 実行成功。</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete these mincuts?</source>
-			<translation>Сигурни ли сте, че искате да изтриете тези миниатюри?</translation>
+			<translation>本当にこのミニカットを削除したいのですか？</translation>
 		</message>
 		<message>
 			<source>File created successfully</source>
-			<translation>Файлът е създаден успешно</translation>
+			<translation>ファイルの作成に成功</translation>
 		</message>
 		<message>
 			<source>Real location has been updated</source>
-			<translation>Реалното местоположение е актуализирано</translation>
+			<translation>リアルロケーションが更新されました</translation>
 		</message>
 		<message>
 			<source>Selected schema not found</source>
-			<translation>Избраната схема не е намерена</translation>
+			<translation>選択したスキーマが見つからない</translation>
 		</message>
 		<message>
 			<source>Select a valid path.</source>
-			<translation>Изберете валиден път</translation>
+			<translation>有効なパスを選択する</translation>
 		</message>
 		<message>
 			<source>The QML file is invalid.</source>
@@ -1403,55 +1403,55 @@
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records?</source>
-			<translation>Сигурни ли сте, че искате да изтриете тези записи?</translation>
+			<translation>これらのレコードを削除してもよろしいですか？</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records?\nSome events have documents</source>
-			<translation>Сигурни ли сте, че искате да изтриете тези записи?\Някои събития имат документи</translation>
+			<translation>これらのレコードを削除してもよろしいですか？</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to disconnect this elements?</source>
-			<translation>Сигурни ли сте, че искате да прекъснете връзката с тези елементи?</translation>
+			<translation>本当にこのエレメントを切り離してもいいのか？</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to replace selected feature with a new one?</source>
-			<translation>Сигурни ли сте, че искате да замените избраната функция с нова?</translation>
+			<translation>本当に選択した機能を新しい機能で置き換えるのですか？</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to update the data?</source>
-			<translation>Сигурни ли сте, че искате да актуализирате данните?</translation>
+			<translation>本当にデータを更新しますか？</translation>
 		</message>
 		<message>
 			<source>Widget not found</source>
-			<translation>Уиджетът не е намерен</translation>
+			<translation>ウィジェットが見つかりません</translation>
 		</message>
 		<message>
 			<source>Without replacements</source>
-			<translation>Без замени</translation>
+			<translation>交換なし</translation>
 		</message>
 		<message>
 			<source>You cannot change the status of a result with status 'FINISHED'.</source>
-			<translation>Не можете да променяте статуса на резултат със статус "FINISHED".</translation>
+			<translation>ステータス「FINISHED」の結果のステータスを変更することはできません。</translation>
 		</message>
 		<message>
 			<source>You cannot insert more than one feature at the same time</source>
-			<translation>Не можете да вмъкнете повече от един елемент едновременно, като завършите редактирането на предишния елемент.</translation>
+			<translation>複数のフィーチャーを同時に挿入することはできません。</translation>
 		</message>
 		<message>
 			<source>You can only delete results with the status 'CANCELED'.</source>
-			<translation>Можете да изтривате само резултати със статус "ОТМЕНЕН".</translation>
+			<translation>削除できるのは、ステータスが「CANCELED」の結果のみです。</translation>
 		</message>
 		<message>
 			<source>You closed a valve</source>
-			<translation>Затворили сте клапан, това ще промени текущите зони на картата и може да отнеме малко време.</translation>
+			<translation>バルブを閉めると、現在のマップゾーンが変更され、少し時間がかかるかもしれません。</translation>
 		</message>
 		<message>
 			<source>You do not have permission to execute this application</source>
-			<translation>Нямате разрешение да изпълните това приложение</translation>
+			<translation>このアプリケーションを実行する権限がありません。</translation>
 		</message>
 		<message>
 			<source>You don't have any connection to PostGIS database configurated.  </source>
-			<translation>Нямате конфигурирана връзка с базата данни PostGIS.  </translation>
+			<translation>PostGISデータベースへの接続が設定されていません。  </translation>
 		</message>
 		<message>
 			<source>Any document selected</source>
@@ -1475,11 +1475,11 @@
 		</message>
 		<message>
 			<source>Documents deleted successfully</source>
-			<translation>Успешно изтрити документи</translation>
+			<translation>ドキュメントの削除に成功</translation>
 		</message>
 		<message>
 			<source>Do you want to overwrite custom values?</source>
-			<translation>Искате ли да презапишете персонализираните стойности?</translation>
+			<translation>カスタム値を上書きしますか？</translation>
 		</message>
 		<message>
 			<source>Created nodes GeoDataFrame from graph</source>
@@ -1579,31 +1579,31 @@
 		</message>
 		<message>
 			<source>Error updating element in table, you need to review data</source>
-			<translation>Грешка при актуализиране на елемент в таблицата, трябва да прегледате данните</translation>
+			<translation>テーブルの要素の更新にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>Feature has not been updated because no catalog has been selected</source>
-			<translation>Функцията не е актуализирана, защото не е избран каталог.</translation>
+			<translation>カタログが選択されていないため、機能が更新されていません。</translation>
 		</message>
 		<message>
 			<source>File cannot be created. Check if it is already opened</source>
-			<translation>Файлът не може да бъде създаден. Проверете дали вече е отворен</translation>
+			<translation>ファイルが作成できません。すでに開かれているか確認してください。</translation>
 		</message>
 		<message>
 			<source>File path doesn't exist or you dont have permission or file is opened</source>
-			<translation>Пътят на файла не съществува или нямате разрешение, или файлът е отворен</translation>
+			<translation>ファイルパスが存在しないか、パーミッションがないか、ファイルが開かれている。</translation>
 		</message>
 		<message>
 			<source>File RPT not found</source>
-			<translation>Файлът RPT не е намерен</translation>
+			<translation>ファイルRPTが見つからない</translation>
 		</message>
 		<message>
 			<source>Function gw_fct_duplicate_psector executed with no result</source>
-			<translation>Функцията gw_fct_duplicate_psector се изпълнява без резултат</translation>
+			<translation>関数 gw_fct_duplicate_psector が実行され、結果が得られない。</translation>
 		</message>
 		<message>
 			<source>Function not found</source>
-			<translation>Функцията не е намерена</translation>
+			<translation>関数が見つかりません</translation>
 		</message>
 		<message>
 			<source>Discarding the `gdf_nodes` 'geometry' column, though its values differ from the coordinates in the 'x' and 'y' columns.</source>
@@ -1687,35 +1687,35 @@
 		</message>
 		<message>
 			<source>Giswater executable file not found</source>
-			<translation>Изпълнимият файл на Giswater не е намерен</translation>
+			<translation>Giswaterの実行ファイルが見つからない</translation>
 		</message>
 		<message>
 			<source>Giswater folder not found</source>
-			<translation>Папката Giswater не е намерена</translation>
+			<translation>Giswaterフォルダが見つかりません</translation>
 		</message>
 		<message>
 			<source>Invalid compliance value for material</source>
-			<translation>Невалидна стойност за съответствие за материала</translation>
+			<translation>材料のコンプライアンス値が無効</translation>
 		</message>
 		<message>
 			<source>Invalid diameters: {list}.</source>
-			<translation>Невалидни диаметри: {list}.</translation>
+			<translation>無効な直径：{list}。</translation>
 		</message>
 		<message>
 			<source>Invalid materials: {list}.</source>
-			<translation>Невалидни материали: {list}.</translation>
+			<translation>無効な材料です：{リスト}。</translation>
 		</message>
 		<message>
 			<source>Invalid value for type of priority dialog. Please pass either 'GLOBAL' or 'SELECTION'. Value passed:</source>
-			<translation>Невалидна стойност за типа на диалога за приоритет. Моля, въведете 'GLOBAL' или 'SELECTION'. Предадена стойност:</translation>
+			<translation>プライオリティ・ダイアログのタイプに無効な値があります。GLOBAL'または'SELECTION'を指定してください。値が渡されました：</translation>
 		</message>
 		<message>
 			<source>Java folder not found</source>
-			<translation>Папката Java не е намерена</translation>
+			<translation>Javaフォルダが見つかりません</translation>
 		</message>
 		<message>
 			<source>Java Runtime executable file not found</source>
-			<translation>Изпълнимият файл на Java Runtime не е намерен</translation>
+			<translation>Javaランタイムの実行ファイルが見つかりません</translation>
 		</message>
 		<message>
 			<source>Please select a feature to add</source>
@@ -1771,23 +1771,23 @@
 		</message>
 		<message>
 			<source>Layer not found</source>
-			<translation>Слоят не е намерен</translation>
+			<translation>レイヤーが見つかりません</translation>
 		</message>
 		<message>
 			<source>Leaks within the indicated period: {leaks}.</source>
-			<translation>Течове в рамките на посочения период: {течове}.</translation>
+			<translation>指示された期間内の漏洩：{リーク｝</translation>
 		</message>
 		<message>
 			<source>Leaks without pipes intersecting its buffer: {leaks}.</source>
-			<translation>Течове без тръби, пресичащи буфера му: {leaks}.</translation>
+			<translation>パイプがバッファと交差していないリーク：{リーク}。</translation>
 		</message>
 		<message>
 			<source>Mandatory field is missing. Please</source>
-			<translation>Липсва задължително поле. Моля, задайте стойност</translation>
+			<translation>必須フィールドがありません。値を設定してください。</translation>
 		</message>
 		<message>
 			<source>Min non-zero rleak: {rleak} leaks/km.year.</source>
-			<translation>Min non-zero rleak: {rleak} течове/км.г.</translation>
+			<translation>リークがゼロでない最小値：{rleak}リーク/km.年.</translation>
 		</message>
 		<message>
 			<source>Administrative tools</source>
@@ -1795,7 +1795,7 @@
 		</message>
 		<message>
 			<source>Info</source>
-			<translation>информация</translation>
+			<translation>インフォメーション</translation>
 		</message>
 		<message>
 			<source></source>
@@ -1871,35 +1871,35 @@
 		</message>
 		<message>
 			<source>Any record found for current user in table</source>
-			<translation>Всеки намерен запис за текущия потребител в таблицата</translation>
+			<translation>テーブルで現在のユーザーに該当するレコードが見つかった場合</translation>
 		</message>
 		<message>
 			<source>No composers found.</source>
-			<translation>Не са намерени композитори.</translation>
+			<translation>作曲家は見つかりませんでした。</translation>
 		</message>
 		<message>
 			<source>No pipes found matching your selected filters.</source>
-			<translation>Не са намерени тръби, които да отговарят на избраните от вас филтри.</translation>
+			<translation>選択したフィルターに一致するパイプは見つかりませんでした。</translation>
 		</message>
 		<message>
 			<source>No primary key value set</source>
-			<translation>Няма зададена стойност на първичния ключ</translation>
+			<translation>主キーの値が設定されていない</translation>
 		</message>
 		<message>
 			<source>No records found with selected 'result_id'</source>
-			<translation>Не са намерени записи с избрана стойност 'result_id'</translation>
+			<translation>選択された 'result_id' を含むレコードが見つかりません。</translation>
 		</message>
 		<message>
 			<source>No results found. Please check values set on selector of state and exploitation</source>
-			<translation>Не са намерени резултати. Моля, проверете стойностите, зададени в селектора на държавата и експлоатацията</translation>
+			<translation>結果が見つかりません。州と搾取のセレクタに設定された値を確認してください。</translation>
 		</message>
 		<message>
 			<source>Number of features selected in the group of</source>
-			<translation>Брой характеристики, избрани в групата от</translation>
+			<translation>のグループで選択された特徴の数</translation>
 		</message>
 		<message>
 			<source>Object already associated with this feature</source>
-			<translation>Обект, който вече е свързан с тази функция</translation>
+			<translation>この機能に既に関連付けられたオブジェクト</translation>
 		</message>
 		<message>
 			<source>Overwrite</source>
@@ -1959,23 +1959,23 @@
 		</message>
 		<message>
 			<source>Parameters related with 'searchplus' not set in table 'config_param_system'</source>
-			<translation>Параметрите, свързани с 'searchplus', не са зададени в таблица 'config_param_system'</translation>
+			<translation>テーブル 'config_param_system' に 'searchplus' に関連するパラメータが設定されていない。</translation>
 		</message>
 		<message>
 			<source>Parameter widgetfunction is null for widget</source>
-			<translation>Параметърът widgetfunction е null за widget</translation>
+			<translation>ウィジェットのパラメータ widgetfunction は NULL です。</translation>
 		</message>
 		<message>
 			<source>Parameter widgetfunction is null for widget hyperlink</source>
-			<translation>Параметърът widgetfunction е null за джаджата hyperlink</translation>
+			<translation>ウィジェットのハイパーリンクでは、パラメータ widgetfunction が NULL です。</translation>
 		</message>
 		<message>
 			<source>Period of leaks: {years:.4g} years.</source>
-			<translation>Период на изтичане: {години:.4g} години.</translation>
+			<translation>漏洩期間：{年：.4g}年。</translation>
 		</message>
 		<message>
 			<source>Please choose a different name.</source>
-			<translation>Моля, изберете друго име.</translation>
+			<translation>別の名前を選んでください。</translation>
 		</message>
 		<message>
 			<source>Function {0} returned {1}</source>
@@ -2055,27 +2055,27 @@
 		</message>
 		<message>
 			<source>Please select a category to update.</source>
-			<translation>Моля, изберете категория, която да актуализирате.</translation>
+			<translation>更新するカテゴリーを選択してください。</translation>
 		</message>
 		<message>
 			<source>Please select a target year.</source>
-			<translation>Моля, изберете целева година.</translation>
+			<translation>対象年を選択してください。</translation>
 		</message>
 		<message>
 			<source>Please select a workcat id end</source>
-			<translation>Моля, изберете workcat id end</translation>
+			<translation>ワークキャットIDエンドを選択してください</translation>
 		</message>
 		<message>
 			<source>Please select only one result before changing its status.</source>
-			<translation>Моля, изберете само един резултат, преди да промените състоянието му.</translation>
+			<translation>ステータスを変更する前に、結果を1つだけ選択してください。</translation>
 		</message>
 		<message>
 			<source>Plugin version not found</source>
-			<translation>Версията на плъгина не е намерена</translation>
+			<translation>プラグインのバージョンが見つかりません</translation>
 		</message>
 		<message>
 			<source>PostgreSQL version is not compatible with Giswater. Please check wiki</source>
-			<translation>Версията на PostgreSQL не е съвместима с Giswater. Моля, проверете в уикипедия</translation>
+			<translation>PostgreSQLのバージョンはGiswaterと互換性がありません。ウィキ</translation>
 		</message>
 		<message>
 			<source>You need to enter a psector name</source>
@@ -2155,27 +2155,27 @@
 		</message>
 		<message>
 			<source>Project read successfully</source>
-			<translation>Проектът е прочетен успешно</translation>
+			<translation>プロジェクトの読み取り成功</translation>
 		</message>
 		<message>
 			<source>QGIS project has more than one v_edit_node layer coming from different schemas.  </source>
-			<translation>Проектът QGIS има повече от един слой v_edit_node, който идва от различни схеми.  </translation>
+			<translation>QGISプロジェクトには、異なるスキーマに由来する複数のv_edit_nodeレイヤーがあります。  </translation>
 		</message>
 		<message>
 			<source>Result Manager</source>
-			<translation>Мениджър резултати</translation>
+			<translation>リザルト・マネージャー</translation>
 		</message>
 		<message>
 			<source>Select a workcat id end</source>
-			<translation>Изберете идентификатор на работна група end</translation>
+			<translation>ワークキャットIDを選択 end</translation>
 		</message>
 		<message>
 			<source>Select connecs or gullies with qgis tool and use right click to connect them with network</source>
-			<translation>Изберете връзки или улеи с инструмента qgis и използвайте десния бутон на мишката, за да ги свържете с мрежата</translation>
+			<translation>qgisツールでコネクションやガリーを選択し、右クリックでネットワークに接続する。</translation>
 		</message>
 		<message>
 			<source>Selected CSV has been imported successfully</source>
-			<translation>Избраният CSV е импортиран успешно</translation>
+			<translation>選択されたCSVは正常にインポートされました</translation>
 		</message>
 		<message>
 			<source>{0} --> {1} --> {2}</source>
@@ -2231,31 +2231,31 @@
 		</message>
 		<message>
 			<source>Select UI file</source>
-			<translation>Изберете файл на потребителския интерфейс</translation>
+			<translation>UIファイルを選択</translation>
 		</message>
 		<message>
 			<source>Select valid INP file</source>
-			<translation>Изберете валиден INP файл</translation>
+			<translation>有効なINPファイルを選択する</translation>
 		</message>
 		<message>
 			<source>Select valid RPT file</source>
-			<translation>Изберете валиден RPT файл</translation>
+			<translation>有効なRPTファイルを選択する</translation>
 		</message>
 		<message>
 			<source>Select visit to open</source>
-			<translation>Изберете посещение, за да отворите</translation>
+			<translation>訪問を選択して開く</translation>
 		</message>
 		<message>
 			<source>Service database connection error (psycopg2). Please open plugin log file to get more details</source>
-			<translation>Грешка при свързването с базата данни на услугата (psycopg2). Моля, отворете регистрационния файл на плъгина, за да получите повече подробности</translation>
+			<translation>サービスデータベース接続エラー（psycopg2）。プラグインのログファイルを開いて詳細を確認してください。</translation>
 		</message>
 		<message>
 			<source>The result cannot be deleted</source>
-			<translation>Резултатът не може да бъде изтрит</translation>
+			<translation>結果を削除することはできません。</translation>
 		</message>
 		<message>
 			<source>Shamir-Howard parameters</source>
-			<translation>Параметри на Шамир-Хауърд</translation>
+			<translation>シャミア-ハワード・パラメーター</translation>
 		</message>
 		<message>
 			<source>Incorrect user or password</source>
@@ -2287,31 +2287,31 @@
 		</message>
 		<message>
 			<source>Max. Longevity</source>
-			<translation>Макс. Дълъг живот</translation>
+			<translation>マックス寿命</translation>
 		</message>
 		<message>
 			<source>Some parameters are missing for node</source>
-			<translation>Липсват някои параметри за възел</translation>
+			<translation>いくつかのパラメータがノードにありません。</translation>
 		</message>
 		<message>
 			<source>The name is currently in use</source>
-			<translation>Името се използва в момента</translation>
+			<translation>現在使用中の名前</translation>
 		</message>
 		<message>
 			<source>There was an error deleting object.</source>
-			<translation>Имаше грешка при изтриването на обекта.</translation>
+			<translation>オブジェクトの削除にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>The node has not been updated because no catalog has been selected</source>
-			<translation>Възелът не е актуализиран, защото не е избран каталог.</translation>
+			<translation>カタログが選択されていないため、ノードが更新されていません。</translation>
 		</message>
 		<message>
 			<source>The node is obsolete</source>
-			<translation>Възелът е остарял, този инструмент не работи с остарели възли.</translation>
+			<translation>このツールは廃止されたノードでは動作しません。</translation>
 		</message>
 		<message>
 			<source>The 'Path' field is required for Import INP data.</source>
-			<translation>Полето "Път" се изисква за данни за внос на INP.</translation>
+			<translation>Path」フィールドはINPデータのインポートに必要です。</translation>
 		</message>
 		<message>
 			<source>The node is obsolete, this tool doesn't work with obsolete nodes.</source>
@@ -2351,31 +2351,31 @@
 		</message>
 		<message>
 			<source>Node deleted successfully</source>
-			<translation>Възелът е изтрит успешно</translation>
+			<translation>ノードの削除に成功</translation>
 		</message>
 		<message>
 			<source>There are missing values in these nodes:</source>
-			<translation>В тези възли има липсващи стойности:</translation>
+			<translation>これらのノードには欠損値がある：</translation>
 		</message>
 		<message>
 			<source>There are no results available to display.</source>
-			<translation>Няма налични резултати за показване.</translation>
+			<translation>表示可能な結果はありません。</translation>
 		</message>
 		<message>
 			<source>There are no visible mincuts in the table. Try a different filter</source>
-			<translation>В таблицата няма видими миниразрези. Опитайте с друг филтър или направете такъв</translation>
+			<translation>テーブルには目に見えるミンカットがない。別のフィルタを試すか、フィルタを作成してください。</translation>
 		</message>
 		<message>
 			<source>There is no project selected or it is not valid. Please check the first tab...</source>
-			<translation>Няма избран проект или той не е валиден. Моля, проверете първия раздел...</translation>
+			<translation>プロジェクトが選択されていないか、有効ではありません。最初のタブを確認してください。</translation>
 		</message>
 		<message>
 			<source>There was an error deleting object values.</source>
-			<translation>Беше допусната грешка при изтриването на стойностите на обекта.</translation>
+			<translation>オブジェクト値の削除にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>There was an error deleting old curve values.</source>
-			<translation>Имаше грешка при изтриването на стари стойности на кривата.</translation>
+			<translation>古いカーブの値を削除するエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>Add translator</source>
@@ -2451,23 +2451,23 @@
 		</message>
 		<message>
 			<source>Node replaced successfully</source>
-			<translation>Възелът е заменен успешно</translation>
+			<translation>ノードの交換に成功</translation>
 		</message>
 		<message>
 			<source>There was an error inserting curve.</source>
-			<translation>Имаше грешка при вмъкването на кривата.</translation>
+			<translation>カーブの挿入に誤りがありました。</translation>
 		</message>
 		<message>
 			<source>There was an error inserting curve value.</source>
-			<translation>Имаше грешка при вмъкването на стойността на кривата.</translation>
+			<translation>カーブ値の挿入にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>There was an error inserting lid.</source>
-			<translation>Имаше грешка при вмъкването на капака.</translation>
+			<translation>蓋の挿入に誤りがありました。</translation>
 		</message>
 		<message>
 			<source>The selected INP file does not match with a 'WS' project. Please check it before continuing...</source>
-			<translation>Избраният INP файл не съвпада с проект "WS". Моля, проверете го, преди да продължите...</translation>
+			<translation>選択されたINPファイルは'WS'プロジェクトと一致しません。続行する前に確認してください。</translation>
 		</message>
 		<message>
 			<source>The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.</source>
@@ -2539,7 +2539,7 @@
 		</message>
 		<message>
 			<source>Connection Failed. Please</source>
-			<translation>Връзката е неуспешна. Моля, проверете параметрите на връзката</translation>
+			<translation>接続に失敗しました。接続パラメータを確認してください。</translation>
 		</message>
 		<message>
 			<source>To open psector {0}, it must be activated before.</source>
@@ -2639,23 +2639,23 @@
 		</message>
 		<message>
 			<source>The sum of weights must equal 1. Please adjust the values accordingly.</source>
-			<translation>Сумата от теглата трябва да е равна на 1. Моля, коригирайте съответно стойностите.</translation>
+			<translation>重みの合計は1に等しくなければならない。それに応じて値を調整してください。</translation>
 		</message>
 		<message>
 			<source>This id already exists</source>
-			<translation>Този идентификатор вече съществува</translation>
+			<translation>このIDはすでに存在する</translation>
 		</message>
 		<message>
 			<source>This is not a valid Giswater project</source>
-			<translation>Това не е валиден проект на Giswater</translation>
+			<translation>これは有効なギスウォーター・プロジェクトではない</translation>
 		</message>
 		<message>
 			<source>This project name alredy exist.</source>
-			<translation>Това име на проекта вече съществува.</translation>
+			<translation>このプロジェクト名はすでに存在している。</translation>
 		</message>
 		<message>
 			<source>This psector does not match the current one. Value of current psector will be updated.</source>
-			<translation>Този псектор не съвпада с настоящия. Стойността на текущия псектор ще бъде актуализирана.</translation>
+			<translation>このセクタは現在のセクタと一致しない。現在のpsectorの値が更新される。</translation>
 		</message>
 		<message>
 			<source>rasterio must be installed as an optional dependency to query rasters.</source>
@@ -2727,23 +2727,23 @@
 		</message>
 		<message>
 			<source>Unrecognised form type</source>
-			<translation>Неразпознат тип формуляр</translation>
+			<translation>認識できないフォームタイプ</translation>
 		</message>
 		<message>
 			<source>Values has been updated</source>
-			<translation>Стойностите са актуализирани</translation>
+			<translation>バリューが更新されました</translation>
 		</message>
 		<message>
 			<source>Valve analytics executed successfully</source>
-			<translation>Успешно изпълнени анализи на клапани</translation>
+			<translation>バルブ分析の成功</translation>
 		</message>
 		<message>
 			<source>Variable log_sql from user config file has been disabled.</source>
-			<translation>Променливата log_sql от потребителския конфигурационен файл е деактивирана.</translation>
+			<translation>ユーザー設定ファイルの log_sql 変数が無効になりました。</translation>
 		</message>
 		<message>
 			<source>WARNING: You have updated the status value to CANCELED (Save Trace). If you click 'Accept' on  </source>
-			<translation>ПРЕДУПРЕЖДЕНИЕ: Актуализирали сте стойността на състоянието на CANCELED (Запазване на следата). Ако щракнете върху "Приемам" на</translation>
+			<translation>警告：ステータスの値を CANCELED（トレースを保存）に更新しました。もし</translation>
 		</message>
 		<message>
 			<source>Please enter a Workcat_id to proceed with this import.</source>
@@ -2819,23 +2819,23 @@
 		</message>
 		<message>
 			<source>With replacements</source>
-			<translation>Със замествания</translation>
+			<translation>交換部品付き</translation>
 		</message>
 		<message>
 			<source>Work_id field is empty</source>
-			<translation>Полето Work_id е празно</translation>
+			<translation>Work_id フィールドが空です。</translation>
 		</message>
 		<message>
 			<source>You are about to delete the result </source>
-			<translation>Предстои да изтриете резултата</translation>
+			<translation>結果を削除しようとしている</translation>
 		</message>
 		<message>
 			<source>You are trying to delete your current psector. Please, change your current psector before delete.</source>
-			<translation>Опитвате се да изтриете текущия си псектор. Моля, променете текущия си псектор, преди да го изтриете.</translation>
+			<translation>現在のパセクターを削除しようとしています。削除する前に現在のセクターを変更してください。</translation>
 		</message>
 		<message>
 			<source>You are trying to enter different types</source>
-			<translation>Опитвате се да въведете различни типове</translation>
+			<translation>さまざまなタイプを入力しようとしている</translation>
 		</message>
 		<message>
 			<source>You have to fill in 'date', 'time' and 'value' fields!</source>
@@ -2855,51 +2855,51 @@
 		</message>
 		<message>
 			<source>Field catalog_id required!</source>
-			<translation>Поле catalog_id е задължително!</translation>
+			<translation>catalog_id フィールドは必須！</translation>
 		</message>
 		<message>
 			<source>You need to insert data</source>
-			<translation>Трябва да вмъкнете данни</translation>
+			<translation>データを挿入する必要がある</translation>
 		</message>
 		<message>
 			<source>You need to insert doc_id</source>
-			<translation>Трябва да вмъкнете doc_id</translation>
+			<translation>doc_idを挿入する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to insert doc_type</source>
-			<translation>Трябва да вмъкнете doc_type</translation>
+			<translation>doc_typeを挿入する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to insert psector_id</source>
-			<translation>Трябва да вмъкнете psector_id</translation>
+			<translation>psector_idを挿入する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to insert value for field</source>
-			<translation>Трябва да вмъкнете стойност за полето</translation>
+			<translation>フィールドに値を挿入する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to insert visit_id</source>
-			<translation>Трябва да вмъкнете visit_id</translation>
+			<translation>visit_idを挿入する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to select a template</source>
-			<translation>Трябва да изберете шаблон</translation>
+			<translation>テンプレートを選択する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to select a valid parameter id</source>
-			<translation>Трябва да изберете валиден параметър id</translation>
+			<translation>有効なパラメータ ID を選択する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to select some sector</source>
-			<translation>Трябва да изберете някои сектори</translation>
+			<translation>いくつかのセクターを選択する必要がある。</translation>
 		</message>
 		<message>
 			<source>A rollback on schema will be done.</source>
-			<translation>Ще бъде извършено връщане на схемата.</translation>
+			<translation>スキーマのロールバックが行われる。</translation>
 		</message>
 		<message>
 			<source>You need to upgrade your version of pgRouting</source>
-			<translation>Трябва да обновите версията на pgRouting</translation>
+			<translation>pgRoutingのバージョンをアップグレードする必要があります。</translation>
 		</message>
 		<message>
 			<source>{0} Exception: {1}</source>
@@ -4235,895 +4235,895 @@
 		</message>
 		<message>
 			<source>Any record found in table 'cat_node' related with selected 'node_type.type'</source>
-			<translation>Всеки намерен запис в таблица 'cat_node', свързан с избрания 'node_type.type'</translation>
+			<translation>テーブル 'cat_node' で、選択された 'node_type.type' に関連するレコードが見つかった場合。</translation>
 		</message>
 		<message>
 			<source>Any table has been selected</source>
-			<translation>Избрана е някоя маса</translation>
+			<translation>どのテーブルも選択されている</translation>
 		</message>
 		<message>
 			<source>Compliance Grade</source>
-			<translation>Степен на съответствие</translation>
+			<translation>コンプライアンス等級</translation>
 		</message>
 		<message>
 			<source>Mincut done successfully</source>
-			<translation>Mincut се извършва успешно</translation>
+			<translation>ミニカットに成功</translation>
 		</message>
 		<message>
 			<source>Some data is missing</source>
-			<translation>Липсват някои данни</translation>
+			<translation>一部のデータが欠落</translation>
 		</message>
 		<message>
 			<source>Total</source>
-			<translation>Общо</translation>
+			<translation>合計</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to override the configuration of this workspace?</source>
-			<translation>Сигурни ли сте, че искате да замените конфигурацията на това работно пространство?</translation>
+			<translation>本当にこのワークスペースの設定を上書きしたいのですか？</translation>
 		</message>
 		<message>
 			<source>Cannot get giswater minor version from windows registry</source>
-			<translation>Не мога да получа второстепенна версия на giswater от регистъра на Windows</translation>
+			<translation>Windowsレジストリからgiswaterのマイナーバージョンを取得できない</translation>
 		</message>
 		<message>
 			<source>Feature_id is mandatory.</source>
-			<translation>Feature_id е задължително.</translation>
+			<translation>Feature_idは必須である。</translation>
 		</message>
 		<message>
 			<source>Category name already exists</source>
-			<translation>Името на категорията вече съществува</translation>
+			<translation>カテゴリー名はすでに存在する</translation>
 		</message>
 		<message>
 			<source>Category name cannot be empty.</source>
-			<translation>Името на категорията не може да бъде празно.</translation>
+			<translation>カテゴリー名を空にすることはできない。</translation>
 		</message>
 		<message>
 			<source>Category updated successfully!</source>
-			<translation>Категорията е актуализирана успешно!</translation>
+			<translation>カテゴリーが正常に更新されました！</translation>
 		</message>
 		<message>
 			<source>Composer 'ud_profile' created</source>
-			<translation>Създаден е композитор 'ud_profile'</translation>
+			<translation>コンポーザー「ud_profile」作成</translation>
 		</message>
 		<message>
 			<source>Click on a feature to set mincut location and start the process</source>
-			<translation>Кликнете върху функция, за да зададете местоположението на миниатюрната обработка и да стартирате процеса</translation>
+			<translation>フィーチャーをクリックしてミニカットの位置を設定し、処理を開始する。</translation>
 		</message>
 		<message>
 			<source>Geometry has been added!</source>
-			<translation>Добавена е геометрия!</translation>
+			<translation>ジオメトリーが追加された！</translation>
 		</message>
 		<message>
 			<source>Prob. of Failure</source>
-			<translation>Вероятност от неуспех</translation>
+			<translation>故障の確率</translation>
 		</message>
 		<message>
 			<source>Med. Longevity</source>
-			<translation>Med. Longevity</translation>
+			<translation>メド長寿</translation>
 		</message>
 		<message>
 			<source>Feature already in the list</source>
-			<translation>Функция, която вече е в списъка</translation>
+			<translation>すでにリストにある機能</translation>
 		</message>
 		<message>
 			<source>Assigning leaks to pipes</source>
-			<translation>Присвояване на течове към тръби</translation>
+			<translation>漏れをパイプに割り当てる</translation>
 		</message>
 		<message>
 			<source>Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type.</source>
-			<translation>Щракнете върху функцията, за да я замените с нова. Можете да изберете друг слой, за да го прикрепите към друг тип функция.</translation>
+			<translation>フィーチャーをクリックして、新しいフィーチャーに置き換えます。他のレイヤーを選択して、別のフィーチャータイプにスナップすることができます。</translation>
 		</message>
 		<message>
 			<source>Please choose a valid path</source>
-			<translation>Моля, изберете валиден път</translation>
+			<translation>有効なパスを選択してください。</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the built date range.</source>
-			<translation>Моля, въведете валидно цяло число за диапазона на построената дата.</translation>
+			<translation>構築された日付範囲に有効な整数を入力してください。</translation>
 		</message>
 		<message>
 			<source>Database connection error (PgDao). Please open plugin log file to get more details</source>
-			<translation>Грешка при свързването с базата данни (PgDao). Моля, отворете регистрационния файл на плъгина, за да получите повече подробности</translation>
+			<translation>データベース接続エラー（PgDao）。詳細については、プラグインのログファイルを開いてください。</translation>
 		</message>
 		<message>
 			<source>Profile deleted</source>
-			<translation>Изтрит профил</translation>
+			<translation>プロフィール削除</translation>
 		</message>
 		<message>
 			<source>Save as</source>
-			<translation>Запазване като</translation>
+			<translation>名前を付けて保存</translation>
 		</message>
 		<message>
 			<source>Task finished!</source>
-			<translation>Задачата е изпълнена!</translation>
+			<translation>タスク終了！</translation>
 		</message>
 		<message>
 			<source>Undefined error</source>
-			<translation>Недефинирана грешка</translation>
+			<translation>未定義エラー</translation>
 		</message>
 		<message>
 			<source>Calculating values</source>
-			<translation>Изчисляване на стойности</translation>
+			<translation>値の計算</translation>
 		</message>
 		<message>
 			<source>Check fields from table or view</source>
-			<translation>Проверка на полета от таблица или изглед</translation>
+			<translation>テーブルまたはビューからフィールドをチェックする</translation>
 		</message>
 		<message>
 			<source>Clicking an item will check/uncheck it. </source>
-			<translation>Щракването върху даден елемент води до неговото маркиране/отменяне.</translation>
+			<translation>項目をクリックすると、その項目のチェック／チェックを外すことができる。</translation>
 		</message>
 		<message>
 			<source>Current layer not valid</source>
-			<translation>Текущият слой не е валиден</translation>
+			<translation>現在のレイヤーが無効</translation>
 		</message>
 		<message>
 			<source>Click on node to computed its downstream network</source>
-			<translation>Кликнете върху възел, за да изчислите мрежата му надолу по веригата</translation>
+			<translation>ノードをクリックして、その下流のネットワークを計算する。</translation>
 		</message>
 		<message>
 			<source>Column name already exists.</source>
-			<translation>Името на колоната вече съществува.</translation>
+			<translation>カラム名は既に存在します。</translation>
 		</message>
 		<message>
 			<source>Column name and Label fields are mandatory. Please set correct value.</source>
-			<translation>Полетата Име на колона и Етикет са задължителни. Моля, задайте правилната стойност.</translation>
+			<translation>カラム名とラベルのフィールドは必須です。正しい値を設定してください。</translation>
 		</message>
 		<message>
 			<source>Date interval not valid!</source>
-			<translation>Интервалът от дати не е валиден!</translation>
+			<translation>日付間隔が有効でない！</translation>
 		</message>
 		<message>
 			<source>Database name contains special characters that are not supported</source>
-			<translation>Името на базата данни съдържа специални символи, които не се поддържат</translation>
+			<translation>データベース名にサポートされていない特殊文字が含まれている</translation>
 		</message>
 		<message>
 			<source>Default Built Date</source>
-			<translation>Дата на построяване по подразбиране</translation>
+			<translation>デフォルト構築日</translation>
 		</message>
 		<message>
 			<source>Couldn't draw profile. You may need to select another exploitation.</source>
-			<translation>Не може да нарисува профил. Може да се наложи да изберете друга експлоатация.</translation>
+			<translation>プロファイルを描画できませんでした。他のエクスプロイトを選択する必要があるかもしれません。</translation>
 		</message>
 		<message>
 			<source>Couldn't find layer to zoom to</source>
-			<translation>Не можах да намеря слой, който да приближа</translation>
+			<translation>ズームするレイヤーが見つからない</translation>
 		</message>
 		<message>
 			<source>Document deleted</source>
-			<translation>Изтрит документ</translation>
+			<translation>ドキュメント削除</translation>
 		</message>
 		<message>
 			<source>There was an error inserting pattern.</source>
-			<translation>Имаше грешка при вмъкването на модела.</translation>
+			<translation>パターンの挿入にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>Updating tables</source>
-			<translation>Актуализиране на таблици</translation>
+			<translation>テーブルの更新</translation>
 		</message>
 		<message>
 			<source>Weights</source>
-			<translation>Тежести</translation>
+			<translation>ウェイト</translation>
 		</message>
 		<message>
 			<source>Database connection error. Please check your connection parameters.</source>
-			<translation>Грешка при свързването на базата данни. Моля, проверете параметрите на връзката.</translation>
+			<translation>データベース接続エラーです。接続パラメータを確認してください。</translation>
 		</message>
 		<message>
 			<source>Database connection error. Please open plugin log file to get more details</source>
-			<translation>Грешка при свързването на базата данни. Моля, отворете регистрационния файл на плъгина, за да получите повече информация</translation>
+			<translation>データベース接続エラー。プラグインのログファイルを開いて詳細を確認してください。</translation>
 		</message>
 		<message>
 			<source>Do you want to open GIS project?</source>
-			<translation>Искате ли да отворите ГИС проект?</translation>
+			<translation>GISプロジェクトを開きますか？</translation>
 		</message>
 		<message>
 			<source>Folder not found</source>
-			<translation>Папката не е намерена</translation>
+			<translation>フォルダが見つかりません</translation>
 		</message>
 		<message>
 			<source>Hemisphere of the node has been updated. Value is</source>
-			<translation>Полусферата на възела е актуализирана. Стойността е</translation>
+			<translation>ノードの半球が更新された。値は</translation>
 		</message>
 		<message>
 			<source>Element does not exist</source>
-			<translation>Елементът не съществува</translation>
+			<translation>要素が存在しない</translation>
 		</message>
 		<message>
 			<source>Getting auxiliary data from DB</source>
-			<translation>Получаване на спомагателни данни от БД</translation>
+			<translation>DBからの補助データ取得</translation>
 		</message>
 		<message>
 			<source>Connect link task is already active!</source>
-			<translation>Задачата за свързване на връзката вече е активна!</translation>
+			<translation>接続リンクタスクはすでにアクティブになっている！</translation>
 		</message>
 		<message>
 			<source>Canceling task...</source>
-			<translation>Отмяна на задача...</translation>
+			<translation>タスクのキャンセル</translation>
 		</message>
 		<message>
 			<source>Changes on this page are dangerous and can break Giswater plugin in various ways. n </source>
-			<translation>Промените в тази страница са опасни и могат да повредят плъгина Giswater по различни начини. n</translation>
+			<translation>このページの変更は危険であり、Giswaterプラグインを様々な方法で破壊する可能性があります。</translation>
 		</message>
 		<message>
 			<source>Click on feature or any place on the map and set radius of a circle</source>
-			<translation>Щракнете върху обект или върху всяко място в картата и задайте радиус на окръжност</translation>
+			<translation>フィーチャーまたは地図上の任意の場所をクリックし、円の半径を設定します。</translation>
 		</message>
 		<message>
 			<source>Click on feature to change its type</source>
-			<translation>Щракнете върху функцията, за да промените нейния тип</translation>
+			<translation>機能をクリックしてタイプを変更する</translation>
 		</message>
 		<message>
 			<source>Field child_layer of id: </source>
-			<translation>Поле child_layer на id:</translation>
+			<translation>idのフィールドchild_layer：</translation>
 		</message>
 		<message>
 			<source>Invalid value for field</source>
-			<translation>Невалидна стойност за полето</translation>
+			<translation>フィールドの値が無効</translation>
 		</message>
 		<message>
 			<source>Table not found</source>
-			<translation>Таблицата не е намерена</translation>
+			<translation>テーブルが見つかりません</translation>
 		</message>
 		<message>
 			<source>Task canceled:</source>
-			<translation>Задачата е отменена:</translation>
+			<translation>タスクはキャンセルされた：</translation>
 		</message>
 		<message>
 			<source>Please choose a csv file</source>
-			<translation>Моля, изберете csv файл</translation>
+			<translation>csvファイルを選択してください。</translation>
 		</message>
 		<message>
 			<source>Error on create auto mincut</source>
-			<translation>Грешка при създаването на автоматичен mincut, трябва да прегледате данните</translation>
+			<translation>オートミニカットの作成でエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>Error on create auto mincut, you need to review data</source>
-			<translation>Грешка при създаването на автоматичен mincut, трябва да прегледате данните</translation>
+			<translation>オートミニカットの作成でエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>A material is considered invalid if it is not listed in the material configuration table.</source>
-			<translation>Даден материал се счита за невалиден, ако не е посочен в таблицата за конфигурация на материала.</translation>
+			<translation>材料構成表に記載されていない材料は無効とみなされます。</translation>
 		</message>
 		<message>
 			<source>Max rleak: {rleak} leaks/km.year.</source>
-			<translation>Max rleak: {rleak} течове/км.г.</translation>
+			<translation>最大リーク量：{リーク} リーク/km.年。</translation>
 		</message>
 		<message>
 			<source>Psector values updated successfully</source>
-			<translation>Стойностите на Psector са актуализирани успешно</translation>
+			<translation>Psectorの値が正常に更新された</translation>
 		</message>
 		<message>
 			<source>Cannot create file</source>
-			<translation>Не мога да създам файл, проверете дали е отворен</translation>
+			<translation>ファイルを作成できません。</translation>
 		</message>
 		<message>
 			<source>ConfigLayerFields task is already active!</source>
-			<translation>Задачата ConfigLayerFields вече е активна!</translation>
+			<translation>ConfigLayerFieldsタスクは既にアクティブである！</translation>
 		</message>
 		<message>
 			<source>As a result, the material of these pipes will be treated as the configured unknown material, {unknown_material}.</source>
-			<translation>В резултат на това материалът на тези тръби ще се третира като конфигуриран неизвестен материал, {unknown_material}.</translation>
+			<translation>その結果、これらのパイプの材質は、設定された未知の材質{unknown_material}として扱われる。</translation>
 		</message>
 		<message>
 			<source>Process finished successfully</source>
-			<translation>Процесът е завършен успешно</translation>
+			<translation>プロセスは正常に終了した</translation>
 		</message>
 		<message>
 			<source>Saving results to DB</source>
-			<translation>Записване на резултати в БД</translation>
+			<translation>結果をDBに保存</translation>
 		</message>
 		<message>
 			<source>Task canceled.</source>
-			<translation>Задачата е отменена.</translation>
+			<translation>タスクはキャンセルされた。</translation>
 		</message>
 		<message>
 			<source>You need to enter hydrometer_id</source>
-			<translation>Трябва да въведете hydrometer_id</translation>
+			<translation>hydrometer_id を入力する必要があります。</translation>
 		</message>
 		<message>
 			<source>Document already exist</source>
-			<translation>Документът вече съществува</translation>
+			<translation>すでに存在する文書</translation>
 		</message>
 		<message>
 			<source>A diameter value is considered invalid if it is zero, negative, NULL or greater than the maximum diameter in the configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
-			<translation>Стойността на диаметъра се счита за невалидна, ако е нула, отрицателна, NULL или по-голяма от максималния диаметър в таблицата за конфигурация. В резултат на това на тези тръби НЯМА да бъде присвоена стойност на приоритет.</translation>
+			<translation>直径の値がゼロ、負、NULL、またはコンフィギュレーションテーブルの最大直径より大きい場合は無効とみなされる。その結果、これらのパイプには優先度が割り当てられない。</translation>
 		</message>
 		<message>
 			<source>An arccat_id is considered invalid if it is not listed in the catalog configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
-			<translation>Arccat_id се счита за невалиден, ако не е посочен в таблицата за конфигурация на каталога. В резултат на това на тези тръби НЕ се присвоява стойност на приоритет.</translation>
+			<translation>arccat_idがカタログ・コンフィギュレーション・テーブルにリストされていない場合、そのarccat_idは無効とみなされる。その結果、これらのパイプには優先度が割り当てられない。</translation>
 		</message>
 		<message>
 			<source>Any record found in table 'node_type' related with selected 'node_type.type'</source>
-			<translation>Всеки намерен запис в таблица 'node_type', свързан с избрания 'node_type.type'</translation>
+			<translation>テーブル'node_type'で、選択された'node_type.type'に関連するレコードが見つかった場合。</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete these profile?</source>
-			<translation>Сигурни ли сте, че искате да изтриете този профил?</translation>
+			<translation>このプロフィールを削除してもよろしいですか？</translation>
 		</message>
 		<message>
 			<source>Cannot get Java folder from windows registry</source>
-			<translation>Не мога да получа папката Java от регистъра на Windows</translation>
+			<translation>WindowsレジストリからJavaフォルダを取得できない</translation>
 		</message>
 		<message>
 			<source>Click on disconnected node</source>
-			<translation>Щракнете върху прекъснатия възел, преместете показалеца до желаното място на тръбата, за да я прекъснете.</translation>
+			<translation>切断されたノードをクリックし、ポインタをパイプの好きな場所に移動して切断する。</translation>
 		</message>
 		<message>
 			<source>Click on disconnected node, move the pointer to the desired location on pipe to break it</source>
-			<translation>Щракнете върху прекъснатия възел, преместете показалеца до желаното място на тръбата, за да я прекъснете.</translation>
+			<translation>切断されたノードをクリックし、ポインタをパイプの好きな場所に移動して切断する。</translation>
 		</message>
 		<message>
 			<source>Click on feature or any place on the map and set a radius of a circle</source>
-			<translation>Кликнете върху елемент или върху всяко място на картата и задайте радиус на окръжност</translation>
+			<translation>フィーチャーまたは地図上の任意の場所をクリックし、円の半径を設定します。</translation>
 		</message>
 		<message>
 			<source>Compliance value must be between 0 and 10 inclusive.</source>
-			<translation>Стойността на съответствието трябва да бъде между 0 и 10 включително.</translation>
+			<translation>コンプライアンス値は0から10の間でなければならない。</translation>
 		</message>
 		<message>
 			<source>Composer template not found. Name should be</source>
-			<translation>Не е намерен шаблон на Composer. Името трябва да бъде</translation>
+			<translation>Composer テンプレートが見つかりません。名前は</translation>
 		</message>
 		<message>
 			<source>Configuration file not found, please make sure it is located in the correct directory and try again</source>
-			<translation>Конфигурационният файл не е намерен, моля, уверете се, че се намира в правилната директория, и опитайте отново</translation>
+			<translation>設定ファイルが見つかりません。正しいディレクトリにあることを確認してから、もう一度やり直してください。</translation>
 		</message>
 		<message>
 			<source>Credentials will be stored in GIS project file</source>
-			<translation>Удостоверенията ще се съхраняват във файла на проекта на ГИС</translation>
+			<translation>認証情報はGISプロジェクトファイルに保存される。</translation>
 		</message>
 		<message>
 			<source>Database connection error (psycopg2). Please open plugin log file to get more details</source>
-			<translation>Грешка при свързването с базата данни (psycopg2). Моля, отворете регистрационния файл на плъгина, за да получите повече подробности</translation>
+			<translation>データベース接続エラー（psycopg2）。プラグインのログファイルを開いて詳細を確認してください。</translation>
 		</message>
 		<message>
 			<source>Go2Epa task is already active!</source>
-			<translation>Задачата Go2Epa вече е активна!</translation>
+			<translation>Go2Epaタスクはすでにアクティブになっている！</translation>
 		</message>
 		<message>
 			<source>Database connection error (QSqlDatabase). Please open plugin log file to get more details</source>
-			<translation>Грешка при свързването на базата данни (QSqlDatabase). Моля, отворете регистрационния файл на плъгина, за да получите повече подробности</translation>
+			<translation>データベース接続エラー（QSqlDatabase）。プラグインのログファイルを開いて詳細を確認してください。</translation>
 		</message>
 		<message>
 			<source>Data is ok. You can try to generate the INP file</source>
-			<translation>Данните са наред. Можете да опитате да генерирате INP файла</translation>
+			<translation>データは大丈夫です。INPファイルを生成してみる</translation>
 		</message>
 		<message>
 			<source>Document inserted successfully</source>
-			<translation>Документът е вмъкнат успешно</translation>
+			<translation>ドキュメントの挿入に成功</translation>
 		</message>
 		<message>
 			<source>Do you want to overwrite file?</source>
-			<translation>Искате ли да презапишете файла?</translation>
+			<translation>ファイルを上書きしますか？</translation>
 		</message>
 		<message>
 			<source>Do you want to proceed?</source>
-			<translation>Искате ли да продължите?</translation>
+			<translation>続行しますか？</translation>
 		</message>
 		<message>
 			<source>Draw a pipe connected to two nodes</source>
-			<translation>Начертайте тръба, свързана с два възела</translation>
+			<translation>2つのノードに接続されたパイプを描く</translation>
 		</message>
 		<message>
 			<source>Empty value detected in 'Diameter' tab. Please enter a value for diameter.</source>
-			<translation>Открита е празна стойност в раздела 'Диаметър'. Моля, въведете стойност за диаметъра.</translation>
+			<translation>直径」タブで空の値が検出されました。直径の値を入力してください。</translation>
 		</message>
 		<message>
 			<source>Error getting table name from selected layer</source>
-			<translation>Грешка при получаване на името на таблицата от избрания слой</translation>
+			<translation>選択レイヤーからのテーブル名取得エラー</translation>
 		</message>
 		<message>
 			<source>Error inserting element in table, you need to review data</source>
-			<translation>Грешка при вмъкване на елемент в таблица, трябва да прегледате данните</translation>
+			<translation>テーブルへの要素の挿入に失敗した場合、データを見直す必要があります。</translation>
 		</message>
 		<message>
 			<source>Error inserting profile table, you need to review data</source>
-			<translation>Грешка при вмъкване на таблица с профил, трябва да прегледате данните</translation>
+			<translation>プロファイル・テーブルの挿入に失敗した場合は、データを確認する必要があります。</translation>
 		</message>
 		<message>
 			<source>Error updating element in table</source>
-			<translation>Грешка при актуализиране на елемент в таблицата, трябва да прегледате данните</translation>
+			<translation>テーブルの要素の更新にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>Generating result stats</source>
-			<translation>Генериране на статистически данни за резултатите</translation>
+			<translation>結果統計の作成</translation>
 		</message>
 		<message>
 			<source>Getting leak data from DB</source>
-			<translation>Получаване на данни за изтичане от DB</translation>
+			<translation>DBからのリークデータ取得</translation>
 		</message>
 		<message>
 			<source>Getting pipe data from DB</source>
-			<translation>Получаване на данни за тръбите от DB</translation>
+			<translation>DBからのパイプデータ取得</translation>
 		</message>
 		<message>
 			<source>Leaks assigned by material only: {leaks}.</source>
-			<translation>Течове, определени само по материал: {leaks}.</translation>
+			<translation>リークはマテリアルのみで割り当てられる： {リーク}。</translation>
 		</message>
 		<message>
 			<source>Leaks assigned to any nearby pipes: {leaks}.</source>
-			<translation>Течове, разпределени към всички близки тръби: {течове}.</translation>
+			<translation>近くのパイプに割り当てられたリーク：{リーク}。</translation>
 		</message>
 		<message>
 			<source>Mandatory field is missing. Please, set a value</source>
-			<translation>Липсва задължително поле. Моля, задайте стойност</translation>
+			<translation>必須フィールドがありません。値を設定してください。</translation>
 		</message>
 		<message>
 			<source>Metadata file not found</source>
-			<translation>Файлът с метаданни не е намерен</translation>
+			<translation>メタデータファイルが見つかりません</translation>
 		</message>
 		<message>
 			<source>Method of calculation not defined in configuration file. Please check config file.</source>
-			<translation>Методът на изчисление не е дефиниран в конфигурационния файл. Моля, проверете конфигурационния файл.</translation>
+			<translation>計算方法が設定ファイルで定義されていません。設定ファイルを確認してください。</translation>
 		</message>
 		<message>
 			<source>Mincut done</source>
-			<translation>Mincut е направен, но има конфликт и припокриване с</translation>
+			<translation>ミンカットは完了したが、競合や重複がある</translation>
 		</message>
 		<message>
 			<source>Mincut done, but has conflict and overlaps with</source>
-			<translation>Mincut е направен, но има конфликт и припокриване с</translation>
+			<translation>ミンカットは完了したが、競合や重複がある</translation>
 		</message>
 		<message>
 			<source>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</source>
-			<translation>Mincut е направен, но има конфликт. Погледнете в anl_arc и anl_node, за да видите подробностите за конфликта</translation>
+			<translation>ミンカットは完了したが、コンフリクトがある。anl_arcとanl_nodeでコンフリクトの詳細を見てください。</translation>
 		</message>
 		<message>
 			<source>Mincut task is already active!</source>
-			<translation>Задачата Mincut вече е активна!</translation>
+			<translation>Mincutタスクはすでにアクティブになっている！</translation>
 		</message>
 		<message>
 			<source>More then one document selected. Select just one document.</source>
-			<translation>Избран е повече от един документ. Изберете само един документ.</translation>
+			<translation>複数の文書が選択されています。ドキュメントを1つだけ選択します。</translation>
 		</message>
 		<message>
 			<source>More then one event selected. Select just one</source>
-			<translation>Избрано е повече от едно събитие. Изберете само едно</translation>
+			<translation>複数のイベントが選択されています。1つだけ選択</translation>
 		</message>
 		<message>
 			<source>Move node: Error updating geometry</source>
-			<translation>Преместване на възел: Грешка при актуализиране на геометрията</translation>
+			<translation>ノードの移動ジオメトリの更新エラー</translation>
 		</message>
 		<message>
 			<source>New feature type is null. Please</source>
-			<translation>Типът на новата функция е null. Моля, изберете валидна стойност.</translation>
+			<translation>新しいフィーチャータイプがNULLです。有効な値を選択してください。</translation>
 		</message>
 		<message>
 			<source>Node type has been updated!</source>
-			<translation>Типът на възела е актуализиран!</translation>
+			<translation>ノードタイプが更新されました！</translation>
 		</message>
 		<message>
 			<source>No pipes found matching your budget.</source>
-			<translation>Не са намерени тръби, които да отговарят на бюджета Ви.</translation>
+			<translation>ご予算に合うパイプは見つかりませんでした。</translation>
 		</message>
 		<message>
 			<source>On tab workcat set details of changing features to obsolete, on tab relations select affected features</source>
-			<translation>В раздела workcat задайте подробности за промяната на функциите в остарели, а в раздела Relations изберете засегнатите функции.</translation>
+			<translation>workcatタブで変更する機能の詳細をobsoleteに設定し、relationshipタブで影響を受ける機能を選択する。</translation>
 		</message>
 		<message>
 			<source>Parameter button_function is null for button</source>
-			<translation>Параметърът button_function е null за бутона</translation>
+			<translation>ボタンのパラメータbutton_functionはnullです。</translation>
 		</message>
 		<message>
 			<source>Parameter functionName is null for button</source>
-			<translation>Параметърът functionName е null за бутона</translation>
+			<translation>ボタンのパラメータ functionName が NULL</translation>
 		</message>
 		<message>
 			<source>Parameter 'Query text:' is mandatory for 'combo' widgets. Please set value.</source>
-			<translation>Параметърът 'Query text:' е задължителен за уиджетите 'combo'. Моля, задайте стойност.</translation>
+			<translation>パラメータ'Query text:'は'combo'ウィジェットでは必須です。値を設定してください。</translation>
 		</message>
 		<message>
 			<source>Parameter widgetfunction not found for widget type hyperlink</source>
-			<translation>Параметърът widgetfunction не е намерен за тип джаджа хипервръзка</translation>
+			<translation>ウィジェットタイプがハイパーリンクの場合、パラメータ widgetfunction が見つかりません。</translation>
 		</message>
 		<message>
 			<source>Pipes with invalid arccat_ids: {qtd}.</source>
-			<translation>Тръбопроводи с невалидни arccat_ids: {qtd}.</translation>
+			<translation>無効な arccat_id を持つパイプ：{qtd}.</translation>
 		</message>
 		<message>
 			<source>Pipes with invalid diameters: {qtd}.</source>
-			<translation>Тръби с невалидни диаметри: {qtd}.</translation>
+			<translation>無効な直径のパイプ：{qtd}.</translation>
 		</message>
 		<message>
 			<source>Pipes with invalid materials: {qtd}.</source>
-			<translation>Тръби с невалидни материали: {qtd}.</translation>
+			<translation>無効な材質のパイプ：{qtd}.</translation>
 		</message>
 		<message>
 			<source>Pipes with invalid pressures: {qtd}.</source>
-			<translation>Тръби с невалидно налягане: {qtd}.</translation>
+			<translation>無効な圧力のパイプ{qtd}.</translation>
 		</message>
 		<message>
 			<source>Pipes with zero leaks per km per year: {pipes}.</source>
-			<translation>Тръби с нулеви течове на километър годишно: {тръби}.</translation>
+			<translation>年間1km当たりの漏れがゼロのパイプ：{パイプ}.</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the cluster length.</source>
-			<translation>Моля, въведете валидно цяло число за дължината на клъстера.</translation>
+			<translation>クラスタの長さに有効な整数を入力してください。</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the maximum distance.</source>
-			<translation>Моля, въведете валидно цяло число за максималното разстояние.</translation>
+			<translation>最大距離に有効な整数を入力してください。</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the number of years.</source>
-			<translation>Моля, въведете валидно цяло число за броя на годините.</translation>
+			<translation>年数を有効な整数で入力してください。</translation>
 		</message>
 		<message>
 			<source>Please enter a valid number.</source>
-			<translation>Моля, въведете валиден номер.</translation>
+			<translation>有効な番号を入力してください。</translation>
 		</message>
 		<message>
 			<source>Please enter a valid number for the budget.</source>
-			<translation>Моля, въведете валидно число за бюджета.</translation>
+			<translation>予算に有効な数字を入力してください。</translation>
 		</message>
 		<message>
 			<source>Please enter the diameter range in this format: [minimum factor]-[maximum factor]. For example, 0.75-1.5</source>
-			<translation>Моля, въведете диапазона на диаметъра в този формат: [минимален коефициент]-[максимален коефициент]. Например: 0,75-1,5</translation>
+			<translation>直径の範囲を以下のフォーマットで入力してください：[最小係数]-[最大係数]。例：0.75-1.5</translation>
 		</message>
 		<message>
 			<source>Please provide a result name.</source>
-			<translation>Моля, посочете името на резултата.</translation>
+			<translation>結果名をご記入ください。</translation>
 		</message>
 		<message>
 			<source>Please provide the repairing cost for diameter</source>
-			<translation>Моля, посочете разходите за ремонт на диаметъра</translation>
+			<translation>直径の修理費用を教えてください。</translation>
 		</message>
 		<message>
 			<source>Please provide the replacing cost for diameter</source>
-			<translation>Моля, посочете разходите за подмяна на диаметъра</translation>
+			<translation>直径の交換費用を教えてください。</translation>
 		</message>
 		<message>
 			<source>Price list csv file name is required</source>
-			<translation>Изисква се име на CSV файл с ценова листа</translation>
+			<translation>価格表CSVファイル名必須</translation>
 		</message>
 		<message>
 			<source>Priority Calculation (Selection)</source>
-			<translation>Изчисляване на приоритета (селекция)</translation>
+			<translation>優先順位計算（セレクション）</translation>
 		</message>
 		<message>
 			<source>Process finished with some errors</source>
-			<translation>Процесът завърши с някои грешки</translation>
+			<translation>いくつかのエラーが発生したが、処理は終了した。</translation>
 		</message>
 		<message>
 			<source>Profile name is mandatory.</source>
-			<translation>Името на профила е задължително.</translation>
+			<translation>プロファイル名は必須です。</translation>
 		</message>
 		<message>
 			<source>QGIS version is not compatible with Giswater. Please check wiki</source>
-			<translation>Версията на QGIS не е съвместима с Giswater. Моля, проверете в уикипедия</translation>
+			<translation>QGISのバージョンはGiswaterと互換性がありません。ウィキ</translation>
 		</message>
 		<message>
 			<source>Reset position form done successfully.</source>
-			<translation>Формулярът за нулиране на позицията е изпълнен успешно.</translation>
+			<translation>ポジションフォームのリセットに成功。</translation>
 		</message>
 		<message>
 			<source>Result name already exists</source>
-			<translation>Името на резултата вече съществува, искате ли да го презапишете?</translation>
+			<translation>結果名はすでに存在しますが、上書きしますか？</translation>
 		</message>
 		<message>
 			<source>Result name already in use, please choose a different name.</source>
-			<translation>Името на резултата вече се използва, моля, изберете друго име.</translation>
+			<translation>結果名はすでに使用されていますので、別の名前を選択してください。</translation>
 		</message>
 		<message>
 			<source>Result name not found. It's not possible to import RPT file into database</source>
-			<translation>Името на резултата не е намерено. Не е възможно да се импортира RPT файл в базата данни</translation>
+			<translation>結果名が見つかりません。RPTファイルをデータベースにインポートできません。</translation>
 		</message>
 		<message>
 			<source>Result Selector</source>
-			<translation>Селектор на резултати</translation>
+			<translation>結果セレクタ</translation>
 		</message>
 		<message>
 			<source>Second iteration</source>
-			<translation>Втора итерация</translation>
+			<translation>2回目の反復</translation>
 		</message>
 		<message>
 			<source>Selected date interval is not valid</source>
-			<translation>Избраният интервал от дати не е валиден</translation>
+			<translation>選択した日付間隔が無効</translation>
 		</message>
 		<message>
 			<source>Selected element already in the list</source>
-			<translation>Избраният елемент вече е в списъка</translation>
+			<translation>選択された要素はすでにリストにある</translation>
 		</message>
 		<message>
 			<source>Selected functions have been executed</source>
-			<translation>Изпълнени са избрани функции</translation>
+			<translation>選択した機能が実行された</translation>
 		</message>
 		<message>
 			<source>Selected hydrometer_id not found</source>
-			<translation>Избраният hydrometer_id не е намерен</translation>
+			<translation>選択された hydrometer_id が見つかりません。</translation>
 		</message>
 		<message>
 			<source>Selected 'profile_id' already exist in database</source>
-			<translation>Избраното 'profile_id' вече съществува в базата данни</translation>
+			<translation>選択された 'profile_id' はすでにデータベースに存在します。</translation>
 		</message>
 		<message>
 			<source>Select feature type and id and check if it''s related to any other features. click delete to remove it completely</source>
-			<translation>Изберете типа и идентификатора на функцията и проверете дали тя е свързана с други функции. Щракнете върху Изтриване, за да я премахнете напълно</translation>
+			<translation>機能の種類とIDを選択し、それが他の機能と関連しているかどうかを確認します。完全に削除するには削除をクリックします。</translation>
 		</message>
 		<message>
 			<source>Select just one document</source>
-			<translation>Изберете само един документ</translation>
+			<translation>ドキュメントを1つだけ選択する</translation>
 		</message>
 		<message>
 			<source>Service database connection error (QSqlDatabase). Please open plugin log file to get more details</source>
-			<translation>Грешка при свързването на сервизната база данни (QSqlDatabase). Моля, отворете регистрационния файл на плъгина, за да получите повече подробности</translation>
+			<translation>サービス・データベース接続エラー（QSqlDatabase）。プラグインのログファイルを開いて詳細を確認してください。</translation>
 		</message>
 		<message>
 			<source>Some data is missing. Check gis_length for arc</source>
-			<translation>Липсват някои данни. Проверете gis_length за дъга</translation>
+			<translation>一部のデータがありません。アークのgis_lengthをチェックする</translation>
 		</message>
 		<message>
 			<source>Some layers of your role not found. Do you want to view them?</source>
-			<translation>Някои слоеве на вашата роля не са открити. Искате ли да ги видите?</translation>
+			<translation>あなたの役割のいくつかの層が見つかりません。表示しますか？</translation>
 		</message>
 		<message>
 			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
-			<translation>Липсват някои задължителни стойности. Моля, проверете джаджите, отбелязани в червено.</translation>
+			<translation>いくつかの必須値が欠落しています。赤で示されたウィジェットを確認してください。</translation>
 		</message>
 		<message>
 			<source>Some parameters are missing (Values Defaults used for)</source>
-			<translation>Липсват някои параметри (Използвани са стойности по подразбиране за)</translation>
+			<translation>いくつかのパラメータがありません。</translation>
 		</message>
 		<message>
 			<source>Table_object is not a table name or QTableView</source>
-			<translation>Table_object не е име на таблица или QTableView</translation>
+			<translation>Table_object はテーブル名でも QTableView でもありません。</translation>
 		</message>
 		<message>
 			<source>Task canceled: The number of years is greater than the interval disponible.</source>
-			<translation>Задачата е отменена: Броят на годините е по-голям от разполагаемия интервал.</translation>
+			<translation>タスクがキャンセルされた：タスクがキャンセルされました。</translation>
 		</message>
 		<message>
 			<source>The csv file has been successfully exported</source>
-			<translation>Файлът csv е експортиран успешно</translation>
+			<translation>csvファイルが正常にエクスポートされました。</translation>
 		</message>
 		<message>
 			<source>The 'Description' field is required.</source>
-			<translation>Полето "Описание" е задължително.</translation>
+			<translation>説明」フィールドは必須です。</translation>
 		</message>
 		<message>
 			<source>The field layoutname is not configured for</source>
-			<translation>Името на оформлението на полето не е конфигурирано за</translation>
+			<translation>フィールドのレイアウト名が</translation>
 		</message>
 		<message>
 			<source>The field layoutorder is not configured for</source>
-			<translation>Полето layoutorder не е конфигурирано за</translation>
+			<translation>フィールドレイアウトオーダーは</translation>
 		</message>
 		<message>
 			<source>The field widgettype is not configured for</source>
-			<translation>Типът на джаджата на полето не е конфигуриран за</translation>
+			<translation>フィールドのウィジェットタイプが</translation>
 		</message>
 		<message>
 			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
  Please ensure that features has no undelete value on true.\n
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>Процедурата ще изтрие характеристики в базата данни, освен ако не е възел, който не разделя дъга.\n
- Моля, уверете се, че функциите нямат стойност за изтриване true.\n
- От друга страна, трябва да знаете, че в таблицата за проследимост ще се съхранява предходна информация.</translation>
+			<translation>このプロシージャは、arcを分割しないノードでない限り、データベース上のフィーチャーを削除します。
+ featuresにundeleteの値がtrueになっていないことを確認してください。
+ 一方、トレーサビリティ・テーブルには先例情報が格納されることを知っておく必要があります。</translation>
 		</message>
 		<message>
 			<source>The project name can't be a PostgreSQL reserved keyword</source>
-			<translation>Името на проекта не може да бъде запазена ключова дума на PostgreSQL</translation>
+			<translation>プロジェクト名にPostgreSQL予約キーワードを使用することはできません。</translation>
 		</message>
 		<message>
 			<source>The project name can't have any upper-case characters</source>
-			<translation>Името на проекта не може да съдържа главни букви.</translation>
+			<translation>プロジェクト名に大文字を使用することはできません。</translation>
 		</message>
 		<message>
 			<source>The 'Project_name' field is required.</source>
-			<translation>Полето "Project_name" е задължително.</translation>
+			<translation>Project_name'フィールドは必須です。</translation>
 		</message>
 		<message>
 			<source>The QGIS Projects templates was correctly created.</source>
-			<translation>Шаблоните на QGIS Projects са създадени правилно.</translation>
+			<translation>QGIS Projectsテンプレートが正しく作成されました。</translation>
 		</message>
 		<message>
 			<source>There was an error deleting old lid values.</source>
-			<translation>Имаше грешка при изтриването на стари стойности на капака.</translation>
+			<translation>古い蓋の値を削除するエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>There was an error deleting old pattern values.</source>
-			<translation>Имаше грешка при изтриването на стари стойности на шаблона.</translation>
+			<translation>古いパターン値を削除するエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>There was an error deleting old timeseries values.</source>
-			<translation>Имаше грешка при изтриването на стари стойности на времеви редове.</translation>
+			<translation>古いタイムスリリーの値を削除するエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>There was an error inserting control.</source>
-			<translation>Имаше грешка при вмъкването на контрола.</translation>
+			<translation>コントロールの挿入にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>There was an error inserting pattern value.</source>
-			<translation>Имаше грешка при вмъкването на стойността на модела.</translation>
+			<translation>パターン値の挿入にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>There was an error inserting timeseries.</source>
-			<translation>Имаше грешка при вмъкването на времеви редове.</translation>
+			<translation>タイムスリリーの挿入にエラーが発生しました。</translation>
 		</message>
 		<message>
 			<source>There were velocities >50 in the rpt file. You have activated the option to force the import  </source>
-			<translation>Във файла rpt има скорости >50. Активирали сте опцията за принудително импортиране</translation>
+			<translation>rptファイルに50以上の速度があった。インポートを強制するオプションを有効にしました。</translation>
 		</message>
 		<message>
 			<source>The schema version has to be updated to make rename</source>
-			<translation>Версията на схемата трябва да се актуализира, за да се извърши преименуването</translation>
+			<translation>リネームを行うには、スキーマのバージョンを更新する必要があります。</translation>
 		</message>
 		<message>
 			<source>The selected INP file does not match with a 'UD' project.n </source>
-			<translation>Избраният INP файл не съвпада с проект "UD".n</translation>
+			<translation>選択したINPファイルが'UD'プロジェクトと一致しません。</translation>
 		</message>
 		<message>
 			<source>The selected INP file does not match with a 'UD' project. Please check it before continuing...</source>
-			<translation>Избраният INP файл не съвпада с проект "UD". Моля, проверете го, преди да продължите...</translation>
+			<translation>選択されたINPファイルは'UD'プロジェクトと一致しません。続行する前に確認してください。</translation>
 		</message>
 		<message>
 			<source>The selected INP file does not match with a 'WS' project.n </source>
-			<translation>Избраният INP файл не съвпада с проект "WS".n</translation>
+			<translation>選択された INP ファイルが 'WS' プロジェクトと一致しません。</translation>
 		</message>
 		<message>
 			<source>These pipes have been assigned as compliant by default, which may affect their priority value.</source>
-			<translation>Тези тръби са определени като съвместими по подразбиране, което може да повлияе на стойността на техния приоритет.</translation>
+			<translation>これらのパイプは、デフォルトでコンプライ アントとして割り当てられている。</translation>
 		</message>
 		<message>
 			<source>These pipes have been identified as the configured unknown material, {unknown_material}.</source>
-			<translation>Тези тръби са идентифицирани като конфигуриран неизвестен материал, {unknown_material}.</translation>
+			<translation>これらのパイプは、設定された未知の素材{unknown_material}として識別された。</translation>
 		</message>
 		<message>
 			<source>These pipes have no pressure information for their nodes. This will result in them receiving the maximum longevity value for their material, which may affect the final priority value.</source>
-			<translation>Тези тръби нямат информация за налягането в своите възли. В резултат на това те ще получат максималната стойност за дълготрайност за своя материал, което може да повлияе на крайната стойност на приоритета.</translation>
+			<translation>これらのパイプには、そのノードの圧力情報がない。この結果、これらのパイプは、そのマテリアルの最大寿命値を受け取ることになり、最終的なプライオリティ値に影響を与える可能性がある。</translation>
 		</message>
 		<message>
 			<source>These pipes have NOT been assigned a priority value.</source>
-			<translation>На тези тръби НЕ е присвоена стойност на приоритет.</translation>
+			<translation>これらのパイプには優先順位が割り当てられていない。</translation>
 		</message>
 		<message>
 			<source>This process will take time (few minutes). Are you sure to continue?</source>
-			<translation>Този процес ще отнеме време (няколко минути). Сигурни ли сте, че ще продължите?</translation>
+			<translation>このプロセスには時間がかかります（数分）。続けてよろしいですか？</translation>
 		</message>
 		<message>
 			<source>You need to select at least one process</source>
-			<translation>Трябва да изберете поне един процес.</translation>
+			<translation>少なくとも1つのプロセスを選択する必要があります。</translation>
 		</message>
 		<message>
 			<source>This result name already exists</source>
-			<translation>Това име на резултат вече съществува</translation>
+			<translation>この結果名はすでに存在する</translation>
 		</message>
 		<message>
 			<source>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
-			<translation>На тези тръби НЕ е присвоена стойност на приоритета, тъй като конфигурираният неизвестен материал, {unknown_material}, не е посочен в раздела за материали в конфигурацията.</translation>
+			<translation>設定された未知の材質{unknown_material}が材質の設定タブにリストされていないため、これらのパイプには優先値が割り当てられていません。</translation>
 		</message>
 		<message>
 			<source>Variable log_sql from user config file has been enabled.</source>
-			<translation>Променливата log_sql от потребителския конфигурационен файл е активирана.</translation>
+			<translation>ユーザー設定ファイルの log_sql 変数が有効になりました。</translation>
 		</message>
 		<message>
 			<source>These pipes received the maximum longevity value for their material.</source>
-			<translation>Тези тръби са получили максимална стойност на дълготрайност за своя материал.</translation>
+			<translation>これらのパイプは、その材質に対して最大の長寿命値を得た。</translation>
 		</message>
 		<message>
 			<source>These pipes will NOT be assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
-			<translation>На тези тръби НЯМА да бъде присвоена стойност на приоритет, тъй като конфигурираният неизвестен материал, {unknown_material}, не е посочен в раздела за материали на конфигурацията.</translation>
+			<translation>設定された未知の材質{unknown_material}は、材質の設定タブにリストされていないため、これらのパイプには優先値が割り当てられません。</translation>
 		</message>
 		<message>
 			<source>The state selector is empty</source>
-			<translation>Селекторът на състоянието е празен</translation>
+			<translation>ステートセレクタは空です。</translation>
 		</message>
 		<message>
 			<source>This is not a valid Giswater project. Do you want to view problem details?</source>
-			<translation>Това не е валиден проект на Giswater. Искате ли да видите подробности за проблема?</translation>
+			<translation>これは有効なGiswaterプロジェクトではありません。問題の詳細を表示しますか？</translation>
 		</message>
 		<message>
 			<source>This parameter is mandatory. Please</source>
-			<translation>Този параметър е задължителен. Моля, задайте стойност</translation>
+			<translation>このパラメータは必須です。値を設定してください。</translation>
 		</message>
 		<message>
 			<source>This param is mandatory. Please</source>
-			<translation>Този параметър е задължителен. Моля, задайте стойност</translation>
+			<translation>このパラメータは必須です。値を設定してください。</translation>
 		</message>
 		<message>
 			<source>This param is mandatory. Please, set a value</source>
-			<translation>Този параметър е задължителен. Моля, задайте стойност</translation>
+			<translation>このパラメータは必須です。値を設定してください。</translation>
 		</message>
 		<message>
 			<source>This SRID value does not exist on Postgres Database. Please select a diferent one.</source>
-			<translation>Тази SRID стойност не съществува в базата данни Postgres. Моля, изберете друга.</translation>
+			<translation>このSRID値はPostgresデータベースに存在しません。別のものを選択してください。</translation>
 		</message>
 		<message>
 			<source>This task may take some time to complete, do you want to proceed?</source>
-			<translation>Изпълнението на тази задача може да отнеме известно време, искате ли да продължите?</translation>
+			<translation>このタスクを完了するには時間がかかるかもしれませんが、進めますか？</translation>
 		</message>
 		<message>
 			<source>This will modify your inp file</source>
-			<translation>Това ще промени вашия inp файл, така че ще бъде създадено резервно копие.\n \</translation>
+			<translation>これにより、inpファイルが変更され、バックアップが作成されます。</translation>
 		</message>
 		<message>
 			<source>Toolbox task is already active!</source>
-			<translation>Задачата в кутията с инструменти вече е активна!</translation>
+			<translation>ツールボックスのタスクはすでにアクティブになっている！</translation>
 		</message>
 		<message>
 			<source>To see the conflicts load the views</source>
-			<translation>За да видите конфликтите, заредете изгледите</translation>
+			<translation>コンフリクトを見るには、ビューをロードする</translation>
 		</message>
 		<message>
 			<source>Total of pipes: {pipes}.</source>
-			<translation>Общо тръби: {тръби}.</translation>
+			<translation>パイプの合計：{パイプ}.</translation>
 		</message>
 		<message>
 			<source>Unable to create fuzzystrmatch extension. Packages must be installed</source>
-			<translation>Не е възможно да се създаде разширение fuzzystrmatch. Пакетите трябва да бъдат инсталирани, консултирайте се с вашия администратор.</translation>
+			<translation>fuzzystrmatch エクステンションを作成できません。パッケージがインストールされている必要があります。</translation>
 		</message>
 		<message>
 			<source>Unable to create Postgis extension. Packages must be installed</source>
-			<translation>Невъзможно е да се създаде разширение на Postgis. Пакетите трябва да бъдат инсталирани, консултирайте се с вашия администратор</translation>
+			<translation>Postgis エクステンションを作成できません。パッケージがインストールされている必要があります。</translation>
 		</message>
 		<message>
 			<source>WARNING: You have updated the status value to EXECUTED (Save Trace). If you click 'Accept' on  </source>
-			<translation>ПРЕДУПРЕЖДЕНИЕ: Актуализирали сте стойността на състоянието на EXECUTED (Запазване на следа). Ако щракнете върху "Приемам" на</translation>
+			<translation>警告： ステータス値を EXECUTED（トレースを保存）に更新しました。もし</translation>
 		</message>
 		<message>
 			<source>WARNING: You have updated the status value to EXECUTED (Set OPERATIVE and Save Trace). If you  </source>
-			<translation>ПРЕДУПРЕЖДЕНИЕ: Актуализирали сте стойността на състоянието на EXECUTED (Задайте OPERATIVE и запазете проследяването). Ако сте</translation>
+			<translation>警告： ステータス値を EXECUTED に更新しました（Set OPERATIVE and Save Trace）。もし</translation>
 		</message>
 		<message>
 			<source>Widget expl_id not found</source>
-			<translation>Уиджет expl_id не е намерен</translation>
+			<translation>ウィジェットのexpl_idが見つからない</translation>
 		</message>
 		<message>
 			<source>You don't have permissions to administrate project schemas on this connection</source>
-			<translation>Нямате права за администриране на схемите на проекта за тази връзка</translation>
+			<translation>この接続には、プロジェクト・スキーマを管理する権限がありません。</translation>
 		</message>
 		<message>
 			<source>You have to fill in 'date'</source>
-			<translation>Трябва да попълните полетата "време" и "стойност"!</translation>
+			<translation>時間」と「値」のフィールドを埋める必要がある！</translation>
 		</message>
 		<message>
 			<source>You have to fill in 'time' and 'value' fields!</source>
-			<translation>Трябва да попълните полетата "време" и "стойност"!</translation>
+			<translation>時間」と「値」のフィールドを埋める必要がある！</translation>
 		</message>
 		<message>
 			<source>You have to select at least one feature!</source>
-			<translation>Трябва да изберете поне една функция!</translation>
+			<translation>少なくとも1つの機能を選択しなければならない！</translation>
 		</message>
 		<message>
 			<source>You have to set this parameter</source>
-			<translation>Трябва да зададете този параметър.</translation>
+			<translation>このパラメータを設定する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need at least one row of values.</source>
-			<translation>Необходим ви е поне един ред със стойности.</translation>
+			<translation>少なくとも1行の値が必要だ。</translation>
 		</message>
 		<message>
 			<source>You need to enter a customer code</source>
-			<translation>Трябва да въведете код на клиента</translation>
+			<translation>顧客コードを入力する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to enter a feature id</source>
-			<translation>Трябва да въведете идентификатор на функцията</translation>
+			<translation>機能IDを入力する必要があります。</translation>
 		</message>
 		<message>
 			<source>You need to have a ws and ud schema created to create a utils schema</source>
-			<translation>Трябва да имате създадени схеми ws и ud, за да създадете схема utils.</translation>
+			<translation>utilsスキーマを作成するには、wsスキーマとudスキーマを作成する必要がある。</translation>
 		</message>
 		<message>
 			<source>You need to upgrade your version of pg_routing!</source>
-			<translation>Трябва да обновите версията си на pg_routing!</translation>
+			<translation>pg_routingのバージョンをアップグレードする必要があります！</translation>
 		</message>
 		<message>
 			<source>Your composer's path is bad configured. Please</source>
-			<translation>Пътят на вашия композитор е лошо конфигуриран. Моля, променете го и опитайте отново.</translation>
+			<translation>コンポーザーのパスが正しく設定されていません。修正して再度お試しください。</translation>
 		</message>
 		<message>
 			<source>Your composer's path is bad configured. Please, modify it and try again.</source>
-			<translation>Пътят на вашия композитор е лошо конфигуриран. Моля, променете го и опитайте отново.</translation>
+			<translation>コンポーザーのパスが正しく設定されていません。修正して再度お試しください。</translation>
 		</message>
 		<message>
 			<source>Your exploitation selector has been updated</source>
-			<translation>Селекторът ви за експлоатация е актуализиран</translation>
+			<translation>エクスプロイト・セレクターが更新されました</translation>
 		</message>
 		<message>
 			<source>Zoom unavailable. Doesn't exist the geometry for the street</source>
-			<translation>Увеличението не е налично. Не съществува геометрия за улицата</translation>
+			<translation>ズームできません。通りのジオメトリが存在しない</translation>
 		</message>
 		<message>
 			<source>Once you have configured all the necessary catalogs, you can click on the 'Accept' button to start the import process.</source>
@@ -6683,7 +6683,7 @@
 		</message>
 		<message>
 			<source>lbl_enabled</source>
-			<translation>Активирано:</translation>
+			<translation>有効：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enabled</source>
@@ -6699,7 +6699,7 @@
 		</message>
 		<message>
 			<source>dlg_main_addfields</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_addfields</source>
@@ -6707,7 +6707,7 @@
 		</message>
 		<message>
 			<source>tab_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_update</source>
@@ -6731,7 +6731,7 @@
 		</message>
 		<message>
 			<source>lbl_query_filter</source>
-			<translation>Филтър за текст на заявката:</translation>
+			<translation>クエリ・テキスト・フィルタ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_query_filter</source>
@@ -6755,7 +6755,7 @@
 		</message>
 		<message>
 			<source>lbl_query_text</source>
-			<translation>Текст на заявката:</translation>
+			<translation>クエリーテキスト</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_query_text</source>
@@ -6771,7 +6771,7 @@
 		</message>
 		<message>
 			<source>lbl_parent</source>
-			<translation>Родител:</translation>
+			<translation>親だ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parent</source>
@@ -6779,7 +6779,7 @@
 		</message>
 		<message>
 			<source>lbl_null_value</source>
-			<translation>Нулева стойност:</translation>
+			<translation>ヌル値：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_null_value</source>
@@ -6795,15 +6795,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_open</source>
-			<translation>Отвори</translation>
+			<translation>オープン</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -6811,7 +6811,7 @@
 		</message>
 		<message>
 			<source>lbl_auto_update</source>
-			<translation>Автоматично актуализиране:</translation>
+			<translation>自動更新：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_auto_update</source>
@@ -6819,7 +6819,7 @@
 		</message>
 		<message>
 			<source>lbl_column_id</source>
-			<translation>Име на колоната:</translation>
+			<translation>カラム名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_column_id</source>
@@ -6827,7 +6827,7 @@
 		</message>
 		<message>
 			<source>lbl_form_type</source>
-			<translation>Вид на формуляра:</translation>
+			<translation>フォームタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_form_type</source>
@@ -6835,7 +6835,7 @@
 		</message>
 		<message>
 			<source>lbl_widget_type</source>
-			<translation>Тип на джаджата:</translation>
+			<translation>ウィジェットタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widget_type</source>
@@ -6843,7 +6843,7 @@
 		</message>
 		<message>
 			<source>lbl_field_length</source>
-			<translation>Дължина на полето:</translation>
+			<translation>フィールドの長さ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_field_length</source>
@@ -6851,7 +6851,7 @@
 		</message>
 		<message>
 			<source>lbl_parent_id</source>
-			<translation>Идентификатор на родител:</translation>
+			<translation>親のID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parent_id</source>
@@ -6859,7 +6859,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -6875,7 +6875,7 @@
 		</message>
 		<message>
 			<source>lbl_label</source>
-			<translation>Етикет:</translation>
+			<translation>ラベル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_label</source>
@@ -6899,7 +6899,7 @@
 		</message>
 		<message>
 			<source>lbl_placeholder</source>
-			<translation>Заместник:</translation>
+			<translation>プレースホルダー：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_placeholder</source>
@@ -6907,11 +6907,11 @@
 		</message>
 		<message>
 			<source>lbl_widgetcontrols</source>
-			<translation>Контроли на джаджите:</translation>
+			<translation>ウィジェットコントロール：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widgetcontrols</source>
-			<translation>Примерни конфигурационни ключове {"widgetdim": 150, "setMultiline":true, "vdefault": "01-01-2014", "filterSign": ">}</translation>
+			<translation>設定キーの例{"widgetdim"：150, "setMultiline":true, "vdefault"："01-01-2014", "filterSign"：">}</translation>
 		</message>
 		<message>
 			<source>stylesheet</source>
@@ -6931,7 +6931,7 @@
 		</message>
 		<message>
 			<source>lbl_not_update</source>
-			<translation>Не се актуализира:</translation>
+			<translation>更新されていない：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_not_update</source>
@@ -6939,7 +6939,7 @@
 		</message>
 		<message>
 			<source>lbl_field_name</source>
-			<translation>Име на полето:</translation>
+			<translation>フィールド名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_field_name</source>
@@ -6955,7 +6955,7 @@
 		</message>
 		<message>
 			<source>lbl_typeahead</source>
-			<translation>Тип напред:</translation>
+			<translation>タイプアヘッド</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_typeahead</source>
@@ -6963,7 +6963,7 @@
 		</message>
 		<message>
 			<source>lbl_widget_function</source>
-			<translation>Функция на джаджата:</translation>
+			<translation>ウィジェット機能：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widget_function</source>
@@ -6971,7 +6971,7 @@
 		</message>
 		<message>
 			<source>lbl_editable</source>
-			<translation>Може да се редактира:</translation>
+			<translation>編集可能：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_editable</source>
@@ -6979,7 +6979,7 @@
 		</message>
 		<message>
 			<source>tab_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_create</source>
@@ -6987,7 +6987,7 @@
 		</message>
 		<message>
 			<source>tab_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_delete</source>
@@ -6995,7 +6995,7 @@
 		</message>
 		<message>
 			<source>lbl_editability</source>
-			<translation>Възможност за редактиране:</translation>
+			<translation>編集可能性：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_editability</source>
@@ -7003,7 +7003,7 @@
 		</message>
 		<message>
 			<source>lbl_data_type</source>
-			<translation>Тип данни:</translation>
+			<translation>データ型：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_data_type</source>
@@ -7011,7 +7011,7 @@
 		</message>
 		<message>
 			<source>lbl_action_function</source>
-			<translation>Функция за действие:</translation>
+			<translation>アクション機能：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_action_function</source>
@@ -7019,7 +7019,7 @@
 		</message>
 		<message>
 			<source>lbl_num_dec</source>
-			<translation>Брой десетични дроби:</translation>
+			<translation>小数：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_num_dec</source>
@@ -7027,7 +7027,7 @@
 		</message>
 		<message>
 			<source>grb_mandatory</source>
-			<translation>Задължителна конфигурация на полетата за добавяне</translation>
+			<translation>必須アドフィールド設定</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_mandatory</source>
@@ -7035,7 +7035,7 @@
 		</message>
 		<message>
 			<source>lbl_reload_field</source>
-			<translation>Поле за презареждане:</translation>
+			<translation>フィールドをリロードする：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_reload_field</source>
@@ -7043,7 +7043,7 @@
 		</message>
 		<message>
 			<source>lbl_tooltip</source>
-			<translation>Подсказка:</translation>
+			<translation>ツールチップ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_tooltip</source>
@@ -7051,7 +7051,7 @@
 		</message>
 		<message>
 			<source>lbl_stylesheet</source>
-			<translation>Лист на стиловете:</translation>
+			<translation>スタイルシート：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_stylesheet</source>
@@ -7059,7 +7059,7 @@
 		</message>
 		<message>
 			<source>lbl_linkedobject</source>
-			<translation>Linkedobject</translation>
+			<translation>リンクオブジェクト</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_linkedobject</source>
@@ -7067,7 +7067,7 @@
 		</message>
 		<message>
 			<source>grb_additional</source>
-			<translation>Допълнителна конфигурация</translation>
+			<translation>追加構成</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_additional</source>
@@ -7075,7 +7075,7 @@
 		</message>
 		<message>
 			<source>lbl_active</source>
-			<translation>Активен:</translation>
+			<translation>アクティブだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_active</source>
@@ -7091,7 +7091,7 @@
 		</message>
 		<message>
 			<source>lbl_mandatory</source>
-			<translation>Задължително:</translation>
+			<translation>必須：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mandatory</source>
@@ -7272,7 +7272,7 @@
 		</message>
 		<message>
 			<source>lbl_connection_message</source>
-			<translation>Не можа да извлече параметрите на връзката за:</translation>
+			<translation>の接続パラメータを取得できませんでした：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_connection_message</source>
@@ -7280,15 +7280,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_password</source>
-			<translation>Парола:</translation>
+			<translation>パスワード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_password</source>
@@ -7296,7 +7296,7 @@
 		</message>
 		<message>
 			<source>lbl_connec</source>
-			<translation>Връзка:</translation>
+			<translation>コネクションだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_connec</source>
@@ -7312,7 +7312,7 @@
 		</message>
 		<message>
 			<source>dlg_main_credentials</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_credentials</source>
@@ -7320,7 +7320,7 @@
 		</message>
 		<message>
 			<source>lbl_user_name</source>
-			<translation>Потребителско име:</translation>
+			<translation>ユーザー名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_user_name</source>
@@ -7343,7 +7343,7 @@
 		</message>
 		<message>
 			<source>grb_projectschema</source>
-			<translation>Настройки на схемата на проекта</translation>
+			<translation>プロジェクトスキーマ設定</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_projectschema</source>
@@ -7359,15 +7359,15 @@
 		</message>
 		<message>
 			<source>lbl_filter</source>
-			<translation>Филтър SRID</translation>
+			<translation>フィルター SRID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter</source>
-			<translation>Идентификатор на пространствена референция. Позволени са само стойностите, посочени в таблицата по-долу.</translation>
+			<translation>空間参照識別子。以下の表に示す値のみ使用可能。</translation>
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -7375,15 +7375,15 @@
 		</message>
 		<message>
 			<source>lbl_locale</source>
-			<translation>Местни жители:</translation>
+			<translation>地元だ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_locale</source>
-			<translation>Език на схемите</translation>
+			<translation>スキーマ言語</translation>
 		</message>
 		<message>
 			<source>dlg_main_dbproject</source>
-			<translation>Създаване на проект</translation>
+			<translation>プロジェクトの作成</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_dbproject</source>
@@ -7391,7 +7391,7 @@
 		</message>
 		<message>
 			<source>rdb_sample_inv</source>
-			<translation>Пример за инвентар</translation>
+			<translation>在庫の例</translation>
 		</message>
 		<message>
 			<source>tooltip_rdb_sample_inv</source>
@@ -7407,7 +7407,7 @@
 		</message>
 		<message>
 			<source>rdb_inp</source>
-			<translation>Импортиране на данни от INP</translation>
+			<translation>INPデータのインポート</translation>
 		</message>
 		<message>
 			<source>tooltip_rdb_inp</source>
@@ -7415,15 +7415,15 @@
 		</message>
 		<message>
 			<source>lbl_project_name</source>
-			<translation>Име на проекта:</translation>
+			<translation>プロジェクト名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_project_name</source>
-			<translation>Име на нова схема. Името трябва да бъде написано с малки букви, като се използват само буквите от английската азбука и без интервали или тирета.</translation>
+			<translation>新しいスキーマの名前。名前は小文字で、アルファベットのみを使用し、スペースやダッシュは使用しないでください。</translation>
 		</message>
 		<message>
 			<source>lbl_source</source>
-			<translation>Източник на данни:</translation>
+			<translation>データソース</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_source</source>
@@ -7431,7 +7431,7 @@
 		</message>
 		<message>
 			<source>rdb_sample_full</source>
-			<translation>Пълен пример</translation>
+			<translation>完全な例</translation>
 		</message>
 		<message>
 			<source>tooltip_rdb_sample_full</source>
@@ -7439,15 +7439,15 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>rdb_empty</source>
-			<translation>Празни данни</translation>
+			<translation>空のデータ</translation>
 		</message>
 		<message>
 			<source>tooltip_rdb_empty</source>
@@ -7455,15 +7455,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_project_type</source>
-			<translation>Тип на проекта:</translation>
+			<translation>プロジェクトの種類</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_project_type</source>
@@ -7486,7 +7486,7 @@
 		</message>
 		<message>
 			<source>dlg_main_gisproject</source>
-			<translation>Създаване на проект QGIS</translation>
+			<translation>QGISプロジェクトの作成</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_gisproject</source>
@@ -7510,7 +7510,7 @@
 		</message>
 		<message>
 			<source>lbl_role</source>
-			<translation>Вид роля:</translation>
+			<translation>役割のタイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_role</source>
@@ -7518,7 +7518,7 @@
 		</message>
 		<message>
 			<source>lbl_export_user_pass</source>
-			<translation>Експортиране на потребителска парола:</translation>
+			<translation>ユーザーパスワードをエクスポートします：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_export_user_pass</source>
@@ -7526,15 +7526,15 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>lbl_gis_folder</source>
-			<translation>Папка:</translation>
+			<translation>フォルダー</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_gis_folder</source>
@@ -7550,15 +7550,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_gis_file</source>
-			<translation>Име на файл в QGIS:</translation>
+			<translation>QGISファイル名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_gis_file</source>
@@ -7720,7 +7720,7 @@
 		<name>admin_importinp</name>
 		<message>
 			<source>tab_config</source>
-			<translation>Конфигурация</translation>
+			<translation>コンフィグ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_config</source>
@@ -7728,7 +7728,7 @@
 		</message>
 		<message>
 			<source>dlg_main_importinp</source>
-			<translation>Параметри на конфигурацията</translation>
+			<translation>設定パラメータ</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_importinp</source>
@@ -7736,7 +7736,7 @@
 		</message>
 		<message>
 			<source>btn_run</source>
-			<translation>Изпълнявайте</translation>
+			<translation>走る</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_run</source>
@@ -7744,7 +7744,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -7752,7 +7752,7 @@
 		</message>
 		<message>
 			<source>tab_loginfo</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_loginfo</source>
@@ -7822,7 +7822,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Информация за нови актуализации</translation>
+			<translation>新しいアップデートに関する情報</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -7838,7 +7838,7 @@
 		</message>
 		<message>
 			<source>dlg_main_projectinfo</source>
-			<translation>Актуализиране на SQL</translation>
+			<translation>SQLの更新</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_projectinfo</source>
@@ -7854,7 +7854,7 @@
 		</message>
 		<message>
 			<source>btn_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
@@ -7862,11 +7862,11 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>dlg_admin_projectinfo</source>
@@ -7881,15 +7881,15 @@
 		<name>admin_qtdialog</name>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>dlg_main_qtdialog</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_qtdialog</source>
@@ -7897,7 +7897,7 @@
 		</message>
 		<message>
 			<source>lbl_formname</source>
-			<translation>Име на формуляра:</translation>
+			<translation>フォーム名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_formname</source>
@@ -7905,11 +7905,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_path</source>
@@ -7921,7 +7921,7 @@
 		</message>
 		<message>
 			<source>lbl_path</source>
-			<translation>Път към потребителския интерфейс:</translation>
+			<translation>UIパス：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_path</source>
@@ -7936,11 +7936,11 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>statusbar</source>
@@ -7952,7 +7952,7 @@
 		</message>
 		<message>
 			<source>lbl_rename_copy</source>
-			<translation>Моля, задайте ново име на проекта:</translation>
+			<translation>新しいプロジェクト名を設定してください：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rename_copy</source>
@@ -7968,7 +7968,7 @@
 		</message>
 		<message>
 			<source>dlg_readsq_rename</source>
-			<translation>Преименуване на проекта</translation>
+			<translation>プロジェクト名の変更</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_readsq_rename</source>
@@ -7976,18 +7976,18 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 	</context>
 	<context>
 		<name>admin_sysfields</name>
 		<message>
 			<source>dlg_main_sysfields</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_sysfields</source>
@@ -7995,7 +7995,7 @@
 		</message>
 		<message>
 			<source>btn_open</source>
-			<translation>Отвори</translation>
+			<translation>オープン</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -8003,15 +8003,15 @@
 		</message>
 		<message>
 			<source>lbl_widgetcontrols</source>
-			<translation>Контроли на джаджите:</translation>
+			<translation>ウィジェットコントロール：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widgetcontrols</source>
-			<translation>Примерни конфигурационни ключове {"widgetdim": 150, "setMultiline":true, "vdefault": "01-01-2014", "filterSign": ">}</translation>
+			<translation>設定キーの例{"widgetdim"：150, "setMultiline":true, "vdefault"："01-01-2014", "filterSign"：">}</translation>
 		</message>
 		<message>
 			<source>lbl_column_id</source>
-			<translation>Идентификатор на колоната:</translation>
+			<translation>カラムID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_column_id</source>
@@ -8019,7 +8019,7 @@
 		</message>
 		<message>
 			<source>grb_additional_conf</source>
-			<translation>Допълнителна конфигурация</translation>
+			<translation>追加構成</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_additional_conf</source>
@@ -8027,7 +8027,7 @@
 		</message>
 		<message>
 			<source>tab_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_create</source>
@@ -8035,7 +8035,7 @@
 		</message>
 		<message>
 			<source>lbl_editable</source>
-			<translation>Може да се редактира:</translation>
+			<translation>編集可能：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_editable</source>
@@ -8043,7 +8043,7 @@
 		</message>
 		<message>
 			<source>lbl_enabled</source>
-			<translation>Разрешено:</translation>
+			<translation>有効：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enabled</source>
@@ -8051,7 +8051,7 @@
 		</message>
 		<message>
 			<source>lbl_stylesheet</source>
-			<translation>Лист на стиловете:</translation>
+			<translation>スタイルシート：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_stylesheet</source>
@@ -8059,7 +8059,7 @@
 		</message>
 		<message>
 			<source>tab_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_update</source>
@@ -8067,7 +8067,7 @@
 		</message>
 		<message>
 			<source>lbl_form_name</source>
-			<translation>Име на формуляра:</translation>
+			<translation>フォーム名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_form_name</source>
@@ -8075,7 +8075,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -8083,7 +8083,7 @@
 		</message>
 		<message>
 			<source>lbl_hidden</source>
-			<translation>Скрито:</translation>
+			<translation>隠れている：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_hidden</source>
@@ -8091,7 +8091,7 @@
 		</message>
 		<message>
 			<source>lbl_layout_order</source>
-			<translation>Ред на оформление:</translation>
+			<translation>レイアウト順：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_layout_order</source>
@@ -8099,7 +8099,7 @@
 		</message>
 		<message>
 			<source>lbl_label</source>
-			<translation>Етикет:</translation>
+			<translation>ラベル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_label</source>
@@ -8107,7 +8107,7 @@
 		</message>
 		<message>
 			<source>lbl_placeholder</source>
-			<translation>Заместник:</translation>
+			<translation>プレースホルダー：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_placeholder</source>
@@ -8115,7 +8115,7 @@
 		</message>
 		<message>
 			<source>lbl_mandatory</source>
-			<translation>Задължително:</translation>
+			<translation>必須：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mandatory</source>
@@ -8123,7 +8123,7 @@
 		</message>
 		<message>
 			<source>lbl_layout_name</source>
-			<translation>Име на макета:</translation>
+			<translation>レイアウト名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_layout_name</source>
@@ -8131,15 +8131,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_tooltip</source>
-			<translation>Подсказка:</translation>
+			<translation>ツールチップ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_tooltip</source>
@@ -8147,7 +8147,7 @@
 		</message>
 		<message>
 			<source>grb_basic_conf</source>
-			<translation>Основна конфигурация</translation>
+			<translation>基本構成</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_basic_conf</source>
@@ -8155,7 +8155,7 @@
 		</message>
 		<message>
 			<source>lbl_editability</source>
-			<translation>Възможност за редактиране:</translation>
+			<translation>編集可能性：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_editability</source>
@@ -8170,7 +8170,7 @@
 		</message>
 		<message>
 			<source>lbl_database</source>
-			<translation>База данни:</translation>
+			<translation>データベース：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_database</source>
@@ -8178,7 +8178,7 @@
 		</message>
 		<message>
 			<source>grb_translate_files</source>
-			<translation>Превод на файлове</translation>
+			<translation>ファイルを翻訳する</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_translate_files</source>
@@ -8186,7 +8186,7 @@
 		</message>
 		<message>
 			<source>grb_info_connection</source>
-			<translation>Информация за връзката</translation>
+			<translation>接続情報</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_info_connection</source>
@@ -8194,7 +8194,7 @@
 		</message>
 		<message>
 			<source>chk_py_msg</source>
-			<translation>Превод на съобщенията на UI и py</translation>
+			<translation>uiとpyのメッセージを翻訳する</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_py_msg</source>
@@ -8218,7 +8218,7 @@
 		</message>
 		<message>
 			<source>lbl_scode</source>
-			<translation>Изходен код:</translation>
+			<translation>ソースコード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_scode</source>
@@ -8226,7 +8226,7 @@
 		</message>
 		<message>
 			<source>lbl_port</source>
-			<translation>Пристанище:</translation>
+			<translation>ポート</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_port</source>
@@ -8234,7 +8234,7 @@
 		</message>
 		<message>
 			<source>lbl_language</source>
-			<translation>Език:</translation>
+			<translation>言語：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_language</source>
@@ -8250,7 +8250,7 @@
 		</message>
 		<message>
 			<source>chk_db_msg</source>
-			<translation>Превод на съобщенията на db</translation>
+			<translation>dbメッセージを翻訳する</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_db_msg</source>
@@ -8274,7 +8274,7 @@
 		</message>
 		<message>
 			<source>btn_connection</source>
-			<translation>Проверка на връзката</translation>
+			<translation>テスト接続</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_connection</source>
@@ -8290,7 +8290,7 @@
 		</message>
 		<message>
 			<source>lbl_pass</source>
-			<translation>Парола:</translation>
+			<translation>パスワード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_pass</source>
@@ -8298,7 +8298,7 @@
 		</message>
 		<message>
 			<source>lbl_user</source>
-			<translation>Потребител:</translation>
+			<translation>ユーザー</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_user</source>
@@ -8322,7 +8322,7 @@
 		</message>
 		<message>
 			<source>lbl_host</source>
-			<translation>Гост:</translation>
+			<translation>ゲストだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_host</source>
@@ -8341,7 +8341,7 @@
 		<name>admin_ui</name>
 		<message>
 			<source>tab_general</source>
-			<translation>Обща информация</translation>
+			<translation>一般</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_general</source>
@@ -8349,31 +8349,31 @@
 		</message>
 		<message>
 			<source>grb_load_cf</source>
-			<translation>Зареждане на потребителски файл</translation>
+			<translation>カスタムファイルのロード</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_load_cf</source>
-			<translation>Изберете папка с .sql файлове, които искате да изпълните върху избрана схема</translation>
+			<translation>選択したスキーマで実行したい.sqlファイルのあるフォルダを選択する。</translation>
 		</message>
 		<message>
 			<source>grb_visit</source>
-			<translation>Посетете</translation>
+			<translation>訪問</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_visit</source>
-			<translation>Създаване, конфигуриране или премахване на дефиниция за посещение, свързана с избран тип функция или за всички типове функции, дефинирани в проекта</translation>
+			<translation>選択したフィーチャータイプまたはプロジェクトで定義されたすべてのフィーチャータイプに関連する訪問定義の作成、設定、削除</translation>
 		</message>
 		<message>
 			<source>lbl_project_type</source>
-			<translation>Вид на проекта:</translation>
+			<translation>プロジェクトの種類</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_project_type</source>
-			<translation>Вид на проекта giswater</translation>
+			<translation>ジスウォーター・プロジェクトの種類</translation>
 		</message>
 		<message>
 			<source>btn_export_ui</source>
-			<translation>Експорт</translation>
+			<translation>輸出</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_export_ui</source>
@@ -8381,7 +8381,7 @@
 		</message>
 		<message>
 			<source>grb_project_scin</source>
-			<translation>Информация за схемата на проекта</translation>
+			<translation>プロジェクト・スキーマ情報</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_project_scin</source>
@@ -8389,7 +8389,7 @@
 		</message>
 		<message>
 			<source>btn_gis_create</source>
-			<translation>Създаване на файл на проекта QGIS</translation>
+			<translation>QGISプロジェクトファイルの作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_gis_create</source>
@@ -8397,7 +8397,7 @@
 		</message>
 		<message>
 			<source>lbl_use_constrains</source>
-			<translation>Използвайте ограничения:</translation>
+			<translation>制約を使う：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_use_constrains</source>
@@ -8405,7 +8405,7 @@
 		</message>
 		<message>
 			<source>btn_create_view</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create_view</source>
@@ -8413,7 +8413,7 @@
 		</message>
 		<message>
 			<source>grb_manage_ui</source>
-			<translation>Управление на потребителския интерфейс</translation>
+			<translation>UIの管理</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_manage_ui</source>
@@ -8421,15 +8421,15 @@
 		</message>
 		<message>
 			<source>lbl_connection</source>
-			<translation>Име на връзката:</translation>
+			<translation>接続名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_connection</source>
-			<translation>Име на връзка с база данни, дефинирана в QGIS</translation>
+			<translation>QGISで定義されているデータベース接続名</translation>
 		</message>
 		<message>
 			<source>tab_advanced</source>
-			<translation>Разширен</translation>
+			<translation>上級</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_advanced</source>
@@ -8437,7 +8437,7 @@
 		</message>
 		<message>
 			<source>btn_update_field</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_field</source>
@@ -8445,7 +8445,7 @@
 		</message>
 		<message>
 			<source>tab_fields_manager</source>
-			<translation>Мениджър на полета</translation>
+			<translation>フィールドマネージャー</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_fields_manager</source>
@@ -8453,7 +8453,7 @@
 		</message>
 		<message>
 			<source>tab_api_manager</source>
-			<translation>Ръководител на пожарната</translation>
+			<translation>ファイヤーマネージャー</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_api_manager</source>
@@ -8461,7 +8461,7 @@
 		</message>
 		<message>
 			<source>tab_schema_manager</source>
-			<translation>Мениджър на схеми</translation>
+			<translation>スキーママネージャー</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_schema_manager</source>
@@ -8469,15 +8469,15 @@
 		</message>
 		<message>
 			<source>grb_manage_sys_fields</source>
-			<translation>Управление на системните полета</translation>
+			<translation>システムフィールドの管理</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_manage_sys_fields</source>
-			<translation>Конфигуриране на свойствата на системните полета за избран тип функция, дефинирани в config_form_fields</translation>
+			<translation>config_form_fields で定義された、選択された機能タイプ用のシステムフィールドプロパティを設定します。</translation>
 		</message>
 		<message>
 			<source>btn_create_qgis_template</source>
-			<translation>Шаблони на QGIS</translation>
+			<translation>QGISテンプレート</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create_qgis_template</source>
@@ -8485,7 +8485,7 @@
 		</message>
 		<message>
 			<source>grb_conection</source>
-			<translation>Връзка</translation>
+			<translation>接続</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_conection</source>
@@ -8493,15 +8493,15 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на избрана схема на база данни</translation>
+			<translation>選択したデータベーススキーマを削除する</translation>
 		</message>
 		<message>
 			<source>lbl_reload_func_sch</source>
-			<translation>Функции за презареждане:</translation>
+			<translation>リロード機能：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_reload_func_sch</source>
@@ -8517,23 +8517,23 @@
 		</message>
 		<message>
 			<source>lbl_name</source>
-			<translation>Име:</translation>
+			<translation>名前</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_name</source>
-			<translation>Име на схемата на базата данни</translation>
+			<translation>データベーススキーマ名</translation>
 		</message>
 		<message>
 			<source>btn_info</source>
-			<translation>Актуализиране на схемата на проекта</translation>
+			<translation>プロジェクト・スキーマの更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_info</source>
-			<translation>Актуализиране на версията на избрана схема на база данни</translation>
+			<translation>選択したデータベーススキーマのバージョンを更新する</translation>
 		</message>
 		<message>
 			<source>btn_custom_load_file</source>
-			<translation>Зареждане на файл</translation>
+			<translation>ファイルを読み込む</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_custom_load_file</source>
@@ -8541,15 +8541,15 @@
 		</message>
 		<message>
 			<source>btn_schema_rename</source>
-			<translation>Преименуване на</translation>
+			<translation>名前変更</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_schema_rename</source>
-			<translation>Преименуване на избрана схема на база данни</translation>
+			<translation>選択したデータベーススキーマの名前を変更する</translation>
 		</message>
 		<message>
 			<source>btn_schema_file_to_db</source>
-			<translation>Файл към БД</translation>
+			<translation>ファイルからDBへ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_schema_file_to_db</source>
@@ -8557,7 +8557,7 @@
 		</message>
 		<message>
 			<source>btn_import_ui</source>
-			<translation>Внос</translation>
+			<translation>輸入</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_import_ui</source>
@@ -8565,7 +8565,7 @@
 		</message>
 		<message>
 			<source>grb_files_generator</source>
-			<translation>Генератор на файлове на плъгини</translation>
+			<translation>プラグインファイルジェネレーター</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_files_generator</source>
@@ -8573,7 +8573,7 @@
 		</message>
 		<message>
 			<source>lbl_update_all_sch</source>
-			<translation>Актуализирайте всички:</translation>
+			<translation>すべて更新：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_update_all_sch</source>
@@ -8581,7 +8581,7 @@
 		</message>
 		<message>
 			<source>btn_update_schema</source>
-			<translation>Изпълнение на</translation>
+			<translation>実行する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_schema</source>
@@ -8589,7 +8589,7 @@
 		</message>
 		<message>
 			<source>lbl_ui_path</source>
-			<translation>Път към потребителския интерфейс:</translation>
+			<translation>UIパス：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ui_path</source>
@@ -8597,7 +8597,7 @@
 		</message>
 		<message>
 			<source>btn_update_sys_field</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_sys_field</source>
@@ -8605,7 +8605,7 @@
 		</message>
 		<message>
 			<source>btn_visit_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_visit_delete</source>
@@ -8613,7 +8613,7 @@
 		</message>
 		<message>
 			<source>btn_visit_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_visit_update</source>
@@ -8621,7 +8621,7 @@
 		</message>
 		<message>
 			<source>dlg_main</source>
-			<translation>Giswater</translation>
+			<translation>ジスウォーター</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main</source>
@@ -8629,7 +8629,7 @@
 		</message>
 		<message>
 			<source>lbl_add_fields_feature</source>
-			<translation>Име на функцията:</translation>
+			<translation>特集名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_add_fields_feature</source>
@@ -8637,7 +8637,7 @@
 		</message>
 		<message>
 			<source>lbl_ui_form_name</source>
-			<translation>Име на формуляра:</translation>
+			<translation>フォーム名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ui_form_name</source>
@@ -8645,7 +8645,7 @@
 		</message>
 		<message>
 			<source>lbl_system_feature</source>
-			<translation>Име на функцията:</translation>
+			<translation>特集名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_system_feature</source>
@@ -8653,15 +8653,15 @@
 		</message>
 		<message>
 			<source>grb_manage_childviews</source>
-			<translation>Управление на подчинени изгледи</translation>
+			<translation>子ビューの管理</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_manage_childviews</source>
-			<translation>Пресъздаване на подчинени изгледи за избран тип функция или за всички типове функции, дефинирани в проекта</translation>
+			<translation>選択したフィーチャタイプ、またはプロジェクトで定義されたすべてのフィーチャタイプの子ビューを再作成します。</translation>
 		</message>
 		<message>
 			<source>btn_create_field</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create_field</source>
@@ -8669,11 +8669,11 @@
 		</message>
 		<message>
 			<source>btn_copy</source>
-			<translation>Копие</translation>
+			<translation>コピー</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_copy</source>
-			<translation>Копиране на избрана схема на база данни</translation>
+			<translation>選択したデータベーススキーマをコピーする</translation>
 		</message>
 		<message>
 			<source>btn_path</source>
@@ -8685,15 +8685,15 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>btn_constrains</source>
-			<translation>Ограничения</translation>
+			<translation>制約</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_constrains</source>
@@ -8701,7 +8701,7 @@
 		</message>
 		<message>
 			<source>grb_schema_manager</source>
-			<translation>Управление на схемите</translation>
+			<translation>スキーマ管理</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_schema_manager</source>
@@ -8709,7 +8709,7 @@
 		</message>
 		<message>
 			<source>lbl_child_feature</source>
-			<translation>Име на функцията:</translation>
+			<translation>特集名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_child_feature</source>
@@ -8717,7 +8717,7 @@
 		</message>
 		<message>
 			<source>grb_schema_reload</source>
-			<translation>Презареждане</translation>
+			<translation>リロード</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_schema_reload</source>
@@ -8725,7 +8725,7 @@
 		</message>
 		<message>
 			<source>grb_schema_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_schema_update</source>
@@ -8733,15 +8733,15 @@
 		</message>
 		<message>
 			<source>grb_manage_addfields</source>
-			<translation>Управление на полетата за добавяне</translation>
+			<translation>追加フィールドの管理</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_manage_addfields</source>
-			<translation>Създаване, конфигуриране или премахване на допълнително поле, свързано с избран тип функция или за всички типове функции, дефинирани в проекта</translation>
+			<translation>選択したフィーチャタイプ、またはプロジェクトで定義されたすべてのフィーチャタイプに関連する追加フィールドを作成、設定、または削除します。</translation>
 		</message>
 		<message>
 			<source>btn_schema_create</source>
-			<translation>Създаване на схема на проекта DB</translation>
+			<translation>DBプロジェクト・スキーマの作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_schema_create</source>
@@ -8749,7 +8749,7 @@
 		</message>
 		<message>
 			<source>btn_visit_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_visit_create</source>
@@ -8757,7 +8757,7 @@
 		</message>
 		<message>
 			<source>btn_delete_field</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_field</source>
@@ -8765,7 +8765,7 @@
 		</message>
 		<message>
 			<source>btn_translation</source>
-			<translation>Файлове за превод</translation>
+			<translation>翻訳ファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_translation</source>
@@ -8899,7 +8899,7 @@
 		</message>
 		<message>
 			<source>btn_param_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_param_delete</source>
@@ -8907,7 +8907,7 @@
 		</message>
 		<message>
 			<source>lbl_feat_type</source>
-			<translation>Тип на функцията:</translation>
+			<translation>フィーチャー・タイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feat_type</source>
@@ -8915,7 +8915,7 @@
 		</message>
 		<message>
 			<source>btn_param_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_param_create</source>
@@ -8931,7 +8931,7 @@
 		</message>
 		<message>
 			<source>lbl_multi_event</source>
-			<translation>Множество събития:</translation>
+			<translation>マルチイベント：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_multi_event</source>
@@ -8939,7 +8939,7 @@
 		</message>
 		<message>
 			<source>dlg_main_visitclass</source>
-			<translation>Управление на класа за посещения</translation>
+			<translation>訪問クラスの管理</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_visitclass</source>
@@ -8947,7 +8947,7 @@
 		</message>
 		<message>
 			<source>lbl_class_id</source>
-			<translation>Идентификатор на класа:</translation>
+			<translation>クラスID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_class_id</source>
@@ -8955,7 +8955,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -8971,7 +8971,7 @@
 		</message>
 		<message>
 			<source>lbl_viewname</source>
-			<translation>Име на изгледа:</translation>
+			<translation>名前を見る</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_viewname</source>
@@ -8979,7 +8979,7 @@
 		</message>
 		<message>
 			<source>lbl_active</source>
-			<translation>Активен:</translation>
+			<translation>アクティブだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_active</source>
@@ -8995,7 +8995,7 @@
 		</message>
 		<message>
 			<source>btn_param_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_param_update</source>
@@ -9003,7 +9003,7 @@
 		</message>
 		<message>
 			<source>lbl_class_name</source>
-			<translation>Име на класа:</translation>
+			<translation>クラス名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_class_name</source>
@@ -9011,7 +9011,7 @@
 		</message>
 		<message>
 			<source>lbl_multi_feat</source>
-			<translation>Многофункционална функция:</translation>
+			<translation>多機能：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_multi_feat</source>
@@ -9019,7 +9019,7 @@
 		</message>
 		<message>
 			<source>btn_class_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_class_cancel</source>
@@ -9027,7 +9027,7 @@
 		</message>
 		<message>
 			<source>btn_class_ok</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_class_ok</source>
@@ -9035,7 +9035,7 @@
 		</message>
 		<message>
 			<source>lbl_param_opt</source>
-			<translation>Опции за параметри:</translation>
+			<translation>パラメータのオプション：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_param_opt</source>
@@ -9043,7 +9043,7 @@
 		</message>
 		<message>
 			<source>btn_ok</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_ok</source>
@@ -9051,7 +9051,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описване:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -9059,7 +9059,7 @@
 		</message>
 		<message>
 			<source>lbl_visit_type</source>
-			<translation>Вид на посещението:</translation>
+			<translation>訪問タイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_type</source>
@@ -9074,7 +9074,7 @@
 		</message>
 		<message>
 			<source>dlg_main_visitparam</source>
-			<translation>Управление на параметъра на посещението</translation>
+			<translation>訪問パラメータの管理</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_visitparam</source>
@@ -9082,7 +9082,7 @@
 		</message>
 		<message>
 			<source>lbl_code</source>
-			<translation>Код:</translation>
+			<translation>コード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_code</source>
@@ -9090,7 +9090,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_type</source>
-			<translation>Тип на параметъра:</translation>
+			<translation>パラメータタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_type</source>
@@ -9106,7 +9106,7 @@
 		</message>
 		<message>
 			<source>lbl_short_descript</source>
-			<translation>Кратко описание:</translation>
+			<translation>短い記述：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_short_descript</source>
@@ -9114,7 +9114,7 @@
 		</message>
 		<message>
 			<source>lbl_enabled</source>
-			<translation>Разрешено:</translation>
+			<translation>有効：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enabled</source>
@@ -9122,7 +9122,7 @@
 		</message>
 		<message>
 			<source>lbl_query_text</source>
-			<translation>Текст на заявката:</translation>
+			<translation>クエリーテキスト</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_query_text</source>
@@ -9130,7 +9130,7 @@
 		</message>
 		<message>
 			<source>lbl_widgettype</source>
-			<translation>Тип на джаджата:</translation>
+			<translation>ウィジェットタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widgettype</source>
@@ -9138,7 +9138,7 @@
 		</message>
 		<message>
 			<source>lbl_mandatory</source>
-			<translation>Задължително:</translation>
+			<translation>必須：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mandatory</source>
@@ -9146,7 +9146,7 @@
 		</message>
 		<message>
 			<source>lbl_editable</source>
-			<translation>Може да се редактира:</translation>
+			<translation>編集可能：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_editable</source>
@@ -9154,7 +9154,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описване:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -9162,7 +9162,7 @@
 		</message>
 		<message>
 			<source>lbl_form_type</source>
-			<translation>Вид на формуляра:</translation>
+			<translation>フォームタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_form_type</source>
@@ -9170,7 +9170,7 @@
 		</message>
 		<message>
 			<source>grb_params</source>
-			<translation>Параметри</translation>
+			<translation>パラメータ</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_params</source>
@@ -9178,7 +9178,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_name</source>
-			<translation>Име на параметъра:</translation>
+			<translation>パラメータ名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_name</source>
@@ -9186,7 +9186,7 @@
 		</message>
 		<message>
 			<source>lbl_default_value</source>
-			<translation>Стойност по подразбиране:</translation>
+			<translation>デフォルト値：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_default_value</source>
@@ -9194,7 +9194,7 @@
 		</message>
 		<message>
 			<source>lbl_data_type</source>
-			<translation>Тип данни:</translation>
+			<translation>データ型：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_data_type</source>
@@ -9202,7 +9202,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -9210,7 +9210,7 @@
 		</message>
 		<message>
 			<source>btn_ok</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_ok</source>
@@ -9221,11 +9221,11 @@
 		<name>arc_fusion</name>
 		<message>
 			<source>title</source>
-			<translation>Сливане на дъги</translation>
+			<translation>アーク融合</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -9233,7 +9233,7 @@
 		</message>
 		<message>
 			<source>lbl_enddate</source>
-			<translation>Крайна дата:</translation>
+			<translation>終了日</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enddate</source>
@@ -9241,7 +9241,7 @@
 		</message>
 		<message>
 			<source>lbl_nodeaction</source>
-			<translation>Край на идентификатора Workcat:</translation>
+			<translation>ワークキャットIDエンド：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_nodeaction</source>
@@ -9249,15 +9249,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>dlg_arc_fusion</source>
-			<translation>Сливане на дъги</translation>
+			<translation>アーク融合</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_arc_fusion</source>
@@ -9265,7 +9265,7 @@
 		</message>
 		<message>
 			<source>lbl_workcat_id_end</source>
-			<translation>Край на идентификатора Workcat:</translation>
+			<translation>ワークキャットIDエンド：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id_end</source>
@@ -9281,7 +9281,7 @@
 		</message>
 		<message>
 			<source>tab_config</source>
-			<translation>Сливане на дъги</translation>
+			<translation>アーク融合</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_config</source>
@@ -9289,7 +9289,7 @@
 		</message>
 		<message>
 			<source>tab_loginfo</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_loginfo</source>
@@ -9297,7 +9297,7 @@
 		</message>
 		<message>
 			<source>lbl_statetype</source>
-			<translation>Край на идентификатора Workcat:</translation>
+			<translation>ワークキャットIDエンド：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_statetype</source>
@@ -9312,11 +9312,11 @@
 		</message>
 		<message>
 			<source>lbl_max_distance</source>
-			<translation>Максимално разстояние (m):</translation>
+			<translation>最大距離（m）：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_max_distance</source>
-			<translation>Максимално разстояние в метри между началната тръба и другите тръби, включени в клъстера.</translation>
+			<translation>最初のパイプとクラスターに含まれる他のパイプとの間の最大距離（メートル単位）。</translation>
 		</message>
 		<message>
 			<source>lbl_max_distance</source>
@@ -9336,7 +9336,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -9344,11 +9344,11 @@
 		</message>
 		<message>
 			<source>lbl_buffer</source>
-			<translation>Буферно разстояние (m):</translation>
+			<translation>緩衝距離（m）：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_buffer</source>
-			<translation>Разстояние от теч, на което тръбите се избират, за да им се присвои този теч.</translation>
+			<translation>その漏れが割り当てられるパイプが選択される漏水からの距離。</translation>
 		</message>
 		<message>
 			<source>dlg_assignation</source>
@@ -9376,11 +9376,11 @@
 		</message>
 		<message>
 			<source>chk_all_leaks</source>
-			<translation>Използвайте всички течове</translation>
+			<translation>すべてのリークを使用する</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_all_leaks</source>
-			<translation>Изчислява течовете на километър за година, като използва всички налични данни, независимо от параметъра "години за изчисляване".</translation>
+			<translation>計算年数」パラメータに関係なく、利用可能なすべてのデータを使用して、年間1キロメートルあたりの漏れを計算する。</translation>
 		</message>
 		<message>
 			<source>lbl_builtdate_range</source>
@@ -9392,7 +9392,7 @@
 		</message>
 		<message>
 			<source>dlg_assignation</source>
-			<translation>Присвояване на течове</translation>
+			<translation>リーク割り当て</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_assignation</source>
@@ -9400,11 +9400,11 @@
 		</message>
 		<message>
 			<source>lbl_builtdate</source>
-			<translation>Филтриране по дата на построяване:</translation>
+			<translation>製造年月日で絞り込む：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate</source>
-			<translation>Използва само тръби, които съвпадат с диапазона на датата на построяване на първоначалната тръба.</translation>
+			<translation>最初のパイプのbuiltdateの範囲と一致するパイプのみを使用する。</translation>
 		</message>
 		<message>
 			<source>tab_config</source>
@@ -9424,7 +9424,7 @@
 		</message>
 		<message>
 			<source>lbl_pipes</source>
-			<translation>Тръби</translation>
+			<translation>パイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_pipes</source>
@@ -9448,11 +9448,11 @@
 		</message>
 		<message>
 			<source>lbl_diameter</source>
-			<translation>Филтриране по диаметър:</translation>
+			<translation>直径で絞り込む：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_diameter</source>
-			<translation>Използва само тръби, които отговарят на диаметъра на първоначалната тръба.</translation>
+			<translation>最初のパイプの直径範囲と一致するパイプのみを使用する。</translation>
 		</message>
 		<message>
 			<source>chk_all_leaks</source>
@@ -9480,11 +9480,11 @@
 		</message>
 		<message>
 			<source>lbl_years</source>
-			<translation>Години за изчисляване:</translation>
+			<translation>計算年数：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_years</source>
-			<translation>Брой години на данните за изтичане на информация, които да се вземат предвид, въз основа на актуалността.</translation>
+			<translation>漏えいデータの年数。</translation>
 		</message>
 		<message>
 			<source>lbl_cluster_length</source>
@@ -9496,15 +9496,15 @@
 		</message>
 		<message>
 			<source>lbl_material</source>
-			<translation>Филтриране по материал:</translation>
+			<translation>素材で絞り込む：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_material</source>
-			<translation>Използва само тръби от същия материал като първоначалния.</translation>
+			<translation>最初のパイプと同じ材質のパイプのみを使用する。</translation>
 		</message>
 		<message>
 			<source>tab_config</source>
-			<translation>Конфигурация</translation>
+			<translation>コンフィグ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_config</source>
@@ -9512,11 +9512,11 @@
 		</message>
 		<message>
 			<source>lbl_diameter_range</source>
-			<translation>Диапазон на диаметъра:</translation>
+			<translation>直径の範囲：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_diameter_range</source>
-			<translation>Диапазонът на диаметъра се основава на факторите на първоначалната тръба.</translation>
+			<translation>初期パイプの要因に基づく直径範囲。</translation>
 		</message>
 		<message>
 			<source>lbl_material</source>
@@ -9528,7 +9528,7 @@
 		</message>
 		<message>
 			<source>lbl_leaks</source>
-			<translation>Течове</translation>
+			<translation>雨漏り</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_leaks</source>
@@ -9536,19 +9536,19 @@
 		</message>
 		<message>
 			<source>lbl_cluster_length</source>
-			<translation>Дължина на клъстера (m):</translation>
+			<translation>クラスターの長さ（m）：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_cluster_length</source>
-			<translation>Максимална сума на дължините на тръбите в рамките на клъстера, в метри.</translation>
+			<translation>クラスター内のパイプの長さの最大合計（メートル単位）。</translation>
 		</message>
 		<message>
 			<source>lbl_builtdate_range</source>
-			<translation>Обхват на датата на построяване (години):</translation>
+			<translation>建設された日付の範囲（年）：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate_range</source>
-			<translation>Диапазон от дати на построяване, в години преди и след първоначалната тръба.</translation>
+			<translation>最初のパイプの前後何年かを示す。</translation>
 		</message>
 	</context>
 	<context>
@@ -9617,11 +9617,11 @@
 		<name>auxcircle</name>
 		<message>
 			<source>title</source>
-			<translation>CAD рисува кръг</translation>
+			<translation>CADドローサークル</translation>
 		</message>
 		<message>
 			<source>dlg_auxcircle</source>
-			<translation>CAD рисува кръг</translation>
+			<translation>CADドローサークル</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_auxcircle</source>
@@ -9629,7 +9629,7 @@
 		</message>
 		<message>
 			<source>lbl_ins_radius</source>
-			<translation>Радиус на вмъкване:</translation>
+			<translation>挿入半径：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ins_radius</source>
@@ -9637,15 +9637,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -9661,7 +9661,7 @@
 		</message>
 		<message>
 			<source>chk_delete_prev</source>
-			<translation>Изтриване на предишни кръгове</translation>
+			<translation>以前のサークルを削除する</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_delete_prev</source>
@@ -9672,19 +9672,19 @@
 		<name>auxpoint</name>
 		<message>
 			<source>title</source>
-			<translation>CAD Добавяне на точка</translation>
+			<translation>CAD 追加ポイント</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>chk_delete_prev</source>
-			<translation>Изтриване на предишни точки</translation>
+			<translation>以前のポイントを削除する</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_delete_prev</source>
@@ -9692,7 +9692,7 @@
 		</message>
 		<message>
 			<source>dlg_auxpoint</source>
-			<translation>CAD Добавяне на точка</translation>
+			<translation>CAD 追加ポイント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_auxpoint</source>
@@ -9700,7 +9700,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -9716,7 +9716,7 @@
 		</message>
 		<message>
 			<source>lbl_distx</source>
-			<translation>Dist X:</translation>
+			<translation>ディストX</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_distx</source>
@@ -9724,7 +9724,7 @@
 		</message>
 		<message>
 			<source>rb_left</source>
-			<translation>Начална точка</translation>
+			<translation>開始点</translation>
 		</message>
 		<message>
 			<source>tooltip_rb_left</source>
@@ -9732,7 +9732,7 @@
 		</message>
 		<message>
 			<source>rb_right</source>
-			<translation>Крайна точка</translation>
+			<translation>終点</translation>
 		</message>
 		<message>
 			<source>tooltip_rb_right</source>
@@ -9740,7 +9740,7 @@
 		</message>
 		<message>
 			<source>grb_from</source>
-			<translation>Изтриване на предишни точки</translation>
+			<translation>以前のポイントを削除する</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_from</source>
@@ -9756,7 +9756,7 @@
 		</message>
 		<message>
 			<source>lbl_disty</source>
-			<translation>Dist Y:</translation>
+			<translation>ディストY：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_disty</source>
@@ -9987,11 +9987,11 @@
 		<name>comp_x_pages</name>
 		<message>
 			<source>title</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>dlg_comp_x_pages</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_comp_x_pages</source>
@@ -10316,7 +10316,7 @@
 		</message>
 		<message>
 			<source>tooltip_feature_id</source>
-			<translation>Идентификатор на категория</translation>
+			<translation>カテゴリーID</translation>
 		</message>
 		<message>
 			<source>idval</source>
@@ -10324,11 +10324,11 @@
 		</message>
 		<message>
 			<source>tooltip_idval</source>
-			<translation>Наименование на категорията</translation>
+			<translation>カテゴリー名</translation>
 		</message>
 		<message>
 			<source>lbl_cat_id</source>
-			<translation>ID на категорията:</translation>
+			<translation>カテゴリーID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_cat_id</source>
@@ -10336,7 +10336,7 @@
 		</message>
 		<message>
 			<source>lbl_cat_name</source>
-			<translation>Наименование на категорията:</translation>
+			<translation>カテゴリー名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_cat_name</source>
@@ -10344,7 +10344,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -10356,11 +10356,11 @@
 		</message>
 		<message>
 			<source>tooltip_descript</source>
-			<translation>Описание</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>lbl_role</source>
-			<translation>Роля:</translation>
+			<translation>役割</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_role</source>
@@ -10372,30 +10372,30 @@
 		</message>
 		<message>
 			<source>tooltip_sys_role</source>
-			<translation>Роля, която ще може да използва този стил</translation>
+			<translation>このスタイルを使用できる役割</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>btn_add</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 	</context>
 	<context>
 		<name>crm_trace</name>
 		<message>
 			<source>lbl_inst</source>
-			<translation>Инструкции:</translation>
+			<translation>指示する：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_inst</source>
@@ -10406,11 +10406,11 @@
 		<name>csv</name>
 		<message>
 			<source>title</source>
-			<translation>Импортиране на CSV</translation>
+			<translation>CSVインポート</translation>
 		</message>
 		<message>
 			<source>lbl_import_type</source>
-			<translation>Вид на вноса:</translation>
+			<translation>輸入タイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_import_type</source>
@@ -10418,7 +10418,7 @@
 		</message>
 		<message>
 			<source>lbl_set_of_charac</source>
-			<translation>Набор от символи:</translation>
+			<translation>文字セット：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_set_of_charac</source>
@@ -10426,7 +10426,7 @@
 		</message>
 		<message>
 			<source>tab_info</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_info</source>
@@ -10434,7 +10434,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Информация:</translation>
+			<translation>情報</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -10442,23 +10442,23 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>dlg_csv</source>
-			<translation>Импортиране на CSV</translation>
+			<translation>CSVインポート</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_csv</source>
@@ -10514,7 +10514,7 @@
 		</message>
 		<message>
 			<source>lbl_delimiter</source>
-			<translation>Разделител:</translation>
+			<translation>区切り文字：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_delimiter</source>
@@ -10522,7 +10522,7 @@
 		</message>
 		<message>
 			<source>lbl_ignore_header</source>
-			<translation>Игнориране на заглавията:</translation>
+			<translation>ヘッダーを無視する：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ignore_header</source>
@@ -10530,7 +10530,7 @@
 		</message>
 		<message>
 			<source>lbl_import_label</source>
-			<translation>Етикет за внос:</translation>
+			<translation>輸入ラベル：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_import_label</source>
@@ -10546,7 +10546,7 @@
 		</message>
 		<message>
 			<source>lbl_file</source>
-			<translation>Файл:</translation>
+			<translation>ファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_file</source>
@@ -10554,7 +10554,7 @@
 		</message>
 		<message>
 			<source>tab_preview</source>
-			<translation>Преглед</translation>
+			<translation>プレビュー</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_preview</source>
@@ -10565,11 +10565,11 @@
 		<name>dialog_table</name>
 		<message>
 			<source>title</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -10577,7 +10577,7 @@
 		</message>
 		<message>
 			<source>btn_add_row</source>
-			<translation>Добавяне на ред</translation>
+			<translation>行を追加</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_row</source>
@@ -10585,7 +10585,7 @@
 		</message>
 		<message>
 			<source>dlg_dialog_table</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_dialog_table</source>
@@ -10593,30 +10593,30 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 	</context>
 	<context>
 		<name>dialog_text</name>
 		<message>
 			<source>title</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -10624,7 +10624,7 @@
 		</message>
 		<message>
 			<source>dlg_dialog_text</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_dialog_text</source>
@@ -10632,7 +10632,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -10643,19 +10643,19 @@
 		<name>dimensioning</name>
 		<message>
 			<source>title</source>
-			<translation>Оразмеряване</translation>
+			<translation>寸法測定</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>grb_other</source>
-			<translation>Други</translation>
+			<translation>その他</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_other</source>
@@ -10663,7 +10663,7 @@
 		</message>
 		<message>
 			<source>dlg_dimensioning</source>
-			<translation>Оразмеряване</translation>
+			<translation>寸法測定</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_dimensioning</source>
@@ -10671,7 +10671,7 @@
 		</message>
 		<message>
 			<source>grb_symbology</source>
-			<translation>Символика на кръга</translation>
+			<translation>円記号</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_symbology</source>
@@ -10679,7 +10679,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -10695,7 +10695,7 @@
 		</message>
 		<message>
 			<source>grb_depth</source>
-			<translation>Измервания</translation>
+			<translation>計測</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_depth</source>
@@ -10706,11 +10706,11 @@
 		<name>doc</name>
 		<message>
 			<source>title</source>
-			<translation>Документ</translation>
+			<translation>ドキュメント</translation>
 		</message>
 		<message>
 			<source>dlg_doc</source>
-			<translation>Документ</translation>
+			<translation>ドキュメント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_doc</source>
@@ -10718,7 +10718,7 @@
 		</message>
 		<message>
 			<source>lbl_doc_type</source>
-			<translation>Вид на документа:</translation>
+			<translation>ドックタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_type</source>
@@ -10726,7 +10726,7 @@
 		</message>
 		<message>
 			<source>lbl_doc_name</source>
-			<translation>Име на доктора:</translation>
+			<translation>ドック名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_name</source>
@@ -10734,7 +10734,7 @@
 		</message>
 		<message>
 			<source>tab_gully</source>
-			<translation>Gully</translation>
+			<translation>ガリー</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_gully</source>
@@ -10778,15 +10778,15 @@
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>lbl_link</source>
-			<translation>Връзка:</translation>
+			<translation>リンク</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_link</source>
-			<translation>Връзка към</translation>
+			<translation>リンク</translation>
 		</message>
 		<message>
 			<source>tab_elem</source>
@@ -10798,15 +10798,15 @@
 		</message>
 		<message>
 			<source>path</source>
-			<translation>път</translation>
+			<translation>パス</translation>
 		</message>
 		<message>
 			<source>tooltip_path</source>
-			<translation>Попълнете го с някакъв достъпен път до папка или уеб път</translation>
+			<translation>アクセス可能なフォルダパスまたはウェブパスを入力します。</translation>
 		</message>
 		<message>
 			<source>_dlg_doc</source>
-			<translation>Документ</translation>
+			<translation>ドキュメント</translation>
 		</message>
 		<message>
 			<source>tooltip__dlg_doc</source>
@@ -10822,7 +10822,7 @@
 		</message>
 		<message>
 			<source>tab_node</source>
-			<translation>Възел</translation>
+			<translation>ノード</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_node</source>
@@ -10830,11 +10830,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_path_doc</source>
@@ -10846,7 +10846,7 @@
 		</message>
 		<message>
 			<source>tab_arc</source>
-			<translation>Дъга</translation>
+			<translation>アーク</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_arc</source>
@@ -10858,11 +10858,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>Вмъкване на</translation>
+			<translation>挿入</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -10890,11 +10890,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>Снапинг</translation>
+			<translation>スナップ</translation>
 		</message>
 		<message>
 			<source>tab_rel</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_rel</source>
@@ -10910,15 +10910,15 @@
 		</message>
 		<message>
 			<source>btn_path_url</source>
-			<translation>Уеб</translation>
+			<translation>ウェブ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_path_url</source>
-			<translation>Отворете изследователя, за да позволите избора на уеб път. Възможно е също така просто да поставите пътя в текстовото поле Връзка</translation>
+			<translation>エクスプローラーを開いてウェブパスを選択できるようにする。リンクのテキストボックスにパスを貼り付けることもできます。</translation>
 		</message>
 		<message>
 			<source>lbl_filter_name</source>
-			<translation>Име на доктора:</translation>
+			<translation>ドック名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter_name</source>
@@ -10926,7 +10926,7 @@
 		</message>
 		<message>
 			<source>tab_connec</source>
-			<translation>Връзка</translation>
+			<translation>コネック</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_connec</source>
@@ -10934,7 +10934,7 @@
 		</message>
 		<message>
 			<source>lbl_observ</source>
-			<translation>Наблюдения:</translation>
+			<translation>観察している：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_observ</source>
@@ -10942,7 +10942,7 @@
 		</message>
 		<message>
 			<source>tab_visit</source>
-			<translation>Документ</translation>
+			<translation>ドキュメント</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_visit</source>
@@ -10950,7 +10950,7 @@
 		</message>
 		<message>
 			<source>tab_doc</source>
-			<translation>Документ</translation>
+			<translation>ドキュメント</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_doc</source>
@@ -10961,11 +10961,11 @@
 		<name>doc_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Управление на документи</translation>
+			<translation>文書管理</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -10973,7 +10973,7 @@
 		</message>
 		<message>
 			<source>lbl_filter_name</source>
-			<translation>Филтрирайте по: Име на документа</translation>
+			<translation>フィルタをかけるドク名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter_name</source>
@@ -10981,7 +10981,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -10997,7 +10997,7 @@
 		</message>
 		<message>
 			<source>dlg_doc_manager</source>
-			<translation>Управление на документи</translation>
+			<translation>文書管理</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_doc_manager</source>
@@ -11047,11 +11047,11 @@
 		<name>dscenario_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>btn_duplicate</source>
-			<translation>Дублиране на</translation>
+			<translation>重複</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_duplicate</source>
@@ -11067,7 +11067,7 @@
 		</message>
 		<message>
 			<source>btn_toolbox</source>
-			<translation>Кутия с инструменти</translation>
+			<translation>ツールボックス</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_toolbox</source>
@@ -11075,7 +11075,7 @@
 		</message>
 		<message>
 			<source>btn_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
@@ -11083,11 +11083,11 @@
 		</message>
 		<message>
 			<source>chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -11099,7 +11099,7 @@
 		</message>
 		<message>
 			<source>btn_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
@@ -11115,7 +11115,7 @@
 		</message>
 		<message>
 			<source>lbl_dscenario_name</source>
-			<translation>Филтрирайте по: Име на сценария</translation>
+			<translation>フィルターシナリオ名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_dscenario_name</source>
@@ -11123,7 +11123,7 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -11131,7 +11131,7 @@
 		</message>
 		<message>
 			<source>dlg_dscenario_manager</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_dscenario_manager</source>
@@ -11142,11 +11142,11 @@
 		<name>element</name>
 		<message>
 			<source>title</source>
-			<translation>Елемент</translation>
+			<translation>エレメント</translation>
 		</message>
 		<message>
 			<source>lbl_expl_id</source>
-			<translation>Работа:</translation>
+			<translation>オペレーション</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_expl_id</source>
@@ -11154,23 +11154,23 @@
 		</message>
 		<message>
 			<source>tab_arc</source>
-			<translation>Дъга</translation>
+			<translation>アーク</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_arc</source>
-			<translation>Дъга</translation>
+			<translation>アーク</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tab_element</source>
-			<translation>Елемент</translation>
+			<translation>エレメント</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_element</source>
@@ -11186,7 +11186,7 @@
 		</message>
 		<message>
 			<source>lbl_comment</source>
-			<translation>Как мога да помогна?</translation>
+			<translation>どうすればいいですか？</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_comment</source>
@@ -11194,23 +11194,23 @@
 		</message>
 		<message>
 			<source>tab_relations</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>lbl_workcat_id</source>
-			<translation>Идентификатор на Workcat:</translation>
+			<translation>ワークキャットID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id</source>
-			<translation>Идентификатор на Workcat</translation>
+			<translation>ワークキャットID</translation>
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Ротация:</translation>
+			<translation>ローテーションだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -11222,11 +11222,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>Снапинг</translation>
+			<translation>スナップ</translation>
 		</message>
 		<message>
 			<source>dlg_element</source>
-			<translation>Елемент</translation>
+			<translation>エレメント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_element</source>
@@ -11234,15 +11234,15 @@
 		</message>
 		<message>
 			<source>lbl_link</source>
-			<translation>Връзка:</translation>
+			<translation>リンク</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_link</source>
-			<translation>Връзка към</translation>
+			<translation>リンク</translation>
 		</message>
 		<message>
 			<source>lbl_code</source>
-			<translation>Код:</translation>
+			<translation>コード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_code</source>
@@ -11266,7 +11266,7 @@
 		</message>
 		<message>
 			<source>tab_gully</source>
-			<translation>Gully</translation>
+			<translation>ガリー</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_gully</source>
@@ -11282,7 +11282,7 @@
 		</message>
 		<message>
 			<source>lbl_buildercat_id</source>
-			<translation>Идентификатор на Buildercat:</translation>
+			<translation>ビルダーキャットID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_buildercat_id</source>
@@ -11290,7 +11290,7 @@
 		</message>
 		<message>
 			<source>lbl_location_type</source>
-			<translation>Тип на местоположението:</translation>
+			<translation>ロケーションタイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_location_type</source>
@@ -11298,7 +11298,7 @@
 		</message>
 		<message>
 			<source>lbl_verified</source>
-			<translation>Проверено:</translation>
+			<translation>確認済みだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_verified</source>
@@ -11306,7 +11306,7 @@
 		</message>
 		<message>
 			<source>tab_connec</source>
-			<translation>Връзка</translation>
+			<translation>コネック</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_connec</source>
@@ -11314,7 +11314,7 @@
 		</message>
 		<message>
 			<source>lbl_element_type</source>
-			<translation>Тип на елемента:</translation>
+			<translation>エレメントタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_element_type</source>
@@ -11322,7 +11322,7 @@
 		</message>
 		<message>
 			<source>lbl_observ</source>
-			<translation>Наблюдения:</translation>
+			<translation>観察している：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_observ</source>
@@ -11330,7 +11330,7 @@
 		</message>
 		<message>
 			<source>lbl_builtdate</source>
-			<translation>Дата на построяване:</translation>
+			<translation>建築年月日：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate</source>
@@ -11338,7 +11338,7 @@
 		</message>
 		<message>
 			<source>lbl_state_type</source>
-			<translation>Вид държава:</translation>
+			<translation>州のタイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state_type</source>
@@ -11350,15 +11350,15 @@
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>Вмъкване на</translation>
+			<translation>挿入</translation>
 		</message>
 		<message>
 			<source>lbl_workcat_id_end</source>
-			<translation>Край на идентификатора Workcat:</translation>
+			<translation>ワークキャットIDエンド：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>Идентификатор на Workcat end</translation>
+			<translation>ワークキャットID終了</translation>
 		</message>
 		<message>
 			<source>lbl_num_elements</source>
@@ -11370,7 +11370,7 @@
 		</message>
 		<message>
 			<source>tab_node</source>
-			<translation>Възел</translation>
+			<translation>ノード</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_node</source>
@@ -11390,11 +11390,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>lbl_ownercat_id</source>
-			<translation>Собственик:</translation>
+			<translation>オーナー</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ownercat_id</source>
@@ -11402,7 +11402,7 @@
 		</message>
 		<message>
 			<source>lbl_elementcat_id</source>
-			<translation>Идентификатор на елемента:</translation>
+			<translation>エレメントキャットID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_elementcat_id</source>
@@ -11410,7 +11410,7 @@
 		</message>
 		<message>
 			<source>lbl_element_id</source>
-			<translation>Идентификатор на елемента:</translation>
+			<translation>要素ID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_element_id</source>
@@ -11418,7 +11418,7 @@
 		</message>
 		<message>
 			<source>lbl_num_element</source>
-			<translation>Номер на елемента:</translation>
+			<translation>要素番号</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_num_element</source>
@@ -11426,15 +11426,15 @@
 		</message>
 		<message>
 			<source>btn_add_geom</source>
-			<translation>Добавяне на геом</translation>
+			<translation>ジオムの追加</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_geom</source>
-			<translation>Добавяне на геометрия</translation>
+			<translation>ジオメトリの追加</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -11442,7 +11442,7 @@
 		</message>
 		<message>
 			<source>lbl_state</source>
-			<translation>Състояние:</translation>
+			<translation>州</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state</source>
@@ -11453,11 +11453,11 @@
 		<name>element_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Управление на елементи</translation>
+			<translation>エレメント管理</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -11465,7 +11465,7 @@
 		</message>
 		<message>
 			<source>dlg_element_manager</source>
-			<translation>Управление на елементи</translation>
+			<translation>エレメント管理</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_element_manager</source>
@@ -11473,15 +11473,15 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>lbl_element_id</source>
-			<translation>Филтрирайте по: Елемент id</translation>
+			<translation>フィルタ要素 id</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_element_id</source>
@@ -12221,11 +12221,11 @@
 		<name>fastprint</name>
 		<message>
 			<source>title</source>
-			<translation>Fastprint</translation>
+			<translation>ファストプリント</translation>
 		</message>
 		<message>
 			<source>btn_print</source>
-			<translation>Отпечатване</translation>
+			<translation>プリント</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_print</source>
@@ -12233,7 +12233,7 @@
 		</message>
 		<message>
 			<source>grb_option_values</source>
-			<translation>Незадължителни стойности:</translation>
+			<translation>オプションの値：</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_option_values</source>
@@ -12241,7 +12241,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -12249,7 +12249,7 @@
 		</message>
 		<message>
 			<source>btn_preview</source>
-			<translation>Преглед</translation>
+			<translation>プレビュー</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_preview</source>
@@ -12257,7 +12257,7 @@
 		</message>
 		<message>
 			<source>grb_map_options</source>
-			<translation>Опции за карта:</translation>
+			<translation>地図のオプション</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_map_options</source>
@@ -12265,7 +12265,7 @@
 		</message>
 		<message>
 			<source>dlg_fastprint</source>
-			<translation>Fastprint</translation>
+			<translation>ファストプリント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_fastprint</source>
@@ -12276,11 +12276,11 @@
 		<name>feature_delete</name>
 		<message>
 			<source>title</source>
-			<translation>Изтриване на функцията</translation>
+			<translation>削除機能</translation>
 		</message>
 		<message>
 			<source>tab_del_feature</source>
-			<translation>Изтриване на функцията</translation>
+			<translation>削除機能</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_del_feature</source>
@@ -12288,7 +12288,7 @@
 		</message>
 		<message>
 			<source>btn_delete_another</source>
-			<translation>Изтриване на друга функция</translation>
+			<translation>別の機能を削除する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_another</source>
@@ -12296,7 +12296,7 @@
 		</message>
 		<message>
 			<source>tab_info_log</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_info_log</source>
@@ -12304,7 +12304,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -12312,7 +12312,7 @@
 		</message>
 		<message>
 			<source>btn_relations</source>
-			<translation>Показване на отношенията на функциите</translation>
+			<translation>機能関係を表示する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_relations</source>
@@ -12320,7 +12320,7 @@
 		</message>
 		<message>
 			<source>lbl_feature_id</source>
-			<translation>Идентификатор на функцията:</translation>
+			<translation>フィーチャーID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_id</source>
@@ -12328,7 +12328,7 @@
 		</message>
 		<message>
 			<source>dlg_feature_delete</source>
-			<translation>Изтриване на функцията</translation>
+			<translation>削除機能</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_feature_delete</source>
@@ -12336,11 +12336,11 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на избрана функция</translation>
+			<translation>選択した機能を削除する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>btn_snapping</source>
@@ -12348,11 +12348,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>Снапинг</translation>
+			<translation>スナップ</translation>
 		</message>
 		<message>
 			<source>lbl_feature_type</source>
-			<translation>Тип на функцията:</translation>
+			<translation>フィーチャー・タイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_type</source>
@@ -12363,23 +12363,23 @@
 		<name>feature_end</name>
 		<message>
 			<source>title</source>
-			<translation>Крайна функция</translation>
+			<translation>エンド機能</translation>
 		</message>
 		<message>
 			<source>tab_relations</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tab_info_log</source>
@@ -12391,15 +12391,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tab_node</source>
-			<translation>Възел</translation>
+			<translation>ノード</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_node</source>
@@ -12419,7 +12419,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>Снапинг</translation>
+			<translation>スナップ</translation>
 		</message>
 		<message>
 			<source>btn_insert</source>
@@ -12427,7 +12427,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>Вмъкване на</translation>
+			<translation>挿入</translation>
 		</message>
 		<message>
 			<source>builtdate</source>
@@ -12439,7 +12439,7 @@
 		</message>
 		<message>
 			<source>tab_connec</source>
-			<translation>Връзка</translation>
+			<translation>コネック</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_connec</source>
@@ -12455,7 +12455,7 @@
 		</message>
 		<message>
 			<source>dlg_feature_end</source>
-			<translation>Крайна функция</translation>
+			<translation>エンド機能</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_feature_end</source>
@@ -12463,7 +12463,7 @@
 		</message>
 		<message>
 			<source>tab_gully</source>
-			<translation>Gully</translation>
+			<translation>ガリー</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_gully</source>
@@ -12471,7 +12471,7 @@
 		</message>
 		<message>
 			<source>lbl_description</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_description</source>
@@ -12479,7 +12479,7 @@
 		</message>
 		<message>
 			<source>lbl_state_type</source>
-			<translation>Край на типа държава:</translation>
+			<translation>ステートタイプ終了：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state_type</source>
@@ -12487,7 +12487,7 @@
 		</message>
 		<message>
 			<source>tab_elem</source>
-			<translation>Elem</translation>
+			<translation>小学校</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_elem</source>
@@ -12495,7 +12495,7 @@
 		</message>
 		<message>
 			<source>lbl_workcat_date</source>
-			<translation>Дата на Workcat:</translation>
+			<translation>ワークキャットの日付：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_date</source>
@@ -12503,7 +12503,7 @@
 		</message>
 		<message>
 			<source>tab_workcat</source>
-			<translation>Workcat</translation>
+			<translation>ワークキャット</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_workcat</source>
@@ -12511,7 +12511,7 @@
 		</message>
 		<message>
 			<source>lbl_workcat_id_end</source>
-			<translation>Край на идентификатора Workcat:</translation>
+			<translation>ワークキャットIDエンド：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id_end</source>
@@ -12519,7 +12519,7 @@
 		</message>
 		<message>
 			<source>tab_arc</source>
-			<translation>Дъга</translation>
+			<translation>アーク</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_arc</source>
@@ -12539,11 +12539,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>lbl_enddate</source>
-			<translation>Крайна дата:</translation>
+			<translation>終了日</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enddate</source>
@@ -12554,11 +12554,11 @@
 		<name>feature_end_connec</name>
 		<message>
 			<source>title</source>
-			<translation>Краен списък на Workcat</translation>
+			<translation>ワークキャット終了リスト</translation>
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Тези връзки ще бъдат прекъснати след понижаване на избраните дъги:</translation>
+			<translation>これらの接続は、選択したアークをダウングレードした後、接続が解除される：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -12566,15 +12566,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>lbl_filter_by</source>
-			<translation>Филтриране по идентификатор на дъга:</translation>
+			<translation>アーク ID でフィルタリングする：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter_by</source>
@@ -12582,7 +12582,7 @@
 		</message>
 		<message>
 			<source>dlg_feature_end_connec</source>
-			<translation>Краен списък на Workcat</translation>
+			<translation>ワークキャット終了リスト</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_feature_end_connec</source>
@@ -12590,18 +12590,18 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 	</context>
 	<context>
 		<name>feature_replace</name>
 		<message>
 			<source>title</source>
-			<translation>Управление на Mincut</translation>
+			<translation>ミニカットマネジメント</translation>
 		</message>
 		<message>
 			<source>config</source>
@@ -12621,7 +12621,7 @@
 		</message>
 		<message>
 			<source>lbl_enddate</source>
-			<translation>Замяна на дата:</translation>
+			<translation>交換日：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enddate</source>
@@ -12637,8 +12637,7 @@
 		</message>
 		<message>
 			<source>lbl_keep_asset_id</source>
-			<translation>Запазване на идентификатора на актива:
-</translation>
+			<translation>資産IDを保持する：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_keep_asset_id</source>
@@ -12646,7 +12645,7 @@
 		</message>
 		<message>
 			<source>lbl_catalog_id</source>
-			<translation>Каталожен идентификатор:</translation>
+			<translation>カタログID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_catalog_id</source>
@@ -12654,7 +12653,7 @@
 		</message>
 		<message>
 			<source>lbl_keep_elements</source>
-			<translation>Запазване на елементите:</translation>
+			<translation>要素を保つ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_keep_elements</source>
@@ -12662,7 +12661,7 @@
 		</message>
 		<message>
 			<source>lbl_keep_epa_values</source>
-			<translation>Запазване на стойностите на EPA:</translation>
+			<translation>EPAの値を維持する：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_keep_epa_values</source>
@@ -12670,7 +12669,7 @@
 		</message>
 		<message>
 			<source>dlg_feature_replace</source>
-			<translation>Управление на Mincut</translation>
+			<translation>ミニカットマネジメント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_feature_replace</source>
@@ -12678,7 +12677,7 @@
 		</message>
 		<message>
 			<source>lbl_new_feature_type</source>
-			<translation>Нов тип обект:</translation>
+			<translation>新しいフィーチャー・タイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_feature_type</source>
@@ -12686,7 +12685,7 @@
 		</message>
 		<message>
 			<source>lbl_feature_type</source>
-			<translation>Текущ тип функция:</translation>
+			<translation>現在のフィーチャー・タイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_type</source>
@@ -12694,7 +12693,7 @@
 		</message>
 		<message>
 			<source>grb_feature_parameters</source>
-			<translation>Запазване на стойностите на EPA:</translation>
+			<translation>EPAの値を維持する：</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_feature_parameters</source>
@@ -12710,7 +12709,7 @@
 		</message>
 		<message>
 			<source>grb_end_parameters</source>
-			<translation>Запазване на стойностите на EPA:</translation>
+			<translation>EPAの値を維持する：</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_end_parameters</source>
@@ -12718,7 +12717,7 @@
 		</message>
 		<message>
 			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id:</translation>
+			<translation>ワークキャットID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id_end</source>
@@ -12745,11 +12744,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Управление на Mincut</translation>
+			<translation>ミニカットマネジメント</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Управление на Mincut</translation>
+			<translation>ミニカットマネジメント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>
@@ -12768,7 +12767,7 @@
 		<name>go2epa</name>
 		<message>
 			<source>title</source>
-			<translation>Go2Epa</translation>
+			<translation>ゴーツーエパ</translation>
 		</message>
 		<message>
 			<source>btn_file_inp</source>
@@ -12780,7 +12779,7 @@
 		</message>
 		<message>
 			<source>chk_import_result</source>
-			<translation>Резултат от вноса</translation>
+			<translation>インポート結果</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_import_result</source>
@@ -12788,7 +12787,7 @@
 		</message>
 		<message>
 			<source>tab_loginfo</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_loginfo</source>
@@ -12796,7 +12795,7 @@
 		</message>
 		<message>
 			<source>chk_recurrent</source>
-			<translation>Използване на итеративни повиквания</translation>
+			<translation>反復呼び出しの使用</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_recurrent</source>
@@ -12804,7 +12803,7 @@
 		</message>
 		<message>
 			<source>chk_only_check</source>
-			<translation>Използване на геометрията на мрежата за резултати</translation>
+			<translation>結果ネットワーク・ジオメトリを使用する</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_only_check</source>
@@ -12812,7 +12811,7 @@
 		</message>
 		<message>
 			<source>dlg_go2epa</source>
-			<translation>Go2Epa</translation>
+			<translation>ゴーツーエパ</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa</source>
@@ -12820,7 +12819,7 @@
 		</message>
 		<message>
 			<source>grb_file_manager</source>
-			<translation>Файлов мениджър</translation>
+			<translation>ファイルマネージャー</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_file_manager</source>
@@ -12828,15 +12827,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_result_name</source>
-			<translation>Име на резултата:</translation>
+			<translation>結果名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_name</source>
@@ -12844,7 +12843,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -12868,7 +12867,7 @@
 		</message>
 		<message>
 			<source>grb_process_options</source>
-			<translation>Опции за предварителна обработка</translation>
+			<translation>前処理オプション</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_process_options</source>
@@ -12876,7 +12875,7 @@
 		</message>
 		<message>
 			<source>lbl_inp_file</source>
-			<translation>INP файл:</translation>
+			<translation>INPファイル：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_inp_file</source>
@@ -12892,7 +12891,7 @@
 		</message>
 		<message>
 			<source>btn_hs_ds</source>
-			<translation>Селектор</translation>
+			<translation>セレクター</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_hs_ds</source>
@@ -12900,7 +12899,7 @@
 		</message>
 		<message>
 			<source>chk_export</source>
-			<translation>Експорт на INP</translation>
+			<translation>輸出 INP</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_export</source>
@@ -12908,7 +12907,7 @@
 		</message>
 		<message>
 			<source>chk_exec</source>
-			<translation>Изпълнение на софтуера на EPA</translation>
+			<translation>EPAソフトウェアの実行</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_exec</source>
@@ -12924,7 +12923,7 @@
 		</message>
 		<message>
 			<source>btn_options</source>
-			<translation>Опции</translation>
+			<translation>オプション</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_options</source>
@@ -12932,7 +12931,7 @@
 		</message>
 		<message>
 			<source>lbl_rpt_file</source>
-			<translation>RPT файл:</translation>
+			<translation>RPTファイル：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rpt_file</source>
@@ -12956,7 +12955,7 @@
 		</message>
 		<message>
 			<source>tab_file_manager</source>
-			<translation>Файлов мениджър</translation>
+			<translation>ファイルマネージャー</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_file_manager</source>
@@ -12967,11 +12966,11 @@
 		<name>go2epa_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Управление на резултатите на Epa</translation>
+			<translation>EPA結果管理</translation>
 		</message>
 		<message>
 			<source>dlg_go2epa_manager</source>
-			<translation>Управление на резултатите на Epa</translation>
+			<translation>EPA結果管理</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa_manager</source>
@@ -12979,15 +12978,15 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>btn_set_corporate</source>
-			<translation>Превключване на корпоративни</translation>
+			<translation>トグル企業</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_set_corporate</source>
@@ -13003,7 +13002,7 @@
 		</message>
 		<message>
 			<source>lbl_result_id</source>
-			<translation>Филтрирайте по: Идентификатор на резултата</translation>
+			<translation>フィルタ結果ID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_id</source>
@@ -13035,7 +13034,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -13046,11 +13045,11 @@
 		<name>go2epa_options</name>
 		<message>
 			<source>title</source>
-			<translation>Go2Epa - опции</translation>
+			<translation>Go2Epa - オプション</translation>
 		</message>
 		<message>
 			<source>tab_other</source>
-			<translation>Други</translation>
+			<translation>その他</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_other</source>
@@ -13066,11 +13065,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>grb_general</source>
@@ -13090,7 +13089,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -13114,7 +13113,7 @@
 		</message>
 		<message>
 			<source>dlg_go2epa_options</source>
-			<translation>Go2Epa - опции</translation>
+			<translation>Go2Epa - オプション</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa_options</source>
@@ -13122,7 +13121,7 @@
 		</message>
 		<message>
 			<source>tab_inp</source>
-			<translation>В</translation>
+			<translation>インプット</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_inp</source>
@@ -13149,11 +13148,11 @@
 		<name>go2epa_result</name>
 		<message>
 			<source>title</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>dlg_go2epa_result</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa_result</source>
@@ -13161,15 +13160,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tab_datetime</source>
-			<translation>Дата и час</translation>
+			<translation>日時</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_datetime</source>
@@ -13177,7 +13176,7 @@
 		</message>
 		<message>
 			<source>tab_result</source>
-			<translation>Резултат</translation>
+			<translation>結果</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_result</source>
@@ -13185,7 +13184,7 @@
 		</message>
 		<message>
 			<source>lbl_compare_time</source>
-			<translation>Сравнете времето:</translation>
+			<translation>時間を比較する：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compare_time</source>
@@ -13193,7 +13192,7 @@
 		</message>
 		<message>
 			<source>tab_time</source>
-			<translation>Време</translation>
+			<translation>時間</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_time</source>
@@ -13201,7 +13200,7 @@
 		</message>
 		<message>
 			<source>lbl_time_to_compare</source>
-			<translation>Време (за сравнение):</translation>
+			<translation>時間（比較）：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_time_to_compare</source>
@@ -13209,7 +13208,7 @@
 		</message>
 		<message>
 			<source>lbl_selector_time</source>
-			<translation>Време на селектора:</translation>
+			<translation>セレクターの時間：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_selector_time</source>
@@ -13217,7 +13216,7 @@
 		</message>
 		<message>
 			<source>lbl_result_name_to_show</source>
-			<translation>Име на резултата (за показване):</translation>
+			<translation>結果名（表示する）：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_name_to_show</source>
@@ -13225,7 +13224,7 @@
 		</message>
 		<message>
 			<source>lbl_selector_date</source>
-			<translation>Дата на избора:</translation>
+			<translation>セレクターの日付：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_selector_date</source>
@@ -13233,7 +13232,7 @@
 		</message>
 		<message>
 			<source>lbl_compare_date</source>
-			<translation>Дати на поява:</translation>
+			<translation>出演日：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compare_date</source>
@@ -13241,7 +13240,7 @@
 		</message>
 		<message>
 			<source>lbl_time_to_show</source>
-			<translation>Време (за показване):</translation>
+			<translation>上映時間</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_time_to_show</source>
@@ -13249,7 +13248,7 @@
 		</message>
 		<message>
 			<source>lbl_result_name_to_compare</source>
-			<translation>Име на резултата (за сравнение):</translation>
+			<translation>結果名（比較する）：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_name_to_compare</source>
@@ -13257,11 +13256,11 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 	</context>
 	<context>
@@ -13398,11 +13397,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -13422,7 +13421,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -13430,7 +13429,7 @@
 		</message>
 		<message>
 			<source>dlg_info_catalog</source>
-			<translation>Каталог</translation>
+			<translation>カタログ</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_catalog</source>
@@ -13449,11 +13448,11 @@
 		<name>info_crmvalue</name>
 		<message>
 			<source>title</source>
-			<translation>Хидрометър</translation>
+			<translation>比重計</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -13461,7 +13460,7 @@
 		</message>
 		<message>
 			<source>dlg_info_crmvalue</source>
-			<translation>Хидрометър</translation>
+			<translation>比重計</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_crmvalue</source>
@@ -13469,7 +13468,7 @@
 		</message>
 		<message>
 			<source>lbl_hydrometer_id</source>
-			<translation>Идентификатор на хидрометъра:</translation>
+			<translation>比重計ID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_hydrometer_id</source>
@@ -13477,18 +13476,18 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 	</context>
 	<context>
 		<name>info_crossect</name>
 		<message>
 			<source>title</source>
-			<translation>Раздел</translation>
+			<translation>セクション</translation>
 		</message>
 		<message>
 			<source>lbl_cost_trench</source>
@@ -13524,11 +13523,11 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>lbl_cost_b_right</source>
@@ -13540,7 +13539,7 @@
 		</message>
 		<message>
 			<source>dlg_info_crossect</source>
-			<translation>Раздел</translation>
+			<translation>セクション</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_crossect</source>
@@ -13658,11 +13657,11 @@
 		<name>info_feature</name>
 		<message>
 			<source>title</source>
-			<translation>Информация за функциите</translation>
+			<translation>特集情報</translation>
 		</message>
 		<message>
 			<source>tab_hydrometer_val</source>
-			<translation>Стойности на хидрометъра</translation>
+			<translation>比重計の値</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_hydrometer_val</source>
@@ -13682,11 +13681,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_doc_delete</source>
-			<translation>Изтриване на документ</translation>
+			<translation>文書の削除</translation>
 		</message>
 		<message>
 			<source>tab_plan</source>
-			<translation>План</translation>
+			<translation>プラン</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_plan</source>
@@ -13698,7 +13697,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_open_doc</source>
-			<translation>Отваряне на документ</translation>
+			<translation>ドキュメントを開く</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -13706,7 +13705,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>groupBox_2</source>
@@ -13734,7 +13733,7 @@
 		</message>
 		<message>
 			<source>tab_hydrometer</source>
-			<translation>Хидрометър</translation>
+			<translation>比重計</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_hydrometer</source>
@@ -13742,7 +13741,7 @@
 		</message>
 		<message>
 			<source>tab_connections</source>
-			<translation>Връзки</translation>
+			<translation>コネクション</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_connections</source>
@@ -13750,7 +13749,7 @@
 		</message>
 		<message>
 			<source>tab_elements</source>
-			<translation>Елементи</translation>
+			<translation>エレメント</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_elements</source>
@@ -13758,7 +13757,7 @@
 		</message>
 		<message>
 			<source>tab_documents</source>
-			<translation>Документи</translation>
+			<translation>資料</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_documents</source>
@@ -13770,7 +13769,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_doc_new</source>
-			<translation>Създаване на нов документ</translation>
+			<translation>新規文書の作成</translation>
 		</message>
 		<message>
 			<source>tab_om</source>
@@ -13782,11 +13781,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_open_element</source>
@@ -13810,7 +13809,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_doc_insert</source>
-			<translation>Вмъкване на документ</translation>
+			<translation>文書の挿入</translation>
 		</message>
 		<message>
 			<source>tab_visit</source>
@@ -13822,7 +13821,7 @@
 		</message>
 		<message>
 			<source>dlg_info_feature</source>
-			<translation>Информация за функциите</translation>
+			<translation>特集情報</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_feature</source>
@@ -13830,15 +13829,15 @@
 		</message>
 		<message>
 			<source>tab_relations</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>lbl_param_type_om</source>
-			<translation>Тип на параметъра:</translation>
+			<translation>パラメータタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_param_type_om</source>
@@ -13878,7 +13877,7 @@
 		</message>
 		<message>
 			<source>lbl_upstream_features</source>
-			<translation>Възходящи функции:</translation>
+			<translation>上流の特徴：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_upstream_features</source>
@@ -13894,7 +13893,7 @@
 		</message>
 		<message>
 			<source>lbl_cat_per_filter</source>
-			<translation>Филтър за период Cat:</translation>
+			<translation>猫期間フィルター：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_cat_per_filter</source>
@@ -13902,7 +13901,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_om</source>
-			<translation>Параметър:</translation>
+			<translation>パラメーター</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_om</source>
@@ -13910,7 +13909,7 @@
 		</message>
 		<message>
 			<source>lbl_to_om</source>
-			<translation>До:</translation>
+			<translation>へ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_to_om</source>
@@ -13918,7 +13917,7 @@
 		</message>
 		<message>
 			<source>tab_rpt</source>
-			<translation>Rpt</translation>
+			<translation>抜粋</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_rpt</source>
@@ -13926,7 +13925,7 @@
 		</message>
 		<message>
 			<source>page_add</source>
-			<translation>Rpt</translation>
+			<translation>抜粋</translation>
 		</message>
 		<message>
 			<source>tooltip_page_add</source>
@@ -13934,7 +13933,7 @@
 		</message>
 		<message>
 			<source>lbl_downstream_features</source>
-			<translation>Функции надолу по веригата:</translation>
+			<translation>下流の特徴：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_downstream_features</source>
@@ -13950,7 +13949,7 @@
 		</message>
 		<message>
 			<source>lbl_from_doc</source>
-			<translation>От:</translation>
+			<translation>からだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_from_doc</source>
@@ -13958,7 +13957,7 @@
 		</message>
 		<message>
 			<source>tab_data</source>
-			<translation>Данни</translation>
+			<translation>データ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_data</source>
@@ -13974,15 +13973,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>lbl_type_doc</source>
-			<translation>Тип:</translation>
+			<translation>タイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_type_doc</source>
@@ -13990,7 +13989,7 @@
 		</message>
 		<message>
 			<source>lbl_from_om</source>
-			<translation>От:</translation>
+			<translation>からだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_from_om</source>
@@ -13998,7 +13997,7 @@
 		</message>
 		<message>
 			<source>page_main</source>
-			<translation>Rpt</translation>
+			<translation>抜粋</translation>
 		</message>
 		<message>
 			<source>tooltip_page_main</source>
@@ -14006,7 +14005,7 @@
 		</message>
 		<message>
 			<source>lbl_to_doc</source>
-			<translation>До:</translation>
+			<translation>へ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_to_doc</source>
@@ -14014,11 +14013,11 @@
 		</message>
 		<message>
 			<source>btn_apply</source>
-			<translation>Направете заявка на</translation>
+			<translation>応募する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_apply</source>
-			<translation>Направете заявка на</translation>
+			<translation>応募する</translation>
 		</message>
 		<message>
 			<source>page</source>
@@ -14034,11 +14033,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>Вмъкване на</translation>
+			<translation>挿入</translation>
 		</message>
 		<message>
 			<source>lbl_doc_id</source>
-			<translation>Име на доктора:</translation>
+			<translation>ドック名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_id</source>
@@ -14057,11 +14056,11 @@
 		<name>info_generic</name>
 		<message>
 			<source>title</source>
-			<translation>Основна информация</translation>
+			<translation>基本情報</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -14077,7 +14076,7 @@
 		</message>
 		<message>
 			<source>dlg_info_generic</source>
-			<translation>Основна информация</translation>
+			<translation>基本情報</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_generic</source>
@@ -14085,11 +14084,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>dlg_info_generic</source>
@@ -14120,7 +14119,7 @@
 		<name>info_workcat</name>
 		<message>
 			<source>title</source>
-			<translation>Нов Workcat</translation>
+			<translation>新しいワークキャット</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -14132,7 +14131,7 @@
 		</message>
 		<message>
 			<source>lbl_builtdate</source>
-			<translation>Дата на построяване:</translation>
+			<translation>建設年月日</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate</source>
@@ -14140,7 +14139,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -14148,15 +14147,15 @@
 		</message>
 		<message>
 			<source>lbl_link</source>
-			<translation>Връзка:</translation>
+			<translation>リンク</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_link</source>
-			<translation>Връзка към</translation>
+			<translation>リンク</translation>
 		</message>
 		<message>
 			<source>lbl_workid_key_1</source>
-			<translation>Работен идентификационен ключ 1:</translation>
+			<translation>ワークIDキー 1：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workid_key_1</source>
@@ -14164,7 +14163,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -14172,15 +14171,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>dlg_info_workcat</source>
-			<translation>Нов Workcat</translation>
+			<translation>新しいワークキャット</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_workcat</source>
@@ -14236,7 +14235,7 @@
 		</message>
 		<message>
 			<source>lbl_workid_key_2</source>
-			<translation>Работен идентификационен ключ 2:</translation>
+			<translation>ワークIDキー 2：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workid_key_2</source>
@@ -14624,7 +14623,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Композитор pdf файл</translation>
+			<translation>コンポーザーpdfファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -14825,11 +14824,11 @@
 		<name>main_dbproject</name>
 		<message>
 			<source>title</source>
-			<translation>Създаване на проект</translation>
+			<translation>プロジェクトの作成</translation>
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -14837,7 +14836,7 @@
 		</message>
 		<message>
 			<source>dlg_main_dbproject</source>
-			<translation>dlg_main_dbproject</translation>
+			<translation>dlg_main_dbプロジェクト</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_dbproject</source>
@@ -14979,43 +14978,43 @@
 		</message>
 		<message>
 			<source>btn_toggle_active</source>
-			<translation>Превключване на активен</translation>
+			<translation>トグルアクティブ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_toggle_active</source>
-			<translation>Превключване на активен</translation>
+			<translation>トグルアクティブ</translation>
 		</message>
 		<message>
 			<source>btn_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>btn_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>lbl_mapzone_name</source>
-			<translation>Филтрирайте по: Име на Mapzone</translation>
+			<translation>フィルターマップゾーン名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mapzone_name</source>
-			<translation>Филтрирайте по: Име на Mapzone</translation>
+			<translation>フィルターマップゾーン名</translation>
 		</message>
 		<message>
 			<source>btn_execute</source>
@@ -15023,39 +15022,39 @@
 		</message>
 		<message>
 			<source>tooltip_btn_execute</source>
-			<translation>Изпълнение на процеса на анализ на Mapzone</translation>
+			<translation>マップゾーン分析プロセスの実行</translation>
 		</message>
 		<message>
 			<source>chk_show_all</source>
-			<translation>Показване на всички mapzones</translation>
+			<translation>すべてのマップゾーンを表示</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_show_all</source>
-			<translation>Показване на всички mapzones</translation>
+			<translation>すべてのマップゾーンを表示</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>btn_config</source>
-			<translation>Конфигурация</translation>
+			<translation>コンフィグ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_config</source>
-			<translation>Конфигуриране на</translation>
+			<translation>設定</translation>
 		</message>
 		<message>
 			<source>chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>dlg_mapzone_manager</source>
@@ -15157,7 +15156,7 @@
 		<name>mincut</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut</translation>
+			<translation>ミンカット</translation>
 		</message>
 		<message>
 			<source>btn_start</source>
@@ -15217,7 +15216,7 @@
 		</message>
 		<message>
 			<source>grb_location</source>
-			<translation>Местоположение</translation>
+			<translation>所在地</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_location</source>
@@ -15225,7 +15224,7 @@
 		</message>
 		<message>
 			<source>btn_start</source>
-			<translation>Начало</translation>
+			<translation>スタート</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_start</source>
@@ -15281,7 +15280,7 @@
 		</message>
 		<message>
 			<source>lbl_dist_from_plot</source>
-			<translation>Разстояние от парцела:</translation>
+			<translation>プロットからの距離</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_dist_from_plot</source>
@@ -15337,7 +15336,7 @@
 		</message>
 		<message>
 			<source>grb_plan_details</source>
-			<translation>Подробности</translation>
+			<translation>詳細</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_plan_details</source>
@@ -15345,15 +15344,15 @@
 		</message>
 		<message>
 			<source>lbl_exec_startdate</source>
-			<translation>Дата на започване:</translation>
+			<translation>開始日</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_startdate</source>
-			<translation>Посещение ID</translation>
+			<translation>IDを見る</translation>
 		</message>
 		<message>
 			<source>lbl_exec_user</source>
-			<translation>Потребител Exec:</translation>
+			<translation>実行ユーザー：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_user</source>
@@ -15369,7 +15368,7 @@
 		</message>
 		<message>
 			<source>chk_use_planified</source>
-			<translation>Използване на планирана мрежа</translation>
+			<translation>計画されたネットワークを使用</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_use_planified</source>
@@ -15377,7 +15376,7 @@
 		</message>
 		<message>
 			<source>lbl_work_order</source>
-			<translation>Работна поръчка:</translation>
+			<translation>仕事の依頼</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_work_order</source>
@@ -15385,7 +15384,7 @@
 		</message>
 		<message>
 			<source>lbl_msg</source>
-			<translation>Не са намерени резултати</translation>
+			<translation>結果は見つかりませんでした</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
@@ -15401,7 +15400,7 @@
 		</message>
 		<message>
 			<source>lbl_id</source>
-			<translation>Идентификация:</translation>
+			<translation>だろう：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_id</source>
@@ -15425,7 +15424,7 @@
 		</message>
 		<message>
 			<source>lbl_exec_enddate</source>
-			<translation>Крайна дата:</translation>
+			<translation>終了日</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_enddate</source>
@@ -15433,7 +15432,7 @@
 		</message>
 		<message>
 			<source>lbl_cause</source>
-			<translation>Причина:</translation>
+			<translation>原因がある：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_cause</source>
@@ -15441,7 +15440,7 @@
 		</message>
 		<message>
 			<source>lbl_type</source>
-			<translation>Тип:</translation>
+			<translation>タイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_type</source>
@@ -15465,7 +15464,7 @@
 		</message>
 		<message>
 			<source>lbl_descript_pd</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript_pd</source>
@@ -15481,7 +15480,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut</source>
-			<translation>Mincut</translation>
+			<translation>ミンカット</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut</source>
@@ -15489,11 +15488,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_msg</source>
@@ -15505,7 +15504,7 @@
 		</message>
 		<message>
 			<source>lbl_turbidity</source>
-			<translation>Мътност:</translation>
+			<translation>濁度：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_turbidity</source>
@@ -15513,7 +15512,7 @@
 		</message>
 		<message>
 			<source>lbl_start</source>
-			<translation>От:</translation>
+			<translation>からだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start</source>
@@ -15521,7 +15520,7 @@
 		</message>
 		<message>
 			<source>lbl_end</source>
-			<translation>До:</translation>
+			<translation>へ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end</source>
@@ -15529,15 +15528,15 @@
 		</message>
 		<message>
 			<source>lbl_exec_appropriate</source>
-			<translation>Подходящо:</translation>
+			<translation>適切だ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_appropriate</source>
-			<translation>Ако е вярно, действителното местоположение съвпада с планираната информация за mincut</translation>
+			<translation>trueの場合、実際の位置はミニカットのスケジュール情報と一致する</translation>
 		</message>
 		<message>
 			<source>btn_end</source>
-			<translation>Край на</translation>
+			<translation>終了</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_end</source>
@@ -15545,7 +15544,7 @@
 		</message>
 		<message>
 			<source>lbl_depth</source>
-			<translation>Дълбочина:</translation>
+			<translation>深さだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_depth</source>
@@ -15553,7 +15552,7 @@
 		</message>
 		<message>
 			<source>lbl_received_date</source>
-			<translation>Дата на получаване:</translation>
+			<translation>受信日</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_received_date</source>
@@ -15561,7 +15560,7 @@
 		</message>
 		<message>
 			<source>lbl_descript_rd</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript_rd</source>
@@ -15617,7 +15616,7 @@
 		</message>
 		<message>
 			<source>grb_exec_realdates</source>
-			<translation>Реални дати</translation>
+			<translation>実際の日付</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_exec_realdates</source>
@@ -15625,7 +15624,7 @@
 		</message>
 		<message>
 			<source>tab_hydro</source>
-			<translation>Hydro</translation>
+			<translation>仕事の依頼</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_hydro</source>
@@ -15641,11 +15640,11 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tab_config</source>
@@ -15657,7 +15656,7 @@
 		</message>
 		<message>
 			<source>lbl_chlorine</source>
-			<translation>Хлор:</translation>
+			<translation>塩素だ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_chlorine</source>
@@ -15705,7 +15704,7 @@
 		</message>
 		<message>
 			<source>lbl_assigned_to</source>
-			<translation>Присвоява се на:</translation>
+			<translation>担当：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_assigned_to</source>
@@ -15713,7 +15712,7 @@
 		</message>
 		<message>
 			<source>grb_plan_forecasted_dates</source>
-			<translation>Прогнозни дати</translation>
+			<translation>予想日</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_plan_forecasted_dates</source>
@@ -15737,7 +15736,7 @@
 		</message>
 		<message>
 			<source>lbl_state</source>
-			<translation>Състояние:</translation>
+			<translation>州</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state</source>
@@ -15748,7 +15747,7 @@
 		<name>mincut_composer</name>
 		<message>
 			<source>title</source>
-			<translation>Композитор Mincut</translation>
+			<translation>ミンカット作曲家</translation>
 		</message>
 		<message>
 			<source>groupBox_2</source>
@@ -15760,7 +15759,7 @@
 		</message>
 		<message>
 			<source>btn_ok</source>
-			<translation>Отвори</translation>
+			<translation>オープン</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_ok</source>
@@ -15768,15 +15767,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>dlg_mincut_composer</source>
-			<translation>Композитор Mincut</translation>
+			<translation>ミンカット作曲家</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_composer</source>
@@ -15784,7 +15783,7 @@
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Ротация:</translation>
+			<translation>ローテーションだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -15816,7 +15815,7 @@
 		</message>
 		<message>
 			<source>lbl_title</source>
-			<translation>Заглавие:</translation>
+			<translation>タイトル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_title</source>
@@ -15848,7 +15847,7 @@
 		</message>
 		<message>
 			<source>lbl_template</source>
-			<translation>Шаблон:</translation>
+			<translation>テンプレート</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_template</source>
@@ -15883,7 +15882,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -15895,7 +15894,7 @@
 		</message>
 		<message>
 			<source>lbl_search</source>
-			<translation>Търсене по код на клиента:</translation>
+			<translation>顧客コードで検索</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_search</source>
@@ -15907,11 +15906,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>Снапинг</translation>
+			<translation>スナップ</translation>
 		</message>
 		<message>
 			<source>dlg_mincut_connec</source>
-			<translation>Свързване на Mincut</translation>
+			<translation>ミニカットコネック</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_connec</source>
@@ -15923,26 +15922,26 @@
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>Вмъкване на</translation>
+			<translation>挿入</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 	</context>
 	<context>
 		<name>mincut_end</name>
 		<message>
 			<source>title</source>
-			<translation>Край на Mincut</translation>
+			<translation>ミニカット・エンド</translation>
 		</message>
 		<message>
 			<source>btn_set_real_location</source>
-			<translation>Задаване на реално местоположение</translation>
+			<translation>リアルロケーションの設定</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_set_real_location</source>
@@ -15950,7 +15949,7 @@
 		</message>
 		<message>
 			<source>lbl_start_date</source>
-			<translation>От:</translation>
+			<translation>からだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start_date</source>
@@ -16006,7 +16005,7 @@
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>До:</translation>
+			<translation>へ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -16014,7 +16013,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_end</source>
-			<translation>Край на Mincut</translation>
+			<translation>ミニカット・エンド</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_end</source>
@@ -16046,11 +16045,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>dlg_mincut_end</source>
@@ -16086,7 +16085,7 @@
 		</message>
 		<message>
 			<source>lbl_work_order</source>
-			<translation>Работна поръчка:</translation>
+			<translation>仕事の依頼</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_work_order</source>
@@ -16094,7 +16093,7 @@
 		</message>
 		<message>
 			<source>lbl_street</source>
-			<translation>Улица:</translation>
+			<translation>通り：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_street</source>
@@ -16102,7 +16101,7 @@
 		</message>
 		<message>
 			<source>lbl_start_hour</source>
-			<translation>Начален час:</translation>
+			<translation>開始時間</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start_hour</source>
@@ -16110,7 +16109,7 @@
 		</message>
 		<message>
 			<source>lbl_end_hour</source>
-			<translation>Краен час:</translation>
+			<translation>終了時間</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_hour</source>
@@ -16118,7 +16117,7 @@
 		</message>
 		<message>
 			<source>lbl_number</source>
-			<translation>Номер:</translation>
+			<translation>番号</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_number</source>
@@ -16134,7 +16133,7 @@
 		</message>
 		<message>
 			<source>grb_close_mincut</source>
-			<translation>Близък минимален разрез</translation>
+			<translation>クローズ・ミンカット</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_close_mincut</source>
@@ -16150,7 +16149,7 @@
 		</message>
 		<message>
 			<source>lbl_municipality</source>
-			<translation>Община:</translation>
+			<translation>自治体</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_municipality</source>
@@ -16166,7 +16165,7 @@
 		</message>
 		<message>
 			<source>lbl_executed</source>
-			<translation>Изпълнява се от:</translation>
+			<translation>実行者</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_executed</source>
@@ -16174,7 +16173,7 @@
 		</message>
 		<message>
 			<source>lbl_mincut</source>
-			<translation>Mincut:</translation>
+			<translation>ミンカット</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mincut</source>
@@ -16182,7 +16181,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -16205,7 +16204,7 @@
 		</message>
 		<message>
 			<source>lbl_ccc</source>
-			<translation>Код на клиента Connec:</translation>
+			<translation>顧客コード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ccc</source>
@@ -16237,7 +16236,7 @@
 		</message>
 		<message>
 			<source>lbl_hcc</source>
-			<translation>Код на клиента на хидрометъра:</translation>
+			<translation>比重計顧客コード：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_hcc</source>
@@ -16253,7 +16252,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_hydrometer</source>
-			<translation>Хидрометър Mincut</translation>
+			<translation>ミニカット比重計</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_hydrometer</source>
@@ -16261,11 +16260,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>btn_insert</source>
@@ -16273,7 +16272,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>Вмъкване на</translation>
+			<translation>挿入</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -16281,7 +16280,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 	</context>
 	<context>
@@ -16292,7 +16291,7 @@
 		</message>
 		<message>
 			<source>lbl_state</source>
-			<translation>Състояние:</translation>
+			<translation>州</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state</source>
@@ -16300,7 +16299,7 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -16316,7 +16315,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -16324,7 +16323,7 @@
 		</message>
 		<message>
 			<source>lbl_date_from</source>
-			<translation>От:</translation>
+			<translation>からだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_date_from</source>
@@ -16332,7 +16331,7 @@
 		</message>
 		<message>
 			<source>btn_notify</source>
-			<translation>Изпращане на sms</translation>
+			<translation>SMS送信</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_notify</source>
@@ -16348,7 +16347,7 @@
 		</message>
 		<message>
 			<source>lbl_streetaxis</source>
-			<translation>Streetaxis:</translation>
+			<translation>ストリートアクシス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_streetaxis</source>
@@ -16356,7 +16355,7 @@
 		</message>
 		<message>
 			<source>lbl_date_to</source>
-			<translation>До:</translation>
+			<translation>へ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_date_to</source>
@@ -16364,7 +16363,7 @@
 		</message>
 		<message>
 			<source>lbl_mincut_type</source>
-			<translation>Тип:</translation>
+			<translation>タイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mincut_type</source>
@@ -16372,7 +16371,7 @@
 		</message>
 		<message>
 			<source>lbl_filter</source>
-			<translation>Филтрирайте по:</translation>
+			<translation>フィルター</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter</source>
@@ -16380,7 +16379,7 @@
 		</message>
 		<message>
 			<source>lbl_exploitation</source>
-			<translation>Работа:</translation>
+			<translation>オペレーション</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exploitation</source>
@@ -16388,7 +16387,7 @@
 		</message>
 		<message>
 			<source>btn_cancel_mincut</source>
-			<translation>Отмяна на mincut</translation>
+			<translation>ミニカットのキャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel_mincut</source>
@@ -16396,7 +16395,7 @@
 		</message>
 		<message>
 			<source>btn_next_days</source>
-			<translation>Следващи дни</translation>
+			<translation>次の日</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_next_days</source>
@@ -16404,7 +16403,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_manager</source>
-			<translation>Управление на Mincut</translation>
+			<translation>ミニカットマネジメント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_manager</source>
@@ -16423,7 +16422,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
-			<translation>Извършване на анализ на зоните на картата</translation>
+			<translation>マップゾーン分析の実行</translation>
 		</message>
 		<message>
 			<source>btn_toggle_active</source>
@@ -16431,7 +16430,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_toggle_active</source>
-			<translation>Извършване на анализ на зоните на картата</translation>
+			<translation>マップゾーン分析の実行</translation>
 		</message>
 		<message>
 			<source>btn_config</source>
@@ -16439,7 +16438,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_config</source>
-			<translation>Извършване на анализ на зоните на картата</translation>
+			<translation>マップゾーン分析の実行</translation>
 		</message>
 		<message>
 			<source>dlg_netscenario</source>
@@ -16455,7 +16454,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_mapzone_id</source>
-			<translation>Извършване на анализ на зоните на картата</translation>
+			<translation>マップゾーン分析の実行</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -16463,7 +16462,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Извършване на анализ на зоните на картата</translation>
+			<translation>マップゾーン分析の実行</translation>
 		</message>
 		<message>
 			<source>btn_toggle_closed</source>
@@ -16471,7 +16470,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_toggle_closed</source>
-			<translation>Извършване на анализ на зоните на картата</translation>
+			<translation>マップゾーン分析の実行</translation>
 		</message>
 		<message>
 			<source>btn_update</source>
@@ -16479,14 +16478,14 @@
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
-			<translation>Извършване на анализ на зоните на картата</translation>
+			<translation>マップゾーン分析の実行</translation>
 		</message>
 	</context>
 	<context>
 		<name>netscenario_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>btn_toggle_active</source>
@@ -16498,27 +16497,27 @@
 		</message>
 		<message>
 			<source>btn_create</source>
-			<translation>     Създаване на</translation>
+			<translation>     作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>btn_duplicate</source>
-			<translation>Дублиране на</translation>
+			<translation>重複</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_duplicate</source>
-			<translation>Дублиране на</translation>
+			<translation>重複</translation>
 		</message>
 		<message>
 			<source>lbl_netscenario_name</source>
-			<translation>Филтрирайте по: Име на мрежовия сценарий</translation>
+			<translation>フィルターネットシナリオ名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_netscenario_name</source>
-			<translation>Филтрирайте по: Име на мрежовия сценарий</translation>
+			<translation>フィルターネットシナリオ名</translation>
 		</message>
 		<message>
 			<source>btn_execute</source>
@@ -16526,7 +16525,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_execute</source>
-			<translation>Извършване на анализ на зоните на картата</translation>
+			<translation>マップゾーン分析の実行</translation>
 		</message>
 		<message>
 			<source>btn_toc</source>
@@ -16534,66 +16533,66 @@
 		</message>
 		<message>
 			<source>tooltip_btn_toc</source>
-			<translation>Зареждане на слой Giswater</translation>
+			<translation>ジスウォーター層の読み込み</translation>
 		</message>
 		<message>
 			<source>dlg_netscenario_manager</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_netscenario_manager</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>btn_update_netscenario</source>
-			<translation>Текущ нетен сценарий</translation>
+			<translation>現在のネットシナリオ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_netscenario</source>
-			<translation>Текущ нетен сценарий</translation>
+			<translation>現在のネットシナリオ</translation>
 		</message>
 		<message>
 			<source>btn_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 	</context>
 	<context>
 		<name>nodetype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Промяна на типа на възела</translation>
+			<translation>ノードタイプの変更</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -16601,7 +16600,7 @@
 		</message>
 		<message>
 			<source>lbl_catalog_id</source>
-			<translation>Идентификатор по каталог:</translation>
+			<translation>カタログID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_catalog_id</source>
@@ -16609,15 +16608,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_node_type</source>
-			<translation>Текущ тип възел:</translation>
+			<translation>現在のノードタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_node_type</source>
@@ -16625,7 +16624,7 @@
 		</message>
 		<message>
 			<source>dlg_nodetype_change</source>
-			<translation>Промяна на типа на възела</translation>
+			<translation>ノードタイプの変更</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_nodetype_change</source>
@@ -16633,7 +16632,7 @@
 		</message>
 		<message>
 			<source>lbl_custom_node_type</source>
-			<translation>Нов тип възел:</translation>
+			<translation>新しいノードタイプ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_custom_node_type</source>
@@ -17421,7 +17420,7 @@
 		<name>nonvisual_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>v_edit_inp_timeseries</source>
@@ -17561,7 +17560,7 @@
 		</message>
 		<message>
 			<source>dlg_nonvisual_manager</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_nonvisual_manager</source>
@@ -17569,11 +17568,11 @@
 		</message>
 		<message>
 			<source>chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 	</context>
 	<context>
@@ -18065,7 +18064,7 @@
 		</message>
 		<message>
 			<source>lbl_text6</source>
-			<translation>Текст 6:</translation>
+			<translation>テキスト6</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text6</source>
@@ -18073,7 +18072,7 @@
 		</message>
 		<message>
 			<source>lbl_psector_id</source>
-			<translation>Идентификатор на сектора:</translation>
+			<translation>セクターID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_psector_id</source>
@@ -18081,7 +18080,7 @@
 		</message>
 		<message>
 			<source>lbl_text3</source>
-			<translation>Текст 3:</translation>
+			<translation>テキスト 3：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text3</source>
@@ -18101,7 +18100,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>Изберете функции</translation>
+			<translation>機能選択</translation>
 		</message>
 		<message>
 			<source>tab_arc</source>
@@ -18129,7 +18128,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -18141,7 +18140,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_arc_fusion</source>
-			<translation>Сливане на дъги с планирани дъги</translation>
+			<translation>平坦化された円弧との融合</translation>
 		</message>
 		<message>
 			<source>gexpenses_label_10</source>
@@ -18153,7 +18152,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -18169,7 +18168,7 @@
 		</message>
 		<message>
 			<source>lbl_type</source>
-			<translation>Тип:</translation>
+			<translation>タイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_type</source>
@@ -18193,7 +18192,7 @@
 		</message>
 		<message>
 			<source>lbl_total_arcs</source>
-			<translation>Общо дъги:</translation>
+			<translation>アークの合計：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_total_arcs</source>
@@ -18209,7 +18208,7 @@
 		</message>
 		<message>
 			<source>lbl_total_nodes</source>
-			<translation>Общо възли:</translation>
+			<translation>総ノード数：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_total_nodes</source>
@@ -18225,7 +18224,7 @@
 		</message>
 		<message>
 			<source>btn_remove</source>
-			<translation>Премахване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_remove</source>
@@ -18241,7 +18240,7 @@
 		</message>
 		<message>
 			<source>lbl_observation</source>
-			<translation>Наблюдение:</translation>
+			<translation>観察している：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_observation</source>
@@ -18249,7 +18248,7 @@
 		</message>
 		<message>
 			<source>lbl_vat</source>
-			<translation>ДДС:</translation>
+			<translation>付加価値税：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_vat</source>
@@ -18261,11 +18260,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_select_arc</source>
-			<translation>Замяна на услугата за планирана дъга</translation>
+			<translation>プラニファイド・アークのサービス交換</translation>
 		</message>
 		<message>
 			<source>lbl_ext_code</source>
-			<translation>Външен код</translation>
+			<translation>内線コード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ext_code</source>
@@ -18273,7 +18272,7 @@
 		</message>
 		<message>
 			<source>lbl_scale</source>
-			<translation>Стълбища:</translation>
+			<translation>階段：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_scale</source>
@@ -18281,7 +18280,7 @@
 		</message>
 		<message>
 			<source>lbl_general_expenses</source>
-			<translation>Общи разходи</translation>
+			<translation>一般経費</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_general_expenses</source>
@@ -18289,7 +18288,7 @@
 		</message>
 		<message>
 			<source>btn_select</source>
-			<translation>Изберете</translation>
+			<translation>選択</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_select</source>
@@ -18297,7 +18296,7 @@
 		</message>
 		<message>
 			<source>lbl_other_expenses</source>
-			<translation>Други разходи</translation>
+			<translation>その他の費用</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_other_expenses</source>
@@ -18305,7 +18304,7 @@
 		</message>
 		<message>
 			<source>lbl_text4</source>
-			<translation>Текст 4:</translation>
+			<translation>テキスト 4：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text4</source>
@@ -18313,7 +18312,7 @@
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Ротация:</translation>
+			<translation>ローテーションだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -18329,7 +18328,7 @@
 		</message>
 		<message>
 			<source>lbl_status</source>
-			<translation>Статус:</translation>
+			<translation>ステータス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
@@ -18337,7 +18336,7 @@
 		</message>
 		<message>
 			<source>lbl_text1</source>
-			<translation>Текст 1:</translation>
+			<translation>テキスト 1：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text1</source>
@@ -18361,7 +18360,7 @@
 		</message>
 		<message>
 			<source>lbl_text5</source>
-			<translation>Текст 5:</translation>
+			<translation>テキスト5：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text5</source>
@@ -18369,7 +18368,7 @@
 		</message>
 		<message>
 			<source>grb_map_details</source>
-			<translation>Подробности за картата</translation>
+			<translation>地図詳細</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_map_details</source>
@@ -18389,7 +18388,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tab_relations</source>
@@ -18401,7 +18400,7 @@
 		</message>
 		<message>
 			<source>lbl_text2</source>
-			<translation>Текст 2:</translation>
+			<translation>テキスト2：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text2</source>
@@ -18469,7 +18468,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_set_to_arc</source>
-			<translation>Задаване на arc_id (само ARC exit_type)</translation>
+			<translation>arc_id を設定する（ARC exit_type のみ）。</translation>
 		</message>
 		<message>
 			<source>label</source>
@@ -18481,7 +18480,7 @@
 		</message>
 		<message>
 			<source>lbl_priority</source>
-			<translation>Приоритет:</translation>
+			<translation>優先順位が高い：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_priority</source>
@@ -18505,7 +18504,7 @@
 		</message>
 		<message>
 			<source>lbl_workcat_id</source>
-			<translation>Идентификатор на Workcat:</translation>
+			<translation>ワークキャットID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id</source>
@@ -18513,7 +18512,7 @@
 		</message>
 		<message>
 			<source>btn_rapports</source>
-			<translation>Генериране на отчети</translation>
+			<translation>レポートの作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_rapports</source>
@@ -18553,7 +18552,7 @@
 		</message>
 		<message>
 			<source>lbl_atlas_id</source>
-			<translation>Atlas id:</translation>
+			<translation>アトラスID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_atlas_id</source>
@@ -18561,7 +18560,7 @@
 		</message>
 		<message>
 			<source>chk_enable_all</source>
-			<translation>Активиране на всички (визуализиране на остарялото състояние на функциите, свързани с псектора)</translation>
+			<translation>すべてを有効にする(psectorに関連する機能の廃止状態を可視化する)</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_enable_all</source>
@@ -18569,7 +18568,7 @@
 		</message>
 		<message>
 			<source>lbl_name</source>
-			<translation>Име:</translation>
+			<translation>名前</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_name</source>
@@ -18585,7 +18584,7 @@
 		</message>
 		<message>
 			<source>lbl_num_value</source>
-			<translation>Стойност Num:</translation>
+			<translation>数値：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_num_value</source>
@@ -18625,7 +18624,7 @@
 		</message>
 		<message>
 			<source>active</source>
-			<translation>Активен</translation>
+			<translation>アクティブ</translation>
 		</message>
 		<message>
 			<source>tooltip_active</source>
@@ -18633,7 +18632,7 @@
 		</message>
 		<message>
 			<source>lbl_parent_id</source>
-			<translation>Идентификатор на родител:</translation>
+			<translation>親のID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parent_id</source>
@@ -18649,7 +18648,7 @@
 		</message>
 		<message>
 			<source>lbl_exploitation</source>
-			<translation>Работа:</translation>
+			<translation>オペレーション</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exploitation</source>
@@ -18661,11 +18660,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>Вмъкване на</translation>
+			<translation>挿入</translation>
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описване:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -18676,11 +18675,11 @@
 		<name>price_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Управление на ценовите резултати</translation>
+			<translation>価格結果管理</translation>
 		</message>
 		<message>
 			<source>btn_update_result</source>
-			<translation>Текущ резултат</translation>
+			<translation>現在の結果</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_result</source>
@@ -18688,7 +18687,7 @@
 		</message>
 		<message>
 			<source>lbl_result_id</source>
-			<translation>Филтрирайте по:</translation>
+			<translation>フィルター</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_id</source>
@@ -18696,7 +18695,7 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -18704,7 +18703,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -18712,7 +18711,7 @@
 		</message>
 		<message>
 			<source>dlg_price_manager</source>
-			<translation>Управление на ценовите резултати</translation>
+			<translation>価格結果管理</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_price_manager</source>
@@ -18782,7 +18781,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Изчислете</translation>
+			<translation>計算する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -18846,7 +18845,7 @@
 		</message>
 		<message>
 			<source>lbl_result_id</source>
-			<translation>Име на резултата:</translation>
+			<translation>結果名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_id</source>
@@ -18878,7 +18877,7 @@
 		</message>
 		<message>
 			<source>lbl_material</source>
-			<translation>Материал:</translation>
+			<translation>素材：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_material</source>
@@ -18894,7 +18893,7 @@
 		</message>
 		<message>
 			<source>tab_material</source>
-			<translation>Материал</translation>
+			<translation>素材</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_material</source>
@@ -18902,7 +18901,7 @@
 		</message>
 		<message>
 			<source>grb_selection</source>
-			<translation>Избор на функции</translation>
+			<translation>機能の選択</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_selection</source>
@@ -18910,7 +18909,7 @@
 		</message>
 		<message>
 			<source>lbl_year</source>
-			<translation>Година на хоризонт:</translation>
+			<translation>ホライゾン・イヤー</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_year</source>
@@ -18926,7 +18925,7 @@
 		</message>
 		<message>
 			<source>lbl_presszone</source>
-			<translation>Прес зона:</translation>
+			<translation>プレスゾーン</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_presszone</source>
@@ -18934,7 +18933,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Отмяна на</translation>
+			<translation>Cancel</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -18950,7 +18949,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -18958,7 +18957,7 @@
 		</message>
 		<message>
 			<source>lbl_expl_selection</source>
-			<translation>Работа:</translation>
+			<translation>オペレーション</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_expl_selection</source>
@@ -18966,7 +18965,7 @@
 		</message>
 		<message>
 			<source>lbl_dnom</source>
-			<translation>Диаметър:</translation>
+			<translation>直径：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_dnom</source>
@@ -18974,7 +18973,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -19034,7 +19033,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>Изберете функции върху платно</translation>
+			<translation>キャンバスの特徴を選ぶ</translation>
 		</message>
 		<message>
 			<source>tab_infolog</source>
@@ -19054,7 +19053,7 @@
 		</message>
 		<message>
 			<source>tab_engine</source>
-			<translation>Двигател</translation>
+			<translation>エンジン</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_engine</source>
@@ -19062,7 +19061,7 @@
 		</message>
 		<message>
 			<source>tab_catalog</source>
-			<translation>Каталог</translation>
+			<translation>カタログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_catalog</source>
@@ -19070,7 +19069,7 @@
 		</message>
 		<message>
 			<source>tab_calc</source>
-			<translation>Изчисление</translation>
+			<translation>計算</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_calc</source>
@@ -19078,7 +19077,7 @@
 		</message>
 		<message>
 			<source>lbl_budget</source>
-			<translation>Годишен бюджет:</translation>
+			<translation>年間予算：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_budget</source>
@@ -19086,7 +19085,7 @@
 		</message>
 		<message>
 			<source>grb_global</source>
-			<translation>Параметри на изчислението</translation>
+			<translation>計算パラメーター</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_global</source>
@@ -19094,7 +19093,7 @@
 		</message>
 		<message>
 			<source>lbl_status</source>
-			<translation>Статус:</translation>
+			<translation>ステータス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
@@ -19102,7 +19101,7 @@
 		</message>
 		<message>
 			<source>dlg_priority</source>
-			<translation>Изчисляване на приоритета</translation>
+			<translation>優先順位の計算</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority</source>
@@ -19157,7 +19156,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -19173,7 +19172,7 @@
 		</message>
 		<message>
 			<source>btn_status</source>
-			<translation>Промяна на състоянието</translation>
+			<translation>ステータス変更</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_status</source>
@@ -19189,7 +19188,7 @@
 		</message>
 		<message>
 			<source>btn_edit</source>
-			<translation>Редактиране на</translation>
+			<translation>編集</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_edit</source>
@@ -19221,7 +19220,7 @@
 		</message>
 		<message>
 			<source>lbl_filter</source>
-			<translation>Филтрирайте по: Име на резултата</translation>
+			<translation>フィルタをかける結果名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter</source>
@@ -19229,7 +19228,7 @@
 		</message>
 		<message>
 			<source>lbl_expl</source>
-			<translation>Работа:</translation>
+			<translation>オペレーション</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_expl</source>
@@ -19237,7 +19236,7 @@
 		</message>
 		<message>
 			<source>btn_corporate</source>
-			<translation>Редактиране на</translation>
+			<translation>編集</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_corporate</source>
@@ -19245,7 +19244,7 @@
 		</message>
 		<message>
 			<source>dlg_priority_manager</source>
-			<translation>Мениджър резултати</translation>
+			<translation>リザルト・マネージャー</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority_manager</source>
@@ -19261,7 +19260,7 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -19269,7 +19268,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Информация:</translation>
+			<translation>情報</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -19285,7 +19284,7 @@
 		</message>
 		<message>
 			<source>lbl_status</source>
-			<translation>Статус:</translation>
+			<translation>ステータス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
@@ -19293,7 +19292,7 @@
 		</message>
 		<message>
 			<source>lbl_type</source>
-			<translation>Тип:</translation>
+			<translation>タイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_type</source>
@@ -19301,7 +19300,7 @@
 		</message>
 		<message>
 			<source>btn_duplicate</source>
-			<translation>Дублиране на</translation>
+			<translation>重複</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_duplicate</source>
@@ -19336,11 +19335,11 @@
 		<name>profile</name>
 		<message>
 			<source>title</source>
-			<translation>Профил на чертежа</translation>
+			<translation>ドロー・プロフィール</translation>
 		</message>
 		<message>
 			<source>lbl_profile_id</source>
-			<translation>Идентификатор на профила:</translation>
+			<translation>プロフィールID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_profile_id</source>
@@ -19348,7 +19347,7 @@
 		</message>
 		<message>
 			<source>btn_add_additional_point</source>
-			<translation>Добавяне на допълнителна точка</translation>
+			<translation>追加ポイント</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_additional_point</source>
@@ -19356,7 +19355,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -19364,7 +19363,7 @@
 		</message>
 		<message>
 			<source>btn_add_end_point</source>
-			<translation>Добавяне на крайна точка</translation>
+			<translation>終点追加</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_end_point</source>
@@ -19372,7 +19371,7 @@
 		</message>
 		<message>
 			<source>lbl_sh</source>
-			<translation>Хоризонтална скала:</translation>
+			<translation>水平スケール：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_sh</source>
@@ -19380,7 +19379,7 @@
 		</message>
 		<message>
 			<source>grb_composer</source>
-			<translation>Начална точка:</translation>
+			<translation>スタート地点：</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_composer</source>
@@ -19388,7 +19387,7 @@
 		</message>
 		<message>
 			<source>lbl_path</source>
-			<translation>Път:</translation>
+			<translation>パス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_path</source>
@@ -19396,7 +19395,7 @@
 		</message>
 		<message>
 			<source>btn_add_start_point</source>
-			<translation>Добавяне на начална точка</translation>
+			<translation>スタート地点の追加</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_start_point</source>
@@ -19436,7 +19435,7 @@
 		</message>
 		<message>
 			<source>lbl_date</source>
-			<translation>Заглавие:</translation>
+			<translation>タイトル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_date</source>
@@ -19444,7 +19443,7 @@
 		</message>
 		<message>
 			<source>lbl_end_point</source>
-			<translation>Крайна точка:</translation>
+			<translation>エンドポイント：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_point</source>
@@ -19452,7 +19451,7 @@
 		</message>
 		<message>
 			<source>lbl_additional_point</source>
-			<translation>Допълнителна точка:</translation>
+			<translation>追加点：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_additional_point</source>
@@ -19460,7 +19459,7 @@
 		</message>
 		<message>
 			<source>dlg_profile</source>
-			<translation>Профил на чертежа</translation>
+			<translation>ドロー・プロフィール</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_profile</source>
@@ -19468,7 +19467,7 @@
 		</message>
 		<message>
 			<source>lbl_min_distance</source>
-			<translation>Заглавие:</translation>
+			<translation>タイトル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_min_distance</source>
@@ -19484,7 +19483,7 @@
 		</message>
 		<message>
 			<source>btn_save_profile</source>
-			<translation>Запазване на профил</translation>
+			<translation>プロファイルの保存</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_save_profile</source>
@@ -19492,7 +19491,7 @@
 		</message>
 		<message>
 			<source>btn_export_pdf</source>
-			<translation>Отворен композитор</translation>
+			<translation>オープンコンポーザー</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_export_pdf</source>
@@ -19500,7 +19499,7 @@
 		</message>
 		<message>
 			<source>btn_clear_profile</source>
-			<translation>Ясен профил</translation>
+			<translation>明確なプロフィール</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_clear_profile</source>
@@ -19508,7 +19507,7 @@
 		</message>
 		<message>
 			<source>grb_profile</source>
-			<translation>Начална точка:</translation>
+			<translation>スタート地点：</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_profile</source>
@@ -19524,7 +19523,7 @@
 		</message>
 		<message>
 			<source>lbl_title</source>
-			<translation>Заглавие:</translation>
+			<translation>タイトル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_title</source>
@@ -19532,7 +19531,7 @@
 		</message>
 		<message>
 			<source>btn_draw_profile</source>
-			<translation>Профил на чертежа</translation>
+			<translation>ドロー・プロフィール</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_draw_profile</source>
@@ -19540,7 +19539,7 @@
 		</message>
 		<message>
 			<source>lbl_sv</source>
-			<translation>Вертикална скала:</translation>
+			<translation>垂直スケール：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_sv</source>
@@ -19548,7 +19547,7 @@
 		</message>
 		<message>
 			<source>lbl_start_point</source>
-			<translation>Начална точка:</translation>
+			<translation>スタート地点：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start_point</source>
@@ -19556,7 +19555,7 @@
 		</message>
 		<message>
 			<source>lbl_template</source>
-			<translation>Шаблон:</translation>
+			<translation>テンプレート</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_template</source>
@@ -19564,7 +19563,7 @@
 		</message>
 		<message>
 			<source>btn_load_profile</source>
-			<translation>Профил на натоварване</translation>
+			<translation>負荷プロファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_load_profile</source>
@@ -19644,7 +19643,7 @@
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Ротация:</translation>
+			<translation>ローテーションだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -19655,11 +19654,11 @@
 		<name>profile_list</name>
 		<message>
 			<source>title</source>
-			<translation>Профили на натоварване</translation>
+			<translation>負荷プロファイル</translation>
 		</message>
 		<message>
 			<source>btn_delete_profile</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_profile</source>
@@ -19667,7 +19666,7 @@
 		</message>
 		<message>
 			<source>dlg_profile_list</source>
-			<translation>Профили на натоварване</translation>
+			<translation>負荷プロファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_profile_list</source>
@@ -19707,7 +19706,7 @@
 		</message>
 		<message>
 			<source>btn_open</source>
-			<translation>Отворете</translation>
+			<translation>オープン</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -19718,11 +19717,11 @@
 		<name>project_check</name>
 		<message>
 			<source>title</source>
-			<translation>Проверка на проекта</translation>
+			<translation>プロジェクトをチェック</translation>
 		</message>
 		<message>
 			<source>dlg_project_check</source>
-			<translation>Проверка на проекта</translation>
+			<translation>プロジェクトをチェック</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_project_check</source>
@@ -19730,15 +19729,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tab_qgis_projlog</source>
-			<translation>Дневник на проекта Qgis</translation>
+			<translation>Qgisプロジェクトログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_qgis_projlog</source>
@@ -19746,7 +19745,7 @@
 		</message>
 		<message>
 			<source>tab_databaselog</source>
-			<translation>Регистър на базата данни</translation>
+			<translation>データベースログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_databaselog</source>
@@ -20044,19 +20043,19 @@
 		<name>psector_duplicate</name>
 		<message>
 			<source>title</source>
-			<translation>Дублиране на psector</translation>
+			<translation>psectorの重複</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_new_psector</source>
-			<translation>Ново име на сектор:</translation>
+			<translation>新しいセクター名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_psector</source>
@@ -20064,7 +20063,7 @@
 		</message>
 		<message>
 			<source>dlg_psector_duplicate</source>
-			<translation>Дублиране на psector</translation>
+			<translation>psectorの重複</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_psector_duplicate</source>
@@ -20072,7 +20071,7 @@
 		</message>
 		<message>
 			<source>tab_duplicate_psector</source>
-			<translation>Дублиране на psector</translation>
+			<translation>psectorの重複</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_duplicate_psector</source>
@@ -20080,7 +20079,7 @@
 		</message>
 		<message>
 			<source>lbl_duplicate_psector</source>
-			<translation>Дублиране на psector:</translation>
+			<translation>psectorが重複している：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_duplicate_psector</source>
@@ -20088,7 +20087,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -20096,7 +20095,7 @@
 		</message>
 		<message>
 			<source>tab_info_log</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_info_log</source>
@@ -20107,11 +20106,11 @@
 		<name>psector_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Управление на сектора</translation>
+			<translation>部門マネジメント</translation>
 		</message>
 		<message>
 			<source>btn_toggle_active</source>
-			<translation>Превключване на активен</translation>
+			<translation>トグルアクティブ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_toggle_active</source>
@@ -20127,23 +20126,23 @@
 		</message>
 		<message>
 			<source>btn_merge</source>
-			<translation>Обединяване на</translation>
+			<translation>マージ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_merge</source>
-			<translation>За да обедините различни псектори в един, трябва предварително да ги изберете с Ctrl и след това да щракнете върху този бутон.</translation>
+			<translation>さまざまなセクトを1つに統合するには、Ctrlキーを押しながらセクトを選択し、このボタンをクリックします。</translation>
 		</message>
 		<message>
 			<source>chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_active</source>
-			<translation>Показване на неактивни</translation>
+			<translation>非アクティブ表示</translation>
 		</message>
 		<message>
 			<source>lbl_psector_name</source>
-			<translation>Филтрирайте по:</translation>
+			<translation>フィルター</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_psector_name</source>
@@ -20151,7 +20150,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -20159,15 +20158,15 @@
 		</message>
 		<message>
 			<source>chk_filter_canvas</source>
-			<translation>Филтриране от платното</translation>
+			<translation>キャンバスからのフィルター</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_filter_canvas</source>
-			<translation>Показвайте само псектори, видими в платното</translation>
+			<translation>キャンバスに表示されているセクトのみ表示</translation>
 		</message>
 		<message>
 			<source>btn_duplicate</source>
-			<translation>Дублиране на</translation>
+			<translation>重複</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_duplicate</source>
@@ -20175,7 +20174,7 @@
 		</message>
 		<message>
 			<source>btn_show_psector</source>
-			<translation>Покажете psector</translation>
+			<translation>セクターを表示</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_show_psector</source>
@@ -20183,7 +20182,7 @@
 		</message>
 		<message>
 			<source>btn_update_psector</source>
-			<translation>Текущ псектор</translation>
+			<translation>現在のセクター</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_psector</source>
@@ -20191,7 +20190,7 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -20207,7 +20206,7 @@
 		</message>
 		<message>
 			<source>dlg_psector_manager</source>
-			<translation>Управление на сектора</translation>
+			<translation>部門マネジメント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_psector_manager</source>
@@ -20218,11 +20217,11 @@
 		<name>psector_rapport</name>
 		<message>
 			<source>title</source>
-			<translation>Доклад за сектора</translation>
+			<translation>セクター・ラポール</translation>
 		</message>
 		<message>
 			<source>lbl_detail_csv</source>
-			<translation>Подробен csv файл:</translation>
+			<translation>詳細csvファイル：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_detail_csv</source>
@@ -20238,7 +20237,7 @@
 		</message>
 		<message>
 			<source>chk_composer</source>
-			<translation>Композитор pdf файл</translation>
+			<translation>コンポーザーpdfファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_composer</source>
@@ -20246,7 +20245,7 @@
 		</message>
 		<message>
 			<source>lbl_composer_disabled</source>
-			<translation>Композиторът е деактивиран</translation>
+			<translation>コンポーザー使用不可</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_composer_disabled</source>
@@ -20254,15 +20253,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>dlg_psector_rapport</source>
-			<translation>Доклад за сектора</translation>
+			<translation>セクター・ラポール</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_psector_rapport</source>
@@ -20270,7 +20269,7 @@
 		</message>
 		<message>
 			<source>grb_rapport</source>
-			<translation>Рапорт</translation>
+			<translation>ラポール</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_rapport</source>
@@ -20278,7 +20277,7 @@
 		</message>
 		<message>
 			<source>btn_ok</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_ok</source>
@@ -20286,7 +20285,7 @@
 		</message>
 		<message>
 			<source>lbl_prices_list</source>
-			<translation>Списък с цени csv файл:</translation>
+			<translation>価格リストcsvファイル：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_prices_list</source>
@@ -20302,7 +20301,7 @@
 		</message>
 		<message>
 			<source>lbl_template</source>
-			<translation>Шаблон:</translation>
+			<translation>テンプレート</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_template</source>
@@ -20325,7 +20324,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Композитор pdf файл</translation>
+			<translation>コンポーザーpdfファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -20341,7 +20340,7 @@
 		</message>
 		<message>
 			<source>btn_repair</source>
-			<translation>Композитор pdf файл</translation>
+			<translation>コンポーザーpdfファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_repair</source>
@@ -20826,11 +20825,11 @@
 		<name>result_selector</name>
 		<message>
 			<source>title</source>
-			<translation>Селектор на резултати</translation>
+			<translation>結果セレクタ</translation>
 		</message>
 		<message>
 			<source>lbl_result_compare</source>
-			<translation>Резултат за сравнение:</translation>
+			<translation>比較すべき結果：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_compare</source>
@@ -20838,7 +20837,7 @@
 		</message>
 		<message>
 			<source>lbl_result_main</source>
-			<translation>Резултат за показване:</translation>
+			<translation>結果を示す：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_main</source>
@@ -20846,7 +20845,7 @@
 		</message>
 		<message>
 			<source>tab_result</source>
-			<translation>Резултат</translation>
+			<translation>結果</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_result</source>
@@ -20854,7 +20853,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -20862,7 +20861,7 @@
 		</message>
 		<message>
 			<source>dlg_result_selector</source>
-			<translation>Селектор на резултати</translation>
+			<translation>結果セレクタ</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_result_selector</source>
@@ -20870,7 +20869,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -20878,7 +20877,7 @@
 		</message>
 		<message>
 			<source>lbl_descript_compare</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript_compare</source>
@@ -20886,7 +20885,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -20961,11 +20960,11 @@
 		<name>search</name>
 		<message>
 			<source>title</source>
-			<translation>SearchPlus</translation>
+			<translation>サーチプラス</translation>
 		</message>
 		<message>
 			<source>lbl_msg</source>
-			<translation>Не са намерени резултати</translation>
+			<translation>結果は見つかりませんでした</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
@@ -20973,7 +20972,7 @@
 		</message>
 		<message>
 			<source>dlg_search</source>
-			<translation>SearchPlus</translation>
+			<translation>サーチプラス</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_search</source>
@@ -20981,7 +20980,7 @@
 		</message>
 		<message>
 			<source>Check all</source>
-			<translation>Проверете всички</translation>
+			<translation>すべてチェック</translation>
 		</message>
 		<message>
 			<source>tooltip_Check all</source>
@@ -20992,7 +20991,7 @@
 		<name>search_workcat</name>
 		<message>
 			<source>title</source>
-			<translation>Търсене в Workcat</translation>
+			<translation>ワークキャット検索</translation>
 		</message>
 		<message>
 			<source>btn_path</source>
@@ -21004,7 +21003,7 @@
 		</message>
 		<message>
 			<source>btn_export_to_csv</source>
-			<translation>Експортиране в CSV</translation>
+			<translation>CSVエクスポート</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_export_to_csv</source>
@@ -21012,7 +21011,7 @@
 		</message>
 		<message>
 			<source>tab_init</source>
-			<translation>Инсталиран</translation>
+			<translation>設置済み</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_init</source>
@@ -21020,7 +21019,7 @@
 		</message>
 		<message>
 			<source>btn_state1</source>
-			<translation>Активиране на</translation>
+			<translation>アクティベート</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_state1</source>
@@ -21028,7 +21027,7 @@
 		</message>
 		<message>
 			<source>lbl_end</source>
-			<translation>Филтрирайте по:</translation>
+			<translation>フィルター</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end</source>
@@ -21036,7 +21035,7 @@
 		</message>
 		<message>
 			<source>btn_state0</source>
-			<translation>Активиране на</translation>
+			<translation>アクティベート</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_state0</source>
@@ -21044,7 +21043,7 @@
 		</message>
 		<message>
 			<source>lbl_total2</source>
-			<translation>Общ брой:</translation>
+			<translation>総数だ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_total2</source>
@@ -21052,7 +21051,7 @@
 		</message>
 		<message>
 			<source>tab_doc</source>
-			<translation>Документи</translation>
+			<translation>資料</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_doc</source>
@@ -21060,7 +21059,7 @@
 		</message>
 		<message>
 			<source>tab_ended</source>
-			<translation>Премахнати</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_ended</source>
@@ -21068,7 +21067,7 @@
 		</message>
 		<message>
 			<source>dlg_search_workcat</source>
-			<translation>Търсене в Workcat</translation>
+			<translation>ワークキャット検索</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_search_workcat</source>
@@ -21076,7 +21075,7 @@
 		</message>
 		<message>
 			<source>lbl_destination_path</source>
-			<translation>Път за местоназначение:</translation>
+			<translation>デスティネーション・パス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_destination_path</source>
@@ -21084,7 +21083,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -21092,7 +21091,7 @@
 		</message>
 		<message>
 			<source>lbl_feat_ini</source>
-			<translation>Функции, инсталирани с избрания workcat</translation>
+			<translation>選択したワークキャットにインストールされている機能</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feat_ini</source>
@@ -21100,7 +21099,7 @@
 		</message>
 		<message>
 			<source>lbl_feat_end</source>
-			<translation>Функции, премахнати с избрания workcat</translation>
+			<translation>選択したワークキャットで削除された機能</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feat_end</source>
@@ -21108,7 +21107,7 @@
 		</message>
 		<message>
 			<source>lbl_init</source>
-			<translation>Филтрирайте по:</translation>
+			<translation>フィルター</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_init</source>
@@ -21116,7 +21115,7 @@
 		</message>
 		<message>
 			<source>lbl_total1</source>
-			<translation>Общ брой:</translation>
+			<translation>総数だ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_total1</source>
@@ -21131,7 +21130,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -21171,7 +21170,7 @@
 		</message>
 		<message>
 			<source>dlg_selector</source>
-			<translation>Селектор</translation>
+			<translation>セレクター</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_selector</source>
@@ -21179,11 +21178,11 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 	</context>
 	<context>
@@ -21210,7 +21209,7 @@
 		</message>
 		<message>
 			<source>dlg_selector_date</source>
-			<translation>Управление на Mincut</translation>
+			<translation>ミニカットマネジメント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_selector_date</source>
@@ -21430,7 +21429,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -21462,7 +21461,7 @@
 		</message>
 		<message>
 			<source>dlg_status_selector</source>
-			<translation>Избирател на състоянието</translation>
+			<translation>ステータスセレクター</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_status_selector</source>
@@ -21486,7 +21485,7 @@
 		</message>
 		<message>
 			<source>lbl_result_main</source>
-			<translation>Променяте състоянието на следния резултат:</translation>
+			<translation>以下の結果のステータスを変更します：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_main</source>
@@ -21502,7 +21501,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -21510,7 +21509,7 @@
 		</message>
 		<message>
 			<source>lbl_new_status</source>
-			<translation>Нов статус:</translation>
+			<translation>新しいステータス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_status</source>
@@ -21592,7 +21591,7 @@
 		<name>style_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -21608,7 +21607,7 @@
 		</message>
 		<message>
 			<source>tooltip_style_name</source>
-			<translation>Въведете името на слоя за филтриране</translation>
+			<translation>フィルターにレイヤー名を導入する</translation>
 		</message>
 		<message>
 			<source>btn_deleteGroup</source>
@@ -21616,7 +21615,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_deleteGroup</source>
-			<translation>Изтриване на избрана категория</translation>
+			<translation>選択したカテゴリーを削除する</translation>
 		</message>
 		<message>
 			<source>btn_update_style</source>
@@ -21632,15 +21631,15 @@
 		</message>
 		<message>
 			<source>tooltip_btn_addGroup</source>
-			<translation>Добавяне на нова категория</translation>
+			<translation>新しいカテゴリーを追加する</translation>
 		</message>
 		<message>
 			<source>btn_updateStyle</source>
-			<translation>Актуализиране на стила</translation>
+			<translation>更新スタイル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_updateStyle</source>
-			<translation>Актуализира стила на избрания слой със стила в съответния слой на проекта</translation>
+			<translation>選択されたレイヤーのスタイルを、対応するプロジェクトレイヤーのスタイルで更新する</translation>
 		</message>
 		<message>
 			<source>btn_delete_style</source>
@@ -21660,31 +21659,31 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>btn_deleteStyle</source>
-			<translation>Изтриване на стила</translation>
+			<translation>スタイル削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_deleteStyle</source>
-			<translation>Премахва даден стил от категорията</translation>
+			<translation>カテゴリーからスタイルを削除する</translation>
 		</message>
 		<message>
 			<source>btn_update_group</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_group</source>
-			<translation>Актуализиране на избраната категория</translation>
+			<translation>選択したカテゴリーを更新</translation>
 		</message>
 		<message>
 			<source>dlg_style_manager</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_style_manager</source>
@@ -21696,23 +21695,23 @@
 		</message>
 		<message>
 			<source>tooltip_stylegroup</source>
-			<translation>Всички категории на стила ви</translation>
+			<translation>すべてのスタイル・カテゴリー</translation>
 		</message>
 		<message>
 			<source>btn_addStyle</source>
-			<translation>Добавяне на стил</translation>
+			<translation>スタイルを追加する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_addStyle</source>
-			<translation>Добавя слой към избраната категория</translation>
+			<translation>選択したカテゴリーにレイヤーを追加する</translation>
 		</message>
 		<message>
 			<source>btn_refreshAll</source>
-			<translation>Обновяване на всички</translation>
+			<translation>すべてをリフレッシュ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_refreshAll</source>
-			<translation>Презареждане на стиловете, заредени в проекта</translation>
+			<translation>プロジェクトに読み込まれたスタイルをリロードする</translation>
 		</message>
 		<message>
 			<source>btn_add_style</source>
@@ -21732,7 +21731,7 @@
 		</message>
 		<message>
 			<source>lbl_filter_name</source>
-			<translation>Филтрирайте по: Име на слоя</translation>
+			<translation>フィルタをかけるレイヤー名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter_name</source>
@@ -21932,7 +21931,7 @@
 		<name>toolbox</name>
 		<message>
 			<source>title</source>
-			<translation>Кутия с инструменти</translation>
+			<translation>ツールボックス</translation>
 		</message>
 		<message>
 			<source>trv_reports</source>
@@ -21944,7 +21943,7 @@
 		</message>
 		<message>
 			<source>tab_loginfo</source>
-			<translation>Информационен дневник</translation>
+			<translation>情報ログ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_loginfo</source>
@@ -21984,7 +21983,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -21992,7 +21991,7 @@
 		</message>
 		<message>
 			<source>dlg_toolbox</source>
-			<translation>Кутия с инструменти</translation>
+			<translation>ツールボックス</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_toolbox</source>
@@ -22016,7 +22015,7 @@
 		</message>
 		<message>
 			<source>btn_run</source>
-			<translation>Изпълнявайте</translation>
+			<translation>走る</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_run</source>
@@ -22024,7 +22023,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -22040,7 +22039,7 @@
 		</message>
 		<message>
 			<source>tab_config</source>
-			<translation>Конфигурация</translation>
+			<translation>コンフィグ</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_config</source>
@@ -22229,27 +22228,27 @@
 		<name>update_style_group</name>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_rename_copy</source>
-			<translation>Моля, изберете ново име на категорията:</translation>
+			<translation>新しいカテゴリー名を選択してください：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rename_copy</source>
-			<translation>Моля, изберете ново име на категорията:</translation>
+			<translation>新しいカテゴリー名を選択してください：</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 	</context>
 	<context>
@@ -22354,7 +22353,7 @@
 		<name>visit</name>
 		<message>
 			<source>title</source>
-			<translation>Посетете</translation>
+			<translation>訪問</translation>
 		</message>
 		<message>
 			<source>lbl_expl</source>
@@ -22374,7 +22373,7 @@
 		</message>
 		<message>
 			<source>lbl_code</source>
-			<translation>Код:</translation>
+			<translation>コード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_code</source>
@@ -22382,7 +22381,7 @@
 		</message>
 		<message>
 			<source>lbl_id</source>
-			<translation>Идентификация:</translation>
+			<translation>だろう：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_id</source>
@@ -22390,7 +22389,7 @@
 		</message>
 		<message>
 			<source>lbl_status</source>
-			<translation>Статус:</translation>
+			<translation>ステータス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
@@ -22402,11 +22401,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_doc_delete</source>
-			<translation>Изтриване на документ</translation>
+			<translation>文書の削除</translation>
 		</message>
 		<message>
 			<source>dlg_visit</source>
-			<translation>Посетете</translation>
+			<translation>訪問</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit</source>
@@ -22414,7 +22413,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Информация:</translation>
+			<translation>情報</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -22426,7 +22425,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_doc_insert</source>
-			<translation>Вмъкване на документ</translation>
+			<translation>文書の挿入</translation>
 		</message>
 		<message>
 			<source>btn_doc_new</source>
@@ -22434,11 +22433,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_doc_new</source>
-			<translation>Създаване на нов документ</translation>
+			<translation>新規文書の作成</translation>
 		</message>
 		<message>
 			<source>btn_event_delete</source>
-			<translation>Изтриване на събитие</translation>
+			<translation>イベント削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_delete</source>
@@ -22446,7 +22445,7 @@
 		</message>
 		<message>
 			<source>lbl_visitcat_id</source>
-			<translation>Посетете идентификационен номер на котката:</translation>
+			<translation>猫IDをご覧ください：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visitcat_id</source>
@@ -22454,7 +22453,7 @@
 		</message>
 		<message>
 			<source>btn_event_insert</source>
-			<translation>Събитие за вмъкване</translation>
+			<translation>イベント挿入</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_insert</source>
@@ -22462,7 +22461,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -22494,15 +22493,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>lbl_feature_type</source>
-			<translation>Тип на функцията:</translation>
+			<translation>フィーチャー・タイプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_type</source>
@@ -22558,7 +22557,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -22574,7 +22573,7 @@
 		</message>
 		<message>
 			<source>btn_event_update</source>
-			<translation>Събитие за актуализиране</translation>
+			<translation>更新イベント</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_update</source>
@@ -22590,7 +22589,7 @@
 		</message>
 		<message>
 			<source>btn_add_geom</source>
-			<translation>Добавяне на геом</translation>
+			<translation>ジオムの追加</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_geom</source>
@@ -22666,11 +22665,11 @@
 		</message>
 		<message>
 			<source>tooltip_btn_open_doc</source>
-			<translation>Отваряне на документ</translation>
+			<translation>ドキュメントを開く</translation>
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>До:</translation>
+			<translation>へ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -22750,15 +22749,15 @@
 		</message>
 		<message>
 			<source>tab_relations</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>Връзки</translation>
+			<translation>関係</translation>
 		</message>
 		<message>
 			<source>tab_event</source>
-			<translation>Събитие</translation>
+			<translation>イベント</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_event</source>
@@ -22766,7 +22765,7 @@
 		</message>
 		<message>
 			<source>tab_document</source>
-			<translation>Документ</translation>
+			<translation>ドキュメント</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_document</source>
@@ -22798,7 +22797,7 @@
 		</message>
 		<message>
 			<source>lbl_start_date</source>
-			<translation>От:</translation>
+			<translation>からだ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start_date</source>
@@ -22822,7 +22821,7 @@
 		</message>
 		<message>
 			<source>lbl_user_name</source>
-			<translation>Потребителско име:</translation>
+			<translation>ユーザー名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_user_name</source>
@@ -22830,7 +22829,7 @@
 		</message>
 		<message>
 			<source>tab_visit</source>
-			<translation>Посетете</translation>
+			<translation>訪問</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_visit</source>
@@ -22853,7 +22852,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_document</source>
-			<translation>Зареждане на документи</translation>
+			<translation>書類を読み込む</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_document</source>
@@ -22869,7 +22868,7 @@
 		</message>
 		<message>
 			<source>btn_open</source>
-			<translation>Отвори</translation>
+			<translation>オープン</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -22877,11 +22876,11 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Посетете ID:</translation>
+			<translation>IDをご覧ください：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>Посещение ID</translation>
+			<translation>IDを見る</translation>
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
@@ -22916,7 +22915,7 @@
 		</message>
 		<message>
 			<source>lbl_value</source>
-			<translation>Стойност:</translation>
+			<translation>価値がある：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value</source>
@@ -22948,7 +22947,7 @@
 		</message>
 		<message>
 			<source>lbl_text</source>
-			<translation>Текст:</translation>
+			<translation>テキスト</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text</source>
@@ -22964,7 +22963,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Стойност на позицията:</translation>
+			<translation>ポジションの値：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -22980,7 +22979,7 @@
 		</message>
 		<message>
 			<source>btn_delete_file</source>
-			<translation>Изтриване на файла</translation>
+			<translation>ファイルの削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
@@ -22988,7 +22987,7 @@
 		</message>
 		<message>
 			<source>btn_add_file</source>
-			<translation>Добавяне на файл</translation>
+			<translation>ファイルを追加する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_file</source>
@@ -23004,7 +23003,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Идентификатор на параметъра:</translation>
+			<translation>パラメータID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -23012,7 +23011,7 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Идентификатор на позицията:</translation>
+			<translation>ポジションID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_id</source>
@@ -23020,7 +23019,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event</source>
-			<translation>Стандартно събитие с дъга</translation>
+			<translation>スタンダード・アーク・イベント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event</source>
@@ -23068,7 +23067,7 @@
 		</message>
 		<message>
 			<source>lbl_files</source>
-			<translation>Файлове:</translation>
+			<translation>ファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_files</source>
@@ -23079,11 +23078,11 @@
 		<name>visit_event_full</name>
 		<message>
 			<source>title</source>
-			<translation>Събитие</translation>
+			<translation>イベント</translation>
 		</message>
 		<message>
 			<source>lbl_xcoord</source>
-			<translation>Координати X</translation>
+			<translation>Xコーディネート</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_xcoord</source>
@@ -23131,7 +23130,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Стойност на позицията:</translation>
+			<translation>ポジションの値：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -23147,7 +23146,7 @@
 		</message>
 		<message>
 			<source>lbl_files</source>
-			<translation>Файлове:</translation>
+			<translation>ファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_files</source>
@@ -23155,7 +23154,7 @@
 		</message>
 		<message>
 			<source>lbl_tstamp</source>
-			<translation>Печат:</translation>
+			<translation>Tスタンプ</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_tstamp</source>
@@ -23163,7 +23162,7 @@
 		</message>
 		<message>
 			<source>lbl_is_last</source>
-			<translation>Последен е:</translation>
+			<translation>これが最後だ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_is_last</source>
@@ -23171,7 +23170,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event_full</source>
-			<translation>Събитие</translation>
+			<translation>イベント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event_full</source>
@@ -23195,7 +23194,7 @@
 		</message>
 		<message>
 			<source>lbl_compass</source>
-			<translation>Компас:</translation>
+			<translation>コンパス</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compass</source>
@@ -23203,7 +23202,7 @@
 		</message>
 		<message>
 			<source>lbl_value</source>
-			<translation>Стойност:</translation>
+			<translation>価値がある：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value</source>
@@ -23211,7 +23210,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Идентификатор на параметъра:</translation>
+			<translation>パラメータID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -23219,7 +23218,7 @@
 		</message>
 		<message>
 			<source>lbl_value1</source>
-			<translation>Стойност 1:</translation>
+			<translation>価値 1：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value1</source>
@@ -23227,7 +23226,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Стойност 2:</translation>
+			<translation>価値 2：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -23251,7 +23250,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -23275,7 +23274,7 @@
 		</message>
 		<message>
 			<source>lbl_text</source>
-			<translation>Текст:</translation>
+			<translation>テキスト</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text</source>
@@ -23291,7 +23290,7 @@
 		</message>
 		<message>
 			<source>lbl_id</source>
-			<translation>Идентификация:</translation>
+			<translation>だろう：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_id</source>
@@ -23299,15 +23298,15 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Посетете ID:</translation>
+			<translation>IDをご覧ください：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>Посещение ID</translation>
+			<translation>IDを見る</translation>
 		</message>
 		<message>
 			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
+			<translation>ジオム3</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom3</source>
@@ -23331,7 +23330,7 @@
 		</message>
 		<message>
 			<source>tab_files</source>
-			<translation>Файлове</translation>
+			<translation>ファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_files</source>
@@ -23363,7 +23362,7 @@
 		</message>
 		<message>
 			<source>lbl_event_code</source>
-			<translation>Код на събитието:</translation>
+			<translation>イベントコード</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_code</source>
@@ -23387,7 +23386,7 @@
 		</message>
 		<message>
 			<source>lbl_geom2</source>
-			<translation>Geom 2:</translation>
+			<translation>ジオム2</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom2</source>
@@ -23395,7 +23394,7 @@
 		</message>
 		<message>
 			<source>lbl_geom1</source>
-			<translation>Geom 1:</translation>
+			<translation>ジオム1：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom1</source>
@@ -23403,7 +23402,7 @@
 		</message>
 		<message>
 			<source>lbl_ycoord</source>
-			<translation>Y коорд:</translation>
+			<translation>Yコーディネート：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ycoord</source>
@@ -23419,7 +23418,7 @@
 		</message>
 		<message>
 			<source>tab_info</source>
-			<translation>Информация</translation>
+			<translation>インフォメーション</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_info</source>
@@ -23427,7 +23426,7 @@
 		</message>
 		<message>
 			<source>lbl_index_val</source>
-			<translation>Индекс на капана:</translation>
+			<translation>インデックス・トラップ：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_index_val</source>
@@ -23459,7 +23458,7 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Идентификатор на позицията:</translation>
+			<translation>ポジションID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_id</source>
@@ -23474,7 +23473,7 @@
 		</message>
 		<message>
 			<source>lbl_value1</source>
-			<translation>Стойност 1:</translation>
+			<translation>価値 1：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value1</source>
@@ -23538,7 +23537,7 @@
 		</message>
 		<message>
 			<source>lbl_files</source>
-			<translation>Файлове:</translation>
+			<translation>ファイル</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_files</source>
@@ -23546,7 +23545,7 @@
 		</message>
 		<message>
 			<source>lbl_geom1</source>
-			<translation>Geom 1:</translation>
+			<translation>ジオム1：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom1</source>
@@ -23554,7 +23553,7 @@
 		</message>
 		<message>
 			<source>lbl_geom2</source>
-			<translation>Geom 2:</translation>
+			<translation>ジオム2</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom2</source>
@@ -23562,7 +23561,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Идентификатор на параметъра:</translation>
+			<translation>パラメータID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -23570,7 +23569,7 @@
 		</message>
 		<message>
 			<source>btn_add_file</source>
-			<translation>Добавяне на файл</translation>
+			<translation>ファイルを追加する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_file</source>
@@ -23578,7 +23577,7 @@
 		</message>
 		<message>
 			<source>lbl_text</source>
-			<translation>Текст:</translation>
+			<translation>テキスト</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text</source>
@@ -23594,7 +23593,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Стойност на позицията:</translation>
+			<translation>ポジションの値：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -23602,7 +23601,7 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Идентификатор на позицията:</translation>
+			<translation>ポジションID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_id</source>
@@ -23618,7 +23617,7 @@
 		</message>
 		<message>
 			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
+			<translation>ジオム3</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom3</source>
@@ -23674,7 +23673,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Стойност 2:</translation>
+			<translation>価値 2：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -23682,7 +23681,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event_rehab</source>
-			<translation>Събитие с дъга за рехабилитация</translation>
+			<translation>リハビリ・アーク・イベント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event_rehab</source>
@@ -23690,7 +23689,7 @@
 		</message>
 		<message>
 			<source>btn_delete_file</source>
-			<translation>Изтриване на файла</translation>
+			<translation>ファイルの削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
@@ -23701,11 +23700,11 @@
 		<name>visit_gallery</name>
 		<message>
 			<source>title</source>
-			<translation>Галерия</translation>
+			<translation>ギャラリー</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -23721,7 +23720,7 @@
 		</message>
 		<message>
 			<source>lbl_event_id</source>
-			<translation>Идентификатор на събитието:</translation>
+			<translation>イベントID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_id</source>
@@ -23745,11 +23744,11 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Посетете ID:</translation>
+			<translation>IDをご覧ください：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>Посещение ID</translation>
+			<translation>IDを見る</translation>
 		</message>
 		<message>
 			<source>btn_next</source>
@@ -23761,7 +23760,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_gallery</source>
-			<translation>Галерия</translation>
+			<translation>ギャラリー</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_gallery</source>
@@ -23800,7 +23799,7 @@
 		</message>
 		<message>
 			<source>lbl_event_id</source>
-			<translation>Идентификатор на събитието:</translation>
+			<translation>イベントID：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_id</source>
@@ -23808,11 +23807,11 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Посетете ID:</translation>
+			<translation>IDをご覧ください：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>Посещение ID</translation>
+			<translation>IDを見る</translation>
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
@@ -23824,7 +23823,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_gallery_zoom</source>
-			<translation>Увеличаване на галерията</translation>
+			<translation>ギャラリーズーム</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_gallery_zoom</source>
@@ -23867,7 +23866,7 @@
 		<name>visit_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Управление на Mincut</translation>
+			<translation>ミニカットマネジメント</translation>
 		</message>
 		<message>
 			<source>btn_open</source>
@@ -23887,7 +23886,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_manager</source>
-			<translation>Управление на Mincut</translation>
+			<translation>ミニカットマネジメント</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_manager</source>
@@ -24018,7 +24017,7 @@
 		<name>visit_picture</name>
 		<message>
 			<source>title</source>
-			<translation>Добавяне на снимка</translation>
+			<translation>画像を追加</translation>
 		</message>
 		<message>
 			<source>path_doc</source>
@@ -24030,15 +24029,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>dlg_visit_picture</source>
-			<translation>Добавяне на снимка</translation>
+			<translation>画像を追加</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_picture</source>
@@ -24046,7 +24045,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -24054,18 +24053,18 @@
 		</message>
 		<message>
 			<source>lbl_link</source>
-			<translation>Връзка:</translation>
+			<translation>リンク</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_link</source>
-			<translation>Връзка към</translation>
+			<translation>リンク</translation>
 		</message>
 	</context>
 	<context>
 		<name>workcat_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -24077,7 +24076,7 @@
 		</message>
 		<message>
 			<source>dlg_workcat_manager</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workcat_manager</source>
@@ -24274,7 +24273,7 @@
 		</message>
 		<message>
 			<source>btn_toggle_privacy</source>
-			<translation>Превключване на поверителността</translation>
+			<translation>トグル・プライバシー</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_toggle_privacy</source>
@@ -24282,11 +24281,11 @@
 		</message>
 		<message>
 			<source>txt_workspace_name</source>
-			<translation>txt_workspace_name</translation>
+			<translation>txt_ワークスペース名</translation>
 		</message>
 		<message>
 			<source>tooltip_txt_workspace_name</source>
-			<translation>Име на работното пространство *Задължително</translation>
+			<translation>ワークスペース名 *必須</translation>
 		</message>
 		<message>
 			<source>dlg_workspace_create</source>
@@ -24298,31 +24297,31 @@
 		</message>
 		<message>
 			<source>tab_new_workspace</source>
-			<translation>Име на работното пространство:</translation>
+			<translation>ワークスペース名：</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_new_workspace</source>
-			<translation>Име на работното пространство</translation>
+			<translation>ワークスペース名</translation>
 		</message>
 		<message>
 			<source>lbl_new_workspace_descript</source>
-			<translation>Описание:</translation>
+			<translation>説明</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_workspace_descript</source>
-			<translation>Описание на работното пространство</translation>
+			<translation>ワークスペースの説明</translation>
 		</message>
 		<message>
 			<source>lbl_new_workspace_chk</source>
-			<translation>Име на работното пространство:</translation>
+			<translation>ワークスペース名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_workspace_chk</source>
-			<translation>Име на работното пространство</translation>
+			<translation>ワークスペース名</translation>
 		</message>
 		<message>
 			<source>btn_update</source>
-			<translation>Актуализация</translation>
+			<translation>更新</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
@@ -24330,7 +24329,7 @@
 		</message>
 		<message>
 			<source>dlg_workspace_create</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workspace_create</source>
@@ -24338,15 +24337,15 @@
 		</message>
 		<message>
 			<source>tab_info_log</source>
-			<translation>Име на работното пространство:</translation>
+			<translation>ワークスペース名：</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_info_log</source>
-			<translation>Име на работното пространство</translation>
+			<translation>ワークスペース名</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Приемане на</translation>
+			<translation>受け入れる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -24354,7 +24353,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Отмяна на</translation>
+			<translation>キャンセル</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -24366,15 +24365,15 @@
 		</message>
 		<message>
 			<source>tooltip_txt_workspace_descript</source>
-			<translation>Използвайте това, за да опишете за какво се използва работното пространство</translation>
+			<translation>ワークスペースの用途を説明するために使用します。</translation>
 		</message>
 		<message>
 			<source>lbl_new_workspace</source>
-			<translation>Име на работното пространство:</translation>
+			<translation>ワークスペース名：</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_workspace</source>
-			<translation>Име на работното пространство</translation>
+			<translation>ワークスペース名</translation>
 		</message>
 	</context>
 	<context>
@@ -24389,23 +24388,23 @@
 		</message>
 		<message>
 			<source>tooltip_txt_name</source>
-			<translation>Име на работното пространство</translation>
+			<translation>ワークスペース名</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Изтриване на</translation>
+			<translation>削除</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>Изтриване на избраното работно пространство</translation>
+			<translation>選択したワークスペースを削除する</translation>
 		</message>
 		<message>
 			<source>btn_current</source>
-			<translation>Задаване на текущия</translation>
+			<translation>電流を設定する</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_current</source>
-			<translation>Задаване на текущото работно пространство</translation>
+			<translation>現在のワークスペースを設定する</translation>
 		</message>
 		<message>
 			<source>dlg_workspace_manager</source>
@@ -24417,7 +24416,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Затвори</translation>
+			<translation>閉じる</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -24425,15 +24424,15 @@
 		</message>
 		<message>
 			<source>btn_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
-			<translation>Създаване на</translation>
+			<translation>作成</translation>
 		</message>
 		<message>
 			<source>dlg_workspace_manager</source>
-			<translation>Диалог</translation>
+			<translation>対話</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workspace_manager</source>
@@ -24445,7 +24444,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_vdefault_workspace</source>
-			<translation>Текущо работно пространство</translation>
+			<translation>現在のワークスペース</translation>
 		</message>
 		<message>
 			<source>btn_toggle_privacy</source>
@@ -24457,11 +24456,11 @@
 		</message>
 		<message>
 			<source>btn_reset</source>
-			<translation>Нулиране на работното пространство</translation>
+			<translation>ワークスペースをリセットする</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_reset</source>
-			<translation>Нулиране на стойностите на текущото работно пространство</translation>
+			<translation>現在のワークスペースの値をリセットする。</translation>
 		</message>
 		<message>
 			<source>label</source>
@@ -24481,7 +24480,7 @@
 		</message>
 		<message>
 			<source>lbl_workspace_name</source>
-			<translation>Филтрирайте по: Име на работното пространство</translation>
+			<translation>フィルタをかけるワークスペース名</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workspace_name</source>

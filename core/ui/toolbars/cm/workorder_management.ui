@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>campaign_management</class>
- <widget class="QDialog" name="campaign_management">
+ <class>workorder_management</class>
+ <widget class="QDialog" name="workorder_management">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>835</width>
-    <height>669</height>
+    <height>666</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Administrador de Campañas</string>
+   <string>Workorder Management</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
@@ -130,7 +130,7 @@
      <item row="0" column="1">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Tancar</string>
+        <string>Close</string>
        </property>
       </widget>
      </item>

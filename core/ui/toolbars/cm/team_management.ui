@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Administrador d'equips</string>
+   <string>Team management</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -23,7 +23,7 @@
        </property>
        <widget class="QWidget" name="tab_user">
         <attribute name="title">
-         <string>Usuaris</string>
+         <string>Users</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="3" column="1">
@@ -146,7 +146,7 @@
        </widget>
        <widget class="QWidget" name="tab_visit_class">
         <attribute name="title">
-         <string>Classe de Visita</string>
+         <string>Visit class</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="1">
@@ -220,7 +220,7 @@
      <item>
       <widget class="QPushButton" name="btn_close">
        <property name="text">
-        <string>Tancar</string>
+        <string>Close</string>
        </property>
       </widget>
      </item>

@@ -239,15 +239,6 @@ class GwDocManagerUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-UINAME = "element"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwElementUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
 UINAME = "element_manager"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
@@ -798,15 +789,6 @@ class ResourcesManagementUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-UINAME = "organization_create"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class OrganizationCreateUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
 UINAME = "team_create"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
@@ -1115,16 +1097,6 @@ FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
 
 class GwAdminVisitParamUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-# admin cm
-UINAME = "admin_cm_base"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwAdminCmBaseUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 

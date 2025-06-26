@@ -46,12 +46,12 @@ class GwUpdateSchemaTask(GwTask):
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
         self.admin.progress_value = 0
-        msg = "Task 'Update schema' execute function '{0}'"
-        msg_params = ("def main_execution",)
+        msg = "Task '{0}' execute function '{1}'"
+        msg_params = ("Update schema", "main_execution",)
         tools_log.log_info(msg, msg_params=msg_params)
         status = self.main_execution()
         if not status:
-            msg = "Function {0} returned False"
+            msg = "Function '{0}' returned False"
             msg_params = ("main_execution",)
             tools_log.log_info(msg, msg_params=msg_params)
             return False
@@ -97,10 +97,10 @@ class GwUpdateSchemaTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f"<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"
-            msg += f"<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"
-            msg += f"<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"
-            msg += f"<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"
+            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
+            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
+            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
+            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
 

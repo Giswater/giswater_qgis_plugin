@@ -540,7 +540,9 @@ class GwProfileButton(GwAction):
         if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)
         else:
-            tools_log.log_info(f"User settings file: {img_path}")
+            msg = "User settings file: {0}"
+            msg_params = (img_path,)
+            tools_log.log_info(msg, msg_params=msg_params)
 
         fig_size = plt.rcParams["figure.figsize"]
 

@@ -21,7 +21,9 @@ class GwTestTask:
         This will be passed together with the exception (None in case of success) to the on_finished method
         """
 
-        tools_log.log_info("Started task '{}'".format(task.description()))
+        msg = "Started task '{0}'"
+        msg_params = (task.description(),)
+        tools_log.log_info(msg, msg_params=msg_params)
 
         wait_time = wait_time / 100
         total = 0
@@ -45,32 +47,38 @@ class GwTestTask:
 
     def _task_stopped(self, task):
         """"""
-        tools_log.log_info('Task "{name}" was cancelled'.format(name=task.description()))
+        msg = "Task '{0}' was cancelled"
+        msg_params = (task.description(),)
+        tools_log.log_info(msg, msg_params=msg_params)
 
     def _task_completed(self, exception, result):
         """ Called when run is finished.
         Exception is not None if run raises an exception. Result is the return value of run
         """
 
-        tools_log.log_info("task_completed")
+        msg = "task_completed"
+        tools_log.log_info(msg)
 
         if exception is None:
             if result is None:
                 msg = 'Completed with no exception and no result'
                 tools_log.log_info(msg)
             else:
-                tools_log.log_info('Task {name} completed\n'
-                                   'Total: {total} (with {iterations} '
-                                   'iterations)'.format(name=result['task'], total=result['total'],
-                                                        iterations=result['iterations']))
+                msg = "Task {0} completed\n"
+                msg_params = (result['task'], result['total'], result['iterations'])
+                tools_log.log_info(msg, msg_params=msg_params)
         else:
-            tools_log.log_info("Exception: {}".format(exception))
+            msg = "Exception: {0}"
+            msg_params = (exception,)
+            tools_log.log_info(msg, msg_params=msg_params)
             raise exception
 
     def _task_example(self):
         """ Add task example to taskManager """
-
-        tools_log.log_info("task_example")
+        
+        msg = "{0}"
+        msg_params = ("task_example",)
+        tools_log.log_info(msg, msg_params=msg_params)
         task1 = QgsTask.fromFunction('task_example', self._task_started, on_finished=self._task_completed, wait_time=20)
         QgsApplication.taskManager().addTask(task1)
 

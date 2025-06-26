@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Administrador de Recursos</string>
+   <string>Resource Management</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -37,10 +37,10 @@
            <property name="topMargin">
             <number>0</number>
            </property>
-           <item row="0" column="5">
-            <widget class="QPushButton" name="btn_organi_delete">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
              <property name="text">
-              <string>Delete</string>
+              <string>Filter by name: </string>
              </property>
             </widget>
            </item>
@@ -57,29 +57,8 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="3">
-            <widget class="QPushButton" name="btn_organi_create">
-             <property name="text">
-              <string>Create</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <widget class="QPushButton" name="btn_organi_update">
-             <property name="text">
-              <string>Update</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="1">
             <widget class="QLineEdit" name="txt_orgname"/>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Filtrar por nombre: </string>
-             </property>
-            </widget>
            </item>
           </layout>
          </item>
@@ -90,7 +69,7 @@
        </widget>
        <widget class="QWidget" name="tab_teams">
         <attribute name="title">
-         <string>Equipos</string>
+         <string>Teams</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
@@ -112,7 +91,7 @@
            <item row="1" column="0">
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Filtrar por organización:</string>
+              <string>Filter by organization:</string>
              </property>
             </widget>
            </item>
@@ -155,7 +134,7 @@
        </widget>
        <widget class="QWidget" name="tab_users">
         <attribute name="title">
-         <string>Usuarios</string>
+         <string>Users</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_7">
          <item row="0" column="0">
@@ -163,14 +142,14 @@
            <item row="0" column="4">
             <widget class="QPushButton" name="btn_user_update">
              <property name="text">
-              <string>Modificar</string>
+              <string>Modify</string>
              </property>
             </widget>
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Filtrar por equipo:</string>
+              <string>Filter by teams:</string>
              </property>
             </widget>
            </item>
@@ -190,14 +169,14 @@
            <item row="0" column="3">
             <widget class="QPushButton" name="btn_user_create">
              <property name="text">
-              <string>Crear</string>
+              <string>Create</string>
              </property>
             </widget>
            </item>
            <item row="0" column="5">
             <widget class="QPushButton" name="btn_user_delete">
              <property name="text">
-              <string>Eliminar</string>
+              <string>Delete</string>
              </property>
             </widget>
            </item>

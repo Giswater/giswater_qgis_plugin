@@ -53,15 +53,15 @@ class GwCreateSchemaTask(GwTask):
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
         self.admin.progress_value = 0
-        msg = "Task 'Create schema' execute function '{0}'"
-        msg_params = ("main_execution",)
+        msg = "Task '{0}' execute function '{1}'"
+        msg_params = ("Create schema", "main_execution",)
         tools_log.log_info(msg, msg_params=msg_params)
         status = self.main_execution()
         if not tools_os.set_boolean(status, False):
             message = "Function {0} returned False"
             tools_log.log_info(message, msg_params=msg_params)
             return False
-        msg_params = ("custom_execution",)
+        msg_params = ("Create schema", "custom_execution",)
         tools_log.log_info(msg, msg_params=msg_params)
         self.custom_execution()
         return True
@@ -92,9 +92,9 @@ class GwCreateSchemaTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f"<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"
-            msg += f"<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"
-            msg += f"<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"
+            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
+            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
+            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
             msg += f"<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
@@ -105,6 +105,9 @@ class GwCreateSchemaTask(GwTask):
         self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                              is_test=self.is_test)
         self.setProgress(100)
+        
+        # Emit task_finished signal with empty list
+        self.task_finished.emit([])
 
     def set_progress(self, value):
 
@@ -121,8 +124,8 @@ class GwCreateSchemaTask(GwTask):
         project_srid = self.params['project_srid']
 
         self.admin.progress_ratio = 0.8
-        msg = "Task 'Create schema' execute function '{0}'"
-        msg_params = ("calculate_number_of_files",)
+        msg = "Task '{0}' execute function '{1}'"
+        msg_params = ("Create schema", "calculate_number_of_files",)
         tools_log.log_info(msg, msg_params=msg_params)
         self.admin.total_sql_files = self.calculate_number_of_files()
         msg = "Number of SQL files 'TOTAL': {0}"

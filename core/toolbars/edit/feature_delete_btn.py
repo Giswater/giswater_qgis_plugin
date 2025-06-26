@@ -119,7 +119,7 @@ class GwFeatureDeleteButton(GwAction):
 
         # Get child layer
         sql = (f"SELECT array_agg({feature_type}_id) FROM {feature_type} "
-               f"WHERE {feature_type}_id LIKE '%{feature_id}%' LIMIT 10")
+               f"WHERE {feature_type}_id::text LIKE '%{feature_id}%' LIMIT 10")
         rows_typeahead = tools_db.get_rows(sql)
         rows_typeahead = rows_typeahead[0][0]
 

@@ -22,12 +22,12 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoub
     QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QMenu
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
-    QgsPointXY, QgsProject
+    QgsPointXY, QgsProject, QgsFeature
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
-from .catalog import GwCatalog
+from ..shared.catalog import GwCatalog
 from .dimensioning import GwDimensioning
-from .element import GwElement
+from ..toolbars.edit.element_manager_btn import GwElementManagerButton
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
 from .workcat import GwWorkcat
@@ -69,9 +69,25 @@ class GwInfo(QObject):
         self.connected = False
         self.rubber_band = tools_gw.create_rubberband(self.canvas, "point")
         self.snapper_manager = GwSnapManager(self.iface)
+        self.vertex_marker = self.snapper_manager.vertex_marker
         self.snapper_manager.set_snapping_layers()
         self.conf_supp = None
         self.prev_action = None
+
+        # Setting lists
+        self.rel_ids = []
+        self.rel_list_ids = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
+        self.rel_layers = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
+        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
+        self.rel_layers['element'] = tools_gw.get_layers_from_feature_type('element')
+        if global_vars.project_type == 'ud':
+            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+        self.rel_feature_type = None
+        self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]
+        self.point_xy = {"x": None, "y": None}
 
     def get_info_from_coordinates(self, point, tab_type):
         return self.open_form(point=point, tab_type=tab_type)
@@ -80,19 +96,19 @@ class GwInfo(QObject):
         return self.open_form(table_name=table_name, feature_id=feature_id, tab_type=tab_type, is_add_schema=is_add_schema)
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
-                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False):
+                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False, connect_signal=None):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
         :param feature_id: id of feature to do info
         :return:
         """
-
         try:
             # Manage tab signal
             self.tab_epa_loaded = False
             self.tab_element_loaded = False
             self.tab_relations_loaded = False
+            self.tab_features_loaded = False
             self.tab_connections_loaded = False
             self.tab_hydrometer_loaded = False
             self.tab_hydrometer_val_loaded = False
@@ -138,15 +154,15 @@ class GwInfo(QObject):
 
             function_name = None
             body = None
-
             # Insert new feature
-            if point and feature_cat:
+            if (point and feature_cat) or new_feature_id:
                 self.feature_cat = feature_cat
                 self.new_feature_id = new_feature_id
                 self.layer_new_feature = layer_new_feature
                 self.iface.actionPan().trigger()
                 feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
-                extras += f', "coordinates":{{{point}}}'
+                if point:
+                    extras += f', "coordinates":{{{point}}}'                    
                 body = tools_gw.create_body(feature=feature, extras=extras)
                 function_name = 'gw_fct_getfeatureinsert'
 
@@ -232,19 +248,18 @@ class GwInfo(QObject):
                 if feature_id:
                     x1 = self.complet_result['body']['feature']['geometry']['x']
                     y1 = self.complet_result['body']['feature']['geometry']['y']
+                    if x1 and y1:
+                        current_extent = global_vars.canvas.extent()
+                        feature_point = QgsPointXY(x1, y1)
 
-                    current_extent = global_vars.canvas.extent()
-
-                    feature_point = QgsPointXY(x1, y1)
-
-                    if not current_extent.contains(feature_point):
-                        global_vars.canvas.setCenter(feature_point)
-                        global_vars.canvas.refresh()
+                        if not current_extent.contains(feature_point):
+                            global_vars.canvas.setCenter(feature_point)
+                            global_vars.canvas.refresh()
 
                 feature_id = self.complet_result['body']['feature']['id']
 
                 result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
-                    new_feature=new_feature)
+                    new_feature=new_feature, connect_signal=connect_signal)
                 if feature_cat is not None:
                     self._manage_new_feature(self.complet_result, dialog)
                 return result, dialog
@@ -259,7 +274,7 @@ class GwInfo(QObject):
 
             elif template == 'element':
                 element_id = self.complet_result['body']['feature']['id']
-                manage_element = GwElement()
+                manage_element = GwElementManagerButton()
                 manage_element.get_element(new_element_id=False, selected_object_id=element_id)
                 dlg_add_element = manage_element.get_element_dialog()
                 dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
@@ -282,8 +297,8 @@ class GwInfo(QObject):
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
-    def add_feature(self, feature_cat, action=None):
-        """ Button 21, 22: Add 'node' or 'arc' """
+    def add_feature(self, feature_cat, action=None, connect_signal=None):
+        """ Button 21, 22: Add 'node', 'arc', 'connec' or 'element' """
 
         global is_inserting  # noqa: F824
         if is_inserting:
@@ -296,15 +311,32 @@ class GwInfo(QObject):
         keep_active = tools_os.set_boolean(keep_active, False)
         if not keep_active:
             self.prev_action = None
-
         tools_gw.connect_signal(self.iface.actionAddFeature().toggled, self._action_is_checked,
                                 'info', 'add_feature_actionAddFeature_toggled_action_is_checked')
-
         self.feature_cat = feature_cat
         # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
-        if self.info_layer:
+        
+        if self.info_layer and feature_cat.parent_layer == 've_genelem':
+
+            tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
+
+            config = self.info_layer.editFormConfig()
+            self.conf_supp = config.suppress()
+            config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
+            self.info_layer.setEditFormConfig(config)
+            self.iface.setActiveLayer(self.info_layer)
+            self.info_layer.startEditing()
+
+            # Connect signal with feature_id
+            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal), 
+                                    'info', 'add_feature_featureAdded_open_new_feature')
+            # Create a new feature with the given feature_id
+            feature = QgsFeature(self.info_layer.fields())
+            self.info_layer.addFeature(feature)
+
+        elif self.info_layer:
             # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
             # realizes that he has made a mistake and selects another feature, without this two features would
             # be inserted. This disconnect signal avoids it
@@ -317,7 +349,7 @@ class GwInfo(QObject):
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
             self.iface.actionAddFeature().trigger()
-            tools_gw.connect_signal(self.info_layer.featureAdded, self._open_new_feature,
+            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal),
                                     'info', 'add_feature_featureAdded_open_new_feature')
         else:
             message = "Layer not found"
@@ -343,8 +375,6 @@ class GwInfo(QObject):
         # Block the signals of de dialog so that the key ESC does not close it
         dialog.blockSignals(True)
 
-        self.vertex_marker = self.snapper_manager.vertex_marker
-
         # Set signals
         tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
         tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
@@ -358,9 +388,10 @@ class GwInfo(QObject):
 
     # region private functions
 
-    def _get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature):
+    def _get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature, connect_signal=None):
         return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id,
-                              layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature)
+                              layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature,
+                              connect_signal=connect_signal)
 
     def _manage_new_feature(self, complet_result, dialog):
 
@@ -388,7 +419,7 @@ class GwInfo(QObject):
             else:
                 if widget is None:
                     msg = "Widget {0} is not configured or have a bad config"
-                    msg_params = (field['columname'],)
+                    msg_params = (field['columnname'],)
                     tools_qgis.show_message(msg, dialog=dialog, msg_params=msg_params)
             if str(value) not in ('', None, -1, "None", "-1") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
@@ -457,7 +488,7 @@ class GwInfo(QObject):
 
         return result, self.dlg_generic
 
-    def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
+    def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None, connect_signal=None):
         """
         Opens a custom form
             :param feature_id: the id of the node that will populate the form (Integer)
@@ -468,7 +499,6 @@ class GwInfo(QObject):
             :param new_feature: Whether the form will create a new feature or not (Boolean)
             :return: self.complt_result, self.dlg_cf
         """
-
         # Dialog
         self.dlg_cf = GwInfoFeatureUi(self, sub_tag)
         tools_gw.load_settings(self.dlg_cf)
@@ -609,7 +639,7 @@ class GwInfo(QObject):
 
         # Check if audit schema exists
         sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
-        rows = tools_db.get_rows(sql, commit=False)
+        rows = tools_db.get_rows(sql, log_info=False, commit=False)
 
         # Check if audit is active
         schema_actived = tools_gw.get_config_parser('toolbars_add', 'audit_active', 'user', 'init', False)
@@ -619,6 +649,15 @@ class GwInfo(QObject):
 
         if rows and schema_actived:
             self._enable_action(dlg_cf, self.action_audit, True)
+
+        if connect_signal:
+            for signal in connect_signal:
+                func_name = signal.func.__name__
+                if func_name == "add_object":
+                    signal_kwargs = signal.keywords
+                    signal_kwargs['complet_result_info'] = complet_result
+                    
+                self.dlg_cf.dlg_closed.connect(signal)
 
         return self.complet_result, self.dlg_cf
 
@@ -655,7 +694,6 @@ class GwInfo(QObject):
         self.action_link = self.dlg_cf.findChild(QAction, "actionLink")
         self.action_help = self.dlg_cf.findChild(QAction, "actionHelp")
         self.action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
-        # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         self.action_section = self.dlg_cf.findChild(QAction, "actionSection")
         self.action_orifice = self.dlg_cf.findChild(QAction, "actionOrifice")
         self.action_outlet = self.dlg_cf.findChild(QAction, "actionOutlet")
@@ -663,6 +701,7 @@ class GwInfo(QObject):
         self.action_weir = self.dlg_cf.findChild(QAction, "actionWeir")
         self.action_demand = self.dlg_cf.findChild(QAction, "actionDemand")
         self.action_audit = self.dlg_cf.findChild(QAction, "actionAudit")
+        self.action_set_geom = self.dlg_cf.findChild(QAction, "actionSetGeom")
 
     def _manage_icons(self):
         """ Adds icons to actions and buttons """
@@ -688,6 +727,7 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_weir, "162")
         tools_gw.add_icon(self.action_demand, "163")
         tools_gw.add_icon(self.action_audit, "177")
+        tools_gw.add_icon(self.action_set_geom, "133")
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False, tab='tab_data'):
         """ Creates and populates all the widgets """
@@ -707,9 +747,10 @@ class GwInfo(QObject):
 
         current_layout = ""
         for field in complet_result['body']['data']['fields']:
+            
             if field.get('hidden'):
                 continue
-            if tab != field['tabname']:
+            if tab != field.get('tabname'):
                 continue
             if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
                     and field.get('value') in (None, ''):
@@ -848,7 +889,8 @@ class GwInfo(QObject):
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
-
+        self.action_set_geom.triggered.connect(self._get_point_xy)
+        
         # EPA Actions
         self.action_orifice.triggered.connect(partial(self._open_orifice_dlg))
         self.action_outlet.triggered.connect(partial(self._open_outlet_dlg))
@@ -1102,7 +1144,6 @@ class GwInfo(QObject):
             tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
 
         # Set circle vertex marker
-        self.vertex_marker = self.snapper_manager.vertex_marker
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
         self.vertex_marker.show()
 
@@ -1347,9 +1388,6 @@ class GwInfo(QObject):
         # Set snapping
         # layer = global_vars.iface.activeLayer() TODO: Remove this line if not needed
 
-        # Set marker
-        self.vertex_marker = self.snapper_manager.vertex_marker
-
         if feature_type == 'node':
             self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
@@ -1413,8 +1451,8 @@ class GwInfo(QObject):
         # Select only first element of the feature list
         feature = feature_list[0]
         feature_id = feature.attribute(str(self.feature_type) + '_id')
-        msg = (f"{tools_qt.tr('Selected snapped feature_id to copy values from')}: {snapped_feature_attr[0]}\n"
-               f"{tools_qt.tr('Do you want to copy its values to the current node?')}\n\n")
+        msg = (f'''{tools_qt.tr('Selected snapped feature_id to copy values from')}: {snapped_feature_attr[0]}\n'''
+               f'''{tools_qt.tr('Do you want to copy its values to the current node?')}\n\n''')
         # Replace id because we don't have to copy it!
         snapped_feature_attr[0] = feature_id
         snapped_feature_attr_aux = []
@@ -1765,13 +1803,6 @@ class GwInfo(QObject):
                     self.layer_new_feature.startEditing()
                 self.layer_new_feature.updateFeature(new_feature)
 
-                status = self.layer_new_feature.commitChanges()
-                if status is False:
-                    error = self.layer_new_feature.commitErrors()
-                    msg = str(error)
-                    tools_log.log_warning(msg)
-                    return False
-
                 self.new_feature_id = None
                 self._enable_action(dialog, "actionCentered", True)
                 self._enable_action(dialog, "actionAudit", True)
@@ -1780,6 +1811,8 @@ class GwInfo(QObject):
                 is_inserting = False
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
+                    if new_feature is not None:
+                        self.layer_new_feature.commitChanges()
                     # Force a map refresh
                     tools_qgis.refresh_map_canvas()  # First refresh all the layers
                     global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
@@ -1820,14 +1853,16 @@ class GwInfo(QObject):
                 epa_type_changed = True
 
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
-            print(json_result)
             if not json_result:
                 return False
-
+            
             if clear_json:
                 _json.clear()
 
             if "Accepted" in json_result['status']:
+                # If we create a new feature
+                if new_feature is not None:
+                    self.layer_new_feature.commitChanges()
                 msg = json_result['message']['text']
                 if msg is None:
                     msg = 'Feature upserted'
@@ -1838,6 +1873,10 @@ class GwInfo(QObject):
                 self._reload_fields(dialog, json_result, p_widget)
                 if epa_type_changed:
                     self._reload_epa_tab(dialog)
+
+                # Update geometry field (if user have selected a point)
+                if self.point_xy['x'] is not None:
+                    self._update_geom(p_table_id, id_name, newfeature_id)
 
                 if thread:
                     # If param is true show question and create thread
@@ -1857,6 +1896,9 @@ class GwInfo(QObject):
                         QgsApplication.taskManager().triggerTask(self.valve_thread)
             elif "Failed" in json_result['status']:
                 # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
+                # If we create a new feature
+                if self.new_feature_id is not None:
+                    self.layer_new_feature.rollBack()
                 return False
 
         # Tab EPA
@@ -2082,9 +2124,10 @@ class GwInfo(QObject):
             if new_feature is None:
                 can_edit = tools_os.set_boolean(tools_db.check_role_user('role_epa'))
                 if not can_edit:
-                    message = "You are not enabled to modify this epa_type widget"
+                    message = "You are not enabled to modify this {0} widget"
+                    msg_params = ("epa_type",)
                     title = "Change epa_type"
-                    tools_qt.show_info_box(message, title)
+                    tools_qt.show_info_box(message, title, msg_params=msg_params)
                     return
                 widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
                 msg = ("You are going to change the epa_type. With this operation you will lose information about "
@@ -2662,6 +2705,15 @@ class GwInfo(QObject):
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_relations_loaded = True
+        # Tab 'Features'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_features' and not self.tab_features_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_features')
+            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields)
+            tab_feature = dialog.tab_main.findChild(QTabWidget, 'tab_feature')
+            tab_feature.currentChanged.connect(partial(tools_gw.get_signal_change_tab, dialog, self.excluded_layers, 'tab_features_feature_id'))
+            tools_gw.get_signal_change_tab(dialog, self.excluded_layers, 'tab_features_feature_id')
+            self.tab_features_loaded = True
         # Tab 'Connections'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_connections')
@@ -2760,7 +2812,6 @@ class GwInfo(QObject):
             if complet_list is False:
                 return False
             tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
-        return complet_list
 
     def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields, id_name=None):
         """ Put filter widgets into layout and set headers into QTableView """
@@ -3017,7 +3068,6 @@ class GwInfo(QObject):
         for field in result['body']['data']['fields']:
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
             if widget.property('typeahead'):
-                # print(field['comboIds'])
                 tools_qt.set_completer_object(QCompleter(), QStandardItemModel(), widget, field['comboIds'])
                 tools_qt.set_widget_text(self.dlg_cf, widget, field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
@@ -3173,28 +3223,31 @@ class GwInfo(QObject):
         if not self.iface.actionAddFeature().isChecked():
             tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
-    def _open_new_feature(self, feature_id):
+    def _open_new_feature(self, feature_id, connect_signal=None):
         """
         :param feature_id: Parameter sent by the featureAdded method itself
         :return:
         """
 
-        self.info_layer.featureAdded.disconnect(self._open_new_feature)
+        tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
         geom = feature.geometry()
         list_points = None
-        if self.info_layer.geometryType() == 0:
-            points = geom.asPoint()
-            list_points = f'"x1":{points.x()}, "y1":{points.y()}'
-        elif self.info_layer.geometryType() in (1, 2):
-            points = geom.asPolyline()
-            init_point = points[0]
-            last_point = points[-1]
-            list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
-            list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
-        else:
-            msg = "NO FEATURE TYPE DEFINED"
-            tools_log.log_info(msg)
+        try:
+            if self.info_layer.geometryType() == 0:
+                points = geom.asPoint()
+                list_points = f'"x1":{points.x()}, "y1":{points.y()}'
+            elif self.info_layer.geometryType() in (1, 2):
+                points = geom.asPolyline()
+                init_point = points[0]
+                last_point = points[-1]
+                list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
+                list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
+            else:
+                msg = "NO FEATURE TYPE DEFINED"
+                tools_log.log_info(msg)
+        except Exception:
+            pass
 
         tools_gw.init_docker()
         global is_inserting  # noqa: F824
@@ -3204,7 +3257,8 @@ class GwInfo(QObject):
         self.info_feature.prev_action = self.prev_action
         result, dialog = self.info_feature._get_feature_insert(point=list_points, feature_cat=self.feature_cat,
                                                                new_feature_id=feature_id, new_feature=feature,
-                                                               layer_new_feature=self.info_layer, tab_type='data')
+                                                               layer_new_feature=self.info_layer, tab_type='data', 
+                                                               connect_signal=connect_signal)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         config = self.info_layer.editFormConfig()
@@ -3241,6 +3295,20 @@ class GwInfo(QObject):
         for combo_child in result['body']['data']:
             if combo_child is not None:
                 tools_gw.manage_combo_child(dialog, widget, combo_child)
+    
+    def _get_point_xy(self):
+        """ Capture point XY from the canvas """
+        self.snapper_manager.add_point(self.vertex_marker)
+        self.point_xy = self.snapper_manager.point_xy
+
+    def _update_geom(self, table_id, id_name, newfeature_id):
+        """ Update geometry field """
+        
+        srid = lib_vars.data_epsg
+        sql = (f"UPDATE {table_id}"
+               f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
+               f" WHERE {id_name} = {newfeature_id}")
+        tools_db.execute_sql(sql)
 
     # endregion
 # region Static functions used by the widgets in the custom form
@@ -4018,7 +4086,7 @@ def manage_element(element_id, **kwargs):
             expr_filter = f"{field_id} = '{feature_id}'"
             feature = tools_qgis.get_feature_by_expr(layer, expr_filter)
 
-    elem = GwElement()
+    elem = GwElementManagerButton()
     elem.get_element(True, feature, feature_type)
 
     # If element exist

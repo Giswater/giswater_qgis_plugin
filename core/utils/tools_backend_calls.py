@@ -13,7 +13,7 @@ import webbrowser
 from functools import partial
 from qgis.PyQt.QtCore import QDate, QRegExp, QRegularExpression
 from qgis.PyQt.QtGui import QStandardItemModel
-from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QTableView, QWidget, QDoubleSpinBox, QSpinBox
+from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QTableView, QWidget, QDoubleSpinBox, QSpinBox, QMenu
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsLayerTreeLayer, QgsVectorLayer
 from qgis.gui import QgsDateTimeEdit
 
@@ -21,9 +21,10 @@ from ... import global_vars
 from ..shared.document import GwDocument
 from ..shared.info import GwInfo
 from ..shared.visit import GwVisit
-from ..shared.element import GwElement
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
+from .selection_mode import GwSelectionMode
+
 
 from ..shared.mincut_tools import filter_by_days, filter_by_dates
 
@@ -51,12 +52,12 @@ def add_object(**kwargs):
             filter_sign = button.property('widgetcontrols')['filterSign']
 
     # Get values from dialog
-    object_id = tools_qt.get_text(dialog, f"{func_params['sourcewidget']}")
-    if object_id == 'null':
-        msg = "You need to insert data"
-        tools_qgis.show_warning(msg, parameter=func_params['sourcewidget'])
-        return
-
+    if 'sourcewidget' in func_params:
+        object_id = tools_qt.get_text(dialog, f"{func_params['sourcewidget']}")
+        if object_id == 'null':
+            msg = "You need to insert data"
+            tools_qgis.show_warning(msg, parameter=func_params['sourcewidget'])
+            return
     # Special case for documents: get the document ID using the name
     if qtable_name == 'tbl_document' or 'doc' in tab_name:
         sql = f"SELECT id FROM doc WHERE name = '{object_id}'"
@@ -67,9 +68,17 @@ def add_object(**kwargs):
             return
         # Use the found document ID
         object_id = row['id']
+    elif qtable_name == 'tbl_element' or 'element' in tab_name:
+        object_id = kwargs['complet_result_info']['body']['feature']['id']
+        field_object_id = kwargs['complet_result_info']['body']['feature']['idName']
 
     # Check if this object exists
-    view_object = f"v_ui_{func_params['sourceview']}"
+    if 'sourceview' in func_params:
+        view_object = f"v_ui_{func_params['sourceview']}"
+        tablename = func_params['sourceview'] + "_x_" + feature_type
+    else:
+        view_object = func_params['sourcetable']
+    
     sql = ("SELECT * FROM " + view_object + ""
            " WHERE id = '" + object_id + "'")
     row = tools_db.get_row(sql, log_sql=True)
@@ -79,16 +88,18 @@ def add_object(**kwargs):
         return
 
     # Check if this object is already associated to current feature
-    field_object_id = dialog.findChild(QWidget, func_params['sourcewidget']).property('columnname')
     if qtable_name == 'tbl_document' or 'doc' in tab_name:
         field_object_id = 'doc_id'
+    elif qtable_name == 'tbl_element' or 'element' in tab_name:
+        object_id = kwargs['complet_result_info']['body']['feature']['id']
+        field_object_id = kwargs['complet_result_info']['body']['feature']['idName']
+    else:
+        field_object_id = dialog.findChild(QWidget, func_params['sourcewidget']).property('columnname')
 
-    tablename = func_params['sourceview'] + "_x_" + feature_type
     sql = ("SELECT * FROM " + str(tablename) + ""
            " WHERE " + str(field_id) + " = '" + str(feature_id) + "'"
            " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
     row = tools_db.get_row(sql, log_info=False)
-
     # If object already exist show warning message
     if row:
         msg = "Object already associated with this feature"
@@ -122,14 +133,17 @@ def delete_object(**kwargs):
 
     func_params = kwargs['func_params']
     complet_result = kwargs['complet_result']
+    qtable_name = func_params['targetwidget']
 
-    if 'featureType' in complet_result['body']['feature']:
+    if qtable_name == 'tab_features_tbl_element':
+        feature_type = tools_gw.get_signal_change_tab(dialog)
+        tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
+        qtable_name = f"{qtable_name}_x_{feature_type}"
+    elif 'featureType' in complet_result['body']['feature']:
         feature_type = complet_result['body']['feature']['featureType']
         tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
     else:
         tablename = f"v_ui_{func_params['sourceview']}"
-
-    qtable_name = func_params['targetwidget']
     qtable: QTableView = tools_qt.get_widget(dialog, f"{qtable_name}")
 
     # Get selected rows
@@ -473,7 +487,9 @@ def open_rpt_result(**kwargs):
     complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type='tab_data')
 
     if not complet_result:
-        tools_log.log_info("FAIL open_rpt_result")
+        msg = "FAIL {0}"
+        msg_params = ("open_rpt_result",)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
 
@@ -506,7 +522,9 @@ def get_info_node(**kwargs):
     complet_result, dialog = custom_form.open_form(table_name='v_edit_node', feature_id=feature_id,
                                                        tab_type='tab_data', is_docker=False)
     if not complet_result:
-        tools_log.log_info("FAIL open_node")
+        msg = "FAIL {0}"
+        msg_params = ("open_node",)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
 
@@ -523,8 +541,9 @@ def get_graph_config(**kwargs):
 
     json_result = kwargs.get('json_result')
     if not json_result or json_result.get('status') != "Accepted":
-        msg = "Function get_graph_config error: json_result from last function is invalid"
-        tools_log.log_warning(msg)
+        msg = "Function {0} error: {1} from last function is invalid"
+        msg_params = ("get_graph_config", "json_result")
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
     has_conflicts = json_result['body']['data'].get('hasConflicts')
@@ -535,15 +554,17 @@ def get_graph_config(**kwargs):
     context = "NETSCENARIO" if netscenario_id else "OPERATIVE"
     mapzone_type = json_result['body']['data'].get('graphClass')
     if not mapzone_type:
-        msg = "Function get_graph_config error: missing key 'graphClass'"
-        tools_log.log_warning(msg)
+        msg = "Function {0} error: missing key {1}"
+        msg_params = ("get_graph_config", "graphClass")
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
     extras = f'"context":"{context}", "mapzone": "{mapzone_type}"'
     body = tools_gw.create_body(extras=extras)
     json_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', body)
     if json_result is None:
-        msg = "Function get_graph_config error: gw_fct_getgraphconfig returned null"
-        tools_log.log_warning(msg)
+        msg = "Function {0} error: {1} returned null"
+        msg_params = ("get_graph_config", "gw_fct_getgraphconfig")
+        tools_log.log_warning(msg, msg_params=msg_params)
         return
 
 
@@ -581,8 +602,9 @@ def refresh_attribute_table(**kwargs):
     for layer_name in layers_name_list:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if not layer:
-            msg = f"Layer {layer_name} does not found, therefore, not configured"
-            tools_log.log_info(msg)
+            msg = "Layer {0} does not found, therefore, not configured"
+            msg_params = (layer_name,)
+            tools_log.log_info(msg, msg_params=msg_params)
             continue
 
         # Get sys variale
@@ -678,7 +700,9 @@ def set_column_visibility(**kwargs):
         col_name = kwargs["field"]
         hidden = kwargs["hidden"]
     except Exception as e:
-        tools_log.log_info(f"{kwargs}-->{type(e).__name__} --> {e}")
+        msg = "{0} --> {1} --> {2}"
+        msg_params = (kwargs, type(e).__name__, e)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
     config = layer.attributeTableConfig()
@@ -701,7 +725,9 @@ def set_column_multiline(**kwargs):
             layer = tools_qgis.get_layer_by_tablename(layer)
         field_index = kwargs["fieldIndex"]
     except Exception as e:
-        tools_log.log_info(f"{type(e).__name__} --> {e}")
+        msg = "{0} --> {1}"
+        msg_params = (type(e).__name__, e)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
 
     if field['widgettype'] == 'text':
@@ -721,7 +747,9 @@ def set_read_only(**kwargs):
             layer = tools_qgis.get_layer_by_tablename(layer)
         field_index = kwargs["fieldIndex"]
     except Exception as e:
-        tools_log.log_info(f"{type(e).__name__} --> {e}")
+        msg = "{0} --> {1}"
+        msg_params = (type(e).__name__, e)
+        tools_log.log_info(msg, msg_params=msg_params)
         return
     # Get layer config
     config = layer.editFormConfig()
@@ -751,11 +779,13 @@ def load_qml(**kwargs):
     qml_path = kwargs.get('qmlPath')
 
     if not os.path.exists(qml_path):
-        tools_log.log_warning("File not found", parameter=qml_path)
+        msg = "File not found"
+        tools_log.log_warning(msg, parameter=qml_path)
         return False
 
     if not qml_path.endswith(".qml"):
-        tools_log.log_warning("File extension not valid", parameter=qml_path)
+        msg = "File extension not valid"
+        tools_log.log_warning(msg, parameter=qml_path)
         return False
 
     layer.loadNamedStyle(qml_path)
@@ -928,23 +958,58 @@ def open_selected_manager_item(**kwargs):
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
 
-    if qtable.property('linkedobject') == 'v_ui_element':
+    if qtable.property('linkedobject') in ('v_ui_element', 'tbl_element_x_arc', 'tbl_element_x_node', 'tbl_element_x_connec', 'tbl_element_x_link', 'tbl_element_x_gully'):
         # Open selected element
         element_id = index.sibling(row, column_index).data()
-        manage_element(element_id, **kwargs)
+        sql = f"SELECT concat('ve_', lower(feature_class)) from v_ui_element where id = '{element_id}' "
+        table_name = tools_db.get_row(sql)
+        info_feature = GwInfo('tab_data')
+        complet_result, dialog = info_feature.open_form(table_name=table_name[0], feature_id=element_id, tab_type='data')
+        if not complet_result:
+            tools_log.log_info("FAIL open_selected_manager_item")
+            return
 
 
-def manage_element(element_id, **kwargs):
+def manage_element_menu(**kwargs):
     """ Function called in class tools_gw.add_button(...) -->
             widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
 
-    elem = GwElement()
-    elem.get_element(True)
+    # Get widget from kwargs
+    button = kwargs['widget']
+    func_params = kwargs['func_params']
+    table = func_params['sourcetable']
+    connect = None
+    if table == 'v_ui_element': 
+        connect = [partial(reload_table_manager, **kwargs)]
+    elif table == 'v_ui_element_x_arc':
+        connect = [partial(add_object, **kwargs), partial(_reload_table, **kwargs)]
 
-    # If element exist
-    if element_id:
-        tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
-    elem.dlg_add_element.btn_accept.clicked.connect(partial(reload_table_manager, **kwargs))
+    # Create menu for button
+    btn_menu = QMenu()
+    # Create info feature object for tab_data
+    info_feature = GwInfo('tab_data')
+    # Get list of different element types
+    features_cat = tools_gw.manage_feature_cat()
+    if features_cat is not None:
+        # Get list of feature categories
+        list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
+        # Add FRELEM type features first
+        for feature_cat in list_feature_cat:
+            if feature_cat.feature_class.upper() == 'FRELEM':
+                action_frelem = btn_menu.addAction(feature_cat.id)
+                action_frelem.triggered.connect(partial(info_feature.add_feature, feature_cat, connect_signal=connect))
+        # Add separator between feature types
+        btn_menu.addSeparator()
+        # Get list again for GENELEM features
+        list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
+        # Add GENELEM type features
+        for feature_cat in list_feature_cat:
+            if feature_cat.feature_class.upper() == 'GENELEM':
+                action_genelem = btn_menu.addAction(feature_cat.id)
+                action_genelem.triggered.connect(partial(info_feature.add_feature, feature_cat, connect_signal=connect))
+    # Set and show menu on button
+    button.setMenu(btn_menu)
+    button.showMenu()
 
 
 def delete_manager_item(**kwargs):
@@ -955,10 +1020,11 @@ def delete_manager_item(**kwargs):
     params = kwargs['func_params']
     table_widget = params['targetwidget']
     table = params['sourcetable']
+    field_object_id = params.get('field_object_id', None)
 
     # Get QTableView, delete selected rows and reload the table
     table_widget = tools_qt.get_widget(dialog, f"{table_widget}")
-    tools_gw.delete_selected_rows(table_widget, table)
+    tools_gw.delete_selected_rows(table_widget, table, field_object_id)
     reload_table_manager(**kwargs)
 
 
@@ -1128,8 +1194,25 @@ def manage_duplicate_dscenario_copyfrom(dialog):
         tools_qt.set_widget_text(dialog, 'active', row[3])
         tools_qt.set_combo_value(dialog.findChild(QComboBox, 'expl'), f"{row[4]}", 0)
 
-# region unused functions atm
 
+def selection_init(**kwargs):
+    """
+    Initialize the selection.
+    """
+    tools_gw.selection_init(kwargs.get('class'), kwargs.get('dialog'), kwargs.get('class').feature_type, GwSelectionMode.ELEMENT)
+
+
+def insert_feature(**kwargs):
+    """
+    Insert the selected records.
+    """
+    func_params = kwargs.get('func_params')
+    target_widget = func_params.get('targetwidget')
+    
+    tools_gw.insert_feature(kwargs.get('class'), kwargs.get('dialog'), None, GwSelectionMode.ELEMENT, target_widget=target_widget)
+
+
+# region unused functions atm
 
 def get_all_layers(group, all_layers):
 

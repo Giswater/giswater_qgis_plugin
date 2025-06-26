@@ -94,34 +94,34 @@ class GwPsector:
         # Get layers of every feature_type
 
         # Setting lists
-        self.ids = []
-        self.list_ids = {}
-        self.list_ids['arc'] = []
-        self.list_ids['node'] = []
-        self.list_ids['connec'] = []
-        self.list_ids['gully'] = []
-        self.list_ids['element'] = []
+        self.rel_ids = []
+        self.rel_list_ids = {}
+        self.rel_list_ids['arc'] = []
+        self.rel_list_ids['node'] = []
+        self.rel_list_ids['connec'] = []
+        self.rel_list_ids['gully'] = []
+        self.rel_list_ids['element'] = []
 
         # Setting layers
-        self.layers = {}
-        self.layers['gully'] = []
-        self.layers['element'] = []
-        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
-        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
-        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.rel_layers = {}
+        self.rel_layers['gully'] = []
+        self.rel_layers['element'] = []
+        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         if self.project_type.upper() == 'UD':
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         else:
             tools_qt.remove_tab(self.dlg_plan_psector.tab_feature, 'tab_gully')
 
         self.update = False  # if false: insert; if true: update
 
-        self.feature_type = "arc"
+        self.rel_feature_type = "arc"
 
         self.all_layers_checked = self._check_for_layers()
 
         # Remove all previous selections
-        self.layers = tools_gw.remove_selection(True, layers=self.layers)
+        self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
 
         # Set icons
         tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111")
@@ -402,8 +402,8 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
-        viewname = "v_edit_" + self.feature_type
-        tools_gw.set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.feature_type) + "_id")
+        viewname = "v_edit_" + self.rel_feature_type
+        tools_gw.set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.rel_feature_type) + "_id")
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
