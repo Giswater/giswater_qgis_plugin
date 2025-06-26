@@ -80,7 +80,7 @@ BEGIN
                        "data":{"message":"4020", "function":"3134", "parameters":{"v_infiltration":"'||v_infiltration||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4022", "function":"3134", "parameters":{"v_text":"'||v_text||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"4022", "function":"3134", "parameters":{"v_text":"'||quote_nullable(v_text)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3716", "function":"3134", "parameters":{"v_expl_id":"'||v_expl_id||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
