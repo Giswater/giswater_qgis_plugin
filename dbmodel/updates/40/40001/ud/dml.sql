@@ -2079,4 +2079,27 @@ VALUES(3976, 'There are no nodes with all values of top_elev, ymax and elev inse
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3978, 'There are %v_count% nodes with all values of top_elev, ymax and elev inserted.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+--26/06/2025
+
+UPDATE sys_function SET function_alias = 'NODE FLOW REGULATOR ANALYSIS' WHERE function_name = 'gw_fct_anl_node_flowregulator';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3980, 'The analysis have been executed skipping nodes with ''VERIFIED'' on colum verified', null, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'NODE WITH EXIT ARC OVER ENTRY ARC ANALYSIS' WHERE function_name = 'gw_fct_anl_node_exit_upper_intro';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3982, 'There are no flow regulator nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3984, 'There are %v_count% flow regulator nodes.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3986, 'There are no nodes with exit arc over entry arc.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3988, 'There are %v_count% nodes with exit arc over entry arc.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
 
