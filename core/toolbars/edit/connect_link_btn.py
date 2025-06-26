@@ -6,12 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from enum import Enum
+from functools import partial
 
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication, QActionGroup, QWidget, QAction, QMenu
 from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsFeatureRequest
 
 from ..maptool import GwMaptool
+from ...ui.ui_manager import GwDialogShowInfoUi
 from ...utils import tools_gw
 from ....libs import tools_qgis, tools_qt, tools_db
 from ...threads.connect_link import GwConnectLink
@@ -225,7 +227,9 @@ class GwConnectLinkButton(GwMaptool):
 
     def manage_result(self, result):
 
-        if result and result['status'] == 'Failed':
+        if result and result['status'] != 'Failed':
+            tools_gw.fill_tab_log(self.dlg_connect_link, result['body']['data'])
+        else:
             msg = "gw_fct_setlinktonetwork (Check log messages)"
             tools_qgis.show_warning(msg, title='Function error')
 
@@ -446,7 +450,7 @@ def accept(**kwargs):
     this.cancel_map_tool()
 
     # Close dialog
-    tools_gw.close_dialog(this.dlg_connect_link)
+    #tools_gw.close_dialog(this.dlg_connect_link)
 
 
 def snapping(**kwargs):
