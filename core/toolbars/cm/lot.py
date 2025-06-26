@@ -387,7 +387,6 @@ class AddNewLot:
     def _on_tab_feature_changed(self):
         # Update self.feature_type just like in Campaign
         self.feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
-        print(f"[DEBUG] feature_type updated to: {self.feature_type}")
 
     def get_allowed_features_for_lot(self, lot_id, feature):
         """Only be able to make the relations to the features id that come from campaign """
@@ -400,7 +399,10 @@ class AddNewLot:
         feature_table = f"cm.om_campaign_x_{feature}"
         feature_id = f"{feature}_id"
         sql = f"SELECT {feature_id} FROM {feature_table} WHERE campaign_id = {campaign_id}"
-        return [row[feature_id] for row in tools_db.get_rows(sql)]
+        rows = tools_db.get_rows(sql)
+        if not rows:
+            return []
+        return [row[feature_id] for row in rows]
 
     def enable_feature_tabs_by_campaign(self, lot_id):
         row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
