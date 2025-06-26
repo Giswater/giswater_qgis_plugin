@@ -119,9 +119,12 @@ class GwCheckCMProjectButton(GwAction):
         # Find the log widget and pass it directly to the task for reliability
         log_widget = self.dialog.findChild(QTextEdit, "tab_log_txt_infolog")
 
+        campaign_id = tools_qt.get_combo_value(self.dialog, "tab_data_campaign", index=0)
+        lot_id = tools_qt.get_combo_value(self.dialog, "tab_data_lot", index=-1)
+
         # Set parameters and re-run the project check task.
         params = {"layers": layers, "init_project": "false", "dialog": self.dialog,
-                  "log_widget": log_widget, "campaign_id": self.campaign_combo.currentData(), "lot_id": self.lot_combo.currentData()}
+                  "log_widget": log_widget, "campaign_id": campaign_id, "lot_id": lot_id}
 
         self.project_check_task = GwProjectCheckCMTask('check_project_cm', params)
 
