@@ -973,16 +973,10 @@ VALUES(4024, 'Minsector attribute on arc/node/connec/link features have been upd
 UPDATE sys_function SET function_alias = 'IMPORT DSCENARIO DEMAND' WHERE function_name = 'gw_fct_import_dscenario_demands';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3920, 'Nothing to import', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3922, 'Reading values from temp_csv table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3924, 'Inserting values on inp_dscenario_demand table -> Done', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(3926, 'Process finished', null, 0, true, 'utils', 'core', 'AUDIT');
 
 UPDATE sys_function SET function_alias = 'BUILT MISSING NODES USING START/END VERTICES' WHERE function_name = 'gw_fct_setnodefromarc';
 

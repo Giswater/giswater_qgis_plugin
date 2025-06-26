@@ -51,15 +51,15 @@ BEGIN
    	
 	-- manage log (fid:  234)
 	DELETE FROM audit_check_data WHERE fid = 234 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('IMPORT DB PRICES FILE'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('------------------------------'));
-
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"function":"2510","parameters":null, "is_process":true, "is_header":true, "fid":234, "result_id":"'||v_result_id||'"}}$$);';
 	
 	-- control of rows
 	SELECT count(*) INTO v_count FROM temp_csv WHERE cur_user=current_user AND fid = 234;
 
 	IF v_count =0 THEN
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Nothing to import'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3920", "function":"2510", "is_process":true, "fid":234, "result_id":"'||v_result_id||'"}}$$);';
 	ELSE
 
 		-- control of price code (csv1)
@@ -76,7 +76,7 @@ BEGIN
 
 		IF v_units IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"2088", "function":"2510","parameters":{"units":"'||v_units||'"}, "is_process":true}}$$);'INTO v_audit_result;
+			"data":{"message":"2088", "function":"2510","parameters":{"units":"'||replace(v_units::text, '"', '')||'"}, "is_process":true}}$$);'INTO v_audit_result;
 		END IF;
 
 		-- control of price descript (csv3)
@@ -110,10 +110,17 @@ BEGIN
 		UPDATE plan_price SET pricecat_id=v_label, price=csv5::numeric(12,4) FROM temp_csv WHERE cur_user=current_user AND fid = 234 AND plan_price.id=csv1;
 			
 		-- manage log (fid: 234)
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Reading values from temp_csv table -> Done'));
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Inserting values on plan_price table -> Done'));
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Deleting values from temp_csv -> Done'));
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Process finished'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3848", "function":"2510", "is_process":true, "fid":234, "result_id":"'||v_result_id||'"}}$$);';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"4030", "function":"2510", "is_process":true, "fid":234, "result_id":"'||v_result_id||'"}}$$);';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3852", "function":"2510", "is_process":true, "fid":234, "result_id":"'||v_result_id||'"}}$$);';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3926", "function":"2510", "is_process":true, "fid":234, "result_id":"'||v_result_id||'"}}$$);';
 
 	END IF;
 
