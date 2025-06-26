@@ -299,17 +299,22 @@ BEGIN
 		-- NODES MAPZONES
 		-- Nodes that are the starting points of mapzones
 		v_query_text =
-			'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = ' || v_mapzone_field || '
-			FROM (
-				SELECT ' || v_mapzone_field || ', ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::int4 AS node_id
+			'WITH mapzone AS (
+                SELECT ' || v_mapzone_field || ' AS mapzone_id, 
+                ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::int4 AS node_id,
+                json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json)::int4 AS to_arc
 				FROM ' || v_mapzone_name || ' 
 				WHERE graphconfig IS NOT NULL 
 				AND active
+            )
+            UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
+			FROM (
+				SELECT mapzone_id, node_id, array_agg(to_arc) AS to_arc
+                FROM mapzone
+                GROUP BY mapzone_id, node_id
 			) AS s 
 			WHERE n.node_id = s.node_id';
 		EXECUTE v_query_text;
-		
-		-- DANI: TODO FALTA UPDATE to_arc
 
 		-- Nodes forceClosed
 		v_query_text =
@@ -368,14 +373,13 @@ BEGIN
 	EXECUTE 'SELECT array_agg(pgr_node_id)::INT[] 
 			FROM temp_pgr_node 
 			WHERE graph_delimiter = ''' || v_mapzone_name || ''' 
-			AND node_id IS NOT NULL'
+			AND modif = TRUE'
 	INTO v_pgr_root_vids;
 
 	-- Execute pgr_drivingDistance function
     v_query_text = 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 
 		FROM temp_pgr_arc a
-		WHERE a.pgr_node_1 IS NOT NULL AND a.pgr_node_2 IS NOT NULL
-		AND (cost<> -1 OR reverse_cost <> -1)';
+		WHERE cost<> -1 OR reverse_cost <> -1';
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
     (
 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
