@@ -124,7 +124,6 @@ BEGIN
     -- the flood is reversed; the one-way valves that don't stop the water will stay inside the minsector, they cannot be borders because they cannot be closed
     v_query_text='SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, reverse_cost_mincut as cost, cost_mincut as reverse_cost
     FROM temp_pgr_arc
-    WHERE cost_mincut <> -1 OR reverse_cost_mincut <> -1
     ';
     TRUNCATE temp_pgr_drivingdistance;
     INSERT INTO  temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
