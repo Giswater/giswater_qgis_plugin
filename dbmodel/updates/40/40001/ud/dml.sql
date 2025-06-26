@@ -2100,6 +2100,25 @@ VALUES(3986, 'There are no nodes with exit arc over entry arc.', null, 0, true, 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3988, 'There are %v_count% nodes with exit arc over entry arc.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'SECTION CONTROL ANALYSIS' WHERE function_name = 'gw_graphanalytics_upstream_section_control';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3990, 'In order to execute the process you need to specify starting node_id.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3992, 'You can use outfalls without doing it and execute the process for the entire layer.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3994, 'Node %v_node_id% does''t exist in the selected layer.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3996, 'Choose another node to continue.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(3998, 'There are no arcs with unconsistent sections.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4000, 'There are %v_count% arcs with section (geom1) bigger than the section of the following arc.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 
 
