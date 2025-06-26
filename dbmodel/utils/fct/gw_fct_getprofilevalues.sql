@@ -201,8 +201,8 @@ BEGIN
 	  dma_id integer,
 	  exit_topelev double precision,
 	  exit_elev double precision,
-	  the_geom geometry(LineString,SRID_VALUE),
-	  the_geom_endpoint geometry(Point,SRID_VALUE),
+	  the_geom geometry(LineString,25831),
+	  the_geom_endpoint geometry(Point,25831),
 	  flag boolean,
 	  CONSTRAINT temp_link_pkey PRIMARY KEY (link_id));
 
@@ -503,14 +503,14 @@ BEGIN
 
 		-- update descript and code field
 		EXECUTE 'UPDATE temp_anl_arc SET descript = a.descript, code=a.code 
-		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id = temp_anl_arc.arc_id AND fid=222';
+		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id::text = temp_anl_arc.arc_id AND fid=222';
 		EXECUTE' UPDATE temp_anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
 					(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id::text else code end as code, 
 					total_distance FROM temp_anl_node WHERE fid=222 AND cur_user = current_user)row)a
 					WHERE a.node_id = temp_anl_node.node_id';
 
 		EXECUTE 'UPDATE temp_anl_node SET  descript = gw_fct_json_object_set_key(descript::json, ''code'', a.code) 
-		FROM (SELECT node_id, case when code is null then node_id::text else code end code FROM ('||v_textnode||')row)a WHERE a.node_id = temp_anl_node.node_id ';
+		FROM (SELECT node_id, case when code is null then node_id::text else code end code FROM ('||v_textnode||')row)a WHERE a.node_id::text = temp_anl_node.node_id ';
 
 		-- delete not used keys
 		UPDATE temp_anl_arc SET descript = gw_fct_json_object_delete_keys(descript::json, 'arc_id')  ;
@@ -586,7 +586,7 @@ BEGIN
 				WHERE fid=222 AND cur_user = current_user AND node_id = v_nid[i];
 			END IF;
 
-			UPDATE 	temp_anl_node SET nodecat_id = 'VNODE' WHERE fid=222 AND cur_user = current_user AND node_id = v_nid[i] AND nodecat_id IS NULL;
+			UPDATE 	temp_anl_node SET nodecat_id = 'VNODE' WHERE fid=222 AND cur_user = current_user AND node_id = v_nid[i]::text AND nodecat_id IS NULL;
 		END LOOP;
 
 		-- update node table those ymax nulls
@@ -719,7 +719,7 @@ BEGIN
 				select row_number() over (order by a.total_distance) as rid, a.'||v_ftopelev||' as top_n1, b.'||v_ftopelev||' as top_n2, (b.'||v_ftopelev||'-a.'||v_ftopelev||')::numeric(12,3) as delta_y, 
 				b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1, a.nodecat_id as surface_type from querytext a
 				left join querytext b ON a.rid = b.rid-1 
-				left join (select * from temp_anl_arc where fid = 222 AND cur_user = current_user) c ON a.arc_id = c.arc_id) row'
+				left join (select * from temp_anl_arc where fid = 222 AND cur_user = current_user) c ON a.arc_id::text = c.arc_id::text) row'
 				INTO v_terrain;
 				/*
 				WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM temp_anl_node where fid = 222 AND cur_user = current_user ORDER by total_distance)

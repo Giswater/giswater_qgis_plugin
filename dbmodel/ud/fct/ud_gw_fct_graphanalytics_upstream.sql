@@ -171,13 +171,13 @@ BEGIN
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
 	) p
 	WHERE n.cur_user="current_user"() AND n.fid = v_fid
-	AND n.node_id = p.node;
+	AND n.node_id::int4 = p.node;
 
 	INSERT INTO anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
 	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
 	FROM v_edit_arc a
-	JOIN anl_node n1 ON a.node_1 = n1.node_id
-	JOIN anl_node n2 ON a.node_2 = n2.node_id
+	JOIN anl_node n1 ON a.node_1::text = n1.node_id
+	JOIN anl_node n2 ON a.node_2::text = n2.node_id
 	WHERE n1.cur_user="current_user"() AND n1.fid = v_fid
 	AND n2.cur_user="current_user"() AND n2.fid = v_fid;
 
@@ -206,14 +206,14 @@ BEGIN
 	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, the_geom
 	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
 	UNION
-	SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
-	FROM anl_arc a JOIN v_edit_connec c using (arc_id)
+	SELECT v_context as context, c.expl_id, c.connec_id::text, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
+	FROM anl_arc a JOIN v_edit_connec c ON c.arc_id::text = a.arc_id
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND c.state > 0
 	AND c.is_operative = TRUE
 	UNION
-	SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
-	FROM anl_arc a JOIN v_edit_gully g using (arc_id)
+	SELECT v_context as context, g.expl_id, g.gully_id::text, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
+	FROM anl_arc a JOIN v_edit_gully g ON g.arc_id::text = a.arc_id
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND g.state > 0
 	AND g.is_operative = TRUE) row) features;
