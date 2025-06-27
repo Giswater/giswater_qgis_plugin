@@ -120,7 +120,7 @@ BEGIN
         FROM arcs_modif s
         WHERE t.pgr_arc_id= s.pgr_arc_id;
 
-        -- for the nodes with v_graph_delimiter
+        -- for the nodes with v_graph_delimiter - all the arcs
         WITH arcs_selected AS (
         SELECT
             a.pgr_arc_id,
@@ -145,7 +145,7 @@ BEGIN
         WHERE t.pgr_arc_id= s.pgr_arc_id;
     END IF;
 
-    -- for the nodes with graph_delimiter = 'FORCECLOSED' 
+    -- for the nodes with graph_delimiter = 'FORCECLOSED' - all the arcs
     WITH arcs_selected AS (
         SELECT
             a.pgr_arc_id,
