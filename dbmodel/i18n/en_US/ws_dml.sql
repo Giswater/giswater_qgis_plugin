@@ -4733,7 +4733,7 @@ FROM (
     (2646, 'Main function of go2epa workflow'),
     (2320, NULL),
     (3008, 'Function that reverse arc'),
-    (3052, 'Check topology assistant. Detect arcs duplicated only by final nodes or the entire geometry'),
+    (3052, 'Check topology assistant. Analyze and validate the length of arcs for potential inconsistencies or errors'),
     (3398, NULL),
     (3040, 'Check topology assistant. Detect arcs duplicated only by final nodes or the entire geometry'),
     (2304, 'This function proposes what valves must be closed in a mincut operation'),

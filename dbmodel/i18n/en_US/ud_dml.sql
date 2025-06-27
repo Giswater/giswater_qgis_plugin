@@ -5128,7 +5128,7 @@ FROM (
     (3442, 'Builds a complete, multi-tab selector interface. It dynamically generates each tab and its selectable items based on extensive database configurations, user roles, and current selections'),
     (2714, 'Replace one node, connec or gully on service for another one, copying all attributes, setting old one on obsolete and reconnecting other features with the new one'),
     (3008, 'Function that reverse arc'),
-    (3052, 'Check topology assistant. Detect arcs duplicated only by final nodes or the entire geometry'),
+    (3052, 'Check topology assistant. Analyze and validate the length of arcs for potential inconsistencies or errors'),
     (3040, 'Check topology assistant. Detect arcs duplicated only by final nodes or the entire geometry'),
     (3280, 'Function to update massively the column rotation for nodes. Function works with the selection of user (exploitation and psectors)'),
     (3284, 'Function to merge two or more psectors into one'),
