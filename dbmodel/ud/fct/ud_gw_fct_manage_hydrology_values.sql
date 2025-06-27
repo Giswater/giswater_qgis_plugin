@@ -82,7 +82,7 @@ BEGIN
                        "data":{"message":"3728", "function":"3100", "parameters":{"v_action":"'||v_action||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4028", "function":"3100", "parameters":{"v_sector_name":"'||v_sector_name||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"4028", "function":"3100", "parameters":{"v_sector_name":"'||quote_nullable(v_sector_name)||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3730", "function":"3100", "parameters":{"v_source_name":"'||v_source_name||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true}}$$)';
@@ -102,23 +102,23 @@ BEGIN
 	IF (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_copyfrom) != (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_target) THEN
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3754", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"3", "is_process":true}}$$)';
+                       "data":{"message":"3754", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "is_process":true}}$$)';
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4040", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
+                       "data":{"message":"4040", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
 
 	ELSIF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3754", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"3", "is_process":true}}$$)';
+                       "data":{"message":"3754", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "is_process":true}}$$)';
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3724", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
+                       "data":{"message":"3724", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
 	ELSE
 		IF v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4050", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
+                       "data":{"message":"4050", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
 		END IF;
 
 		--manage delete for copy action
