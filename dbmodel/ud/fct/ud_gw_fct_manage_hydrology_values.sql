@@ -195,8 +195,6 @@ BEGIN
                        "data":{"message":"4052", "function":"3100", "parameters":{"v_sector":"'||v_sector||'", "object_rec":"'||object_rec.table||'"}, "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
 
 					ELSIF v_count2 > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_sector, 1, concat('INFO: ',v_count2,' row(s) have been inserted for sector ',v_sector,' on inp_',object_rec.table,' table.'));
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"4054", "function":"3100", "parameters":{"v_count2":"'||v_count2||'", "v_sector":"'||v_sector||'", "object_rec":"'||object_rec.table||'"}, "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
 
