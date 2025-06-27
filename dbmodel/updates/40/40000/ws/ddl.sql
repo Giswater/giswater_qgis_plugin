@@ -953,11 +953,11 @@ ALTER TABLE dqa DROP CONSTRAINT dqa_pattern_id_fkey;
 ALTER TABLE sector DROP CONSTRAINT sector_pattern_id_fkey;
 ALTER TABLE inp_dscenario_demand DROP CONSTRAINT inp_dscenario_demand_pattern_id_fkey;
 ALTER TABLE supplyzone DROP CONSTRAINT supplyzone_pattern_id_fkey;
-ALTER TABLE _inp_source_ DROP CONSTRAINT inp_source_pattern_id_fkey;
+ALTER TABLE IF EXISTS _inp_source_ DROP CONSTRAINT IF EXISTS inp_source_pattern_id_fkey;
 
 
-ALTER TABLE _inp_pattern DROP CONSTRAINT inp_pattern_pkey;
-ALTER TABLE _inp_pattern DROP CONSTRAINT inp_pattern_expl_id_fkey;
+ALTER TABLE IF EXISTS _inp_pattern DROP CONSTRAINT IF EXISTS inp_pattern_pkey;
+ALTER TABLE IF EXISTS _inp_pattern DROP CONSTRAINT IF EXISTS inp_pattern_expl_id_fkey;
 
 CREATE TABLE inp_pattern (
 	pattern_id varchar(16) NOT NULL,
@@ -1002,9 +1002,9 @@ ALTER TABLE plan_psector_x_arc DROP CONSTRAINT plan_psector_x_arc_arc_id_fkey;
 ALTER TABLE plan_psector_x_connec DROP CONSTRAINT plan_psector_x_connec_arc_id_fkey;
 
 
-ALTER TABLE _arc_border_expl_ DROP CONSTRAINT arc_border_expl_arc_id_fkey;
-ALTER TABLE _inp_valve_importinp_ DROP CONSTRAINT inp_valve_importinp_to_arc_fkey;
-ALTER TABLE _inp_virtualvalve_ DROP CONSTRAINT _inp_virtualvalve_arc_id_fkey_;
+ALTER TABLE IF EXISTS _arc_border_expl_ DROP CONSTRAINT IF EXISTS arc_border_expl_arc_id_fkey;
+ALTER TABLE IF EXISTS _inp_valve_importinp_ DROP CONSTRAINT IF EXISTS inp_valve_importinp_to_arc_fkey;
+ALTER TABLE IF EXISTS _inp_virtualvalve_ DROP CONSTRAINT IF EXISTS _inp_virtualvalve_arc_id_fkey_;
 
 -- Drop foreign keys from table arc
 
@@ -1140,17 +1140,17 @@ CREATE TABLE arc (
 	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	CONSTRAINT arc_pkey PRIMARY KEY (arc_id),
 	CONSTRAINT arc_arccat_id_fkey FOREIGN KEY (arccat_id) REFERENCES cat_arc(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT arc_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	-- CONSTRAINT arc_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT arc_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT arc_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_pavcat_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT arc_soilcat_id_fkey FOREIGN KEY (soilcat_id) REFERENCES cat_soil(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT arc_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT arc_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT arc_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT arc_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1365,17 +1365,17 @@ CREATE TABLE connec (
 	CONSTRAINT connec_pkey PRIMARY KEY (connec_id),
 	CONSTRAINT connec_connecat_id_fkey FOREIGN KEY (conneccat_id) REFERENCES cat_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_crmzone_id_fkey FOREIGN KEY (crmzone_id) REFERENCES crmzone(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT connec_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	-- CONSTRAINT connec_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT connec_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT connec_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_pjoint_type_fkey FOREIGN KEY (pjoint_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_soilcat_id_fkey FOREIGN KEY (soilcat_id) REFERENCES cat_soil(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT connec_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT connec_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT connec_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT connec_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -1495,8 +1495,7 @@ CREATE TABLE element (
 	CONSTRAINT element_elementcat_id_fkey FOREIGN KEY (elementcat_id) REFERENCES cat_element(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_model_id FOREIGN KEY (model_id) REFERENCES cat_brand_model(id),
-	CONSTRAINT element_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id),
-	CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1555,17 +1554,17 @@ ALTER TABLE plan_psector_x_node DROP CONSTRAINT plan_psector_x_node_node_id_fkey
 ALTER TABLE rtc_hydrometer_x_node DROP CONSTRAINT rtc_hydrometer_x_node_node_id_fkey;
 ALTER TABLE ext_rtc_scada_x_data DROP CONSTRAINT ext_rtc_scada_x_data_node_id_fkey;
 
-ALTER TABLE _node_border_sector DROP CONSTRAINT arc_border_expl_node_id_fkey;
-ALTER TABLE _inp_emitter_ DROP CONSTRAINT inp_emitter_node_id_fkey;
-ALTER TABLE _inp_mixing_ DROP CONSTRAINT inp_mixing_node_id_fkey;
-ALTER TABLE _inp_quality_ DROP CONSTRAINT inp_quality_node_id_fkey;
-ALTER TABLE _inp_source_ DROP CONSTRAINT inp_source_node_id_fkey;
-ALTER TABLE _inp_valve_ DROP CONSTRAINT _inp_valve_node_id_fkey_;
+ALTER TABLE IF EXISTS _node_border_sector DROP CONSTRAINT IF EXISTS arc_border_expl_node_id_fkey;
+ALTER TABLE IF EXISTS _inp_emitter_ DROP CONSTRAINT IF EXISTS inp_emitter_node_id_fkey;
+ALTER TABLE IF EXISTS _inp_mixing_ DROP CONSTRAINT IF EXISTS inp_mixing_node_id_fkey;
+ALTER TABLE IF EXISTS _inp_quality_ DROP CONSTRAINT IF EXISTS inp_quality_node_id_fkey;
+ALTER TABLE IF EXISTS _inp_source_ DROP CONSTRAINT IF EXISTS inp_source_node_id_fkey;
+ALTER TABLE IF EXISTS _inp_valve_ DROP CONSTRAINT IF EXISTS _inp_valve_node_id_fkey_;
 ALTER TABLE om_visit_event DROP CONSTRAINT om_visit_event_position_id_fkey;
 
 -- Drop foreign keys from table node
 ALTER TABLE _node DROP CONSTRAINT node_parent_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_pkey;
+ALTER TABLE _node DROP CONSTRAINT node_pkey CASCADE;
 
 ALTER TABLE _node DROP CONSTRAINT node_epa_type_check;
 
@@ -1693,12 +1692,12 @@ CREATE TABLE node (
 	CONSTRAINT node_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['JUNCTION'::text, 'RESERVOIR'::text, 'TANK'::text, 'INLET'::text, 'UNDEFINED'::text, 'SHORTPIPE'::text, 'VALVE'::text, 'PUMP'::text]))),
 	CONSTRAINT node_pkey PRIMARY KEY (node_id),
 	CONSTRAINT node_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	-- CONSTRAINT node_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT node_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_nodecat_id_fkey FOREIGN KEY (nodecat_id) REFERENCES cat_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1707,8 +1706,8 @@ CREATE TABLE node (
 	CONSTRAINT node_soilcat_id_fkey FOREIGN KEY (soilcat_id) REFERENCES cat_soil(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT node_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT node_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1813,7 +1812,7 @@ CREATE TABLE link (
 	CONSTRAINT link_exit_type_fkey FOREIGN KEY (exit_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	--CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_presszonecat_id_fkey FOREIGN KEY (presszone_id) REFERENCES presszone(presszone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id),
 	CONSTRAINT link_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -2042,7 +2041,18 @@ CREATE TABLE macroexploitation (
 ALTER TABLE exploitation RENAME TO _exploitation;
 
 -- Drop foreign keys that reference exploitation
-ALTER TABLE ext_streetaxis DROP CONSTRAINT ext_streetaxis_exploitation_id_fkey;
+DO $$
+DECLARE
+	v_utils boolean;
+BEGIN
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS FALSE THEN
+		ALTER TABLE ext_streetaxis DROP CONSTRAINT ext_streetaxis_exploitation_id_fkey;
+		ALTER TABLE IF EXISTS ext_address DROP CONSTRAINT IF EXISTS ext_address_exploitation_id_fkey;
+		ALTER TABLE ext_plot DROP CONSTRAINT ext_plot_exploitation_id_fkey;
+	END IF;
+END $$;
 ALTER TABLE node DROP CONSTRAINT node_expl_fkey;
 ALTER TABLE config_user_x_expl DROP CONSTRAINT config_user_x_expl_expl_id_fkey;
 ALTER TABLE macrodqa DROP CONSTRAINT macrodqa_expl_id_fkey;
@@ -2050,7 +2060,6 @@ ALTER TABLE om_streetaxis DROP CONSTRAINT om_streetaxis_exploitation_id_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_expl_fkey;
 ALTER TABLE om_waterbalance DROP CONSTRAINT om_waterbalance_expl_id_fkey;
 ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_exploitation_id_fkey;
-ALTER TABLE ext_address DROP CONSTRAINT ext_address_exploitation_id_fkey;
 ALTER TABLE dimensions DROP CONSTRAINT dimensions_exploitation_id_fkey;
 ALTER TABLE om_mincut DROP CONSTRAINT om_mincut_expl_id_fkey;
 ALTER TABLE selector_expl DROP CONSTRAINT selector_expl_id_fkey;
@@ -2063,11 +2072,10 @@ ALTER TABLE link DROP CONSTRAINT link_exploitation_id_fkey;
 ALTER TABLE inp_pattern DROP CONSTRAINT inp_pattern_expl_id_fkey;
 ALTER TABLE minsector DROP CONSTRAINT minsector_expl_id_fkey;
 ALTER TABLE cat_dscenario DROP CONSTRAINT cat_dscenario_expl_id_fkey;
-ALTER TABLE ext_plot DROP CONSTRAINT ext_plot_exploitation_id_fkey;
 ALTER TABLE inp_curve DROP CONSTRAINT inp_curve_expl_id_fkey;
-ALTER TABLE _arc_border_expl_ DROP CONSTRAINT arc_border_expl_expl_id_fkey;
-ALTER TABLE _pond_ DROP CONSTRAINT pond_exploitation_id_fkey;
-ALTER TABLE _pool_ DROP CONSTRAINT pool_exploitation_id_fkey;
+ALTER TABLE IF EXISTS _arc_border_expl_ DROP CONSTRAINT IF EXISTS arc_border_expl_expl_id_fkey;
+ALTER TABLE IF EXISTS _pond_ DROP CONSTRAINT IF EXISTS pond_exploitation_id_fkey;
+ALTER TABLE IF EXISTS _pool_ DROP CONSTRAINT IF EXISTS pool_exploitation_id_fkey;
 
 
 -- Drop foreign keys from table exploitation
