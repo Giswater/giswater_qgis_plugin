@@ -106,3 +106,29 @@ VALUES(4036, '%v_count% row(s) have been removed from inp_%object_rec% table.', 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4038, '%v_count% row(s) have been inserted into inp_dwf table from v_edit_inp_junction table.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'MANAGE HYDROLOGY VALUES' WHERE function_name = 'gw_fct_manage_hydrology_values';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4040, 'Infiltration method for (%v_source_name%) and (%v_target_name%) are not the same.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4042, '%v_count% row(s) have been removed from inp_subcathment table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4044, '%v_count% row(s) have been removed from inp_loadings table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4046, '%v_count% row(s) have been removed from inp_groundwater table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4048, '%v_count% row(s) have been removed from inp_coverage table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4050, 'Target and source have same infiltration method.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4052, 'No rows have been inserted for sector %v_sector% on inp_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4054, '%v_count2% row(s) have been inserted for sector %v_sector% on inp_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+

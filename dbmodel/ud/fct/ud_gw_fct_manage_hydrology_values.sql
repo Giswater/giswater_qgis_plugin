@@ -72,39 +72,53 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 4, concat('MANAGE HYDROLOGY VALUES'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 4, '------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 4, concat('Target scenario: ',v_target_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 4, concat('Action: ',v_action));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 4, concat('Sector: ',v_sector_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 4, concat('Copy from scenario: ',v_source_name));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3100", "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3726", "function":"3100", "parameters":{"v_target_name":"'||v_target_name||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3728", "function":"3100", "parameters":{"v_action":"'||v_action||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4028", "function":"3100", "parameters":{"v_sector_name":"'||v_sector_name||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3730", "function":"3100", "parameters":{"v_source_name":"'||v_source_name||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"4", "is_process":true}}$$)';
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 4, concat(''));
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 3, 'ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 3, '--------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3100", "fid":"'||v_fid||'", "result_id":"-1", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2008"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 2, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3100", "fid":"'||v_fid||'", "result_id":"-1", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, -1, 1, '---------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3100", "fid":"'||v_fid||'", "result_id":"-1", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
 
 	-- check controlmethod
 	IF (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_copyfrom) != (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_target) THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_sector, 3, concat('PROCESS HAS FAILED......'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_sector, 3, concat('ERROR-403: Infiltration method for (',v_source_name,') and (', v_target_name,') are not the same.'));
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3754", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"3", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4040", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
 
 	ELSIF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_sector, 3, concat('PROCESS HAS FAILED......'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_sector, 3, concat('ERROR-403: Target and source are the same.'));
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3754", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"3", "is_process":true}}$$)';
+
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"3724", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
 	ELSE
 		IF v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_sector, 1, concat('INFO: Target and source have same infiltration method.'));
+
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4050", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
 		END IF;
 
 		--manage delete for copy action
@@ -113,29 +127,33 @@ BEGIN
 			EXECUTE 'DELETE FROM inp_subcatchment WHERE hydrology_id = '||v_target;
 			GET DIAGNOSTICS v_count = row_count;
 			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, -1, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_subcathment table.'));
+
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4042", "function":"3100", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"2", "prefix_id":"1002", "is_process":true}}$$)';
 			END IF;
 
 			EXECUTE 'DELETE FROM inp_loadings WHERE hydrology_id = '||v_target;
 			GET DIAGNOSTICS v_count = row_count;
 			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, -1, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_loadings table.'));
+
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4044", "function":"3100", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"2", "prefix_id":"1002", "is_process":true}}$$)';
 			END IF;
 
 			EXECUTE 'DELETE FROM inp_groundwater WHERE hydrology_id = '||v_target;
 			GET DIAGNOSTICS v_count = row_count;
 			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, -1, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_groundwater table.'));
+
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4046", "function":"3100", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"2", "prefix_id":"1002", "is_process":true}}$$)';
 			END IF;
 
 			EXECUTE 'DELETE FROM inp_coverage WHERE hydrology_id = '||v_target;
 			GET DIAGNOSTICS v_count = row_count;
 			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, -1, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_coverage table.'));
+
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4048", "function":"3100", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"-1", "criticity":"2", "prefix_id":"1002", "is_process":true}}$$)';
 			END IF;
 		END IF;
 
@@ -147,8 +165,8 @@ BEGIN
 			FOR object_rec IN SELECT json_array_elements_text('["subcatchment", "loadings", "groundwater", "coverage"]'::json) as table,
 			json_array_elements_text('["subc_id", "subc_id, poll_id", "subc_id", "subc_id, landus_id"]'::json) as pk,
 			json_array_elements_text('[
-			"subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id", 
-			"poll_id, subc_id, ibuildup", 
+			"subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id",
+			"poll_id, subc_id, ibuildup",
 			"subc_id,  aquif_id, node_id, surfel, a1, b1, a2, b2, a3, tw, h, fl_eq_lat, fl_eq_deep",
 			"subc_id, landus_id, t.percent"]'::json) as column
 			LOOP
@@ -162,7 +180,7 @@ BEGIN
 						' ON CONFLICT (hydrology_id, subc_id) DO NOTHING';
 						EXECUTE v_querytext;
 					ELSE
-						v_querytext = 'INSERT INTO inp_'||object_rec.table||' SELECT '||object_rec.column||', '||v_target||' FROM inp_'||object_rec.table||' t JOIN inp_subcatchment USING (subc_id, hydrology_id) 
+						v_querytext = 'INSERT INTO inp_'||object_rec.table||' SELECT '||object_rec.column||', '||v_target||' FROM inp_'||object_rec.table||' t JOIN inp_subcatchment USING (subc_id, hydrology_id)
 						WHERE hydrology_id = '||v_copyfrom||' AND sector_id = '||v_sector||
 						' ON CONFLICT (hydrology_id, '||object_rec.pk||') DO NOTHING';
 
@@ -172,11 +190,16 @@ BEGIN
 					-- get message
 					GET DIAGNOSTICS v_count2 = row_count;
 					IF v_count > 0 AND v_count2 = 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_sector, 1, concat('INFO: No rows have been inserted for sector ',v_sector,' on inp_',object_rec.table,' table.'));
+
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4052", "function":"3100", "parameters":{"v_sector":"'||v_sector||'", "object_rec":"'||object_rec.table||'"}, "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
+
 					ELSIF v_count2 > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (v_fid, v_sector, 1, concat('INFO: ',v_count2,' row(s) have been inserted for sector ',v_sector,' on inp_',object_rec.table,' table.'));
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4054", "function":"3100", "parameters":{"v_count2":"'||v_count2||'", "v_sector":"'||v_sector||'", "object_rec":"'||object_rec.table||'"}, "fid":"'||v_fid||'", "result_id":"'||v_sector||'", "criticity":"1", "prefix_id":"1001", "is_process":true}}$$)';
+
 					END IF;
 				END IF;
 			END LOOP;
