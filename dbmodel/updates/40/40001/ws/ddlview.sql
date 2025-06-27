@@ -37,6 +37,18 @@ BEGIN
             ext_code,
             source
         FROM utils.address;
+
+        CREATE OR REPLACE VIEW ext_streetaxis
+        AS SELECT id,
+          code,
+          type,
+          name,
+          text,
+          the_geom,
+          ws_expl_id AS expl_id,
+          muni_id,
+          source
+          FROM utils.streetaxis;
      END IF;
 END $$;
 
