@@ -95,7 +95,7 @@ BEGIN
 
 	-- setting those node with sectors without inlet to sector_id = 0
 	UPDATE temp_t_pgr_go2epa_node SET sector_id = 0 WHERE sector_id NOT IN
-	(SELECT DISTINCT sector_id FROM (SELECT DISTINCT sector_id, epa_type FROM temp_t_pgr_go2epa_node WHERE epa_type IN ('INLET', 'RESERVOIR', 'TANK'))a);
+	(SELECT DISTINCT sector_id FROM (SELECT DISTINCT sector_id, epa_type FROM temp_t_pgr_go2epa_node WHERE epa_type IN ('INLET', 'RESERVOIR', 'TANK', 'OUTFALL'))a);
 
 	-- update arc graph
 	UPDATE temp_t_pgr_go2epa_arc SET sector_id = n.sector_id FROM temp_t_pgr_go2epa_node n WHERE node_id =  node_1;
