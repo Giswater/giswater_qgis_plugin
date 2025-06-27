@@ -87,7 +87,7 @@ BEGIN
                        "data":{"message":"3728", "function":"3102", "parameters":{"v_action":"'||v_action||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4028", "function":"3102", "parameters":{"v_sector_name":"'||v_sector_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"4028", "function":"3102", "parameters":{"v_sector_name":"'||quote_nullable(v_sector_name)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3730", "function":"3102", "parameters":{"v_source_name":"'||v_source_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
