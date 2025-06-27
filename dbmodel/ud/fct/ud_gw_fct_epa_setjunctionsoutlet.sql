@@ -60,9 +60,11 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;		
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SET JUNCTIONS OUTLET'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Minimun distance used: ',v_mindistance));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
+						"data":{"function":"3186","fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
+						"data":{"message":"4306","function":"3186","parameters":{"v_mindistance":"'||v_mindistance||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 
 
 	raise notice '1- Insert';
@@ -70,7 +72,8 @@ BEGIN
 	SELECT node_id, nodecat_id, expl_id,  the_geom, sector_id, state FROM v_edit_node where epa_type = 'JUNCTION';
 
 	select count(*) into v_count from temp_node;
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Initial junctions: ',v_count));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
+						"data":{"message":"4308","function":"3186","parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 
 	raise notice '2- Clean';
 	for rec_node in EXECUTE 'select n1, array_agg(n2) n2 FROM (select n1.node_id n1, n2.node_id n2 FROM temp_node n1, temp_node n2 
@@ -81,7 +84,9 @@ BEGIN
 	end loop;
 
 	select count(*) into v_count from temp_node;
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total junctions after process: ',v_count));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
+						"data":{"message":"4310","function":"3186","parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
+
 
 	INSERT INTO anl_node (node_id, nodecat_id, expl_id, the_geom, sector_id, state, fid, cur_user)
 	SELECT node_id, nodecat_id, expl_id,  the_geom, sector_id, state, 484, current_user FROM temp_node;
