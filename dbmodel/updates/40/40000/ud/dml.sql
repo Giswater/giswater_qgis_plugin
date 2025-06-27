@@ -2766,6 +2766,35 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', widgettype='combo', dv_qu
 
 DELETE FROM config_form_fields WHERE columnname='buildercat_id';
 
+INSERT INTO macroexploitation (macroexpl_id, code, "name", descript, lock_level, active, updated_at)
+SELECT macroexpl_id, macroexpl_id::text, "name", descript, NULL, active, now()
+FROM _macroexploitation;
+
+INSERT INTO exploitation (expl_id, code, "name", descript, macroexpl_id, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
+SELECT expl_id, expl_id::text, "name", descript, macroexpl_id, NULL, active, the_geom, tstamp, insert_user, lastupdate, lastupdate_user
+FROM _exploitation;
+
+INSERT INTO macrosector (macrosector_id, code, "name", descript, lock_level, active, the_geom, updated_at)
+SELECT macrosector_id, macrosector_id::text, "name", descript, NULL, active, the_geom, now()
+FROM _macrosector;
+
+INSERT INTO macroomzone (macroomzone_id, code, "name", descript, expl_id, lock_level, active, the_geom, updated_at)
+SELECT macrodma_id, macrodma_id::text, "name", descript, expl_id, NULL, active, the_geom, now()
+FROM _macrodma;
+
+INSERT INTO omzone (omzone_id, code, "name", descript, omzone_type, expl_id, macroomzone_id, minc, maxc, effc, link,
+graphconfig, stylesheet, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
+SELECT dma_id, dma_id::text, "name", descript, dma_type, expl_id, macrodma_id, minc, maxc, effc, link,
+graphconfig, stylesheet, lock_level, active, the_geom, tstamp, insert_user, lastupdate, lastupdate_user
+FROM _dma;
+
+INSERT INTO drainzone (drainzone_id, code, "name", drainzone_type, descript, expl_id, link, graphconfig, stylesheet, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
+SELECT drainzone_id, drainzone_id::text, "name", drainzone_type, descript, expl_id, link, graphconfig, stylesheet, NULL, active, the_geom, tstamp, insert_user, lastupdate, lastupdate_user
+FROM _drainzone;
+
+INSERT INTO sector (sector_id, code, "name", descript, macrosector_id, parent_id, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
+SELECT sector_id, sector_id::text, "name", descript, macrosector_id, parent_id, NULL, active, the_geom, tstamp, insert_user, lastupdate, lastupdate_user
+FROM _sector;
 
 -- 20/03/2025
 -- todo: disable triggers
