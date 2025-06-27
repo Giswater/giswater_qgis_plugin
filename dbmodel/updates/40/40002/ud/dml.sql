@@ -127,7 +127,7 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES (4310, 'Total junctions after process: %v_count%', null, 0, true, 'utils', 'core', 'AUDIT');
 
 --27/06/2025
-UPDATE sys_function SET function_alias = 'DUPLICATE HYDROLOGY SCENARIO' WHERE function_name = 'gw_fct_duplicatehydroscenario';
+UPDATE sys_function SET function_alias = 'DUPLICATE HYDROLOGY SCENARIO' WHERE function_name = 'gw_fct_duplicate_hydrology_scenario';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (4312, 'Source scenario: %v_sourcename%', null, 0, true, 'utils', 'core', 'AUDIT');
