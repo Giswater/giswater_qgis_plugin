@@ -131,6 +131,11 @@ BEGIN
 		END IF;
 	END IF;
 
+	-- control null tabname when layout of municipalities appear
+	IF v_tabname IS NULL AND v_selectortype = 'explfrommuni' THEN 
+		v_tabname = 'tab_municipality';
+	END IF;
+
 	-- Get system parameters
 	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_tabname));
 	v_tablename = v_parameter_selector->>'selector';
