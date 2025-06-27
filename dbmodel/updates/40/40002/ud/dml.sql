@@ -84,4 +84,25 @@ VALUES (4312, 'INFO: Copied values from Dwf scenario ( %v_copyfrom% ) to new Dwf
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (4314, 'This DWF scenario is now your current scenario.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+--27/06/2025
+
+UPDATE sys_function SET function_alias = 'MANAGE DWF VALUES' WHERE function_name = 'gw_fct_manage_dwf_values';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4028, 'Sector: %v_sector_name%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4030, '%v_count% row(s) have been keep from inp_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4032, 'No rows have been inserted on inp_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4034, '%v_count2% row(s) have been inserted on inp_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4036, '%v_count% row(s) have been removed from inp_%object_rec% table.', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4038, '%v_count% row(s) have been inserted into inp_dwf table from v_edit_inp_junction table.', null, 0, true, 'utils', 'core', 'AUDIT');
 
