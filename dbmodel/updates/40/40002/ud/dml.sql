@@ -58,31 +58,13 @@ VALUES (3896, 'The new dscenario is now your current DWF scenario', null, 0, tru
 UPDATE sys_function SET function_alias = 'DUPLICATE DWF SCENARIO' WHERE function_name = 'gw_fct_duplicate_dwf_scenario';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (3898, 'Id_val: %v_idval%', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES (3898, 'Dwf scenario named "%v_idval%" created with values from Dwf scenario ( %v_copyfrom% ).', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (3900, 'Descript: %v_startdate%', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES (3900, 'Copied values from Dwf scenario ( %v_copyfrom% ) to new Dwf scenario ( %v_scenarioid% ).', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4302, 'Parent: %v_enddate%', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4304, 'Type: %v_observ%', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4306, 'active: %v_active%', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4308, 'Expl_id: %v_expl_id%', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4310, 'INFO: Dwf scenario named "%v_idval%" created with values from Dwf scenario ( %v_copyfrom% ).', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4312, 'INFO: Copied values from Dwf scenario ( %v_copyfrom% ) to new Dwf scenario ( %v_scenarioid% ).', null, 0, true, 'utils', 'core', 'AUDIT');
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4314, 'This DWF scenario is now your current scenario.', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES (4302, 'This DWF scenario is now your current scenario.', null, 0, true, 'utils', 'core', 'AUDIT');
 
 --27/06/2025
 
