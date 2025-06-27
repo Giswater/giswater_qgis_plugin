@@ -231,6 +231,16 @@ BEGIN
             WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
         END IF;
 
+        IF v_project_type = 'UD' THEN
+            UPDATE temp_pgr_node t
+            SET to_arc = a.to_arc
+            FROM (
+                    SELECT pgr_node_1, array_agg(arc_id) AS to_arc
+                    FROM temp_pgr_arc
+                    GROUP BY pgr_node_1
+                )a
+            WHERE t.graph_delimiter = v_graph_delimiter AND t.pgr_node_id = a.pgr_node_1;
+        END IF;
     END IF;
 
 
