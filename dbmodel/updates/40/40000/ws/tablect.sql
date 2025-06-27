@@ -585,7 +585,7 @@ DECLARE
     v_feature_name text;
 BEGIN
     FOR v_rec IN
-        SELECT DISTINCT cf.id, feature_type
+        SELECT DISTINCT cf.id, cf.feature_type
         FROM sys_addfields sa
         JOIN cat_feature cf ON cf.id = sa.cat_feature_id
     LOOP
