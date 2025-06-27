@@ -65,7 +65,7 @@ BEGIN
     END IF;
 
     IF v_project_type = 'UD' THEN
-        v_cost = -1;
+        v_reverse_cost = -1;
     ELSE
         -- ARCS TO MODIFY - Depending on the nodes with modif = TRUE
         -- ARCS VALVES
@@ -119,31 +119,31 @@ BEGIN
             modif2= s.modif2
         FROM arcs_modif s
         WHERE t.pgr_arc_id= s.pgr_arc_id;
-
-        -- for the nodes with v_graph_delimiter - all the arcs
-        WITH arcs_selected AS (
-        SELECT
-            a.pgr_arc_id,
-            n.pgr_node_id,
-            a.pgr_node_1,
-            a.pgr_node_2
-        FROM temp_pgr_node n
-        JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-        WHERE n.modif = TRUE AND n.graph_delimiter = v_graph_delimiter
-        ), arcs_modif AS (
-            SELECT
-                pgr_arc_id,
-                bool_or(pgr_node_id = pgr_node_1) AS modif1,
-                bool_or( pgr_node_id = pgr_node_2) AS modif2
-            FROM arcs_selected
-            GROUP BY pgr_arc_id
-        )
-        UPDATE temp_pgr_arc t
-        SET modif1= s.modif1,
-            modif2= s.modif2
-        FROM arcs_modif s
-        WHERE t.pgr_arc_id= s.pgr_arc_id;
     END IF;
+
+    -- for the nodes with v_graph_delimiter - all the arcs
+    WITH arcs_selected AS (
+    SELECT
+        a.pgr_arc_id,
+        n.pgr_node_id,
+        a.pgr_node_1,
+        a.pgr_node_2
+    FROM temp_pgr_node n
+    JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+    WHERE n.modif = TRUE AND n.graph_delimiter = v_graph_delimiter
+    ), arcs_modif AS (
+        SELECT
+            pgr_arc_id,
+            bool_or(pgr_node_id = pgr_node_1) AS modif1,
+            bool_or( pgr_node_id = pgr_node_2) AS modif2
+        FROM arcs_selected
+        GROUP BY pgr_arc_id
+    )
+    UPDATE temp_pgr_arc t
+    SET modif1= s.modif1,
+        modif2= s.modif2
+    FROM arcs_modif s
+    WHERE t.pgr_arc_id= s.pgr_arc_id;
 
     -- for the nodes with graph_delimiter = 'FORCECLOSED' - all the arcs
     WITH arcs_selected AS (
@@ -163,11 +163,11 @@ BEGIN
             FROM arcs_selected
             GROUP BY pgr_arc_id
         )
-        UPDATE temp_pgr_arc t
-        SET modif1= s.modif1,
-            modif2= s.modif2
-        FROM arcs_modif s
-        WHERE t.pgr_arc_id= s.pgr_arc_id;
+    UPDATE temp_pgr_arc t
+    SET modif1= s.modif1,
+        modif2= s.modif2
+    FROM arcs_modif s
+    WHERE t.pgr_arc_id= s.pgr_arc_id;
 
     -- Disconnect arcs with modif = TRUE at nodes with modif1 = TRUE; a new arc N_new->N_original is created with the v_cost and v_reverse_cost
     FOR v_record IN
@@ -228,18 +228,18 @@ BEGIN
         AND a.to_arc IS NOT NULL
         AND a.closed = FALSE;
 
-        -- for mapzone graph_delimiter - only the inlet arcs
+        -- for mapzone graph_delimiter - the inlet arcs behave like checkvalves
         UPDATE temp_pgr_arc a
         SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
             reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
         WHERE a.graph_delimiter = v_graph_delimiter
         AND a.old_arc_id <> ALL (a.to_arc);
-
-        -- nodes FORCECLOSED
-        UPDATE temp_pgr_arc a
-        SET cost = -1, reverse_cost = -1
-        WHERE a.graph_delimiter  = 'FORCECLOSED';
     END IF;
+
+    -- nodes FORCECLOSED
+    UPDATE temp_pgr_arc a
+    SET cost = -1, reverse_cost = -1
+    WHERE a.graph_delimiter  = 'FORCECLOSED';
     
 
     RETURN jsonb_build_object(
