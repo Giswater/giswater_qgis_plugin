@@ -276,7 +276,7 @@ BEGIN
 	-- NODES TO MODIFY
 
 	-- NODES MAPZONES
-	-- Nodes that are the final points of mapzones
+	-- The mapzone nodes are the final points of mapzones
 	IF v_fromzero = 'true' THEN
 		v_query_text =
             'UPDATE temp_pgr_node n SET modif = TRUE
@@ -287,7 +287,7 @@ BEGIN
 		v_query_text =
 			'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = ' || v_mapzone_field || '
 			FROM (
-				SELECT ' || v_mapzone_field || ', (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' AS node_id
+				nullif ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'','''')::int4 AS node_id
 				FROM ' || v_mapzone_name || ' 
 				WHERE graphconfig IS NOT NULL 
 				AND active
@@ -295,63 +295,99 @@ BEGIN
 			WHERE n.node_id = s.node_id';
 		RAISE NOTICE 'v_query_text:: %', v_query_text;
 		EXECUTE v_query_text;
+
+		UPDATE temp_pgr_node t
+        SET to_arc = a.to_arc
+        FROM (
+                SELECT pgr_node_1, array_agg(arc_id) AS to_arc
+                FROM temp_pgr_arc
+                GROUP BY pgr_node_1
+            ) a
+        WHERE t.graph_delimiter = v_mapzone_name AND t.pgr_node_id = a.pgr_node_1;
 	END IF;
 
-	-- ARCS TO MODIFY
-	-- arcs with initoverflowpath TRUE
+	-- Nodes forceClosed
+	v_query_text =
+		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''FORCECLOSED'' 
+		FROM (
+			SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::int4 AS node_id
+			FROM ' || v_mapzone_name || ' 
+			WHERE graphconfig IS NOT NULL 
+			AND active
+		) s 
+		WHERE n.node_id = s.node_id';
+	EXECUTE v_query_text;
+
+	-- Nodes "ignore", should not be disconnected
+	v_query_text =
+		'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''IGNORE'' 
+		FROM (
+			SELECT (json_array_elements_text((graphconfig->>''ignore'')::json))::int4 AS node_id
+			FROM ' || v_mapzone_name || ' 
+			WHERE graphconfig IS NOT NULL 
+			AND active 
+		) s 
+		WHERE n.node_id = s.node_id';
+	EXECUTE v_query_text;             
+
+	-- Nodes forceClosed acording init parameters
+	UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'FORCECLOSED'
+	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
+
+	-- Nodes forceOpen acording init parameters
+	UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'IGNORE'
+	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
+
+	-- arcs initoverflowpath
+    IF v_mapzone_name = 'DWFZONE' THEN
+        UPDATE temp_pgr_arc t
+        SET modif1 = TRUE, graph_delimiter = 'INITOVERFLOWPATH'
+        FROM v_temp_arc v
+        WHERE v.arc_id = t.arc_id AND v.initoverflowpath; 
+
+        UPDATE temp_pgr_node t
+        SET modif = TRUE
+        FROM temp_pgr_arc a
+        WHERE v.pgr_node_1 = t.pgr_node_id AND a.graph_delimiter = 'INITOVERFLOWPATH'; 
+    END IF;   
+
+	-- =======================
+    SELECT gw_fct_graphanalytics_arrangenetwork() INTO v_response;
+
+    IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
+    END IF;
+
+	-- put in 'NONE' arcs that were controled by graph_delimiter of arc and not of node, to keep only the new ones with the graph_delimiter<>'NONE'; for the moment - there are just the INITOVERFLOWPATH arcs
+    UPDATE temp_pgr_arc t
+    SET graph_delimiter = 'NONE'
+    WHERE graph_delimiter <> 'NONE' AND arc_id IS NOT NULL;
+
+	-- disconnect to_arcs for nodes graph_delimiter
+	UPDATE temp_pgr_arc a
+    SET cost = -1, reverse_cost = -1
+    WHERE a.graph_delimiter = v_mapzone_name
+    AND a.old_arc_id = ANY (a.to_arc);
+	
+	-- disconnect arcs with initoverflowpath TRUE
 	IF v_mapzone_name = 'DWFZONE' THEN
-		UPDATE temp_pgr_arc
-		SET modif1 = true, graph_delimiter = 'INITOVERFLOWPATH', cost = -1, reverse_cost = -1
-		FROM v_temp_arc v
-		WHERE v.arc_id = temp_pgr_arc.arc_id AND v.initoverflowpath;
+		UPDATE temp_pgr_arc t
+        SET cost = -1, reverse_cost = -1 
+        WHERE graph_delimiter = 'INITOVERFLOWPATH';
 	END IF;
+
+	-- arcs that connects with nodes IGNORE 
+	UPDATE temp_pgr_arc t
+	SET cost = 1, reverse_cost = 1
+	FROM temp_pgr_node n 
+	WHERE n.pgr_node_id IN (t.pgr_node_1, t.pgr_node_2) AND n.graph_delimiter = 'IGNORE';
+	
+	
 
 	-- ARCS MAPZONES
-	IF v_fromzero = 'true' THEN
 
-	ELSE
-		v_query_text = '
-			UPDATE temp_pgr_arc
-			SET modif1 = true, cost = 1, reverse_cost = 1
-			FROM temp_pgr_node n
-			WHERE temp_pgr_arc.node_2 = n.node_id
-			AND n.graph_delimiter = ''' || v_mapzone_name || '''
-		';
-		RAISE NOTICE 'v_query_text:: %', v_query_text;
-		EXECUTE v_query_text;
 
-		v_query_text =
-			'UPDATE temp_pgr_arc a SET modif1 = TRUE, graph_delimiter = ''FORCECLOSED'', cost = -1, reverse_cost = -1
-			FROM (
-				SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) AS arc_id
-				FROM ' || v_mapzone_name || ' 
-				WHERE graphconfig IS NOT NULL 
-				AND active
-			) s 
-			WHERE a.arc_id = s.arc_id';
-		EXECUTE v_query_text;
-
-		v_query_text =
-			'UPDATE temp_pgr_arc a SET modif1 = FALSE, graph_delimiter = ''IGNORE'', cost = 1, reverse_cost = -1
-			FROM (
-				SELECT json_array_elements_text((graphconfig->>''ignore'')::json) AS arc_id
-				FROM ' || v_mapzone_name || ' 
-				WHERE graphconfig IS NOT NULL 
-				AND active 
-			) s 
-			WHERE a.arc_id = s.arc_id';
-		EXECUTE v_query_text;
-	END IF;
-
-	-- Arcs forceClosed acording init parameters
-	UPDATE temp_pgr_arc a SET modif1 = TRUE, graph_delimiter = 'FORCECLOSED', cost = -1, reverse_cost = -1
-	WHERE a.arc_id IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
-
-	-- Arcs forceOpen acording init parameters
-	UPDATE temp_pgr_arc a SET modif1 = FALSE, graph_delimiter = 'IGNORE', cost = 1, reverse_cost = 1
-	WHERE a.arc_id IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
-
-	-- TODO: revise this json
+	-- TODO: revise this json DANI - 
 	v_graphconfig_json = json_build_object(
 		'use', json_build_array(
 			json_build_object(
@@ -382,10 +418,7 @@ BEGIN
 	-- Execute pgr_drivingDistance function
 	v_query_text = '
 		SELECT pgr_arc_id AS id, pgr_node_2 AS source, pgr_node_1 AS target, cost, reverse_cost
-		FROM temp_pgr_arc a
-		WHERE a.pgr_node_1 IS NOT NULL 
-		AND a.pgr_node_2 IS NOT NULL
-	';
+		FROM temp_pgr_arc';
 	INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
 	(
 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost

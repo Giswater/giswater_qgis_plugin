@@ -289,6 +289,8 @@ BEGIN
 	AND n.closed = FALSE
 	AND n.broken = FALSE;
 
+	-- NODES MAPZONES
+	-- The mapzone nodes are the starting points of mapzones
 	IF v_fromzero THEN 
 		 v_query_text =
             'UPDATE temp_pgr_node n SET modif = TRUE
@@ -296,25 +298,24 @@ BEGIN
             '; 
 		EXECUTE v_query_text;     
 	ELSE
-		-- NODES MAPZONES
-		-- Nodes that are the starting points of mapzones
-		v_query_text =
-			'WITH mapzone AS (
-                SELECT ' || v_mapzone_field || ' AS mapzone_id, 
-                ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::int4 AS node_id,
-                json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json)::int4 AS to_arc
-				FROM ' || v_mapzone_name || ' 
-				WHERE graphconfig IS NOT NULL 
-				AND active
-            )
-            UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
-			FROM (
-				SELECT mapzone_id, node_id, array_agg(to_arc) AS to_arc
-                FROM mapzone
-                GROUP BY mapzone_id, node_id
-			) AS s 
-			WHERE n.node_id = s.node_id';
-		EXECUTE v_query_text;
+		v_query_text = 
+            'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
+            FROM (
+                SELECT 
+                    ' || v_mapzone_field || ' AS mapzone_id,
+                    ARRAY(
+                        SELECT value::int
+                        FROM json_array_elements_text(use_item->''toArc'') AS elem(value)
+                    ) AS to_arc,
+                    (use_item->>''nodeParent'')::int AS node_id
+                FROM ' || v_mapzone_name || ',
+                    LATERAL json_array_elements(graphconfig->''use'') AS use_item
+                WHERE graphconfig IS NOT NULL 
+                AND active
+            ) AS s 
+             WHERE n.node_id = s.node_id
+            ';
+        EXECUTE v_query_text;
 
 		-- Nodes forceClosed
 		v_query_text =
@@ -362,10 +363,9 @@ BEGIN
 	-- Note: node_id IS NULL AND arc_id IS NULL for the new nodes/arcs generated
 	
 	-- disconect InletArcs for nodes graph_delimiter
-	EXECUTE 'UPDATE temp_pgr_arc SET cost = -1, reverse-cost = -1
-			WHERE graph_delimiter = ''' || v_mapzone_name || ''' 
-			AND cost <> reverse_cost
-			';
+	UPDATE temp_pgr_arc  SET cost = -1, reverse_cost = -1
+    WHERE graph_delimiter = v_mapzone_name
+    AND old_arc_id <> ALL (to_arc);
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
     INTO v_pgr_distance;
@@ -378,13 +378,22 @@ BEGIN
 
 	-- Execute pgr_drivingDistance function
     v_query_text = 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 
-		FROM temp_pgr_arc a
-		WHERE cost<> -1 OR reverse_cost <> -1';
+		FROM temp_pgr_arc';
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
     (
 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
 		FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
     );
+
+	IF v_fromzero = 'true' THEN
+		v_query_text = '
+			SELECT seq AS id, start_vid AS source, node AS target, cost
+			FROM temp_pgr_drivingdistance
+		';
+		INSERT INTO temp_pgr_connectedcomponents (seq,component, node)
+		SELECT seq,component, node
+		FROM pgr_connectedComponents(v_query_text);
+	END IF;
 
 	IF v_updatemapzgeom > 0 THEN
 		-- message
