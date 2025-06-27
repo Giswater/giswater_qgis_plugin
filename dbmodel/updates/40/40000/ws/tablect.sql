@@ -408,9 +408,6 @@ CREATE RULE macrodqa_undefined AS
    WHERE ((new.macrodqa_id = 0) OR (old.macrodqa_id = 0)) DO INSTEAD NOTHING;
 
 
--- exploitation
-ALTER TABLE ext_streetaxis ADD CONSTRAINT ext_streetaxis_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
 CREATE RULE exploitation_del_undefined AS
     ON DELETE TO exploitation
    WHERE (old.expl_id = 0) DO INSTEAD NOTHING;
@@ -436,7 +433,6 @@ ALTER TABLE om_streetaxis ADD CONSTRAINT om_streetaxis_exploitation_id_fkey FORE
 ALTER TABLE connec ADD CONSTRAINT connec_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_waterbalance ADD CONSTRAINT om_waterbalance_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE ext_address ADD CONSTRAINT ext_address_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE dimensions ADD CONSTRAINT dimensions_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE selector_expl ADD CONSTRAINT selector_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -449,11 +445,7 @@ ALTER TABLE link ADD CONSTRAINT link_exploitation_id_fkey FOREIGN KEY (expl_id) 
 ALTER TABLE inp_pattern ADD CONSTRAINT inp_pattern_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE minsector ADD CONSTRAINT minsector_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE cat_dscenario ADD CONSTRAINT cat_dscenario_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE ext_plot ADD CONSTRAINT ext_plot_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE inp_curve ADD CONSTRAINT inp_curve_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE _pond_ ADD CONSTRAINT pond_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE _pool_ ADD CONSTRAINT pool_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE _arc_border_expl_ ADD CONSTRAINT arc_border_expl_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 CREATE RULE omzone_conflict AS
     ON UPDATE TO omzone
@@ -577,16 +569,30 @@ BEGIN
         ALTER TABLE arc ADD CONSTRAINT arc_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE;
         ALTER TABLE connec ADD CONSTRAINT connec_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE;
         ALTER TABLE connec ADD CONSTRAINT connec_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+        ALTER TABLE ext_streetaxis ADD CONSTRAINT ext_streetaxis_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+        ALTER TABLE ext_address ADD CONSTRAINT ext_address_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+        ALTER TABLE ext_plot ADD CONSTRAINT ext_plot_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
     END IF;
 END $$;
 
 
 DO $$
 DECLARE
-v_rec RECORD;
+    v_rec RECORD;
+    v_table_name text;
+    v_feature_name text;
 BEGIN
-    FOR v_rec IN SELECT DISTINCT cf.id, concat('man_', lower(cf.feature_type), '_', lower(cf.id)) AS table_name FROM sys_addfields sa
-    JOIN cat_feature cf ON cf.id = sa.cat_feature_id; LOOP
-        EXECUTE 'ALTER TABLE ' || v_rec.table_name || ' ADD CONSTRAINT ' || v_rec.table_name || '_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE';
+    FOR v_rec IN
+        SELECT DISTINCT cf.id, feature_type
+        FROM sys_addfields sa
+        JOIN cat_feature cf ON cf.id = sa.cat_feature_id
+    LOOP
+        v_feature_name := lower(v_rec.feature_type) || '_id';
+        v_table_name := 'man_' || lower(v_rec.feature_type) || '_' || lower(v_rec.id);
+
+        EXECUTE 'ALTER TABLE ' || v_table_name || ' ALTER COLUMN ' || v_feature_name || ' TYPE int4 USING ' || v_feature_name || '::int4';
+        EXECUTE 'ALTER TABLE ' || v_table_name || ' ADD CONSTRAINT ' || v_table_name || '_' || v_feature_name || '_fkey FOREIGN KEY (' || v_feature_name || ') REFERENCES node(' || v_feature_name || ') ON DELETE CASCADE';
     END LOOP;
 END $$;
