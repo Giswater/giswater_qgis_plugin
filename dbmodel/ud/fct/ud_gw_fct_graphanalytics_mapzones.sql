@@ -130,7 +130,7 @@ DECLARE
 	v_status text;
 	v_message text;
 
-	v_querytext text;
+	v_query_text text;
 	v_data json;
 
 	v_result text;
@@ -273,23 +273,18 @@ BEGIN
         RETURN v_response;
     END IF;
 
-
+	-- NODES TO MODIFY
 
 	-- NODES MAPZONES
 	-- Nodes that are the final points of mapzones
 	IF v_fromzero = 'true' THEN
-		v_querytext =
-			'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || '''
-			FROM (
-				SELECT node_id::int
-				FROM v_temp_node v
-				WHERE ''' || v_mapzone_name || '''  = ANY(v.graph_delimiter)
-				AND active
-			) AS s 
-			WHERE s.node_id <> '''' AND n.node_id = s.node_id';
-		EXECUTE v_querytext;
+		v_query_text =
+            'UPDATE temp_pgr_node n SET modif = TRUE
+            WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
+            '; 
+		EXECUTE v_query_text;
 	ELSE
-		v_querytext =
+		v_query_text =
 			'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = ' || v_mapzone_field || '
 			FROM (
 				SELECT ' || v_mapzone_field || ', (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' AS node_id
@@ -297,9 +292,9 @@ BEGIN
 				WHERE graphconfig IS NOT NULL 
 				AND active
 			) AS s 
-			WHERE s.node_id <> '''' AND n.node_id = s.node_id';
-		RAISE NOTICE 'v_querytext:: %', v_querytext;
-		EXECUTE v_querytext;
+			WHERE n.node_id = s.node_id';
+		RAISE NOTICE 'v_query_text:: %', v_query_text;
+		EXECUTE v_query_text;
 	END IF;
 
 	-- ARCS TO MODIFY
@@ -315,17 +310,17 @@ BEGIN
 	IF v_fromzero = 'true' THEN
 
 	ELSE
-		v_querytext = '
+		v_query_text = '
 			UPDATE temp_pgr_arc
 			SET modif1 = true, cost = 1, reverse_cost = 1
 			FROM temp_pgr_node n
 			WHERE temp_pgr_arc.node_2 = n.node_id
 			AND n.graph_delimiter = ''' || v_mapzone_name || '''
 		';
-		RAISE NOTICE 'v_querytext:: %', v_querytext;
-		EXECUTE v_querytext;
+		RAISE NOTICE 'v_query_text:: %', v_query_text;
+		EXECUTE v_query_text;
 
-		v_querytext =
+		v_query_text =
 			'UPDATE temp_pgr_arc a SET modif1 = TRUE, graph_delimiter = ''FORCECLOSED'', cost = -1, reverse_cost = -1
 			FROM (
 				SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) AS arc_id
@@ -334,9 +329,9 @@ BEGIN
 				AND active
 			) s 
 			WHERE a.arc_id = s.arc_id';
-		EXECUTE v_querytext;
+		EXECUTE v_query_text;
 
-		v_querytext =
+		v_query_text =
 			'UPDATE temp_pgr_arc a SET modif1 = FALSE, graph_delimiter = ''IGNORE'', cost = 1, reverse_cost = -1
 			FROM (
 				SELECT json_array_elements_text((graphconfig->>''ignore'')::json) AS arc_id
@@ -345,7 +340,7 @@ BEGIN
 				AND active 
 			) s 
 			WHERE a.arc_id = s.arc_id';
-		EXECUTE v_querytext;
+		EXECUTE v_query_text;
 	END IF;
 
 	-- Arcs forceClosed acording init parameters
@@ -376,16 +371,16 @@ BEGIN
 	EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
 	INTO v_pgr_distance;
 
-	v_querytext = '
+	v_query_text = '
 		SELECT array_agg(pgr_node_id)::INT[] 
 		FROM temp_pgr_node 
 		WHERE graph_delimiter = ''' || v_mapzone_name || ''' 
 		AND modif = TRUE';
-	RAISE NOTICE 'v_querytext:: %', v_querytext;
-	EXECUTE v_querytext INTO v_pgr_root_vids;
+	RAISE NOTICE 'v_query_text:: %', v_query_text;
+	EXECUTE v_query_text INTO v_pgr_root_vids;
 
 	-- Execute pgr_drivingDistance function
-	v_querytext = '
+	v_query_text = '
 		SELECT pgr_arc_id AS id, pgr_node_2 AS source, pgr_node_1 AS target, cost, reverse_cost
 		FROM temp_pgr_arc a
 		WHERE a.pgr_node_1 IS NOT NULL 
@@ -394,17 +389,17 @@ BEGIN
 	INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
 	(
 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
-		FROM pgr_drivingdistance(v_querytext, v_pgr_root_vids, v_pgr_distance)
+		FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
 	);
 
 	IF v_fromzero = 'true' THEN
-		v_querytext = '
+		v_query_text = '
 			SELECT seq AS id, start_vid AS source, node AS target, cost
 			FROM temp_pgr_drivingdistance
 		';
 		INSERT INTO temp_pgr_connectedcomponents (seq,component, node)
 		SELECT seq,component, node
-		FROM pgr_connectedComponents(v_querytext);
+		FROM pgr_connectedComponents(v_query_text);
 	END IF;
 
 
@@ -456,7 +451,7 @@ BEGIN
 		FROM temp_pgr_node n
 		where n.pgr_node_id = a.pgr_node_2;
 
-		v_querytext = '
+		v_query_text = '
 			WITH mapzone_nodes AS (
 				SELECT node_id::int
 				FROM temp_pgr_node t
@@ -475,8 +470,8 @@ BEGIN
 			FROM new_mapzones d
 			GROUP BY d.component;
 		';
-		RAISE NOTICE 'v_querytext:: %', v_querytext;
-		EXECUTE v_querytext;
+		RAISE NOTICE 'v_query_text:: %', v_query_text;
+		EXECUTE v_query_text;
 	END IF;
 
 
@@ -573,7 +568,7 @@ BEGIN
 	IF v_updatemapzgeom = 0 THEN
 		-- do nothing
 
-		v_querytext = '
+		v_query_text = '
 			UPDATE temp_pgr_mapzone SET the_geom = a.geom
 			FROM (
 				SELECT mapzone_id, ST_Union(the_geom) AS geom
@@ -585,13 +580,13 @@ BEGIN
 			WHERE temp_pgr_mapzone.mapzone_id = a.mapzone_id
 			AND temp_pgr_mapzone.mapzone_id > 0
 		';
-		RAISE NOTICE 'SIMPLE UNION v_querytext:: %', v_querytext;
-		EXECUTE v_querytext;
+		RAISE NOTICE 'SIMPLE UNION v_query_text:: %', v_query_text;
+		EXECUTE v_query_text;
 
 	ELSIF  v_updatemapzgeom = 1 THEN
 
 		-- concave polygon
-		v_querytext = '
+		v_query_text = '
 			UPDATE temp_pgr_mapzone SET the_geom = ST_Multi(a.the_geom) 
 			FROM (
 				WITH polygon AS (
@@ -609,13 +604,13 @@ BEGIN
 			) a 
 			WHERE a.mapzone_id = temp_pgr_mapzone.mapzone_id 
 			AND temp_pgr_mapzone.mapzone_id > 0';
-		RAISE NOTICE 'CONCAVE POLYGON v_querytext:: %', v_querytext;
-		EXECUTE v_querytext;
+		RAISE NOTICE 'CONCAVE POLYGON v_query_text:: %', v_query_text;
+		EXECUTE v_query_text;
 
 	ELSIF  v_updatemapzgeom = 2 THEN
 
 		-- pipe buffer
-		v_querytext = '
+		v_query_text = '
 			UPDATE temp_pgr_mapzone SET the_geom = geom 
 			FROM (
 				SELECT mapzone_id, ST_Multi(ST_Buffer(ST_Collect(the_geom),'||v_geomparamupdate||')) AS geom 
@@ -625,13 +620,13 @@ BEGIN
 				GROUP BY mapzone_id
 			) a 
 			WHERE a.mapzone_id = temp_pgr_mapzone.mapzone_id;';
-		RAISE NOTICE 'PIPE BUFFER v_querytext:: %', v_querytext;
-		EXECUTE v_querytext;
+		RAISE NOTICE 'PIPE BUFFER v_query_text:: %', v_query_text;
+		EXECUTE v_query_text;
 
 	ELSIF  v_updatemapzgeom = 3 THEN
 
 		-- use plot and pipe buffer
-		v_querytext = '
+		v_query_text = '
 			UPDATE temp_pgr_mapzone SET the_geom = geom FROM (
 				SELECT mapzone_id, ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom FROM (
 					SELECT mapzone_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a
@@ -649,15 +644,15 @@ BEGIN
 				GROUP BY mapzone_id 
 			) b 
 			WHERE b.mapzone_id= temp_pgr_mapzone.mapzone_id;';
-		RAISE NOTICE 'PLOT AND PIPE BUFFER v_querytext:: %', v_querytext;
-		EXECUTE v_querytext;
+		RAISE NOTICE 'PLOT AND PIPE BUFFER v_query_text:: %', v_query_text;
+		EXECUTE v_query_text;
 
 	ELSIF  v_updatemapzgeom = 4 THEN
 
 		v_geomparamupdate_divide = v_geomparamupdate / 2;
 
 		-- use link and pipe buffer
-		v_querytext = '
+		v_query_text = '
 			UPDATE temp_pgr_mapzone SET the_geom = b.geom FROM (
 				SELECT c.mapzone_id, ST_Multi(ST_Buffer(ST_Collect(c.geom),0.01)) AS geom FROM (
 					SELECT a.mapzone_id, ST_Buffer(ST_Collect(va.the_geom), '||v_geomparamupdate||') AS geom 
@@ -676,8 +671,8 @@ BEGIN
 			) b
 			WHERE b.mapzone_id = temp_pgr_mapzone.mapzone_id;';
 
-		RAISE NOTICE 'LINK AND PIPE BUFFER v_querytext:: %', v_querytext;
-		EXECUTE v_querytext;
+		RAISE NOTICE 'LINK AND PIPE BUFFER v_query_text:: %', v_query_text;
+		EXECUTE v_query_text;
 	END IF;
 
 
@@ -759,7 +754,7 @@ BEGIN
 	IF v_commitchanges IS FALSE THEN
 		-- arc elements
 		IF v_floodonlymapzone IS NULL THEN
-			v_querytext = '
+			v_query_text = '
 			SELECT jsonb_agg(features.feature) 
 			FROM (
 				SELECT jsonb_build_object(
@@ -788,8 +783,8 @@ BEGIN
 					AND ta.arc_id IS NOT NULL
 				) row 
 			) features';
-			RAISE NOTICE 'v_querytext:: %', v_querytext;
-			EXECUTE v_querytext INTO v_result;
+			RAISE NOTICE 'v_query_text:: %', v_query_text;
+			EXECUTE v_query_text INTO v_result;
 
 		ELSE
 			EXECUTE '
@@ -845,15 +840,15 @@ BEGIN
 			-- TODO[epic=mapzones]: netscnearios
 		ELSE
 
-			v_querytext = 'UPDATE '||v_mapzone_name||' SET 
+			v_query_text = 'UPDATE '||v_mapzone_name||' SET 
 				the_geom = t.the_geom, 
 				updated_at = now(), 
 				updated_by = current_user 
 			FROM temp_pgr_mapzone t 
 			WHERE t.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
-			EXECUTE v_querytext;
+			EXECUTE v_query_text;
 
-			v_querytext = 'UPDATE '||v_mapzone_name||' SET 
+			v_query_text = 'UPDATE '||v_mapzone_name||' SET 
 				expl_id = subq.expl_ids,
 				muni_id = subq.muni_ids,
 				sector_id = subq.sector_ids,
@@ -872,7 +867,7 @@ BEGIN
 				GROUP BY tm.mapzone_id
 			) subq
 			WHERE subq.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
-			EXECUTE v_querytext;
+			EXECUTE v_query_text;
 
 
 			-- old zone id array
@@ -886,7 +881,7 @@ BEGIN
 
 			RAISE NOTICE 'v_old_mapzone_id_array:: %', v_old_mapzone_id_array;
 
-			v_querytext = '
+			v_query_text = '
 				WITH arcs AS (
 					SELECT 
 						arc_id,
@@ -900,10 +895,10 @@ BEGIN
 				WHERE arc.arc_id = arcs.arc_id
 				AND arc.'||quote_ident(v_mapzone_field)||' <> arcs.mapzone_id
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE arc with temp_pgr_arc mapzone_id %', v_querytext;
-			EXECUTE v_querytext;
+			RAISE NOTICE 'v_query_text:: UPDATE arc with temp_pgr_arc mapzone_id %', v_query_text;
+			EXECUTE v_query_text;
 
-			v_querytext = '
+			v_query_text = '
 				WITH nodes AS (
 					SELECT 
 						node_id,
@@ -917,10 +912,10 @@ BEGIN
 				WHERE node.node_id = nodes.node_id
 				AND node.'||quote_ident(v_mapzone_field)||' <> nodes.mapzone_id
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE node with temp_pgr_node mapzone_id %', v_querytext;
-			EXECUTE v_querytext;
+			RAISE NOTICE 'v_query_text:: UPDATE node with temp_pgr_node mapzone_id %', v_query_text;
+			EXECUTE v_query_text;
 
-			v_querytext = '
+			v_query_text = '
 				WITH connecs AS (
 					SELECT 
 						connec_id,
@@ -935,10 +930,10 @@ BEGIN
 				WHERE connec.connec_id = connecs.connec_id
 				AND connec.'||quote_ident(v_mapzone_field)||' <> connecs.mapzone_id
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE connec with temp_pgr_arc join v_temp_connec mapzone_id %', v_querytext;
-			EXECUTE v_querytext;
+			RAISE NOTICE 'v_query_text:: UPDATE connec with temp_pgr_arc join v_temp_connec mapzone_id %', v_query_text;
+			EXECUTE v_query_text;
 
-			v_querytext = '
+			v_query_text = '
 				WITH links AS (
 					SELECT 
 						link_id,
@@ -953,10 +948,10 @@ BEGIN
 				WHERE link.link_id = links.link_id
 				AND link.'||quote_ident(v_mapzone_field)||' <> links.mapzone_id
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE link with temp_pgr_arc join v_temp_link_connec mapzone_id %', v_querytext;
-			EXECUTE v_querytext;
+			RAISE NOTICE 'v_query_text:: UPDATE link with temp_pgr_arc join v_temp_link_connec mapzone_id %', v_query_text;
+			EXECUTE v_query_text;
 
-			v_querytext = '
+			v_query_text = '
 				WITH links AS (
 					SELECT 
 						link_id,
@@ -971,10 +966,10 @@ BEGIN
 				WHERE link.link_id = links.link_id
 				AND link.'||quote_ident(v_mapzone_field)||' <> links.mapzone_id
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE link with temp_pgr_arc join v_temp_link_gully mapzone_id %', v_querytext;
-			EXECUTE v_querytext;
+			RAISE NOTICE 'v_query_text:: UPDATE link with temp_pgr_arc join v_temp_link_gully mapzone_id %', v_query_text;
+			EXECUTE v_query_text;
 
-			v_querytext = '
+			v_query_text = '
 				WITH gullys AS (
 					SELECT 
 						gully_id,
@@ -989,69 +984,69 @@ BEGIN
 				WHERE gully.gully_id = gullys.gully_id
 				AND gully.'||quote_ident(v_mapzone_field)||' <> gullys.mapzone_id
 			';
-			RAISE NOTICE 'v_querytext:: UPDATE gully with temp_pgr_arc join v_temp_gully mapzone_id %', v_querytext;
-			EXECUTE v_querytext;
+			RAISE NOTICE 'v_query_text:: UPDATE gully with temp_pgr_arc join v_temp_gully mapzone_id %', v_query_text;
+			EXECUTE v_query_text;
 
 			IF v_old_mapzone_id_array IS NOT NULL THEN
-				v_querytext = 'UPDATE arc SET '||quote_ident(v_mapzone_field)||' = 0
+				v_query_text = 'UPDATE arc SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc tpa WHERE tpa.mapzone_id = arc.'||quote_ident(v_mapzone_field)||'
 					)
 					AND arc.'||quote_ident(v_mapzone_field)||' <> 0
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE arc old_mapzone_id not in temp_pgr_arc %', v_querytext;
-				EXECUTE v_querytext;
+				RAISE NOTICE 'v_query_text:: UPDATE arc old_mapzone_id not in temp_pgr_arc %', v_query_text;
+				EXECUTE v_query_text;
 
-				v_querytext = 'UPDATE node SET '||quote_ident(v_mapzone_field)||' = 0
+				v_query_text = 'UPDATE node SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_node tpn WHERE tpn.mapzone_id = node.'||quote_ident(v_mapzone_field)||'
 					)
 					AND node.'||quote_ident(v_mapzone_field)||' <> 0
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE node old_mapzone_id not in temp_pgr_node %', v_querytext;
-				EXECUTE v_querytext;
+				RAISE NOTICE 'v_query_text:: UPDATE node old_mapzone_id not in temp_pgr_node %', v_query_text;
+				EXECUTE v_query_text;
 
-				v_querytext = 'UPDATE connec SET '||quote_ident(v_mapzone_field)||' = 0
+				v_query_text = 'UPDATE connec SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE vc.connec_id = connec.'||quote_ident(v_mapzone_field)||'
 					)
 					AND connec.'||quote_ident(v_mapzone_field)||' <> 0
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE connec old_mapzone_id not in v_temp_connec join temp_pgr_arc %', v_querytext;
-				EXECUTE v_querytext;
+				RAISE NOTICE 'v_query_text:: UPDATE connec old_mapzone_id not in v_temp_connec join temp_pgr_arc %', v_query_text;
+				EXECUTE v_query_text;
 
-				v_querytext = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = 0
+				v_query_text = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id) WHERE vc.link_id = link.'||quote_ident(v_mapzone_field)||'
 					)
 					AND link.'||quote_ident(v_mapzone_field)||' <> 0
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE link old_mapzone_id not in v_temp_link_connec join temp_pgr_arc %', v_querytext;
-				EXECUTE v_querytext;
+				RAISE NOTICE 'v_query_text:: UPDATE link old_mapzone_id not in v_temp_link_connec join temp_pgr_arc %', v_query_text;
+				EXECUTE v_query_text;
 
-				v_querytext = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = 0
+				v_query_text = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_gully vc USING (arc_id) WHERE vc.link_id = link.'||quote_ident(v_mapzone_field)||'
 					)
 					AND link.'||quote_ident(v_mapzone_field)||' <> 0
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE link old_mapzone_id not in v_temp_link_gully join temp_pgr_arc %', v_querytext;
-				EXECUTE v_querytext;
+				RAISE NOTICE 'v_query_text:: UPDATE link old_mapzone_id not in v_temp_link_gully join temp_pgr_arc %', v_query_text;
+				EXECUTE v_query_text;
 
-				v_querytext = 'UPDATE gully SET '||quote_ident(v_mapzone_field)||' = 0
+				v_query_text = 'UPDATE gully SET '||quote_ident(v_mapzone_field)||' = 0
 					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_gully vc USING (arc_id) WHERE vc.gully_id = gully.'||quote_ident(v_mapzone_field)||'
 					)
 					AND gully.'||quote_ident(v_mapzone_field)||' <> 0
 				';
-				RAISE NOTICE 'v_querytext:: UPDATE gully old_mapzone_id not in v_temp_gully join temp_pgr_arc %', v_querytext;
-				EXECUTE v_querytext;
+				RAISE NOTICE 'v_query_text:: UPDATE gully old_mapzone_id not in v_temp_gully join temp_pgr_arc %', v_query_text;
+				EXECUTE v_query_text;
 			END IF;
 
 		END IF;
@@ -1063,18 +1058,18 @@ BEGIN
 	-- SECTION[epic=mapzones]: calculate drainzone with dwfzones
 	-- IF v_mapzone_name = 'DWFZONE' THEN
 	-- 	EXECUTE 'TRUNCATE TABLE temp_pgr_drivingdistance';
-	-- 	v_querytext = '
+	-- 	v_query_text = '
 	-- 		UPDATE temp_pgr_arc SET cost = 1, reverse_cost = -1
 	-- 		FROM temp_pgr_arc ta
 	-- 		WHERE ta.graph_delimiter = ''INITOVERFLOWPATH''
 	-- 		AND ta.arc_id IS NOT NULL
 	-- 		AND ta.arc_id = arc.arc_id;
 	-- 	';
-	-- 	RAISE NOTICE 'v_querytext:: UPDATE arc cost to ignore overflow path %', v_querytext;
-	-- 	EXECUTE v_querytext;
+	-- 	RAISE NOTICE 'v_query_text:: UPDATE arc cost to ignore overflow path %', v_query_text;
+	-- 	EXECUTE v_query_text;
 
 	-- 	-- reexecute pgr_drivingdistance
-	-- 	v_querytext = '
+	-- 	v_query_text = '
 	-- 		SELECT pgr_arc_id AS id, pgr_node_2 AS source, pgr_node_1 AS target, cost, reverse_cost
 	-- 		FROM temp_pgr_arc a
 	-- 		WHERE a.pgr_node_1 IS NOT NULL
@@ -1083,7 +1078,7 @@ BEGIN
 	-- 	INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
 	-- 	(
 	-- 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
-	-- 		FROM pgr_drivingdistance(v_querytext, v_pgr_root_vids, v_pgr_distance)
+	-- 		FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
 	-- 	);
 
 
@@ -1092,15 +1087,15 @@ BEGIN
 
 
 	-- 	-- Union all mapzone multilinestrings into a single geometry collection for reporting or further analysis
-	-- 	v_querytext = '
+	-- 	v_query_text = '
 	-- 		SELECT ST_Union(the_geom) AS geom
 	-- 		FROM (
 	-- 			SELECT the_geom
 	-- 			FROM temp_pgr_mapzone
 	-- 		) sub
 	-- 	';
-	-- 	RAISE NOTICE 'Union of mapzone multilinestrings v_querytext:: %', v_querytext;
-	-- 	EXECUTE v_querytext INTO v_union_geom;
+	-- 	RAISE NOTICE 'Union of mapzone multilinestrings v_query_text:: %', v_query_text;
+	-- 	EXECUTE v_query_text INTO v_union_geom;
 
 	-- 	EXECUTE 'TRUNCATE TABLE temp_pgr_mapzone';
 
