@@ -564,45 +564,6 @@ AS SELECT doc.id,
    FROM doc;
 
 -- 05/12/2024
-CREATE OR REPLACE VIEW v_ext_address
-AS SELECT ext_address.id,
-    ext_address.muni_id,
-    ext_address.postcode,
-    ext_address.streetaxis_id,
-    ext_address.postnumber,
-    ext_address.plot_id,
-    ext_address.expl_id,
-    ext_streetaxis.name,
-    ext_address.the_geom,
-    ext_address.postcomplement,
-    ext_address.ext_code,
-    ext_address.source
-   FROM selector_municipality s,
-    ext_address
-     LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = ext_address.streetaxis_id::text
-  WHERE ext_address.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-
-CREATE OR REPLACE VIEW v_ext_streetaxis
-AS SELECT ext_streetaxis.id,
-    ext_streetaxis.code,
-    ext_streetaxis.type,
-    ext_streetaxis.name,
-    ext_streetaxis.text,
-    ext_streetaxis.the_geom,
-    ext_streetaxis.expl_id,
-    ext_streetaxis.muni_id,
-        CASE
-            WHEN ext_streetaxis.type IS NULL THEN ext_streetaxis.name::text
-            WHEN ext_streetaxis.text IS NULL THEN ((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '.'::text
-            WHEN ext_streetaxis.type IS NULL AND ext_streetaxis.text IS NULL THEN ext_streetaxis.name::text
-            ELSE (((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '. '::text) || ext_streetaxis.text
-        END AS descript,
-    ext_streetaxis.source
-   FROM selector_municipality,
-    ext_streetaxis
-  WHERE ext_streetaxis.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text;
-
-
 CREATE OR REPLACE VIEW v_edit_plan_psector
 AS SELECT plan_psector.psector_id,
     plan_psector.name,
