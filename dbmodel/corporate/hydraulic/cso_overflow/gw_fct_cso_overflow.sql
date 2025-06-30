@@ -142,14 +142,21 @@ BEGIN
 
 	-- SCHEMA_NAME data: drainzones, outfalls and its specific features (vret, etc.)
 	EXECUTE '
-	insert into cso_inp_system_subc (node_id, drainzone_id, q_max, vret)
+	insert into cso_inp_system_subc (node_id)
+	select (graphconfig::json ->''use''->0 ->>''nodeParent'')::text
+	from drainzone where link is not null and drainzone_id IN ('||v_selected_drainzone_id||')
+	on conflict (node_id) do nothing';
+
+	EXECUTE '
+	update cso_inp_system_subc t set drainzone_id = a.drainzone_id, q_max = a.qmax, vret = a.vret from (
 	select 
 	(graphconfig::json ->''use''->0 ->>''nodeParent'')::text as node_id,
 	drainzone_id,
 	(link::json ->>''qmax'')::numeric as qmax,
 	(link::json ->>''vret'')::numeric as vret
 	from drainzone where link is not null and drainzone_id IN ('||v_selected_drainzone_id||')
-	on conflict (node_id, drainzone_id) do nothing';
+	)a where t.node_id = a.node_id 
+	';
 
 	-- imperv area 
 	execute '
