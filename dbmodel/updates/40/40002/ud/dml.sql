@@ -157,9 +157,10 @@ VALUES(4206, '%v_count2-v_count1% subcatchments have been updated with outlet va
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4208, '0 subcatchments have been updated with outlet values', null, 0, true, 'utils', 'core', 'AUDIT');
 
+UPDATE sys_function SET function_alias = 'FLUID TYPE CALCULATION' WHERE function_name = 'gw_fct_graphanalytics_fluid_type';
 
-
-
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4210, 'Fluid type calculation done succesfully', null, 0, true, 'utils', 'core', 'UI');
 
 
 
