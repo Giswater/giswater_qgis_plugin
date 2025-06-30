@@ -422,8 +422,8 @@ BEGIN
 		SELECT dscenario_id INTO v_dscenario_id FROM cat_dscenario WHERE "name" = v_inflows_dscenario;
 			
 		EXECUTE '
-		INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id)
-		SELECT '||v_dscenario_id||', node_id, node_id::INTEGER, concat(rf_name, ''_'', node_id) AS lluvia
+		INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base)
+		SELECT '||v_dscenario_id||', node_id, node_id::INTEGER, concat(rf_name, ''_'', node_id) AS lluvia, 1, 1
 		FROM cso_out_vol WHERE drainzone_id IN ('||v_selected_drainzone_id||')
 		ORDER BY RIGHT(rf_name, 2) LIMIT 1
 		ON CONFLICT (dscenario_id, node_id, order_id) DO NOTHING
