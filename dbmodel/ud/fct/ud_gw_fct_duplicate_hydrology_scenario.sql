@@ -81,7 +81,7 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
 						"data":{"message":"4314","function":"3156","parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"message":"4022","function":"3156","parameters":{"v_text":"'||v_text||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
+						"data":{"message":"4022","function":"3156","parameters":{"v_text":"'||quote_nullable(v_text)||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
 						"data":{"message":"3892","function":"3156","parameters":{"v_expl_id":"'||v_expl_id||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
