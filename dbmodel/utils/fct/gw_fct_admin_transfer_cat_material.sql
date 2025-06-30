@@ -59,34 +59,27 @@ BEGIN
 
         FOR rec IN EXECUTE 'SELECT * FROM ' || v_table_name LOOP
             -- Check if an existing record in cat_material exists with the same id and get the feature_type
-            v_querytext := 'SELECT feature_type, v_link FROM ' || v_cat_material || ' WHERE id = ' || quote_literal(rec.id);
-			RAISE NOTICE 'v_querytext: %', v_querytext;
+            v_querytext := 'SELECT feature_type, link FROM ' || v_cat_material || ' WHERE id = ' || quote_literal(rec.id);
             EXECUTE v_querytext INTO v_feature_type, v_link;
 
             IF v_feature_type IS NULL THEN
-				RAISE NOTICE 'v_feature_type es null: %', v_feature_type;
-
                 -- If no record exists, initialize feature_type with the current table
                 v_feature_type := ARRAY[v_table];
-				RAISE NOTICE 'v_feature_type actualizado: %', v_feature_type;
 
                 v_querytext := 'INSERT INTO ' || v_cat_material ||
                                ' (id, descript, feature_type, featurecat_id, link, active) ' ||
                                'VALUES(' || quote_literal(rec.id) || ', ' || quote_literal(rec.descript) ||
                                ', ' || quote_literal(v_feature_type) || ', NULL, ' ||
                                quote_nullable(rec.link) || ', ' || quote_nullable(rec.active) || ')';
-				RAISE NOTICE 'v_querytext: %', v_querytext;
                 EXECUTE v_querytext;
 
                 -- For UD project type and 'arc' table, add the 'n' column
                 IF v_project_type = 'UD' AND v_table = 'ARC' THEN
                     v_querytext := 'UPDATE ' || v_cat_material ||
-                                   ' SET n = ' || rec.n || ' WHERE id = ' || quote_literal(rec.id);
-					RAISE NOTICE 'v_querytext: %', v_querytext;
+                                   ' SET n = ' || quote_nullable(rec.n) || ' WHERE id = ' || quote_literal(rec.id);
                     EXECUTE v_querytext;
                 END IF;
             ELSE
-				RAISE NOTICE 'v_feature_type no es null: %', v_feature_type;
                 -- If a record exists, add the current table to the feature_type array
                 v_feature_type := v_feature_type || v_table;
 
@@ -98,7 +91,7 @@ BEGIN
                 -- For UD project type and 'arc' table, update the 'n' column
                 IF v_project_type = 'UD' AND v_table = 'ARC' THEN
                     v_querytext := 'UPDATE ' || v_cat_material ||
-                                   ' SET n = ' || rec.n || ' WHERE id = ' || quote_literal(rec.id);
+                                   ' SET n = ' || quote_nullable(rec.n) || ' WHERE id = ' || quote_literal(rec.id);
                     EXECUTE v_querytext;
                 END IF;
             END IF;

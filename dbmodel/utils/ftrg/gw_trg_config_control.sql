@@ -19,11 +19,14 @@ v_widgettype text;
 v_message json;
 v_variables text;
 rec_feature text;
+v_project_type text;
 
 BEGIN
 
 	-- search path
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	SELECT UPPER(project_type), giswater INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_configtable:= TG_ARGV[0];	 -- not used yet. Ready to enhance this trigger control
 
@@ -62,7 +65,7 @@ BEGIN
 			END IF;
 
 			-- Insert into cat_mat_roughness if feature_type is ARC and operation is INSERT. Before rule called: insert_inp_cat_mat_roughness
-			IF TG_OP = 'INSERT' THEN
+			IF TG_OP = 'INSERT' AND project_type = 'WS' THEN
 				IF NEW.feature_type IS NOT NULL AND 'ARC' = ANY(NEW.feature_type) THEN
 				    INSERT INTO cat_mat_roughness (matcat_id)
 				    VALUES (NEW.id);
