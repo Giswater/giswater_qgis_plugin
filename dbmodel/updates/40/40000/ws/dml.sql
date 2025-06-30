@@ -9,6 +9,16 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 
+INSERT INTO supplyzone VALUES (0, 'Undefined', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL) ON CONFLICT DO NOTHING;
+
+INSERT INTO macroomzone (macroomzone_id, code, "name", expl_id, descript, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by) VALUES(0, '0', 'Undefined', 0, NULL, NULL, true, NULL, '2025-04-14 12:57:25.809', current_user, NULL, NULL) ON CONFLICT DO NOTHING;
+
+INSERT INTO omzone (omzone_id, code, "name", descript, omzone_type, expl_id, macroomzone_id, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by) VALUES(0, '0', 'Undefined', NULL, NULL, NULL, 0, NULL, true, NULL, '2025-04-14 12:57:25.809', current_user, NULL, NULL) ON CONFLICT DO NOTHING;
+
+INSERT INTO crmzone VALUES (0, 'Undefined', NULL, NULL, true) ON CONFLICT DO NOTHING;
+
+INSERT INTO macrocrmzone (macrocrmzone_id, name, active) VALUES(0, 'Undefined', true) ON CONFLICT DO NOTHING;
+
 -- drop gw_trg_presszone_check_datatype
 DELETE FROM sys_function WHERE id=3306;
 

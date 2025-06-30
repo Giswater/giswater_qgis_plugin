@@ -141,24 +141,24 @@ BEGIN
     IF v_utils THEN
 
         -- create indexes
-        CREATE INDEX idx_address_streetaxis_id ON utils.address USING btree (streetaxis_id);
-        CREATE INDEX idx_address_plot_id ON utils.address USING btree (plot_id);
-        CREATE INDEX idx_address_postcode ON utils.address USING btree (postcode);
-        CREATE INDEX idx_address_the_geom ON utils.address USING gist (the_geom);
+        CREATE INDEX IF NOT EXISTS idx_address_streetaxis_id ON utils.address USING btree (streetaxis_id);
+        CREATE INDEX IF NOT EXISTS idx_address_plot_id ON utils.address USING btree (plot_id);
+        CREATE INDEX IF NOT EXISTS idx_address_postcode ON utils.address USING btree (postcode);
+        CREATE INDEX IF NOT EXISTS idx_address_the_geom ON utils.address USING gist (the_geom);
 
-        CREATE INDEX idx_streetaxis_name ON utils.streetaxis USING btree (name);
-        CREATE INDEX idx_streetaxis_the_geom ON utils.streetaxis USING gist (the_geom);
-        CREATE INDEX idx_streetaxis_muni_id ON utils.streetaxis USING btree (muni_id);
-        CREATE INDEX idx_streetaxis_code ON utils.streetaxis USING btree (code);
+        CREATE INDEX IF NOT EXISTS idx_streetaxis_name ON utils.streetaxis USING btree (name);
+        CREATE INDEX IF NOT EXISTS idx_streetaxis_the_geom ON utils.streetaxis USING gist (the_geom);
+        CREATE INDEX IF NOT EXISTS idx_streetaxis_muni_id ON utils.streetaxis USING btree (muni_id);
+        CREATE INDEX IF NOT EXISTS idx_streetaxis_code ON utils.streetaxis USING btree (code);
 
-        CREATE INDEX idx_municipality_name ON utils.municipality USING btree (name);
-        CREATE INDEX idx_municipality_the_geom ON utils.municipality USING gist (the_geom);
+        CREATE INDEX IF NOT EXISTS idx_municipality_name ON utils.municipality USING btree (name);
+        CREATE INDEX IF NOT EXISTS idx_municipality_the_geom ON utils.municipality USING gist (the_geom);
 
-        CREATE INDEX idx_plot_plot_code ON utils.plot USING btree (plot_code);
-        CREATE INDEX idx_plot_muni_id ON utils.plot USING btree (muni_id);
-        CREATE INDEX idx_plot_streetaxis_id ON utils.plot USING btree (streetaxis_id);
-        CREATE INDEX idx_plot_the_geom ON utils.plot USING gist (the_geom);
-        CREATE INDEX idx_plot_postcode ON utils.plot USING btree (postcode);
+        CREATE INDEX IF NOT EXISTS idx_plot_plot_code ON utils.plot USING btree (plot_code);
+        CREATE INDEX IF NOT EXISTS idx_plot_muni_id ON utils.plot USING btree (muni_id);
+        CREATE INDEX IF NOT EXISTS idx_plot_streetaxis_id ON utils.plot USING btree (streetaxis_id);
+        CREATE INDEX IF NOT EXISTS idx_plot_the_geom ON utils.plot USING gist (the_geom);
+        CREATE INDEX IF NOT EXISTS idx_plot_postcode ON utils.plot USING btree (postcode);
 
     ELSE
 

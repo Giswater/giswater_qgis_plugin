@@ -61,6 +61,18 @@ BEGIN
             ext_code,
             source
         FROM utils.address;
+
+        CREATE OR REPLACE VIEW ext_streetaxis
+        AS SELECT id,
+            code,
+            type,
+            name,
+            text,
+            the_geom,
+            ud_expl_id AS expl_id,
+            muni_id,
+            source
+        FROM utils.streetaxis;
      END IF;
 END $$;
 
@@ -108,6 +120,56 @@ AS SELECT DISTINCT s.muni_id,
     m.the_geom
     FROM ext_municipality m, selector_municipality s
 	WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+
+
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+     SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+     IF v_utils THEN
+        CREATE OR REPLACE VIEW ext_raster_dem
+        AS SELECT id,
+            rast,
+            rastercat_id,
+            envelope
+        FROM utils.raster_dem;
+
+        CREATE OR REPLACE VIEW v_ext_raster_dem
+        AS SELECT DISTINCT ON (r.id) r.id,
+            c.code,
+            c.alias,
+            c.raster_type,
+            c.descript,
+            c.source,
+            c.provider,
+            c.year,
+            r.rast,
+            r.rastercat_id,
+            r.envelope
+        FROM v_ext_municipality a, utils.raster_dem r
+        JOIN utils.cat_raster c ON c.id = r.rastercat_id
+        WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
+     ELSE
+        CREATE OR REPLACE VIEW v_ext_raster_dem
+        AS SELECT DISTINCT ON (r.id) r.id,
+            c.code,
+            c.alias,
+            c.raster_type,
+            c.descript,
+            c.source,
+            c.provider,
+            c.year,
+            r.rast,
+            r.rastercat_id,
+            r.envelope
+        FROM v_ext_municipality a, ext_raster_dem r
+        JOIN ext_cat_raster c ON c.id = r.rastercat_id
+        WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
+     END IF;
+END $$;
+
 
 
 -- ====
@@ -1875,21 +1937,7 @@ AS SELECT d.arc_id,
                   WHERE c.arc_id IS NOT NULL
                   GROUP BY c.arc_id) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id = v_plan_aux_arc_cost.arc_id) d;
 
-CREATE OR REPLACE VIEW v_ext_raster_dem
-AS SELECT DISTINCT ON (r.id) r.id,
-    c.code,
-    c.alias,
-    c.raster_type,
-    c.descript,
-    c.source,
-    c.provider,
-    c.year,
-    r.rast,
-    r.rastercat_id,
-    r.envelope
-    FROM v_ext_municipality a, ext_raster_dem r
-    JOIN ext_cat_raster c ON c.id = r.rastercat_id
-    WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
+
 
 
 CREATE OR REPLACE VIEW v_ui_element_x_gully

@@ -9,6 +9,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 
+INSERT INTO dwfzone (dwfzone_id, code, name) VALUES(0, '0', 'Undefined') ON CONFLICT DO NOTHING;
+
 -- 15/10/2024
 INSERT INTO cat_arc (id, arc_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width, area, estimated_depth, thickness, cost_unit, "cost", m2bottom_cost, m3protec_cost, active, "label", tsect_id, curve_id, acoeff, connect_cost, visitability_vdef)
 SELECT id, arc_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, "cost", m2bottom_cost, m3protec_cost, active, "label", tsect_id, curve_id, acoeff, connect_cost, visitability_vdef

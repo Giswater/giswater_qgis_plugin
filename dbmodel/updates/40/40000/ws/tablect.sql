@@ -597,6 +597,6 @@ BEGIN
         v_table_name := 'man_' || lower(v_rec.feature_type) || '_' || lower(v_rec.id);
 
         EXECUTE 'ALTER TABLE ' || v_table_name || ' ALTER COLUMN ' || v_feature_name || ' TYPE int4 USING ' || v_feature_name || '::int4';
-        EXECUTE 'ALTER TABLE ' || v_table_name || ' ADD CONSTRAINT ' || v_table_name || '_' || v_feature_name || '_fkey FOREIGN KEY (' || v_feature_name || ') REFERENCES node(' || v_feature_name || ') ON DELETE CASCADE';
+        EXECUTE 'ALTER TABLE ' || v_table_name || ' ADD CONSTRAINT ' || v_table_name || '_' || v_feature_name || '_fkey FOREIGN KEY (' || v_feature_name || ') REFERENCES '|| v_rec.feature_type ||'(' || v_feature_name || ') ON DELETE CASCADE';
     END LOOP;
 END $$;
