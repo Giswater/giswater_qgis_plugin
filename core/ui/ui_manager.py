@@ -9,7 +9,7 @@ import os
 
 from qgis.PyQt import uic, QtCore
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QLineEdit, QWidget
+from qgis.PyQt.QtWidgets import QAction, QLineEdit
 
 from ...libs import lib_vars
 from ...libs.ui.ui_manager import DialogTextUi
@@ -1351,8 +1351,3 @@ class GwStatusSelectorUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 # endregion
-
-class GwPasswordWidget(QWidget):
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
