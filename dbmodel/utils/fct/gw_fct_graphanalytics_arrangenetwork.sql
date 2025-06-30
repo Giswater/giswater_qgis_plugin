@@ -206,13 +206,25 @@ BEGIN
         SET closed = n.closed, broken = n.broken, to_arc = n.to_arc
         FROM temp_pgr_node n
         WHERE COALESCE(t.node_1, t.node_2) = n.node_id
-        AND t.arc_id IS NULL;
+        AND t.graph_delimiter = 'MINSECTOR';
 
         UPDATE temp_pgr_node t
         SET closed = n.closed, broken = n.broken, to_arc = n.to_arc
         FROM temp_pgr_node n
         WHERE t.old_node_id = n.node_id
-        AND t.node_id IS NULL;
+        AND t.graph_delimiter = 'MINSECTOR';
+
+        UPDATE temp_pgr_arc t
+        SET to_arc = n.to_arc
+        FROM temp_pgr_node n
+        WHERE COALESCE(t.node_1, t.node_2) = n.node_id
+        AND t.graph_delimiter = v_graph_delimiter;
+
+        UPDATE temp_pgr_node t
+        SET to_arc = n.to_arc
+        FROM temp_pgr_node n
+        WHERE t.old_node_id = n.node_id
+        AND t.graph_delimiter = v_graph_delimiter;
 
         -- closed valves
         UPDATE temp_pgr_arc a
