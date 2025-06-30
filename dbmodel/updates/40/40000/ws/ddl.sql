@@ -2047,9 +2047,9 @@ DECLARE
 BEGIN
 	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
 
-	IF v_utils IS FALSE THEN
+	IF v_utils IS NOT TRUE THEN
 		ALTER TABLE ext_streetaxis DROP CONSTRAINT ext_streetaxis_exploitation_id_fkey;
-		ALTER TABLE IF EXISTS ext_address DROP CONSTRAINT IF EXISTS ext_address_exploitation_id_fkey;
+		ALTER TABLE ext_address DROP CONSTRAINT ext_address_exploitation_id_fkey;
 		ALTER TABLE ext_plot DROP CONSTRAINT ext_plot_exploitation_id_fkey;
 	END IF;
 END $$;
