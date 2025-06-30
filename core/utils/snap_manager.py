@@ -9,8 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
-from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsPointLocator, QgsSnappingConfig, \
-    QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
+from qgis.core import QgsProject, QgsPointXY, QgsPointLocator, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from ... import global_vars
@@ -54,139 +53,6 @@ class GwSnapManager(object):
 
         global_snapping_config = QgsProject.instance().snappingConfig()
         return global_snapping_config
-
-    def store_snapping_options(self):
-        """ This function is deprecated """
-        """ Store the project user snapping configuration """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        # Get an array containing the snapping options for all the layers
-        self.snapping_config = self.get_snapping_options()
-        self.snapping_config.setEnabled(True)
-        self.previous_snapping = self.snapping_config
-
-    def set_snapping_status(self, enable=False):
-        """ This function is deprecated """
-        """ Enable/Disable snapping of all layers """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        QgsProject.instance().blockSignals(True)
-
-        layers = tools_qgis.get_project_layers()
-        # Loop through all the layers in the project
-        for layer in layers:
-            if type(layer) is not QgsVectorLayer:
-                continue
-            layer_settings = self.snapping_config.individualLayerSettings(layer)
-            layer_settings.setEnabled(enable)
-            self.snapping_config.setIndividualLayerSettings(layer, layer_settings)
-
-        QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
-
-    def set_snap_mode(self, mode=3):
-        """ This function is deprecated """
-        """ Defines on which layer the snapping is performed
-        :param mode: 1 = ActiveLayer, 2=AllLayers, 3=AdvancedConfiguration (int or SnappingMode)
-        """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        if Qgis.QGIS_VERSION_INT >= 32600:
-            mode = Qgis.SnappingMode.AdvancedConfiguration
-        snapping_options = self.get_snapping_options()
-        if snapping_options:
-            QgsProject.instance().blockSignals(True)
-            snapping_options.setMode(mode)
-            QgsProject.instance().setSnappingConfig(snapping_options)
-            QgsProject.instance().blockSignals(False)
-            QgsProject.instance().snappingConfigChanged.emit(snapping_options)
-
-    def config_snap_to_arc(self):
-        """ This function is deprecated """
-        """ Set snapping to 'arc' """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        QgsProject.instance().blockSignals(True)
-        self.set_snapping_layers()
-        segment_flag = tools_gw.get_segment_flag(2)
-        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1, 0, 0)
-        self.snapping_config.setIndividualLayerSettings(self.layer_arc, layer_settings)
-
-    def config_snap_to_node(self):
-        """ This function is deprecated """
-        """ Set snapping to 'node' """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        QgsProject.instance().blockSignals(True)
-        vertex_flag = tools_gw.get_vertex_flag(1)
-        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
-        self.snapping_config.setIndividualLayerSettings(self.layer_node, layer_settings)
-
-    def config_snap_to_connec(self):
-        """ This function is deprecated """
-        """ Set snapping to 'connec' """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        QgsProject.instance().blockSignals(True)
-        snapping_config = self.get_snapping_options()
-        vertex_flag = tools_gw.get_vertex_flag(1)
-        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
-        snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_connec'), layer_settings)
-
-    def config_snap_to_gully(self):
-        """ This function is deprecated """
-        """ Set snapping to 'gully' """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        QgsProject.instance().blockSignals(True)
-        snapping_config = self.get_snapping_options()
-        vertex_flag = tools_gw.get_vertex_flag(1)
-        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
-        snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_gully'), layer_settings)
-
-    def config_snap_to_layer(self, layer, point_locator=QgsPointLocator.All, set_settings=False):
-        """ This function is deprecated """
-        """ Set snapping to @layer """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        if layer is None:
-            return
-
-        QgsSnappingUtils.LayerConfig(layer, point_locator, 15, QgsTolerance.Pixels)
-        if set_settings:
-            layer_settings = self.snapping_config.individualLayerSettings(layer)
-            layer_settings.setEnabled(True)
-            self.snapping_config.setIndividualLayerSettings(layer, layer_settings)
-            return layer_settings
-
-    def restore_snap_options(self, snappings_options):
-        """ This function is deprecated """
-        """ Function that applies selected snapping configuration """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        QgsProject.instance().blockSignals(True)
-        if snappings_options is None and self.snapping_config:
-            snappings_options = self.snapping_config
-        QgsProject.instance().setSnappingConfig(snappings_options)
-        QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
-
-    def recover_snapping_options(self):
-        """ This function is deprecated """
-        """ Function to restore the previous snapping configuration """
-
-        if global_vars.use_gw_snapping is not True:
-            return
-        self.restore_snap_options(self.previous_snapping)
 
     def get_snapper(self):
         """ Return snapper """
