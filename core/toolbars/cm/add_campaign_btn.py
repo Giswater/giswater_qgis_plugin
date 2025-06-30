@@ -20,7 +20,18 @@ class GwAddCampaignButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.new_campaign = Campaign(icon_path, action_name, text, toolbar, action_group)
 
-        # Fetch and parse the campaign type configuration from the database
+        # Check user role
+        roles = tools_db.get_cm_user_role()
+        is_cm_edit_role = roles and 'role_cm_edit' in list(roles)
+
+        if is_cm_edit_role:
+            # For 'role_cm_edit', the button directly creates an 'inventory' campaign
+            self.action.triggered.connect(lambda: self.clicked_event("INVENTORY"))
+            if toolbar is not None:
+                toolbar.addAction(self.action)
+            return
+
+        # Fetch and parse the campaign type configuration from the database for other roles
         config_query = "SELECT value FROM cm.config_param_system WHERE parameter = 'admin_campaign_type'"
         config_result = tools_db.get_row(config_query)
         
@@ -82,3 +93,5 @@ class GwAddCampaignButton(GwAction):
             self.new_campaign.create_campaign(dialog_type="review")
         elif selected_action == tools_qt.tr("Visit"):
             self.new_campaign.create_campaign(dialog_type="visit")
+        elif selected_action == tools_qt.tr("Inventory"):
+            self.new_campaign.create_campaign(dialog_type="inventory")

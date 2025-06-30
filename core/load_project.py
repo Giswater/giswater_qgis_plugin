@@ -31,6 +31,7 @@ class GwLoadProject(QObject):
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
         self.buttons = {}
+        self.is_role_cm_edit = False
 
     def project_read(self, show_warning=True, main=None):
         """ Function executed when a user opens a QGIS project (*.qgs) """
@@ -552,26 +553,38 @@ class GwLoadProject(QObject):
         tools_qgis.manage_snapping_layer('v_edit_gully', snapping_type=0)
 
     def _check_user_roles(self):
-        """ Check roles of this user to show or hide toolbars """
+        """ Check user roles and show/hide toolbars """
+        self.is_role_cm_edit = False
 
-        if lib_vars.project_vars['project_role'] == 'role_basic':
+        # Check cm role and adjust CM toolbar if necessary
+        cm_role = tools_db.get_cm_user_role()
+        if cm_role and 'role_cm_edit' in list(cm_role):
+            self.is_role_cm_edit = True
+            # Hide buttons not wanted for role_cm_edit
+            self._hide_button('86', True)  # GwAddLotButton
+            self._hide_button('87', True)  # GwLotResourceManagementButton
+
+        # Let the standard project role logic run for everyone
+        project_role = lib_vars.project_vars.get('project_role')
+
+        if project_role == 'role_basic':
             return
 
-        elif lib_vars.project_vars['project_role'] == 'role_om':
+        elif project_role == 'role_om':
             self._enable_toolbar("om")
             return
 
-        elif lib_vars.project_vars['project_role'] == 'role_edit':
+        elif project_role == 'role_edit':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
 
-        elif lib_vars.project_vars['project_role'] == 'role_epa':
+        elif project_role == 'role_epa':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("epa")
             self._hide_button("72", False)
 
-        elif lib_vars.project_vars['project_role'] == 'role_master' or lib_vars.project_vars['project_role'] == 'role_admin' or lib_vars.project_vars['project_role'] == 'role_system':
+        elif project_role == 'role_master' or project_role == 'role_admin' or project_role == 'role_system':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("epa")

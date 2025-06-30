@@ -14,7 +14,7 @@ from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
-from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi
+from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, AddCampaignInventoryUi
 from ...shared.selector import GwSelector
 
 
@@ -27,8 +27,6 @@ class Campaign:
         self.iface = global_vars.iface
         self.campaign_date_format = 'yyyy-MM-dd'
         self.schema_parent = lib_vars.schema_name
-        # self.cm_schema = lib_vars.project_vars['cm_schema']
-        # self.cm_schema = self.cm_schema.strip("'")
         self.project_type = tools_gw.get_project_type()
         self.dialog = None
         self.campaign_type = None
@@ -82,10 +80,15 @@ class Campaign:
     def open_campaign_selector(self):
         """ Open the campaign-specific selector when the button is clicked """
         selector_type = "selector_campaign"
+
+        # Check user role
+        cm_roles = tools_db.get_cm_user_role()
+        show_lot = not (cm_roles and 'role_cm_edit' in list(cm_roles))
+
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
         selector = GwSelector()
-        selector.open_selector(selector_type)
+        selector.open_selector(selector_type, show_lot_tab=show_lot)
 
     def load_campaign_dialog(self, campaign_id=None, mode="review"):
         """
@@ -123,7 +126,7 @@ class Campaign:
             "v_edit_gully", "v_edit_link"
         ]
 
-        modes = {"review": 1, "visit": 2}
+        modes = {"review": 1, "visit": 2, "inventory": 3}
         self.campaign_type = modes.get(mode, 1)
 
         body = {
@@ -147,7 +150,17 @@ class Campaign:
 
         form_fields = response["body"]["data"].get("fields", [])
         self.fields_form = form_fields
-        self.dialog = AddCampaignReviewUi(self) if mode == "review" else AddCampaignVisitUi(self)
+
+        dialog_map = {
+            "review": AddCampaignReviewUi,
+            "visit": AddCampaignVisitUi,
+            "inventory": AddCampaignInventoryUi
+        }
+        dialog_class = dialog_map.get(mode)
+        if not dialog_class:
+            tools_qgis.show_warning(f"Invalid campaign mode: {mode}")
+            return
+        self.dialog = dialog_class(self)
 
         # When open from campaign manager
         if campaign_id:

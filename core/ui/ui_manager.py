@@ -9,7 +9,7 @@ import os
 
 from qgis.PyQt import uic, QtCore
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QLineEdit
+from qgis.PyQt.QtWidgets import QAction, QLineEdit, QWidget
 
 from ...libs import lib_vars
 from ...libs.ui.ui_manager import DialogTextUi
@@ -825,6 +825,15 @@ class AddCampaignVisitUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
+UINAME = "add_campaign_inventory"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class AddCampaignInventoryUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
 UINAME = "campaign_management"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
@@ -895,7 +904,6 @@ class GwCredentialsUi(GwDialog, FORM_CLASS):
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
             self.action = QAction(icon, "show")
-        self.action.triggered.connect(self.show_pass)
         self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
 
     def show_pass(self):
@@ -1343,3 +1351,8 @@ class GwStatusSelectorUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 # endregion
+
+class GwPasswordWidget(QWidget):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)

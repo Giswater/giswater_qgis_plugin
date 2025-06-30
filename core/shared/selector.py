@@ -25,7 +25,7 @@ class GwSelector:
         self.scrolled_amount = 0
         self.is_campaign = is_campaign
 
-    def open_selector(self, selector_type="selector_basic", reload_dlg=None):
+    def open_selector(self, selector_type="selector_basic", reload_dlg=None, show_lot_tab=True):
         """
         :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
@@ -39,7 +39,7 @@ class GwSelector:
             else:
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
-            self.get_selector(reload_dlg, selector_type, current_tab=current_tab, aux_params=aux_params)
+            self.get_selector(reload_dlg, selector_type, current_tab=current_tab, aux_params=aux_params, show_lot_tab=show_lot_tab)
             if self.scrolled_amount:
                 reload_dlg.main_tab.currentWidget().verticalScrollBar().setValue(self.scrolled_amount)
             return
@@ -53,7 +53,7 @@ class GwSelector:
             current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_campaign", "user", "session")
         else:
             current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
-        self.get_selector(dlg_selector, selector_type, current_tab=current_tab)
+        self.get_selector(dlg_selector, selector_type, current_tab=current_tab, show_lot_tab=show_lot_tab)
         tools_qt.manage_translation('selector', dlg_selector)
         if lib_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(dlg_selector, dlg_name='selector')
@@ -108,7 +108,7 @@ class GwSelector:
                 widget.setFocus()
 
     def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
-                     aux_params=None):
+                     aux_params=None, show_lot_tab=True):
         """
         Ask to DB for selectors and make dialog
             :param dialog: Is a standard dialog, from file selector.ui, where put widgets
@@ -169,6 +169,10 @@ class GwSelector:
 
             tab_name = form_tab['tabName']
             if filter and tab_name != str(current_tab):
+                continue
+
+            # Hide tab_lot for role_cm_edit
+            if selector_type == 'selector_campaign' and tab_name == 'tab_lot' and not show_lot_tab:
                 continue
 
             selection_mode = form_tab['selectionMode']

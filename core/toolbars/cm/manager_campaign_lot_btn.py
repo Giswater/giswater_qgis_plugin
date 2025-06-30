@@ -11,7 +11,7 @@ from .workorder import Workorder
 from ..dialog import GwAction
 from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
-from ....libs import tools_qt
+from ....libs import tools_qt, tools_db
 
 
 class GwManageCampaignLotButton(GwAction):
@@ -24,6 +24,11 @@ class GwManageCampaignLotButton(GwAction):
         self.workorder_manager = Workorder(icon_path, action_name, text, toolbar, action_group)
 
         self.actions = [tools_qt.tr('Manage Campaign'), tools_qt.tr('Manage Lot'), tools_qt.tr('Manage Workorder')]
+
+        # Conditionally remove 'Lot management' for role_cm_edit
+        cm_roles = tools_db.get_cm_user_role()
+        if cm_roles and 'role_cm_edit' in list(cm_roles):
+            self.actions.remove(tools_qt.tr('Manage Lot'))
 
         # Create a menu and add all the actions
         self.menu = QMenu()
