@@ -141,3 +141,26 @@ VALUES (4316, 'Hydrology scenario named (%v_name%) have been created with values
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (4318, 'The new hydrology scenario (%v_name%) is now your current scenario.', null, 0, true, 'utils', 'core', 'AUDIT');
 
+--30/06/2025
+
+UPDATE sys_function SET function_alias = 'SET OPTIMUM OUTLET' WHERE function_name = 'gw_fct_epa_setoptimumoutlet';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4202, 'SECTOR ID: %v_sector%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4204, 'HYDROLOGY SCENARIO: %v_name%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4206, '%v_count2-v_count1% subcatchments have been updated with outlet values', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4208, '0 subcatchments have been updated with outlet values', null, 0, true, 'utils', 'core', 'AUDIT');
+
+
+
+
+
+
+
+

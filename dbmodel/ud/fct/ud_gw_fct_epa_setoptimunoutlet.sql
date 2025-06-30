@@ -57,8 +57,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_buffer := ((p_data ->>'data')::json->>'parameters')::json->>'buffer';
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
@@ -73,58 +73,62 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SET OPTIMUM OUTLET'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3242", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- starting process
 	v_sector = (SELECT replace (replace ((array_agg(sector_id))::text, '{', ''), '}', '') FROM v_edit_sector);
 
-	IF v_selectionmode = 'previousSelection' then 
-		if v_array is not null then	
+	IF v_selectionmode = 'previousSelection' then
+		if v_array is not null then
 			EXECUTE 'INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM v_edit_node 
 			WHERE epa_type = ''JUNCTION'' AND state > 0 AND sector_id in (select sector_id from v_edit_sector) and node_id in ('||v_array||')';
 		end if;
 	else
-		INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM v_edit_node 
+		INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM v_edit_node
 		WHERE epa_type = 'JUNCTION' AND state > 0 AND sector_id in (select sector_id from v_edit_sector);
-	end if; 
+	end if;
 
 	SELECT value::integer INTO v_hydrology FROM config_param_user where parameter = 'inp_options_hydrology_scenario' and cur_user = current_user;
 	select name into v_name from cat_hydrology where hydrology_id = v_hydrology;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat('SECTOR ID: ', v_sector));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('HYDROLOGY SCENARIO: ', v_name));
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4202", "function":"3242", "parameters":{"v_sector":"'||v_sector||'"}, "fid":"'||v_fid||'", "criticity":"3", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4204", "function":"3242", "parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	select count(*) into v_count1 from v_edit_inp_subcatchment where outlet_id is null;
 
-	if (select count(*) from temp_node) > 0 then 
+	if (select count(*) from temp_node) > 0 then
 
 		FOR rec_subc IN SELECT * FROM inp_subcatchment WHERE hydrology_id = v_hydrology AND sector_id in (select sector_id from v_edit_sector)
 		loop
-			
+
 			raise notice 'loop rec_subc % ', rec_subc.subc_id;
-			
+
 			IF rec_subc.minelev IS NULL THEN
-				SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, v_buffer) 
+				SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, v_buffer)
 				ORDER BY st_distance(rec_subc.the_geom, n.the_geom) ASC LIMIT 1;
 			ELSE
-				SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, v_buffer) 
+				SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, v_buffer)
 				AND n.elev > rec_subc.minelev
 				ORDER BY st_distance(rec_subc.the_geom, n.the_geom) ASC LIMIT 1;
 			END IF;
-		
+
 			UPDATE inp_subcatchment SET outlet_id = rec_node.node_id WHERE hydrology_id = v_hydrology AND subc_id = rec_subc.subc_id;
-			
+
 		END LOOP;
-		
+
 		select count(*) into v_count2 from v_edit_inp_subcatchment where outlet_id is null;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat (v_count2-v_count1,' subcatchments have been updated with outlet values'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4206", "function":"3242", "parameters":{"v_count2-v_count1":"'||v_count2-v_count1||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 	else
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-		VALUES (v_fid, null, 1, concat ('0 subcatchments have been updated with outlet values'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"message":"4208", "function":"3242", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+
 	end if;
-	
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
