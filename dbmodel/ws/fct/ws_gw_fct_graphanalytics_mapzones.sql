@@ -123,6 +123,7 @@ DECLARE
 
 	v_mapzone_name text;
 	v_mapzone_field text;
+	v_mapzone_id int4;
 	v_ignore_broken_valves BOOLEAN = TRUE; 
 	v_pgr_distance integer;
 	v_pgr_root_vids int[];
@@ -385,15 +386,21 @@ BEGIN
 		FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
     );
 
-	IF v_fromzero = 'true' THEN
-		v_query_text = '
-			SELECT seq AS id, start_vid AS source, node AS target, cost
-			FROM temp_pgr_drivingdistance
-		';
-		INSERT INTO temp_pgr_connectedcomponents (seq,component, node)
-		SELECT seq,component, node
-		FROM pgr_connectedComponents(v_query_text);
-	END IF;
+	v_query_text = '
+		SELECT seq AS id, start_vid AS source, node AS target, 1 AS COST
+		FROM temp_pgr_drivingdistance t
+	';
+	INSERT INTO temp_pgr_connectedcomponents (seq,component, node)
+	SELECT seq,component, node
+	FROM pgr_connectedComponents(v_query_text);
+
+	-- generating zones
+	INSERT INTO temp_pgr_mapzone (component, mapzone_id)
+	SELECT component, array_agg(DISTINCT n.mapzone_id)
+	FROM temp_pgr_connectedcomponents c
+	JOIN temp_pgr_node n ON n.pgr_node_id = c.node
+	WHERE n.graph_delimiter = v_graph_delimiter AND modif = TRUE 
+	GROUP BY c.component;
 
 	IF v_updatemapzgeom > 0 THEN
 		-- message
@@ -402,6 +409,36 @@ BEGIN
 	END IF;
 
 	-- Update mapzone_id
+	IF v_fromzero = TRUE THEN
+		EXECUTE 'SELECT max( ' || v_mapzone_field || ') FROM '|| v_mapzone_name
+		INTO v_mapzone_id;
+		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id];
+	END IF;
+	/*
+	if v_fromzero = TRUE - how to calculate graphconfig
+	WITH 
+		my_table AS (
+			SELECT component, n.node_id, n.to_arc 
+			FROM temp_pgr_connectedcomponents c
+			JOIN (SELECT DISTINCT start_vid FROM temp_pgr_drivingdistance) d ON c.node = d.start_vid
+			JOIN temp_pgr_node n ON n.pgr_node_id = d.start_vid
+		)
+	SELECT 
+	component,
+	json_build_object(
+		'use', json_agg(
+		json_build_object(
+			'nodeParent', node_id::text,
+			'toArc', to_arc
+		)
+		),
+		'ignore', '[]'::json,
+		'forceClosed', '[]'::json
+	) AS zone_json
+	FROM my_table
+	GROUP BY component;
+	*/
+
 	-- Update nodes with mapzone conflicts; nodes that are heads of mapzones in conflict with other mapzones are overwritten;
 	UPDATE temp_pgr_node n SET mapzone_id = -1
     FROM (
@@ -528,12 +565,6 @@ BEGIN
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 	END IF;
-
-	-- generating zones
-	INSERT INTO temp_pgr_mapzone (mapzone_id)
-	SELECT DISTINCT mapzone_id FROM temp_pgr_node a
-	WHERE a.mapzone_id > 0;
-
 
 	RAISE NOTICE 'Creating geometry of mapzones';
 	-- SECTION: Creating geometry of mapzones

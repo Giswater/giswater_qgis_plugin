@@ -123,6 +123,7 @@ DECLARE
 
 	v_mapzone_name text;
 	v_mapzone_field text;
+	v_mapzone_id int4;
 	v_pgr_distance integer;
 	v_pgr_root_vids int[];
 
@@ -277,11 +278,19 @@ BEGIN
 
 	-- NODES MAPZONES
 	-- The mapzone nodes are the final points of mapzones
-	IF v_fromzero = 'true' THEN
-		v_query_text =
-            'UPDATE temp_pgr_node n SET modif = TRUE
-            WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
-            '; 
+	IF v_fromzero = TRUE THEN
+		IF v_mapzone_name = 'DWFZONE' THEN
+			v_query_text =
+                'UPDATE temp_pgr_node n SET modif = TRUE
+                WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
+                AND NOT EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE n.pgr_node_id = a.pgr_node_1)
+                '; 
+		ELSE
+			v_query_text =
+				'UPDATE temp_pgr_node n SET modif = TRUE
+				WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
+				'; 
+		END IF;
 		EXECUTE v_query_text;
 	ELSE
 		v_query_text =
@@ -338,7 +347,8 @@ BEGIN
 	UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'IGNORE'
 	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
 
-	-- arcs initoverflowpath
+	-- arcs initoverflowpath - disable for the moment
+	/*
     IF v_mapzone_name = 'DWFZONE' THEN
         UPDATE temp_pgr_arc t
         SET modif1 = TRUE, graph_delimiter = 'INITOVERFLOWPATH'
@@ -349,7 +359,8 @@ BEGIN
         SET modif = TRUE
         FROM temp_pgr_arc a
         WHERE v.pgr_node_1 = t.pgr_node_id AND a.graph_delimiter = 'INITOVERFLOWPATH'; 
-    END IF;   
+    END IF;
+	*/
 
 	-- =======================
     SELECT gw_fct_graphanalytics_arrangenetwork() INTO v_response;
@@ -358,16 +369,19 @@ BEGIN
         RETURN v_response;
     END IF;
 
-	-- put in 'NONE' arcs that were controled by graph_delimiter of arc and not of node, to keep only the new ones with the graph_delimiter<>'NONE'; for the moment - there are just the INITOVERFLOWPATH arcs
-    UPDATE temp_pgr_arc t
-    SET graph_delimiter = 'NONE'
-    WHERE graph_delimiter <> 'NONE' AND arc_id IS NOT NULL;
-
 	-- disconnect to_arcs for nodes graph_delimiter
 	UPDATE temp_pgr_arc a
     SET cost = -1, reverse_cost = -1
     WHERE a.graph_delimiter = v_mapzone_name
     AND a.old_arc_id = ANY (a.to_arc);
+
+	
+	-- put in 'NONE' arcs that were controled by graph_delimiter of arc and not of node, to keep only the new ones with the graph_delimiter<>'NONE'; for the moment - there are just the INITOVERFLOWPATH arcs
+	-- disable for the moment - creating new arcs for INITOVERFLOWPATH is also disables
+	/*
+    UPDATE temp_pgr_arc t
+    SET graph_delimiter = 'NONE'
+    WHERE graph_delimiter = 'INITOVERFLOWPATH' AND arc_id IS NOT NULL;
 	
 	-- disconnect arcs with initoverflowpath TRUE
 	IF v_mapzone_name = 'DWFZONE' THEN
@@ -375,6 +389,7 @@ BEGIN
         SET cost = -1, reverse_cost = -1 
         WHERE graph_delimiter = 'INITOVERFLOWPATH';
 	END IF;
+*/
 
 	-- arcs that connects with nodes IGNORE 
 	UPDATE temp_pgr_arc t
@@ -425,15 +440,21 @@ BEGIN
 		FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
 	);
 
-	IF v_fromzero = 'true' THEN
-		v_query_text = '
-			SELECT seq AS id, start_vid AS source, node AS target, cost
-			FROM temp_pgr_drivingdistance
-		';
-		INSERT INTO temp_pgr_connectedcomponents (seq,component, node)
-		SELECT seq,component, node
-		FROM pgr_connectedComponents(v_query_text);
-	END IF;
+	v_query_text = '
+		SELECT seq AS id, start_vid AS source, node AS target, 1 AS COST
+		FROM temp_pgr_drivingdistance t
+	';
+	INSERT INTO temp_pgr_connectedcomponents (seq,component, node)
+	SELECT seq,component, node
+	FROM pgr_connectedComponents(v_query_text);
+
+	-- generating zones
+	INSERT INTO temp_pgr_mapzone (component, mapzone_id)
+	SELECT component, array_agg(DISTINCT n.mapzone_id)
+	FROM temp_pgr_connectedcomponents c
+	JOIN temp_pgr_node n ON n.pgr_node_id = c.node
+	WHERE n.graph_delimiter = v_graph_delimiter AND modif = TRUE 
+	GROUP BY c.component;
 
 
 	IF v_updatemapzgeom > 0 THEN
@@ -443,6 +464,36 @@ BEGIN
 	END IF;
 
 	-- Update mapzone_id
+	IF v_fromzero = TRUE THEN
+		EXECUTE 'SELECT max( ' || v_mapzone_field || ') FROM '|| v_mapzone_name
+		INTO v_mapzone_id;
+		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id];
+	END IF;
+	/*
+	if v_fromzero = TRUE - how to calculate graphconfig
+	WITH 
+		my_table AS (
+			SELECT component, n.node_id, n.to_arc 
+			FROM temp_pgr_connectedcomponents c
+			JOIN (SELECT DISTINCT start_vid FROM temp_pgr_drivingdistance) d ON c.node = d.start_vid
+			JOIN temp_pgr_node n ON n.pgr_node_id = d.start_vid
+		)
+	SELECT 
+	component,
+	json_build_object(
+		'use', json_agg(
+		json_build_object(
+			'nodeParent', node_id::text,
+			'toArc', to_arc
+		)
+		),
+		'ignore', '[]'::json,
+		'forceClosed', '[]'::json
+	) AS zone_json
+	FROM my_table
+	GROUP BY component;
+	*/
+
 	-- Update nodes with mapzone conflicts; nodes that are heads of mapzones in conflict with other mapzones are overwritten;
 	UPDATE temp_pgr_node n SET mapzone_id = -1
     FROM (
@@ -467,46 +518,9 @@ BEGIN
 	-- Update arcs
     UPDATE temp_pgr_arc a SET mapzone_id = n.mapzone_id
     FROM temp_pgr_node n
-    WHERE a.pgr_node_2 = n.pgr_node_id
-	AND n.mapzone_id <> 0;
-
-	IF v_fromzero = 'true' THEN
-		UPDATE temp_pgr_node n
-		SET mapzone_id = t.component
-		FROM (
-			SELECT component, node
-			FROM temp_pgr_connectedcomponents
-		) t
-		WHERE t.node = n.pgr_node_id;
-
-		UPDATE temp_pgr_arc a
-		SET mapzone_id = n.mapzone_id
-		FROM temp_pgr_node n
-		where n.pgr_node_id = a.pgr_node_2;
-
-		v_query_text = '
-			WITH mapzone_nodes AS (
-				SELECT node_id::int
-				FROM temp_pgr_node t
-				WHERE t.graph_delimiter = ''' || v_mapzone_name || '''
-			), new_mapzones AS (
-				SELECT component, node
-				FROM temp_pgr_connectedcomponents t
-				WHERE EXISTS (
-					SELECT 1 FROM mapzone_nodes n
-					WHERE n.node_id = t.node
-				)
-				ORDER BY component, node
-			)
-			INSERT INTO ' || v_mapzone_name || ' (' || v_mapzone_field || ', graphconfig)
-			SELECT d.component, array_to_json(array_agg(d.node::varchar))
-			FROM new_mapzones d
-			GROUP BY d.component;
-		';
-		RAISE NOTICE 'v_query_text:: %', v_query_text;
-		EXECUTE v_query_text;
-	END IF;
-
+    WHERE ((a.pgr_node_2 = n.pgr_node_id AND a.cost >= 0)
+    OR (a.pgr_node_1 = n.pgr_node_id AND reverse_cost >= 0))
+    AND n.mapzone_id <> 0;
 
 	-- DISCONECTED COUNTS
 	IF v_floodonlymapzone IS NULL THEN
@@ -588,12 +602,6 @@ BEGIN
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 	END IF;
-
-	-- generating zones
-	INSERT INTO temp_pgr_mapzone (mapzone_id)
-	SELECT DISTINCT mapzone_id FROM temp_pgr_node a
-	WHERE a.mapzone_id > 0;
-
 
 	RAISE NOTICE 'Creating geometry of mapzones';
 	-- SECTION: Creating geometry of mapzones
