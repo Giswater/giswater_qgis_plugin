@@ -370,16 +370,18 @@ class GwSelector:
             message = json_result['body']['message']['text']
             tools_qgis.show_message(message, level)
 
-        try:
-            # Zoom to feature
-            x1 = json_result['body']['data']['geometry']['x1']
-            y1 = json_result['body']['data']['geometry']['y1']
-            x2 = json_result['body']['data']['geometry']['x2']
-            y2 = json_result['body']['data']['geometry']['y2']
-            if x1 is not None:
-                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
-        except KeyError:
-            pass
+        # Apply zoom only to the selected tabs
+        if tab_name in ('tab_exploitation', 'tab_municipality', 'tab_sector'):
+            try:
+                # Zoom to feature
+                x1 = json_result['body']['data']['geometry']['x1']
+                y1 = json_result['body']['data']['geometry']['y1']
+                x2 = json_result['body']['data']['geometry']['x2']
+                y2 = json_result['body']['data']['geometry']['y2']
+                if x1 is not None:
+                    tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            except KeyError:
+                pass
 
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')
