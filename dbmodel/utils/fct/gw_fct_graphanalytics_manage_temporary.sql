@@ -48,10 +48,13 @@ BEGIN
     IF v_action = 'CREATE' THEN
         -- Create temporary tables
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_mapzone (
-            mapzone_id int4 NOT NULL,
+            id SERIAL NOT NULL,
+            component int4,
+            mapzone_id _int4,
             the_geom geometry(Geometry, SRID_VALUE),
-            CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (mapzone_id)
+            CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (id)
         );
+        CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_component_idx ON temp_pgr_mapzone USING btree (component);
 
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node (
