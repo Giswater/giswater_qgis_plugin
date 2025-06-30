@@ -99,26 +99,20 @@ DECLARE
   gullyr record;
   connecr record;
 BEGIN
-  FOR gullyr IN (SELECT gully_id, _connec_arccat_id FROM gully WHERE _connec_arccat_id IS NOT NULL)
+  FOR gullyr IN (SELECT g.gully_id, g._connec_arccat_id FROM gully g LEFT JOIN link l ON l.feature_id = g.gully_id WHERE l.feature_id IS NULL)
   LOOP
-    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = gullyr.gully_id) THEN
-      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || gullyr.gully_id || ']"},
-     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "GULLY", "linkcatId":"UPDATE_LINK_40"}}$$);';
-      UPDATE link SET uncertain=true WHERE feature_id = gullyr.gully_id;
-    END IF;
+    EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || gullyr.gully_id || ']"},
+    "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "GULLY", "linkcatId":"UPDATE_LINK_40"}}$$);';
+    UPDATE link SET uncertain=true WHERE feature_id = gullyr.gully_id;
   END LOOP;
 
-  FOR connecr IN (SELECT connec_id, conneccat_id  FROM connec)
+  FOR connecr IN (SELECT c.connec_id, c.conneccat_id FROM connec c LEFT JOIN link l ON l.feature_id = c.connec_id WHERE l.feature_id IS NULL)
   LOOP
-    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = connecr.connec_id) THEN
-      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || connecr.connec_id || ']"},
-     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "CONNEC", "linkcatId":"UPDATE_LINK_40"}}$$);';
-      UPDATE link SET uncertain=true WHERE feature_id = connecr.connec_id;
-    END IF;
+    EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || connecr.connec_id || ']"},
+    "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "CONNEC", "linkcatId":"UPDATE_LINK_40"}}$$);';
+    UPDATE link SET uncertain=true WHERE feature_id = connecr.connec_id;
   END LOOP;
 END $func$;
-
-
 
 
 
