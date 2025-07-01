@@ -472,7 +472,8 @@ BEGIN
 		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id];
 	END IF;
 	/*
-	if v_fromzero = TRUE - how to calculate graphconfig
+	if v_fromzero = TRUE - how to calculate graphconfig:
+	For WS:
 	SELECT 
 	component, m.mapzone_id[1],
 	json_build_object(
@@ -489,6 +490,8 @@ BEGIN
 	JOIN temp_pgr_node n ON n.mapzone_id = m.component 
 	WHERE n.graph_delimiter = 'SECTOR' AND n.modif = TRUE
 	GROUP BY component,m.mapzone_id[1];
+	
+	For UD - without toArc
 	*/
 
 	-- Update nodes and arcs: "mapzone_id" = temp_pgr_mapzone."component"!
@@ -510,19 +513,21 @@ BEGIN
 	-- Note: if a closed valve, for example, is between sector 2 and sector 3, it means it is a boundary, it will have '0' as mapzone_id; if it is between -1 and 2 it will also have 0;
 	-- However, if a closed valve is between arcs with the same sector, it retains it; if it is between 1 and 1, it retains 1, meaning it is not a boundary; if it is between -1 and -1, it does not change, it retains Conflict
 
-	-- Set to 0 the boundary nodes of mapzones
-	WITH boundary AS (
-		SELECT COALESCE(n1.node_id, n2.node_id) AS node_id
-		FROM temp_pgr_arc a
-		JOIN temp_pgr_node n1 on a.pgr_node_1 = n1.pgr_node_id
-		JOIN temp_pgr_node n2 on a.pgr_node_2 = n2.pgr_node_id
-		WHERE a.graph_delimiter = 'MINSECTOR'
-		AND n1.mapzone_id <> 0 AND n2.mapzone_id <> 0
-		AND n1.mapzone_id <> n2.mapzone_id
-		)
-	UPDATE temp_pgr_node n SET mapzone_id = 0
-	FROM boundary AS s
-	WHERE n.node_id = s.node_id AND n.graph_delimiter = 'MINSECTOR';
+	IF v_project_type = 'WS' THEN
+		-- Set to 0 the boundary nodes of mapzones
+		WITH boundary AS (
+			SELECT COALESCE(n1.node_id, n2.node_id) AS node_id
+			FROM temp_pgr_arc a
+			JOIN temp_pgr_node n1 on a.pgr_node_1 = n1.pgr_node_id
+			JOIN temp_pgr_node n2 on a.pgr_node_2 = n2.pgr_node_id
+			WHERE a.graph_delimiter = 'MINSECTOR'
+			AND n1.mapzone_id <> 0 AND n2.mapzone_id <> 0
+			AND n1.mapzone_id <> n2.mapzone_id
+			)
+		UPDATE temp_pgr_node n SET mapzone_id = 0
+		FROM boundary AS s
+		WHERE n.node_id = s.node_id AND n.graph_delimiter = 'MINSECTOR';
+	END IF;
 
 	IF v_updatemapzgeom > 0 THEN
 		-- message
