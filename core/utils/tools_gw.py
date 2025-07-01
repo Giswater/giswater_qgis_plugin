@@ -4978,6 +4978,22 @@ def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
     set_tablemodel_config(dialog, qtable, tablename)
 
 
+def get_cm_user_role():
+    """Get user role from the cm database schema, if it exists."""
+
+    # First, check if the 'cm' schema exists to avoid errors on projects without it.
+    if not tools_db.check_schema('cm'):
+        return None
+
+    sql = f"""
+        SELECT t.role_id
+        FROM cm.cat_user AS u
+        JOIN cm.cat_team AS t ON u.team_id = t.team_id
+        WHERE u.username = '{tools_db.get_current_user()}'
+    """
+    return tools_db.get_row(sql)
+
+
 def get_ids_from_qtable(qtable, id_column):
     """ Get all IDs from a QTableView model for the given column """
     ids = []

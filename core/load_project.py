@@ -557,7 +557,7 @@ class GwLoadProject(QObject):
         self.is_role_cm_edit = False
 
         # Check cm role and adjust CM toolbar if necessary
-        cm_role = tools_db.get_cm_user_role()
+        cm_role = tools_gw.get_cm_user_role()
         if cm_role and 'role_cm_edit' in list(cm_role):
             self.is_role_cm_edit = True
             # Hide buttons not wanted for role_cm_edit

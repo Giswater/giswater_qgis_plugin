@@ -82,7 +82,7 @@ class Campaign:
         selector_type = "selector_campaign"
 
         # Check user role
-        cm_roles = tools_db.get_cm_user_role()
+        cm_roles = tools_gw.get_cm_user_role()
         show_lot = not (cm_roles and 'role_cm_edit' in list(cm_roles))
 
         # Show form in docker

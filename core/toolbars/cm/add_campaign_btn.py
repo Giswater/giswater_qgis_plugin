@@ -10,6 +10,7 @@ from ..dialog import GwAction
 from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
 from ....libs import tools_qt, tools_db
+from ...utils import tools_gw
 import json
 
 
@@ -21,7 +22,7 @@ class GwAddCampaignButton(GwAction):
         self.new_campaign = Campaign(icon_path, action_name, text, toolbar, action_group)
 
         # Check user role
-        roles = tools_db.get_cm_user_role()
+        roles = tools_gw.get_cm_user_role()
         is_cm_edit_role = roles and 'role_cm_edit' in list(roles)
 
         if is_cm_edit_role:
