@@ -236,6 +236,11 @@ class Campaign:
 
         self.setup_tab_relations()
         self._check_enable_tab_relations()
+        
+        # For inventory campaigns, enable all tabs from the start
+        if self.campaign_type == 3:
+            self._manage_tabs_enabled([])  # Pass empty list, the method will handle inventory case
+        
         self._update_feature_completer(self.dialog)
 
         self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
@@ -266,18 +271,25 @@ class Campaign:
         """
         Load related elements into campaign relation tabs for the given ID.
         Includes 'gully' only if project type is UD.
+        Uses inventory-specific tables for inventory campaigns.
         """
+        # Use different table prefix based on campaign type
+        if self.campaign_type == 3:  # inventory
+            table_prefix = "om_campaign_inventory_x_"
+        else:
+            table_prefix = "om_campaign_x_"
+            
         relation_tabs = {
-            "tbl_campaign_x_arc": ("om_campaign_x_arc", "arc_id"),
-            "tbl_campaign_x_node": ("om_campaign_x_node", "node_id"),
-            "tbl_campaign_x_connec": ("om_campaign_x_connec", "connec_id"),
-            "tbl_campaign_x_link": ("om_campaign_x_link", "link_id")
+            "tbl_campaign_x_arc": (f"{table_prefix}arc", "arc_id"),
+            "tbl_campaign_x_node": (f"{table_prefix}node", "node_id"),
+            "tbl_campaign_x_connec": (f"{table_prefix}connec", "connec_id"),
+            "tbl_campaign_x_link": (f"{table_prefix}link", "link_id")
         }
 
         # Only include gully and link if project type is 'ud'
         if self.project_type == 'ud':
             relation_tabs.update({
-                "tbl_campaign_x_gully": ("om_campaign_x_gully", "gully_id"),
+                "tbl_campaign_x_gully": (f"{table_prefix}gully", "gully_id"),
             })
 
         for table_name, (db_table, col_id) in relation_tabs.items():
@@ -547,12 +559,17 @@ class Campaign:
             return
 
         # Get allowed feature types
+        allowed_types = []
         if self.campaign_type == 1:
             reviewclass_id = tools_qt.get_combo_value(self.dialog, self.reviewclass_combo)
             allowed_types = self.get_allowed_feature_subtypes(feature, reviewclass_id)
         elif self.campaign_type == 2:
             visitclass_id = tools_qt.get_combo_value(self.dialog, self.visitclass_combo)
             allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
+        elif self.campaign_type == 3:
+            # For inventory campaigns, allow all feature types - no restrictions
+            return
+        
         if not allowed_types:
             return
 
@@ -667,10 +684,17 @@ class Campaign:
     def _manage_tabs_enabled(self, feature_types):
         """ Enable or disable relation tabs depending on allowed feature types (e.g., ['node', 'arc']). """
 
+        tab_widget = self.dialog.tab_feature
+        
+        # For inventory campaigns (type 3), enable all tabs
+        if self.campaign_type == 3:
+            for i in range(tab_widget.count()):
+                tab_widget.setTabEnabled(i, True)
+            return
+
+        # For review/visit campaigns, apply feature type restrictions
         # Normalize all feature types to lowercase for comparison
         normalized = [ft.lower() for ft in feature_types]
-
-        tab_widget = self.dialog.tab_feature
 
         for i in range(tab_widget.count()):
             widget = tab_widget.widget(i)
