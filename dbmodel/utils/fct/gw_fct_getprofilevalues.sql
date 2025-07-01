@@ -147,7 +147,7 @@ v_cost_string text;
 BEGIN
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ud_40_sample_01072025", public;
 
 	-- get projectytpe
 	SELECT project_type, giswater FROM sys_version ORDER BY id DESC LIMIT 1 INTO v_project_type, v_version;
@@ -178,52 +178,56 @@ BEGIN
   	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
   	SELECT (value::json->>'vnodeStatus') INTO v_vnode_status FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 
-	-- create temp tables
-	CREATE TEMP TABLE temp_vnode(
-	  id serial NOT NULL,
-	  l1 integer,
-	  v1 integer,
-	  l2 integer,
-	  v2 integer,
-	  CONSTRAINT temp_vnode_pkey PRIMARY KEY (id));
+	CREATE TEMP TABLE temp_vnode (
+		id serial NOT NULL,
+		l1 integer,
+		v1 integer,
+		l2 integer,
+		v2 integer,
+		CONSTRAINT temp_vnode_pkey PRIMARY KEY (id)
+	);
 
 	CREATE TEMP TABLE temp_link(
-	  link_id integer NOT NULL,
-	  vnode_id integer,
-	  vnode_type text,
-	  feature_id character varying(16),
-	  feature_type character varying(16),
-	  exit_id character varying(16),
-	  exit_type character varying(16),
-	  state smallint,
-	  expl_id integer,
-	  sector_id integer,
-	  dma_id integer,
-	  exit_topelev double precision,
-	  exit_elev double precision,
-	  the_geom geometry(LineString,25831),
-	  the_geom_endpoint geometry(Point,25831),
-	  flag boolean,
-	  CONSTRAINT temp_link_pkey PRIMARY KEY (link_id));
+		link_id integer NOT NULL,
+		vnode_id integer,
+		vnode_type text,
+		feature_id character varying(16),
+		feature_type character varying(16),
+		exit_id character varying(16),
+		exit_type character varying(16),
+		state smallint,
+		expl_id integer,
+		sector_id integer,
+		exit_topelev double precision,
+		exit_elev double precision,
+		the_geom geometry(LineString,25831),
+		the_geom_endpoint geometry(Point,25831),
+		flag boolean,
+		CONSTRAINT temp_link_pkey PRIMARY KEY (link_id)
+	);
+
+	IF v_project_type = 'WS' THEN
+		ALTER TABLE temp_link ADD COLUMN dma_id integer;
+	END IF;
 
 	CREATE TEMP TABLE temp_link_x_arc(
-	  link_id integer NOT NULL,
-	  vnode_id integer,
-	  arc_id character varying(16),
-	  feature_type character varying(16),
-	  feature_id character varying(16),
-	  node_1 character varying(16),
-	  node_2 character varying(16),
-	  vnode_distfromnode1 numeric(12,3),
-	  vnode_distfromnode2 numeric(12,3),
-	  exit_topelev double precision,
-	  exit_ymax numeric(12,3),
-	  exit_elev numeric(12,3),
-	  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
-
-	CREATE TEMP TABLE temp_anl_arc(LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_v_edit_arc (LIKE SCHEMA_NAME.v_edit_arc INCLUDING ALL);
+		link_id integer NOT NULL,
+		vnode_id integer,
+		arc_id character varying(16),
+		feature_type character varying(16),
+		feature_id character varying(16),
+		node_1 character varying(16),
+		node_2 character varying(16),
+		vnode_distfromnode1 numeric(12,3),
+		vnode_distfromnode2 numeric(12,3),
+		exit_topelev double precision,
+		exit_ymax numeric(12,3),
+		exit_elev numeric(12,3),
+		CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id)
+	);
+	CREATE TEMP TABLE temp_anl_arc(LIKE ud_40_sample_01072025.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_node(LIKE ud_40_sample_01072025.anl_node INCLUDING ALL);
+	CREATE TEMP TABLE temp_v_edit_arc (LIKE ud_40_sample_01072025.v_edit_arc INCLUDING ALL);
 
 	insert into temp_v_edit_arc select * from v_edit_arc;
 
@@ -272,17 +276,17 @@ BEGIN
 
 			v_querytext1 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode1, total_length
 				FROM temp_link_x_arc 
-				JOIN anl_arc USING (arc_id)
-				JOIN gully c ON c.gully_id = temp_link_x_arc.feature_id
+				JOIN anl_arc ON temp_link_x_arc.arc_id::integer = anl_arc.arc_id::integer
+				JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
 				WHERE fid=222 AND cur_user = current_user
-				AND anl_arc.node_1 = temp_link_x_arc.node_1';
+				AND anl_arc.node_1::integer = temp_link_x_arc.node_1::integer';
 
 			v_querytext2 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2, total_length
 				FROM temp_link_x_arc 
-				JOIN anl_arc USING (arc_id)
-				JOIN gully c ON c.gully_id = temp_link_x_arc.feature_id
+				JOIN anl_arc ON temp_link_x_arc.arc_id::integer = anl_arc.arc_id::integer
+				JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
 				WHERE fid=222 AND cur_user = current_user
-				AND anl_arc.node_1 = temp_link_x_arc.node_2';
+				AND anl_arc.node_1::integer = temp_link_x_arc.node_2::integer';
 
 			v_elev1 = 'case when node_1=node_id then sys_elev1 else sys_elev2 end';
 			v_elev2 = 'case when node_1=node_id then sys_elev2 else sys_elev1 end';
@@ -404,7 +408,7 @@ BEGIN
 					    v_edit_arc.sys_elev2 + v_edit_arc.sys_y2 AS top_elev2
 					   FROM temp_v_edit_arc v_edit_arc, temp_link t
 					    WHERE st_dwithin(v_edit_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_edit_arc.state > 0 AND t.state > 0 AND exit_type ='ARC'
-					    and arc_id in (select arc_id from temp_anl_arc) ) a)b
+					    and arc_id::integer in (select arc_id::integer from temp_anl_arc) ) a)b
 					    ORDER BY arc_id, node_2 DESC;
 
 			ELSIF v_project_type = 'WS' THEN
@@ -439,17 +443,17 @@ BEGIN
 				-- connec on same sense (pg_routing & arc)
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode1 as dist, total_length
 					FROM temp_link_x_arc 
-					JOIN temp_anl_arc USING (arc_id)
-					JOIN connec c ON c.connec_id = temp_link_x_arc.feature_id
-					WHERE temp_anl_arc.node_1 = temp_link_x_arc.node_1
+					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
+					JOIN connec c ON c.connec_id::integer = temp_link_x_arc.feature_id::integer
+					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_1::integer
 				'||v_querytext1||'-- gully on same sense (pg_routing & arc)
 				UNION
 				-- connec on reverse sense (pg_routing & arc)
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2 as dist, total_length
 					FROM temp_link_x_arc 
-					JOIN temp_anl_arc USING (arc_id)
-					JOIN connec c ON c.connec_id = temp_link_x_arc.feature_id
-					WHERE temp_anl_arc.node_1 = temp_link_x_arc.node_2
+					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
+					JOIN connec c ON c.connec_id::integer = temp_link_x_arc.feature_id::integer
+					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_2::integer
 				'||v_querytext2||' -- gully on reverse sense (pg_routing & arc)
 				)a
 			)b 
@@ -465,17 +469,17 @@ BEGIN
 				-- gully on same sense (pg_routing & arc)
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, gully_id as feature_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode1 as dist, total_length
 					FROM temp_link_x_arc 
-					JOIN temp_anl_arc USING (arc_id)
-					JOIN gully c ON c.gully_id = temp_link_x_arc.feature_id
-					WHERE temp_anl_arc.node_1 = temp_link_x_arc.node_1
+					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
+					JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
+					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_1::integer
 				'||v_querytext1||'-- gully on same sense (pg_routing & arc)
 				UNION
 				-- gully on reverse sense (pg_routing & arc)
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, gully_id as feature_id,exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2 as dist, total_length
 					FROM temp_link_x_arc 
-					JOIN temp_anl_arc USING (arc_id)
-					JOIN gully c ON c.gully_id = temp_link_x_arc.feature_id
-					WHERE temp_anl_arc.node_1 = temp_link_x_arc.node_2
+					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
+					JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
+					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_2::integer
 				'||v_querytext2||' -- gully on reverse sense (pg_routing & arc)
 				)a
 				)b 
@@ -507,10 +511,10 @@ BEGIN
 		EXECUTE' UPDATE temp_anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
 					(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id::text else code end as code, 
 					total_distance FROM temp_anl_node WHERE fid=222 AND cur_user = current_user)row)a
-					WHERE a.node_id = temp_anl_node.node_id';
+					WHERE a.node_id::integer = temp_anl_node.node_id::integer';
 
 		EXECUTE 'UPDATE temp_anl_node SET  descript = gw_fct_json_object_set_key(descript::json, ''code'', a.code) 
-		FROM (SELECT node_id, case when code is null then node_id::text else code end code FROM ('||v_textnode||')row)a WHERE a.node_id::text = temp_anl_node.node_id ';
+		FROM (SELECT node_id, case when code is null then node_id::text else code end code FROM ('||v_textnode||')row)a WHERE a.node_id::integer = temp_anl_node.node_id::integer ';
 
 		-- delete not used keys
 		UPDATE temp_anl_arc SET descript = gw_fct_json_object_delete_keys(descript::json, 'arc_id')  ;
