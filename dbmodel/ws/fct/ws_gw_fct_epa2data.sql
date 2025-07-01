@@ -155,21 +155,37 @@ BEGIN
 		quality_max = EXCLUDED.quality_max, quality_min = EXCLUDED.quality_min, quality_avg=EXCLUDED.quality_avg, result_id=EXCLUDED.result_id;
 
 		--calc avg_press for mapzones
-		for v_mapzone in select unnest(array['dma', 'sector', 'presszone'])
-		loop
+		FOR v_mapzone IN SELECT unnest(array['dma', 'sector', 'presszone', 'expl'])
+		LOOP
+			
+			IF v_mapzone = 'expl' THEN
+			
+				EXECUTE 'update exploitation d set avg_press = a.avg_press from (
+				with cn as (
+					select na.node_id as feature_id, na.press_avg, n.'||v_mapzone||'_id::varchar from node_add na join node n using (node_id) 
+					union select ca.connec_id as feature_id, ca.press_avg, c.'||v_mapzone||'_id::varchar from connec_add ca join connec c using (connec_id)
+					) 
+				select round(avg(press_avg),2) as avg_press, '||v_mapzone||'_id::varchar from cn group by '||v_mapzone||'_id
+				)a where a.'||v_mapzone||'_id::varchar = d.'||v_mapzone||'_id::varchar
+				and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id 
+				in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
+			
+			ELSE 
 
-			execute 'update '||v_mapzone||' d set avg_press = a.avg_press from (
-			with cn as (
-				select na.node_id as feature_id, na.press_avg, n.'||v_mapzone||'_id::varchar from node_add na join node n using (node_id) 
-				union select ca.connec_id as feature_id, ca.press_avg, c.'||v_mapzone||'_id::varchar from connec_add ca join connec c using (connec_id)
-				) 
-			select round(avg(press_avg),2) as avg_press, '||v_mapzone||'_id::varchar from cn group by '||v_mapzone||'_id
-			)a where a.'||v_mapzone||'_id::varchar = d.'||v_mapzone||'_id::varchar
-			and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id 
-			in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
+				EXECUTE 'update '||v_mapzone||' d set avg_press = a.avg_press from (
+				with cn as (
+					select na.node_id as feature_id, na.press_avg, n.'||v_mapzone||'_id::varchar from node_add na join node n using (node_id) 
+					union select ca.connec_id as feature_id, ca.press_avg, c.'||v_mapzone||'_id::varchar from connec_add ca join connec c using (connec_id)
+					) 
+				select round(avg(press_avg),2) as avg_press, '||v_mapzone||'_id::varchar from cn group by '||v_mapzone||'_id
+				)a where a.'||v_mapzone||'_id::varchar = d.'||v_mapzone||'_id::varchar
+				and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id 
+				in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
 
-		end loop;
-
+			END IF;
+			
+		END LOOP;
+		
 		--set start date
 		v_addparam := jsonb_set(
 			v_addparam,
@@ -208,14 +224,25 @@ BEGIN
 		UPDATE rpt_cat_result SET addparam = v_addparam::json WHERE result_id = v_result_id;
 
 		--set avg_press null on mapzones when set corporate is false
-		for v_mapzone in select unnest(array['dma', 'sector', 'presszone'])
-		loop
+		FOR v_mapzone IN SELECT unnest(array['dma', 'sector', 'presszone', 'expl'])
+		LOOP
+			
+			IF v_mapzone = 'expl' THEN
 
-			execute '
-			UPDATE '||v_mapzone||' set avg_press = null where '||v_mapzone||'_id in 
-			(select distinct '||v_mapzone||'_id from node where node_id in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
+				EXECUTE '
+				UPDATE exploitation set avg_press = null where '||v_mapzone||'_id in 
+				(select distinct '||v_mapzone||'_id from node where node_id in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
+			
+			ELSE
 
-		end loop;
+				EXECUTE '
+				UPDATE '||v_mapzone||' set avg_press = null where '||v_mapzone||'_id in 
+				(select distinct '||v_mapzone||'_id from node where node_id in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
+
+			END IF;
+			
+		END LOOP;
+
 	END IF;
 
 	-- Manage v_message_text
