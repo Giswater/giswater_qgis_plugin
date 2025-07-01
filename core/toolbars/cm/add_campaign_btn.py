@@ -27,7 +27,7 @@ class GwAddCampaignButton(GwAction):
 
         if is_cm_edit_role:
             # For 'role_cm_edit', the button directly creates an 'inventory' campaign
-            self.action.triggered.connect(lambda: self.clicked_event("INVENTORY"))
+            self.action.triggered.connect(lambda: self.clicked_event(tools_qt.tr("Inventory")))
             if toolbar is not None:
                 toolbar.addAction(self.action)
             return
