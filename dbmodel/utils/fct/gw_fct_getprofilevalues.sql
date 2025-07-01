@@ -57,8 +57,8 @@ DECLARE
 
 v_init  integer;
 v_init_aux integer;
-v_mid integer;
-v_end integer;
+v_mid text;
+v_end text;
 v_end_aux integer;
 v_query_dijkstra text;
 v_i json;
@@ -147,7 +147,7 @@ v_cost_string text;
 BEGIN
 
 	--  Search path
-	SET search_path = "ud_40_sample_01072025", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get projectytpe
 	SELECT project_type, giswater FROM sys_version ORDER BY id DESC LIMIT 1 INTO v_project_type, v_version;
@@ -225,9 +225,9 @@ BEGIN
 		exit_elev numeric(12,3),
 		CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id)
 	);
-	CREATE TEMP TABLE temp_anl_arc(LIKE ud_40_sample_01072025.anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_node(LIKE ud_40_sample_01072025.anl_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_v_edit_arc (LIKE ud_40_sample_01072025.v_edit_arc INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_arc(LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+	CREATE TEMP TABLE temp_v_edit_arc (LIKE SCHEMA_NAME.v_edit_arc INCLUDING ALL);
 
 	insert into temp_v_edit_arc select * from v_edit_arc;
 
@@ -250,10 +250,10 @@ BEGIN
 	v_nodemessage = 'Start/End nodes is/are not valid(s). CHECK elev data. Only NOT start/end nodes may have missed elev data';
 	IF v_project_type = 'UD' THEN
 		IF (SELECT COUNT(*) FROM v_edit_node JOIN cat_feature_node ON node_type = id
-			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init) > 0
+			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_init::integer) > 0
 			THEN
 			IF (SELECT COUNT(*) FROM v_edit_node JOIN cat_feature_node ON node_type = id
-				WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end) = 0
+				WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_end::integer) = 0
 				THEN
 				v_level = 2;
 				v_message = v_nodemessage;
@@ -496,7 +496,7 @@ BEGIN
 
 				--distance values
 				IF ((v_dist[i] < (v_dist[i-1]+ v_linksdistance)) OR (v_dist[i] > (v_dist[i+1]+ v_linksdistance))) AND v_systype[i] = 'LINK' THEN
-					DELETE FROM temp_anl_node WHERE node_id = v_nid[i];
+					DELETE FROM temp_anl_node WHERE node_id::integer = v_nid[i]::integer;
 				END IF;
 			END LOOP;
 

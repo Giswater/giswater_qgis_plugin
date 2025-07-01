@@ -11,8 +11,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 1 test
-SELECT plan(3);
+SELECT plan(5);
 
 -- Create roles for testing
 CREATE USER plan_user;
@@ -51,6 +50,21 @@ SELECT is (
     'Accepted',
     'Check if gw_fct_getprofilevalues with linksDistance and scale (eh and ev) returns status "Accepted"'
 )
+
+SELECT is (
+    (gw_fct_getprofilevalues($${"client":{"device":4, "lang":"es_ES", "version":"4.0.002", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "initNode":"18976", "endNode":"18973", "midNodes":[43]}}$$))->>'status',
+    'Accepted',
+    'Check if gw_fct_getprofilevalues with one midNode returns status "Accepted"'
+)
+
+SELECT is (
+    (gw_fct_getprofilevalues($${"client":{"device":4, "lang":"es_ES", "version":"4.0.002", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "initNode":"18976", "endNode":"18973", "linksDistance":1000, "scale":{ "eh":1000, "ev":1000}, "midNodes":[43, 43, 40, 104]}}$$))->>'status',
+    'Accepted',
+    'Check if gw_fct_getprofilevalues with multiple midNodes returns status "Accepted"'
+)
+
 
 
 -- Finish the test
