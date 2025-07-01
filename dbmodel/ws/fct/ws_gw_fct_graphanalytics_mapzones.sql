@@ -9,7 +9,7 @@ or (at your option) any later version.
 --FUNCTION CODE: 2710
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mapzones(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_v1(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_v2(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -124,7 +124,7 @@ DECLARE
 	v_mapzone_name text;
 	v_mapzone_field text;
 	v_mapzone_id int4;
-	v_ignore_broken_valves BOOLEAN = TRUE; 
+	v_ignore_broken_valves BOOLEAN = TRUE;
 	v_pgr_distance integer;
 	v_pgr_root_vids int[];
 
@@ -284,22 +284,22 @@ BEGIN
 
 	-- valves with to_arc NOT NULL and NOT broken
 	UPDATE temp_pgr_node n SET modif = TRUE
-	WHERE n.graph_delimiter = 'MINSECTOR' 
+	WHERE n.graph_delimiter = 'MINSECTOR'
 	AND n.closed = FALSE
-	AND n.to_arc IS NOT NULL 
+	AND n.to_arc IS NOT NULL
 	AND n.closed = FALSE
 	AND n.broken = FALSE;
 
 	-- NODES MAPZONES
 	-- The mapzone nodes are the starting points of mapzones
-	IF v_fromzero THEN 
+	IF v_fromzero THEN
 		 v_query_text =
             'UPDATE temp_pgr_node n SET modif = TRUE
             WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
-            '; 
-		EXECUTE v_query_text;     
+            ';
+		EXECUTE v_query_text;
 	ELSE
-		v_query_text = 
+		v_query_text =
             'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
             FROM (
                 SELECT 
@@ -340,9 +340,9 @@ BEGIN
 				AND active 
 			) s 
 			WHERE n.node_id = s.node_id';
-		EXECUTE v_query_text;             
+		EXECUTE v_query_text;
     END IF;
-    
+
 	-- Nodes forceClosed acording init parameters
 	UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'FORCECLOSED'
 	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
@@ -362,7 +362,7 @@ BEGIN
     END IF;
 
 	-- Note: node_id IS NULL AND arc_id IS NULL for the new nodes/arcs generated
-	
+
 	-- disconect InletArcs for nodes graph_delimiter
 	UPDATE temp_pgr_arc  SET cost = -1, reverse_cost = -1
     WHERE graph_delimiter = v_mapzone_name
@@ -399,7 +399,7 @@ BEGIN
 	SELECT component, array_agg(DISTINCT n.mapzone_id)
 	FROM temp_pgr_connectedcomponents c
 	JOIN temp_pgr_node n ON n.pgr_node_id = c.node
-	WHERE n.graph_delimiter = v_graph_delimiter AND modif = TRUE 
+	WHERE n.graph_delimiter = v_graph_delimiter AND modif = TRUE
 	GROUP BY c.component;
 
 	IF v_updatemapzgeom > 0 THEN
@@ -416,14 +416,14 @@ BEGIN
 	END IF;
 	/*
 	if v_fromzero = TRUE - how to calculate graphconfig
-	WITH 
+	WITH
 		my_table AS (
-			SELECT component, n.node_id, n.to_arc 
+			SELECT component, n.node_id, n.to_arc
 			FROM temp_pgr_connectedcomponents c
 			JOIN (SELECT DISTINCT start_vid FROM temp_pgr_drivingdistance) d ON c.node = d.start_vid
 			JOIN temp_pgr_node n ON n.pgr_node_id = d.start_vid
 		)
-	SELECT 
+	SELECT
 	component,
 	json_build_object(
 		'use', json_agg(
