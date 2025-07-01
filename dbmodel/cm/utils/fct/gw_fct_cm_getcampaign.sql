@@ -67,6 +67,8 @@ BEGIN
 	-- Set formname based on mode
 	IF v_campaign_mode = 'visit' THEN
 		v_formname := 'campaign_visit';
+	ELSEIF v_campaign_mode = 'inventory' THEN
+		v_formname := 'campaign_inventory';
 	ELSE
 		v_formname := 'campaign_review';
 	END IF;

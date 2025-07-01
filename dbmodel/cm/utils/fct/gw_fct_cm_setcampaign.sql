@@ -115,6 +115,9 @@ BEGIN
         ELSIF v_campaign_type = 2 THEN
             INSERT INTO om_campaign_visit (campaign_id, visitclass_id)
             VALUES (v_newid, v_visitclass_id);
+        ELSIF v_campaign_type = 3 THEN
+            INSERT INTO om_campaign_inventory (campaign_id)
+            VALUES (v_newid);
         END IF;
 
     ELSE
@@ -127,6 +130,12 @@ BEGIN
             UPDATE om_campaign_review SET reviewclass_id = v_reviewclass_id WHERE campaign_id = v_newid;
         ELSIF v_campaign_type = 2 THEN
             UPDATE om_campaign_visit SET visitclass_id = v_visitclass_id WHERE campaign_id = v_newid;
+        ELSIF v_campaign_type = 3 THEN
+            -- For inventory campaigns, the om_campaign_inventory table doesn't have additional fields to update
+            -- Just ensure the record exists
+            INSERT INTO om_campaign_inventory (campaign_id) 
+            VALUES (v_newid) 
+            ON CONFLICT (campaign_id) DO NOTHING;
         END IF;
     END IF;
 

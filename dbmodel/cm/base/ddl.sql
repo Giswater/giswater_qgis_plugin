@@ -39,6 +39,16 @@ BEGIN
 END
 $$;
 
+DO $$
+BEGIN
+   IF NOT EXISTS (
+      SELECT FROM pg_catalog.pg_roles WHERE rolname = 'role_cm_edit'
+   ) THEN
+      CREATE role role_cm_edit WITH NOSUPERUSER NOCREATEDB NOCREATEROLE inherit NOREPLICATION NOBYPASSRLS;
+   END IF;
+END
+$$;
+
 
 -- system tables
 CREATE TABLE sys_table (
@@ -294,6 +304,22 @@ CREATE TABLE om_reviewclass_x_object (
   CONSTRAINT om_reviewclass_x_object_pkey PRIMARY KEY (reviewclass_id, object_id)
 );
 
+CREATE TABLE om_inventory (
+  id serial NOT NULL,
+  idval text,
+  pschema_id text,
+  descript text,
+  active boolean DEFAULT true,
+  CONSTRAINT om_inventory_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE om_inventory_x_object (
+  inventory_id integer NOT NULL,
+  object_id text NOT NULL,
+  orderby int2,
+  active boolean DEFAULT true,
+  CONSTRAINT om_inventory_x_object_pkey PRIMARY KEY (inventory_id, object_id)
+);
 
 CREATE TABLE om_visitclass (
   id serial NOT NULL,
@@ -324,7 +350,7 @@ CREATE TABLE om_campaign (
   sector_id integer,
   the_geom geometry(MultiPolygon,SRID_VALUE),
   CONSTRAINT om_campaign_pkey PRIMARY KEY (campaign_id),
-  CONSTRAINT om_campaign_check_type check (campaign_type in (1,2)),
+  CONSTRAINT om_campaign_check_type check (campaign_type in (1,2,3)),
   CONSTRAINT om_campaign_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES cat_organization(organization_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
@@ -345,6 +371,65 @@ CREATE TABLE om_campaign_review (
   CONSTRAINT om_campaign_review_reviewclass_id_fkey FOREIGN KEY (reviewclass_id) REFERENCES om_reviewclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
+CREATE TABLE om_campaign_inventory (
+  campaign_id integer NOT NULL,
+  inventory_id integer,
+  CONSTRAINT om_campaign_inventory_pkey PRIMARY KEY (campaign_id),
+  CONSTRAINT om_campaign_inventory_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT om_campaign_inventory_inventory_id_fkey FOREIGN KEY (inventory_id) REFERENCES om_inventory (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
+);
+
+CREATE TABLE om_campaign_inventory_x_arc (
+  id serial4 NOT NULL,
+  campaign_id integer NOT NULL,
+  arc_id int4 NOT NULL,
+  code character varying(30),
+  status int2,
+  admin_observ text,
+  org_observ text,
+  CONSTRAINT om_campaign_inventory_x_arc_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_inventory_x_arc_un UNIQUE (campaign_id, arc_id),
+  CONSTRAINT om_campaign_inventory_x_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES cm.om_campaign_inventory (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE om_campaign_inventory_x_node (
+  id serial4 NOT NULL,
+  campaign_id integer NOT NULL,
+  node_id int4 NOT NULL,
+  code character varying(30),
+  status int2,
+  admin_observ text,
+  org_observ text,
+  CONSTRAINT om_campaign_inventory_x_node_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_inventory_x_node_un UNIQUE (campaign_id, node_id),
+  CONSTRAINT om_campaign_inventory_x_node_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES cm.om_campaign_inventory (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE om_campaign_inventory_x_connec (
+  id serial4 NOT NULL,
+  campaign_id integer NOT NULL,
+  connec_id int4 NOT NULL,
+  code character varying(30),
+  status int2,
+  admin_observ text,
+  org_observ text,
+  CONSTRAINT om_campaign_inventory_x_connec_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_inventory_x_connec_un UNIQUE (campaign_id, connec_id),
+  CONSTRAINT om_campaign_inventory_x_connec_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES cm.om_campaign_inventory (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE om_campaign_inventory_x_link (
+  id serial4 NOT NULL,
+  campaign_id integer NOT NULL,
+  link_id int4 NOT NULL,
+  code character varying(30),
+  status int2,
+  admin_observ text,
+  org_observ text,
+  CONSTRAINT om_campaign_inventory_x_link_pkey PRIMARY KEY (id),
+  CONSTRAINT om_campaign_inventory_x_link_un UNIQUE (campaign_id, link_id),
+  CONSTRAINT om_campaign_inventory_x_link_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES cm.om_campaign_inventory (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+);
 
 CREATE TABLE om_campaign_x_arc (
   id serial4 NOT NULL,
