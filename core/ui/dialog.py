@@ -46,6 +46,7 @@ class GwDialog(QDialog):
         try:
             # Wrap the existing layout in a widget
             main_widget = QWidget()
+            # NOTE: This crashes QGIS if the dialog has no layout
             main_widget.setLayout(self.layout())
 
             # Create a stacked layout to overlay the message bar
