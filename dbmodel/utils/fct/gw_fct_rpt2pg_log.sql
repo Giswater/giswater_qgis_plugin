@@ -59,6 +59,8 @@ BEGIN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (114, p_result, 3, 'HINT: Take a look on the RPT file OR Export INP file again without ''Execute EPA software'' & ''Import Results'' in order to check and fix errors.');
 
+			UPDATE rpt_cat_result SET status = 4 WHERE result_id = p_result;
+
 			v_status = 'Failed';
 		ELSE
 
@@ -99,6 +101,8 @@ BEGIN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '');
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (114, p_result, 3, 'HINT: Take a look on the RPT file OR Export INP file again without ''Execute EPA software'' & ''Import Results'' in order to check and fix errors.');
+
+			UPDATE rpt_cat_result SET status = 4 WHERE result_id = p_result;
 
 			v_status = 'Failed';
 
