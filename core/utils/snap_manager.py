@@ -84,7 +84,6 @@ class GwSnapManager(object):
             return None, None
 
         result = self.snapper.snapToMap(event_point)
-        print(type(result))
         if vertex_marker:
             if result.isValid():
                 # Get the point and add marker on it

@@ -41,15 +41,14 @@ class GwMenuLoad(QObject):
 
         icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons"
         icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
-        config_icon = QIcon(icon_path)
+        config_icon = QIcon(icon_path)   
 
+        # region Actions
+        actions_menu = QMenu(tools_qt.tr("Actions"), self.iface.mainWindow().menuBar())
+        actions_menu.setIcon(config_icon)
+        self.main_menu.addMenu(actions_menu)
+        
         if project_loaded:
-
-            # region Actions
-            actions_menu = QMenu(tools_qt.tr("Actions"), self.iface.mainWindow().menuBar())
-            actions_menu.setIcon(config_icon)
-            self.main_menu.addMenu(actions_menu)
-
             # Action 'Get help'
             action_help = actions_menu.addAction(tools_qt.tr("Get help"))
             action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", "shortcut_help", "user", "init", prefix=False)
@@ -59,10 +58,11 @@ class GwMenuLoad(QObject):
             action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
             action_help.triggered.connect(tools_gw.open_dlg_help)
 
-            # Action 'Reset dialogs'
-            action_reset_dialogs = actions_menu.addAction(tools_qt.tr("Reset dialogs"))
-            action_reset_dialogs.triggered.connect(self._reset_position_dialog)
+        # Action 'Reset dialogs'
+        action_reset_dialogs = actions_menu.addAction(tools_qt.tr("Reset dialogs"))
+        action_reset_dialogs.triggered.connect(self._reset_position_dialog)
 
+        if project_loaded:
             # Action 'Reset plugin
             action_reset_plugin = actions_menu.addAction(tools_qt.tr("Reset plugin"))
             action_reset_plugin_shortcut = tools_gw.get_config_parser("actions_shortcuts", "shortcut_reset_plugin",
@@ -83,14 +83,14 @@ class GwMenuLoad(QObject):
             action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
             action_open_selections.triggered.connect(self._open_current_selections)
 
-            # Action 'Toggle Log DB'
-            action_set_log_sql = actions_menu.addAction(tools_qt.tr("Toggle Log DB"))
-            log_sql_shortcut = tools_gw.get_config_parser("actions_shortcuts", "shortcut_toggle_log_db", "user", "init", prefix=False)
-            if not log_sql_shortcut:
-                tools_gw.set_config_parser("actions_shortcuts", "shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
-                    "init", prefix=False)
-            action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
-            action_set_log_sql.triggered.connect(self._set_log_sql)
+        # Action 'Toggle Log DB'
+        action_set_log_sql = actions_menu.addAction(tools_qt.tr("Toggle Log DB"))
+        log_sql_shortcut = tools_gw.get_config_parser("actions_shortcuts", "shortcut_toggle_log_db", "user", "init", prefix=False)
+        if not log_sql_shortcut:
+            tools_gw.set_config_parser("actions_shortcuts", "shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
+                "init", prefix=False)
+        action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
+        action_set_log_sql.triggered.connect(self._set_log_sql)
 
             # endregion
 
