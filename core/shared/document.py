@@ -784,7 +784,7 @@ class GwDocument(QObject):
 
     def _get_file_dialog(self, dialog, widget):
         """ Get file dialog """
-        files_path = tools_qt.get_open_files_path(dialog, widget, "Select files")
+        files_path = tools_qt.get_open_files_path("Select files", "All (*.*)")
 
         file_text = ""
         if len(files_path) == 1:
@@ -795,11 +795,13 @@ class GwDocument(QObject):
         if files_path:
             tools_qt.set_widget_text(dialog, widget, str("\n\n".join(files_path)))
             self.files_path = files_path
-            gps_coordinates = self.get_geolocation_gdal(files_path[0])
-            if gps_coordinates:
-                self.point_xy = {"x": gps_coordinates[0], "y": gps_coordinates[1]}
-            else:
-                self.point_xy = {"x": None, "y": None}
+            self.point_xy = {"x": None, "y": None}
+            for file in files_path:
+                if file.lower().endswith(('.tif', '.tiff', '.jpg', '.jpeg', '.png')):
+                    gps_coordinates = self.get_geolocation_gdal(files_path[0])
+                    if gps_coordinates:
+                        self.point_xy = {"x": gps_coordinates[0], "y": gps_coordinates[1]}
+                        break
 
         return files_path
 
@@ -843,8 +845,9 @@ class GwDocument(QObject):
         s = float(value[2])
         return d + (m / 60.0) + (s / 3600.0)
 
-    def get_geolocation_gdal(self, file_path):
+    def get_geolocation_gdal(self, file_path: str):
         """ Extract geolocation metadata from an image file using GDAL """
+
         dataset = gdal.Open(file_path)
         if not dataset:
             return None
