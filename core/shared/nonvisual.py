@@ -43,7 +43,7 @@ class GwNonVisual:
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg: GwNonVisualManagerUi = None
-        self.dict_views = {'ws': {'cat_mat_roughness': f'{tr("Roughness")}', 'v_edit_inp_curve': f'{tr("curves")}',
+        self.dict_views = {'ws': {'cat_mat_roughness': f'{tr("roughness")}', 'v_edit_inp_curve': f'{tr("curves")}',
                                  'v_edit_inp_pattern': f'{tr("patterns")}', 'v_edit_inp_controls': f'{tr("controls")}',
                                  'v_edit_inp_rules': f'{tr("rules")}'},
                            'ud': {'v_edit_inp_curve': f'{tr("curves")}', 'v_edit_inp_pattern': f'{tr("patterns")}',
@@ -334,7 +334,9 @@ class GwNonVisual:
         """ Creates a new non-visual object from the manager """
 
         table = dialog.main_tab.currentWidget()
+        print(table)
         function_name = table.property('function')
+        print(function_name)
 
         getattr(self, function_name)()
 
