@@ -982,5 +982,5 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=37, "datatype
 UPDATE config_form_fields SET layoutname='lyt_general_5', layoutorder=2, "datatype"='text', widgettype='text', "label"='Parent id:', tooltip='Parent id', placeholder=NULL, ismandatory=false, isparent=false, iseditable=false, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=1 WHERE formname='generic' AND formtype='psector' AND columnname='parent_id' AND tabname='tab_general';
 
 -- 02/07/2025
-UPDATE config_form_fields SET stylesheet='{"label":"color:green; font-weight:bold; font-size:14px"}'::json WHERE columnname='expl_id';
-UPDATE config_form_fields SET stylesheet='{"label":"color:blue; font-weight:bold; font-size:14px"}'::json WHERE columnname='sector_id';
+UPDATE config_form_fields SET stylesheet='{"label":"color:green; font-weight:bold;"}'::json WHERE columnname='expl_id';
+UPDATE config_form_fields SET stylesheet='{"label":"color:blue; font-weight:bold;"}'::json WHERE columnname='sector_id';

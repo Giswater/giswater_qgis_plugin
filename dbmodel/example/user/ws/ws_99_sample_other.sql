@@ -1107,5 +1107,5 @@ INSERT INTO man_pipelink (link_id) SELECT link_id FROM link l;
 
 
 -- 02/07/2025
-UPDATE config_form_fields SET stylesheet='{"label":"color:green; font-weight:bold; font-size:14px"}'::json WHERE columnname='expl_id';
-UPDATE config_form_fields SET stylesheet='{"label":"color:blue; font-weight:bold; font-size:14px"}'::json WHERE columnname='sector_id';
+UPDATE config_form_fields SET stylesheet='{"label":"color:green; font-weight:bold;"}'::json WHERE columnname='expl_id';
+UPDATE config_form_fields SET stylesheet='{"label":"color:blue; font-weight:bold;"}'::json WHERE columnname='sector_id';
