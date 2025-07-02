@@ -59,12 +59,6 @@ class GwInfoButton(GwMaptool):
 
     def activate(self):
 
-        if info.is_inserting:
-            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
-            tools_qgis.show_message(msg)
-            super().deactivate()
-            return
-
         # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
         if hasattr(self.action, "setChecked"):
             self.action.setChecked(True)
