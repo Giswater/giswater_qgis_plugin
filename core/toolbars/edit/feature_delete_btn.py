@@ -127,6 +127,7 @@ class GwFeatureDeleteButton(GwAction):
             model.setStringList([''])
             return
 
+        rows_typeahead = [str(item) for item in rows_typeahead]
         tools_qt.set_completer_object(completer, model, widget, rows_typeahead)
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
