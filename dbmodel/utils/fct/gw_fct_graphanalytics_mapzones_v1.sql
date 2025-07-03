@@ -934,6 +934,40 @@ BEGIN
 					GROUP BY m.mapzone_id[1]';
 				END IF;
 				EXECUTE v_query_text;
+
+				UPDATE v_mapzone_name m
+				SET graphconfig = jsonb_set(
+					graphconfig::jsonb,
+					'{ignore}',
+					to_jsonb(a.node_id),
+					true
+				)
+				FROM (
+					SELECT n.node_id, m.mapzone_id[1] AS mapzone_id
+					FROM temp_pgr_node n
+					JOIN temp_pgr_mapzone m ON m.component = n.mapzone_id
+					WHERE n.graph_delimiter = 'IGNORE'
+					AND CARDINALITY (m.mapzone_id)= 1
+				) a
+				WHERE m.mapzone_id = a.mapzone_id ;
+
+				UPDATE v_mapzone_name m
+				SET graphconfig = jsonb_set(
+					graphconfig::jsonb,
+					'{forceClosed}',
+					to_jsonb(a.node_id),
+					true
+				)
+				FROM (
+					SELECT DISTINCT ON (n.old_node_id) n.old_node_id AS node_id, m.mapzone_id[1] AS mapzone_id
+					FROM temp_pgr_node n
+					JOIN temp_pgr_mapzone m ON m.component = n.mapzone_id
+					WHERE n.graph_delimiter = 'FORCECLOSED'
+					AND n.old_mapzone_id IS NOT NULL
+					AND CARDINALITY (m.mapzone_id)= 1
+				) a
+				WHERE m.mapzone_id = a.mapzone_id ;
+
 			ELSE
 				v_query_text = 'UPDATE '||v_mapzone_name||' m SET 
 					the_geom = t.the_geom, 
