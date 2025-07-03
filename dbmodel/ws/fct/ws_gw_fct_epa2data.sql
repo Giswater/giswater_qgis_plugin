@@ -79,14 +79,15 @@ BEGIN
 				UPDATE rpt_cat_result SET iscorporate = FALSE WHERE result_id in (SELECT result_id FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE AND result_id != v_result_id);
 				v_message_text = 'Epa corporate updated';
 			else
-				 SELECT CONCAT(
+				SELECT CONCAT(
 				        'To set this result as corporate, the following results will no longer be marked as corporate: (Network Type - ',v_network_name,') \n\n',
 				        STRING_AGG(
 				            CONCAT(
 			                '- ', result_id, ' with sectors: ''', sector_id, ''''
 			            	), '\n'
 				        )
-				    ) AS msg
+				    )
+				INTO v_message_text
 				FROM (
 				    SELECT
 				        result_id,
@@ -96,7 +97,7 @@ BEGIN
 				    WHERE r.network_type = v_network_type::text
 				      AND v_sectors::integer[] @> r.sector_id
 				      AND iscorporate IS TRUE
-				) INTO v_message_text;
+				) subq;
 				RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
 						 ',"body":{"form":{}'||
 					 ',"data":{ "question":{"level": 1, "status":"Accepted", "message":"'||v_message_text||'", "accept_action": "action_update"}'||
@@ -157,9 +158,9 @@ BEGIN
 		--calc avg_press for mapzones
 		FOR v_mapzone IN SELECT unnest(array['dma', 'sector', 'presszone', 'expl'])
 		LOOP
-			
+
 			IF v_mapzone = 'expl' THEN
-			
+
 				EXECUTE 'update exploitation d set avg_press = a.avg_press from (
 				with cn as (
 					select na.node_id as feature_id, na.press_avg, n.'||v_mapzone||'_id::varchar from node_add na join node n using (node_id) 
@@ -169,8 +170,8 @@ BEGIN
 				)a where a.'||v_mapzone||'_id::varchar = d.'||v_mapzone||'_id::varchar
 				and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id 
 				in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
-			
-			ELSE 
+
+			ELSE
 
 				EXECUTE 'update '||v_mapzone||' d set avg_press = a.avg_press from (
 				with cn as (
@@ -183,9 +184,9 @@ BEGIN
 				in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
 
 			END IF;
-			
+
 		END LOOP;
-		
+
 		--set start date
 		v_addparam := jsonb_set(
 			v_addparam,
@@ -226,13 +227,13 @@ BEGIN
 		--set avg_press null on mapzones when set corporate is false
 		FOR v_mapzone IN SELECT unnest(array['dma', 'sector', 'presszone', 'expl'])
 		LOOP
-			
+
 			IF v_mapzone = 'expl' THEN
 
 				EXECUTE '
 				UPDATE exploitation set avg_press = null where '||v_mapzone||'_id in 
 				(select distinct '||v_mapzone||'_id from node where node_id in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
-			
+
 			ELSE
 
 				EXECUTE '
@@ -240,7 +241,7 @@ BEGIN
 				(select distinct '||v_mapzone||'_id from node where node_id in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
 
 			END IF;
-			
+
 		END LOOP;
 
 	END IF;
