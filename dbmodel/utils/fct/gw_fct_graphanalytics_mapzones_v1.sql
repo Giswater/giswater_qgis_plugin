@@ -114,6 +114,8 @@ DECLARE
 	v_audit_result text;
 	v_visible_layer text;
 	v_has_conflicts boolean = false;
+	v_source text;
+	v_target text;
 
 	v_arcs_count integer;
 	v_nodes_count integer;
