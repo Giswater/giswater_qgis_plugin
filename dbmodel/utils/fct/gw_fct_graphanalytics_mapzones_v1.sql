@@ -562,7 +562,7 @@ BEGIN
 
 	IF v_arcs_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-		VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
+		VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_arcs_count ,' arc''s have been disconnected'));
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 1, concat('INFO: 0 arc''s have been disconnected'));
@@ -577,7 +577,7 @@ BEGIN
 
 		IF v_connecs_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
+			VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_connecs_count ,' connec''s have been disconnected'));
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
