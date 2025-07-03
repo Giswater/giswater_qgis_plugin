@@ -12,38 +12,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_macromapzones(p_dat
 RETURNS json AS
 $BODY$
 
-/* Example usage:
-
--- QUERY SAMPLE
-SELECT gw_fct_graphanalytics_mapzones('
-	{
-		"data":{
-			"parameters":{
-				"graphClass":"MACROSECTOR",
-				"exploitation":"1,2,0",
-				"updateMapZone":2,
-				"geomParamUpdate":15,
-				"commitChanges":true,
-			}
-		}
-	}
-');
-SELECT gw_fct_graphanalytics_mapzones('
-	{
-		"data":{
-			"parameters":{
-				"graphClass":"MACROOMZONE",
-				"exploitation":"1,2,0",
-				"updateMapZone":2,
-				"geomParamUpdate":15,
-				"commitChanges":true,
-			}
-		}
-	}
-');
-
-*/
-
 DECLARE
 
 	-- system variables
@@ -56,48 +24,35 @@ DECLARE
 	-- dialog variables
 	v_class text;
 	v_expl_id text;
-	v_expl_id_array text;
-	v_old_mapzone_id_array text;
+	v_expl_id_array text[];
 	v_updatemapzgeom integer = 0;
-	v_geomparamupdate_divide float;
-	v_concavehull float = 0.9;
 	v_geomparamupdate float;
 	v_commitchanges boolean;
 
-	--
 	v_audit_result text;
 	v_visible_layer text;
-	v_source text;
-	v_target text;
-
-	v_arcs_count integer;
-	v_nodes_count integer;
-	v_connecs_count integer;
-	v_gullies_count integer;
-	v_mapzones_ids text;
-
-	v_macro_mapzone_name text;
-	v_mapzone_field text;
-	v_mapzone_id int4;
-	v_ignore_broken_valves BOOLEAN = TRUE;
-	v_pgr_distance integer;
-	v_pgr_root_vids int[];
 
 	v_level integer;
 	v_status text;
 	v_message text;
 
 	v_query_text text;
-	v_query_text_aux text;
-	v_data json;
+		v_result text;
 
-	v_result text;
 	v_result_info json;
 	v_result_point json;
 	v_result_line json;
 	v_result_polygon json;
-
 	v_response JSON;
+
+	-- dynamic mapping
+	v_macro_table text;
+	v_child_table text;
+	v_macro_id_field text;
+	v_child_id_field text;
+	v_child_expl_field text;
+
+	v_data json;
 
 BEGIN
 
@@ -114,36 +69,49 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges')::BOOLEAN;
 
+	-- Dynamic mapping for macro/child tables and fields
 	IF v_class NOT IN ('MACROSECTOR', 'MACROOMZONE','MACRODMA','MACRODQA') THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3090", "function":"3482","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
+		RETURN NULL;
 	END IF;
 
-	-- SECTION[epic=mapzones]: SET VARIABLES
-	v_macro_mapzone_name = LOWER(v_class);
-	v_mapzone_name = replace(v_macro_mapzone_name, 'macro', '');
-    v_mapzone_field = v_macro_mapzone_name || '_id';
-	v_visible_layer = 'v_edit_' || v_macro_mapzone_name;
-	v_macro_mapzone_name = UPPER(v_macro_mapzone_name);
+	v_macro_table := lower(v_class);
+	v_child_table := replace(v_macro_table, 'macro', '');
+	v_macro_id_field := v_macro_table || '_id';
+	v_child_id_field := v_macro_id_field;
+	v_child_expl_field := 'expl_id';
+	v_visible_layer := 'v_edit_' || v_macro_table;
 
-	-- MANAGE EXPL ARR
-    IF v_expl_id = '-901' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-		FROM selector_expl;
-    ELSIF v_expl_id = '-902' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-        FROM exploitation
-		WHERE active;
-    ELSE
-		v_expl_id_array = string_to_array(v_expl_id, ',');
+	-- Parse expl_id array
+	IF v_expl_id = '-901' THEN
+		SELECT array_agg(DISTINCT expl_id::text) INTO v_expl_id_array FROM selector_expl;
+	ELSIF v_expl_id = '-902' THEN
+		SELECT array_agg(DISTINCT expl_id::text) INTO v_expl_id_array FROM exploitation WHERE active;
+	ELSE
+		v_expl_id_array := string_to_array(v_expl_id, ',');
+	END IF;
+
+	-- Delete temporary tables
+	-- =======================
+	v_data := '{"data":{"action":"DROP", "fct_name":"'|| v_class ||'"}}';
+	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+
+	-- Create temporary tables
+	-- =======================
+	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'"}}';
+	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+
+    IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
     END IF;
 
-	-- Start Building Log Message
+	-- Log
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MACROMAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('------------------------------------------------------------------'));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, '------------------------------------------------------------------');
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Macromapzone constructor method: ', upper(v_updatemapzgeom::text)));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_commitchanges::text)));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, '-----------');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '');
@@ -154,43 +122,67 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
 
-	RAISE NOTICE 'Creating geometry of mapzones';
-
-	-- SECTION: Creating geometry of mapzones
-	-- (unchanged, keep all the original geometry creation logic here...)
-
-	-- ... (all the original v_updatemapzgeom logic, unchanged) ...
-
-	-- SECTION: JOIN THE_GEOM BY EXPL_ID IN MACROZONE
-	-- This is the new part: after all geometry creation, join the_geom for all rows with the same expl_id in the macrozone table
-	-- This will overwrite the_geom in the macrozone table with the union of all geometries for each expl_id
-
-	-- Only do this for macrozone tables (not for PRESSZONE, DWFZONE, etc)
-	IF v_class IN ('MACROSECTOR', 'MACROOMZONE','MACRODMA','MACRODQA') THEN
-		v_query_text = '
-			WITH geom_by_expl AS (
+	IF v_commitchanges THEN
+		v_query_text := '
+			WITH macro_geom AS (
 				SELECT
-					expl_id,
+					' || v_child_id_field || ' AS macro_id,
 					ST_Union(the_geom) AS the_geom
-				FROM '||v_macro_mapzone_name||'
+				FROM ' || v_child_table || '
 				WHERE the_geom IS NOT NULL
-				GROUP BY expl_id
+				AND (
+					' || CASE
+						WHEN v_expl_id_array IS NULL OR array_length(v_expl_id_array,1) = 0 THEN 'TRUE'
+						ELSE v_child_expl_field || '::text = ANY(' ||
+							'ARRAY[' ||
+								(SELECT string_agg(quote_literal(x), ',') FROM unnest(v_expl_id_array) x) ||
+							']::text[])'
+					END || '
+				)
+				GROUP BY ' || v_child_id_field || '
 			)
-			UPDATE '||v_macro_mapzone_name||' m
+			UPDATE ' || v_macro_table || ' m
 			SET the_geom = g.the_geom
-			FROM geom_by_expl g
-			WHERE m.expl_id = g.expl_id
+			FROM macro_geom g
+			WHERE m.' || v_macro_id_field || ' = g.macro_id
 			AND g.the_geom IS NOT NULL;
 		';
 		EXECUTE v_query_text;
+	ELSE
+		-- temporal layer
+		EXECUTE '
+			SELECT COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+			FROM (
+				SELECT jsonb_build_object(
+					''type'',       ''Feature'',
+					''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+					''properties'', to_jsonb(row) - ''the_geom''
+				) AS feature
+				FROM (
+				SELECT
+					' || v_child_id_field || ' AS macro_id,
+					ST_Union(the_geom) AS the_geom
+				FROM ' || v_child_table || '
+				WHERE the_geom IS NOT NULL
+				AND (
+					' || CASE
+						WHEN v_expl_id_array IS NULL OR array_length(v_expl_id_array,1) = 0 THEN 'TRUE'
+						ELSE v_child_expl_field || '::text = ANY(' ||
+							'ARRAY[' ||
+								(SELECT string_agg(quote_literal(x), ',') FROM unnest(v_expl_id_array) x) ||
+							']::text[])'
+					END || '
+				)
+				GROUP BY ' || v_child_id_field || '
+				) AS row
+			) AS features
+		' INTO v_result;
+
+		v_result := COALESCE(v_result, '{}');
+		v_result_line := concat('{"geometryType":"LineString", "features":', v_result, '}');
 	END IF;
 
-	-- (rest of the function unchanged, including temporal layers, updates, and return)
-	-- ... (all the rest of the code as in the original selection) ...
 
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
 
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result_point := COALESCE(v_result_point, '{}');
