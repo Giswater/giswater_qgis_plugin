@@ -619,7 +619,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     field_id = field_id.replace(" ", "")
-    uri = tools_db.get_uri()
+    uri, _ = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
     if the_geom:
         try:
@@ -4066,7 +4066,7 @@ def get_project_version(schemaname=None):
 def export_layers_to_gpkg(layers, path):
     """ This function is not used on Giswater Project at the moment. """
 
-    uri = tools_db.get_uri()
+    uri, _ = tools_db.get_uri()
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     is_first = True
     options = QgsVectorFileWriter.SaveVectorOptions()

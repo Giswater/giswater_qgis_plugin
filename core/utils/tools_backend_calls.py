@@ -561,7 +561,7 @@ def add_query_layer(**kwargs):
     layer_name = kwargs.get('layerName', default='QueryLayer')
     group = kwargs.get('group', default='GW Layers')
 
-    uri = tools_db.get_uri()
+    uri, _ = tools_db.get_uri()
 
     querytext = f"(SELECT row_number() over () AS _uid_,* FROM ({query}) AS query_table)"
     pk = '_uid_'
