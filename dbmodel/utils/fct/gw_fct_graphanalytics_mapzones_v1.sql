@@ -731,7 +731,7 @@ BEGIN
 					JOIN v_temp_arc va USING (arc_id)
 					WHERE ta.mapzone_id = 0
 					UNION
-					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
+					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, array_to_string(m.mapzone_id, '','') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc ta
 					JOIN v_temp_arc va USING (arc_id)
 					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id 
@@ -751,7 +751,7 @@ BEGIN
 				JOIN v_temp_gully vg USING (arc_id)
 				WHERE tc.mapzone_id = 0
 				UNION
-				SELECT vg.gully_id, vg.gullycat_id, vg.state, vg.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, vg.the_geom, ''Conflict''::text AS descript 
+				SELECT vg.gully_id, vg.gullycat_id, vg.state, vg.expl_id, array_to_string(m.mapzone_id, '','') AS mapzone_id, vg.the_geom, ''Conflict''::text AS descript 
 				FROM temp_pgr_arc tc
 				JOIN v_temp_gully vg USING (arc_id)
 				JOIN temp_pgr_mapzone m ON m.component = tc.mapzone_id 
@@ -775,7 +775,7 @@ BEGIN
 					JOIN v_temp_connec vc USING (arc_id)
 					WHERE tc.mapzone_id = 0
 					UNION
-					SELECT vc.connec_id, vc.conneccat_id, vc.state, vc.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
+					SELECT vc.connec_id, vc.conneccat_id, vc.state, vc.expl_id, array_to_string(m.mapzone_id, '','') AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc tc
 					JOIN v_temp_connec vc USING (arc_id)
 					JOIN temp_pgr_mapzone m ON m.component = tc.mapzone_id 
@@ -797,8 +797,8 @@ BEGIN
 		) INTO v_has_conflicts;
 	ELSE
 
-		v_query_text = '
-			SELECT jsonb_agg(features.feature) 
+		EXECUTE '
+			SELECT jsonb_agg(features.feature)
 			FROM (
 				SELECT jsonb_build_object(
 					''type'',       ''Feature'',
@@ -806,25 +806,25 @@ BEGIN
 					''properties'', to_jsonb(row) - ''the_geom''
 				) AS feature
 				FROM (
-					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, mapzone_id::text, va.the_geom, ''Disconnected''::text AS descript 
+					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, mapzone_id::text, va.the_geom, ''Disconnected''::text AS descript
 					FROM temp_pgr_arc ta
 					JOIN v_temp_arc va USING (arc_id)
 					WHERE ta.mapzone_id = 0
-					UNION
-					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
+					UNION ALL
+					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, array_to_string(m.mapzone_id, '','') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript
 					FROM temp_pgr_arc ta
 					JOIN v_temp_arc va USING (arc_id)
-					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id 
+					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id
 					WHERE CARDINALITY(m.mapzone_id) > 1
-					UNION
+					UNION ALL
 					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, m.mapzone_id[1]::text AS mapzone_id, va.the_geom, m.name AS descript
 					FROM temp_pgr_arc ta
 					JOIN v_temp_arc va USING (arc_id)
-					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id 
+					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id
 					WHERE CARDINALITY(m.mapzone_id) = 1
-				) row 
-			) features';
-		EXECUTE v_query_text INTO v_result;
+				) AS row
+			) AS features
+		' INTO v_result;
 
 		v_result := COALESCE(v_result, '{}');
 		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
@@ -838,7 +838,7 @@ BEGIN
 				JOIN v_temp_gully vg USING (arc_id)
 				WHERE tc.mapzone_id = 0
 				UNION
-				SELECT vg.gully_id AS feature_id, vg.gullycat_id AS cat_id, ''GULLY'' AS feature_type, vg.state, vg.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, vg.the_geom, ''Conflict''::text AS descript 
+				SELECT vg.gully_id AS feature_id, vg.gullycat_id AS cat_id, ''GULLY'' AS feature_type, vg.state, vg.expl_id, array_to_string(m.mapzone_id, '','') AS mapzone_id, vg.the_geom, ''Conflict''::text AS descript 
 				FROM temp_pgr_arc tc
 				JOIN v_temp_gully vg USING (arc_id)
 				JOIN temp_pgr_mapzone m ON m.component = tc.mapzone_id 
@@ -868,7 +868,7 @@ BEGIN
 					JOIN v_temp_connec vc USING (arc_id)
 					WHERE tc.mapzone_id = 0
 					UNION
-					SELECT vc.connec_id AS feature_id, vc.conneccat_id AS cat_id, ''CONNEC'' AS feature_type, vc.state, vc.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
+					SELECT vc.connec_id AS feature_id, vc.conneccat_id AS cat_id, ''CONNEC'' AS feature_type, vc.state, vc.expl_id, array_to_string(m.mapzone_id, '','') AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc tc
 					JOIN v_temp_connec vc USING (arc_id)
 					JOIN temp_pgr_mapzone m ON m.component = tc.mapzone_id 
