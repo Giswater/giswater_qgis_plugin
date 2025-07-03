@@ -14,20 +14,20 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT * FROM no_plan();
 
 --check if table exists
-SELECT has_table('anl_arc_x_node'::name, 'Table anl_arc_x_node should exist');
+SELECT has_table('anl_node'::name, 'Table anl_node should exist');
 
 -- check columns names 
 
 
 SELECT columns_are(
-    'anl_arc',
+    'anl_node',
     ARRAY[
         'id', 'node_id', 'nodecat_id','state','num_arc','node_id_aux', 'nodecat_id_aux', 'state_aux',
          'expl_id', 'fid','cur_user', 'the_geom', 'arc_distance','arc_id','descript','result_id', 'total_distance', 
          'sys_type','code', 'cat_geom1', 'top_elev','elev', 'ymax','state_type','sector_id', 'addparam', 'drainzone_id', 'dwzone_id',
 
     ],
-    'Table anl_arc should have the correct columns'
+    'Table anl_node should have the correct columns'
 );
 -- check columns names
 SELECT col_type_is('anl_node', 'id', 'serial4', 'Column id should be serial4');

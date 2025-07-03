@@ -20,29 +20,29 @@ SELECT has_table('anl_arc_x_node'::name, 'Table anl_arc_x_node should exist');
 
 
 SELECT columns_are(
-    'anl_arc',
+    'anl_arc_x_node',
     ARRAY[
         'id', 'arc_id', 'arccat_id', 'node_id', 'state', 'arc_id_aux', 'fid','cur_user', 'the_geom', 'the_geom_p', 'descript',
          'result_id', 
     ],
-    'Table anl_arc should have the correct columns'
+    'Table anl_arc_x_node should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('anl_arc', 'id', 'serial4', 'Column id should be serial4');
-SELECT col_type_is('anl_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
-SELECT col_type_is('anl_arc', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
-SELECT col_type_is('anl_arc', 'arccat_id', 'varchar(30)', 'Column arccat_id should be varchar(30)');
-SELECT col_type_is('anl_arc', 'state', 'integer', 'Column state should be integer');
-SELECT col_type_is('anl_arc', 'arc_id_aux', 'integer', 'Column arc_id_aux should be integer');
-SELECT col_type_is('anl_arc', 'expl_id', 'integer', 'Column expl_id should be integer');
-SELECT col_type_is('anl_arc', 'fid', 'integer', 'Column fid should be integer');
-SELECT col_type_is('anl_arc', 'cur_user', 'varchar(50)', 'Column cur_user should be varchar(50)');
-SELECT col_type_is('anl_arc', 'the_geom', 'geometry(linestring, 25831)', 'Column the_geom should be geometry(linestring, 25831)');
-SELECT col_type_is('anl_arc', 'the_geom_p', 'geometry(point, 25831)', 'Column the_geom_p should be geometry(point, 25831)');
-SELECT col_type_is('anl_arc', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('anl_arc', 'result_id', 'varchar(16)', 'Column result_id should be varchar(16)');
+SELECT col_type_is('anl_arc_x_node', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('anl_arc_x_node', 'arc_id', 'integer', 'Column arc_id should be integer');
+SELECT col_type_is('anl_arc_x_node', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('anl_arc_x_node', 'arccat_id', 'varchar(30)', 'Column arccat_id should be varchar(30)');
+SELECT col_type_is('anl_arc_x_node', 'state', 'integer', 'Column state should be integer');
+SELECT col_type_is('anl_arc_x_node', 'arc_id_aux', 'integer', 'Column arc_id_aux should be integer');
+SELECT col_type_is('anl_arc_x_node', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('anl_arc_x_node', 'fid', 'integer', 'Column fid should be integer');
+SELECT col_type_is('anl_arc_x_node', 'cur_user', 'varchar(50)', 'Column cur_user should be varchar(50)');
+SELECT col_type_is('anl_arc_x_node', 'the_geom', 'geometry(linestring, 25831)', 'Column the_geom should be geometry(linestring, 25831)');
+SELECT col_type_is('anl_arc_x_node', 'the_geom_p', 'geometry(point, 25831)', 'Column the_geom_p should be geometry(point, 25831)');
+SELECT col_type_is('anl_arc_x_node', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('anl_arc_x_node', 'result_id', 'varchar(16)', 'Column result_id should be varchar(16)');
 
---check defealt values
+--check default values
 
 
 -- check foreign keys
@@ -50,10 +50,10 @@ SELECT col_type_is('anl_arc', 'result_id', 'varchar(16)', 'Column result_id shou
 
 -- check index
 
-SELECT has_index('anl_arc', 'arc_id', 'Table anl_arc should have index on arc_id');
-SELECT has_index('anl_arc', 'the_geom', 'Table anl_arc should have index on the_geom');
-SELECT has_index('anl_arc', 'node_id', 'Table anl_arc should have index on node_id');
-SELECT has_index('anl_arc', 'id', 'Table anl_arc should have index on id');
+SELECT has_index('anl_arc_x_node', 'arc_id', 'Table anl_arc_x_node should have index on arc_id');
+SELECT has_index('anl_arc_x_node', 'the_geom', 'Table anl_arc_x_node should have index on the_geom');
+SELECT has_index('anl_arc_x_node', 'node_id', 'Table anl_arc_x_node should have index on node_id');
+SELECT has_index('anl_arc_x_node', 'id', 'Table anl_arc_x_node should have index on id');
 
 --check trigger 
 
