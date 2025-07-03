@@ -4,12 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
--- The code of this inundation function have been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
 
---FUNCTION CODE: 2710
+--FUNCTION CODE: 3482
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mapzones(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_v1(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_macromapzones(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_macromapzones(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -20,14 +19,11 @@ SELECT gw_fct_graphanalytics_mapzones('
 	{
 		"data":{
 			"parameters":{
-				"graphClass":"DRAINZONE",
+				"graphClass":"MACROSECTOR",
 				"exploitation":"1,2,0",
 				"updateMapZone":2,
 				"geomParamUpdate":15,
 				"commitChanges":true,
-				"usePlanPsector":false,
-				"forceOpen":"1,2,3",
-				"forceClosed":"2,3,4"
 			}
 		}
 	}
@@ -36,46 +32,16 @@ SELECT gw_fct_graphanalytics_mapzones('
 	{
 		"data":{
 			"parameters":{
-				"graphClass":"PRESSZONE",
+				"graphClass":"MACROOMZONE",
 				"exploitation":"1,2,0",
 				"updateMapZone":2,
 				"geomParamUpdate":15,
 				"commitChanges":true,
-				"usePlanPsector":false
 			}
 		}
 	}
 ');
 
-Query to visualize arcs with their geometries:
-
-SELECT p.*, a.the_geom
-FROM temp_pgr_arc p
-JOIN arc a ON p.arc_id = a.arc_id;
-
-Query to visualize nodes with their geometries:
-
-SELECT p.*, n.the_geom
-FROM temp_pgr_node p
-JOIN node n ON p.node_id = n.node_id;
-
-Query to calculate the factor for adding/subtracting flow in a DMA:
-
-WITH
-temp_dma_graph AS (
-	SELECT
-		COALESCE (a.node_1, a.node_2) AS node_id,
-		n.mapzone_id AS dma_id,
-		CASE WHEN n.node_id IS NOT NULL THEN 1 ELSE -1 END AS flow_sign
-	FROM temp_pgr_node n
-	JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	WHERE n.graph_delimiter = 'dma'
-	AND a.graph_delimiter ='dma'
-	AND n.mapzone_id::int > 0
-	)
-SELECT DISTINCT ON (node_id, dma_id) node_id, dma_id, flow_sign
-FROM temp_dma_graph
-ORDER BY node_id, dma_id;
 */
 
 DECLARE
@@ -97,19 +63,12 @@ DECLARE
 	v_geomparamupdate_divide float;
 	v_concavehull float = 0.9;
 	v_geomparamupdate float;
-    v_parameters json;
-	v_usepsector boolean;
 	v_commitchanges boolean;
-	v_fromzero boolean = FALSE;
 
-	v_dscenario_valve text;
-	v_checkdata text;  -- FULL / PARTIAL / NONE
-	v_netscenario text;
 
 	--
 	v_audit_result text;
 	v_visible_layer text;
-	v_has_conflicts boolean = false;
 	v_source text;
 	v_target text;
 
@@ -155,45 +114,11 @@ BEGIN
 	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
-	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
-	-- to use forceopen and forceclosed -> WHERE X IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::JSON))
-	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector')::BOOLEAN;
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges')::BOOLEAN;
 
-	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
-	v_dscenario_valve = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_valve');
-	v_netscenario = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'netscenario');
-
-	-- TODO: add new param to calculate mapzones from zero
-	v_fromzero = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'fromZero');
-
-	-- profilactic controls
-	IF v_dscenario_valve = '' THEN v_dscenario_valve = NULL; END IF;
-	IF v_netscenario = '' THEN v_netscenario = NULL; END IF;
-
-
-	-- it's not allowed to commit changes when psectors are used
- 	IF v_usepsector THEN
-		v_commitchanges := FALSE;
-	END IF;
-
-	-- TODO: if fromzero is true, we need to check if all mapzones are disabled
-
-	IF v_class = 'PRESSZONE' THEN
-		v_fid=146;
-	ELSIF v_class = 'DMA' THEN
-		v_fid=145;
-	ELSIF v_class = 'DQA' THEN
-		v_fid=144;
-	ELSIF v_class = 'SECTOR' THEN
-		v_fid=130;
-	ELSIF v_class = 'DWFZONE' THEN
-		-- dwfzone and drainzone are calculated in the same process
-		v_fid=481;
-		v_fromzero := TRUE;
-	ELSE
+	IF v_class NOT IN ('MACROSECTOR', 'MACROOMZONE','MACRODMA','MACRODQA') THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3090", "function":"2710","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
+		"data":{"message":"3090", "function":"3482","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 	END IF;
 
 	-- SECTION[epic=mapzones]: SET VARIABLES
@@ -204,7 +129,6 @@ BEGIN
 
 
 	-- MANAGE EXPL ARR
-
     -- For user selected exploitations
     IF v_expl_id = '-901' THEN
         SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
@@ -226,7 +150,7 @@ BEGIN
 
 	-- Create temporary tables
 	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'", "use_psector":"'|| v_usepsector ||'"}}';
+	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'"}}';
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -235,12 +159,10 @@ BEGIN
 
 	-- Start Building Log Message
 	-- =======================
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MACROMAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('------------------------------------------------------------------'));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Mapzone constructor method: ', upper(v_updatemapzgeom::text)));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_commitchanges::text)));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
 
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
@@ -284,76 +206,61 @@ BEGIN
 
 	-- NODES MAPZONES
 	-- Nodes that are the starting/ending points of mapzones
-	IF v_fromzero THEN
-		IF v_project_type = 'UD' AND v_mapzone_name = 'DWFZONE' THEN
-            v_query_text =
-                'UPDATE temp_pgr_node n SET modif = TRUE
-                WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
-                AND NOT EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE n.pgr_node_id = a.pgr_node_1)
-                ';
-        ELSE
-            v_query_text =
-                'UPDATE temp_pgr_node n SET modif = TRUE
-                WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
-                ';
-        END IF;
-		EXECUTE v_query_text;
-	ELSE
-		IF v_project_type = 'WS' THEN
-			v_query_text =
-				'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
-				FROM (
-					SELECT 
-						' || v_mapzone_field || ' AS mapzone_id,
-						ARRAY(
-							SELECT value::int
-							FROM json_array_elements_text(use_item->''toArc'') AS elem(value)
-						) AS to_arc,
-						(use_item->>''nodeParent'')::int AS node_id
-					FROM ' || v_mapzone_name || ',
-						LATERAL json_array_elements(graphconfig->''use'') AS use_item
-					WHERE graphconfig IS NOT NULL 
-					AND active
-				) AS s 
-				WHERE n.node_id = s.node_id
-				';
-		ELSE
-			v_query_text =
-                'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id
-                FROM (
-                    SELECT ' || v_mapzone_field || ' AS mapzone_id,
-                    nullif ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'','''')::int4 AS node_id
-                    FROM ' || v_mapzone_name || ' 
-                    WHERE graphconfig IS NOT NULL 
-                    AND active
-                ) AS s 
-                WHERE n.node_id = s.node_id';
-		END IF;
-		EXECUTE v_query_text;
-		-- Nodes forceClosed
+	IF v_project_type = 'WS' THEN
 		v_query_text =
-			'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''FORCECLOSED'' 
+			'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
 			FROM (
-				SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::int4 AS node_id
+				SELECT 
+					' || v_mapzone_field || ' AS mapzone_id,
+					ARRAY(
+						SELECT value::int
+						FROM json_array_elements_text(use_item->''toArc'') AS elem(value)
+					) AS to_arc,
+					(use_item->>''nodeParent'')::int AS node_id
+				FROM ' || v_mapzone_name || ',
+					LATERAL json_array_elements(graphconfig->''use'') AS use_item
+				WHERE graphconfig IS NOT NULL 
+				AND active
+			) AS s 
+			WHERE n.node_id = s.node_id
+			';
+	ELSE
+		v_query_text =
+			'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id
+			FROM (
+				SELECT ' || v_mapzone_field || ' AS mapzone_id,
+				nullif ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'','''')::int4 AS node_id
 				FROM ' || v_mapzone_name || ' 
 				WHERE graphconfig IS NOT NULL 
 				AND active
-			) s 
+			) AS s 
 			WHERE n.node_id = s.node_id';
-		EXECUTE v_query_text;
+	END IF;
+	EXECUTE v_query_text;
+	-- Nodes forceClosed
+	v_query_text =
+		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''FORCECLOSED'' 
+		FROM (
+			SELECT (json_array_elements_text((graphconfig->>''forceClosed'')::json))::int4 AS node_id
+			FROM ' || v_mapzone_name || ' 
+			WHERE graphconfig IS NOT NULL 
+			AND active
+		) s 
+		WHERE n.node_id = s.node_id';
+	EXECUTE v_query_text;
 
-		-- Nodes "ignore", should not be disconnected
-		v_query_text =
-			'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''IGNORE'' 
-			FROM (
-				SELECT (json_array_elements_text((graphconfig->>''ignore'')::json))::int4 AS node_id
-				FROM ' || v_mapzone_name || ' 
-				WHERE graphconfig IS NOT NULL 
-				AND active 
-			) s 
-			WHERE n.node_id = s.node_id';
-		EXECUTE v_query_text;
-    END IF;
+	-- Nodes "ignore", should not be disconnected
+	v_query_text =
+		'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''IGNORE'' 
+		FROM (
+			SELECT (json_array_elements_text((graphconfig->>''ignore'')::json))::int4 AS node_id
+			FROM ' || v_mapzone_name || ' 
+			WHERE graphconfig IS NOT NULL 
+			AND active 
+		) s 
+		WHERE n.node_id = s.node_id';
+	EXECUTE v_query_text;
+
 
 	IF v_project_type = 'UD' THEN
         UPDATE temp_pgr_node t
@@ -462,17 +369,12 @@ BEGIN
 	GROUP BY c.component;
 
 	-- Update mapzone_id
-	IF v_fromzero = TRUE THEN
-		EXECUTE 'SELECT max( ' || v_mapzone_field || ') FROM '|| v_mapzone_name
-		INTO v_mapzone_id;
-		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(v_mapzone_name, '-', m.id);
-	ELSE
-		EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.name
-		FROM ' || v_mapzone_name || ' mz
-		WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
-		AND CARDINALITY(m.mapzone_id) = 1
-		';
-	END IF;
+	EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.name
+	FROM ' || v_mapzone_name || ' mz
+	WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
+	AND CARDINALITY(m.mapzone_id) = 1
+	';
+
 
 	IF v_updatemapzgeom > 0 THEN
 		-- message
@@ -787,14 +689,6 @@ BEGIN
 
 		v_result := COALESCE(v_result, '{}');
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result,'}');
-
-		SELECT EXISTS (
-			SELECT 1
-			FROM temp_pgr_arc ta
-			JOIN v_temp_arc va USING (arc_id)
-			JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id
-			WHERE CARDINALITY(m.mapzone_id) > 1
-		) INTO v_has_conflicts;
 	ELSE
 
 		v_query_text = '
@@ -891,58 +785,13 @@ BEGIN
 	-- ENDSECTION
 
 	IF v_commitchanges IS TRUE THEN
-		IF v_netscenario IS NOT NULL THEN
-			-- TODO[epic=mapzones]: netscnearios
-		ELSE
-
-			IF v_class = 'DMA' THEN
-				-- before inserted on om_waterbalance_dma_graph, remove obsolete nodes.
-				-- TODO[epic=mapzones]: fill om_waterbalance_dma_graph
-
-
-			END IF;
-
-			IF v_fromzero = TRUE THEN
-				IF v_project_type = 'WS' THEN
-					v_query_text = 'INSERT INTO '||v_mapzone_name||' ('||v_mapzone_field||',code, name, the_geom, created_at, created_by, updated_at, updated_by, graphconfig) 
-					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], m.the_geom, now(), current_user, now(), current_user,
-					json_build_object(
-						''use'', json_agg(
-							json_build_object(
-								''nodeParent'', node_id::text,
-								''toArc'', to_arc
-							)
-						)
-					) as graphconfig
-					FROM temp_pgr_mapzone m
-					JOIN temp_pgr_node n ON n.mapzone_id = m.component 
-					WHERE n.graph_delimiter = ' || v_mapzone_name || ' AND n.modif = TRUE
-					GROUP BY m.mapzone_id[1]';
-				ELSE
-					v_query_text = 'INSERT INTO '||v_mapzone_name||' ('||v_mapzone_field||',code, name, the_geom, created_at, created_by, updated_at, updated_by, graphconfig) 
-					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], m.the_geom, now(), current_user, now(), current_user,
-					json_build_object(
-						''use'', json_agg(
-							json_build_object(
-								''nodeParent'', node_id::text
-							)
-						)
-					) as graphconfig
-					FROM temp_pgr_mapzone m
-					JOIN temp_pgr_node n ON n.mapzone_id = m.component 
-					WHERE n.graph_delimiter = ' || v_mapzone_name || ' AND n.modif = TRUE
-					GROUP BY m.mapzone_id[1]';
-				END IF;
-				EXECUTE v_query_text;
-			ELSE
-				v_query_text = 'UPDATE '||v_mapzone_name||' m SET 
-					the_geom = t.the_geom, 
-					updated_at = now(), 
-					updated_by = current_user 
-				FROM (SELECT component, UNNEST (mapzone_id) AS mapzone_id, the_geom FROM temp_pgr_mapzone) t 
-				WHERE t.mapzone_id = m.'||v_mapzone_field;
-				EXECUTE v_query_text;
-			END IF;
+			v_query_text = 'UPDATE '||v_mapzone_name||' m SET 
+				the_geom = t.the_geom, 
+				updated_at = now(), 
+				updated_by = current_user 
+			FROM (SELECT component, UNNEST (mapzone_id) AS mapzone_id, the_geom FROM temp_pgr_mapzone) t 
+			WHERE t.mapzone_id = m.'||v_mapzone_field;
+			EXECUTE v_query_text;
 
 
 			v_query_text = 'UPDATE '||v_mapzone_name||' SET 
@@ -1277,7 +1126,6 @@ BEGIN
 	v_level := COALESCE(v_level, 0);
 	v_message := COALESCE(v_message, '');
 	v_version := COALESCE(v_version, '');
-	v_netscenario := COALESCE(v_netscenario, '');
 
 	-- Return JSON
 	RETURN gw_fct_json_create_return(('{
@@ -1291,8 +1139,6 @@ BEGIN
 			"form":{}, 
 			"data":{
 				"graphClass": "'||v_class||'", 
-				"netscenarioId": "'||v_netscenario||'", 
-				"hasConflicts": '||v_has_conflicts||', 
 				"info":'||v_result_info||',
 				"point":'||v_result_point||',
 				"line":'||v_result_line||',
