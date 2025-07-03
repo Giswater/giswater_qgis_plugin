@@ -21,6 +21,7 @@ INSERT INTO cat_team (team_id, code, teamname, organization_id, descript, role_i
 INSERT INTO cat_team (team_id, code, teamname, organization_id, descript, role_id, active) VALUES(5, '1234512345', 'o1_field2', 2, 'field team of org1', 'role_cm_field', true);
 INSERT INTO cat_team (team_id, code, teamname, organization_id, descript, role_id, active) VALUES(6, '1234512345', 'o2_field1', 3, 'field team of org2', 'role_cm_field', true);
 INSERT INTO cat_team (team_id, code, teamname, organization_id, descript, role_id, active) VALUES(7, '1234512345', 'o2_field2', 3, 'field team of org2', 'role_cm_field', true);
+INSERT INTO cat_team (team_id, code, teamname, organization_id, descript, role_id, active) VALUES(8, '1234512345', 'team_edit', 1, 'team edit', 'role_cm_edit', true);
 
 
 -- Team administrator
