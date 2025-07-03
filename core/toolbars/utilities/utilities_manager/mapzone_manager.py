@@ -159,7 +159,6 @@ class GwMapzoneManager:
 
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
 
-
         if mapzone_type in self.mapzone_status["enabled"]:
             # enabled
             self.mapzone_mng_dlg.btn_execute.setEnabled(True)
