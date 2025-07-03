@@ -117,6 +117,14 @@ BEGIN
         -- Create other additional temporary tables
         CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
+        CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
+            seq INT8 NOT NULL,
+            component INT8 NULL,
+            node INT8 NULL,
+            CONSTRAINT temp_pgr_connectedcomponents_pkey PRIMARY KEY (seq)
+        );
+        CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
+        CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
         -- Create temporary tables depending on the project type
         IF v_project_type = 'WS' THEN
             ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
@@ -135,14 +143,6 @@ BEGIN
                 ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mincut INT DEFAULT 1;
             END IF;
             IF v_fct_name = 'MINSECTOR' THEN
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
-                    seq INT8 NOT NULL,
-                    component INT8 NULL,
-                    node INT8 NULL,
-                    CONSTRAINT temp_pgr_connectedcomponents_pkey PRIMARY KEY (seq)
-                );
-                CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
-                CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
 
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);

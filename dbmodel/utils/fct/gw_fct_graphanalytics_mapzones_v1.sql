@@ -384,7 +384,8 @@ BEGIN
 	-- Generate new arcs
 
 	-- =======================
-    SELECT gw_fct_graphanalytics_arrangenetwork() INTO v_response;
+    v_data := '{"data":{"mapzone_name":"'|| v_mapzone_name ||'"}}';
+    SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
         RETURN v_response;
@@ -454,12 +455,12 @@ BEGIN
 
 	-- generating zones
 	INSERT INTO temp_pgr_mapzone (component, mapzone_id)
-	SELECT component, array_agg(DISTINCT n.mapzone_id)
+	SELECT component, array_agg(DISTINCT n.mapzone_id ORDER BY n.mapzone_id)
 	FROM temp_pgr_connectedcomponents c
 	JOIN temp_pgr_node n ON n.pgr_node_id = c.node
 	WHERE n.graph_delimiter = v_mapzone_name AND modif = TRUE
-	ORDER BY c.component, n.mapzone_id;
-	GROUP BY c.component;
+	GROUP BY c.component
+	ORDER BY c.component;
 
 	-- Update mapzone_id
 	IF v_fromzero = TRUE THEN
@@ -489,9 +490,8 @@ BEGIN
 	-- Update arcs
 	EXECUTE 'UPDATE temp_pgr_arc a SET mapzone_id = n.mapzone_id
 	FROM temp_pgr_node n
-	WHERE ((a.' || v_source || ' = n.pgr_node_id AND a.cost >= 0)
-	AND n.mapzone_id <> 0
-	';
+	WHERE (a.' || v_source || ' = n.pgr_node_id AND a.cost >= 0)
+	AND n.mapzone_id <> 0';
 
 	EXECUTE 'UPDATE temp_pgr_arc a SET mapzone_id = n.mapzone_id
 	FROM temp_pgr_node n
@@ -541,12 +541,12 @@ BEGIN
 	JOIN v_temp_connec vc USING (arc_id)
 	WHERE CARDINALITY(m.mapzone_id) > 1;
 
-	SELECT string_agg(unnest_id, ',') INTO v_mapzones_ids
+	SELECT string_agg(unnest_id::text, ',') INTO v_mapzones_ids
 	FROM (
 		SELECT UNNEST(m.mapzone_id) AS unnest_id
 		FROM temp_pgr_mapzone m
 		WHERE CARDINALITY(m.mapzone_id) > 1
-		ORDER BY unnest_id;
+		ORDER BY unnest_id
 	) sub;
 
 	IF v_arcs_count > 0 OR v_connecs_count > 0 THEN
@@ -558,7 +558,7 @@ BEGIN
 	RAISE NOTICE 'Disconnected arcs';
 	SELECT COUNT(t.*) INTO v_arcs_count
 	FROM temp_pgr_arc t
-	WHERE  a.arc_id IS NOT NULL AND t.mapzone_id = 0;
+	WHERE t.arc_id IS NOT NULL AND t.mapzone_id = 0;
 
 	IF v_arcs_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
@@ -731,7 +731,7 @@ BEGIN
 					JOIN v_temp_arc va USING (arc_id)
 					WHERE ta.mapzone_id = 0
 					UNION
-					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, string_agg(m.mapzone_id, ',') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
+					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc ta
 					JOIN v_temp_arc va USING (arc_id)
 					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id 
@@ -751,7 +751,7 @@ BEGIN
 				JOIN v_temp_gully vg USING (arc_id)
 				WHERE tc.mapzone_id = 0
 				UNION
-				SELECT vg.gully_id, vg.gullycat_id, vg.state, vg.expl_id, string_agg(m.mapzone_id, ',') AS mapzone_id, vg.the_geom, ''Conflict''::text AS descript 
+				SELECT vg.gully_id, vg.gullycat_id, vg.state, vg.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, vg.the_geom, ''Conflict''::text AS descript 
 				FROM temp_pgr_arc tc
 				JOIN v_temp_gully vg USING (arc_id)
 				JOIN temp_pgr_mapzone m ON m.component = tc.mapzone_id 
@@ -775,7 +775,7 @@ BEGIN
 					JOIN v_temp_connec vc USING (arc_id)
 					WHERE tc.mapzone_id = 0
 					UNION
-					SELECT vc.connec_id, vc.conneccat_id, vc.state, vc.expl_id, string_agg(m.mapzone_id, ',') AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
+					SELECT vc.connec_id, vc.conneccat_id, vc.state, vc.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc tc
 					JOIN v_temp_connec vc USING (arc_id)
 					JOIN temp_pgr_mapzone m ON m.component = tc.mapzone_id 
@@ -811,13 +811,13 @@ BEGIN
 					JOIN v_temp_arc va USING (arc_id)
 					WHERE ta.mapzone_id = 0
 					UNION
-					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, string_agg(m.mapzone_id, ',') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
+					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc ta
 					JOIN v_temp_arc va USING (arc_id)
 					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id 
 					WHERE CARDINALITY(m.mapzone_id) > 1
 					UNION
-					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, string_agg(m.mapzone_id, ',') AS mapzone_id, va.the_geom, ''Conflict''::text AS descript 
+					SELECT ta.arc_id, va.arccat_id, va.state, va.expl_id, m.mapzone_id[1]::text AS mapzone_id, va.the_geom, m.name AS descript
 					FROM temp_pgr_arc ta
 					JOIN v_temp_arc va USING (arc_id)
 					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id 
@@ -838,7 +838,7 @@ BEGIN
 				JOIN v_temp_gully vg USING (arc_id)
 				WHERE tc.mapzone_id = 0
 				UNION
-				SELECT vg.gully_id AS feature_id, vg.gullycat_id AS cat_id, ''GULLY'' AS feature_type, vg.state, vg.expl_id, string_agg(m.mapzone_id, ',') AS mapzone_id, vg.the_geom, ''Conflict''::text AS descript 
+				SELECT vg.gully_id AS feature_id, vg.gullycat_id AS cat_id, ''GULLY'' AS feature_type, vg.state, vg.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, vg.the_geom, ''Conflict''::text AS descript 
 				FROM temp_pgr_arc tc
 				JOIN v_temp_gully vg USING (arc_id)
 				JOIN temp_pgr_mapzone m ON m.component = tc.mapzone_id 
@@ -868,7 +868,7 @@ BEGIN
 					JOIN v_temp_connec vc USING (arc_id)
 					WHERE tc.mapzone_id = 0
 					UNION
-					SELECT vc.connec_id AS feature_id, vc.conneccat_id AS cat_id, ''CONNEC'' AS feature_type, vc.state, vc.expl_id, string_agg(m.mapzone_id, ',') AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
+					SELECT vc.connec_id AS feature_id, vc.conneccat_id AS cat_id, ''CONNEC'' AS feature_type, vc.state, vc.expl_id, array_to_string(m.mapzone_id, ',') AS mapzone_id, vc.the_geom, ''Conflict''::text AS descript 
 					FROM temp_pgr_arc tc
 					JOIN v_temp_connec vc USING (arc_id)
 					JOIN temp_pgr_mapzone m ON m.component = tc.mapzone_id 
@@ -1222,8 +1222,8 @@ BEGIN
 				WITH nodes AS (
 					SELECT node AS node_id, array_agg(start_vid) AS dwfzone_outfall
 					FROM temp_pgr_drivingdistance
-					ORDER BY node, start_vid
 					GROUP BY node
+					ORDER BY node, start_vid
 				)
 				UPDATE node SET dwfzone_outfall = nodes.dwfzone_outfall
 				FROM nodes
