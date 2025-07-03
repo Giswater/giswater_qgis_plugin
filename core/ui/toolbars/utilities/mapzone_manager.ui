@@ -102,13 +102,6 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="6">
-       <widget class="QPushButton" name="btn_flood_from_node">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="0" colspan="2">
        <widget class="QLabel" name="lbl_mapzone_name">
         <property name="text">
@@ -205,7 +198,6 @@
   <tabstop>chk_active</tabstop>
   <tabstop>btn_flood</tabstop>
   <tabstop>btn_execute</tabstop>
-  <tabstop>btn_flood_from_node</tabstop>
   <tabstop>btn_config</tabstop>
   <tabstop>btn_toggle_active</tabstop>
   <tabstop>btn_create</tabstop>

@@ -45,6 +45,12 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg = None
         self.netscenario_id = None
 
+        self.mapzone_status = {
+            "enabled": ["sector", "dma", "dqa", "presszone"],
+            "enabledMacromapzone": ["macrosector", "macrodma", "macrodqa", "macroomzone"],
+            "disabled": ["omzone", "supplyzone"]
+        }
+
         # The -901 is transformed to user selected exploitation in the mapzones analysis
         self.user_selected_exploitation = '-901'
 
@@ -57,7 +63,6 @@ class GwMapzoneManager:
         # Add icons
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_execute, "169")
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "174")
-        tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood_from_node, "135")
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         tabs = ['sector', 'macrosector', 'omzone', 'macroomzone']
@@ -84,8 +89,6 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
         self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis, self.mapzone_mng_dlg))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
-        self.mapzone_mng_dlg.btn_flood_from_node.clicked.connect(
-            partial(self._open_flood_from_node_analysis, self.mapzone_mng_dlg))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
         self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self.manage_create, self.mapzone_mng_dlg, None))
@@ -153,6 +156,22 @@ class GwMapzoneManager:
             self.mapzone_mng_dlg.btn_config.setEnabled(False)
         else:
             self.mapzone_mng_dlg.btn_config.setEnabled(True)
+
+        mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
+
+
+        if mapzone_type in self.mapzone_status["enabled"]:
+            # enabled
+            self.mapzone_mng_dlg.btn_execute.setEnabled(True)
+        elif mapzone_type in self.mapzone_status["enabledMacromapzone"]:
+            # enabledMacromapzone
+            self.mapzone_mng_dlg.btn_execute.setEnabled(True)
+        elif mapzone_type in self.mapzone_status["disabled"]:
+            # disabled
+            self.mapzone_mng_dlg.btn_execute.setEnabled(False)
+        else:
+            # fallback
+            self.mapzone_mng_dlg.btn_execute.setEnabled(False)
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
@@ -230,10 +249,15 @@ class GwMapzoneManager:
 
     def _open_mapzones_analysis(self):
         """ Opens the toolbox 'mapzones_analysis' with the current type of mapzone set """
-
+        mapzone_name = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
+        print(mapzone_name)
+        print(self.mapzone_status["enabledMacromapzone"])
         # Execute toolbox function
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
-        dlg_functions = toolbox_btn.open_function_by_id(2768, use_aux_conn=False)
+        macromapzone_function_id: int = 3482
+        mapzone_function_id: int = 2768
+        function_id: int = macromapzone_function_id if mapzone_name in self.mapzone_status["enabledMacromapzone"] else mapzone_function_id
+        dlg_functions = toolbox_btn.open_function_by_id(function_id, use_aux_conn=False)
 
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
@@ -430,33 +454,6 @@ class GwMapzoneManager:
 
         action = self.iface.mainWindow().findChild(QAction, 'mActionTemporalController')
         action.trigger()
-
-    def _open_flood_from_node_analysis(self, dialog):
-        """Initializes snapping to select a starting node for flood analysis."""
-
-        if hasattr(self, 'emit_point') and self.emit_point is not None:
-            tools_gw.disconnect_signal('mapzone_manager_snapping', 'flood_analysis_xyCoordinates_mouse_move_node')
-            tools_gw.disconnect_signal('mapzone_manager_snapping', 'flood_analysis_canvasClicked_identify_node')
-
-        # Ensure the QgsMapToolEmitPoint is initialized for capturing points on the map
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-
-        # Set the map tool to capture point
-        self.canvas.setMapTool(self.emit_point)
-
-        # Initialize snapping manager
-        self.snapper_manager = GwSnapManager(self.iface)
-        self.snapper = self.snapper_manager.get_snapper()
-        self.vertex_marker = self.snapper_manager.vertex_marker
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-
-        # Connect mouse movement and click signals
-        tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, self.layer_node), 'mapzone_manager_snapping',
-                                'flood_analysis_xyCoordinates_mouse_move_node')
-
-        tools_gw.connect_signal(self.emit_point.canvasClicked,
-                                partial(self._identify_node_and_run_flood_analysis, dialog),
-                                'mapzone_manager_snapping', 'flood_analysis_canvasClicked_identify_node')
 
     def _identify_node_and_run_flood_analysis(self, dialog, point, event):
         """Identify the node at the selected point, retrieve node_id, and run flood analysis."""
