@@ -15,7 +15,6 @@ from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.core import QgsApplication, QgsGeometry, QgsPointXY
 
-from ...shared import info
 from ...shared.info import GwInfo
 from ..maptool import GwMaptool
 from ...threads.toggle_valve_state import GwToggleValveTask
