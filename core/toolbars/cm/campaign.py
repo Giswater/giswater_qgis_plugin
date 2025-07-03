@@ -613,6 +613,13 @@ class Campaign:
         # Determine which table to query
         if sender == self.reviewclass_combo:
             feature_types = self.get_allowed_feature_types_for_reviewclass(selected_id)
+
+            # If the selected class is the 'ALL' class, switch to the first tab.
+            check_all_sql = f"SELECT object_id FROM cm.om_reviewclass_x_object WHERE reviewclass_id = {selected_id}"
+            linked_objects = tools_db.get_rows(check_all_sql)
+            if linked_objects and any(str(row.get('object_id')).upper() == 'ALL' for row in linked_objects):
+                self.dialog.tab_feature.setCurrentIndex(0)
+
         elif sender == self.visitclass_combo:
             feature_types = self.get_allowed_feature_types_from_visitclass("om_visitclass", selected_id)
         else:
@@ -642,30 +649,52 @@ class Campaign:
 
     def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int):
         """
-        Get allowed subtypes (e.g., TANK, PR_BREAK_VALVE) based on reviewclass_id and feature (node, arc, connec...).
+        Get allowed subtypes (e.g., TANK, PR_BREAK_VALVE) based on reviewclass_id.
+        If the class is linked to 'ALL', it returns an empty list to enable all selections.
         """
+        # First, check if this review class is linked to an 'ALL' object.
+        check_all_sql = f"SELECT object_id FROM cm.om_reviewclass_x_object WHERE reviewclass_id = {reviewclass_id}"
+        linked_objects = tools_db.get_rows(check_all_sql)
+
+        # If 'ALL' is found, return an empty list. This signals the UI to allow all features for the active tab.
+        if linked_objects and any(str(row.get('object_id')).upper() == 'ALL' for row in linked_objects):
+            return []
+
+        # For a specific review class, get all linked subtypes.
+        # This list is used to filter the feature selector.
         sql = f"""
             SELECT DISTINCT r.object_id
             FROM cm.om_reviewclass_x_object r
-            JOIN {self.schema_parent}.cat_feature f
-                ON r.object_id = f.id
+            JOIN {self.schema_parent}.cat_feature f ON r.object_id = f.id
             WHERE r.reviewclass_id = {reviewclass_id}
         """
         rows = tools_db.get_rows(sql)
-        return [r["object_id"] for r in rows if r.get("object_id")]
+        return [r["object_id"] for r in rows or []]
 
     def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int):
-        """Query om_reviewclass_x_layer to get allowed feature types for a given reviewclass"""
+        """
+        Query om_reviewclass_x_object to get allowed feature types.
+        Has special handling for a class linked to an 'ALL' object_id.
+        """
+        # First, check if the linked object is 'ALL'.
+        check_all_sql = f"SELECT object_id FROM cm.om_reviewclass_x_object WHERE reviewclass_id = {reviewclass_id}"
+        linked_objects = tools_db.get_rows(check_all_sql)
 
+        if linked_objects and any(str(row.get('object_id')).upper() == 'ALL' for row in linked_objects):
+            # If 'ALL' is found, get all distinct feature types from the catalog.
+            all_features_sql = f"SELECT DISTINCT feature_type FROM {self.schema_parent}.cat_feature WHERE feature_type IS NOT NULL"
+            rows = tools_db.get_rows(all_features_sql)
+            return [r['feature_type'] for r in rows or []]
+
+        # For a specific (non-ALL) review class, get only the linked feature types.
         sql = f"""
-            SELECT DISTINCT r.object_id, f.feature_class, f.feature_type
+            SELECT DISTINCT f.feature_type
             FROM cm.om_reviewclass_x_object r
-            JOIN {self.schema_parent}.cat_feature f
-                ON r.object_id = f.id
+            JOIN {self.schema_parent}.cat_feature f ON r.object_id = f.id
             WHERE r.reviewclass_id = {reviewclass_id}
         """
         rows = tools_db.get_rows(sql)
-        return [r["feature_type"] for r in rows if r.get("feature_type")]
+        return [r["feature_type"] for r in rows or []]
 
     def get_allowed_feature_types_from_visitclass(self, table_name: str, visitclass_id: int):
         """Function to get feature types directly from om_visitclass table."""
