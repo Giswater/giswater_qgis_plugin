@@ -218,7 +218,7 @@ BEGIN
 		END IF;
 
 		--set arc_id to null if there are connecs related
-		EXECUTE 'SELECT string_agg(connec_id,'','') FROM connec WHERE arc_id='||v_feature_id||''
+		EXECUTE 'SELECT string_agg(connec_id::text,'','') FROM connec WHERE arc_id='||v_feature_id||''
 		INTO v_related_id;
 
 		IF v_related_id IS NOT NULL THEN
@@ -228,7 +228,7 @@ BEGIN
 		END IF;
 
 		--set arc_id to null if there are nodes related
-		EXECUTE 'SELECT string_agg(node_id,'','') FROM node WHERE arc_id='||v_feature_id||''
+		EXECUTE 'SELECT string_agg(node_id::text,'','') FROM node WHERE arc_id='||v_feature_id||''
 		INTO v_related_id;
 
 		IF v_related_id IS NOT NULL THEN
@@ -251,7 +251,7 @@ BEGIN
                        "data":{"message":"3502", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
 
-			EXECUTE 'SELECT string_agg(gully_id,'','') FROM gully WHERE arc_id='||v_feature_id||''
+			EXECUTE 'SELECT string_agg(gully_id::text,'','') FROM gully WHERE arc_id='||v_feature_id||''
 			INTO v_related_id;
 
 			EXECUTE'UPDATE gully SET arc_id=NULL WHERE arc_id='||v_feature_id||';';
