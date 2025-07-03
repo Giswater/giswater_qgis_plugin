@@ -988,14 +988,14 @@ BEGIN
 			FROM (
 				SELECT 
 					tm.mapzone_id,
-					array_agg(DISTINCT vn.expl_id)::int[] AS expl_ids,
-					array_agg(DISTINCT vn.muni_id)::int[] AS muni_ids,
-					array_agg(DISTINCT vn.sector_id)::int[] AS sector_ids
+					array_agg(DISTINCT vn.expl_id) FILTER (WHERE vn.expl_id IS NOT NULL)::int[] AS expl_ids,
+					array_agg(DISTINCT vn.muni_id) FILTER (WHERE vn.muni_id IS NOT NULL)::int[] AS muni_ids,
+					array_agg(DISTINCT vn.sector_id) FILTER (WHERE vn.sector_id IS NOT NULL)::int[] AS sector_ids
 				FROM temp_pgr_node tn
 				JOIN v_temp_node vn USING (node_id)
 				JOIN (SELECT component, UNNEST (mapzone_id) AS mapzone_id FROM temp_pgr_mapzone) tm ON tn.mapzone_id = tm.component
 				WHERE tn.mapzone_id > 0 
-				GROUP BY tm.component
+				GROUP BY tm.mapzone_id
 			) subq
 			WHERE subq.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
 			EXECUTE v_query_text;
