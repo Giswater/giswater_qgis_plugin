@@ -1167,57 +1167,79 @@ BEGIN
 				END IF;
 			END IF;
 
-			-- static pressure for
+			-- static pressure for TODO DANI i Xavier revisar les static pressures
 			IF v_class = 'PRESSZONE' THEN
+				-- nodes
 				v_query_text = '
-					UPDATE temp_pgr_node SET staticpressure = a.staticpressure
+					UPDATE node n SET staticpressure = t.staticpressure 
 					FROM (
-						SELECT n.node_id, p.head, vn.top_elev, vn.depth, (p.head - vn.top_elev + (CASE WHEN vn.depth IS NULL THEN 0 ELSE vn.depth END)::float) AS staticpressure
-						FROM temp_pgr_node n
-						JOIN v_temp_node vn ON vn.node_id = n.node_id
-						JOIN '||v_mapzone_name||' p ON vn.mapzone_id = p.'||v_mapzone_field||'
-					) a
-					WHERE temp_pgr_node.node_id = a.node_id
-					AND temp_pgr_node.staticpressure <> a.staticpressure
+						SELECT node_id, 
+						COALESCE ((p.head - COALESCE (n.custom_top_elev, n.top_elev) + COALESCE (n.depth, 0)), 0) AS staticpressure
+						FROM node n 
+						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
+					) t
+					WHERE n.node_id = t.node_id 
+					AND (n.staticpressure <> t.staticpressure OR n.staticpressure IS NULL)
 				';
 				EXECUTE v_query_text;
 				-- arcs
-				UPDATE arc SET staticpress1 = n.staticpressure
-				FROM temp_pgr_node n
-				WHERE node_id = node_1
-				AND (staticpress1 <> n.staticpressure OR staticpress1 IS NULL);
-				UPDATE arc SET staticpress2 = n.staticpressure
-				FROM temp_pgr_node n
-				WHERE node_id = node_2
-				AND (staticpress2 <> n.staticpressure OR staticpress2 IS NULL);
-				-- nodes
-				UPDATE node n
-				SET staticpressure = t.staticpressure
-				FROM temp_pgr_node t
-				WHERE n.node_id=t.node_id
-				AND (n.staticpressure <> t.staticpressure OR n.staticpressure IS NULL);
-				-- connecs todo claudia corregir
 				v_query_text = '
-					UPDATE connec SET staticpressure = a.staticpressure
+					UPDATE arc a SET staticpress1 = t.staticpress1 
 					FROM (
-						SELECT vc.connec_id, p.head, vc.top_elev, vc.depth, (p.head - vc.top_elev + (CASE WHEN vc.depth IS NULL THEN 0 ELSE vc.depth END)::float) AS staticpressure
-						FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id)
-						JOIN '||v_mapzone_name||' p ON ta.mapzone_id = p.'||v_mapzone_field||'
-					) a
-					WHERE connec.connec_id = a.connec_id
-					AND connec.staticpressure <> a.staticpressure;
+						SELECT arc_id, 
+						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth1, 0))::numeric(12,3), 0) AS staticpress1
+						FROM arc a 
+						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+					) t
+					WHERE a.arc_id = t.arc_id 
+					AND (a.staticpress1 <> t.staticpress1 OR a.staticpress1 IS NULL)
+				';
+				EXECUTE v_query_text;
+				v_query_text = '
+					UPDATE arc a SET staticpress2 = t.staticpress2 
+					FROM (
+						SELECT arc_id, 
+						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth2, 0))::numeric(12,3), 0) AS staticpress2
+						FROM arc a 
+						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+					) t
+					WHERE a.arc_id = t.arc_id 
+					AND (a.staticpress2 <> t.staticpress2 OR a.staticpress2 IS NULL)
+				';
+				EXECUTE v_query_text;
+				-- connec
+				v_query_text = '
+					UPDATE connec c SET staticpressure = t.staticpressure 
+					FROM (
+						SELECT  connec_id, 
+						COALESCE ((p.head - c.top_elev  + COALESCE (c.depth, 0))::numeric(12,3), 0) AS staticpressure
+						FROM connec c  
+						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
+					) t
+					WHERE c.connec_id = t.connec_id
+					AND (c.staticpressure <> t.staticpressure OR c.staticpressure IS NULL)
 				';
 				EXECUTE v_query_text;
 				-- links
 				v_query_text = '
-					UPDATE link SET staticpressure = a.staticpressure
+					UPDATE link l SET staticpressure = t.staticpressure 
 					FROM (
-						SELECT vc.link_id, p.head, vc.top_elev, vc.depth, (p.head - vc.top_elev + (CASE WHEN vc.depth IS NULL THEN 0 ELSE vc.depth END)::float) AS staticpressure
-						FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id)
-						JOIN '||v_mapzone_name||' p ON ta.mapzone_id = p.'||v_mapzone_field||'
-					) a
-					WHERE link.link_id = a.link_id
-					AND link.staticpressure <> a.staticpressure;
+						SELECT  link_id, 
+						COALESCE ((p.head - l.top_elev1  + COALESCE (l.depth1, 0))::numeric(12,3), 0) AS staticpressure
+						FROM link l 
+						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
+						WHERE EXISTS (
+							SELECT 1 FROM connec c 
+							JOIN temp_pgr_arc t USING (arc_id)
+							WHERE l.feature_id = c.connec_id 
+						)
+					) t
+					WHERE l.link_id = t.link_id
+					AND (l.staticpressure <> t.staticpressure OR l.staticpressure IS NULL)
 				';
 				EXECUTE v_query_text;
 			ELSIF v_class = 'DWFZONE' THEN
