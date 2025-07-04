@@ -15,6 +15,7 @@ SELECT * FROM no_plan();
  
 -- Check table
 SELECT has_table('archived_rpt_inp_raingage'::name, 'Table archived_rpt_inp_raingage should exist');
+
  
 -- Check columns
 SELECT columns_are(
