@@ -92,9 +92,9 @@ BEGIN
 				--Select nodes on which the process will be executed - all values or only nulls from selected exploitation
 			IF v_updatevalues = 'allValues' THEN
 				IF v_project_type = 'WS' and v_feature_type='vnode' THEN
-					v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||'';
+					v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state, expl_id FROM '||v_worklayer||'';
 				ELSE
-					v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state FROM '||v_worklayer||'';
+					v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state, expl_id FROM '||v_worklayer||'';
 				END IF;
 
 				--Filter features if there are only some selected
@@ -126,6 +126,8 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3628", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true}}$$)';
 				END IF;
+			
+			end if;
 
 			--loop over selected nodes, intersect node with raster
 			FOR rec IN EXECUTE v_query LOOP
@@ -160,8 +162,8 @@ BEGIN
 
 			END LOOP;
 
-			END IF;
 		END IF;
+	
 	END IF;
 
 	--count updated elements
