@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QColor
-from qgis.core import QgsMapToPixel, QgsWkbTypes, QgsGeometry, QgsPoint, QgsPointXY, QgsSymbol
+from qgis.core import QgsMapToPixel, QgsGeometry, QgsPoint, QgsPointXY
 from qgis.gui import QgsVertexMarker, QgsRubberBand
 
 from ..maptool import GwMaptool
