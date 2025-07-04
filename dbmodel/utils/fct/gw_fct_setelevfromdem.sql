@@ -149,12 +149,12 @@ BEGIN
 					IF v_feature_type = 'vnode' THEN
 						EXECUTE 'UPDATE vnode SET top_elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
 					ELSIF v_feature_type != 'vnode'  THEN
-						EXECUTE 'UPDATE '||v_worklayer||' SET '||v_update_field||' = '||v_elevation||' ::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'::text';
+						EXECUTE 'UPDATE '||v_worklayer||' SET '||v_update_field||' = '||v_elevation||' ::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'';
 					END IF;
 
 					--temporal insert values into anl_node to create layer with all updated points
 					INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, descript)
-					VALUES (rec.feature_id::text, rec.state::integer, rec.expl_id, 168,rec.the_geom, upper(v_feature_type));
+					VALUES (rec.feature_id, rec.state::integer, rec.expl_id, 168,rec.the_geom, upper(v_feature_type));
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message": "3624", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true, "parameters":{"feature_type":"'||upper(v_feature_type)||'", "feature_id":"'||rec.feature_id||'"}}})$$)';
