@@ -67,7 +67,6 @@ BEGIN
             fluid_type INTEGER DEFAULT 0,
             modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
-            staticpressure FLOAT DEFAULT 0,
             CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_node_node_id_idx ON temp_pgr_node USING btree (node_id);
@@ -228,8 +227,6 @@ BEGIN
                 ), node_selected AS (
                     SELECT DISTINCT ON (node_id) node.node_id,
                     cf.graph_delimiter,
-                    node.top_elev,
-                    node.depth,
                     node.expl_id,
                     node.sector_id,
                     node.presszone_id,
@@ -281,8 +278,6 @@ BEGIN
                 ), connec_selected AS (
                     SELECT DISTINCT ON (connec_id) connec.connec_id,
                         connec.arc_id,
-                        connec.top_elev,
-                        connec.depth,
                         connec.expl_id,
                         connec.sector_id,
                         connec.presszone_id,
@@ -684,8 +679,6 @@ BEGIN
                 SELECT
                     n.node_id,
                     cf.graph_delimiter,
-                    n.top_elev,
-                    n.depth,
                     n.expl_id,
                     n.sector_id,
                     n.presszone_id,
@@ -706,8 +699,6 @@ BEGIN
                     c.connec_id,
                     c.arc_id,
                     c.expl_id,
-                    c.top_elev,
-                    c.depth,
                     c.sector_id,
                     c.presszone_id,
                     c.dma_id,
