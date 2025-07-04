@@ -113,12 +113,29 @@ BEGIN
 		-- Computing process
 		IF v_projecttype = 'UD' THEN
 
-			FOR object_rec IN SELECT json_array_elements_text('["conduit", "junction", "raingage"]'::json) as table,
-						json_array_elements_text('["arc_id", "node_id", "rg_id"]'::json) as pk,
-						json_array_elements_text('["arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit, kavg, flap, q0, qmax, seepage", 
-									   "node_id, y0, ysur, apond, outfallparam",
-									   "rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units"]'::json) as column
+			FOR object_rec IN SELECT elem AS table, '' AS pk, '' AS column FROM  json_array_elements_text(
+                (SELECT json_agg(suffix)::json
+                FROM (
+                    SELECT DISTINCT substring(table_name FROM 'inp_dscenario_(.*)$') AS suffix
+                    FROM information_schema.tables
+                    WHERE table_schema = 'SCHEMA_NAME' AND table_name  LIKE 'inp_dscenario_%'
+                ) s
+              )
+          ) AS j(elem)
 			LOOP
+
+				SELECT string_agg(value, ',') AS column_list INTO object_rec.pk FROM
+					(SELECT json_array_elements_text(json_agg(a.attname)::json) AS pk FROM pg_index i
+					JOIN pg_class t ON t.oid = i.indrelid
+					JOIN pg_namespace n ON n.oid = t.relnamespace
+					JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(i.indkey)
+				WHERE i.indisprimary AND t.relname = 'inp_dscenario_'||object_rec.table AND n.nspname = 'SCHEMA_NAME' AND a.attname <> 'dscenario_id') as t(value);
+
+				SELECT string_agg(value, ',') AS column_list INTO object_rec.column FROM 
+				json_array_elements_text(
+					(SELECT json_agg(column_name)::json FROM information_schema.columns
+					WHERE table_schema = 'SCHEMA_NAME' AND table_name = 'inp_dscenario_'||object_rec.table AND column_name <> 'dscenario_id')) AS t(value);
+
 				IF v_action = 'DELETE-COPY' THEN
 					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target;
 
@@ -142,11 +159,19 @@ BEGIN
 
 					END IF;
 
-					v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
-					FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
-					' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
-					RAISE NOTICE 'v_querytext %', v_querytext;
+					IF object_rec.table = 'controls' THEN
+						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
+						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
+						' ON CONFLICT ('||object_rec.pk||') DO NOTHING';
+						RAISE NOTICE 'v_querytext %', v_querytext;
 					EXECUTE v_querytext;
+					ELSE
+						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
+						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
+						' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
+						RAISE NOTICE 'v_querytext %', v_querytext;
+						EXECUTE v_querytext;
+					END IF;
 
 					-- get message
 					GET DIAGNOSTICS v_count2 = row_count;
@@ -197,6 +222,11 @@ BEGIN
 						INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
 						SELECT v_target, feature_id, feature_type, demand, pattern_id, demand_type, source
 						FROM inp_dscenario_demand WHERE dscenario_id = v_copyfrom;
+					ELSIF object_rec.table = 'controls' THEN
+						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
+						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
+						' ON CONFLICT ('||object_rec.pk||') DO NOTHING';
+						RAISE NOTICE 'v_querytext %', v_querytext;
 					ELSE
 						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
 						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
