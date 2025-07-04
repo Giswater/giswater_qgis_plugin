@@ -29,6 +29,7 @@ class GwAuxCircleAddButton(GwMaptool):
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
         self.layer_circle = None
+        self.dialog_created = False
         self.snap_to_selected_layer = False
         self.rb_circle = tools_gw.create_rubberband(self.canvas, "line")
         self.rb_circle.setLineStyle(Qt.DashLine)
@@ -38,6 +39,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
         self._reset_rubberbands()
         tools_gw.close_dialog(self.dlg_create_circle)
+        self.dialog_created = False
         self.cancel_map_tool()
         if self.layer_circle:
             if self.layer_circle.isEditable():
@@ -168,6 +170,7 @@ class GwAuxCircleAddButton(GwMaptool):
         self.dlg_create_circle.rejected.connect(self.cancel)
 
         tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
+        self.dialog_created = True
         self.dlg_create_circle.radius.setFocus()
 
     def _preview_circle(self, point, text):
@@ -233,6 +236,7 @@ class GwAuxCircleAddButton(GwMaptool):
                 # but all work ok
                 provider.addFeatures([feature])
             tools_gw.close_dialog(self.dlg_create_circle)
+            self.dialog_created = False
             self.layer_circle.commitChanges()
             self.layer_circle.dataProvider().reloadData()
             self.layer_circle.triggerRepaint()
@@ -261,14 +265,18 @@ class GwAuxCircleAddButton(GwMaptool):
             if point is None:
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
+            if self.dialog_created:
+                tools_gw.close_dialog(self.dlg_create_circle)
+
             self._init_create_circle_form(point)
 
-        elif event.button() == Qt.RightButton:
+        if event.button() == Qt.RightButton:
             self._reset_rubberbands()
             self.iface.actionPan().trigger()
             self.cancel_circle = True
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
+            tools_gw.close_dialog(self.dlg_create_circle)
             return
 
         if self.layer_circle:
