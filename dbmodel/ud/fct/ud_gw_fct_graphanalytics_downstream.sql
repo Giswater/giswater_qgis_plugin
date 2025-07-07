@@ -160,15 +160,9 @@ BEGIN
 				AND a.initoverflowpath IS DISTINCT FROM FALSE
 				AND EXISTS (
 					SELECT 1 FROM anl_node an 
-					WHERE an.node_id = a.node_1
+					WHERE an.cur_user = '''||"current_user"()||'''
 					AND an.fid = '''||v_fid||'''
-					AND an.cur_user = '''||"current_user"()||'''
-				)
-				AND EXISTS (
-					SELECT 1 FROM anl_node an 
-					WHERE an.node_id = a.node_2
-					AND an.fid = '''||v_fid||'''
-					AND an.cur_user = '''||"current_user"()||'''
+					AND an.node_id = a.'||v_source||'
 				)
 			)
 		SELECT 
