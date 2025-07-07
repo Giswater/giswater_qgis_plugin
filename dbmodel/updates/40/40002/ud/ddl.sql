@@ -7,3 +7,6 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+ALTER TABLE man_wwtp ALTER COLUMN wwtp_type SET DEFAULT 0;
+ALTER TABLE man_wwtp ALTER COLUMN treatment_type SET DEFAULT 0;
