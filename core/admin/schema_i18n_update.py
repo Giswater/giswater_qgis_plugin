@@ -199,7 +199,7 @@ class GwSchemaI18NUpdate:
         for dbtable in dbtables:
             dbtable = f"{schema_i18n}.{dbtable}"
             dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
-            if not dbtable_rows:
+            if not dbtable_rows or dbtable_columns == []:
                 messages.append(dbtable)  # Corregido
             else:
                 if "json" in dbtable:
@@ -341,7 +341,7 @@ class GwSchemaI18NUpdate:
 
         # Return the corresponding information
         if not rows:
-            return False
+            return False, columns
         return rows, columns
 
     def _write_table_values(self, rows, columns, table):
