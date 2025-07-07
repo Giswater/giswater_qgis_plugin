@@ -30,7 +30,6 @@ class GwAuxPointAddButton(GwMaptool):
         self.point_1 = None
         self.point_2 = None
         self.dialog_created = False
-        self.double_click = False
         self.dlg_create_point = None
         self.snap_to_selected_layer = False
         # RUBBERBANDS TO PREVIEW RESULT
@@ -51,7 +50,6 @@ class GwAuxPointAddButton(GwMaptool):
         self.rb_final_point.setIcon(QgsRubberBand.ICON_X)
         self.rb_final_point.setIconSize(10)
 
-
     def cancel(self):
 
         tools_gw.set_config_parser('btn_auxpoint', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
@@ -68,7 +66,6 @@ class GwAuxPointAddButton(GwMaptool):
         self.cancel_point = True
         self.cancel_map_tool()
 
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
@@ -78,7 +75,6 @@ class GwAuxPointAddButton(GwMaptool):
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
-
 
     def canvasMoveEvent(self, event):
 
@@ -96,11 +92,9 @@ class GwAuxPointAddButton(GwMaptool):
             # Get the point and add marker on it
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
-
     def canvasReleaseEvent(self, event):
 
         self._add_aux_point(event)
-
 
     def activate(self):
 
@@ -151,7 +145,6 @@ class GwAuxPointAddButton(GwMaptool):
         if self.vdefault_layer is None:
             self.vdefault_layer = self.iface.activeLayer()
 
-
     def deactivate(self):
 
         self.point_1 = None
@@ -169,7 +162,6 @@ class GwAuxPointAddButton(GwMaptool):
         except RuntimeError:
             pass
 
-
     # endregion
 
     # region private functions
@@ -177,7 +169,7 @@ class GwAuxPointAddButton(GwMaptool):
     def _load_missing_layers(self):
         """ Adds any missing Mincut layers to TOC """
 
-        sql = f"SELECT id, alias FROM sys_table WHERE id LIKE 'v_edit_cad_aux%' AND alias IS NOT NULL"
+        sql = "SELECT id, alias FROM sys_table WHERE id LIKE 'v_edit_cad_aux%' AND alias IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
             for tablename, alias in rows:
@@ -187,7 +179,6 @@ class GwAuxPointAddButton(GwMaptool):
                     if tablename == 'v_edit_cad_auxcircle':
                         geom = 'geom_polygon'
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
-
 
     def _init_create_point_form(self, point_1=None, point_2=None):
 
@@ -217,7 +208,6 @@ class GwAuxPointAddButton(GwMaptool):
         self.dialog_created = True
         self.dlg_create_point.dist_x.setFocus()
 
-
     def _preview_point(self, dialog, point1, point2):
 
         tools_gw.reset_rubberband(self.rb_final_point, "point")
@@ -226,11 +216,11 @@ class GwAuxPointAddButton(GwMaptool):
         value_y = tools_qt.get_text(dialog, 'dist_y')
         try:
             distance_x = float(value_x)
-        except ValueError as e:
+        except ValueError:
             distance_x = 0.0
         try:
             distance_y = float(value_y)
-        except ValueError as e:
+        except ValueError:
             distance_y = 0.0
 
         if point1 is None or point2 is None:
@@ -278,32 +268,23 @@ class GwAuxPointAddButton(GwMaptool):
 
     def _get_values(self, point_1, point_2):
 
-        if self.double_click:
-            self.dist_x = 0
-            self.dist_y = 0
-        else:
-            tools_gw.set_config_parser('btn_auxpoint', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
-            tools_gw.set_config_parser('btn_auxpoint', "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
+        tools_gw.set_config_parser('btn_auxpoint', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
+        tools_gw.set_config_parser('btn_auxpoint', "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
 
-            self.dist_x = self.dlg_create_point.dist_x.text()
-            if not self.dist_x:
-                self.dist_x = 0
-            self.dist_y = self.dlg_create_point.dist_y.text()
-            if not self.dist_y:
-                self.dist_y = 0
+        self.dist_x = self.dlg_create_point.dist_x.text()
+        if not self.dist_x:
+            self.dist_x = 0
+        self.dist_y = self.dlg_create_point.dist_y.text()
+        if not self.dist_y:
+            self.dist_y = 0
         
         if self.layer_points:
-            self.layer_points.startEditing()                
-            if self.double_click:
-                self.delete_prev = False
+            self.layer_points.startEditing()
+            self.delete_prev = tools_qt.is_checked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
+            if self.dlg_create_point.rb_left.isChecked():
                 self.direction = 1
-                point_2 = QgsPointXY(point_1.x() + 1, point_1.y())
             else:
-                self.delete_prev = tools_qt.is_checked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
-                if self.dlg_create_point.rb_left.isChecked() or self.double_click:
-                    self.direction = 1
-                else:
-                    self.direction = 2
+                self.direction = 2
 
             if self.dialog_created:
                 tools_gw.close_dialog(self.dlg_create_point)
@@ -329,7 +310,6 @@ class GwAuxPointAddButton(GwMaptool):
             self.cancel_point = False
             return
         self._reset_rubberbands()
-
 
     def _add_aux_point(self, event):
 
@@ -365,10 +345,11 @@ class GwAuxPointAddButton(GwMaptool):
                 self.rb_bg_point.addPoint(self.point_2)
 
             if self.point_1 == self.point_2:
-                self.double_click = True
-                self._get_values(self.point_1, self.point_2)
+                message = "You must select two different points"
+                tools_qgis.show_warning(message)
                 self.point_1 = None
                 self.point_2 = None
+                self._reset_rubberbands()
             elif self.point_1 is not None and self.point_2 is not None:
                 tools_gw.reset_rubberband(self.rb_bg_line, "line")
 
@@ -391,7 +372,6 @@ class GwAuxPointAddButton(GwMaptool):
 
         if self.layer_points:
             self.layer_points.commitChanges()
-
 
     def _reset_rubberbands(self):
 
