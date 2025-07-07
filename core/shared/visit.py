@@ -242,7 +242,7 @@ class GwVisit(QObject):
             # self.dlg_add_visit.btn_feature_delete.setEnabled(False)
             # self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
             # self.dlg_add_visit.tab_feature.setEnabled(False)
-            self.dlg_add_visit.tab_feature.tabBar().setEnabled(False)
+            #self.dlg_add_visit.tab_feature.tabBar().setEnabled(False)
 
             # Zoom to selected geometry or relations
             visit_layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
@@ -1864,6 +1864,8 @@ class GwVisit(QObject):
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")
         tools_gw.selection_changed(self, dialog, widget_table, GwSelectionMode.VISIT, self.lazy_widget, self.lazy_init_function)
+
+        tools_gw.load_tableview_visit(dialog, self.visit_id.text(), self.rel_feature_type)
 
         try:
             self.iface.actionPan().trigger()
