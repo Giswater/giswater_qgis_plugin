@@ -15,3 +15,5 @@ UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "le
 -- 03/07/2025
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3482, 'gw_fct_graphanalytics_macromapzones', 'utils', 'function', 'json', 'json', 'Function to analyze network as a macro graph.', 'role_om', NULL, 'core', NULL);
+
+DELETE FROM config_form_fields where columnname='undelete';
