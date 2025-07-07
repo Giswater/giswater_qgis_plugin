@@ -158,6 +158,18 @@ BEGIN
 				AND a.state > 0 
 				AND a.is_operative = TRUE
 				AND a.initoverflowpath IS DISTINCT FROM FALSE
+				AND EXISTS (
+					SELECT 1 FROM anl_node an 
+					WHERE an.node_id = a.node_1
+					AND an.fid = '''||v_fid||'''
+					AND an.cur_user = '''||"current_user"()||'''
+				)
+				AND EXISTS (
+					SELECT 1 FROM anl_node an 
+					WHERE an.node_id = a.node_2
+					AND an.fid = '''||v_fid||'''
+					AND an.cur_user = '''||"current_user"()||'''
+				)
 			)
 		SELECT 
 			a.arc_id::int AS id, '||v_source||'::int AS source, '||v_target||'::int AS target,
