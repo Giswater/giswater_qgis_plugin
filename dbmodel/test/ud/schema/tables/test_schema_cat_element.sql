@@ -53,7 +53,6 @@ SELECT col_has_default('cat_element', 'active', 'Column active should have defau
 -- Check foreign keys
 SELECT has_fk('cat_element', 'Table cat_element should have foreign keys');
 
--- even nakijken 
 
 SELECT fk_ok('cat_element', 'brand', 'cat_brand', 'id', 'Table should have foreign key from brand to cat_brand.id');
 SELECT fk_ok('cat_element', 'element_type', 'cat_feature_element', 'id', 'Table should have foreign key from element_type to cat_feature_element.id');
