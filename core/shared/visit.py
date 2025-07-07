@@ -242,7 +242,7 @@ class GwVisit(QObject):
             # self.dlg_add_visit.btn_feature_delete.setEnabled(False)
             # self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
             # self.dlg_add_visit.tab_feature.setEnabled(False)
-            #self.dlg_add_visit.tab_feature.tabBar().setEnabled(False)
+            # self.dlg_add_visit.tab_feature.tabBar().setEnabled(False)
 
             # Zoom to selected geometry or relations
             visit_layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
