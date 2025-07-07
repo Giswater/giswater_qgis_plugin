@@ -20,4 +20,5 @@ class GwSelectionMode(Enum):
     EXPRESSION_LOT = 6
     ELEMENT = 7
     FEATURE_END = 8
+    VISIT = 9
 

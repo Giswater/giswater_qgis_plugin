@@ -3484,6 +3484,9 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     elif selection_mode == GwSelectionMode.FEATURE_END:
         load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+    elif selection_mode == GwSelectionMode.VISIT:
+        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
+        load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3685,6 +3688,9 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
     elif selection_mode == GwSelectionMode.ELEMENT:
         _insert_feature_elements(dialog, class_object.feature_id, feature_type, ids=selected_ids)
         load_tableview_element(dialog, class_object.feature_id, feature_type)
+    elif selection_mode == GwSelectionMode.VISIT:
+        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
+        load_tableview_visit(dialog, class_object.visit_id.text(), feature_type)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -4056,6 +4062,20 @@ def load_tableview_element(dialog, feature_id, rel_feature_type):
     tools_qgis.refresh_map_canvas()
 
 
+def load_tableview_visit(dialog, feature_id, rel_feature_type):
+    """ Reload QtableView """
+
+    expr = f"visit_id = '{feature_id}'"
+    qtable = tools_qt.get_widget(dialog, f'tbl_visit_x_{rel_feature_type}')
+    tablename = f'om_visit_x_{rel_feature_type}'
+    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange)
+    if message:
+        tools_qgis.show_warning(message)
+    tableview = f'tbl_visit_x_{rel_feature_type}'
+    set_tablemodel_config(dialog, qtable, f"{tableview}")
+    tools_qgis.refresh_map_canvas()
+
+
 def set_completer_object(dialog, tablename, field_id="id"):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
@@ -4371,6 +4391,9 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
         load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type,
                                    expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+    elif selection_mode == GwSelectionMode.VISIT:
+        delete_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, list_id=list_id)
+        load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -5119,6 +5142,23 @@ def _insert_feature_elements(dialog, feature_id, rel_feature_type, ids=None):
         sql = f"INSERT INTO element_x_{rel_feature_type} (element_id, {rel_feature_type}_id) "
         sql += f"VALUES('{feature_id}', '{ids[i]}') ON CONFLICT DO NOTHING;"
         tools_db.execute_sql(sql)
+
+
+def _insert_feature_visit(dialog, feature_id, rel_feature_type, ids=None):
+    """ Insert features_id to table tbl_visit_x_@rel_feature_type """
+
+    for i in range(len(ids)):
+        sql = f"INSERT INTO om_visit_x_{rel_feature_type} (visit_id, {rel_feature_type}_id) "
+        sql += f"VALUES('{feature_id}', '{ids[i]}') ON CONFLICT DO NOTHING;"
+        tools_db.execute_sql(sql)
+
+
+def delete_feature_visit(dialog, visit_id, rel_feature_type, list_id=None):
+    """ Delete features_id to table tbl_visit_x_@rel_feature_type """
+    sql = f"DELETE FROM om_visit_x_{rel_feature_type} WHERE visit_id = '{visit_id}'"
+    if list_id is not None:
+        sql += f" AND {rel_feature_type}_id in ({list_id})"
+    tools_db.execute_sql(sql)
 
 
 def _delete_feature_psector(dialog, feature_type, list_id, state=None):

@@ -45,6 +45,7 @@ class GwVisit(QObject):
         self.canvas = global_vars.canvas
         self.schema_name = lib_vars.schema_name
         self.iface = global_vars.iface
+        self.feature_type = None
         self.rel_feature_type = None
         self.rel_layers = None
         self.event_parameter_id = None
@@ -550,20 +551,20 @@ class GwVisit(QObject):
         # Load feature if in @table_name. Select list of related features
         # Set 'expr_filter' with features that are in the list
         if self.locked_feature_id:
-            expr_filter = f""""{self.rel_feature_type}_id" IN ('{self.locked_feature_id}')"""
+            expr_filter = f""""{self.feature_type}_id" IN ('{self.locked_feature_id}')"""
             (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
             if not is_valid:
                 return
 
             # do selection allowing @table_name to be linked to canvas selectionChanged
-            widget_name = f'tbl_visit_x_{self.rel_feature_type}'
+            widget_name = f'tbl_visit_x_{self.feature_type}'
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             tools_qgis.disconnect_signal_selection_changed()
             tools_gw.disconnect_signal('visit')
             tools_gw.connect_signal(global_vars.canvas.selectionChanged,
-                                    partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT),
+                                    partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, GwSelectionMode.VISIT),
                                     'visit', 'set_locked_relation_canvas_selectionChanged')
-            tools_qgis.select_features_by_ids(self.rel_feature_type, expr, self.rel_layers)
+            tools_qgis.select_features_by_ids(self.feature_type, expr, self.rel_layers)
             tools_qgis.disconnect_signal_selection_changed()
             tools_gw.disconnect_signal('visit')
 
@@ -768,9 +769,9 @@ class GwVisit(QObject):
             if tools_gw.get_project_type() == 'ud':
                 self._update_relations_feature_type("gully")
         else:
-            self._update_relations_feature_type(self.rel_feature_type)
+            self._update_relations_feature_type(self.feature_type)
 
-        widget_name = f"tbl_visit_x_{self.rel_feature_type}"
+        widget_name = f"tbl_visit_x_{self.feature_type}"
         tools_gw.enable_feature_type(dialog, widget_name, ids=self.rel_ids)
 
     def _delete_relations_feature_type(self, feature_type):
@@ -895,7 +896,7 @@ class GwVisit(QObject):
         if row:
             self.feature_type_parameter = row[0]
             if self.it_is_new_visit:
-                self.rel_feature_type = self.feature_type_parameter.lower()
+                self.feature_type = self.feature_type_parameter.lower()
             self._manage_tabs_enabled(True)
 
     def _connect_signal_tab_feature_signal(self, connect=True, excluded_layers=[]):
@@ -917,13 +918,13 @@ class GwVisit(QObject):
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_link", "v_edit_element", "v_edit_gully",
                           "v_edit_element"]
         self.excluded_layers = excluded_layers
-        if self.rel_feature_type is None:
+        if self.feature_type is None:
             return
 
         self._connect_signal_tab_feature_signal(False, excluded_layers)
 
         # If feature_type = 'all': enable all tabs
-        if self.rel_feature_type == 'all':
+        if self.feature_type == 'all':
             for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, True)
             self._connect_signal_tab_feature_signal(True, excluded_layers)
@@ -939,15 +940,20 @@ class GwVisit(QObject):
     def _manage_feature_type_selected(self):
 
         tab_index = 0
-        if self.rel_feature_type == 'arc':
+        if self.feature_type == 'arc':
+            self.rel_feature_type = 'arc'
             tab_index = 0
-        elif self.rel_feature_type == 'node':
+        elif self.feature_type == 'node':
+            self.rel_feature_type = 'node'
             tab_index = 1
-        elif self.rel_feature_type == 'connec':
+        elif self.feature_type == 'connec':
+            self.rel_feature_type = 'connec'
             tab_index = 2
-        elif self.rel_feature_type == 'link':
+        elif self.feature_type == 'link':
+            self.rel_feature_type = 'link'
             tab_index = 3
-        elif self.rel_feature_type == 'gully':
+        elif self.feature_type == 'gully':
+            self.rel_feature_type = 'gully'
             tab_index = 4
 
         # Enable only tab of this geometry type
@@ -971,9 +977,9 @@ class GwVisit(QObject):
             tools_log.log_info(msg, msg_params=msg_params)
         finally:
             self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
-                 self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT, False, None, None))
+                 self.dlg_add_visit, widget_table, GwSelectionMode.VISIT, False, None, None))
             self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
-                 self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT, self.lazy_widget, self.lazy_init_function))
+                 self.dlg_add_visit, widget_table, GwSelectionMode.VISIT, self.lazy_widget, self.lazy_init_function))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
 
@@ -985,7 +991,7 @@ class GwVisit(QObject):
         It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered. """
 
-        if self.rel_feature_type == '':
+        if self.feature_type == '':
             return
 
         # configure model visibility
@@ -1006,7 +1012,7 @@ class GwVisit(QObject):
         if feature_type is None:
             feature_type = self.cmb_feature_type.currentText().lower()
 
-        self.rel_feature_type = feature_type
+        self.feature_type = feature_type
         if feature_type == '':
             return
 
@@ -1077,7 +1083,7 @@ class GwVisit(QObject):
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.disconnect_signal('visit')
         tools_gw.connect_signal(global_vars.canvas.selectionChanged,
-                                partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT),
+                                partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, GwSelectionMode.VISIT),
                                 'visit', 'get_features_visit_feature_type_canvas_selectionChanged')
         tools_qgis.select_features_by_ids(feature_type, expr, self.rel_layers)
         tools_qgis.disconnect_signal_selection_changed()
@@ -1119,10 +1125,9 @@ class GwVisit(QObject):
               " FROM om_visit_cat"\
               " WHERE active is true"
 
-        if self.rel_feature_type not in ('all', None):
-            sql = f"{sql} AND (upper(feature_type) = '{self.rel_feature_type.upper()}' OR feature_type IS NULL) "
+        if self.feature_type not in ('all', None):
+            sql = f"{sql} AND (upper(feature_type) = '{self.feature_type.upper()}' OR feature_type IS NULL) "
         sql = f"{sql} ORDER BY name"
-
         self.visitcat_ids = tools_db.get_rows(sql)
 
         if self.visitcat_ids:
@@ -1226,11 +1231,11 @@ class GwVisit(QObject):
         parameter_type_id = tools_qt.get_text(self.dlg_add_visit, "parameter_type_id")
         if parameter_type_id:
             where = f"WHERE parameter_type = '{parameter_type_id}' "
-        if self.rel_feature_type:
+        if self.feature_type:
             if where is None:
-                where = f"WHERE UPPER(feature_type) IN ('{self.rel_feature_type.upper()}', 'ALL') "
+                where = f"WHERE UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
             else:
-                where += f"AND UPPER(feature_type) IN ('{self.rel_feature_type.upper()}', 'ALL') "
+                where += f"AND UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
 
         sql += where
         sql += "ORDER BY id"
@@ -1789,13 +1794,13 @@ class GwVisit(QObject):
 
     def _populate_position_id(self):
 
-        self.dlg_event.position_id.setEnabled(self.rel_feature_type == 'arc')
-        self.dlg_event.position_value.setEnabled(self.rel_feature_type == 'arc')
+        self.dlg_event.position_id.setEnabled(self.feature_type == 'arc')
+        self.dlg_event.position_value.setEnabled(self.feature_type == 'arc')
         node_list = []
         node_1 = None
         node_2 = None
-        if self.rel_feature_type != 'all':
-            widget_name = f"tbl_visit_x_{self.rel_feature_type}"
+        if self.feature_type != 'all':
+            widget_name = f"tbl_visit_x_{self.feature_type}"
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             if widget_table.model():
                 node_1 = widget_table.model().record(0).value('node_1')
@@ -1811,15 +1816,20 @@ class GwVisit(QObject):
         # Get selected tab to set geometry type
         tab_idx = dialog.tab_feature.currentIndex()
         if dialog.tab_feature.widget(tab_idx).objectName() == 'tab_arc':
-            self.rel_feature_type = "arc"
+            self.feature_type = "arc"
+            self.rel_feature_type = 'arc'
         elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_node':
-            self.rel_feature_type = "node"
+            self.feature_type = "node"
+            self.rel_feature_type = 'node'
         elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_connec':
-            self.rel_feature_type = "connec"
+            self.feature_type = "connec"
+            self.rel_feature_type = 'connec'
         elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_link':
-            self.rel_feature_type = "link"
+            self.feature_type = "link"
+            self.rel_feature_type = 'link'
         elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_gully':
-            self.rel_feature_type = "gully"
+            self.feature_type = "gully"
+            self.rel_feature_type = 'gully'
         if self.rel_feature_type == '':
             return
 
@@ -1840,10 +1850,10 @@ class GwVisit(QObject):
         finally:
 
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(tools_gw.insert_feature, self, self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT, False))
+                partial(tools_gw.insert_feature, self, self.dlg_add_visit, widget_table, GwSelectionMode.VISIT, False))
 
             self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
-                 self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
+                 self.dlg_add_visit, widget_table, GwSelectionMode.VISIT, self.lazy_widget, self.lazy_init_function))
 
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
@@ -1852,8 +1862,8 @@ class GwVisit(QObject):
             )
 
         # Adding auto-completion to a QLineEdit
-        tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.rel_feature_type) + "_id")
-        tools_gw.selection_changed(self, dialog, widget_table, GwSelectionMode.DEFAULT, self.lazy_widget, self.lazy_init_function)
+        tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")
+        tools_gw.selection_changed(self, dialog, widget_table, GwSelectionMode.VISIT, self.lazy_widget, self.lazy_init_function)
 
         try:
             self.iface.actionPan().trigger()
@@ -1863,7 +1873,7 @@ class GwVisit(QObject):
     def _feature_snapping_clicked(self, dialog, table_object):
 
         self.previous_map_tool = global_vars.canvas.mapTool()
-        tools_gw.selection_init(self, dialog, table_object, GwSelectionMode.DEFAULT)
+        tools_gw.selection_init(self, dialog, table_object, GwSelectionMode.VISIT)
 
     def _get_data_from_event(self, visit_id):
         """ Get parameter_id and feature_type from event of @visit_id """
