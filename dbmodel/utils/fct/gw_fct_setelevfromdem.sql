@@ -75,7 +75,7 @@ BEGIN
 
 		
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message": "3630", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true}})$$)';
+			"data":{"message": "3630", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true}}$$)';
 
 	ELSIF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE THEN
 
@@ -144,7 +144,7 @@ BEGIN
 
 					--TODO
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message": "3626", "function":"2760", "fid":"168", "result_id":"elevation from raster", "prefix_id":"1002", "is_process":true, "parameters":{"feature_id":"'||rec.feature_id||'"}}})$$)';
+						"data":{"message": "3626", "function":"2760", "fid":"168", "result_id":"elevation from raster", "prefix_id":"1002", "is_process":true, "parameters":{"feature_id":"'||rec.feature_id||'"}}}$$)';
 				ELSE
 					IF v_feature_type = 'vnode' THEN
 						EXECUTE 'UPDATE vnode SET top_elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
@@ -157,7 +157,7 @@ BEGIN
 					VALUES (rec.feature_id, rec.state::integer, rec.expl_id, 168,rec.the_geom, upper(v_feature_type));
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message": "3624", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true, "parameters":{"feature_type":"'||upper(v_feature_type)||'", "feature_id":"'||rec.feature_id||'"}}})$$)';
+						"data":{"message": "3624", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true, "parameters":{"feature_type":"'||upper(v_feature_type)||'", "feature_id":"'||rec.feature_id||'"}}}$$)';
 				END IF;
 
 			END LOOP;
