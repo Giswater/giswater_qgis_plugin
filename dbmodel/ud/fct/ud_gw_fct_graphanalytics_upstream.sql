@@ -157,7 +157,7 @@ BEGIN
 				AND a.node_2 IS NOT NULL 
 				AND a.state > 0 
 				AND a.is_operative = TRUE
-				AND (a.initoverflowpath IS NULL OR a.initoverflowpath = FALSE)
+				AND a.initoverflowpath IS DISTINCT FROM FALSE
 			)
 		SELECT 
 			a.arc_id::int AS id, '||v_source||'::int AS source, '||v_target||'::int AS target,
