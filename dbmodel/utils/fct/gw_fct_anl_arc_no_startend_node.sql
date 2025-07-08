@@ -169,7 +169,7 @@ BEGIN
                        "data":{"message":"3586", "function":"2102", "fid":"103", "parameters":{"v_count_state1":"'||v_count_state1||'"}, "fcount":"'||v_count_state1||'", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			SELECT 103,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count_state1 
+			SELECT 103,  concat ('Arc_id: ',string_agg(arc_id::text, ', '), '.' ), v_count_state1 
 			FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103 AND state=1;
 		END IF;
 
@@ -178,7 +178,7 @@ BEGIN
                        "data":{"message":"3588", "function":"2102", "fid":"103", "parameters":{"v_count_state2":"'||v_count_state2||'"}, "fcount":"'||v_count_state2||'", "is_process":true}}$$)';
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			SELECT 103,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count_state2 
+			SELECT 103,  concat ('Arc_id: ',string_agg(arc_id::text, ', '), '.' ), v_count_state2 
 			FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103 AND state=2;
 		END IF;
 	END IF;
