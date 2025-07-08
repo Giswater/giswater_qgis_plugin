@@ -464,7 +464,7 @@ class GwDocument(QObject):
         menu.exec(QCursor.pos())
 
     def _handle_delete(self):
-        tools_gw.delete_selected_rows(self.dlg_man.tbl_document, "doc")
+        tools_gw.delete_selected_rows(self.dlg_man.tbl_document, "doc", "name", 1)
         self._refresh_manager_table()
 
     def _fill_table(self, filter_text=None):
@@ -584,8 +584,9 @@ class GwDocument(QObject):
                 title = "Add document"
                 answer = tools_qt.show_question(msg, title)
                 if answer:
-                    for file in self.files_path:
-                        sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, name)
+                    for k, file in enumerate(self.files_path):
+                        temp_name = f"{name}_{k+1}"
+                        sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, temp_name)
         else:
             doc_id = row['id']
             if len(self.files_path) <= 1:
@@ -596,12 +597,9 @@ class GwDocument(QObject):
                 title = "Add document"
                 answer = tools_qt.show_question(msg, title)
                 if answer:
-                    for cont, file in enumerate(self.files_path):
-                        if cont == 0:
-                            sql = self._update_doc_sql(doc_type, observ, date, doc_id, file, the_geom, name)
-                        else:
-                            sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, name)
-
+                    for k, file in enumerate(self.files_path):
+                        temp_name = f"{name}_{k+1}"
+                        sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, temp_name)
         self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, name, close_dlg=close_dlg)
         self.doc_added.emit()
 
