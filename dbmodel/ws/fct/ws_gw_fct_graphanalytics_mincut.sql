@@ -133,7 +133,7 @@ BEGIN
 		AND active;
 
 		-- set the starting elements
-		UPDATE temp_anlgraph SET water=1 , flag = 1 WHERE arc_id IN (SELECT arc_id FROM temp_arc WHERE result_id = v_mincutid::text);
+		UPDATE temp_anlgraph SET water=1 , flag = 1 WHERE arc_id IN (SELECT arc_id::integer FROM temp_arc WHERE result_id = v_mincutid::text);
 
 	END IF;
 
