@@ -16,11 +16,12 @@ from qgis.core import QgsEditFormConfig
 
 from sip import isdeleted
 
-from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, Qt, QRegularExpression
+from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, Qt, QRegularExpression, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel, QCursor
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QMenu
+    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, \
+    QMenu, QToolButton
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
     QgsPointXY, QgsProject, QgsFeature
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
@@ -288,6 +289,7 @@ class GwInfo(QObject):
 
         except Exception as e:
             msg = "Exception in info"
+            print("msg:", msg)
             tools_qgis.show_warning(msg, parameter=e)
             msg = str(traceback.format_exc())
             tools_log.log_error(msg)
@@ -352,8 +354,8 @@ class GwInfo(QObject):
             tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal),
                                     'info', 'add_feature_featureAdded_open_new_feature')
         else:
-            message = "Layer not found"
-            tools_qgis.show_warning(message, parameter=feature_cat.parent_layer)
+            msg = "Layer not found"
+            tools_qgis.show_warning(msg, parameter=feature_cat.parent_layer)
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
 
@@ -649,7 +651,7 @@ class GwInfo(QObject):
 
         if rows and schema_actived:
             self._enable_action(dlg_cf, self.action_audit, True)
-
+        print("connect_signal", connect_signal)
         if connect_signal:
             for signal in connect_signal:
                 func_name = signal.func.__name__
@@ -2764,21 +2766,63 @@ class GwInfo(QObject):
 
             self.tab_visit_loaded = True
         # Tab 'Event'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_event' and not self.tab_event_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_event')
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            self.tab_event_loaded = True
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_event':
+            if not self.tab_event_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_event')
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                self.tab_event_loaded = True
+            else:
+                for widget in self.dlg_cf.findChildren(QWidget):
+                    if isinstance(widget, tools_gw.CustomQgsDateTimeEdit):
+                        self.force_enable_clear_button(widget)
+                        
+
         # Tab 'Documents'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_documents')
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            self.tab_document_loaded = True
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_documents':
+            if not self.tab_document_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_documents')
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                self.tab_document_loaded = True
+            else:
+                for widget in self.dlg_cf.findChildren(QWidget):
+                    if isinstance(widget, tools_gw.CustomQgsDateTimeEdit):
+                        self.force_enable_clear_button(widget)
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self._fill_tab_plan(self.complet_result)
             self.tab_plan_loaded = True
+
+    def force_enable_clear_button(self, widget):
+        # Always ensure nulls are allowed
+        if hasattr(widget, "setAllowNull"):
+            widget.setAllowNull(True)
+
+        if widget.dateTime() == QDateTime():
+            print("widget.dateTime() is None or null")
+            widget.displayNull(True)
+        else:
+            print(f"widget.dateTime() is {widget.dateTime().toString()}")
+            widget.displayNull(False)
+        
+        # Force clear button to be active
+        for btn in widget.findChildren(QToolButton):
+            btn.setEnabled(True)
+            btn.raise_()
+            try:
+                btn.clicked.disconnect()
+            except Exception:
+                pass
+            btn.clicked.connect(widget.clear)
+        
+        if hasattr(widget, "valueChanged"):
+            try:
+                widget.valueChanged.disconnect()
+            except Exception:
+                pass
+            widget.valueChanged.connect(partial(self.force_enable_clear_button, widget))
+        
 
     def _manage_gallery_status(self, tbl_visits, btn_open_gallery):
 
@@ -2909,8 +2953,8 @@ class GwInfo(QObject):
             elif isinstance(widget, QComboBox):
                 widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
             elif isinstance(widget, QgsDateTimeEdit):
-                widget.setDate(QDate.currentDate())
                 widget.dateChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+                widget.setDate(QDate.currentDate())
 
             else:
                 continue
@@ -4067,7 +4111,6 @@ def open_selected_element(**kwargs):
 
 
 def manage_element(element_id, **kwargs):
-
     """ Function called in class tools_gw.add_button(...) -->
             widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
 

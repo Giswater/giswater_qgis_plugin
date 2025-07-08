@@ -47,6 +47,7 @@ def add_object(**kwargs):
     qtable_name = func_params['targetwidget']
     qtable = tools_qt.get_widget(dialog, f"{qtable_name}")
     filter_sign = '='
+    id_name = 'id'
     if button.property('widgetcontrols') is not None and 'filterSign' in button.property('widgetcontrols'):
         if button.property('widgetcontrols')['filterSign'] is not None:
             filter_sign = button.property('widgetcontrols')['filterSign']
@@ -68,9 +69,8 @@ def add_object(**kwargs):
             return
         # Use the found document ID
         object_id = row['id']
-    elif qtable_name == 'tbl_element' or 'element' in tab_name:
-        object_id = kwargs['complet_result_info']['body']['feature']['id']
-        field_object_id = kwargs['complet_result_info']['body']['feature']['idName']
+    elif qtable_name == 'tbl_element' or 'element' in tab_name: 
+        id_name = 'element_id'
 
     # Check if this object exists
     if 'sourceview' in func_params:
@@ -80,7 +80,7 @@ def add_object(**kwargs):
         view_object = func_params['sourcetable']
     
     sql = ("SELECT * FROM " + view_object + ""
-           " WHERE id = '" + object_id + "'")
+           f" WHERE {id_name} = '{object_id}'")
     row = tools_db.get_row(sql, log_sql=True)
     if not row:
         msg = "Object id not found"
@@ -91,8 +91,7 @@ def add_object(**kwargs):
     if qtable_name == 'tbl_document' or 'doc' in tab_name:
         field_object_id = 'doc_id'
     elif qtable_name == 'tbl_element' or 'element' in tab_name:
-        object_id = kwargs['complet_result_info']['body']['feature']['id']
-        field_object_id = kwargs['complet_result_info']['body']['feature']['idName']
+        field_object_id = 'element_id'
     else:
         field_object_id = dialog.findChild(QWidget, func_params['sourcewidget']).property('columnname')
 
@@ -961,7 +960,7 @@ def open_selected_manager_item(**kwargs):
     if qtable.property('linkedobject') in ('v_ui_element', 'tbl_element_x_arc', 'tbl_element_x_node', 'tbl_element_x_connec', 'tbl_element_x_link', 'tbl_element_x_gully'):
         # Open selected element
         element_id = index.sibling(row, column_index).data()
-        sql = f"SELECT concat('ve_', lower(feature_class)) from v_ui_element where id = '{element_id}' "
+        sql = f"SELECT concat('ve_', lower(feature_class)) from v_ui_element where element_id = '{element_id}' "
         table_name = tools_db.get_row(sql)
         info_feature = GwInfo('tab_data')
         complet_result, dialog = info_feature.open_form(table_name=table_name[0], feature_id=element_id, tab_type='data')
