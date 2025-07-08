@@ -329,7 +329,7 @@ BEGIN
 								EXECUTE 'UPDATE arc SET
 									elevation1 = '|| v_sys_top_elev ||',
 									depth1 = '|| v_depth||',
-									staticpress1 = '|| v_staticpress ||' 
+									staticpressure1 = '|| v_staticpress ||' 
 									WHERE arc_id = ' || quote_literal(arcrec."arc_id");
 							END IF;
 
@@ -344,7 +344,7 @@ BEGIN
 								EXECUTE 'UPDATE arc SET
 									elevation2 = '|| v_sys_top_elev ||',
 									depth2 = '|| v_depth||',
-									staticpress2 = '|| v_staticpress ||' 
+									staticpressure2 = '|| v_staticpress ||' 
 									WHERE arc_id = ' || quote_literal(arcrec."arc_id");
 							END IF;
 

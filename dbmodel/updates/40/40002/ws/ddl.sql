@@ -7,3 +7,12 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+-- 07/07/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_valve", "column":"pression_exit", "newName":"pressure_exit"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_valve", "column":"pression_entry", "newName":"pressure_entry"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_pump", "column":"pressure", "newName":"pressure_exit"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"staticpress1", "newName":"staticpressure1"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"staticpress2", "newName":"staticpressure2"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"staticpressure", "newName":"staticpressure1"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"staticpressure2", "dataType":"int4"}}$$);

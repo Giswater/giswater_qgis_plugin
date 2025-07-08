@@ -580,7 +580,7 @@ BEGIN
 			omzone_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, conserv_state,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, updated_at, updated_by,
-			asset_id, drainzone_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
+			asset_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
 			drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
@@ -588,7 +588,7 @@ BEGIN
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.district_id,NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, NEW.updated_at, NEW.updated_by,
-			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.placement_type, NEW.label_quadrant,
+			NEW.asset_id,  NEW.parent_id, NEW.arc_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.placement_type, NEW.label_quadrant,
 			NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id, NEW.hemisphere,
 			NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id);
 		ELSE
@@ -596,7 +596,7 @@ BEGIN
 			omzone_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, conserv_state,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, updated_at, updated_by, matcat_id,
-			asset_id, drainzone_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
+			asset_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
 			drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
@@ -604,7 +604,7 @@ BEGIN
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.district_id, NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value,  NEW.updated_at, NEW.updated_by,NEW.matcat_id,
-			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.placement_type,
+			NEW.asset_id,  NEW.parent_id, NEW.arc_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id, NEW.hemisphere,
 			NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id);
 		END IF;
@@ -885,8 +885,7 @@ BEGIN
 			streetaxis2_id=NEW.streetaxis2_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified,
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, updated_at=now(), updated_by=current_user,
-			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
-			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
+			asset_id=NEW.asset_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant,
 			access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap,
 			pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id
@@ -901,7 +900,7 @@ BEGIN
 			streetaxis2_id=NEW.streetaxis2_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified,
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, updated_at=now(), updated_by=current_user, matcat_id = NEW.matcat_id,
-			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
+			asset_id=NEW.asset_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 			lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id
 			WHERE node_id = OLD.node_id;

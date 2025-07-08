@@ -871,8 +871,8 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=18 WHERE form
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=19 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='macrodqa_id' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=20 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='minsector_id' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=21 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='dqa_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=22 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='staticpress1' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=23 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='staticpress2' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=22 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='staticpressure1' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=23 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='staticpressure2' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=24 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=25 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='link' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=26 WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='sector_name' AND tabname='tab_data';

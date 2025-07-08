@@ -1185,29 +1185,29 @@ BEGIN
 				EXECUTE v_query_text;
 				-- arcs
 				v_query_text = '
-					UPDATE arc a SET staticpress1 = t.staticpress1 
+					UPDATE arc a SET staticpressure1 = t.staticpressure1 
 					FROM (
 						SELECT arc_id, 
-						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth1, 0))::numeric(12,3), 0) AS staticpress1
+						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth1, 0))::numeric(12,3), 0) AS staticpressure1
 						FROM arc a 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
 						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
 					) t
 					WHERE a.arc_id = t.arc_id 
-					AND (a.staticpress1 <> t.staticpress1 OR a.staticpress1 IS NULL)
+					AND (a.staticpressure1 <> t.staticpressure1 OR a.staticpressure1 IS NULL)
 				';
 				EXECUTE v_query_text;
 				v_query_text = '
-					UPDATE arc a SET staticpress2 = t.staticpress2 
+					UPDATE arc a SET staticpressure2 = t.staticpressure2 
 					FROM (
 						SELECT arc_id, 
-						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth2, 0))::numeric(12,3), 0) AS staticpress2
+						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth2, 0))::numeric(12,3), 0) AS staticpressure2
 						FROM arc a 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
 						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
 					) t
 					WHERE a.arc_id = t.arc_id 
-					AND (a.staticpress2 <> t.staticpress2 OR a.staticpress2 IS NULL)
+					AND (a.staticpressure2 <> t.staticpressure2 OR a.staticpressure2 IS NULL)
 				';
 				EXECUTE v_query_text;
 				-- connec

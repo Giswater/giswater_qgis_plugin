@@ -189,8 +189,8 @@ BEGIN
 		ELSE
 			--set final nodes to NULL and delete node
 			IF v_project_type = 'WS' THEN
-				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, elevation1=NULL, depth1=NULL, staticpress1 = NULL WHERE node_1='||v_feature_id||';';
-				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, elevation2=NULL, depth2=NULL, staticpress2 = NULL WHERE node_2='||v_feature_id||';';
+				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, elevation1=NULL, depth1=NULL, staticpressure1 = NULL WHERE node_1='||v_feature_id||';';
+				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, elevation2=NULL, depth2=NULL, staticpressure2 = NULL WHERE node_2='||v_feature_id||';';
 			ELSE
 				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, node_sys_top_elev_1=NULL, node_sys_elev_1=NULL WHERE node_1='||v_feature_id||';';
 				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, node_sys_top_elev_2=NULL, node_sys_elev_2=NULL WHERE node_2='||v_feature_id||';';

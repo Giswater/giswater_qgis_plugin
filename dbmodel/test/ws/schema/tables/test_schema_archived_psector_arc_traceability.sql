@@ -28,7 +28,7 @@ SELECT columns_are(
         'link', 'verified', 'the_geom', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id',
         'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user', 'minsector_id', 'dqa_id',
         'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
-        'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
+        'nodetype_1', 'elevation1', 'depth1', 'staticpressure1', 'nodetype_2', 'elevation2', 'depth2', 'staticpressure2',
         'om_state', 'conserv_state', 'parent_id', 'expl_visibility', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
         'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap'
     ],

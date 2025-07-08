@@ -867,7 +867,7 @@ BEGIN
 			/*
 			-- update on node table those elements disconnected from graph
 			IF v_usepsector is false then
-				EXECUTE 'UPDATE temp_t_node SET staticpressure=(staticpress1-(staticpress1-staticpress2)*st_linelocatepoint(temp_t_arc.the_geom, n.the_geom))::numeric(12,3)
+				EXECUTE 'UPDATE temp_t_node SET staticpressure=(staticpressure1-(staticpressure1-staticpressure2)*st_linelocatepoint(temp_t_arc.the_geom, n.the_geom))::numeric(12,3)
 				FROM temp_t_arc, temp_t_node n
 				WHERE st_dwithin(temp_t_arc.the_geom, n.the_geom, 0.05::double precision) AND temp_t_arc.state = 1 AND n.state =1
 				and n.arc_id IS NOT NULL AND temp_t_node.node_id=n.node_id and n.expl_id='||v_expl_id||';';
@@ -881,7 +881,7 @@ BEGIN
 				WHERE temp_t_connec.connec_id=b.connec_id;';
 
 			-- update link table
-			EXECUTE 'UPDATE temp_t_link SET staticpressure =(b.head - b.top_elev + (case when b.depth is null then 0 else b.depth end)::float) FROM 
+			EXECUTE 'UPDATE temp_t_link SET staticpressure1 =(b.head - b.top_elev + (case when b.depth is null then 0 else b.depth end)::float) FROM 
 				(SELECT link_id, head, top_elev, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
 				JOIN temp_presszone p ON c.presszone_id = p.presszone_id) b
 				WHERE temp_t_link.link_id=b.link_id;';
@@ -1445,8 +1445,8 @@ BEGIN
 		EXECUTE v_querytext;
 		IF v_class = 'PRESSZONE' THEN
 			-- static pressure for arcs
-			UPDATE arc SET staticpress1 = n.staticpressure FROM temp_t_node n WHERE node_id = node_1;
-			UPDATE arc SET staticpress2 = n.staticpressure FROM temp_t_node n WHERE node_id = node_2;
+			UPDATE arc SET staticpressure1 = n.staticpressure FROM temp_t_node n WHERE node_id = node_1;
+			UPDATE arc SET staticpressure2 = n.staticpressure FROM temp_t_node n WHERE node_id = node_2;
 		END IF;
 
 		-- node
@@ -1467,7 +1467,7 @@ BEGIN
 
 		--link
 		IF v_class = 'PRESSZONE' THEN
-			UPDATE link SET staticpressure = l.staticpressure FROM temp_t_link l WHERE l.link_id=link.link_id;
+			UPDATE link SET staticpressure1 = l.staticpressure1 FROM temp_t_link l WHERE l.link_id=link.link_id;
 		END IF;
 
 		v_querytext = 'UPDATE link SET '||quote_ident(v_field)||' = l.'||quote_ident(v_field)||', updated_by = l.updated_by, updated_at = l.updated_at 

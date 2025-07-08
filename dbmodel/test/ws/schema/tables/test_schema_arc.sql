@@ -27,7 +27,7 @@ SELECT columns_are(
         'descript', 'link', 'verified', 'label_x', 'label_y', 'label_rotation', 'publish',
         'inventory', 'expl_id', 'num_value', 'feature_type',
         'minsector_id', 'dqa_id', 'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
-        'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
+        'nodetype_1', 'elevation1', 'depth1', 'staticpressure1', 'nodetype_2', 'elevation2', 'depth2', 'staticpressure2',
         'om_state', 'conserv_state', 'parent_id', 'expl_visibility', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
         'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
@@ -112,11 +112,11 @@ SELECT col_type_is('arc', 'pavcat_id', 'varchar(30)', 'Column pavcat_id should b
 SELECT col_type_is('arc', 'nodetype_1', 'varchar(30)', 'Column nodetype_1 should be varchar(30)');
 SELECT col_type_is('arc', 'elevation1', 'numeric(12,4)', 'Column elevation1 should be numeric(12,4)');
 SELECT col_type_is('arc', 'depth1', 'numeric(12,4)', 'Column depth1 should be numeric(12,4)');
-SELECT col_type_is('arc', 'staticpress1', 'numeric(12,3)', 'Column staticpress1 should be numeric(12,3)');
+SELECT col_type_is('arc', 'staticpressure1', 'numeric(12,3)', 'Column staticpressure1 should be numeric(12,3)');
 SELECT col_type_is('arc', 'nodetype_2', 'varchar(30)', 'Column nodetype_2 should be varchar(30)');
 SELECT col_type_is('arc', 'elevation2', 'numeric(12,4)', 'Column elevation2 should be numeric(12,4)');
 SELECT col_type_is('arc', 'depth2', 'numeric(12,4)', 'Column depth2 should be numeric(12,4)');
-SELECT col_type_is('arc', 'staticpress2', 'numeric(12,3)', 'Column staticpress2 should be numeric(12,3)');
+SELECT col_type_is('arc', 'staticpressure2', 'numeric(12,3)', 'Column staticpressure2 should be numeric(12,3)');
 SELECT col_type_is('arc', 'om_state', 'text', 'Column om_state should be text');
 SELECT col_type_is('arc', 'conserv_state', 'text', 'Column conserv_state should be text');
 SELECT col_type_is('arc', 'parent_id', 'integer', 'Column parent_id should be integer');

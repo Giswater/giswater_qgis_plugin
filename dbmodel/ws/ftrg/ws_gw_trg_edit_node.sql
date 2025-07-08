@@ -569,8 +569,8 @@ BEGIN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
 
 		ELSIF v_man_table='man_pump' THEN
-				INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height, name, pump_number, to_arc)
-				VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number, NEW.to_arc);
+				INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure_exit, elev_height, name, pump_number, to_arc)
+				VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure_exit, NEW.elev_height, NEW.name, NEW.pump_number, NEW.to_arc);
 
 		ELSIF v_man_table='man_reduction' THEN
 
@@ -586,9 +586,9 @@ BEGIN
 			INSERT INTO man_reduction (node_id,diam1,diam2) VALUES(NEW.node_id,NEW.diam1, NEW.diam2);
 
 		ELSIF v_man_table='man_valve' THEN
-			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
+			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pressure_entry, pressure_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
 			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand2, model2, valve_type, to_arc, automated, connection_type)
-			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pression_entry, NEW.pression_exit, NEW.depth_valveshaft, NEW.regulator_situation,
+			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pressure_entry, NEW.pressure_exit, NEW.depth_valveshaft, NEW.regulator_situation,
 			NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2, NEW.ordinarystatus,
 			NEW.shutter, NEW.brand2, NEW.model2, NEW.valve_type, NEW.to_arc, NEW.automated, NEW.connection_type);
 
@@ -970,7 +970,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_pump' THEN
 			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power,
-			pressure=NEW.pressure, elev_height=NEW.elev_height, name=NEW.name, pump_number=NEW.pump_number, to_arc=NEW.to_arc
+			pressure_exit=NEW.pressure_exit, elev_height=NEW.elev_height, name=NEW.name, pump_number=NEW.pump_number, to_arc=NEW.to_arc
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_manhole' THEN
@@ -1003,7 +1003,7 @@ BEGIN
 		ELSIF v_man_table ='man_valve' THEN
 
 			UPDATE man_valve
-			SET closed=NEW.closed, broken=NEW.broken, buried=NEW.buried, irrigation_indicator=NEW.irrigation_indicator, pression_entry=NEW.pression_entry, pression_exit=NEW.pression_exit,
+			SET closed=NEW.closed, broken=NEW.broken, buried=NEW.buried, irrigation_indicator=NEW.irrigation_indicator, pressure_entry=NEW.pressure_entry, pressure_exit=NEW.pressure_exit,
 			depth_valveshaft=NEW.depth_valveshaft, regulator_situation=NEW.regulator_situation, regulator_location=NEW.regulator_location, regulator_observ=NEW.regulator_observ,
 			lin_meters=NEW.lin_meters, exit_type=NEW.exit_type, exit_code=NEW.exit_code, drive_type=NEW.drive_type, cat_valve2=NEW.cat_valve2, ordinarystatus = NEW.ordinarystatus,
 			shutter=NEW.shutter, brand2=NEW.brand2, model2=NEW.model2, valve_type=NEW.valve_type, to_arc=NEW.to_arc, automated=NEW.automated, connection_type=NEW.connection_type
@@ -1094,8 +1094,8 @@ BEGIN
 
 		v_new_node_type= (SELECT node_type FROM  cat_node where cat_node.id=NEW.nodecat_id);
 
-		UPDATE arc SET nodetype_1 = v_new_node_type, elevation1=NEW.top_elev, depth1=NEW.depth, staticpress1 = NEW.staticpressure WHERE node_1 = NEW.node_id;
-		UPDATE arc SET nodetype_2 = v_new_node_type, elevation2=NEW.top_elev, depth2=NEW.depth, staticpress2 = NEW.staticpressure WHERE node_2 = NEW.node_id;
+		UPDATE arc SET nodetype_1 = v_new_node_type, elevation1=NEW.top_elev, depth1=NEW.depth, staticpressure1 = NEW.staticpressure WHERE node_1 = NEW.node_id;
+		UPDATE arc SET nodetype_2 = v_new_node_type, elevation2=NEW.top_elev, depth2=NEW.depth, staticpressure2 = NEW.staticpressure WHERE node_2 = NEW.node_id;
 
 
 
@@ -1378,8 +1378,8 @@ BEGIN
 		-- delete from node_add table
 		DELETE FROM node_add WHERE node_id = OLD.node_id;
 
-		UPDATE arc SET nodetype_1 = NULL, elevation1=NULL, depth1=NULL, staticpress1 = NULL WHERE node_1 = OLD.node_id;
-		UPDATE arc SET nodetype_2 = NULL, elevation2=NULL, depth2=NULL, staticpress2 = NULL WHERE node_2 = OLD.node_id;
+		UPDATE arc SET nodetype_1 = NULL, elevation1=NULL, depth1=NULL, staticpressure1 = NULL WHERE node_1 = OLD.node_id;
+		UPDATE arc SET nodetype_2 = NULL, elevation2=NULL, depth2=NULL, staticpressure2 = NULL WHERE node_2 = OLD.node_id;
 
 		RETURN NULL;
     END IF;

@@ -986,8 +986,8 @@ BEGIN
 				';
 				EXECUTE v_query_text;
 				-- arcs
-				UPDATE arc SET staticpress1 = n.staticpressure FROM temp_pgr_node n WHERE node_id = node_1;
-				UPDATE arc SET staticpress2 = n.staticpressure FROM temp_pgr_node n WHERE node_id = node_2;
+				UPDATE arc SET staticpressure1 = n.staticpressure FROM temp_pgr_node n WHERE node_id = node_1;
+				UPDATE arc SET staticpressure2 = n.staticpressure FROM temp_pgr_node n WHERE node_id = node_2;
 				-- nodes
 				UPDATE node SET staticpressure = n.staticpressure FROM temp_pgr_node n WHERE n.node_id=node.node_id;
 				-- connecs

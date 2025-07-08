@@ -359,3 +359,9 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
     "value": null
   }
 ]'::json, NULL, true, '{4}');
+-- 07/07/2025
+UPDATE config_form_fields SET iseditable=false WHERE formname='v_edit_drainzone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
+UPDATE config_form_fields SET iseditable=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,widgetcontrols,hidden)
+	VALUES ('v_ui_dwfzone','form_feature','tab_none','drainzone_id','lyt_data_1',11,'text','combo','drainzone_id','drainzone_id',false,false,true,false,false,'SELECT drainzone_id id, name idval FROM v_edit_drainzone','{"setMultiline":false}'::json,false);

@@ -7,3 +7,10 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON
+v_edit_link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');
+
+CREATE TRIGGER gw_trg_edit_link_link INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_link_link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');

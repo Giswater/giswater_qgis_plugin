@@ -147,8 +147,8 @@ BEGIN
 					arc_id, code, node_1, node_2, arccat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", custom_length, dma_id, presszone_id, soilcat_id, function_type,
 					category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
 					postnumber2, postcomplement2, descript, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, lastupdate,
-					lastupdate_user, insert_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan, asset_id, pavcat_id, nodetype_1, elevation1, depth1, staticpress1, nodetype_2, elevation2,
-					depth2, staticpress2, om_state, conserv_state, parent_id, expl_visibility, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2, supplyzone_id, datasource,
+					lastupdate_user, insert_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan, asset_id, pavcat_id, nodetype_1, elevation1, depth1, staticpressure1, nodetype_2, elevation2,
+					depth2, staticpressure2, om_state, conserv_state, parent_id, expl_visibility, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2, supplyzone_id, datasource,
 					lock_level, is_scadamap
 				)
 				SELECT
@@ -156,8 +156,8 @@ BEGIN
 					a.arc_id, a.code, a.node_1, a.node_2, a.arccat_id, a.epa_type, a.sector_id, a.state, a.state_type, a.annotation, a.observ, a.comment, a.custom_length, a.dma_id, a.presszone_id::varchar, a.soilcat_id, a.function_type,
 					a.category_type, a.fluid_type, a.location_type, a.workcat_id, a.workcat_id_end, a.builtdate, a.enddate, a.ownercat_id, a.muni_id, a.postcode, a.streetaxis_id, a.postnumber, a.postcomplement, a.streetaxis2_id,
 					a.postnumber2, a.postcomplement2, a.descript, a.link, a.verified, a.the_geom, a.label_x, a.label_y, a.label_rotation, a.publish, a.inventory, a.expl_id, a.num_value, a.feature_type, a.tstamp, a.lastupdate,
-					a.lastupdate_user, a.insert_user, a.minsector_id, a.dqa_id, a.district_id, a.adate, a.adescript, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.nodetype_1, a.elevation1, a.depth1, a.staticpress1, a.nodetype_2, a.elevation2,
-					a.depth2, a.staticpress2, a.om_state, a.conserv_state, a.parent_id, a.expl_visibility, a.brand_id, a.model_id, a.serial_number, a.label_quadrant, a.streetname, a.streetname2, a.supplyzone_id, a.datasource,
+					a.lastupdate_user, a.insert_user, a.minsector_id, a.dqa_id, a.district_id, a.adate, a.adescript, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.nodetype_1, a.elevation1, a.depth1, a.staticpressure1, a.nodetype_2, a.elevation2,
+					a.depth2, a.staticpressure2, a.om_state, a.conserv_state, a.parent_id, a.expl_visibility, a.brand_id, a.model_id, a.serial_number, a.label_quadrant, a.streetname, a.streetname2, a.supplyzone_id, a.datasource,
 					a.lock_level, a.is_scadamap
 				FROM plan_psector_x_arc pa
 				JOIN arc a USING (arc_id)
@@ -480,8 +480,8 @@ BEGIN
 					arc_id, code, node_1, node_2, arccat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", custom_length, dma_id, presszone_id, soilcat_id, function_type,
 					category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
 					postnumber2, postcomplement2, descript, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, lastupdate,
-					lastupdate_user, insert_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan, asset_id, pavcat_id, nodetype_1, elevation1, depth1, staticpress1, nodetype_2, elevation2,
-					depth2, staticpress2, om_state, conserv_state, parent_id, expl_visibility, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2, supplyzone_id, datasource,
+					lastupdate_user, insert_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan, asset_id, pavcat_id, nodetype_1, elevation1, depth1, staticpressure1, nodetype_2, elevation2,
+					depth2, staticpressure2, om_state, conserv_state, parent_id, expl_visibility, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2, supplyzone_id, datasource,
 					lock_level, is_scadamap
 				)
 				SELECT
@@ -489,8 +489,8 @@ BEGIN
 					a.arc_id, a.code, a.node_1, a.node_2, a.arccat_id, a.epa_type, a.sector_id, a.state, a.state_type, a.annotation, a.observ, a.comment, a.custom_length, a.dma_id, a.presszone_id::varchar, a.soilcat_id, a.function_type,
 					a.category_type, a.fluid_type, a.location_type, a.workcat_id, a.workcat_id_end, a.builtdate, a.enddate, a.ownercat_id, a.muni_id, a.postcode, a.streetaxis_id, a.postnumber, a.postcomplement, a.streetaxis2_id,
 					a.postnumber2, a.postcomplement2, a.descript, a.link, a.verified, a.the_geom, a.label_x, a.label_y, a.label_rotation, a.publish, a.inventory, a.expl_id, a.num_value, a.feature_type, a.tstamp, a.lastupdate,
-					a.lastupdate_user, a.insert_user, a.minsector_id, a.dqa_id, a.district_id, a.adate, a.adescript, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.nodetype_1, a.elevation1, a.depth1, a.staticpress1, a.nodetype_2, a.elevation2,
-					a.depth2, a.staticpress2, a.om_state, a.conserv_state, a.parent_id, a.expl_visibility, a.brand_id, a.model_id, a.serial_number, a.label_quadrant, a.streetname, a.streetname2, a.supplyzone_id, a.datasource,
+					a.lastupdate_user, a.insert_user, a.minsector_id, a.dqa_id, a.district_id, a.adate, a.adescript, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.nodetype_1, a.elevation1, a.depth1, a.staticpressure1, a.nodetype_2, a.elevation2,
+					a.depth2, a.staticpressure2, a.om_state, a.conserv_state, a.parent_id, a.expl_visibility, a.brand_id, a.model_id, a.serial_number, a.label_quadrant, a.streetname, a.streetname2, a.supplyzone_id, a.datasource,
 					a.lock_level, a.is_scadamap
 				FROM plan_psector_x_arc pa
 				JOIN arc a USING (arc_id)
