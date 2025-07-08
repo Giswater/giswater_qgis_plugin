@@ -223,6 +223,7 @@ BEGIN
 		INTO v_dqa_id;
 		EXECUTE 'SELECT presszone_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 		INTO v_presszone_id;
+	ELSIF v_project_type = 'UD' THEN
 		EXECUTE 'SELECT dwfzone_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 		INTO v_dwfzone_id;
 	END IF;

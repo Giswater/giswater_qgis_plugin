@@ -20,7 +20,7 @@ SELECT has_table('man_pump'::name, 'Table man_pump should exist');
 SELECT columns_are(
     'man_pump',
     ARRAY[
-        'node_id', 'max_flow', 'min_flow', 'nom_flow', 'power', 'pressure', 'elev_height',
+        'node_id', 'max_flow', 'min_flow', 'nom_flow', 'power', 'pressure_exit', 'elev_height',
         'name', 'pump_number', 'to_arc'
     ],
     'Table man_pump should have the correct columns'
@@ -35,7 +35,7 @@ SELECT col_type_is('man_pump', 'max_flow', 'numeric(12,4)', 'Column max_flow sho
 SELECT col_type_is('man_pump', 'min_flow', 'numeric(12,4)', 'Column min_flow should be numeric(12,4)');
 SELECT col_type_is('man_pump', 'nom_flow', 'numeric(12,4)', 'Column nom_flow should be numeric(12,4)');
 SELECT col_type_is('man_pump', 'power', 'numeric(12,4)', 'Column power should be numeric(12,4)');
-SELECT col_type_is('man_pump', 'pressure', 'numeric(12,4)', 'Column pressure should be numeric(12,4)');
+SELECT col_type_is('man_pump', 'pressure_exit', 'numeric(12,4)', 'Column pressure_exit should be numeric(12,4)');
 SELECT col_type_is('man_pump', 'elev_height', 'numeric(12,4)', 'Column elev_height should be numeric(12,4)');
 SELECT col_type_is('man_pump', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('man_pump', 'pump_number', 'integer', 'Column pump_number should be integer');

@@ -20,7 +20,7 @@ SELECT has_table('man_valve'::name, 'Table man_valve should exist');
 SELECT columns_are(
     'man_valve',
     ARRAY[
-        'node_id', 'closed', 'broken', 'buried', 'irrigation_indicator', 'pression_entry', 'pression_exit',
+        'node_id', 'closed', 'broken', 'buried', 'irrigation_indicator', 'pressure_entry', 'pressure_exit',
         'depth_valveshaft', 'regulator_situation', 'regulator_location', 'regulator_observ', 'lin_meters',
         'exit_type', 'exit_code', 'drive_type', 'cat_valve2', 'ordinarystatus', 'shutter', 'brand2',
         'model2', 'valve_type', 'to_arc', 'automated', 'connection_type'
@@ -37,8 +37,8 @@ SELECT col_type_is('man_valve', 'closed', 'boolean', 'Column closed should be bo
 SELECT col_type_is('man_valve', 'broken', 'boolean', 'Column broken should be boolean');
 SELECT col_type_is('man_valve', 'buried', 'varchar(16)', 'Column buried should be varchar(16)');
 SELECT col_type_is('man_valve', 'irrigation_indicator', 'varchar(16)', 'Column irrigation_indicator should be varchar(16)');
-SELECT col_type_is('man_valve', 'pression_entry', 'numeric(12,3)', 'Column pression_entry should be numeric(12,3)');
-SELECT col_type_is('man_valve', 'pression_exit', 'numeric(12,3)', 'Column pression_exit should be numeric(12,3)');
+SELECT col_type_is('man_valve', 'pressure_entry', 'numeric(12,3)', 'Column pressure_entry should be numeric(12,3)');
+SELECT col_type_is('man_valve', 'pressure_exit', 'numeric(12,3)', 'Column pressure_exit should be numeric(12,3)');
 SELECT col_type_is('man_valve', 'depth_valveshaft', 'numeric(12,3)', 'Column depth_valveshaft should be numeric(12,3)');
 SELECT col_type_is('man_valve', 'regulator_situation', 'varchar(150)', 'Column regulator_situation should be varchar(150)');
 SELECT col_type_is('man_valve', 'regulator_location', 'varchar(150)', 'Column regulator_location should be varchar(150)');

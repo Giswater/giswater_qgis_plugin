@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(12);
 
-INSERT INTO v_edit_link (link_id, code, link_type, feature_type, feature_id, exit_type, exit_id, state, expl_id, sector_id, sector_type, macrosector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, top_elev2, elevation1, fluid_type, gis_length, the_geom, muni_id, epa_type, is_operative, staticpressure, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, updated_at, updated_by, uncertain, minsector_id, verified, state_type)
+INSERT INTO v_edit_link (link_id, code, link_type, feature_type, feature_id, exit_type, exit_id, state, expl_id, sector_id, sector_type, macrosector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, top_elev2, elevation1, fluid_type, gis_length, the_geom, muni_id, epa_type, is_operative, staticpressure1, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, updated_at, updated_by, uncertain, minsector_id, verified, state_type)
 VALUES(-901, '-901', 'PIPELINK', 'CONNEC', '3008', 'ARC', '2067', 1, 1, 3, 'DISTRIBUTION', 1, '3', NULL, 71.75, 2, NULL, NULL, 1, NULL, NULL, NULL, NULL, 'St. Fluid', 16.646, 'SRID=25831;LINESTRING (419084.18264611065 4576806.076099069, 419093.3076407612 4576819.998540623)'::public.geometry, 1, 'JUNCTION', true, 22.741, 'PVC25-PN16-DOM', NULL, NULL, '2002-04-21', NULL, NULL, NULL, false, 113854, 0, 2);
 SELECT is((SELECT count(*)::integer FROM v_edit_link WHERE code = '-901'), 1, 'INSERT: v_edit_link -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM link WHERE code = '-901'), 1, 'INSERT: link -901 was inserted');
@@ -29,7 +29,7 @@ SELECT is((SELECT count(*)::integer FROM v_edit_link WHERE code = '-901'), 0, 'D
 SELECT is((SELECT count(*)::integer FROM link WHERE code = '-901'), 0, 'DELETE: link -901 was deleted');
 
 
-INSERT INTO v_edit_link (link_id, code, link_type, feature_type, feature_id, exit_type, exit_id, state, expl_id, sector_id, sector_type, macrosector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, top_elev2, elevation1, fluid_type, gis_length, the_geom, muni_id, epa_type, is_operative, staticpressure, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, updated_at, updated_by, uncertain, minsector_id, verified, state_type)
+INSERT INTO v_edit_link (link_id, code, link_type, feature_type, feature_id, exit_type, exit_id, state, expl_id, sector_id, sector_type, macrosector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, top_elev2, elevation1, fluid_type, gis_length, the_geom, muni_id, epa_type, is_operative, staticpressure1, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, updated_at, updated_by, uncertain, minsector_id, verified, state_type)
 VALUES(-901, '-901', 'VLINK', 'CONNEC', '3008', 'ARC', '2067', 1, 1, 3, 'DISTRIBUTION', 1, '3', NULL, 71.75, 2, NULL, NULL, 1, NULL, NULL, NULL, NULL, 'St. Fluid', 16.646, 'SRID=25831;LINESTRING (419084.18264611065 4576806.076099069, 419093.3076407612 4576819.998540623)'::public.geometry, 1, 'JUNCTION', true, 22.741, 'PVC25-PN16-DOM', NULL, NULL, '2002-04-21', NULL, NULL, NULL, false, 113854, 0, 2);
 SELECT is((SELECT count(*)::integer FROM v_edit_link WHERE code = '-901'), 1, 'INSERT: v_edit_link -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM link WHERE code = '-901'), 1, 'INSERT: link -901 was inserted');

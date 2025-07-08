@@ -11,6 +11,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DROP VIEW IF EXISTS ve_link_link;
 DROP VIEW IF EXISTS v_edit_link;
 
+ALTER VIEW v_edit_arc RENAME COLUMN staticpress1 TO staticpressure1;
+ALTER VIEW v_edit_arc RENAME COLUMN staticpress2 TO staticpressure2;
+
 CREATE OR REPLACE VIEW v_edit_link
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
@@ -326,3 +329,4 @@ AS SELECT v_edit_link.link_id,
    FROM v_edit_link
      JOIN man_link USING (link_id)
   WHERE v_edit_link.link_type::text = 'LINK'::text;
+
