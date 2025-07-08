@@ -2776,8 +2776,6 @@ class GwInfo(QObject):
                 for widget in self.dlg_cf.findChildren(QWidget):
                     if isinstance(widget, tools_gw.CustomQgsDateTimeEdit):
                         self.force_enable_clear_button(widget)
-                        
-
         # Tab 'Documents'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents':
             if not self.tab_document_loaded:
@@ -2822,7 +2820,6 @@ class GwInfo(QObject):
             except Exception:
                 pass
             widget.valueChanged.connect(partial(self.force_enable_clear_button, widget))
-        
 
     def _manage_gallery_status(self, tbl_visits, btn_open_gallery):
 
