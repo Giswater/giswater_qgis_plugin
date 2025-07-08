@@ -46,7 +46,6 @@ SELECT col_type_is('cat_element', 'geom1', 'numeric(12,3)', 'Column geom1 should
 SELECT col_type_is('cat_element', 'geom2', 'numeric(12,3)', 'Column geom2 should be numeric(12,3)');
 SELECT col_type_is('cat_element', 'isdoublegeom', 'bool', 'Column isdoublegeom should be bool');
 
-
 -- Check default values
 SELECT col_has_default('cat_element', 'active', 'Column active should have default value');
 
