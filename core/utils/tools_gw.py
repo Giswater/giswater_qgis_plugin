@@ -1389,7 +1389,7 @@ def set_stylesheet(field, widget, wtype='label'):
     return widget
 
 
-def delete_selected_rows(widget, table_object, field_object_id=None):
+def delete_selected_rows(widget, table_object, field_object_id=None, col_idx=0):
     """ Delete selected objects of the table (by object_id) """
 
     # Get selected rows
@@ -1407,7 +1407,7 @@ def delete_selected_rows(widget, table_object, field_object_id=None):
     for i in range(0, len(selected_list)):
         row = selected_list[i].row()
         if isinstance(widget.model(), QStandardItemModel):
-            id_ = widget.model().item(row, 0).text()
+            id_ = widget.model().item(row, col_idx).text()
         else:
             id_ = widget.model().record(row).value(str(field_object_id))
         inf_text += f"{id_}, "
