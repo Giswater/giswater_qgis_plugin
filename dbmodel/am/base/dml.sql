@@ -17,7 +17,7 @@ INSERT INTO config_material_def SELECT id, 0.16, 58, 50, 42, 1964, 10 FROM PAREN
 
 INSERT INTO config_engine_def VALUES ('bratemain0', '0.05', 'SH', NULL, NULL, true, 'lyt_engine_1', 1, 'Break rate coefficient', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('drate', '0.05', 'SH', NULL, NULL, true, 'lyt_engine_1', 2, 'Discount rate (%)', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO config_engine_def VALUES ('rleak_1', '0.2', 'WM', NULL, NULL, true, 'lyt_engine_1', 3, 'Roturas reales', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_engine_def VALUES ('rleak_1', '0.2', 'WM', NULL, NULL, true, 'lyt_engine_1', 3, 'Real breaks', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('mleak_1', '0.1', 'WM', NULL, NULL, true, 'lyt_engine_1', 4, 'Probabilidad de falla', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('longevity_1', '0.7', 'WM', NULL, NULL, true, 'lyt_engine_1', 5, 'Longevidad', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('flow_1', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_1', 6, 'Caudal circulante', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -27,7 +27,7 @@ INSERT INTO config_engine_def VALUES ('compliance_1', '0.0', 'WM', NULL, NULL, t
 INSERT INTO config_engine_def VALUES ('expected_year', '0.7', 'SH', NULL, NULL, true, 'lyt_engine_2', 1, 'Weight expected year', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('compliance', '0.1', 'SH', NULL, NULL, true, 'lyt_engine_2', 2, 'Weight compliance', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('strategic', '0.2', 'SH', NULL, NULL, true, 'lyt_engine_2', 3, 'Weight strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO config_engine_def VALUES ('rleak_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 4, 'Roturas reales', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_engine_def VALUES ('rleak_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 4, 'Real breaks', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('mleak_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 5, 'Probabilidad de falla', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('longevity_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 6, 'Longevidad', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_engine_def VALUES ('flow_2', '0.5', 'WM', NULL, NULL, true, 'lyt_engine_2', 7, 'Caudal circulante', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
