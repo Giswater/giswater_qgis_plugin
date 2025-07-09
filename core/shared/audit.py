@@ -7,12 +7,15 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 
 from functools import partial
+
 from qgis.PyQt.QtCore import QDateTime, QDate
 from qgis.PyQt.QtGui import QStandardItemModel
+from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, QLineEdit, QGridLayout, QScrollArea
+
 from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
 from ...libs import tools_qt, tools_db, tools_qgis
-from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, QLineEdit, QGridLayout, QScrollArea
+
 
 
 class GwAudit:
@@ -57,8 +60,8 @@ class GwAudit:
         # Connect signals
         self.dlg_audit_manager.tbl_audit.doubleClicked.connect(partial(self.open_audit))
 
-        # Get yesterday date
-        yesterday = QDateTime.currentDateTime().addDays(-1)
+        # Get today date
+        today = QDateTime.currentDateTime()
 
         # Get date widget
         self.date = self.dlg_audit_manager.findChild(QWidget, "tab_none_date_to")
@@ -66,14 +69,14 @@ class GwAudit:
         # Get open date button
         self.btn_open_date = self.dlg_audit_manager.findChild(QWidget, "tab_none_btn_open_date")
 
-        # Set yesterday as default date and maximum date
-        self.date.setDateTime(yesterday)
+        # Set today as default date and maximum date
+        self.date.setDateTime(today)
 
         # Get first audit log date
         first_log_date = self.get_first_log_date()
 
         # Check the first audit log date
-        if not first_log_date or first_log_date > yesterday.date().toPyDate():
+        if not first_log_date or first_log_date > today.date().toPyDate():
             # Disable open date button and
             self.btn_open_date.setEnabled(False)
             self.date.setEnabled(False)
@@ -84,7 +87,11 @@ class GwAudit:
             # Set minimum date to first snapshot date
             self.date.setMinimumDateTime(q_first_snapshot_date)
 
-            self.date.setMaximumDateTime(yesterday)
+            self.date.setMaximumDateTime(today)
+        
+        # Do not allow null dates
+        for widget in self.dlg_audit_manager.findChildren(tools_gw.CustomQgsDateTimeEdit):
+            widget.setAllowNull(False)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_audit_manager, 'audit_manager')
@@ -111,29 +118,34 @@ class GwAudit:
         if len(selected_list) == 0:
             msg = "Any record selected"
             tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
-            return
-        row = selected_list[0].row()
+            return     
 
         model = self.dlg_audit_manager.tbl_audit.model()
-        audit_id = model.item(row, 0)
-        self.fill_dialog({"logId": audit_id.text()})
+        # Collect (tstamp, audit_id) for each selected row
+        selected_data = []
+        for item in selected_list:
+            row = item.row()
+            audit_id = model.item(row, 0)
+            tstamp_item = model.item(row, 1)  # assuming tstamp is column 1
+            tstamp = tstamp_item.text() if tstamp_item is not None else ""
+            selected_data.append((tstamp, audit_id.text()))
+        # Sort by tstamp ascending (oldest first)
+        selected_data.sort(key=lambda x: x[0])
+        # Build form list in sorted order
+        form = [{"logId": audit_id} for tstamp, audit_id in selected_data]
+        self.fill_dialog(form)
 
     def fill_dialog(self, form):
         """ Create and open dialog """
 
-        # Create body
-        body = {"client": {"cur_user": tools_db.current_user}, "form": form}
+        results = []
+        for log_id in form:
+            # Create body
+            body = {"client": {"cur_user": tools_db.current_user}, "form": log_id}
 
-        # Execute procedure
-        result = tools_gw.execute_procedure('gw_fct_getauditlogdata', body, schema_name='audit')
-        old_data = result['olddata']
-        new_data = result['newdata']
-
-        # Check results
-        if not old_data or not new_data:
-            msg = "No results"
-            tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
-            return
+            # Execute procedure
+            result = tools_gw.execute_procedure('gw_fct_getauditlogdata', body, schema_name='audit')
+            results.append(result)
 
         # Create dialog
         user = tools_db.current_user
@@ -166,25 +178,42 @@ class GwAudit:
         layout.addWidget(label, 0, 2)
 
         # Add widgets in form for each value
-        for row, (key, new_value) in enumerate(new_data.items()):
-            old_value = str(old_data.get(key, ""))
-            new_value = str(new_value)
+        done_values = []
+        for result in results:
+            old_data = result['olddata']
+            new_data = result['newdata']
 
-            # Check if the value has changed
-            if old_value != new_value:
-                # Create label
-                label = QLabel(str(key))
-                layout.addWidget(label, row, 0)
+            # Check results
+            if not old_data or not new_data:
+                msg = "No results"
+                tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
+                return
+            
+            for row, (key, new_value) in enumerate(new_data.items()):
+                old_value = str(old_data.get(key, ""))
+                new_value = str(new_value)
 
-                # Create line edit for old value
-                line_edit = QLineEdit(old_value)
-                line_edit.setEnabled(False)
-                layout.addWidget(line_edit, row, 1)
+                # Check if the value has changed
+                if old_value != new_value and old_value != "":
+                    print(f"new_value: {new_value}")
+                    print(f"old_value: {old_value}\n\n")
+                    # Create label
+                    label = QLabel(str(key))
+                    label.setStyleSheet("font-weight: bold;")
+                    layout.addWidget(label, row + 1, 0)
 
-                # Create line edit for new value
-                line_edit = QLineEdit(new_value)
-                line_edit.setEnabled(False)
-                layout.addWidget(line_edit, row, 2)
+                    # Ensure that the old value is the oldest one
+                    done_values.append(new_value)
+                    if old_value not in done_values:
+                        # Create line edit for old value
+                        line_edit = QLineEdit(old_value)
+                        line_edit.setEnabled(False)
+                        layout.addWidget(line_edit, row + 1, 1)
+            
+                    # Create line edit for new value
+                    line_edit = QLineEdit(new_value)
+                    line_edit.setEnabled(False)
+                    layout.addWidget(line_edit, row + 1, 2)
 
         # Add vertical spacer to the layout
         vertical_spacer = tools_qt.add_verticalspacer()
@@ -253,18 +282,21 @@ def open(**kwargs):
 
     kwargs["class"].open_audit()
 
-
 def open_date(**kwargs):
-    """ Open audit in selected date """
+    """ Open audit in selected date """    
 
     this = kwargs["class"]
+    query = f"""SELECT id FROM audit.log WHERE tstamp > '{this.date.dateTime().toString('yyyy-MM-dd')}' 
+                AND tstamp < now() ORDER BY tstamp ASC"""
+    rows = tools_db.get_rows(query)
 
-    form = {
-        "date": this.date.dateTime().toString("yyyy-MM-dd"),
-        "featureId": this.feature_id,
-        "tableName": this.table_name
-    }
+    form = []
+    for row in rows:
+        form.append({"logId": row[0]})
 
     this.fill_dialog(form)
+
+
+
 
 

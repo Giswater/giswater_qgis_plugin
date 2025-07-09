@@ -651,7 +651,6 @@ class GwInfo(QObject):
 
         if rows and schema_actived:
             self._enable_action(dlg_cf, self.action_audit, True)
-        print("connect_signal", connect_signal)
         if connect_signal:
             for signal in connect_signal:
                 func_name = signal.func.__name__
