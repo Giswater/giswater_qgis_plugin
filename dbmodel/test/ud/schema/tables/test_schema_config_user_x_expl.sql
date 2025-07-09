@@ -47,7 +47,7 @@ SELECT has_index('config_user_x_expl', 'username', 'Table config_user_x_expl sho
 
 
 --check trigger 
-SELECT has_trigger('config_typevalue', 'gw_trg_typevalue_config_fk', 'Table config_typevalue should have trigger gw_trg_typevalue_config_fk');
+SELECT has_trigger('config_user_x_expl', 'gw_trg_typevalue_config_fk', 'Table config_user_x_expl should have trigger gw_trg_typevalue_config_fk');
 --check rule 
 
 SELECT * FROM finish();
