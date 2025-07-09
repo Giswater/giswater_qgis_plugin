@@ -118,21 +118,17 @@ class GwAudit:
         if len(selected_list) == 0:
             msg = "Any record selected"
             tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
-            return     
+            return
+        elif len(selected_list) > 1:
+            msg = "Only one record can be selected"
+            tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
+            return
 
         model = self.dlg_audit_manager.tbl_audit.model()
-        # Collect (tstamp, audit_id) for each selected row
-        selected_data = []
-        for item in selected_list:
-            row = item.row()
-            audit_id = model.item(row, 0)
-            tstamp_item = model.item(row, 1)  # assuming tstamp is column 1
-            tstamp = tstamp_item.text() if tstamp_item is not None else ""
-            selected_data.append((tstamp, audit_id.text()))
-        # Sort by tstamp ascending (oldest first)
-        selected_data.sort(key=lambda x: x[0])
+        row = selected_list[0].row()
+        audit_id = model.item(row, 0)
         # Build form list in sorted order
-        form = [{"logId": audit_id} for tstamp, audit_id in selected_data]
+        form = [{"logId": audit_id.text()}]
         self.fill_dialog(form)
 
     def fill_dialog(self, form):
@@ -286,13 +282,13 @@ def open_date(**kwargs):
     """ Open audit in selected date """    
 
     this = kwargs["class"]
-    query = f"""SELECT id FROM audit.log WHERE tstamp > '{this.date.dateTime().toString('yyyy-MM-dd')}' 
-                AND tstamp < now() ORDER BY tstamp ASC"""
+    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{this.date.dateTime().toString('yyyy-MM-dd')}' ORDER BY tstamp ASC"""
     rows = tools_db.get_rows(query)
 
     form = []
-    for row in rows:
-        form.append({"logId": row[0]})
+    if rows:
+        for row in rows:
+            form.append({"logId": row[0]})
 
     this.fill_dialog(form)
 
