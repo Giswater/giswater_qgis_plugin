@@ -36,10 +36,10 @@ SELECT col_type_is('config_fprocess', 'orderby', 'int4', 'Column orderby should 
 SELECT col_type_is('config_fprocess', 'addparam', 'json', 'Column addparam should be json');
 SELECT col_type_is('config_fprocess', 'active', 'bool', 'Column active should be bool');
 
-	,
+	
 
 --check default values
-
+SELECT col_has_default('config_fprocess', 'active', 'Column active should have default value');
 
 -- check foreign keys
 
