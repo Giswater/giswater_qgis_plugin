@@ -1726,6 +1726,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                         widget.setValidator(QDoubleValidator())
                 elif field['widgettype'] == 'combo':
                     widget = add_combo(field)
+                    if field.get('parentname') and field.get('filterquery'):
+                        widget.setProperty('parentname', field['parentname'])
+                        widget.setProperty('filterquery', field['filterquery'])
                     widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     signal = field.get('signal')
                     if signal:

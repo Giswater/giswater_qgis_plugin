@@ -641,6 +641,11 @@ class GwToolBoxButton(GwAction):
             tools_gw.build_dialog_options(dialog, result, 0, self.function_list, self.temp_layers_added, module)
             self._load_settings_values(dialog, result)
             self._load_parametric_values(dialog, result)
+            for combo in dialog.findChildren(QComboBox):
+                if combo.property('parentname'):
+                    parent_combo = dialog.findChild(QComboBox, combo.property('parentname'))
+                    parent_combo.currentIndexChanged.connect(partial(self._filter_combo_values, dialog, combo))
+                    self._filter_combo_values(dialog, combo)
             # Execute any connected signal
             widgets = result['fields']
             if widgets:
@@ -666,6 +671,25 @@ class GwToolBoxButton(GwAction):
             status = True
 
         return status
+    
+    def _filter_combo_values(self, dialog, combo):
+        parent_name = combo.property('parentname')
+        parent_combo = dialog.findChild(QComboBox, parent_name)
+        if parent_combo:
+            parent_value = parent_combo.currentText()
+            filter_query = combo.property('filterquery')
+            if filter_query:
+                filter_query = filter_query.replace('{parent_value}', parent_value)
+            result = tools_db.get_rows(filter_query)
+            combo.setCurrentIndex(0)
+            combo.clear()
+            if result:
+                combolist = []
+                for i in range(0, len(result)):
+                    elem = [result[i][0], result[i][1]]
+                    combolist.append(elem)
+                for record in combolist:
+                    combo.addItem(record[0], record)
 
     def _populate_cmb_type(self, feature_types):
 
