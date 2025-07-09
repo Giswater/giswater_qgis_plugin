@@ -4253,8 +4253,12 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     answer = tools_qt.show_question(message, title, inf_text)
     if answer:
         for el in del_id:
-            if str(el) in class_object.rel_ids:
-                class_object.rel_ids.remove(str(el))
+            if el in class_object.rel_ids or str(el) in class_object.rel_ids:
+                # Remove whichever format exists
+                try:
+                    class_object.rel_ids.remove(el)
+                except ValueError:
+                    class_object.rel_ids.remove(str(el))
     else:
         return
 
