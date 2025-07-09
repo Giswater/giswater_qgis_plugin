@@ -5844,7 +5844,7 @@ UPDATE sys_table SET alias = '', descript = 'View which shows existent addfields
 UPDATE sys_table SET alias = '', descript = 'Shows ' WHERE id = 've_config_sysfields';
 UPDATE sys_table SET alias = '', descript = 'Editable view for conncs' WHERE id = 've_connec';
 UPDATE sys_table SET alias = 'Custom editable view for VCONNEC', descript = 'Vconnec' WHERE id = 've_connec_vconnec';
-UPDATE sys_table SET alias = 'Layer to store circle geometry when CAD tool is used', descript = 'Cirle' WHERE id = 'v_edit_cad_auxcircle';
+UPDATE sys_table SET alias = 'Layer to store circle geometry when CAD tool is used', descript = 'Circle' WHERE id = 'v_edit_cad_auxcircle';
 UPDATE sys_table SET alias = 'Layer to store line geometry', descript = 'Line' WHERE id = 'v_edit_cad_auxline';
 UPDATE sys_table SET alias = 'Editable view for cat_feature_connec configuration', descript = 'Connec feature catalog' WHERE id = 'v_edit_cat_feature_connec';
 UPDATE sys_table SET alias = 'Node feature catalog', descript = 'Editable view for cat_feature_node configuration' WHERE id = 'v_edit_cat_feature_node';

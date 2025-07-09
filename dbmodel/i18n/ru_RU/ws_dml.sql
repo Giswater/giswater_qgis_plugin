@@ -6269,7 +6269,7 @@ FROM (
     ('v_edit_cad_auxpoint', 'Point', 'Layer to store point geometry when CAD tool is used'),
     ('v_ext_address', 'Address', 'Shows information about entrance numbers'),
     ('v_edit_cad_auxline', 'Line', 'Layer to store line geometry'),
-    ('v_edit_cad_auxcircle', 'Cirle', 'Layer to store circle geometry when CAD tool is used'),
+    ('v_edit_cad_auxcircle', 'Circle', 'Layer to store circle geometry when CAD tool is used'),
     ('ext_municipality', 'Municipality', 'Table of town cities and villages'),
     ('ext_type_street', NULL, 'Catalog of street types'),
     ('om_profile', NULL, 'Table to store profiles'),
