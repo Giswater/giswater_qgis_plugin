@@ -272,7 +272,6 @@ def close_dlg(**kwargs):
 
     tools_gw.close_dialog(kwargs["dialog"])
 
-
 def open(**kwargs):
     """ Open audit """
 
