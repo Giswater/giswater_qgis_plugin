@@ -90,6 +90,7 @@ BEGIN
     IF row_to_json(NEW.*)::text != '{}' THEN
 
         v_new_data := row_to_json(NEW.*);
+        v_new_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_new_data);
         v_the_geom := (v_new_data::jsonb)->'the_geom';
 
         IF v_geometry_type = 'Point' THEN
@@ -118,6 +119,7 @@ BEGIN
     IF row_to_json(OLD.*)::text != '{}' THEN
 
         v_old_data := row_to_json(OLD.*);
+        v_old_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_old_data);
         v_the_geom := (v_old_data::jsonb)->'the_geom';
 
         IF v_geometry_type = 'Point' THEN
