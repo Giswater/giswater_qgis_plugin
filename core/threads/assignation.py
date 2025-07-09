@@ -337,52 +337,39 @@ class GwAssignation(GwTask):
             is_admin=True,
         )
 
-        final_report = [
-            tools_qt.tr("Task finished!"),
-            tools_qt.tr("Period of leaks: {years:.4g} years.").format(years=self.years),
-            tools_qt.tr("Leaks within the indicated period: {leaks}.").format(
-                leaks=values["total_leaks"]
-            ),
-            tools_qt.tr("Leaks without pipes intersecting its buffer: {leaks}.").format(
-                leaks=values["total_leaks"] - self.assigned_leaks
-            ),
+        final_report = []
+        final_report.append('Task finished!')
+
+        # Set final reports
+        final_report_values = [
+            (tools_qt.tr('Period of leaks (years): '), f'{self.years:.4g}'),
+            (tools_qt.tr('Leaks within the indicated period: '), f'{values["total_leaks"]}'),
+            (tools_qt.tr('Leaks without pipes intersecting its buffer: '), f'{values["total_leaks"] - self.assigned_leaks}')
         ]
 
         if self.by_material_diameter:
-            final_report.append(
-                tools_qt.tr("Leaks assigned by material and diameter: {leaks}.").format(
-                    leaks=self.by_material_diameter
-                )
-            )
+            final_report_values.append((tools_qt.tr('Leaks assigned by material and diameter: '), f'{self.by_material_diameter}'))
         if self.by_material:
-            final_report.append(
-                tools_qt.tr("Leaks assigned by material only: {leaks}.").format(
-                    leaks=self.by_material
-                )
-            )
+            final_report_values.append((tools_qt.tr('Leaks assigned by material only: '), f'{self.by_material}'))
         if self.by_diameter:
-            final_report.append(
-                tools_qt.tr("Leaks assigned by diameter only: {leaks}.").format(
-                    leaks=self.by_diameter
-                )
-            )
+            final_report_values.append((tools_qt.tr('Leaks assigned by diameter only: '), f'{self.by_diameter}'))
         if self.any_pipe:
-            final_report.append(
-                tools_qt.tr("Leaks assigned to any nearby pipes: {leaks}.").format(
-                    leaks=self.any_pipe
-                )
-            )
+            final_report_values.append((tools_qt.tr('Leaks assigned to any nearby pipes: '), f'{self.any_pipe}'))
 
-        final_report += [
-            tools_qt.tr("Total of pipes: {pipes}.").format(pipes=values["total_pipes"]),
-            tools_qt.tr("Pipes with zero leaks per km per year: {pipes}.").format(
-                pipes=values["orphan_pipes"]
-            ),
-            tools_qt.tr("Max rleak: {rleak} leaks/km.year.").format(rleak=values["max_rleak"]),
-            tools_qt.tr("Min non-zero rleak: {rleak} leaks/km.year.").format(
-                rleak=values["min_rleak"]
-            ),
-        ]
+        final_report_values.extend([
+            (tools_qt.tr('Total of pipes: '), f'{values["total_pipes"]}'),
+            (tools_qt.tr('Pipes with zero leaks per km per year: '), f'{values["orphan_pipes"]}'),
+            (tools_qt.tr('Max rleak (leaks/km/year): '), f'{values["max_rleak"]}'),
+            (tools_qt.tr('Min non-zero rleak (leaks/km/year): '), f'{values["min_rleak"]}')
+        ])
+
+        label_width = max(len(label) for label, _ in final_report_values)
+        value_width = max(len(value) for _, value in final_report_values)
+
+        # Build final report
+        for label, value in final_report_values:
+            sentence = f'{label:<{label_width}}{str(value):>{value_width}}'
+            final_report.append(sentence)
 
         return final_report
 

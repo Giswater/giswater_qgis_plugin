@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>377</width>
-    <height>469</height>
+    <width>544</width>
+    <height>473</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -236,7 +236,17 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
-        <widget class="QTextEdit" name="tab_log_txt_infolog"/>
+        <widget class="QTextEdit" name="tab_log_txt_infolog">
+         <property name="font">
+          <font>
+           <family>Courier New</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QProgressBar" name="progressBar">
