@@ -585,7 +585,7 @@ class GwDocument(QObject):
                 answer = tools_qt.show_question(msg, title)
                 if answer:
                     for k, file in enumerate(self.files_path):
-                        n = k+1
+                        n = k + 1
                         temp_name = f"{name}_{n}"
                         sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, temp_name)
         else:
@@ -599,7 +599,7 @@ class GwDocument(QObject):
                 answer = tools_qt.show_question(msg, title)
                 if answer:
                     for k, file in enumerate(self.files_path):
-                        n = k+1
+                        n = k + 1
                         temp_name = f"{name}_{n}"
                         sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, temp_name)
         self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, name, close_dlg=close_dlg)
