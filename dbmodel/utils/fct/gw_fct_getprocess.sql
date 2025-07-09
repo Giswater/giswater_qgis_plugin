@@ -107,18 +107,9 @@ BEGIN
 
 	END IF;
 
-	IF v_projectype = 'ws' THEN
-		v_nodetype = (SELECT node_type FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
-		WHERE cur_user = current_user AND parameter = 'edit_nodecat_vdefault');
-		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE node_type = v_nodetype limit 1) IS NULL THEN
-			v_nodetype = (SELECT ctn.id FROM cat_feature_node ctn JOIN cat_feature USING  (id)
-			join cat_node cn ON cn.node_type=ctn.id  WHERE cat_feature.active IS TRUE and cn.active IS TRUE limit 1);
-		END IF;
-	ELSE
-		v_nodetype = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodetype_vdefault');
-		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE node_type = v_nodetype OR node_type IS NULL limit 1) IS NULL THEN
-			v_nodetype = (SELECT id  FROM cat_feature_node JOIN cat_feature USING  (id) WHERE active IS TRUE limit 1);
-		END IF;
+	v_nodetype = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodetype_vdefault');
+	IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE node_type = v_nodetype OR node_type IS NULL limit 1) IS NULL THEN
+		v_nodetype = (SELECT id  FROM cat_feature_node JOIN cat_feature USING  (id) WHERE active IS TRUE limit 1);
 	END IF;
 
 	v_nodecat = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodecat_vdefault');
@@ -184,35 +175,39 @@ BEGIN
 			ELSIF v_selectedid ilike '$user%' then
 
 				IF v_selectedid = '$userExploitation' THEN
-					v_selectedid = concat('"selectedId":"',v_expl,'"');
+					v_selectedid = concat('{"selectedId":"',v_expl,'"}');
 				ELSIF v_selectedid = '$userMincut' THEN
-					v_selectedid = concat('"selectedId":"',v_mincut,'"');
+					v_selectedid = concat('{"selectedId":"',v_mincut,'"}');
 				ELSIF v_selectedid = '$userState' THEN
-					v_selectedid = concat('"selectedId":"',v_state,'"');
+					v_selectedid = concat('{"selectedId":"',v_state,'"}');
 				ELSIF v_selectedid = '$userSector' THEN
-					v_selectedid = concat('"selectedId":"',v_sector,'"');
+					v_selectedid = concat('{"selectedId":"',v_sector,'"}');
 				ELSIF v_selectedid = '$userHydrology' THEN
-					v_selectedid = concat('"selectedId":"',v_inp_hydrology,'"');
+					v_selectedid = concat('{"selectedId":"',v_inp_hydrology,'"}');
 				ELSIF v_selectedid = '$userDwf' THEN
-					v_selectedid = concat('"selectedId":"',v_inp_dwf,'"');
+					v_selectedid = concat('{"selectedId":"',v_inp_dwf,'"}');
 				ELSIF v_selectedid = '$userDscenario' THEN
-					v_selectedid = concat('"selectedId":"',v_inp_dscenario,'"');
+					v_selectedid = concat('{"selectedId":"',v_inp_dscenario,'"}');
 				ELSIF v_selectedid = '$userInpResult' THEN
-					v_selectedid = concat('"selectedId":"',v_inp_result,'"');
+					v_selectedid = concat('{"selectedId":"',v_inp_result,'"}');
 				ELSIF v_selectedid = '$userRptResult' THEN
-					v_selectedid = concat('"selectedId":"',v_rpt_result,'"');
+					v_selectedid = concat('{"selectedId":"',v_rpt_result,'"}');
 				ELSIF v_selectedid = '$userNodetype' THEN
-					v_selectedid = concat('"selectedId":"',v_nodetype,'"');
+					v_selectedid = concat('{"selectedId":"',v_nodetype,'"}');
 				ELSIF v_selectedid = '$userNodecat' THEN
 					IF v_nodecat = any(v_arrayresult) THEN
-						v_selectedid = concat('"selectedId":"',v_nodecat,'"');
+						v_selectedid = concat('{"selectedId":"',v_nodecat,'"}');
 					ELSE
-						v_selectedid = concat('"selectedId":"',v_arrayresult[1],'"');
+						v_selectedid = concat('{"selectedId":"',v_arrayresult[1],'"}');
 					END IF;
 				END IF;
 			END IF;
 
-			IF v_selectedid IS NULL OR  v_selectedid = '' THEN v_selectedid = '"selectedId":""';END IF;
+			IF v_selectedid IS NULL OR  v_selectedid = '' THEN v_selectedid = '{"selectedId":""}';END IF;
+
+			v_rec_replace := ((rec.inputparams::jsonb) #- '{selectedId}') || (v_selectedid::jsonb);
+
+			v_fields = (REPLACE(v_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
 
 			EXECUTE v_querytext INTO v_queryresult;
 
@@ -229,8 +224,8 @@ BEGIN
 			END IF;
 
 			-- Remove dvQueryText and merge with v_queryresult
+			rec.inputparams := ((rec.inputparams::jsonb) #- '{selectedId}') || (v_selectedid::jsonb);
 			v_rec_replace := ((rec.inputparams::jsonb) #- '{dvQueryText}') || (v_queryresult::jsonb);
-
 			v_fields = (REPLACE(v_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
 
 		ELSIF v_value ilike '$user%' THEN
