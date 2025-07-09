@@ -24,3 +24,7 @@ UPDATE config_toolbox SET inputparams='[{"label":"Direct insert into node table:
 INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source",message_type)
 VALUES (4140,'The specified feature type is not supported: %feature_type%','Must be ''FEATURE'' or ''ELEMENT''',2,true,'utils','core','UI');
 
+UPDATE config_param_system
+	SET value = jsonb_set(value::jsonb, '{sys_query_text_add}', '"SELECT distinct(concat(s.name, '''', '''', m.name, '''', '''', a.postnumber)) as \"displayName\" FROM v_ext_streetaxis s join ext_municipality m using(muni_id) join v_ext_address a on s.id = a.streetaxis_id WHERE concat(s.name, '''', '''', m.name, '''', '''', a.postnumber) ILIKE "')
+	WHERE parameter='basic_search_v2_tab_address';
+

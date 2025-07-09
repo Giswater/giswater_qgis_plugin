@@ -143,7 +143,7 @@ BEGIN
 
 					if v_record.count = 1 then
 						v_sys_query_text_add = v_tab_params->>'sys_query_text_add';
-				  		v_sql = concat(v_sys_query_text_add, '''%', v_filter::text, '%'' order by display_name');
+				  		v_sql = concat(v_sys_query_text_add, '''%', v_filter::text, '%'' order by "displayName"');
 
 				  		v_sql = concat('SELECT array_to_json(array_agg(a)) FROM (', v_sql::text, ' LIMIT 10)a');
 					  	execute v_sql into v_fields;
@@ -162,9 +162,9 @@ BEGIN
 				end if;
 
 				if v_tab_params->>'sys_search_name' is not null then
-					v_sys_query_text = concat('SELECT ', quote_literal(v_tab_params->>'sys_pk'), ' as key, ', (v_tab_params->>'sys_pk')::text, ' as value, ', (v_tab_params->>'sys_display_name')::text, ' as display_name FROM ', (v_tab_params->>'sys_tablename')::text, ' WHERE ', (v_tab_params->>'sys_search_name')::text, ' ILIKE ''%', v_filter::text, '%'' ');
+					v_sys_query_text = concat('SELECT ', quote_literal(v_tab_params->>'sys_pk'), ' as key, ', (v_tab_params->>'sys_pk')::text, ' as value, ', (v_tab_params->>'sys_display_name')::text, ' as "displayName" FROM ', (v_tab_params->>'sys_tablename')::text, ' WHERE ', (v_tab_params->>'sys_search_name')::text, ' ILIKE ''%', v_filter::text, '%'' ');
 				else
-					v_sys_query_text = concat('SELECT ', quote_literal(v_tab_params->>'sys_pk'), ' as key, ', (v_tab_params->>'sys_pk')::text, ' as value, ', (v_tab_params->>'sys_display_name')::text, ' as display_name FROM ', (v_tab_params->>'sys_tablename')::text, ' WHERE ', (v_tab_params->>'sys_display_name')::text, ' ILIKE ''%', v_filter::text, '%'' ');
+					v_sys_query_text = concat('SELECT ', quote_literal(v_tab_params->>'sys_pk'), ' as key, ', (v_tab_params->>'sys_pk')::text, ' as value, ', (v_tab_params->>'sys_display_name')::text, ' as "displayName" FROM ', (v_tab_params->>'sys_tablename')::text, ' WHERE ', (v_tab_params->>'sys_display_name')::text, ' ILIKE ''%', v_filter::text, '%'' ');
 				end if;
 
 				if v_tab_params->>'sys_filter' != '' then
