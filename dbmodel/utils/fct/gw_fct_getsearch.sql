@@ -120,6 +120,7 @@ BEGIN
 
         -- Manage apostrophes on v_filter
 		v_filter = replace(v_filter, '''', '''''');
+		v_filter = coalesce(v_filter, '');
 
 		for rec_tab in SELECT * FROM config_form_tabs WHERE formname='search' order by orderby
 		loop
@@ -133,19 +134,18 @@ BEGIN
 
 				if v_parameter = 'basic_search_v2_tab_address' then
 
-					v_sql = 'SELECT count(*) as count FROM '||quote_ident(v_tab_params->>'sys_tablename_aux')||'';
-					execute 'SELECT split_part('||QUOTE_LITERAL(v_filter)||', '','', 1)' into v_filter_split;
+					v_sql = concat('SELECT count(*) as count FROM ', quote_ident(v_tab_params->>'sys_tablename_aux'));
+					execute concat('SELECT split_part(', quote_literal(v_filter), ', '', '', 1)') into v_filter_split;
 			  		-- TODO MANAGE WHERE name
-					v_sql = concat(v_sql,' WHERE name::text ILIKE ''%'||v_filter_split::text||'%''');
+					v_sql = concat(v_sql,' WHERE name::text ILIKE ''%', v_filter_split::text, '%''');
 
 					execute v_sql into v_record;
 
 					if v_record.count = 1 then
 						v_sys_query_text_add = v_tab_params->>'sys_query_text_add';
-				  		v_sql = concat(v_sys_query_text_add,'''%'||v_filter::text||'%'' order by display_name');
+				  		v_sql = concat(v_sys_query_text_add, '''%', v_filter::text, '%'' order by display_name');
 
-				  		v_sql = 'SELECT array_to_json(array_agg(a)) FROM (
-						'||(v_sql)::text||' LIMIT 10)a';
+				  		v_sql = concat('SELECT array_to_json(array_agg(a)) FROM (', v_sql::text, ' LIMIT 10)a');
 					  	execute v_sql into v_fields;
 
 						v_result = gw_fct_json_object_set_key (v_result, 'section', v_parameter);
@@ -162,26 +162,25 @@ BEGIN
 				end if;
 
 				if v_tab_params->>'sys_search_name' is not null then
-					v_sys_query_text = 'SELECT ' || quote_literal(v_tab_params->>'sys_pk') || ' as key, ' || (v_tab_params->>'sys_pk')::text || ' as value, ' || (v_tab_params->>'sys_display_name')::text || ' as display_name FROM ' ||  (v_tab_params->>'sys_tablename')::text || ' WHERE ' || (v_tab_params->>'sys_search_name')::text || ' ILIKE ''%'||v_filter::text||'%'' ';
+					v_sys_query_text = concat('SELECT ', quote_literal(v_tab_params->>'sys_pk'), ' as key, ', (v_tab_params->>'sys_pk')::text, ' as value, ', (v_tab_params->>'sys_display_name')::text, ' as display_name FROM ', (v_tab_params->>'sys_tablename')::text, ' WHERE ', (v_tab_params->>'sys_search_name')::text, ' ILIKE ''%', v_filter::text, '%'' ');
 				else
-					v_sys_query_text = 'SELECT ' || quote_literal(v_tab_params->>'sys_pk') || ' as key, ' || (v_tab_params->>'sys_pk')::text || ' as value, ' || (v_tab_params->>'sys_display_name')::text || ' as display_name FROM ' ||  (v_tab_params->>'sys_tablename')::text || ' WHERE ' || (v_tab_params->>'sys_display_name')::text || ' ILIKE ''%'||v_filter::text||'%'' ';
+					v_sys_query_text = concat('SELECT ', quote_literal(v_tab_params->>'sys_pk'), ' as key, ', (v_tab_params->>'sys_pk')::text, ' as value, ', (v_tab_params->>'sys_display_name')::text, ' as display_name FROM ', (v_tab_params->>'sys_tablename')::text, ' WHERE ', (v_tab_params->>'sys_display_name')::text, ' ILIKE ''%', v_filter::text, '%'' ');
 				end if;
 
 				if v_tab_params->>'sys_filter' != '' then
-					v_sys_query_text := v_sys_query_text || ' AND ('||(v_tab_params->>'sys_filter')::text||')';
+					v_sys_query_text := concat(v_sys_query_text, ' AND (', (v_tab_params->>'sys_filter')::text, ')');
 				end if;
 
 				if v_filter_poly is not null then
 					v_geom := v_tab_params->>'sys_geom';
 					if v_geom is not null and v_geom != '' then
-						v_sys_query_text := v_sys_query_text || ' AND ST_Within(' || v_geom::text || ', ST_GeomFromText(''' || v_filter_poly::text || ''', ' || v_epsg || '))';
+						v_sys_query_text := concat(v_sys_query_text, ' AND ST_Within(', v_geom::text, ', ST_GeomFromText(''', v_filter_poly::text, ''', ', v_epsg, '))');
 					end if;
 				end if;
 
-				v_sys_query_text := v_sys_query_text || ' ORDER BY regexp_replace(' || (v_tab_params->>'sys_display_name')::text || ',''[^0-9a-zA-Z]+'','''',''g'')';
+				v_sys_query_text := concat(v_sys_query_text, ' ORDER BY regexp_replace(', (v_tab_params->>'sys_display_name')::text, ',''[^0-9a-zA-Z]+'','''',''g'')');
 
-				v_sql = 'SELECT array_to_json(array_agg(a)) FROM (
-						'||(v_sys_query_text)::text||' ';
+				v_sql = concat('SELECT array_to_json(array_agg(a)) FROM (', v_sys_query_text::text, ' ');
 
 	  			v_sql = concat(v_sql, ' limit 10)a ;');
 
@@ -201,7 +200,7 @@ BEGIN
 		v_form := COALESCE(v_form, '[]');
 
 		-- Return
-		RETURN ('{"status":"Accepted", "version":'|| v_version ||', "data":' || to_json(v_result_array) ||'}')::json;
+		RETURN (concat('{"status":"Accepted", "version":', v_version, ', "body":{"data":{"searchResults":', to_json(v_result_array), '}}}'))::json;
 
 	else
 		-- Set search path to local schema
@@ -274,18 +273,18 @@ BEGIN
 				'string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
 				-- Create array with network fields
-				fieldsJson := '[' || comboType || ',' || editCode || ']';
+				fieldsJson := concat('[', comboType, ',', editCode, ']');
 				fieldsJson := COALESCE(fieldsJson, '[]');
 
 				-- Create network tab form
 				IF v_firsttab THEN
 					formNetwork := json_build_object('tabName','network', 'tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , v_active);
 					formNetwork := gw_fct_json_object_set_key(formNetwork, 'fields', fieldsJson);
-					v_form := v_form || ',' || formNetwork::text;
+					v_form := concat(v_form, ',', formNetwork::text);
 				ELSE
 					formNetwork := json_build_object('tabName','network', 'tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , true);
 					formNetwork := gw_fct_json_object_set_key(formNetwork, 'fields', fieldsJson);
-					v_form := v_form || formNetwork::text;
+					v_form := concat(v_form, formNetwork::text);
 				END IF;
 
 				v_firsttab := TRUE;
@@ -375,11 +374,11 @@ BEGIN
 				IF v_firsttab THEN
 					formSearch := json_build_object('tabName','search','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', v_active );
 					formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
-					v_form := v_form || ',' || formSearch::text;
+					v_form := concat(v_form, ',', formSearch::text);
 				ELSE
 					formSearch := json_build_object('tabName','search','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', true );
 					formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
-					v_form := v_form || formSearch::text;
+					v_form := concat(v_form, formSearch::text);
 				END IF;
 
 				v_firsttab := TRUE;
@@ -458,18 +457,18 @@ BEGIN
 				'widgettype','typeahead','threshold', 1, 'datatype','integer','placeholder','','disabled',true,'noresultsMsg','No results','loadingMsg','Searching...');
 
 				-- Create array with network fields
-				fieldsJson := '[' || comboType || ',' || editCode1 || ',' || editCode2 || ']';
+				fieldsJson := concat('[', comboType, ',', editCode1, ',', editCode2, ']');
 				fieldsJson := COALESCE(fieldsJson, '[]');
 
 				-- Create tabs array
 				IF v_firsttab THEN
 					formAddress := json_build_object('tabName','address','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', v_active );
 					formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
-					v_form := v_form || ',' || formAddress::text;
+					v_form := concat(v_form, ',', formAddress::text);
 				ELSE
 					formAddress := json_build_object('tabName','address','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', true );
 					formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
-					v_form := v_form || formAddress::text;
+					v_form := concat(v_form, formAddress::text);
 				END IF;
 
 				v_firsttab := TRUE;
@@ -525,18 +524,18 @@ BEGIN
 				'widgettype','check','datatype','boolean','placeholder','','disabled',false,'noresultsMsg','','loadingMsg','', 'tooltip',rec_fields.tooltip);
 
 				-- Create array with hydro fields
-				fieldsJson := '[' || chkContains || ',' || comboType || ',' || editCode || ']';
+				fieldsJson := concat('[', chkContains, ',', comboType, ',', editCode, ']');
 				fieldsJson := COALESCE(fieldsJson, '[]');
 
 				-- Create tabs array
 				IF v_firsttab THEN
 					formHydro := json_build_object('tabName','hydro','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', v_active );
 					formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
-					v_form := v_form || ',' || formHydro::text;
+					v_form := concat(v_form, ',', formHydro::text);
 				ELSE
 					formHydro := json_build_object('tabName','hydro','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', true );
 					formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
-					v_form := v_form || formHydro::text;
+					v_form := concat(v_form, formHydro::text);
 				END IF;
 
 				v_firsttab := TRUE;
@@ -555,18 +554,18 @@ BEGIN
 				'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
 				-- Create array with workcat fields
-				fieldsJson := '[' || editCode || ']';
+				fieldsJson := concat('[', editCode, ']');
 				fieldsJson := COALESCE(fieldsJson, '[]');
 
 				-- Create tabs array
 				IF v_firsttab THEN
 					formWorkcat := json_build_object('tabName','workcat','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', v_active );
 					formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
-					v_form := v_form || ',' || formWorkcat::text;
+					v_form := concat(v_form, ',', formWorkcat::text);
 				ELSE
 					formWorkcat := json_build_object('tabName','workcat','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', true );
 					formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
-					v_form := v_form || formWorkcat::text;
+					v_form := concat(v_form, formWorkcat::text);
 				END IF;
 
 				v_firsttab := TRUE;
@@ -619,18 +618,18 @@ BEGIN
 				'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
 				-- Create array with hydro fields
-				fieldsJson := '[' || comboType || ',' || editCode || ']';
+				fieldsJson := concat('[', comboType, ',', editCode, ']');
 				fieldsJson := COALESCE(fieldsJson, '[]');
 
 				-- Create tabs array
 				IF v_firsttab THEN
 					formPsector := json_build_object('tabName','psector','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', v_active );
 					formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
-					v_form := v_form || ',' || formPsector::text;
+					v_form := concat(v_form, ',', formPsector::text);
 				ELSE
 					formPsector := json_build_object('tabName','psector','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', true );
 					formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
-					v_form := v_form || formPsector::text;
+					v_form := concat(v_form, formPsector::text);
 				END IF;
 
 			END IF;
@@ -646,18 +645,18 @@ BEGIN
 				'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
 				-- Create array with workcat fields
-				fieldsJson := '[' || editCode || ']';
+				fieldsJson := concat('[', editCode, ']');
 				fieldsJson := COALESCE(fieldsJson, '[]');
 
 				-- Create tabs array
 				IF v_firsttab THEN
 					formVisit := json_build_object('tabName','visit','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', v_active );
 					formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
-					v_form := v_form || ',' || formVisit::text;
+					v_form := concat(v_form, ',', formVisit::text);
 				ELSE
 					formVisit := json_build_object('tabName','visit','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active', true );
 					formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
-					v_form := v_form || formVisit::text;
+					v_form := concat(v_form, formVisit::text);
 				END IF;
 
 				v_firsttab := TRUE;
@@ -668,7 +667,7 @@ BEGIN
 		END LOOP;
 
 		-- Finish the construction of v_form
-		v_form := v_form ||']';
+		v_form := concat(v_form, ']');
 
 		-- Check null
 		v_form := COALESCE(v_form, '[]');
@@ -676,13 +675,11 @@ BEGIN
 		-- Return
 		IF v_firsttab IS FALSE THEN
 			-- Return not implemented
-			RETURN ('{"status":"Accepted"' || ', "version":'|| v_version || ', "enabled":false'|| '}')::json;
+			RETURN (concat('{"status":"Accepted", "version":', v_version, ', "enabled":false}'))::json;
 		ELSE
 
 			-- Return
-			RETURN ('{"status":"Accepted", "version":'|| v_version ||', "enabled":true'||
-				',"form":' || v_form ||
-			'}')::json;
+			RETURN (concat('{"status":"Accepted", "version":', v_version, ', "enabled":true,"form":', v_form, '}'))::json;
 		END IF;
 
 	end if;
