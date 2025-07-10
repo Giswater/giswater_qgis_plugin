@@ -38,7 +38,7 @@ SELECT columns_are(
 
 
 --check default values
-
+SELECT col_has_default('config_visit_parameter_action', 'active', 'Column active should have default value');
 
 -- check foreign keys
 SELECT has_fk('config_visit_parameter_action', 'Table config_visit_parameter_action should have foreign keys');
