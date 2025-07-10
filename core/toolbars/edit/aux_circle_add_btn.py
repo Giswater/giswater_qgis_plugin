@@ -103,10 +103,8 @@ class GwAuxCircleAddButton(GwMaptool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
-        self.layer_circle = tools_qgis.get_layer_by_tablename('v_edit_cad_auxcircle')
+        self.layer_circle = tools_qgis.get_layer_by_tablename('v_edit_cad_auxcircle', True, True)
         if self.layer_circle is None:
-            msg = "Layer not found"
-            tools_qgis.show_warning(msg, parameter='v_edit_cad_auxcircle')
             self.iface.actionPan().trigger()
             self.cancel_circle = True
             self.cancel_map_tool()

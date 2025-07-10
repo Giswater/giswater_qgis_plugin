@@ -125,9 +125,8 @@ class GwAuxPointAddButton(GwMaptool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
-        self.layer_points = tools_qgis.get_layer_by_tablename('v_edit_cad_auxpoint')
+        self.layer_points = tools_qgis.get_layer_by_tablename('v_edit_cad_auxpoint', True, True)
         if self.layer_points is None:
-            tools_qgis.show_warning("Layer not found", parameter='v_edit_cad_auxpoint')
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
