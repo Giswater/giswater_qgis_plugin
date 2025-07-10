@@ -28,3 +28,13 @@ UPDATE config_param_system
 	SET value = jsonb_set(value::jsonb, '{sys_query_text_add}', '"SELECT distinct(concat(s.name, '''', '''', m.name, '''', '''', a.postnumber)) as \"displayName\" FROM v_ext_streetaxis s join ext_municipality m using(muni_id) join v_ext_address a on s.id = a.streetaxis_id WHERE concat(s.name, '''', '''', m.name, '''', '''', a.postnumber) ILIKE "')
 	WHERE parameter='basic_search_v2_tab_address';
 
+-- 10/07/2025
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3484, 'gw_fct_getfeatures', 'utils', 'function', 'json', 'json', 'Function for getting features filtering by sys_type and mapzone, with optional ordering by parameter.', NULL, NULL, 'core', NULL);
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3486, 'gw_fct_getdmas', 'utils', 'function', 'json', 'json', 'Function to get a list of DMAs.', 'role_basic', NULL, 'core', NULL);
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3488, 'gw_fct_getdmahydrometers', 'utils', 'function', 'json', 'json', 'Function to get DMA hydrometers.', 'role_om', NULL, 'core', NULL);
+
