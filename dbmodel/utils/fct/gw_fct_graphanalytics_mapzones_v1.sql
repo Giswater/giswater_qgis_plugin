@@ -878,7 +878,6 @@ BEGIN
 
 		v_result := COALESCE(v_result, '{}');
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result,'}');
-
 	END IF;
 	-- ENDSECTION
 
@@ -959,7 +958,7 @@ BEGIN
 				WHERE m.mapzone_id = a.mapzone_id ;
 
 			ELSE
-				v_query_text = 'UPDATE '||v_mapzone_name||' m SET the_geom = t.the_geom
+				v_query_text = 'UPDATE '||v_mapzone_name||' m SET the_geom = tm.the_geom
 				FROM temp_pgr_mapzone tm 
 				WHERE CARDINALITY (tm.mapzone_id) = 1
 				AND tm.mapzone_id[1] = m.'||v_mapzone_field;
@@ -980,7 +979,8 @@ BEGIN
 				v_query_text_aux = '';
 			END IF;
 
-			v_query_text = 'UPDATE '||v_mapzone_name||' m SET 
+			v_query_text = '
+			UPDATE '||v_mapzone_name||' m SET 
 				expl_id = subq.expl_ids,
 				muni_id = subq.muni_ids,  
 				'||v_query_text_aux||'
@@ -1130,11 +1130,11 @@ BEGIN
 
 			IF EXISTS (SELECT 1 FROM v_temp_pgr_mapzone_old LIMIT 1) THEN
 				IF v_mapzone_name = 'PRESSZONE' THEN
-					v_query_text_aux = ', staticpress1 = NULL, staticpress2 = NULL'
-				ELSE IF v_mapzone_name = 'DWFZONE' THEN 
-					v_query_text_aux = ', drainzone_outfall = NULL, dwfzone_outfall = NULL'
+					v_query_text_aux = ', staticpressure1 = NULL, staticpressure2 = NULL';
+				ELSIF v_mapzone_name = 'DWFZONE' THEN 
+					v_query_text_aux = ', drainzone_outfall = NULL, dwfzone_outfall = NULL';
 				ELSE
-					v_query_text_aux = ''
+					v_query_text_aux = '';
 				END IF;
 
 				v_query_text = '
@@ -1151,12 +1151,28 @@ BEGIN
 				';
 				EXECUTE v_query_text;
 
+				v_query_text = '
+				UPDATE link l SET '||quote_ident(v_mapzone_field)||' = 0
+				'||v_query_text_aux||'
+				WHERE EXISTS (
+					SELECT 1 FROM v_temp_pgr_mapzone_old tm
+					WHERE l.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+				)
+				AND NOT EXISTS (
+					SELECT 1 FROM temp_pgr_arc ta 
+					JOIN connec c USING (arc_id) 
+					WHERE c.feature_type = ''CONNEC'' AND c.connec_id = l.feature_id 
+					)
+				AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
+				';
+				EXECUTE v_query_text;
+
 				IF v_mapzone_name = 'PRESSZONE' THEN
-					v_query_text_aux = ', staticpressure = NULL'
-				ELSE IF v_mapzone_name = 'DWFZONE' THEN 
-					v_query_text_aux = ', drainzone_outfall = NULL, dwfzone_outfall = NULL'
+					v_query_text_aux = ', staticpressure = NULL';
+				ELSIF v_mapzone_name = 'DWFZONE' THEN 
+					v_query_text_aux = ', drainzone_outfall = NULL, dwfzone_outfall = NULL';
 				ELSE
-					v_query_text_aux = ''
+					v_query_text_aux = '';
 				END IF;
 
 				v_query_text = '
@@ -1167,7 +1183,7 @@ BEGIN
 					WHERE n.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
 				)
 				AND NOT EXISTS (
-					SELECT 1 FROM temp_pgr_node tn WHERE tn.node_id = node.node_id
+					SELECT 1 FROM temp_pgr_node tn WHERE tn.node_id = n.node_id
 				)
 				AND n.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
@@ -1184,22 +1200,6 @@ BEGIN
 					SELECT 1 FROM temp_pgr_arc ta WHERE ta.arc_id = c.arc_id
 				)
 				AND c.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
-				';
-				EXECUTE v_query_text;
-
-				v_query_text = '
-				UPDATE link l SET '||quote_ident(v_mapzone_field)||' = 0
-				'||v_query_text_aux||'
-				WHERE EXISTS (
-					SELECT 1 FROM v_temp_pgr_mapzone_old tm
-					WHERE c.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
-				)
-				AND NOT EXISTS (
-					SELECT 1 FROM temp_pgr_arc ta 
-					JOIN connec c USING (arc_id) 
-					WHERE c.feature_type = ''CONNEC'' AND c.connec_id = l.feature_id 
-					)
-				AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
 
@@ -1303,10 +1303,10 @@ BEGIN
 
 				-- links
 				v_query_text = '
-					UPDATE link l SET staticpressure = t.staticpressure 
+					UPDATE link l SET staticpressure1 = t.staticpressure1
 					FROM (
 						SELECT  link_id,
-						COALESCE ((p.head - l.top_elev1  + COALESCE (l.depth1, 0))::numeric(12,3), 0) AS staticpressure
+						COALESCE ((p.head - l.top_elev1  + COALESCE (l.depth1, 0))::numeric(12,3), 0) AS staticpressure1
 						FROM link l 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
 						WHERE EXISTS (
@@ -1317,7 +1317,26 @@ BEGIN
 						AND l.'||v_mapzone_field||' > 0
 					) t
 					WHERE l.link_id = t.link_id
-					AND (l.staticpressure IS DISTINCT FROM t.staticpressure)
+					AND (l.staticpressure1 IS DISTINCT FROM t.staticpressure1)
+				';
+				EXECUTE v_query_text;
+
+				v_query_text = '
+					UPDATE link l SET staticpressure2 = t.staticpressure2 
+					FROM (
+						SELECT  link_id,
+						COALESCE ((p.head - l.top_elev1  + COALESCE (l.depth1, 0))::numeric(12,3), 0) AS staticpressure2
+						FROM link l 
+						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
+						WHERE EXISTS (
+							SELECT 1 FROM connec c 
+							JOIN temp_pgr_arc t USING (arc_id)
+							WHERE l.feature_id = c.connec_id 
+						)
+						AND l.'||v_mapzone_field||' > 0
+					) t
+					WHERE l.link_id = t.link_id
+					AND (l.staticpressure2 IS DISTINCT FROM t.staticpressure2)
 				';
 				EXECUTE v_query_text;
 
@@ -1357,14 +1376,25 @@ BEGIN
 
 				-- links
 				v_query_text = '
-					UPDATE link l  SET staticpressure = NULL
+					UPDATE link l  SET staticpressure1 = NULL
 					WHERE EXISTS (
 						SELECT 1 FROM temp_pgr_arc t 
 						JOIN connec c USING (arc_id) 
 						WHERE c.connec_id= l.feature_id
 					)
 					AND l.'||v_mapzone_field||' = 0
-					AND l.staticpressure IS NOT NULL
+					AND l.staticpressure1 IS NOT NULL
+				';
+				EXECUTE v_query_text;
+				v_query_text = '
+					UPDATE link l  SET staticpressure2 = NULL
+					WHERE EXISTS (
+						SELECT 1 FROM temp_pgr_arc t 
+						JOIN connec c USING (arc_id) 
+						WHERE c.connec_id= l.feature_id
+					)
+					AND l.'||v_mapzone_field||' = 0
+					AND l.staticpressure2 IS NOT NULL
 				';
 				EXECUTE v_query_text;
 
@@ -1495,11 +1525,8 @@ BEGIN
 				v_query_text = 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
 					FROM temp_pgr_arc
 				';
-
 			END IF;
-
 		END IF;
-
 	END IF;
 
 
