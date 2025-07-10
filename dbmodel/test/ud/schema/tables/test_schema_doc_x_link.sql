@@ -39,6 +39,8 @@ SELECT col_type_is('doc_x_link', 'link_id', 'int4', 'Column link_id should be in
 
 
 -- check foreign keys
+SELECT has_fk('doc_x_link', 'Table doc_x_link should have foreign keys');
+
 SELECT fk_ok('doc_x_link','doc_id','doc','id','Table should have foreign key from doc_id to doc.id');
 SELECT fk_ok('doc_x_link','link_id','link','link_id','Table should have foreign key from link_id to link.link_id');
 

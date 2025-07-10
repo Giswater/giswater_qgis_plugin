@@ -39,6 +39,8 @@ SELECT col_type_is('doc_x_visit', 'visit_id', 'int4', 'Column visit_id should be
 
 
 -- check foreign keys
+SELECT has_fk('doc_x_visit', 'Table doc_x_visit should have foreign keys');
+
 SELECT fk_ok('doc_x_visit','doc_id','doc','id','Table should have foreign key from doc_id to doc.id');
 SELECT fk_ok('doc_x_visit','visit_id','om_visit','id','Table should have foreign key from visit_id to om_visit.id');
 -- check indexes

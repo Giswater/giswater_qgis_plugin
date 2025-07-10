@@ -39,6 +39,8 @@ SELECT col_type_is('doc_x_node', 'node_id', 'int4', 'Column node_id should be in
 
 
 -- check foreign keys
+SELECT has_fk('doc_x_node', 'Table doc_x_node should have foreign keys');
+
 SELECT fk_ok('doc_x_node','doc_id','doc','id','Table should have foreign key from doc_id to doc.id');
 SELECT fk_ok('doc_x_node','node_id', 'node','node_id','Table should have foreign key from node_id to node.node_id');
 

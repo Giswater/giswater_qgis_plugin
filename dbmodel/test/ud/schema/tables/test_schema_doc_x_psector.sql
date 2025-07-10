@@ -39,6 +39,8 @@ SELECT col_type_is('doc_x_psector', 'psector_id', 'int4', 'Column psector_id sho
 
 
 -- check foreign keys
+SELECT has_fk('doc_x_psector', 'Table doc_x_psector should have foreign keys');
+
 SELECT fk_ok('doc_x_psector', 'doc_id','doc','id','Table should have foreign key from doc_id to doc.id');
 SELECT fk_ok('doc_x_psector','psector_id','plan_psector','psector_id', 'Table should have foreign key from psector_id to plan_psector.psector_id');
 
