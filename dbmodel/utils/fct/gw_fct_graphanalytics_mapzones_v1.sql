@@ -20,7 +20,7 @@ SELECT gw_fct_graphanalytics_mapzones('
 	{
 		"data":{
 			"parameters":{
-				"graphClass":"DRAINZONE",
+				"graphClass":"DWFZONE",
 				"exploitation":"1,2,0",
 				"updateMapZone":2,
 				"geomParamUpdate":15,
@@ -92,7 +92,6 @@ DECLARE
 	v_class text;
 	v_expl_id text;
 	v_expl_id_array text;
-	v_old_mapzone_id_array text;
 	v_updatemapzgeom integer = 0;
 	v_geomparamupdate_divide float;
 	v_concavehull float = 0.9;
@@ -190,7 +189,6 @@ BEGIN
 	ELSIF v_class = 'DWFZONE' THEN
 		-- dwfzone and drainzone are calculated in the same process
 		v_fid=481;
-		v_fromzero := TRUE;
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3090", "function":"2710","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
@@ -285,18 +283,10 @@ BEGIN
 	-- NODES MAPZONES
 	-- Nodes that are the starting/ending points of mapzones
 	IF v_fromzero THEN
-		IF v_project_type = 'UD' AND v_mapzone_name = 'DWFZONE' THEN
-            v_query_text =
-                'UPDATE temp_pgr_node n SET modif = TRUE
-                WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
-                AND NOT EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE n.pgr_node_id = a.pgr_node_1)
-                ';
-        ELSE
-            v_query_text =
-                'UPDATE temp_pgr_node n SET modif = TRUE
-                WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
-                ';
-        END IF;
+		v_query_text =
+			'UPDATE temp_pgr_node n SET modif = TRUE
+			WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
+			';
 		EXECUTE v_query_text;
 	ELSE
 		IF v_project_type = 'WS' THEN
@@ -433,7 +423,7 @@ BEGIN
 	IF v_project_type = 'UD' AND v_mapzone_name = 'DWFZONE' THEN
 		v_query_text = 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
 			FROM temp_pgr_arc
-			WHERE graph_delimiter <> ''INITOVERFLOWPATH'' AND reverse_cost < 0'; -- if pgr_node_1 or pgr_node_2 have graph_delimiter = IGNORE, the arcs will not be ignored
+			WHERE graph_delimiter <> ''INITOVERFLOWPATH'' AND reverse_cost < 0'; -- if pgr_node_1 or pgr_node_2 have graph_delimiter = IGNORE, the arcs will not be filtered
 	ELSE
 		v_query_text = 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
 			FROM temp_pgr_arc';
@@ -906,8 +896,8 @@ BEGIN
 
 			IF v_fromzero = TRUE THEN
 				IF v_project_type = 'WS' THEN
-					v_query_text = 'INSERT INTO '||v_mapzone_name||' ('||v_mapzone_field||',code, name, the_geom, created_at, created_by, updated_at, updated_by, graphconfig) 
-					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], m.the_geom, now(), current_user, now(), current_user,
+					v_query_text = 'INSERT INTO '||v_mapzone_name||' ('||v_mapzone_field||',code, name, the_geom, created_at, created_by, graphconfig) 
+					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], m.the_geom, now(), current_user,
 					json_build_object(
 						''use'', json_agg(
 							json_build_object(
@@ -921,8 +911,8 @@ BEGIN
 					WHERE n.graph_delimiter = ' || v_mapzone_name || ' AND n.modif = TRUE
 					GROUP BY m.mapzone_id[1]';
 				ELSE
-					v_query_text = 'INSERT INTO '||v_mapzone_name||' ('||v_mapzone_field||',code, name, the_geom, created_at, created_by, updated_at, updated_by, graphconfig) 
-					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], m.the_geom, now(), current_user, now(), current_user,
+					v_query_text = 'INSERT INTO '||v_mapzone_name||' ('||v_mapzone_field||',code, name, the_geom, created_at, created_by, graphconfig) 
+					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], m.the_geom, now(), current_user,
 					json_build_object(
 						''use'', json_agg(
 							json_build_object(
@@ -949,7 +939,6 @@ BEGIN
 					FROM temp_pgr_node n
 					JOIN temp_pgr_mapzone m ON m.component = n.mapzone_id
 					WHERE n.graph_delimiter = 'IGNORE'
-					AND CARDINALITY (m.mapzone_id)= 1
 				) a
 				WHERE m.mapzone_id = a.mapzone_id ;
 
@@ -966,223 +955,312 @@ BEGIN
 					JOIN temp_pgr_mapzone m ON m.component = n.mapzone_id
 					WHERE n.graph_delimiter = 'FORCECLOSED'
 					AND n.old_mapzone_id IS NOT NULL
-					AND CARDINALITY (m.mapzone_id)= 1
 				) a
 				WHERE m.mapzone_id = a.mapzone_id ;
 
 			ELSE
-				v_query_text = 'UPDATE '||v_mapzone_name||' m SET 
-					the_geom = t.the_geom, 
-					updated_at = now(), 
-					updated_by = current_user 
-				FROM (SELECT component, UNNEST (mapzone_id) AS mapzone_id, the_geom FROM temp_pgr_mapzone) t 
-				WHERE t.mapzone_id = m.'||v_mapzone_field;
+				v_query_text = 'UPDATE '||v_mapzone_name||' m SET the_geom = t.the_geom
+				FROM temp_pgr_mapzone tm 
+				WHERE CARDINALITY (tm.mapzone_id) = 1
+				AND tm.mapzone_id[1] = m.'||v_mapzone_field;
+				EXECUTE v_query_text;
+
+				v_query_text = '
+					UPDATE '||v_mapzone_name||' m SET the_geom = NULL
+					FROM temp_pgr_mapzone tm 
+					WHERE CARDINALITY (tm.mapzone_id) > 1 
+					AND m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)
+				';
 				EXECUTE v_query_text;
 			END IF;
 
+			IF v_mapzone_name <> 'SECTOR' THEN
+				v_query_text_aux = 'sector_id = subq.sector_ids,';
+			ELSE 
+				v_query_text_aux = '';
+			END IF;
 
-			v_query_text = 'UPDATE '||v_mapzone_name||' SET 
+			v_query_text = 'UPDATE '||v_mapzone_name||' m SET 
 				expl_id = subq.expl_ids,
-				muni_id = subq.muni_ids,
-				sector_id = subq.sector_ids
+				muni_id = subq.muni_ids,  
+				'||v_query_text_aux||'
+				updated_at = now(), 
+				updated_by = current_user
 			FROM (
 				SELECT 
-					tm.mapzone_id,
+					tm.mapzone_id[1] as mapzone_id,
 					array_agg(DISTINCT vn.expl_id) FILTER (WHERE vn.expl_id IS NOT NULL)::int[] AS expl_ids,
 					array_agg(DISTINCT vn.muni_id) FILTER (WHERE vn.muni_id IS NOT NULL)::int[] AS muni_ids,
 					array_agg(DISTINCT vn.sector_id) FILTER (WHERE vn.sector_id IS NOT NULL)::int[] AS sector_ids
 				FROM temp_pgr_node tn
 				JOIN v_temp_node vn USING (node_id)
-				JOIN (SELECT component, UNNEST (mapzone_id) AS mapzone_id FROM temp_pgr_mapzone) tm ON tn.mapzone_id = tm.component
-				WHERE tn.mapzone_id > 0 
+				JOIN temp_pgr_mapzone tm ON tn.mapzone_id = tm.component
+				WHERE CARDINALITY (tm.mapzone_id) = 1
 				GROUP BY tm.mapzone_id
 			) subq
-			WHERE subq.mapzone_id = '||v_mapzone_name||'.'||v_mapzone_field;
+			WHERE m.'||v_mapzone_field|| ' = subq.mapzone_id
+			';
 			EXECUTE v_query_text;
 
-			-- old zone id array
-			SELECT string_agg(a.old_mapzone_id::text, ',') INTO v_old_mapzone_id_array
-			FROM (
-				SELECT DISTINCT old_mapzone_id FROM temp_pgr_node
-			) a
-			WHERE a.old_mapzone_id > 0;
+			IF v_mapzone_name <> 'SECTOR' THEN
+				v_query_text_aux = 'sector_id = NULL,';
+			ELSE 
+				v_query_text_aux = '';
+			END IF;
 
-			v_query_text = '
-				WITH arcs AS (
-					SELECT 
-						a.arc_id,
-						CASE WHEN CARDINALITY(m.mapzone_id) = 1 THEN m.mapzone_id[1]
-						ELSE 0
-						END AS mapzone_id
-					FROM temp_pgr_arc a
-					JOIN temp_pgr_mapzone m ON a.mapzone_id = m.component
-				)
-				UPDATE arc SET '||quote_ident(v_mapzone_field)||' = arcs.mapzone_id
-				FROM arcs
-				WHERE arc.arc_id = arcs.arc_id
-				AND arc.'||quote_ident(v_mapzone_field)||' <> arcs.mapzone_id;
+			v_query_text = 'UPDATE '||v_mapzone_name||' m SET 
+				expl_id = NULL,
+				muni_id = NULL,
+				'||v_query_text_aux||'
+				updated_at = now(), 
+				updated_by = current_user
+			FROM temp_pgr_mapzone tm 
+			WHERE CARDINALITY (tm.mapzone_id) > 1
+			AND m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)
 			';
 			EXECUTE v_query_text;
 
 			v_query_text = '
-				WITH nodes AS (
+				WITH mapzones AS (
 					SELECT 
-						n.node_id,
-						CASE WHEN CARDINALITY(m.mapzone_id) = 1 THEN m.mapzone_id[1]
+						component,
+						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
 						ELSE 0
 						END AS mapzone_id
-					FROM temp_pgr_node n
-					JOIN temp_pgr_mapzone m ON n.mapzone_id = m.component
+					FROM temp_pgr_mapzone
 				)
-				UPDATE node SET '||quote_ident(v_mapzone_field)||' = nodes.mapzone_id
-				FROM nodes
-				WHERE node.node_id = nodes.node_id
-				AND node.'||quote_ident(v_mapzone_field)||' <> nodes.mapzone_id;
+				UPDATE arc a SET '||quote_ident(v_mapzone_field)||' = m.mapzone_id
+				FROM temp_pgr_arc ta
+				JOIN mapzones m ON m.component = ta.mapzone_id
+				WHERE a.arc_id = ta.arc_id
+				AND a.'||quote_ident(v_mapzone_field)||' <> m.mapzone_id
 			';
 			EXECUTE v_query_text;
 
 			v_query_text = '
-				WITH connecs AS (
+				WITH mapzones AS (
 					SELECT 
-						c.connec_id,
-						CASE WHEN CARDINALITY(m.mapzone_id) = 1 THEN m.mapzone_id[1]
+						component,
+						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
 						ELSE 0
 						END AS mapzone_id
-					FROM temp_pgr_arc a
-					JOIN temp_pgr_mapzone m ON a.mapzone_id = m.component
-					JOIN v_temp_connec c ON a.arc_id = c.arc_id
+					FROM temp_pgr_mapzone
 				)
-				UPDATE connec SET '||quote_ident(v_mapzone_field)||' = connecs.mapzone_id
-				FROM connecs
-				WHERE connec.connec_id = connecs.connec_id
-				AND connec.'||quote_ident(v_mapzone_field)||' <> connecs.mapzone_id;
+				UPDATE node n SET '||quote_ident(v_mapzone_field)||' = m.mapzone_id
+				FROM temp_pgr_node tn
+				JOIN mapzones m ON m.component = tn.mapzone_id
+				WHERE n.node_id = tn.node_id
+				AND n.'||quote_ident(v_mapzone_field)||' <> m.mapzone_id
 			';
 			EXECUTE v_query_text;
 
 			v_query_text = '
-				WITH link_connecs AS (
+				WITH mapzones AS (
 					SELECT 
-						c.link_id,
-						CASE WHEN CARDINALITY(m.mapzone_id) = 1 THEN m.mapzone_id[1]
+						component,
+						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
 						ELSE 0
 						END AS mapzone_id
-					FROM temp_pgr_arc a
-					JOIN temp_pgr_mapzone m ON a.mapzone_id = m.component
-					JOIN v_temp_link_connec c ON a.arc_id = c.arc_id
+					FROM temp_pgr_mapzone
 				)
-				UPDATE link SET '||quote_ident(v_mapzone_field)||' = link_connecs.mapzone_id
-				FROM link_connecs
-				WHERE link.link_id = link_connecs.link_id
-				AND link.'||quote_ident(v_mapzone_field)||' <> link_connecs.mapzone_id;
+				UPDATE connec c SET '||quote_ident(v_mapzone_field)||' = m.mapzone_id
+				FROM temp_pgr_arc ta
+				JOIN mapzones m ON m.component = ta.mapzone_id
+				WHERE c.arc_id = ta.arc_id
+				AND c.'||quote_ident(v_mapzone_field)||' <> m.mapzone_id
+			';
+			EXECUTE v_query_text;
+
+			v_query_text = '
+				WITH mapzones AS (
+					SELECT 
+						component,
+						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
+						ELSE 0
+						END AS mapzone_id
+					FROM temp_pgr_mapzone
+				)
+				UPDATE link l SET '||quote_ident(v_mapzone_field)||' = m.mapzone_id
+				FROM temp_pgr_arc ta
+				JOIN mapzones m ON m.component = ta.mapzone_id
+				JOIN connec c ON ta.arc_id = c.arc_id
+				WHERE l.feature_id = c.connec_id
+				AND l.feature_type = ''CONNEC''
+				AND l.'||quote_ident(v_mapzone_field)||' <> m.mapzone_id
 			';
 			EXECUTE v_query_text;
 
 			IF v_project_type = 'UD' THEN
 				v_query_text = '
-					WITH gullys AS (
+					WITH mapzones AS (
 						SELECT 
-							g.gully_id,
-							CASE WHEN CARDINALITY(m.mapzone_id) = 1 THEN m.mapzone_id[1]
+							component,
+							CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
 							ELSE 0
 							END AS mapzone_id
-						FROM temp_pgr_arc a
-						JOIN temp_pgr_mapzone m ON a.mapzone_id = m.component
-						JOIN v_temp_gully g ON a.arc_id = g.arc_id
+						FROM temp_pgr_mapzone
 					)
-					UPDATE gully SET '||quote_ident(v_mapzone_field)||' = gullys.mapzone_id
-					FROM gullys
-					WHERE gully.gully_id = gullys.gully_id
-					AND gully.'||quote_ident(v_mapzone_field)||' <> gullys.mapzone_id;
+					UPDATE gully g SET '||quote_ident(v_mapzone_field)||' = m.mapzone_id
+					FROM temp_pgr_arc ta
+					JOIN mapzones m ON m.component = ta.mapzone_id
+					WHERE g.arc_id = ta.arc_id
+					AND g.'||quote_ident(v_mapzone_field)||' <> m.mapzone_id
 				';
 				EXECUTE v_query_text;
 
 				v_query_text = '
-					WITH link_gullys AS (
+					WITH mapzones AS (
 						SELECT 
-							l.link_id,
-							CASE WHEN CARDINALITY(m.mapzone_id) = 1 THEN m.mapzone_id[1]
+							component,
+							CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
 							ELSE 0
 							END AS mapzone_id
-						FROM temp_pgr_arc a
-						JOIN temp_pgr_mapzone m ON a.mapzone_id = m.component
-						JOIN v_temp_link_gully l ON a.arc_id = l.arc_id
+						FROM temp_pgr_mapzone
 					)
-					UPDATE link SET '||quote_ident(v_mapzone_field)||' = link_gullys.mapzone_id
-					FROM link_gullys
-					WHERE link.link_id = link_gullys.link_id
-					AND link.'||quote_ident(v_mapzone_field)||' <> link_gullys.mapzone_id;
+					UPDATE link l SET '||quote_ident(v_mapzone_field)||' = m.mapzone_id
+					FROM temp_pgr_arc ta
+					JOIN mapzones m ON m.component = ta.mapzone_id
+					JOIN gully g ON ta.arc_id = g.arc_id
+					WHERE l.feature_id = g.gully_id
+					AND l.feature_type = ''GULLY''
+					AND l.'||quote_ident(v_mapzone_field)||' <> m.mapzone_id
 				';
 				EXECUTE v_query_text;
 			END IF;
 
-			IF v_old_mapzone_id_array IS NOT NULL THEN
-				v_query_text = 'UPDATE arc SET '||quote_ident(v_mapzone_field)||' = 0
-					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_arc tpa WHERE tpa.arc_id = arc.arc_id
-					)
+			IF EXISTS (SELECT 1 FROM v_temp_pgr_mapzone_old LIMIT 1) THEN
+				IF v_mapzone_name = 'PRESSZONE' THEN
+					v_query_text_aux = ', staticpress1 = NULL, staticpress2 = NULL'
+				ELSE IF v_mapzone_name = 'DWFZONE' THEN 
+					v_query_text_aux = ', drainzone_outfall = NULL, dwfzone_outfall = NULL'
+				ELSE
+					v_query_text_aux = ''
+				END IF;
+
+				v_query_text = '
+				UPDATE arc a SET '||quote_ident(v_mapzone_field)||' = 0
+				'||v_query_text_aux||'
+				WHERE EXISTS (
+					SELECT 1 FROM v_temp_pgr_mapzone_old tm
+					WHERE a.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+				)
+				AND NOT EXISTS (
+					SELECT 1 FROM temp_pgr_arc ta WHERE ta.arc_id = a.arc_id
+				)
+				AND a.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
 
-				v_query_text = 'UPDATE node SET '||quote_ident(v_mapzone_field)||' = 0
-					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_node tpn WHERE tpn.node_id = node.node_id
-					)
+				IF v_mapzone_name = 'PRESSZONE' THEN
+					v_query_text_aux = ', staticpressure = NULL'
+				ELSE IF v_mapzone_name = 'DWFZONE' THEN 
+					v_query_text_aux = ', drainzone_outfall = NULL, dwfzone_outfall = NULL'
+				ELSE
+					v_query_text_aux = ''
+				END IF;
+
+				v_query_text = '
+				UPDATE node n SET '||quote_ident(v_mapzone_field)||' = 0
+				'||v_query_text_aux||'
+				WHERE EXISTS (
+					SELECT 1 FROM v_temp_pgr_mapzone_old tm
+					WHERE n.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+				)
+				AND NOT EXISTS (
+					SELECT 1 FROM temp_pgr_node tn WHERE tn.node_id = node.node_id
+				)
+				AND n.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
 
-				v_query_text = 'UPDATE connec SET '||quote_ident(v_mapzone_field)||' = 0
-					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE vc.connec_id = connec.connec_id
-					)
+				v_query_text = '
+				UPDATE connec c SET '||quote_ident(v_mapzone_field)||' = 0
+				'||v_query_text_aux||'
+				WHERE EXISTS (
+					SELECT 1 FROM v_temp_pgr_mapzone_old tm
+					WHERE c.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+				)
+				AND NOT EXISTS (
+					SELECT 1 FROM temp_pgr_arc ta WHERE ta.arc_id = c.arc_id
+				)
+				AND c.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
 
-				v_query_text = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = 0
-					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id) WHERE vc.link_id = link.link_id
+				v_query_text = '
+				UPDATE link l SET '||quote_ident(v_mapzone_field)||' = 0
+				'||v_query_text_aux||'
+				WHERE EXISTS (
+					SELECT 1 FROM v_temp_pgr_mapzone_old tm
+					WHERE c.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+				)
+				AND NOT EXISTS (
+					SELECT 1 FROM temp_pgr_arc ta 
+					JOIN connec c USING (arc_id) 
+					WHERE c.feature_type = ''CONNEC'' AND c.connec_id = l.feature_id 
 					)
+				AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
 
 				IF v_project_type = 'UD' THEN
-					v_query_text = 'UPDATE gully SET '||quote_ident(v_mapzone_field)||' = 0
-						WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-						AND NOT EXISTS (
-							SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_gully vg USING (arc_id) WHERE vg.gully_id = gully.gully_id
-						)
+					v_query_text = '
+					UPDATE gully g SET '||quote_ident(v_mapzone_field)||' = 0
+					'||v_query_text_aux||'
+					WHERE EXISTS (
+						SELECT 1 FROM v_temp_pgr_mapzone_old tm
+						WHERE c.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+					)
+					AND NOT EXISTS (
+						SELECT 1 FROM temp_pgr_arc ta WHERE ta.arc_id = g.arc_id
+					)
+					AND g.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 					';
 					EXECUTE v_query_text;
 
-					v_query_text = 'UPDATE link SET '||quote_ident(v_mapzone_field)||' = 0
-					WHERE '||quote_ident(v_mapzone_field)||' IN ('||v_old_mapzone_id_array||')
-					AND NOT EXISTS (
-						SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_gully vg USING (arc_id) WHERE vg.link_id = link.link_id
+					v_query_text = '
+					UPDATE link l SET '||quote_ident(v_mapzone_field)||' = 0
+					'||v_query_text_aux||'
+					WHERE EXISTS (
+						SELECT 1 FROM v_temp_pgr_mapzone_old tm
+						WHERE c.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
 					)
+					AND NOT EXISTS (
+						SELECT 1 FROM temp_pgr_arc ta 
+						JOIN gully g USING (arc_id) 
+						WHERE c.feature_type = ''GULLY'' AND g.gully_id = l.feature_id
+					)
+					AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
 				END IF;
 			END IF;
 
-			-- static pressure for TODO DANI i Xavier revisar les static pressures
-			IF v_class = 'PRESSZONE' THEN
+			-- static pressure
+			IF v_mapzone_name = 'PRESSZONE' THEN
 				-- nodes
 				v_query_text = '
 					UPDATE node n SET staticpressure = t.staticpressure 
 					FROM (
-						SELECT node_id, 
+						SELECT node_id,
 						COALESCE ((p.head - COALESCE (n.custom_top_elev, n.top_elev) + COALESCE (n.depth, 0)), 0) AS staticpressure
 						FROM node n 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
 						WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
+						AND n.'||v_mapzone_field||' > 0
 					) t
 					WHERE n.node_id = t.node_id 
-					AND (n.staticpressure <> t.staticpressure OR n.staticpressure IS NULL)
+					AND (n.staticpressure IS DISTINCT FROM t.staticpressure)
 				';
 				EXECUTE v_query_text;
+
+				v_query_text = '
+					UPDATE node n SET staticpressure = NULL
+					WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
+					AND n.'||v_mapzone_field||' = 0
+				';
+				EXECUTE v_query_text;
+
 				-- arcs
 				v_query_text = '
 					UPDATE arc a SET staticpressure1 = t.staticpressure1 
@@ -1191,25 +1269,57 @@ BEGIN
 						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth1, 0))::numeric(12,3), 0) AS staticpressure1
 						FROM arc a 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
-						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.mapzone_id > 0 AND t.arc_id= a.arc_id)
+						AND a.'||v_mapzone_field||' > 0
 					) t
 					WHERE a.arc_id = t.arc_id 
+<<<<<<< Updated upstream
 					AND (a.staticpressure1 <> t.staticpressure1 OR a.staticpressure1 IS NULL)
+=======
+					AND (a.staticpress1 IS DISTINCT FROM t.staticpress1)
+>>>>>>> Stashed changes
 				';
 				EXECUTE v_query_text;
+
+				v_query_text = '
+					UPDATE arc a SET staticpress1 = NULL
+					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+					AND a.'||v_mapzone_field||' = 0
+					AND a.staticpress1 IS NOT NULL
+				';
+				EXECUTE v_query_text;
+
 				v_query_text = '
 					UPDATE arc a SET staticpressure2 = t.staticpressure2 
 					FROM (
 						SELECT arc_id, 
+<<<<<<< Updated upstream
 						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth2, 0))::numeric(12,3), 0) AS staticpressure2
+=======
+						COALESCE ((p.head - a.elevation2  + COALESCE (a.depth2, 0))::numeric(12,3), 0) AS staticpress2
+>>>>>>> Stashed changes
 						FROM arc a 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
-						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.mapzone_id > 0 AND t.arc_id= a.arc_id)
+						AND a.'||v_mapzone_field||' > 0
 					) t
 					WHERE a.arc_id = t.arc_id 
+<<<<<<< Updated upstream
 					AND (a.staticpressure2 <> t.staticpressure2 OR a.staticpressure2 IS NULL)
+=======
+					AND (a.staticpress2 IS DISTINCT FROM t.staticpress2)
+>>>>>>> Stashed changes
 				';
 				EXECUTE v_query_text;
+
+				v_query_text = '
+					UPDATE arc a SET staticpress2 = NULL
+					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+					AND a.'||v_mapzone_field||' = 0
+					AND a.staticpress2 IS NOT NULL
+				';
+				EXECUTE v_query_text;
+
 				-- connec
 				v_query_text = '
 					UPDATE connec c SET staticpressure = t.staticpressure 
@@ -1218,41 +1328,64 @@ BEGIN
 						COALESCE ((p.head - c.top_elev  + COALESCE (c.depth, 0))::numeric(12,3), 0) AS staticpressure
 						FROM connec c  
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
-						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.mapzone_id > 0 AND t.arc_id= c.arc_id)
 					) t
 					WHERE c.connec_id = t.connec_id
-					AND (c.staticpressure <> t.staticpressure OR c.staticpressure IS NULL)
+					AND (c.staticpressure IS DISTINCT FROM t.staticpressure)
 				';
 				EXECUTE v_query_text;
+
+				v_query_text = '
+					UPDATE connec c  SET staticpressure = NULL
+					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
+					AND c.'||v_mapzone_field||' = 0
+					AND c.staticpressure IS NOT NULL
+				';
+				EXECUTE v_query_text;
+
 				-- links
 				v_query_text = '
 					UPDATE link l SET staticpressure = t.staticpressure 
 					FROM (
-						SELECT  link_id, 
+						SELECT  link_id,
 						COALESCE ((p.head - l.top_elev1  + COALESCE (l.depth1, 0))::numeric(12,3), 0) AS staticpressure
 						FROM link l 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
 						WHERE EXISTS (
 							SELECT 1 FROM connec c 
 							JOIN temp_pgr_arc t USING (arc_id)
-							WHERE l.feature_id = c.connec_id 
+							WHERE t.mapzone_id > 0 AND l.feature_id = c.connec_id 
 						)
 					) t
 					WHERE l.link_id = t.link_id
-					AND (l.staticpressure <> t.staticpressure OR l.staticpressure IS NULL)
+					AND (l.staticpressure IS DISTINCT FROM t.staticpressure)
 				';
 				EXECUTE v_query_text;
-			ELSIF v_class = 'DWFZONE' THEN
-				WITH nodes AS (
-					SELECT node AS node_id, array_agg(start_vid) AS dwfzone_outfall
+
+				v_query_text = '
+					UPDATE link l  SET staticpressure = NULL
+					WHERE EXISTS (
+						SELECT 1 FROM temp_pgr_arc t 
+						JOIN connec c USING (arc_id) 
+						WHERE c.connec_id= l.feature_id
+					)
+					AND l.'||v_mapzone_field||' = 0
+					AND l.staticpressure IS NOT NULL
+				';
+				EXECUTE v_query_text;
+
+			ELSIF v_mapzone_name = 'DWFZONE' THEN
+				WITH outfalls AS (
+					SELECT node AS pgr_node_id, array_agg(start_vid  ORDER BY start_vid) AS dwfzone_outfall
 					FROM temp_pgr_drivingdistance
 					GROUP BY node
-					ORDER BY node, start_vid
 				)
-				UPDATE node SET dwfzone_outfall = nodes.dwfzone_outfall
-				FROM nodes
-				WHERE node.node_id = nodes.node_id
-				AND node.dwfzone_outfall <> nodes.dwfzone_outfall;
+				UPDATE node n SET dwfzone_outfall = o.dwfzone_outfall
+				FROM temp_pgr_node pn
+				JOIN outfalls o USING (pgr_node_id)
+				WHERE n.node_id = pn.node_id
+				AND n.dwfzone_id > 0
+				AND n.dwfzone_outfall IS DISTINCT FROM o.dwfzone_outfall;
 
 				UPDATE arc a SET dwfzone_outfall = n.dwfzone_outfall
 				FROM node n
@@ -1262,7 +1395,8 @@ BEGIN
 					FROM temp_pgr_arc ta
 					WHERE ta.arc_id = a.arc_id
 				)
-				AND a.dwfzone_outfall <> n.dwfzone_outfall;
+				AND a.dwfzone_id > 0 
+				AND a.dwfzone_outfall IS DISTINCT FROM n.dwfzone_outfall;
 
 				UPDATE arc a SET dwfzone_outfall = n.dwfzone_outfall
 				FROM node n
@@ -1272,27 +1406,30 @@ BEGIN
 					FROM temp_pgr_arc ta
 					WHERE ta.arc_id = a.arc_id
 				)
-				AND a.dwfzone_outfall <> n.dwfzone_outfall;
+				and a.dwfzone_id > 0
+				AND a.dwfzone_outfall IS DISTINCT FROM n.dwfzone_outfall;
 
 				UPDATE connec c SET dwfzone_outfall = a.dwfzone_outfall
 				FROM arc a
-				WHERE c.connec_id = a.connec_id
+				WHERE c.arc_id = a.arc_id
 				AND EXISTS (
 					SELECT 1
 					FROM temp_pgr_arc ta
 					WHERE ta.arc_id = a.arc_id
 				)
+				AND c.dwfzone_id > 0
 				AND c.dwfzone_outfall <> a.dwfzone_outfall;
 
 				UPDATE gully g SET dwfzone_outfall = a.dwfzone_outfall
 				FROM arc a
-				WHERE g.gully_id = a.gully_id
+				WHERE g.arc_id = a.arc_id
 				AND EXISTS (
 					SELECT 1
 					FROM temp_pgr_arc ta
 					WHERE ta.arc_id = a.arc_id
 				)
-				AND g.dwfzone_outfall <> a.dwfzone_outfall;
+				AND g.dwfzone_id > 0
+				AND g.dwfzone_outfall IS DISTINCT FROM a.dwfzone_outfall;
 
 				UPDATE link l SET dwfzone_outfall = c.dwfzone_outfall
 				FROM connec c
@@ -1303,7 +1440,8 @@ BEGIN
 					FROM temp_pgr_arc ta
 					WHERE ta.arc_id = c.arc_id
 				)
-				AND l.dwfzone_outfall <> c.dwfzone_outfall;
+				AND l.dwfzone_id > 0
+				AND l.dwfzone_outfall IS DISTINCT FROM c.dwfzone_outfall;
 
 				UPDATE link l SET dwfzone_outfall = g.dwfzone_outfall
 				FROM gully g
@@ -1314,7 +1452,55 @@ BEGIN
 					FROM temp_pgr_arc ta
 					WHERE ta.arc_id = g.arc_id
 				)
-				AND l.dwfzone_outfall <> g.dwfzone_outfall;
+				AND l.dwfzone_id > 0
+				AND l.dwfzone_outfall IS DISTINCT FROM g.dwfzone_outfall;
+
+				-- conflicts
+				UPDATE node n SET dwfzone_outfall = NULL, drainzone_outfall = NULL
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
+				AND n.dwfzone_id = 0;
+
+				UPDATE arc a SET dwfzone_outfall = NULL, drainzone_outfall = NULL
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+				AND a.dwfzone_id = 0;
+
+				UPDATE connec c SET dwfzone_outfall = NULL, drainzone_outfall = NULL
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
+				AND c.dwfzone_id = 0;
+
+				UPDATE gully g SET dwfzone_outfall = NULL, drainzone_outfall = NULL
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= g.arc_id)
+				AND g.dwfzone_id = 0;
+
+				UPDATE link l SET dwfzone_outfall = NULL, drainzone_outfall = NULL
+				WHERE EXISTS (
+					SELECT 1 FROM temp_pgr_arc t 
+					JOIN connec c USING (arc_id) 
+					WHERE c.connec_id= l.feature_id AND l.feature_type = 'CONNEC'
+				)
+				AND l.dwfzone_id = 0;
+
+				UPDATE link l SET dwfzone_outfall = NULL, drainzone_outfall = NULL
+				WHERE EXISTS (
+					SELECT 1 FROM temp_pgr_arc t 
+					JOIN gully g USING (arc_id) 
+					WHERE g.gully_id = l.feature_id AND l.feature_type = 'GULLY'
+				)
+				AND l.dwfzone_id = 0;
+
+				-- TODO DRAINZONE_OUTFALLS for arcs initoverflowpath TRUE that are not in a conflict area
+				EXECUTE 'SELECT array_agg(a.pgr_node_1)::INT[] 
+						FROM temp_pgr_arc a
+						WHERE a.graph_delimiter = ''INITOVERFLOWPATH''
+						AND EXISTS (SELECT 1 FROM temp_pgr_mapzone WHERE CARDINALITY (m.mapzone_id) = 1)
+						AND a.mapzone_id > 0
+						AND a.reverse_cost < 0 
+						AND CARDINALITY (m.mapzone_id) = 1'
+				INTO v_pgr_root_vids;
+
+				v_query_text = 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
+					FROM temp_pgr_arc
+				';
 
 			END IF;
 
