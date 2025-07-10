@@ -1243,7 +1243,7 @@ BEGIN
 					UPDATE node n SET staticpressure = t.staticpressure 
 					FROM (
 						SELECT node_id,
-						COALESCE ((p.head - COALESCE (n.custom_top_elev, n.top_elev) + COALESCE (n.depth, 0)), 0) AS staticpressure
+						(p.head - COALESCE (n.custom_top_elev, n.top_elev) + COALESCE (n.depth, 0))::numeric(12,3) AS staticpressure
 						FROM node n 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
 						WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
@@ -1254,38 +1254,19 @@ BEGIN
 				';
 				EXECUTE v_query_text;
 
-				v_query_text = '
-					UPDATE node n SET staticpressure = NULL
-					WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
-					AND n.'||v_mapzone_field||' = 0
-				';
-				EXECUTE v_query_text;
-
 				-- arcs
 				v_query_text = '
 					UPDATE arc a SET staticpressure1 = t.staticpressure1 
 					FROM (
 						SELECT arc_id, 
-						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth1, 0))::numeric(12,3), 0) AS staticpressure1
+						(p.head - a.elevation1  + COALESCE (a.depth1, 0))::numeric(12,3) AS staticpressure1
 						FROM arc a 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
-						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.mapzone_id > 0 AND t.arc_id= a.arc_id)
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
 						AND a.'||v_mapzone_field||' > 0
 					) t
 					WHERE a.arc_id = t.arc_id 
-<<<<<<< Updated upstream
-					AND (a.staticpressure1 <> t.staticpressure1 OR a.staticpressure1 IS NULL)
-=======
-					AND (a.staticpress1 IS DISTINCT FROM t.staticpress1)
->>>>>>> Stashed changes
-				';
-				EXECUTE v_query_text;
-
-				v_query_text = '
-					UPDATE arc a SET staticpress1 = NULL
-					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
-					AND a.'||v_mapzone_field||' = 0
-					AND a.staticpress1 IS NOT NULL
+					AND (a.staticpressure1 IS DISTINCT FROM t.staticpressure1)
 				';
 				EXECUTE v_query_text;
 
@@ -1293,30 +1274,14 @@ BEGIN
 					UPDATE arc a SET staticpressure2 = t.staticpressure2 
 					FROM (
 						SELECT arc_id, 
-<<<<<<< Updated upstream
-						COALESCE ((p.head - a.elevation1  + COALESCE (a.depth2, 0))::numeric(12,3), 0) AS staticpressure2
-=======
-						COALESCE ((p.head - a.elevation2  + COALESCE (a.depth2, 0))::numeric(12,3), 0) AS staticpress2
->>>>>>> Stashed changes
+						(p.head - a.elevation2  + COALESCE (a.depth2, 0))::numeric(12,3) AS staticpressure2
 						FROM arc a 
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
-						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.mapzone_id > 0 AND t.arc_id= a.arc_id)
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
 						AND a.'||v_mapzone_field||' > 0
 					) t
 					WHERE a.arc_id = t.arc_id 
-<<<<<<< Updated upstream
-					AND (a.staticpressure2 <> t.staticpressure2 OR a.staticpressure2 IS NULL)
-=======
-					AND (a.staticpress2 IS DISTINCT FROM t.staticpress2)
->>>>>>> Stashed changes
-				';
-				EXECUTE v_query_text;
-
-				v_query_text = '
-					UPDATE arc a SET staticpress2 = NULL
-					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
-					AND a.'||v_mapzone_field||' = 0
-					AND a.staticpress2 IS NOT NULL
+					AND (a.staticpressure2 IS DISTINCT FROM t.staticpressure2)
 				';
 				EXECUTE v_query_text;
 
@@ -1325,21 +1290,14 @@ BEGIN
 					UPDATE connec c SET staticpressure = t.staticpressure 
 					FROM (
 						SELECT  connec_id, 
-						COALESCE ((p.head - c.top_elev  + COALESCE (c.depth, 0))::numeric(12,3), 0) AS staticpressure
+						(p.head - c.top_elev  + COALESCE (c.depth, 0))::numeric(12,3) AS staticpressure
 						FROM connec c  
 						JOIN '||v_mapzone_name||' p USING ('||v_mapzone_field||')
-						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.mapzone_id > 0 AND t.arc_id= c.arc_id)
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
+						AND c.'||v_mapzone_field||' > 0
 					) t
 					WHERE c.connec_id = t.connec_id
 					AND (c.staticpressure IS DISTINCT FROM t.staticpressure)
-				';
-				EXECUTE v_query_text;
-
-				v_query_text = '
-					UPDATE connec c  SET staticpressure = NULL
-					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
-					AND c.'||v_mapzone_field||' = 0
-					AND c.staticpressure IS NOT NULL
 				';
 				EXECUTE v_query_text;
 
@@ -1354,14 +1312,50 @@ BEGIN
 						WHERE EXISTS (
 							SELECT 1 FROM connec c 
 							JOIN temp_pgr_arc t USING (arc_id)
-							WHERE t.mapzone_id > 0 AND l.feature_id = c.connec_id 
+							WHERE l.feature_id = c.connec_id 
 						)
+						AND l.'||v_mapzone_field||' > 0
 					) t
 					WHERE l.link_id = t.link_id
 					AND (l.staticpressure IS DISTINCT FROM t.staticpressure)
 				';
 				EXECUTE v_query_text;
 
+				-- conflicts
+				-- nodes
+				v_query_text = '
+					UPDATE node n SET staticpressure = NULL
+					WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
+					AND n.'||v_mapzone_field||' = 0
+				';
+				EXECUTE v_query_text;
+
+				-- arcs 
+				v_query_text = '
+					UPDATE arc a SET staticpressure1 = NULL
+					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+					AND a.'||v_mapzone_field||' = 0
+					AND a.staticpressure1 IS NOT NULL
+				';
+				EXECUTE v_query_text;
+				v_query_text = '
+					UPDATE arc a SET staticpressure2 = NULL
+					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
+					AND a.'||v_mapzone_field||' = 0
+					AND a.staticpressure2 IS NOT NULL
+				';
+				EXECUTE v_query_text;
+
+				-- connec
+				v_query_text = '
+					UPDATE connec c  SET staticpressure = NULL
+					WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
+					AND c.'||v_mapzone_field||' = 0
+					AND c.staticpressure IS NOT NULL
+				';
+				EXECUTE v_query_text;
+
+				-- links
 				v_query_text = '
 					UPDATE link l  SET staticpressure = NULL
 					WHERE EXISTS (
