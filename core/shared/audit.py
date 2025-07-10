@@ -16,6 +16,7 @@ from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
 from ...libs import tools_qt, tools_db, tools_qgis
 
+
 class GwAudit:
 
     def __init__(self):
@@ -270,10 +271,12 @@ def close_dlg(**kwargs):
 
     tools_gw.close_dialog(kwargs["dialog"])
 
+
 def open(**kwargs):
     """ Open audit """
 
     kwargs["class"].open_audit()
+
 
 def open_date(**kwargs):
     """ Open audit in selected date """    
