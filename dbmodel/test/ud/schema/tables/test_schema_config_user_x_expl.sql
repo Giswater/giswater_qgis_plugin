@@ -37,6 +37,7 @@ SELECT col_type_is('config_user_x_expl', 'username', 'varchar(50)', 'Column user
 
 
 -- check foreign keys
+SELECT has_fk('config_user_x_expl', 'Table config_user_x_expl should have foreign keys');
 SELECT fk_ok('config_user_x_expl','expl_id','exploitation','expl_id','Table should have foreign key from expl_id to exploitation.expl_id');
 
 -- check indexes
