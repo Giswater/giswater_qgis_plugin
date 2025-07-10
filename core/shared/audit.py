@@ -16,8 +16,6 @@ from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
 from ...libs import tools_qt, tools_db, tools_qgis
 
-
-
 class GwAudit:
 
     def __init__(self):
