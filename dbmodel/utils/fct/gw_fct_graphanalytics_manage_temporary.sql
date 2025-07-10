@@ -155,6 +155,10 @@ BEGIN
 
 
         -- Create temporary views
+        CREATE OR REPLACE TEMPORARY VIEW v_temp_pgr_mapzone_old AS
+        SELECT DISTINCT t.old_mapzone_id
+        FROM temp_pgr_node t
+        WHERE t.old_mapzone_id > 0;
         IF v_use_psector = 'true' THEN
             -- with psectors
             IF v_project_type = 'WS' THEN
@@ -865,12 +869,6 @@ BEGIN
 
         -- For specific functions
         IF v_fct_name = 'MINSECTOR' THEN
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_pgr_minsector_old AS
-            SELECT DISTINCT v.minsector_id
-            FROM temp_pgr_arc t
-            JOIN v_temp_arc v USING (arc_id)
-            WHERE v.minsector_id IS NOT NULL;
-
             CREATE OR REPLACE TEMPORARY VIEW v_temp_minsector_mincut AS
             WITH minsector_mapzones AS (
                 SELECT
@@ -935,7 +933,7 @@ BEGIN
     ELSIF v_action = 'DROP' THEN
 
         -- Drop temporary views
-        DROP VIEW IF EXISTS v_temp_pgr_minsector_old;
+        DROP VIEW IF EXISTS v_temp_pgr_mapzone_old;
         DROP VIEW IF EXISTS v_temp_minsector_mincut;
         DROP VIEW IF EXISTS v_temp_node;
         DROP VIEW IF EXISTS v_temp_arc;
