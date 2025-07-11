@@ -261,6 +261,11 @@ class GwDocument(QObject):
         """Delete the selected workcat from the document"""
         qtable = dialog.tbl_doc_x_workcat
         # Get selected rows
+        if qtable.selectionModel() is None:
+            msg = "No workcat values"
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -320,6 +325,13 @@ class GwDocument(QObject):
     def _delete_psector(self, dialog):
         """Delete the selected psector from the document"""
         qtable = dialog.tbl_doc_x_psector
+
+        # Get selected rows
+        if qtable.selectionModel() is None:
+            msg = "No psector values"
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -383,6 +395,13 @@ class GwDocument(QObject):
     def _delete_visit(self, dialog):
         """Delete the selected visit from the document"""
         qtable = dialog.tbl_doc_x_visit
+
+        # Get selected rows
+        if qtable.selectionModel() is None:
+            msg = "No visit values"
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -639,15 +658,15 @@ class GwDocument(QObject):
         if sql is not None and sql != "":
             tools_db.execute_sql(sql)
 
-        arc_ids = self.rel_list_ids['arc']
-        node_ids = self.rel_list_ids['node']
-        connec_ids = self.rel_list_ids['connec']
-        link_ids = self.rel_list_ids['link']
+        arc_ids = self.rel_list_ids.get('arc')
+        node_ids = self.rel_list_ids.get('node')
+        connec_ids = self.rel_list_ids.get('connec')
+        link_ids = self.rel_list_ids.get('link')
         workcat_ids = self._get_associated_workcat_ids()
         psector_ids = self._get_associated_psector_ids()
         visit_ids = self._get_associated_visit_ids()
-        gully_ids = self.rel_list_ids['gully']
-        element_ids = self.rel_list_ids['element']
+        gully_ids = self.rel_list_ids.get('gully')
+        element_ids = self.rel_list_ids.get('element')
 
         data = {
             'arc': arc_ids,
