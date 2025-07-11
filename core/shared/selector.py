@@ -371,7 +371,7 @@ class GwSelector:
             tools_qgis.show_message(message, level)
 
         # Apply zoom only to the selected tabs
-        if tab_name in ('tab_exploitation', 'tab_municipality', 'tab_sector'):
+        if tab_name in ('tab_exploitation', 'tab_exploitation_add', 'tab_municipality', 'tab_sector'):
             try:
                 # Zoom to feature
                 x1 = json_result['body']['data']['geometry']['x1']
