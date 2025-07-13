@@ -14,7 +14,7 @@ AS $function$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"ws"}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"ud"}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "ids":"[1,2]", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
@@ -65,7 +65,7 @@ v_zonetable text;
 v_cur_user text;
 v_prev_cur_user text;
 v_device integer;
-v_expand float=0;
+v_expand float=50;
 v_tiled boolean;
 v_result json;
 v_result_init json;
@@ -110,10 +110,6 @@ BEGIN
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
 		EXECUTE 'SET ROLE "'||v_cur_user||'"';
-	END IF;
-
-	IF v_device = 5 THEN
-		v_expand = 50.0;
 	END IF;
 
 	-- profilactic control
@@ -611,7 +607,13 @@ BEGIN
 			EXECUTE' DELETE FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
 			EXECUTE' INSERT INTO '||v_schemaname||'.selector_municipality 
 			SELECT muni_id, current_user FROM selector_municipality WHERE cur_user = current_user';
-
+		
+			SELECT row_to_json (a)
+			INTO v_geometry
+			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, 
+			st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
+			FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc) b) a;
+		
 		END IF;
 	
 		EXECUTE 'SET search_path = '||v_schemaname||', public';
@@ -657,7 +659,7 @@ BEGIN
 		DELETE FROM selector_psector WHERE psector_id NOT IN
 		(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN 
 	    (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-		
+
 	END IF;
 
 	-- get envelope
@@ -668,22 +670,14 @@ BEGIN
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1,
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM sector where sector_id IN
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc where sector_id IN
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)) b) a;
-
-	ELSIF v_tabname='tab_exploitation_add' THEN
-		EXECUTE 'SELECT row_to_json (a) 
-			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
-			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-			union SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM '||v_addschema||'.exploitation where expl_id IN (SELECT expl_id FROM '||v_addschema||
-			'.selector_expl WHERE cur_user = current_user)) b) a'
-			INTO v_geometry;
 			
-	ELSIF v_count_2 > 0 or (v_checkall IS False and v_id is null) THEN
+	ELSIF (v_count_2 > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_node) b) a;
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc) b) a;
 
 	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
@@ -692,14 +686,14 @@ BEGIN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM exploitation where expl_id IN
+		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM v_edit_arc where expl_id IN
 		(SELECT expl_id FROM selector_expl WHERE cur_user=current_user)) b) a;
 
 	ELSIF v_tabname='tab_municipality' THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM ext_municipality where muni_id IN
+		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM v_edit_arc where muni_id IN
 		(SELECT muni_id FROM selector_municipality WHERE cur_user=current_user)) b) a;
 
 	END IF;
