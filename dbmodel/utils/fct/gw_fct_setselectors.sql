@@ -7,10 +7,10 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2870
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setselectors (json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
-  RETURNS json AS
-$BODY$
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
@@ -436,7 +436,7 @@ BEGIN
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 			INSERT INTO selector_macroexpl
 			SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT DISTINCT expl_id FROM node
-			JOIN selector_sector using (sector_id) WHERE cur_user = current_user);
+			JOIN selector_municipality using (muni_id) WHERE cur_user = current_user);
 
 			-- expl
 			DELETE FROM selector_expl WHERE cur_user = current_user;
@@ -448,7 +448,7 @@ BEGIN
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 			INSERT INTO selector_macrosector
 			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT sector_id FROM node
-			JOIN selector_expl using (expl_id) where state = 1 AND cur_user = current_user);
+			JOIN selector_municipality using (muni_id) WHERE cur_user = current_user);
 
 			-- sector
 			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
@@ -493,63 +493,54 @@ BEGIN
 	
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 	
-		-- manage cross-reference tables
-		select count(*) into v_count from node;
-		IF v_count > 0 THEN
+		EXECUTE' DELETE FROM selector_municipality WHERE cur_user = current_user';
+		EXECUTE' INSERT INTO selector_municipality 
+		SELECT muni_id, current_user FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
 
-			IF v_checkall THEN
+		-- macroexpl
+		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
+		INSERT INTO selector_macroexpl
+		SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT DISTINCT expl_id FROM node
+		JOIN selector_municipality using (muni_id) WHERE cur_user = current_user);
 
-				EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
-				',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active
-				ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
+		-- expl
+		DELETE FROM selector_expl WHERE cur_user = current_user;
+		INSERT INTO selector_expl
+		SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+		ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
-			ELSIF v_checkall is false THEN
-				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
-			ELSE
+		-- macrosector
+		DELETE FROM selector_macrosector WHERE cur_user = current_user;
+		INSERT INTO selector_macrosector
+		SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT sector_id FROM node
+		JOIN selector_municipality using (muni_id) WHERE cur_user = current_user);
 
-				IF v_isalone THEN
-					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
-				END IF;
+		-- sector
+		DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+		INSERT INTO selector_sector
+		SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+		ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-				-- manage value
-				IF v_value then
-					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-				ELSE
-					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || '::text = '''|| v_id ||''' AND cur_user = current_user';
-				END IF;
+		-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+		INSERT INTO selector_sector
+		SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+		UNION
+		SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+		ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-			END IF;
-
-			-- macrosector
-			DELETE FROM selector_macrosector WHERE cur_user = current_user;
-			INSERT INTO selector_macrosector
-			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT (sector_id) FROM node
-			JOIN selector_expl using (expl_id) where cur_user = current_user);
-
-			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- muni
-			DELETE FROM selector_municipality WHERE cur_user = current_user;
-			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
-
+		-- scenarios
+		IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
+			DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
+			(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 		END IF;
-			EXECUTE 'SET search_path = '||v_schemaname||', public';
+
+		-- psector
+		DELETE FROM selector_psector WHERE psector_id NOT IN
+		(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+
+		EXECUTE 'SET search_path = '||v_schemaname||', public';
 	END IF;
 
-
-	-- manage addschema
 	IF v_addschema IS NOT NULL AND v_tabname IN ('tab_exploitation_add', 'tab_macroexploitation_add') THEN
 	
 		EXECUTE 'SET search_path = '||v_addschema||', public';
@@ -623,50 +614,49 @@ BEGIN
 
 		END IF;
 	
-			EXECUTE 'SET search_path = '||v_schemaname||', public';
-		
-			-- returting main schema
-						
-			-- macroexpl
-			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-			INSERT INTO selector_macroexpl
-			SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT DISTINCT expl_id FROM node
-			JOIN selector_sector using (sector_id) WHERE cur_user = current_user);
+		EXECUTE 'SET search_path = '||v_schemaname||', public';
+								
+		-- macroexpl
+		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
+		INSERT INTO selector_macroexpl
+		SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT DISTINCT expl_id FROM node
+		JOIN selector_municipality using (muni_id) WHERE cur_user = current_user);
 
-			-- expl
-			DELETE FROM selector_expl WHERE cur_user = current_user;
-			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
-			ON CONFLICT (expl_id, cur_user) DO NOTHING;
+		-- expl
+		DELETE FROM selector_expl WHERE cur_user = current_user;
+		INSERT INTO selector_expl
+		SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+		ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
-			-- macrosector
-			DELETE FROM selector_macrosector WHERE cur_user = current_user;
-			INSERT INTO selector_macrosector
-			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT sector_id FROM node
-			JOIN selector_expl using (expl_id) where state = 1 AND cur_user = current_user);
+		-- macrosector
+		DELETE FROM selector_macrosector WHERE cur_user = current_user;
+		INSERT INTO selector_macrosector
+		SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT sector_id FROM node
+		JOIN selector_municipality using (muni_id) WHERE cur_user = current_user);
 
-			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
+		-- sector
+		DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+		INSERT INTO selector_sector
+		SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+		ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
+		-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+		INSERT INTO selector_sector
+		SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+		UNION
+		SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+		ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-			-- scenarios
-			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
-				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-			END IF;
+		-- scenarios
+		IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
+			DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
+			(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+		END IF;
 
-			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN
-			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+		-- psector
+		DELETE FROM selector_psector WHERE psector_id NOT IN
+		(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN 
+	    (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 		
 	END IF;
 
@@ -714,7 +704,7 @@ BEGIN
 
 	END IF;
 
-	-- force 0
+	-- force 0 
 	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
 
@@ -746,6 +736,5 @@ BEGIN
 
 END;
 
-$BODY$
-LANGUAGE plpgsql VOLATILE
-COST 100;
+$function$
+;
