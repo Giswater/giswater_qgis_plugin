@@ -701,29 +701,6 @@ class AddNewLot:
             self.dlg_lot_man.date_event_from.setDate(current_date)
             self.dlg_lot_man.date_event_to.setDate(current_date)
 
-    def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
-        """Populate a QTableView with the results of a SQL query."""
-
-        data = tools_db.get_rows(query)
-        if not data:
-            view.setModel(QStandardItemModel())  # Clear view
-            return
-
-        # Auto-detect column names if not provided
-        if not columns:
-            columns = list(data[0].keys())
-
-        model = QStandardItemModel(len(data), len(columns))
-        model.setHorizontalHeaderLabels(columns)
-
-        for row_idx, row in enumerate(data):
-            for col_idx, col_name in enumerate(columns):
-                value = str(row.get(col_name, ''))
-                model.setItem(row_idx, col_idx, QStandardItem(value))
-
-        view.setModel(model)
-        view.resizeColumnsToContents()
-
     def filter_lot(self):
         """Filter lot records based on date range and date type."""
         filters = []

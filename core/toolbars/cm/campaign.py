@@ -359,8 +359,19 @@ class Campaign:
     def save_campaign(self, from_tab_change=False):
         """Save campaign data to the database. Updates ID and resets map on success."""
 
-        fields_str = self.extract_campaign_fields(self.dialog)
+        fields_dict = self.extract_campaign_fields(self.dialog, as_dict=True)
+
+        # For inventory campaigns, inventoryclass_id is special.
+        # It should not be saved in om_campaign table but passed as an extra param.
+        inventory_class_id = None
+        if self.campaign_type == 3 and 'inventoryclass_id' in fields_dict:
+            inventory_class_id = fields_dict.pop('inventoryclass_id')
+
+        fields_str = ", ".join([f'"{k}":{v}' for k, v in fields_dict.items()])
         extras = f'"fields":{{{fields_str}}}, "campaign_type":{self.campaign_type}'
+        if inventory_class_id:
+            extras += f', "inventoryclass_id":{inventory_class_id}'
+        
         body = tools_gw.create_body(feature='"tableName":"om_campaign", "idName":"campaign_id"', extras=extras)
 
         # Check mandatory fields
@@ -413,8 +424,8 @@ class Campaign:
             msg = "Failed to save campaign"
             tools_qgis.show_warning(result.get("message", msg))
 
-    def extract_campaign_fields(self, dialog):
-        """Build a JSON string of field values from the campaign dialog"""
+    def extract_campaign_fields(self, dialog, as_dict=False):
+        """Build a JSON string or dictionary of field values from the campaign dialog"""
         fields = {}
 
         # Mappings from widget types to their value getters and properties
@@ -439,7 +450,14 @@ class Campaign:
                     continue
 
                 if value not in ('null', None, ''):
-                    fields[colname] = f'"{value}"' if config['quote'] else value
+                    # For combo boxes, the value might be a list; we take the first element (the ID)
+                    if isinstance(value, (list, tuple)) and value:
+                        value = value[0]
+                    
+                    fields[colname] = f'"{value}"' if config['quote'] else str(value)
+
+        if as_dict:
+            return fields
 
         return ", ".join([f'"{k}":{v}' for k, v in fields.items()])
 
@@ -447,7 +465,7 @@ class Campaign:
         # self.dialog.tab_relations.setCurrentIndex(0)
         self.feature_type = tools_gw.get_signal_change_tab(self.dialog)
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
-        table_object = "campaign"
+        table_object = "campaign_inventory" if self.campaign_type == 3 else "campaign"
         tools_gw.get_signal_change_tab(self.dialog)
 
         highlight_config = {
@@ -522,7 +540,6 @@ class Campaign:
     def _update_feature_completer(self, dlg):
         tab_name = dlg.tab_feature.currentWidget().objectName()
         feature = tab_name.replace('tab_', '')
-        table_name = f"v_edit_{feature}"
         id_column = f"{feature}_id"
 
         # Get allowed feature types
