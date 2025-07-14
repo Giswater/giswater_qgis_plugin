@@ -365,3 +365,17 @@ UPDATE config_form_fields SET iseditable=false WHERE formname='v_ui_drainzone' A
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,widgetcontrols,hidden)
 	VALUES ('v_ui_dwfzone','form_feature','tab_none','drainzone_id','lyt_data_1',11,'text','combo','drainzone_id','drainzone_id',false,false,true,false,false,'SELECT drainzone_id id, name idval FROM v_edit_drainzone','{"setMultiline":false}'::json,false);
+
+-- 10/07/2025
+-- UPDATE config_form_fields SET layoutname = 'lyt_bot_1' WHERE formtype='form_feature' AND tab_name='tab_data' AND columnname in ('sector_id', 'omzone_id', 'state_type', 'state');
+-- formname = 've_node_highpoint' and (columnname ilike 'omzone%' or columnname ilike 'sector_id%' or columnname ilike 'state%')
+
+-- UPDATE config_form_fields SET layoutorder = 44, widgetcontrols = '{"setMultiline":false}'::json WHERE formname = 've_node_highpoint' AND columnname = 'verified' AND tab_name = 'tab_data' AND formtype = 'form_feature';
+
+-- 14/07/2025
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES
+    (3410, 'gw_trg_array_fk_array_table', 'utils', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL),
+    (3412, 'gw_trg_array_fk_id_table', 'utils', 'function', NULL, NULL, NULL, NULL, NULL, 'core', NULL)
+ON CONFLICT (id) DO UPDATE SET project_type = 'utils';
+
+INSERT INTO dma (dma_id, name) VALUES (0, 'UNDEFINED');

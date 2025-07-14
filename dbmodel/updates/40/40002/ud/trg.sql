@@ -89,3 +89,34 @@ v_ui_dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dwfzone('UI');
 
 CREATE TRIGGER gw_trg_edit_link_link INSTEAD OF INSERT OR DELETE OR UPDATE ON
 ve_link_link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
+
+-- 14/07/2025
+-- Municipality
+CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON ext_municipality
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id"}');
+
+CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON ext_municipality
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id"}');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON dma
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
+
+-- Exploitation
+CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON exploitation
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"dma":"expl_id"}');
+
+CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON exploitation
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"dma":"expl_id"}');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON dma
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+-- Sector
+CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON sector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dma":"sector_id"}');
+
+CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON sector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dma":"sector_id"}');
+
+CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON dma
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');

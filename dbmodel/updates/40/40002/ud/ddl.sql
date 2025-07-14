@@ -78,11 +78,24 @@ DROP VIEW IF EXISTS ve_link_link;
 DROP VIEW IF EXISTS v_edit_link;
 
 -- TODO: Check if this is needed
---SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"arc", "column":"drainzone_id"}}$$);
---SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"node", "column":"drainzone_id"}}$$);
---SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"drainzone_id"}}$$);
---SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"gully", "column":"drainzone_id"}}$$);
---SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"link", "column":"drainzone_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"drainzone_id", "newName":"dma_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"node", "column":"drainzone_id", "newName":"dma_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"connec", "column":"drainzone_id", "newName":"dma_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"gully", "column":"drainzone_id", "newName":"dma_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"drainzone_id", "newName":"dma_id"}}$$);
+
+CREATE TABLE IF NOT EXISTS dma (
+    dma_id SERIAL,
+    name TEXT,
+    muni_id INT4[],
+    expl_id INT4[],
+    sector_id INT4[],
+    graphconfig JSON,
+    CONSTRAINT dma_pk PRIMARY KEY (dma_id)
+);
 
 ALTER TABLE dwfzone ADD CONSTRAINT dwfzone_drainzone_fk FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
+
+-- 14/07/2025
+DELETE FROM sys_foreignkey WHERE target_table = 'dma';
 

@@ -1264,3 +1264,7 @@ UPDATE config_param_system SET value='UPDATE v_table set the_geom = geom FROM
         group by v_field
         )a group by v_field)b 
         WHERE b.v_field::text=v_table.v_fieldmp::text' WHERE "parameter"='utils_graphanalytics_custom_geometry_constructor';
+
+-- 14/07/2025
+UPDATE sys_function SET project_type = 'utils' WHERE id = 3410;
+UPDATE sys_function SET project_type = 'utils' WHERE id = 3412;
