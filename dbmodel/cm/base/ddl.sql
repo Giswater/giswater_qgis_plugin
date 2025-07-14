@@ -304,21 +304,21 @@ CREATE TABLE om_reviewclass_x_object (
   CONSTRAINT om_reviewclass_x_object_pkey PRIMARY KEY (reviewclass_id, object_id)
 );
 
-CREATE TABLE om_inventory (
+CREATE TABLE om_inventoryclass (
   id serial NOT NULL,
   idval text,
   pschema_id text,
   descript text,
   active boolean DEFAULT true,
-  CONSTRAINT om_inventory_pkey PRIMARY KEY (id)
+  CONSTRAINT om_inventoryclass_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE om_inventory_x_object (
-  inventory_id integer NOT NULL,
+  inventoryclass_id integer NOT NULL,
   object_id text NOT NULL,
   orderby int2,
   active boolean DEFAULT true,
-  CONSTRAINT om_inventory_x_object_pkey PRIMARY KEY (inventory_id, object_id)
+  CONSTRAINT om_inventory_x_object_pkey PRIMARY KEY (inventoryclass_id, object_id)
 );
 
 CREATE TABLE om_visitclass (
@@ -373,10 +373,10 @@ CREATE TABLE om_campaign_review (
 
 CREATE TABLE om_campaign_inventory (
   campaign_id integer NOT NULL,
-  inventory_id integer,
+  inventoryclass_id integer,
   CONSTRAINT om_campaign_inventory_pkey PRIMARY KEY (campaign_id),
   CONSTRAINT om_campaign_inventory_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT om_campaign_inventory_inventory_id_fkey FOREIGN KEY (inventory_id) REFERENCES om_inventory (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
+  CONSTRAINT om_campaign_inventory_inventoryclass_id_fkey FOREIGN KEY (inventoryclass_id) REFERENCES om_inventoryclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 CREATE TABLE om_campaign_inventory_x_arc (
