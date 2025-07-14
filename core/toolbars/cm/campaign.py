@@ -273,28 +273,17 @@ class Campaign:
         Includes 'gully' only if project type is UD.
         Uses inventory-specific tables for inventory campaigns.
         """
-        # Use different table prefix based on campaign type
-        if self.campaign_type == 3:  # inventory
-            table_prefix = "om_campaign_inventory_x_"
-        else:
-            table_prefix = "om_campaign_x_"
-            
-        relation_tabs = {
-            "tbl_campaign_x_arc": (f"{table_prefix}arc", "arc_id"),
-            "tbl_campaign_x_node": (f"{table_prefix}node", "node_id"),
-            "tbl_campaign_x_connec": (f"{table_prefix}connec", "connec_id"),
-            "tbl_campaign_x_link": (f"{table_prefix}link", "link_id")
-        }
+        table_prefix = "om_campaign_inventory_x_" if self.campaign_type == 3 else "om_campaign_x_"
 
-        # Only include gully and link if project type is 'ud'
+        features = ["arc", "node", "connec", "link"]
         if self.project_type == 'ud':
-            relation_tabs.update({
-                "tbl_campaign_x_gully": (f"{table_prefix}gully", "gully_id"),
-            })
+            features.append("gully")
 
-        for table_name, (db_table, col_id) in relation_tabs.items():
-            view = getattr(self.dialog, table_name, None)
+        for feature in features:
+            table_widget_name = f"tbl_campaign_x_{feature}"
+            view = getattr(self.dialog, table_widget_name, None)
             if view:
+                db_table = f"{table_prefix}{feature}"
                 sql = f"SELECT * FROM cm.{db_table} WHERE campaign_id = {campaign_id}"
                 self.populate_tableview(view, sql)
 
@@ -426,51 +415,33 @@ class Campaign:
 
     def extract_campaign_fields(self, dialog):
         """Build a JSON string of field values from the campaign dialog"""
-        fields = ''
-        for widget in dialog.findChildren(QLineEdit):
-            colname = widget.property('columnname')
-            if not colname:
-                continue
-            value = tools_qt.get_text(dialog, widget)
-            if value != 'null':
-                fields += f'"{colname}":"{value}", '
+        fields = {}
 
-        for widget in dialog.findChildren(QTextEdit):
-            colname = widget.property('columnname')
-            if not colname:
-                continue
-            value = tools_qt.get_text(dialog, widget)
-            if value != 'null':
-                fields += f'"{colname}":"{value}", '
+        # Mappings from widget types to their value getters and properties
+        widget_configs = {
+            QLineEdit: {'getter': tools_qt.get_text, 'quote': True},
+            QTextEdit: {'getter': tools_qt.get_text, 'quote': True},
+            QDateEdit: {'getter': tools_qt.get_calendar_date, 'quote': True},
+            QComboBox: {'getter': tools_qt.get_combo_value, 'quote': True, 'invalid': ['null', '', '-1']},
+            QCheckBox: {'getter': lambda d, w: str(tools_qt.is_checked(d, w)).lower(), 'quote': False, 'invalid': ['null', '""']}
+        }
 
-        for widget in dialog.findChildren(QCheckBox):
-            colname = widget.property('columnname')
-            if not colname:
-                continue
-            value = str(tools_qt.is_checked(dialog, widget)).lower()
-            if value not in ('null', '""'):
-                fields += f'"{colname}":{value}, '
+        for widget_class, config in widget_configs.items():
+            getter = config['getter']
+            for widget in dialog.findChildren(widget_class):
+                colname = widget.property('columnname')
+                if not colname:
+                    continue
 
-        for widget in dialog.findChildren(QComboBox):
-            colname = widget.property('columnname')
-            if not colname:
-                continue
-            value = tools_qt.get_combo_value(dialog, widget)
-            if value not in ('null', '', '-1'):
-                fields += f'"{colname}":"{value}", '
+                value = getter(dialog, widget)
 
-        for widget in dialog.findChildren(QDateEdit):
-            colname = widget.property('columnname')
-            if not colname:
-                continue
-            value = tools_qt.get_calendar_date(dialog, widget)
-            if value:
-                fields += f'"{colname}":"{value}", '
+                if 'invalid' in config and value in config['invalid']:
+                    continue
 
-        if fields.endswith(', '):
-            fields = fields[:-2]
+                if value not in ('null', None, ''):
+                    fields[colname] = f'"{value}"' if config['quote'] else value
 
-        return fields
+        return ", ".join([f'"{k}":{v}' for k, v in fields.items()])
 
     def setup_tab_relations(self):
         # self.dialog.tab_relations.setCurrentIndex(0)
@@ -479,17 +450,20 @@ class Campaign:
         table_object = "campaign"
         tools_gw.get_signal_change_tab(self.dialog)
 
-        highlight_mappings = {
-            "arc": ("v_edit_arc", "arc_id", 5),
-            "node": ("v_edit_node", "node_id", 10),
-            "connec": ("v_edit_connec", "connec_id", 10),
-            "link": ("v_edit_link", "link_id", 10),
-            "gully": ("v_edit_gully", "gully_id", 10)
+        highlight_config = {
+            "arc": {"size": 5},
+            "node": {"size": 10},
+            "connec": {"size": 10},
+            "link": {"size": 10},
+            "gully": {"size": 10}
         }
 
-        for name, (layer, id_column, size) in highlight_mappings.items():
+        for name, config in highlight_config.items():
             tbl = getattr(self.dialog, f"tbl_campaign_x_{name}", None)
             if tbl:
+                layer = f"v_edit_{name}"
+                id_column = f"{name}_id"
+                size = config["size"]
                 tbl.clicked.connect(
                     partial(tools_qgis.highlight_feature_by_id, tbl, layer, id_column, self.rubber_band, size))
 
@@ -547,16 +521,9 @@ class Campaign:
 
     def _update_feature_completer(self, dlg):
         tab_name = dlg.tab_feature.currentWidget().objectName()
-        table_map = {
-            'tab_arc': ('v_edit_arc', 'arc_id', 'arc'),
-            'tab_node': ('v_edit_node', 'node_id', 'node'),
-            'tab_connec': ('v_edit_connec', 'connec_id', 'connec'),
-            'tab_link': ('v_edit_link', 'link_id', 'link'),
-            'tab_gully': ('v_edit_gully', 'gully_id', 'gully')
-        }
-        table_name, id_column, feature = table_map.get(tab_name, (None, None, None))
-        if not table_name:
-            return
+        feature = tab_name.replace('tab_', '')
+        table_name = f"v_edit_{feature}"
+        id_column = f"{feature}_id"
 
         # Get allowed feature types
         allowed_types = []
@@ -569,7 +536,7 @@ class Campaign:
         elif self.campaign_type == 3:
             # For inventory campaigns, allow all feature types - no restrictions
             return
-        
+
         if not allowed_types:
             return
 
@@ -723,7 +690,7 @@ class Campaign:
 
         # For review/visit campaigns, apply feature type restrictions
         # Normalize all feature types to lowercase for comparison
-        normalized = [ft.lower() for ft in feature_types]
+        normalized = {ft.lower() for ft in feature_types}
 
         for i in range(tab_widget.count()):
             widget = tab_widget.widget(i)

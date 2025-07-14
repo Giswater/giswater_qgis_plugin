@@ -335,22 +335,22 @@ class AddNewLot:
 
     def create_widget_from_field(self, field):
         """Create a Qt widget based on field metadata"""
-
         wtype = field.get("widgettype", "text")
         iseditable = field.get("iseditable", True)
-        widget = None
 
-        if wtype == "text":
+        def create_line_edit():
             widget = QLineEdit()
             if not iseditable:
                 widget.setEnabled(False)
+            return widget
 
-        elif wtype == "textarea":
+        def create_text_area():
             widget = QTextEdit()
             if not iseditable:
                 widget.setReadOnly(True)
+            return widget
 
-        elif wtype == "datetime":
+        def create_datetime_edit():
             widget = QDateEdit()
             widget.setCalendarPopup(True)
             widget.setDisplayFormat("MM/dd/yyyy")
@@ -359,13 +359,15 @@ class AddNewLot:
             widget.setDate(date if date.isValid() else QDate.currentDate())
             if not iseditable:
                 widget.setEnabled(False)
+            return widget
 
-        elif wtype == "check":
+        def create_check_box():
             widget = QCheckBox()
             if not iseditable:
                 widget.setEnabled(False)
+            return widget
 
-        elif wtype == "combo":
+        def create_combo_box():
             widget = QComboBox()
             ids = field.get("comboIds", [])
             names = field.get("comboNames", [])
@@ -373,16 +375,18 @@ class AddNewLot:
                 widget.addItem(name, ids[i] if i < len(ids) else name)
             if not iseditable:
                 widget.setEnabled(False)
+            return widget
 
-        # Get columns to ignore for tab_relations when export csv
-        sql = "SELECT columnname FROM config_form_tableview WHERE location_type = 'lot' AND " \
-              "visible IS NOT TRUE AND objectname = 've_lot_x_" + str(self.feature_type) + "'"
-        rows = tools_db.get_rows(sql)
-        result_relation = []
-        if rows is not None:
-            for row in rows:
-                result_relation.append(row[0])
-        return widget
+        widget_map = {
+            "text": create_line_edit,
+            "textarea": create_text_area,
+            "datetime": create_datetime_edit,
+            "check": create_check_box,
+            "combo": create_combo_box,
+        }
+
+        creation_func = widget_map.get(wtype)
+        return creation_func() if creation_func else None
 
     def _on_tab_feature_changed(self):
         # Update self.feature_type just like in Campaign
@@ -426,26 +430,17 @@ class AddNewLot:
         Load related elements into lot relation tabs for the given ID.
         Includes 'gully' only if project type is UD.
         """
-
-        relation_tabs = {
-            "tbl_campaign_lot_x_arc": ("om_campaign_lot_x_arc", "arc_id"),
-            "tbl_campaign_lot_x_node": ("om_campaign_lot_x_node", "node_id"),
-            "tbl_campaign_lot_x_connec": ("om_campaign_lot_x_connec", "connec_id"),
-            "tbl_campaign_lot_x_link": ("om_campaign_lot_x_link", "link_id")
-
-        }
-
-        # Only include gully and link if project type is 'ud'
+        features = ["arc", "node", "connec", "link"]
         if tools_gw.get_project_type() == 'ud':
-            relation_tabs.update({
-                "tbl_campaign_lot_x_gully": ("om_campaign_lot_x_gully", "gully_id"),
-            })
+            features.append("gully")
 
-        for table_name, (db_table, col_id) in relation_tabs.items():
-            view = getattr(self.dlg_lot, table_name, None)
+        for feature in features:
+            table_widget_name = f"tbl_campaign_lot_x_{feature}"
+            view = getattr(self.dlg_lot, table_widget_name, None)
             if view:
+                db_table = f"om_campaign_lot_x_{feature}"
                 sql = f"SELECT * FROM cm.{db_table} WHERE lot_id = {lot_id}"
-                self.populate_manager_lot(view, sql)
+                self.populate_tableview(view, sql)
 
     def get_widget_by_columnname(self, dialog, columnname):
         """Find a widget in a dialog by its 'columnname' property."""
@@ -560,6 +555,12 @@ class AddNewLot:
         fields = {}
         list_mandatory = []
 
+        # Map widget types to their value getters
+        widget_getters = {
+            QComboBox: lambda w: w.currentData(),
+            QDateEdit: lambda w: w.date().toString("yyyy-MM-dd") if w.date().isValid() else None,
+        }
+
         for field in self.fields_form:
             column = field.get("columnname")
             widget = self.dlg_lot.findChild(QWidget, field.get("widgetname"))
@@ -568,14 +569,9 @@ class AddNewLot:
 
             widget.setStyleSheet("")
 
-            # Get value from the widget using the correct method for its type
-            if isinstance(widget, QComboBox):
-                value = widget.currentData()
-            elif isinstance(widget, QDateEdit):
-                value = widget.date().toString("yyyy-MM-dd") if widget.date().isValid() else None
-            else:
-                value = tools_qt.get_widget_value(self.dlg_lot, widget)
-
+            # Get value using the mapped getter or the default
+            getter = widget_getters.get(type(widget), lambda w: tools_qt.get_widget_value(self.dlg_lot, w))
+            value = getter(widget)
             fields[column] = value
 
             if field.get("ismandatory", False) and not value:
@@ -691,7 +687,7 @@ class AddNewLot:
         if not hasattr(self.dlg_lot_man, "tbl_lots"):
             return
         query = "SELECT * FROM cm.om_campaign_lot ORDER BY lot_id DESC"
-        self.populate_manager_lot(self.dlg_lot_man.tbl_lots, query)
+        self.populate_tableview(self.dlg_lot_man.tbl_lots, query)
 
     def init_filters(self):
         current_date = QDate.currentDate()
@@ -705,7 +701,7 @@ class AddNewLot:
             self.dlg_lot_man.date_event_from.setDate(current_date)
             self.dlg_lot_man.date_event_to.setDate(current_date)
 
-    def populate_manager_lot(self, view: QTableView, query: str, columns: list[str] = None):
+    def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
@@ -773,7 +769,7 @@ class AddNewLot:
         if where_clause:
             query += f" WHERE {where_clause}"
         query += " ORDER BY lot_id DESC"
-        self.populate_manager_lot(self.dlg_lot_man.tbl_lots, query)
+        self.populate_tableview(self.dlg_lot_man.tbl_lots, query)
 
     def open_lot(self, index=None):
         """Open selected lot in edit mode, from button or double click."""
@@ -826,21 +822,20 @@ class AddNewLot:
         self.filter_lot()
 
     def _update_feature_completer_lot(self, dlg):
-        # Identify the current tab
-        tab_name = dlg.tab_feature.currentWidget().objectName()
-        table_map = {
-            'tab_arc': ('arc', 'arc_id'),
-            'tab_node': ('node', 'node_id'),
-            'tab_connec': ('connec', 'connec_id'),
-            'tab_link': ('link', 'link_id'),
-            'tab_gully': ('gully', 'gully_id'),
-        }
-        feature, id_column = table_map.get(tab_name, (None, None))
+        # Identify the current tab and derive feature info
+        tab_widget = dlg.tab_feature.currentWidget()
+        if not tab_widget:
+            return
+
+        feature = tab_widget.objectName().replace('tab_', '')
         if not feature:
             return
 
         # Get the allowed IDs for this lot and feature
-        lot_id = self.lot_id_value  # or get the currently edited lot_id from the dialog
+        lot_id = self.lot_id_value
+        if not lot_id:
+            return
+
         allowed_ids = self.get_allowed_features_for_lot(lot_id, feature)  # Returns a list of IDs
 
         # Set up the completer
@@ -865,27 +860,6 @@ class AddNewLot:
             return "role_cm_field"
 
         return None
-
-    """ FUNCTIONS RELATED WITH TAB LOAD"""
-
-    def get_current_user(self):
-        """ Get all user information """
-
-        # Get user name
-        username = tools_db.get_current_user()
-
-        # Get role_id and organizaton_id for the user
-        sql = f"SELECT role_id, organization_id FROM cm.cat_team WHERE team_id = (SELECT team_id FROM cm.cat_user WHERE username = '{username}');"
-        rows = tools_db.get_rows(sql)
-
-        # Check rows
-        if not rows or not rows[0]:
-            return None
-
-        row = rows[0]
-
-        # Return a dict of user information
-        return {"role": row[0], "org_id": row[1]}
 
     def resources_management(self):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
