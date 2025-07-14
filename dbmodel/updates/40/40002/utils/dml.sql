@@ -38,3 +38,10 @@ VALUES(3486, 'gw_fct_getdmas', 'utils', 'function', 'json', 'json', 'Function to
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3488, 'gw_fct_getdmahydrometers', 'utils', 'function', 'json', 'json', 'Function to get DMA hydrometers.', 'role_om', NULL, 'core', NULL);
 
+update sys_table set alias = 'Node' where id='v_edit_node' and alias='Node (parent)';
+update sys_table set alias = 'Arc' where id='v_edit_arc' and alias='Arc (parent)';
+update sys_table set alias = 'Connec' where id='v_edit_connec' and alias='Connec (parent)';
+update sys_table set alias = 'Link' where id='v_edit_link' and alias='Link (parent)';
+update sys_table set alias = 'Gully' where id='v_edit_gully' and alias='Gully (parent)';
+update sys_table set alias = 'Flow Regulator Elements' where id='ve_frelem';
+update sys_table set alias = 'General Elements', context='{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}', orderby=1 where id='ve_genelem';
