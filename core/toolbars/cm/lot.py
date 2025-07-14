@@ -125,10 +125,9 @@ class AddNewLot:
         # Cancel / Accept
         self.dlg_lot.btn_cancel.clicked.connect(self.dlg_lot.reject)
         self.dlg_lot.rejected.connect(self.manage_rejected)
-        self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
+        self.dlg_lot.rejected.connect(self.reset_rb_list)
         self.dlg_lot.btn_accept.clicked.connect(self.save_lot)
-        self.dlg_lot.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-        self.dlg_lot.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.rel_layers))
+        self.dlg_lot.rejected.connect(self._on_dialog_rejected)
 
         # Tab logic
         name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")
@@ -143,31 +142,13 @@ class AddNewLot:
 
         self.dlg_lot.tab_widget.currentChanged.connect(self._on_tab_change)
         self.dlg_lot.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
-        self.dlg_lot.tab_feature.currentChanged.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
+        self.dlg_lot.tab_feature.currentChanged.connect(self._update_completer_and_relations)
 
         # Relation feature buttons
-        self.dlg_lot.btn_insert.clicked.connect(
-            lambda: tools_gw.insert_feature(self, self.dlg_lot, table_object, GwSelectionMode.LOT, False, None, None,
-                                            refresh_callback=lambda: self._load_lot_relations(self.lot_id))
-        )
-        self.dlg_lot.btn_insert.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
-
-        self.dlg_lot.btn_delete.clicked.connect(
-            lambda: tools_gw.delete_records(self, self.dlg_lot, table_object, GwSelectionMode.LOT, None, None, None,
-                                            refresh_callback=lambda: self._load_lot_relations(self.lot_id))
-        )
-        self.dlg_lot.btn_delete.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
-
-        self.dlg_lot.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_lot, table_object, GwSelectionMode.LOT)
-        )
-        self.dlg_lot.btn_snapping.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
-
-        self.dlg_lot.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dlg_lot, table_object,
-                    selection_mode=GwSelectionMode.EXPRESSION_LOT)
-        )
-        self.dlg_lot.btn_expr_select.clicked.connect(lambda: self._update_feature_completer_lot(self.dlg_lot))
+        self.dlg_lot.btn_insert.clicked.connect(self._insert_related_feature)
+        self.dlg_lot.btn_delete.clicked.connect(self._delete_related_records)
+        self.dlg_lot.btn_snapping.clicked.connect(self._init_snapping_selection)
+        self.dlg_lot.btn_expr_select.clicked.connect(self._select_by_expression)
 
         # Always set multi-row and full row selection for relation tables, both on create and edit
         relation_table_names = [
@@ -555,12 +536,6 @@ class AddNewLot:
         fields = {}
         list_mandatory = []
 
-        # Map widget types to their value getters
-        widget_getters = {
-            QComboBox: lambda w: w.currentData(),
-            QDateEdit: lambda w: w.date().toString("yyyy-MM-dd") if w.date().isValid() else None,
-        }
-
         for field in self.fields_form:
             column = field.get("columnname")
             widget = self.dlg_lot.findChild(QWidget, field.get("widgetname"))
@@ -569,9 +544,14 @@ class AddNewLot:
 
             widget.setStyleSheet("")
 
-            # Get value using the mapped getter or the default
-            getter = widget_getters.get(type(widget), lambda w: tools_qt.get_widget_value(self.dlg_lot, w))
-            value = getter(widget)
+            value = None
+            if isinstance(widget, QComboBox):
+                value = widget.currentData()
+            elif isinstance(widget, QDateEdit):
+                value = widget.date().toString("yyyy-MM-dd") if widget.date().isValid() else None
+            else:
+                value = tools_qt.get_widget_value(self.dlg_lot, widget)
+
             fields[column] = value
 
             if field.get("ismandatory", False) and not value:
@@ -617,25 +597,24 @@ class AddNewLot:
             tools_gw.remove_selection(True, layers=self.rel_layers)
             tools_gw.reset_rubberband(self.rubber_band)
             tools_qgis.force_refresh_map_canvas()
-            # Only close dialog if this was a manual Accept, never for auto-save
             if not from_change_tab:
                 self.dlg_lot.accept()
         else:
             msg = "Error saving lot."
             tools_qgis.show_warning(msg)
 
-    def reset_rb_list(self, rb_list):
+    def reset_rb_list(self, rb_list=None):
         """Resets the main rubber band and clears all rubber band selections in the provided list,
         effectively removing any current feature highlights from the canvas."""
-
+        # Use self.rb_list if no list is provided, for direct calls
+        rb_list_to_reset = rb_list if rb_list is not None else self.rb_list
         self.rb_red.reset()
-        for rb in rb_list:
+        for rb in rb_list_to_reset:
             rb.reset()
 
     def manage_rejected(self):
         """Handles the cancellation or rejection of changes by disconnecting selection signals,
         clearing any active feature selections, saving user settings, switching the tool to pan mode, and closing the current dialog."""
-
         tools_qgis.disconnect_signal_selection_changed()
         layer = self.iface.activeLayer()
         if layer:
@@ -643,6 +622,90 @@ class AddNewLot:
         tools_gw.save_settings(self.dlg_lot)
         self.iface.actionPan().trigger()
         tools_gw.close_dialog(self.dlg_lot)
+
+    def _on_dialog_rejected(self):
+        """Handles cleanup when the dialog is rejected."""
+        tools_gw.reset_rubberband(self.rubber_band)
+        tools_gw.remove_selection(True, layers=self.rel_layers)
+
+    def _refresh_relations_table(self):
+        """Callback to refresh relations using the current lot_id."""
+        if self.lot_id:
+            self._load_lot_relations(self.lot_id)
+
+    def _update_completer_and_relations(self):
+        """Helper to update both the feature completer and the relations table."""
+        self._update_feature_completer_lot(self.dlg_lot)
+        if self.lot_id:
+            self._load_lot_relations(self.lot_id)
+
+    def _insert_related_feature(self):
+        """Handles the 'insert feature' button click action."""
+        tools_gw.insert_feature(self, self.dlg_lot, "lot", GwSelectionMode.LOT, False, None, None,
+                                refresh_callback=self._refresh_relations_table)
+        self._update_feature_completer_lot(self.dlg_lot)
+
+    def _delete_related_records(self):
+        """Handles the 'delete records' button click action."""
+        tools_gw.delete_records(self, self.dlg_lot, "lot", GwSelectionMode.LOT, None, None, None,
+                                refresh_callback=self._refresh_relations_table)
+        self._update_feature_completer_lot(self.dlg_lot)
+
+    def _init_snapping_selection(self):
+        """Handles the 'snapping selection' button click action."""
+        tools_gw.selection_init(self, self.dlg_lot, "lot", GwSelectionMode.LOT)
+        self._update_feature_completer_lot(self.dlg_lot)
+
+    def _select_by_expression(self):
+        """Handles the 'select with expression' button click action."""
+        tools_gw.select_with_expression_dialog(self, self.dlg_lot, "lot",
+                                               selection_mode=GwSelectionMode.EXPRESSION_LOT)
+        self._update_feature_completer_lot(self.dlg_lot)
+
+    def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
+        """Populate a QTableView with the results of a SQL query."""
+
+        data = tools_db.get_rows(query)
+        if not data:
+            view.setModel(QStandardItemModel())  # Clear view
+            return
+
+        # Auto-detect column names if not provided
+        if not columns:
+            columns = list(data[0].keys())
+
+        model = QStandardItemModel(len(data), len(columns))
+        model.setHorizontalHeaderLabels(columns)
+
+        for row_idx, row in enumerate(data):
+            for col_idx, col_name in enumerate(columns):
+                value = str(row.get(col_name, ''))
+                model.setItem(row_idx, col_idx, QStandardItem(value))
+
+        view.setModel(model)
+        view.resizeColumnsToContents()
+
+    def get_current_user(self):
+        """
+        Gets the current user's complete data, including role and organization,
+        from the CM schema.
+        """
+        if not tools_db.check_schema('cm'):
+            return None
+
+        username = tools_db.get_current_user()
+        sql = f"""
+            SELECT
+                u.user_id,
+                u.loginname,
+                u.team_id,
+                t.organization_id AS org_id,
+                t.role_id AS role
+            FROM cm.cat_user AS u
+            JOIN cm.cat_team AS t ON u.team_id = t.team_id
+            WHERE u.loginname = '{username}'
+        """
+        return tools_db.get_row(sql)
 
     def lot_manager(self):
         """Entry point for opening the Lot Manager dialog (Button 75)."""
@@ -902,7 +965,7 @@ class AddNewLot:
 
             # Fill tables
             for table in tables:
-                self.populate_tableview(table)
+                self._populate_resource_tableview(table)
 
             # Set signals for manage organizations
             self.dlg_resources_man.txt_orgname.textChanged.connect(partial(self.txt_org_name_changed))
@@ -926,7 +989,7 @@ class AddNewLot:
 
             # Create sql filter and populate table
             sql_filter = f"WHERE ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']})"
-            self.populate_tableview("cat_user", sql_filter)
+            self._populate_resource_tableview("cat_user", sql_filter)
 
         # Fill teams combo
         rows = tools_db.get_rows(sql)
@@ -971,14 +1034,14 @@ class AddNewLot:
 
         org_name = tools_qt.get_text(self.dlg_resources_man, "txt_orgname")
         sql_filter = f"WHERE orgname ILIKE '%{org_name}%'" if org_name != 'null' else None
-        self.populate_tableview("cat_organization", sql_filter)
+        self._populate_resource_tableview("cat_organization", sql_filter)
 
     def filter_teams_table(self):
         """ Filter table by organization id """
 
         org_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_orga")
         sql_filter = f"WHERE co.organization_id = {org_id}" if org_id != '' else None
-        self.populate_tableview("cat_team", sql_filter)
+        self._populate_resource_tableview("cat_team", sql_filter)
 
     def filter_users_table(self):
         """ Filter table by user name """
@@ -995,9 +1058,9 @@ class AddNewLot:
             sql_filter = f"WHERE ct.organization_id = {self.user_data['org_id']}"
 
         # Refresh table
-        self.populate_tableview("cat_user", sql_filter)
+        self._populate_resource_tableview("cat_user", sql_filter)
 
-    def populate_tableview(self, table_name: str, sql_filter: Optional[str] = None):
+    def _populate_resource_tableview(self, table_name: str, sql_filter: Optional[str] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         # Get QTableView
@@ -1100,14 +1163,14 @@ class AddNewLot:
             # Chek user role
             if self.user_data["role"] == "role_cm_admin":
                 # Reload table without filtering
-                self.populate_tableview(tablename)
+                self._populate_resource_tableview(tablename)
             else:
                 if tablename == "cat_team":
                     self.filter_teams_table()
                 elif tablename == "cat_user":
                     # Create sql filter and populate table
                     sql_filter = f"WHERE ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']})"
-                    self.populate_tableview(tablename, sql_filter)
+                    self._populate_resource_tableview(tablename, sql_filter)
 
     def open_create_team(self, is_update: Optional[bool] = False):
         """ Open create team dialog """
@@ -1285,7 +1348,7 @@ def upsert_team(**kwargs):
     # Chek user role
     if this.user_data["role"] == "role_cm_admin":
         # Reload table without filtering
-        this.populate_tableview("cat_team")
+        this._populate_resource_tableview("cat_team")
     else:
         # Filter teams table by the user organization selected
         this.filter_teams_table()
@@ -1422,7 +1485,7 @@ def upsert_user(**kwargs):
     # Close the dialog and refresh the user list
     tools_gw.close_dialog(dlg)
     if this.user_data["role"] == "role_cm_admin":
-        this.populate_tableview("cat_user")
+        this._populate_resource_tableview("cat_user")
 
 
 def close(**kwargs):
