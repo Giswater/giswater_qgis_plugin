@@ -207,8 +207,7 @@ class Campaign:
         tools_gw.add_icon(self.dialog.btn_snapping, '137')
         tools_gw.add_icon(self.dialog.btn_expr_select, '178')
 
-        self.dialog.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-        self.dialog.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.rel_layers))
+        self.dialog.rejected.connect(self._on_dialog_rejected)
 
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
@@ -267,6 +266,11 @@ class Campaign:
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
+    def _on_dialog_rejected(self):
+        """Clean up resources when the dialog is rejected."""
+        tools_gw.reset_rubberband(self.rubber_band)
+        tools_gw.remove_selection(True, layers=self.rel_layers)
+
     def _load_campaign_relations(self, campaign_id):
         """
         Load related elements into campaign relation tabs for the given ID.
@@ -289,22 +293,22 @@ class Campaign:
 
     def create_widget_from_field(self, field, response):
         """Create a Qt widget based on field metadata"""
-
         wtype = field.get("widgettype", "text")
         iseditable = field.get("iseditable", True)
-        widget = None
 
-        if wtype == "text":
+        def create_line_edit():
             widget = QLineEdit()
             if not iseditable:
                 widget.setEnabled(False)
+            return widget
 
-        elif wtype == "textarea":
+        def create_text_area():
             widget = QTextEdit()
             if not iseditable:
                 widget.setReadOnly(True)
+            return widget
 
-        elif wtype == "datetime":
+        def create_datetime_edit():
             widget = QDateEdit()
             widget.setCalendarPopup(True)
             widget.setDisplayFormat("MM/dd/yyyy")
@@ -313,26 +317,36 @@ class Campaign:
             widget.setDate(date if date.isValid() else QDate.currentDate())
             if not iseditable:
                 widget.setEnabled(False)
+            return widget
 
-        elif wtype == "check":
+        def create_check_box():
             widget = QCheckBox()
             if not iseditable:
                 widget.setEnabled(False)
+            return widget
 
-        elif wtype == "combo":
-            # Use the framework's builder to ensure widgetfunctions are connected
+        def create_combo_box():
             kwargs = {
-                "field": field,
-                "dialog": self.dialog,
-                "complet_result": response,
-                "class_info": self
+                "field": field, "dialog": self.dialog,
+                "complet_result": response, "class_info": self
             }
-            widget = tools_gw.add_combo(**kwargs)
+            return tools_gw.add_combo(**kwargs)
 
-        return widget
+        widget_map = {
+            "text": create_line_edit,
+            "textarea": create_text_area,
+            "datetime": create_datetime_edit,
+            "check": create_check_box,
+            "combo": create_combo_box
+        }
+
+        creation_func = widget_map.get(wtype)
+        return creation_func() if creation_func else None
 
     def set_widget_value(self, widget, value):
         """Sets the widget value from JSON"""
+        if value is None:
+            return
 
         if isinstance(widget, QLineEdit):
             widget.setText(str(value))
@@ -424,6 +438,10 @@ class Campaign:
             msg = "Failed to save campaign"
             tools_qgis.show_warning(result.get("message", msg))
 
+    def _get_checkbox_value_as_string(self, dialog, widget):
+        """Helper to get QCheckBox value as a lowercase string ('true'/'false')."""
+        return str(tools_qt.is_checked(dialog, widget)).lower()
+
     def extract_campaign_fields(self, dialog, as_dict=False):
         """Build a JSON string or dictionary of field values from the campaign dialog"""
         fields = {}
@@ -434,7 +452,7 @@ class Campaign:
             QTextEdit: {'getter': tools_qt.get_text, 'quote': True},
             QDateEdit: {'getter': tools_qt.get_calendar_date, 'quote': True},
             QComboBox: {'getter': tools_qt.get_combo_value, 'quote': True, 'invalid': ['null', '', '-1']},
-            QCheckBox: {'getter': lambda d, w: str(tools_qt.is_checked(d, w)).lower(), 'quote': False, 'invalid': ['null', '""']}
+            QCheckBox: {'getter': self._get_checkbox_value_as_string, 'quote': False, 'invalid': ['null', '""']}
         }
 
         for widget_class, config in widget_configs.items():
@@ -597,11 +615,8 @@ class Campaign:
         # Determine which table to query
         if sender == self.reviewclass_combo:
             feature_types = self.get_allowed_feature_types_for_reviewclass(selected_id)
-
             # If the selected class is the 'ALL' class, switch to the first tab.
-            check_all_sql = f"SELECT object_id FROM cm.om_reviewclass_x_object WHERE reviewclass_id = {selected_id}"
-            linked_objects = tools_db.get_rows(check_all_sql)
-            if linked_objects and any(str(row.get('object_id')).upper() == 'ALL' for row in linked_objects):
+            if self._is_reviewclass_for_all(selected_id):
                 self.dialog.tab_feature.setCurrentIndex(0)
 
         elif sender == self.visitclass_combo:
@@ -637,11 +652,7 @@ class Campaign:
         If the class is linked to 'ALL', it returns an empty list to enable all selections.
         """
         # First, check if this review class is linked to an 'ALL' object.
-        check_all_sql = f"SELECT object_id FROM cm.om_reviewclass_x_object WHERE reviewclass_id = {reviewclass_id}"
-        linked_objects = tools_db.get_rows(check_all_sql)
-
-        # If 'ALL' is found, return an empty list. This signals the UI to allow all features for the active tab.
-        if linked_objects and any(str(row.get('object_id')).upper() == 'ALL' for row in linked_objects):
+        if self._is_reviewclass_for_all(reviewclass_id):
             return []
 
         # For a specific review class, get all linked subtypes.
@@ -661,10 +672,7 @@ class Campaign:
         Has special handling for a class linked to an 'ALL' object_id.
         """
         # First, check if the linked object is 'ALL'.
-        check_all_sql = f"SELECT object_id FROM cm.om_reviewclass_x_object WHERE reviewclass_id = {reviewclass_id}"
-        linked_objects = tools_db.get_rows(check_all_sql)
-
-        if linked_objects and any(str(row.get('object_id')).upper() == 'ALL' for row in linked_objects):
+        if self._is_reviewclass_for_all(reviewclass_id):
             # If 'ALL' is found, get all distinct feature types from the catalog.
             all_features_sql = f"SELECT DISTINCT feature_type FROM {self.schema_parent}.cat_feature WHERE feature_type IS NOT NULL"
             rows = tools_db.get_rows(all_features_sql)
@@ -693,6 +701,16 @@ class Campaign:
             """
         rows = tools_db.get_rows(sql)
         return [r["feature_type"].lower() for r in rows if r.get("feature_type")]
+
+    def _is_reviewclass_for_all(self, reviewclass_id: int) -> bool:
+        """Check if a reviewclass is linked to the 'ALL' object."""
+        try:
+            reviewclass_id = int(reviewclass_id)
+        except (ValueError, TypeError):
+            return False
+
+        sql = f"SELECT 1 FROM cm.om_reviewclass_x_object WHERE reviewclass_id = {reviewclass_id} AND upper(object_id) = 'ALL' LIMIT 1"
+        return tools_db.get_row(sql) is not None
 
     def _manage_tabs_enabled(self, feature_types):
         """ Enable or disable relation tabs depending on allowed feature types (e.g., ['node', 'arc']). """
