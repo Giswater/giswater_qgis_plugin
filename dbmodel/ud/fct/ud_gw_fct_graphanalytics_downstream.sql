@@ -162,7 +162,7 @@ BEGIN
 					SELECT 1 FROM anl_node an 
 					WHERE an.cur_user = '''||"current_user"()||'''
 					AND an.fid = '''||v_fid||'''
-					AND an.node_id = a.'||v_source||'
+					AND an.node_id = a.'||v_source||'::text
 				)
 			)
 		SELECT 
