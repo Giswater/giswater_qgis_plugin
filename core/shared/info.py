@@ -40,6 +40,7 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInfoCrossectUi, GwInterpolate, GwPsectorUi
 # WARNING: DO NOT REMOVE THESE IMPORTS, THEY ARE USED BY EPA ACTIONS
 # noinspection PyUnresolvedReferences
+from ..ui.ui_manager import GwInfoEpaUi  # noqa: F401
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...libs.tools_qt import GwHyperLinkLineEdit
@@ -163,7 +164,7 @@ class GwInfo(QObject):
                 self.iface.actionPan().trigger()
                 feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
                 if point:
-                    extras += f', "coordinates":{{{point}}}'                    
+                    extras += f', "coordinates":{{{point}}}'
                 body = tools_gw.create_body(feature=feature, extras=extras)
                 function_name = 'gw_fct_getfeatureinsert'
 
@@ -319,7 +320,7 @@ class GwInfo(QObject):
         # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
-        
+
         if self.info_layer and feature_cat.parent_layer == 've_genelem':
 
             tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
@@ -332,7 +333,7 @@ class GwInfo(QObject):
             self.info_layer.startEditing()
 
             # Connect signal with feature_id
-            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal), 
+            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal),
                                     'info', 'add_feature_featureAdded_open_new_feature')
             # Create a new feature with the given feature_id
             feature = QgsFeature(self.info_layer.fields())
@@ -657,7 +658,7 @@ class GwInfo(QObject):
                 if func_name == "add_object":
                     signal_kwargs = signal.keywords
                     signal_kwargs['complet_result_info'] = complet_result
-                    
+
                 self.dlg_cf.dlg_closed.connect(signal)
 
         return self.complet_result, self.dlg_cf
@@ -748,7 +749,7 @@ class GwInfo(QObject):
 
         current_layout = ""
         for field in complet_result['body']['data']['fields']:
-            
+
             if field.get('hidden'):
                 continue
             if tab != field.get('tabname'):
@@ -891,7 +892,7 @@ class GwInfo(QObject):
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
         self.action_set_geom.triggered.connect(self._get_point_xy)
-        
+
         # EPA Actions
         self.action_orifice.triggered.connect(partial(self._open_orifice_dlg))
         self.action_outlet.triggered.connect(partial(self._open_outlet_dlg))
@@ -1856,7 +1857,7 @@ class GwInfo(QObject):
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
             if not json_result:
                 return False
-            
+
             if clear_json:
                 _json.clear()
 
@@ -2802,7 +2803,7 @@ class GwInfo(QObject):
         else:
             print(f"widget.dateTime() is {widget.dateTime().toString()}")
             widget.displayNull(False)
-        
+
         # Force clear button to be active
         for btn in widget.findChildren(QToolButton):
             btn.setEnabled(True)
@@ -2812,7 +2813,7 @@ class GwInfo(QObject):
             except Exception:
                 pass
             btn.clicked.connect(widget.clear)
-        
+
         if hasattr(widget, "valueChanged"):
             try:
                 widget.valueChanged.disconnect()
@@ -3297,7 +3298,7 @@ class GwInfo(QObject):
         self.info_feature.prev_action = self.prev_action
         result, dialog = self.info_feature._get_feature_insert(point=list_points, feature_cat=self.feature_cat,
                                                                new_feature_id=feature_id, new_feature=feature,
-                                                               layer_new_feature=self.info_layer, tab_type='data', 
+                                                               layer_new_feature=self.info_layer, tab_type='data',
                                                                connect_signal=connect_signal)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
@@ -3335,7 +3336,7 @@ class GwInfo(QObject):
         for combo_child in result['body']['data']:
             if combo_child is not None:
                 tools_gw.manage_combo_child(dialog, widget, combo_child)
-    
+
     def _get_point_xy(self):
         """ Capture point XY from the canvas """
         self.snapper_manager.add_point(self.vertex_marker)
@@ -3343,7 +3344,7 @@ class GwInfo(QObject):
 
     def _update_geom(self, table_id, id_name, newfeature_id):
         """ Update geometry field """
-        
+
         srid = lib_vars.data_epsg
         sql = (f"UPDATE {table_id}"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
