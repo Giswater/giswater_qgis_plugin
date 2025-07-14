@@ -61,7 +61,6 @@ class AddNewLot:
         self.signal_selectionChanged = False
         self.cmb_position = 17
         self.srid = lib_vars.data_epsg
-        table_object = "lot"
 
         if is_new:
             self.is_new_lot = True
