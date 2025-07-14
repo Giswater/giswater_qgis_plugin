@@ -8,7 +8,6 @@ or (at your option) any later version.
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, NULL, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Unknown', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, 0.0130, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Concret', 'Concret', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, 0.0140, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Brick', 'Brick', '{NODE,ARC,CONNEC,GULLY,LINK}', NULL, 0.0140, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PEAD', 'PEAD', '{NODE,ARC,CONNEC,GULLY,LINK}', NULL, 0.0110, NULL, true);
