@@ -121,7 +121,6 @@ DECLARE
 	v_mapzone_name text;
 	v_mapzone_field text;
 	v_mapzone_id int4;
-	v_ignore_broken_valves BOOLEAN = TRUE;
 	v_pgr_distance integer;
 	v_pgr_root_vids int[];
 
@@ -164,7 +163,7 @@ BEGIN
 	v_netscenario = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'netscenario');
 
 	-- TODO: add new param to calculate mapzones from zero
-	v_fromzero = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'fromZero');
+	v_fromzero = COALESCE((SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'fromZero')::bool,v_fromzero);
 
 	-- profilactic controls
 	IF v_dscenario_valve = '' THEN v_dscenario_valve = NULL; END IF;
@@ -959,7 +958,7 @@ BEGIN
 				v_query_text := '
 					UPDATE '||v_mapzone_name||' m SET the_geom = CASE 
 						WHEN CARDINALITY(tm.mapzone_id) = 1 THEN tm.the_geom
-						ELSE m.the_geom
+						ELSE NULL
 					END
 					FROM temp_pgr_mapzone tm
 					WHERE (
@@ -968,6 +967,7 @@ BEGIN
 						CARDINALITY (tm.mapzone_id) > 1 AND m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)
 					)';						
 				EXECUTE v_query_text;
+			END IF;
 
 			IF v_mapzone_name <> 'SECTOR' THEN
 				v_query_text_aux := '
@@ -983,11 +983,11 @@ BEGIN
 			v_query_text := '
 			UPDATE '||v_mapzone_name||' m 
 				SET expl_id = CASE
-    				WHEN CARDINALITY(tm.mapzone_id) = 1 THEN subq.expl_ids
+    				WHEN CARDINALITY(subq.mapzone_id) = 1 THEN subq.expl_ids
     				ELSE NULL
 				END,
 				muni_id = CASE
-    				WHEN CARDINALITY(tm.mapzone_id) = 1 THEN subq.muni_ids
+    				WHEN CARDINALITY(subq.mapzone_id) = 1 THEN subq.muni_ids
 					ELSE NULL
 				END,
 				'||v_query_text_aux||'
