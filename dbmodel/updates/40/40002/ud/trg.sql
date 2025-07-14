@@ -98,7 +98,7 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_
 CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON ext_municipality
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id"}');
 
-CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON dma
+CREATE TRIGGER gw_trg_fk_array_array_table_municipality AFTER INSERT OR UPDATE ON dma
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
 
 -- Exploitation
@@ -108,7 +108,7 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"dma":"expl_
 CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON exploitation
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"dma":"expl_id"}');
 
-CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON dma
+CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON dma
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
 
 -- Sector
@@ -118,5 +118,5 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dma":"sec
 CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON sector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dma":"sector_id"}');
 
-CREATE TRIGGER gw_trg_fk_array_array_table AFTER INSERT OR UPDATE ON dma
+CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON dma
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
