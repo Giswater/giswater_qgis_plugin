@@ -149,7 +149,7 @@ BEGIN
 					IF v_feature_type = 'vnode' THEN
 						EXECUTE 'UPDATE vnode SET top_elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
 					ELSIF v_feature_type != 'vnode'  THEN
-						EXECUTE 'UPDATE '||v_worklayer||' SET '||v_update_field||' = '||v_elevation||' ::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'';
+						EXECUTE 'UPDATE '||v_feature_type||' SET '||v_update_field||' = '||v_elevation||' ::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'';
 					END IF;
 
 					--temporal insert values into anl_node to create layer with all updated points
