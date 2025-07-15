@@ -219,13 +219,13 @@ BEGIN
 		v_visible_layer ='"v_edit_sector"';
 		v_mapzonename = 'name';
 
-	ELSIF v_class = 'DRAINZONE' THEN
-		v_fid=481;
-		v_table = 'drainzone';
-		v_field = 'drainzone_id';
-		v_fieldmp = 'drainzone_id';
-		v_visible_layer ='"v_edit_drainzone"';
-		v_mapzonename = 'name';
+	-- ELSIF v_class = 'DRAINZONE' THEN
+	--	v_fid=481;
+	--	v_table = 'drainzone';
+	--	v_field = 'drainzone_id';
+	--	v_fieldmp = 'drainzone_id';
+	--	v_visible_layer ='"v_edit_drainzone"';
+	--	v_mapzonename = 'name';
 	ELSE
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done sucessfully"}, "version":"'||v_version||'", 
 		"body":{"form":{},"data":{"info":""}}}')::json, 2710, NULL, NULL, NULL);
