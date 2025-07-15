@@ -892,11 +892,11 @@ BEGIN
 		-- update link parameters
 		IF v_projectype = 'WS' THEN
 			UPDATE link
-			SET top_elev1 = NEW.top_elev1, depth1=NEW.depth1, top_elev2 = NEW.top_elev2, depth2 = NEW.depth2, link_type=NEW.link_type
+			SET top_elev1 = NEW.top_elev1, depth1=NEW.depth1, top_elev2 = NEW.top_elev2, depth2 = NEW.depth2
 			WHERE link_id=NEW.link_id;
 		ELSE
 			UPDATE link
-			SET top_elev1 = NEW.top_elev1, y1 = NEW.y1, top_elev2 = NEW.top_elev2, y2 = NEW.y2, drainzone_outfall = NEW.drainzone_outfall, dwfzone_outfall = NEW.dwfzone_outfall
+			SET top_elev1 = NEW.top_elev1, y1 = NEW.y1, top_elev2 = NEW.top_elev2, y2 = NEW.y2, drainzone_outfall = NEW.drainzone_outfall, dwfzone_outfall = NEW.dwfzone_outfall, link_type=NEW.link_type
 			WHERE link_id=NEW.link_id;
 		END IF;
 		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
