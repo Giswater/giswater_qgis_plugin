@@ -581,7 +581,7 @@ BEGIN
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, updated_at, updated_by,
 			asset_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
-			drainzone_outfall, dwfzone_outfall, omunit_id)
+			drainzone_outfall, dwfzone_outfall, dma_id, omunit_id)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.conserv_state,
@@ -590,14 +590,14 @@ BEGIN
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, NEW.updated_at, NEW.updated_by,
 			NEW.asset_id,  NEW.parent_id, NEW.arc_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.placement_type, NEW.label_quadrant,
 			NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id, NEW.hemisphere,
-			NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id);
+			NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.dma_id, NEW.omunit_id);
 		ELSE
 			INSERT INTO node (node_id, code, sys_code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			omzone_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, conserv_state,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, updated_at, updated_by, matcat_id,
 			asset_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
-			drainzone_outfall, dwfzone_outfall, omunit_id)
+			drainzone_outfall, dwfzone_outfall, dma_id, omunit_id)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.omzone_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.conserv_state,
@@ -606,7 +606,7 @@ BEGIN
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value,  NEW.updated_at, NEW.updated_by,NEW.matcat_id,
 			NEW.asset_id,  NEW.parent_id, NEW.arc_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id, NEW.hemisphere,
-			NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id);
+			NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.dma_id, NEW.omunit_id);
 		END IF;
 
 		-- insert into node_add
@@ -888,7 +888,7 @@ BEGIN
 			asset_id=NEW.asset_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant,
 			access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap,
-			pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id
+			pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, omunit_id=NEW.omunit_id
 			WHERE node_id = OLD.node_id;
 		ELSE
 			UPDATE node
@@ -902,7 +902,7 @@ BEGIN
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, updated_at=now(), updated_by=current_user, matcat_id = NEW.matcat_id,
 			asset_id=NEW.asset_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
-			lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id
+			lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, omunit_id=NEW.omunit_id
 			WHERE node_id = OLD.node_id;
 		END IF;
 

@@ -211,6 +211,7 @@ AS WITH typevalue AS (
             arc.omzone_id,
             omzone_table.macroomzone_id,
             omzone_table.omzone_type,
+            arc.dma_id,
             arc.omunit_id,
             arc.minsector_id,
             arc.pavcat_id,
@@ -361,6 +362,7 @@ AS WITH typevalue AS (
     dwfzone_outfall,
     omzone_id,
     macroomzone_id,
+    dma_id,
     omzone_type,
     omunit_id,
     minsector_id,
@@ -554,6 +556,7 @@ AS WITH typevalue AS (
             node.dwfzone_outfall,
             node.omzone_id,
             omzone_table.macroomzone_id,
+            node.dma_id,
             node.omunit_id,
             node.minsector_id,
             node.pavcat_id,
@@ -689,6 +692,7 @@ AS WITH typevalue AS (
             node_selected.dwfzone_outfall,
             node_selected.omzone_id,
             node_selected.macroomzone_id,
+            node_selected.dma_id,
             node_selected.omunit_id,
             node_selected.minsector_id,
             node_selected.pavcat_id,
@@ -803,6 +807,7 @@ AS WITH typevalue AS (
     dwfzone_outfall,
     omzone_id,
     macroomzone_id,
+    dma_id,
     omunit_id,
     minsector_id,
     pavcat_id,
@@ -934,6 +939,7 @@ AS WITH typevalue AS (
             drainzone_table.drainzone_type,
             l.dwfzone_id,
             dwfzone_table.dwfzone_type,
+            l.dma_id,
             l.fluid_type
            FROM link l
              JOIN exploitation USING (expl_id)
@@ -1032,6 +1038,10 @@ AS WITH typevalue AS (
                     WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
                     ELSE link_planned.omzone_type
                 END AS omzone_type,
+                CASE
+                    WHEN link_planned.dma_id IS NULL THEN connec.dma_id
+                    ELSE link_planned.dma_id
+                END AS dma_id,
             connec.omunit_id,
             connec.minsector_id,
             connec.soilcat_id,
@@ -1153,6 +1163,7 @@ AS WITH typevalue AS (
     omzone_id,
     macroomzone_id,
     omzone_type,
+    dma_id,
     omunit_id,
     minsector_id,
     soilcat_id,
@@ -1340,6 +1351,7 @@ AS WITH typevalue AS (
             l.dwfzone_outfall,
             l.omzone_id,
             omzone_table.macroomzone_id,
+            l.dma_id,
             l.location_type,
             l.fluid_type,
             l.custom_length,
@@ -1417,6 +1429,7 @@ AS WITH typevalue AS (
     dwfzone_outfall,
     omzone_id,
     macroomzone_id,
+    dma_id,
     location_type,
     fluid_type,
     custom_length,
@@ -1485,6 +1498,7 @@ AS SELECT link_id,
     dwfzone_outfall,
     omzone_id,
     macroomzone_id,
+    dma_id,
     location_type,
     fluid_type,
     custom_length,
@@ -1554,6 +1568,7 @@ AS SELECT v_edit_link.link_id,
     v_edit_link.dwfzone_outfall,
     v_edit_link.omzone_id,
     v_edit_link.macroomzone_id,
+    v_edit_link.dma_id,
     v_edit_link.location_type,
     v_edit_link.fluid_type,
     v_edit_link.custom_length,
@@ -1625,6 +1640,7 @@ AS SELECT link_id,
     dwfzone_outfall,
     omzone_id,
     macroomzone_id,
+    dma_id,
     location_type,
     fluid_type,
     custom_length,
@@ -1716,7 +1732,8 @@ AS WITH typevalue AS (
             drainzone_table.drainzone_type,
             l.dwfzone_id,
             dwfzone_table.dwfzone_type,
-            l.fluid_type
+            l.fluid_type,
+            l.dma_id
            FROM link l
              JOIN exploitation USING (expl_id)
              JOIN sector_table ON l.sector_id = sector_table.sector_id
@@ -1847,6 +1864,10 @@ AS WITH typevalue AS (
                     WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
                     ELSE link_planned.omzone_type
                 END AS omzone_type,
+                CASE
+                    WHEN link_planned.dma_id IS NULL THEN gully.dma_id
+                    ELSE link_planned.dma_id
+                END AS dma_id,
             gully.omunit_id,
             gully.minsector_id,
             gully.soilcat_id,
@@ -1977,6 +1998,7 @@ AS WITH typevalue AS (
     dwfzone_outfall,
     omzone_id,
     macroomzone_id,
+    dma_id,
     omzone_type,
     omunit_id,
     minsector_id,
@@ -4842,3 +4864,26 @@ UNION
    FROM v_edit_gully
      JOIN exploitation ON exploitation.expl_id = v_edit_gully.expl_id
   WHERE v_edit_gully.state = 0;
+
+DROP VIEW IF EXISTS v_edit_dma;
+DROP VIEW IF EXISTS v_ui_dma;
+
+CREATE OR REPLACE VIEW v_edit_dma
+AS SELECT d.dma_id,
+    d.name,
+    d.expl_id,
+    d.muni_id,
+    d.sector_id,
+    d.graphconfig,
+    d.the_geom
+FROM dma d;
+
+CREATE OR REPLACE VIEW v_ui_dma
+AS SELECT d.dma_id,
+    d.name,
+    d.expl_id,
+    d.muni_id,
+    d.sector_id,
+    d.graphconfig,
+    d.active
+FROM dma d;

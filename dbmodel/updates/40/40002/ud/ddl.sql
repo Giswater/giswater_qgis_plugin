@@ -87,10 +87,17 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "
 CREATE TABLE IF NOT EXISTS dma (
     dma_id SERIAL,
     name TEXT,
+    descript TEXT,
     muni_id INT4[],
     expl_id INT4[],
     sector_id INT4[],
     graphconfig JSON,
+    active BOOLEAN DEFAULT TRUE,
+    the_geom GEOMETRY(POLYGON, SRID_VALUE),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by TEXT DEFAULT current_user,
+    updated_at TIMESTAMP,
+    updated_by TEXT,
     CONSTRAINT dma_pk PRIMARY KEY (dma_id)
 );
 

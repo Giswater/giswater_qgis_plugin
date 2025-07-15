@@ -408,14 +408,14 @@ BEGIN
 		-- FEATURE INSERT
 		IF v_matfromcat THEN
 			INSERT INTO arc (arc_id, code, sys_code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
-			annotation, observ, "comment", inverted_slope, custom_length, omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
+			annotation, observ, "comment", inverted_slope, custom_length, omzone_id, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified,
 			the_geom,label_x,label_y, label_rotation, expl_id, publish, inventory, uncertain, num_value, updated_at, updated_by, asset_id, pavcat_id,
 			parent_id, expl_visibility, adate, adescript, visitability, label_quadrant, brand_id, model_id, serial_number, initoverflowpath, lock_level, is_scadamap, registration_date,
 			meandering, conserv_state, om_state, last_visitdate, negative_offset, drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2,
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment,
-			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, COALESCE(NEW.fluid_type, 0),
+			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, COALESCE(NEW.fluid_type, 0),
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id,  NEW.postcode, NEW.district_id, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.label_x,
@@ -424,14 +424,14 @@ BEGIN
 			NEW.registration_date, NEW.meandering, NEW.conserv_state, NEW.om_state, NEW.last_visitdate, NEW.negative_offset, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id);
 		ELSE
 			INSERT INTO arc (arc_id, code, sys_code, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
-			annotation, observ, "comment", inverted_slope, custom_length, omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
+			annotation, observ, "comment", inverted_slope, custom_length, omzone_id, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified,
 			the_geom,label_x,label_y, label_rotation, expl_id, publish, inventory,	uncertain, num_value, matcat_id, updated_at, updated_by, asset_id, pavcat_id,
 			parent_id, expl_visibility, adate, adescript, visitability, label_quadrant, brand_id, model_id, serial_number, initoverflowpath, lock_level, is_scadamap, registration_date,
 			meandering, conserv_state, om_state, last_visitdate, negative_offset, drainzone_outfall, dwfzone_outfall, omunit_id)
 			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2,
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment,
-			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, COALESCE(NEW.fluid_type, 0),
+			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, COALESCE(NEW.fluid_type, 0),
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id,  NEW.postcode, NEW.district_id, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.label_x,
@@ -701,7 +701,7 @@ BEGIN
 			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id, parent_id=NEW.parent_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			visitability=NEW.visitability, label_quadrant=NEW.label_quadrant, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 			initoverflowpath=NEW.initoverflowpath, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, registration_date=NEW.registration_date,
-			meandering=NEW.meandering, conserv_state=NEW.conserv_state, om_state=NEW.om_state, last_visitdate=NEW.last_visitdate, negative_offset=NEW.negative_offset, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id
+			meandering=NEW.meandering, conserv_state=NEW.conserv_state, om_state=NEW.om_state, last_visitdate=NEW.last_visitdate, negative_offset=NEW.negative_offset, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id, dma_id=NEW.dma_id
 			WHERE arc_id=OLD.arc_id;
 		ELSE
 			UPDATE arc
@@ -716,7 +716,7 @@ BEGIN
 			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id, parent_id=NEW.parent_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			visitability=NEW.visitability, label_quadrant=NEW.label_quadrant, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 			initoverflowpath=NEW.initoverflowpath, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, registration_date=NEW.registration_date,
-			meandering=NEW.meandering, conserv_state=NEW.conserv_state, om_state=NEW.om_state, last_visitdate=NEW.last_visitdate, negative_offset=NEW.negative_offset, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id
+			meandering=NEW.meandering, conserv_state=NEW.conserv_state, om_state=NEW.om_state, last_visitdate=NEW.last_visitdate, negative_offset=NEW.negative_offset, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, omunit_id=NEW.omunit_id, dma_id=NEW.dma_id
 			WHERE arc_id=OLD.arc_id;
 		END IF;
 

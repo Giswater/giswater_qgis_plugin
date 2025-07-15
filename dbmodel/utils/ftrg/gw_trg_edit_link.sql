@@ -760,11 +760,11 @@ BEGIN
 				-- update connect
 				IF NEW.feature_type='CONNEC' AND v_pjoint_id IS NOT NULL THEN
 					IF v_projectype = 'WS' THEN
-						UPDATE connec SET dma_id = v_dma, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
+						UPDATE connec SET fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
 					ELSIF v_projectype = 'UD' THEN
 						UPDATE connec SET fluid_type=v_fluidtype::integer WHERE connec_id = NEW.feature_id;
 					END IF;
-					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector,
+					UPDATE connec SET arc_id = v_arc_id, dma_id = v_dma,pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector,
 					omzone_id = v_omzone WHERE connec_id = NEW.feature_id;
 
 				ELSIF NEW.feature_type='GULLY' AND v_pjoint_id IS NOT NULL  THEN
@@ -833,23 +833,23 @@ BEGIN
 
 			-- update link
 			IF v_projectype = 'WS' THEN
-				UPDATE link SET dma_id = v_dma, fluid_type=v_fluidtype WHERE link_id=NEW.link_id;
+				UPDATE link SET fluid_type=v_fluidtype WHERE link_id=NEW.link_id;
 			ELSIF v_projectype = 'UD' THEN
 				UPDATE link SET fluid_type = v_fluidtype::integer WHERE link_id=NEW.link_id;
 			END IF;
-			UPDATE link SET exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector,
+			UPDATE link SET exit_id = NEW.exit_id, dma_id = v_dma, exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector,
 			omzone_id = v_omzone, uncertain = NEW.uncertain
 			WHERE link_id=NEW.link_id;
 
 			-- force reconnection on connecs
 			IF NEW.feature_type = 'CONNEC' THEN
 				IF v_projectype = 'WS' THEN
-					UPDATE connec SET dma_id = v_dma, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
+					UPDATE connec SET fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
 				ELSIF v_projectype = 'UD' THEN
 					UPDATE connec SET fluid_type=v_fluidtype::integer WHERE connec_id = NEW.feature_id;
 				END IF;
 
-				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
+				UPDATE connec SET arc_id = v_arc_id, dma_id = v_dma, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
 				omzone_id = v_omzone WHERE connec_id = NEW.feature_id;
 
 				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
@@ -902,7 +902,8 @@ BEGIN
 		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
 		enddate = NEW.enddate, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector, verified = NEW.verified, custom_length = NEW.custom_length,
 		datasource = NEW.datasource, location_type=NEW.location_type, epa_type=NEW.epa_type, annotation=NEW.annotation, observ=NEW.observ, comment=NEW.comment,
-		descript=NEW.descript, link=NEW.link, num_value=NEW.num_value, state_type=NEW.state_type
+		descript=NEW.descript, link=NEW.link, num_value=NEW.num_value, state_type=NEW.state_type, link_type=NEW.link_type, sys_code=NEW.sys_code, feature_type=NEW.feature_type, feature_id=NEW.feature_id
+		userdefined_geom=NEW.userdefined_geom, 
 		WHERE link_id=NEW.link_id;
 
 		IF v_man_table = 'VLINK' THEN

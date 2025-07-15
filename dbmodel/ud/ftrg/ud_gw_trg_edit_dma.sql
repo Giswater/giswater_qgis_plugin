@@ -41,9 +41,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO dma (dma_id, name, descript, macrodma_id, expl_id, link, stylesheet, dma_type, graphconfig, lock_level)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.expl_id, NEW.link, NEW.stylesheet,
-		NEW.dma_type, NEW.graphconfig::json, NEW.lock_level);
+		INSERT INTO dma (dma_id, name, expl_id, muni_id, sector_id, graphconfig)
+		VALUES (NEW.dma_id, NEW.name, NEW.expl_id, NEW.muni_id, NEW.sector_id, NEW.graphconfig::json);
 
 		IF view_name = 'UI' THEN
 			UPDATE dma SET active = NEW.active WHERE dma_id = NEW.dma_id;
@@ -58,9 +57,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE dma
-		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, expl_id=NEW.expl_id,
-		link=NEW.link, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet,
-		dma_type=NEW.dma_type, graphconfig=NEW.graphconfig::json, lock_level=NEW.lock_level
+		SET dma_id=NEW.dma_id, name=NEW.name, expl_id=NEW.expl_id, muni_id=NEW.muni_id, sector_id=NEW.sector_id, graphconfig=NEW.graphconfig::json
 		WHERE dma_id=OLD.dma_id;
 
 		IF view_name = 'UI' THEN
