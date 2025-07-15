@@ -892,7 +892,7 @@ BEGIN
 		-- update link parameters
 		IF v_projectype = 'WS' THEN
 			UPDATE link
-			SET top_elev1 = NEW.top_elev1, depth1=NEW.depth1, top_elev2 = NEW.top_elev2, depth2 = NEW.depth2
+			SET top_elev1 = NEW.top_elev1, depth1=NEW.depth1, top_elev2 = NEW.top_elev2, depth2 = NEW.depth2, link_type=NEW.link_type
 			WHERE link_id=NEW.link_id;
 		ELSE
 			UPDATE link
@@ -902,8 +902,7 @@ BEGIN
 		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
 		enddate = NEW.enddate, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector, verified = NEW.verified, custom_length = NEW.custom_length,
 		datasource = NEW.datasource, location_type=NEW.location_type, epa_type=NEW.epa_type, annotation=NEW.annotation, observ=NEW.observ, comment=NEW.comment,
-		descript=NEW.descript, link=NEW.link, num_value=NEW.num_value, state_type=NEW.state_type, link_type=NEW.link_type, sys_code=NEW.sys_code, feature_type=NEW.feature_type, feature_id=NEW.feature_id,
-		userdefined_geom=NEW.userdefined_geom
+		descript=NEW.descript, link=NEW.link, num_value=NEW.num_value, state_type=NEW.state_type
 		WHERE link_id=NEW.link_id;
 
 		IF v_man_table = 'VLINK' THEN
