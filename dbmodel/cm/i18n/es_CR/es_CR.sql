@@ -4,13 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = cm, public, public;
 UPDATE config_form_fields AS t
 SET label = v.label, tooltip = v.tooltip
 FROM (
     VALUES
+    ('campaign_id', 'campaign_review', 'form_feature', 'Id de campaña:', 'Id'),
     ('versions_check', 'generic', 'check_project_cm', 'Versiones', 'Versiones'),
-    ('campaign_id', 'campaign_review', 'form_feature', 'Campaña Id:', 'Id'),
     ('name', 'campaign_review', 'form_feature', 'Nombre:', 'Nombre'),
     ('startdate', 'campaign_review', 'form_feature', 'Inicio planificado:', 'Inicio planificado'),
     ('enddate', 'campaign_review', 'form_feature', 'Fin planificado:', 'Final planificado'),
@@ -31,15 +31,15 @@ FROM (
     ('organization_id', 'campaign_visit', 'form_feature', 'Organización:', 'Organización'),
     ('btn_close', 'generic', 'create_organization', NULL, 'Cerrar'),
     ('active', 'generic', 'create_organization', 'Activa:', 'Activo'),
-    ('descript', 'generic', 'create_organization', 'Descripción:', 'Descripción'),
+    ('descript', 'generic', 'create_organization', 'Descripción', 'Descripción'),
     ('code', 'generic', 'create_organization', 'Código:', 'Código'),
     ('active', 'generic', 'create_user', 'Activa:', 'Activo'),
     ('startdate', 'lot', 'form_feature', 'Inicio planificado:', 'Inicio planificado'),
     ('enddate', 'lot', 'form_feature', 'Fin planificado:', 'Final planificado'),
     ('real_startdate', 'lot', 'form_feature', 'Comienzo real:', 'Inicio real'),
     ('real_enddate', 'lot', 'form_feature', 'Fin real:', 'Real end'),
-    ('campaign_id', 'lot', 'form_feature', 'Campaña id:', 'Id de campaña'),
     ('workorder_id', 'lot', 'form_feature', 'Id. de orden de trabajo:', 'Id de orden de trabajo'),
+    ('campaign_id', 'lot', 'form_feature', 'Id de campaña:', 'Id de campaña'),
     ('active', 'lot', 'form_feature', 'Activa:', 'Activo'),
     ('team_id', 'lot', 'form_feature', 'Equipo:', 'Equipo'),
     ('txt_infolog', 'generic', 'check_project_cm', NULL, NULL),
@@ -57,7 +57,10 @@ FROM (
     ('admin_check', 'generic', 'check_project_cm', 'Comprueba los datos del administrador:', 'Comprueba los datos del administrador:'),
     ('Info:', 'generic', 'check_project_cm', NULL, NULL),
     ('verified_exceptions', 'generic', 'check_project_cm', 'Ignorar excepción verificada:', 'Ignorar excepción verificada:'),
-    ('descript', 'campaign_review', 'form_feature', 'Descripción:', 'Descripción'),
+    ('descript', 'campaign_review', 'form_feature', 'Descripción', 'Descripción'),
+    ('descript', 'campaign_visit', 'form_feature', 'Descripción', 'Descripción'),
+    ('descript', 'generic', 'create_team', 'Descripción', 'Descripción'),
+    ('descript', 'generic', 'create_user', 'Descripción', 'Descripción'),
     ('active', 'generic', 'create_team', 'Activa:', 'Activo'),
     ('campaign_id', 'campaign_visit', 'form_feature', 'Lote Id:', 'Id'),
     ('btn_accept', 'generic', 'create_user', NULL, 'Acepte'),
@@ -67,10 +70,8 @@ FROM (
     ('btn_close', 'generic', 'create_team', NULL, 'Cerrar'),
     ('status', 'campaign_visit', 'form_feature', 'Estado:', 'Estado'),
     ('btn_close', 'generic', 'create_user', NULL, 'Cerrar'),
-    ('descript', 'campaign_visit', 'form_feature', 'Descripción:', 'Descripción'),
     ('code', 'generic', 'create_team', 'Código:', 'Código'),
     ('btn_accept', 'generic', 'create_organization', NULL, 'Acepte'),
-    ('descript', 'generic', 'create_team', 'Descripción:', 'Descripción'),
     ('loginname', 'generic', 'create_user', 'Nombre de usuario:', 'Nombre de usuario'),
     ('name', 'generic', 'create_team', 'Nombre:', 'Nombre'),
     ('name', 'generic', 'create_organization', 'Nombre:', 'Nombre'),
@@ -84,13 +85,12 @@ FROM (
     ('name', 'lot', 'form_feature', 'Nombre:', 'Nombre'),
     ('password', 'generic', 'create_user', 'Contraseña:', 'Contraseña:'),
     ('code', 'generic', 'create_user', 'Código:', 'Código'),
-    ('descript', 'generic', 'create_user', 'Descripción:', 'Descripción'),
     ('team_id', 'generic', 'create_user', 'Equipo:', 'Equipo'),
+    ('descript', 'lot', 'form_feature', 'Descripción', 'Descripción'),
     ('startdate', 'workorder', 'form_feature', 'Fecha de inicio:', 'Fecha de inicio'),
     ('status', 'lot', 'form_feature', 'Estado:', 'Estado'),
     ('address', 'workorder', 'form_feature', 'Dirección:', 'Dirección'),
     ('observ', 'workorder', 'form_feature', 'Observa:', 'Observar'),
-    ('descript', 'lot', 'form_feature', 'Descripción:', 'Descripción'),
     ('cost', 'workorder', 'form_feature', 'Coste:', 'Coste'),
     ('qgisproj_check', 'generic', 'check_project_cm', 'Proyecto Qgis', 'Proyecto Qgis')
 ) AS v(columnname, formname, formtype, label, tooltip)
