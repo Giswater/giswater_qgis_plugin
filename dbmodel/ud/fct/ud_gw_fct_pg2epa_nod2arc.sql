@@ -71,27 +71,28 @@ BEGIN
 
 	--  Move valves to arc
 	RAISE NOTICE 'Starting process of nodarcs';
+	INSERT INTO temp_t_element SELECT * FROM element;
 
 	-- setting record_new_arc
 	SELECT * INTO rec_new_arc FROM temp_t_arc LIMIT 1;
 
 	-- TODO: review this code, with new elements logic of flow regulators
 	FOR rec_flowreg IN
-		SELECT element_id, to_arc, flwreg_length, flw_type, order_id, epa_type FROM
+		SELECT element_id, to_arc, flwreg_length, flw_type, order_id, epa_type, node_id FROM
 		(
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, order_id, 'ORIFICE' as epa_type FROM inp_frorifice, man_frelem
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, node_id, order_id, 'ORIFICE' as epa_type FROM inp_frorifice join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, order_id, 'OUTLET' as epa_type FROM inp_froutlet, man_frelem
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, node_id, order_id, 'OUTLET' as epa_type FROM inp_froutlet join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, order_id, 'PUMP' as epa_type FROM inp_frpump, man_frelem
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, node_id, order_id, 'PUMP' as epa_type FROM inp_frpump join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, order_id, 'WEIR' as epa_type FROM inp_frweir, man_frelem
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, node_id, order_id, 'WEIR' as epa_type FROM inp_frweir join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 		) a
@@ -99,14 +100,14 @@ BEGIN
 
 	LOOP
 		-- Getting data from node
-		SELECT * INTO rec_node FROM temp_t_node WHERE node_id = rec_flowreg.node_id;
+		SELECT * INTO rec_node FROM temp_t_node WHERE node_id = rec_flowreg.node_id::text;
 
 		-- Getting data from arc
-		SELECT arc_id, node_1, node_2, the_geom INTO v_arc, v_node_1, v_node_2, v_geom FROM temp_t_arc WHERE arc_id=rec_flowreg.to_arc;
+		SELECT arc_id, node_1, node_2, the_geom INTO v_arc, v_node_1, v_node_2, v_geom FROM temp_t_arc WHERE arc_id=rec_flowreg.to_arc::text;
 		IF v_arc IS NULL THEN
 
 		ELSE
-			IF v_node_2=rec_flowreg.node_id THEN
+			IF v_node_2=rec_flowreg.node_id::text THEN
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2038", "function":"2240","parameters":{"arc_id":"'||v_arc||'"}, "is_process":true}}$$);';
@@ -124,14 +125,14 @@ BEGIN
 					"data":{"message":"2040", "function":"2240","parameters":{"arc_id":"'||rec_arc1.arc_id||'", "geom_type":"'||ST_GeometryType(v_arc_reduced_geom)||'"}, "is_process":true}}$$);';
 				END IF;
 
-				IF old_node_id = rec_flowreg.node_id AND old_to_arc = rec_flowreg.to_arc THEN
+				IF old_node_id = rec_flowreg.node_id::text AND old_to_arc = rec_flowreg.to_arc::text THEN
 					rec_new_arc.node_2 = old_node_2;
 
-				ELSIF old_node_id = rec_flowreg.node_id AND old_to_arc != rec_flowreg.to_arc THEN
+				ELSIF old_node_id = rec_flowreg.node_id::text AND old_to_arc != rec_flowreg.to_arc::text THEN
 					v_count = v_count + 1;
 					rec_new_arc.node_2 = concat(rec_node.node_id,'VN', v_count);
 
-				ELSIF old_node_id != rec_flowreg.node_id OR old_node_id IS NULL THEN
+				ELSIF old_node_id != rec_flowreg.node_id::text OR old_node_id IS NULL THEN
 					v_count = 1;
 					rec_new_arc.node_2 = concat(rec_node.node_id,'VN', v_count);
 				END IF;
@@ -155,8 +156,9 @@ BEGIN
 				INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, expl_id, the_geom)
 				VALUES(result_id_var, rec_new_arc.arc_id, rec_new_arc.node_1, rec_new_arc.node_2, rec_new_arc.arc_type, rec_new_arc.arccat_id,
 				rec_new_arc.epa_type, rec_new_arc.sector_id, rec_new_arc.state, rec_new_arc.state_type, rec_new_arc.annotation, rec_new_arc.length, rec_new_arc.expl_id, rec_new_arc.the_geom);
+				
 
-				IF old_node_id= rec_flowreg.node_id AND old_to_arc =rec_flowreg.to_arc THEN
+				IF old_node_id= rec_flowreg.node_id::text AND old_to_arc =rec_flowreg.to_arc::text THEN
 
 					v_counter:=v_counter+1;
 
@@ -210,7 +212,9 @@ BEGIN
 				old_to_arc= rec_flowreg.to_arc;
 				old_node_2 = rec_new_arc.node_2;
 
-				UPDATE temp_t_arc SET node_1 = rec_new_arc.node_2 WHERE arc_id = rec_flowreg.to_arc;
+				UPDATE temp_t_arc SET node_1 = rec_new_arc.node_2 WHERE arc_id = rec_flowreg.to_arc::text;
+
+				UPDATE temp_t_arc_flowregulator SET arc_id = concat(rec_new_arc.arc_id, 'hola') WHERE arc_id = rec_node.node_id::text;
 
 				-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
 				IF rec_flowreg.flw_type='PU' THEN

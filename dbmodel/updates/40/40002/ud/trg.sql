@@ -9,6 +9,21 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_gully');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE ON inp_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_gully');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_inlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('INLET');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_inlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('inlet');
+
+CREATE TRIGGER gw_trg_edit_inp_node_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_inlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_inlet');
+
 CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON 
 v_edit_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
 

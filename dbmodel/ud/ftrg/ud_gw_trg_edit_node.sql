@@ -722,6 +722,9 @@ BEGIN
 		ELSIF (NEW.epa_type = 'NETGULLY') THEN
 			INSERT INTO inp_netgully (node_id, y0, ysur, apond, outlet_type, method, weir_cd, orifice_cd, efficiency)
 			VALUES (NEW.node_id, 0, 0, 0, v_gully_outlet_type, v_gully_method, v_gully_weir_cd, v_gully_orifice_cd, v_gully_efficiency);
+		ELSIF (NEW.epa_type = 'INLET') THEN
+			INSERT INTO inp_inlet (node_id, y0, ysur, apond, inlet_type, outlet_type, gully_method, custom_top_elev, custom_depth, inlet_length, inlet_width, cd1, cd2, efficiency)
+			VALUES (NEW.node_id, 0, 0, 0, 'GULLY', v_gully_outlet_type, v_gully_method, 0, 0, 0, 0, 0, 0, 0);
 		END IF;
 
 		-- man2inp_values
@@ -743,6 +746,8 @@ BEGIN
 				v_inp_table:= 'inp_storage';
 			ELSIF (OLD.epa_type = 'NETGULLY') THEN
 				v_inp_table:= 'inp_netgully';
+			ELSIF (OLD.epa_type = 'INLET') THEN
+				v_inp_table:= 'inp_inlet';
 			END IF;
 
 			IF v_inp_table IS NOT NULL THEN
@@ -762,6 +767,8 @@ BEGIN
 				v_inp_table:= 'inp_storage';
 			ELSIF (NEW.epa_type = 'NETGULLY') THEN
 				v_inp_table:= 'inp_netgully';
+			ELSIF (NEW.epa_type = 'INLET') THEN
+				v_inp_table:= 'inp_inlet';
 			END IF;
 			IF v_inp_table IS NOT NULL THEN
 				v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||') ON CONFLICT (node_id) DO NOTHING';

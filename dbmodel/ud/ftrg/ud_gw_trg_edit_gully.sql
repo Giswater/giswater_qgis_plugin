@@ -647,7 +647,7 @@ BEGIN
 
 		-- EPA INSERT
 		IF (NEW.epa_type = 'GULLY') THEN
-			INSERT INTO inp_gully (gully_id, outlet_type, method, weir_cd, orifice_cd, efficiency)
+			INSERT INTO inp_gully (gully_id, outlet_type, gully_method, weir_cd, orifice_cd, efficiency)
 			VALUES (NEW.gully_id, v_epa_gully_outlet_type, v_epa_gully_method, v_epa_gully_weir_cd, v_epa_gully_orifice_cd, v_epa_gully_efficiency);
 		END IF;
 
@@ -659,7 +659,7 @@ BEGIN
 		IF (OLD.epa_type = 'GULLY') AND (NEW.epa_type = 'UNDEFINED') THEN
 			DELETE FROM inp_gully WHERE gully_id = OLD.gully_id;
 		ELSIF (OLD.epa_type = 'UNDEFINED') AND (NEW.epa_type = 'GULLY') THEN
-			INSERT INTO inp_gully (gully_id, outlet_type, method, weir_cd, orifice_cd, efficiency)
+			INSERT INTO inp_gully (gully_id, outlet_type, gully_method, weir_cd, orifice_cd, efficiency)
 			VALUES (NEW.gully_id, v_epa_gully_outlet_type, v_epa_gully_method, v_epa_gully_weir_cd, v_epa_gully_orifice_cd, v_epa_gully_efficiency);
 		END IF;
 

@@ -131,6 +131,12 @@ BEGIN
 	        custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param, ysur=NEW.ysur,y0=NEW.y0,apond=NEW.apond
 	        WHERE node_id=OLD.node_id;
 
+		ELSIF v_node_table = 'inp_inlet' THEN
+
+			UPDATE inp_inlet
+			SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, inlet_type=NEW.inlet_type, outlet_type=NEW.outlet_type, gully_method=NEW.gully_method,custom_top_elev=NEW.custom_top_elev,
+			custom_depth=NEW.custom_depth, inlet_length=NEW.inlet_length, inlet_width=NEW.inlet_width, cd1=NEW.cd1, cd2=NEW.cd2, efficiency=NEW.efficiency
+			WHERE node_id=OLD.node_id;
         END IF;
 
         v_input = concat('{"feature":{"type":"node", "childLayer":"',v_node_table,'", "id":"',NEW.node_id,'"}}');

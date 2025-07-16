@@ -63,7 +63,7 @@ BEGIN
         ELSIF v_epatype = 'netgully' THEN
             UPDATE inp_netgully
             SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, outlet_type=NEW.outlet_type, custom_width=NEW.custom_width, custom_length=NEW.custom_length, custom_depth=NEW.custom_depth,
-            method=NEW.method, weir_cd=NEW.weir_cd, orifice_cd=NEW.orifice_cd, custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param, efficiency=NEW.efficiency
+            gully_method=NEW.gully_method, weir_cd=NEW.weir_cd, orifice_cd=NEW.orifice_cd, custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param, efficiency=NEW.efficiency
             WHERE node_id=OLD.node_id;
 
         ELSIF v_epatype = 'orifice' THEN
@@ -82,6 +82,13 @@ BEGIN
             UPDATE inp_outlet
             SET outlet_type=NEW.outlet_type, offsetval=NEW.offsetval, curve_id=NEW.curve_id, cd1=NEW.cd1,  cd2=NEW.cd2, flap=NEW.flap
             WHERE arc_id=OLD.arc_id;
+
+        ELSIF v_epatype = 'inlet' THEN
+            UPDATE inp_inlet
+            SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, inlet_type=NEW.inlet_type, outlet_type=NEW.outlet_type, gully_method=NEW.gully_method, custom_top_elev=NEW.custom_top_elev, custom_depth=NEW.custom_depth,
+            inlet_length=NEW.inlet_length, inlet_width=NEW.inlet_width, cd1=NEW.cd1, cd2=NEW.cd2, efficiency=NEW.efficiency
+            WHERE node_id=OLD.node_id;
+
         END IF;
 
 		RETURN NEW;

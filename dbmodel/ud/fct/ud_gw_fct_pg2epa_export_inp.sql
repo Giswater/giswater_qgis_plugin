@@ -385,9 +385,9 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_gully AS
-	 SELECT temp_t_gully.gully_id,
+	 SELECT temp_t_gully.gully_id as code,
 	    temp_t_gully.outlet_type,
-	    COALESCE(temp_t_gully.node_id::text, '-9999'::text) AS node_id,
+	    COALESCE(temp_t_gully.node_id::text, '-9999'::text) AS outlet_node,
 	    st_x(temp_t_gully.the_geom)::numeric(12,3) AS xcoord,
 	    st_y(temp_t_gully.the_geom)::numeric(12,3) AS ycoord,
 	    COALESCE(temp_t_gully.top_elev::numeric(12,3), '-9999'::integer::numeric) AS zcoord,
@@ -395,13 +395,13 @@ BEGIN
 	    temp_t_gully.length::numeric(12,3) AS length,
 	    COALESCE(temp_t_gully.depth::numeric(12,3), '-9999'::integer::numeric) AS depth,
 	    temp_t_gully.method,
-	    temp_t_gully.weir_cd::numeric(12,3) AS weir_cd,
-	    temp_t_gully.orifice_cd::numeric(12,3) AS orifice_cd,
-	    temp_t_gully.a_param::numeric(12,3) AS a_param,
-	    temp_t_gully.b_param::numeric(12,3) AS b_param,
+	    COALESCE(temp_t_gully.weir_cd::numeric(12,3), '-9999'::integer::numeric) AS weir_cd,
+	    COALESCE(temp_t_gully.orifice_cd::numeric(12,3), '-9999'::integer::numeric) AS orifice_cd,
+	    COALESCE(temp_t_gully.a_param::numeric(12,3), '-9999'::integer::numeric) AS a_param,
+	    COALESCE(temp_t_gully.b_param::numeric(12,3), '-9999'::integer::numeric) AS b_param,
 		COALESCE(temp_t_gully.efficiency, cat_gully.efficiency) AS efficiency
 	   FROM temp_t_gully
-	     JOIN cat_gully ON cat_gully.id = temp_t_gully.gullycat_id;
+	     LEFT JOIN cat_gully ON cat_gully.id = temp_t_gully.gullycat_id;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_gwf AS
@@ -520,7 +520,7 @@ BEGIN
 	    temp_t_node.apond,
 	    concat(';', temp_t_node.sector_id, ' ', temp_t_node.node_type) AS other
 	   FROM temp_t_node
-	  WHERE temp_t_node.epa_type::text = ANY (ARRAY['JUNCTION'::text, 'NETGULLY'::text]);
+	  WHERE temp_t_node.epa_type::text = ANY (ARRAY['JUNCTION'::text, 'NETGULLY'::text, 'INLET'::text]);
 
 	CREATE OR REPLACE TEMP VIEW vi_t_labels AS
 	 SELECT inp_label.xcoord,
@@ -1002,7 +1002,25 @@ BEGIN
 	    f.coef_curve
 	   FROM temp_t_arc_flowregulator f
 	     JOIN temp_t_arc ON f.arc_id::text = temp_t_arc.arc_id
-	  WHERE f.type::text = 'WEIR'::text;
+	  WHERE f.type::text = 'WEIR'::text
+	  UNION
+	  SELECT a.arc_id,
+	    a.node_1,
+	    a.node_2,
+		w.weir_type,
+		w.offsetval,
+		w.cd,
+		w.flap,
+		w.ec,
+		w.cd2,
+		w.surcharge,
+		w.road_width,
+		w.road_surf,
+		w.coef_curve
+		from inp_frweir w
+			JOIN element_x_node n ON n.element_id = w.element_id
+			JOIN temp_t_arc a ON a.node_1 = n.node_id::text
+		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'WEIR'::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_xsections AS

@@ -128,6 +128,18 @@ BEGIN
 		SELECT node_1 AS node_id FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||' UNION 
 		SELECT node_2 FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		v_statetype ||')a ON node.node_id=a.node_id
+	UNION
+	SELECT '||quote_literal(result_id_var)||',
+	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
+	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
+	FROM selector_sector, node
+		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
+		JOIN inp_inlet ON node.node_id=inp_inlet.node_id
+		JOIN (
+		SELECT node_1 AS node_id FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		v_statetype ||' UNION 
+		SELECT node_2 FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||')a ON node.node_id=a.node_id';
 
 
@@ -206,10 +218,7 @@ BEGIN
 		case when custom_width is null then total_width else custom_width end, 
 		case when custom_length is null then total_length else custom_length end,
 		case when custom_depth is null then depth else custom_depth end,
-		method, weir_cd, orifice_cd, 
-		case when custom_a_param is null then a_param else custom_a_param end,
-		case when custom_b_param is null then b_param else custom_b_param end,
-		efficiency, the_geom
+		gully_method, weir_cd, orifice_cd, custom_a_param, custom_b_param, efficiency, the_geom
 		FROM selector_sector s, v_edit_inp_netgully g 
 		LEFT JOIN value_state_type ON id=g.state_type
 		WHERE g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
@@ -225,15 +234,22 @@ BEGIN
 		case when custom_width is null then total_width else custom_width end, 
 		case when g.custom_length is null then total_length else g.custom_length end,
 		case when custom_depth is null then depth else custom_depth end,
-		method, weir_cd, orifice_cd, 
-		case when custom_a_param is null then a_param else custom_a_param end,
-		case when custom_b_param is null then b_param else custom_b_param end,
-		efficiency, g.the_geom
+		gully_method, weir_cd, orifice_cd, custom_a_param, custom_b_param, efficiency, g.the_geom
 		FROM selector_sector s, v_edit_inp_gully g
 		LEFT JOIN arc a USING (arc_id)
 		LEFT JOIN value_state_type ON id=g.state_type
 		WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
 
+
+		EXECUTE 'INSERT INTO temp_t_gully 
+		SELECT 
+		concat(''IN'',node_id), g.node_type, null, null, g.node_id, g.sector_id, g.state, g.state_type,
+		case when custom_top_elev is null then top_elev else custom_top_elev end, 
+		null, null, outlet_type, inlet_width, inlet_length, null, gully_method, cd1, cd2, null, null, efficiency, the_geom
+		FROM selector_sector s, v_edit_inp_inlet g 
+		LEFT JOIN value_state_type ON id=g.state_type
+		WHERE g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
+ -- TO FIX: INLET
 	END IF;
 
 	-- orifice

@@ -225,6 +225,29 @@ BEGIN
 			INSERT INTO inp_dscenario_controls(dscenario_id, sector_id, text, active)
 			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
 
+		ELSIF v_dscenario_type = 'INLET' THEN
+
+			-- default values
+			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.apond IS NULL THEN NEW.apond = (SELECT apond FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.inlet_type IS NULL THEN NEW.inlet_type = (SELECT inlet_type FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.outlet_type IS NULL THEN NEW.outlet_type = (SELECT outlet_type FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.gully_method IS NULL THEN NEW.gully_method = (SELECT gully_method FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.custom_top_elev IS NULL THEN NEW.custom_top_elev = (SELECT custom_top_elev FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.custom_depth IS NULL THEN NEW.custom_depth = (SELECT custom_depth FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.inlet_length IS NULL THEN NEW.inlet_length = (SELECT inlet_length FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.inlet_width IS NULL THEN NEW.inlet_width = (SELECT inlet_width FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.cd1 IS NULL THEN NEW.cd1 = (SELECT cd1 FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.efficiency IS NULL THEN NEW.efficiency = (SELECT efficiency FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			
+
+			INSERT INTO inp_dscenario_inlet (dscenario_id, elev, ymax, node_id, y0, ysur, apond, inlet_type, outlet_type, gully_method, custom_top_elev, custom_depth, inlet_length, inlet_width, cd1, cd2, efficiency)
+	 		VALUES (NEW.dscenario_id, NEW.elev, NEW.ymax, NEW.node_id, NEW.y0, NEW.ysur, NEW.apond, NEW.inlet_type, NEW.outlet_type, NEW.gully_method, NEW.custom_top_elev, NEW.custom_depth, NEW.inlet_length, NEW.inlet_width, NEW.cd1, NEW.cd2, NEW.efficiency);
+
 		END IF;
 
 		RETURN NEW;

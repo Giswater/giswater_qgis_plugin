@@ -106,3 +106,54 @@ ALTER TABLE dwfzone ADD CONSTRAINT dwfzone_drainzone_fk FOREIGN KEY (drainzone_i
 -- 14/07/2025
 DELETE FROM sys_foreignkey WHERE target_table = 'dma';
 
+
+DROP TABLE IF EXISTS inp_inlet;
+CREATE TABLE inp_inlet (
+	node_id integer NOT NULL,
+	y0 numeric(12, 4) NULL,
+	ysur numeric(12, 4) NULL,
+	apond numeric(12, 4) NULL,
+	inlet_type varchar(30) NULL,
+	outlet_type varchar(30) NULL,
+	gully_method varchar(30) NULL,
+	custom_top_elev float8 NULL,
+	custom_depth float8 NULL,
+	inlet_length float8 NULL,
+	inlet_width float8 NULL,
+	cd1 float8 NULL,
+	cd2 float8 NULL,
+	efficiency float8 NULL,
+    CONSTRAINT inp_inlet_pkey PRIMARY KEY (node_id),
+	CONSTRAINT inp_inlet_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE inp_dscenario_inlet (
+	dscenario_id int4 NOT NULL,
+	node_id integer NOT NULL,
+	elev float8 NULL,
+	ymax float8 NULL,
+	y0 numeric(12, 4) NULL,
+	ysur numeric(12, 4) NULL,
+	apond numeric(12, 4) NULL,
+	inlet_type varchar(30) NULL,
+	outlet_type varchar(30) NULL,
+	gully_method varchar(30) NULL,
+	custom_top_elev float8 NULL,
+	custom_depth float8 NULL,
+	inlet_length float8 NULL,
+	inlet_width float8 NULL,
+	cd1 float8 NULL,
+	cd2 float8 NULL,
+	efficiency float8 NULL,
+	CONSTRAINT inp_dscenario_inlet_pkey PRIMARY KEY (dscenario_id, node_id),
+	CONSTRAINT inp_dscenario_inlet_dscenario_id_fkey FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT inp_dscenario_inlet_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_inlet(node_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_gully", "column":"gully_id", "dataType":"varchar(30)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_gully", "column":"method", "newName":"gully_method"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_netgully", "column":"method", "newName":"gully_method"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ve_epa_netgully", "column":"method", "newName":"gully_method"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_t_arc_flowregulator", "column":"arc_id", "dataType":"varchar(30)"}}$$);
