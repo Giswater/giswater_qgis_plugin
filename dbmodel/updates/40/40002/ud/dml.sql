@@ -379,3 +379,6 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 ON CONFLICT (id) DO UPDATE SET project_type = 'utils';
 
 INSERT INTO dma (dma_id, name) VALUES (0, 'UNDEFINED');
+
+UPDATE sys_param_user SET layoutorder = 25 WHERE id = 'utils_psector_strategy';
+
