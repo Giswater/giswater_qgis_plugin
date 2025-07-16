@@ -156,4 +156,4 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_gull
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_netgully", "column":"method", "newName":"gully_method"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ve_epa_netgully", "column":"method", "newName":"gully_method"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_t_arc_flowregulator", "column":"arc_id", "dataType":"varchar(30)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_arc_flowregulator", "column":"arc_id", "dataType":"varchar(30)"}}$$);
