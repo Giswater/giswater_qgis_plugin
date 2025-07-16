@@ -3746,7 +3746,7 @@ def connect_signal_selection_changed(class_object, dialog, table_object, selecti
         tools_log.log_info(msg, msg_params=msg_params)
 
 
-def docker_dialog(dialog, dlg_name=None):
+def docker_dialog(dialog, dlg_name=None, title=None):
 
     positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
                  2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
@@ -3761,6 +3761,9 @@ def docker_dialog(dialog, dlg_name=None):
         dialog.messageBar().hide()
         global_vars.iface.addDockWidget(positions[lib_vars.session_vars['dialog_docker'].position],
                                         lib_vars.session_vars['dialog_docker'])
+
+        if title:
+            lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
     except RuntimeError as e:
         msg = "{0}: {1}"
         msg_params = (type(e).__name__, e,)
