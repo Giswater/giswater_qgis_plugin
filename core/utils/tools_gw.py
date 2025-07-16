@@ -343,12 +343,13 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
 
     """ Open dialog """
     # Check database connection before opening dialog
-    if (dlg_name != 'admin_credentials' and dlg_name != 'admin_ui') and not tools_db.check_db_connection():
+    if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not tools_db.check_db_connection():
         return
-
+    
     # Manage translate
     if dlg_name:
-        tools_qt.manage_translation(dlg_name, dlg, plugin_dir=plugin_dir, plugin_name=plugin_name)
+        tools_qt._translate_form(dlg_name, dlg)
+
 
     # Set window title
     if title is not None:
@@ -3751,8 +3752,6 @@ def docker_dialog(dialog, dlg_name=None, title=None):
     positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
                  2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
     try:
-        if dlg_name:
-            tools_qt.manage_translation(dlg_name, dialog)
         lib_vars.session_vars['dialog_docker'].setWindowTitle(dialog.windowTitle())
         lib_vars.session_vars['dialog_docker'].setWidget(dialog)
         lib_vars.session_vars['dialog_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
@@ -3764,6 +3763,8 @@ def docker_dialog(dialog, dlg_name=None, title=None):
 
         if title:
             lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
+        if dlg_name:
+            tools_qt._translate_form(dlg_name, dialog)
     except RuntimeError as e:
         msg = "{0}: {1}"
         msg_params = (type(e).__name__, e,)

@@ -838,6 +838,8 @@ class GwAdminButton:
 
         self._manage_utils()
 
+        tools_qt._add_translator(True)
+
         # Set Listeners
         self._set_signals()
 
@@ -978,7 +980,6 @@ class GwAdminButton:
         if username in (None, False):
             self.username = self._get_user_connection(last_connection)
 
-        self.dlg_readsql.btn_info.setText('Update Project Schema')
         self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
 
         # Populate again combo because user could have created one after initialization

@@ -59,8 +59,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>606</width>
-             <height>816</height>
+             <width>598</width>
+             <height>799</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_11">
@@ -163,7 +163,7 @@
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="text">
-                  <string/>
+                  <string>Update Project Schema</string>
                  </property>
                  <property name="iconSize">
                   <size>
@@ -333,8 +333,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>606</width>
-             <height>816</height>
+             <width>598</width>
+             <height>799</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
@@ -670,8 +670,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>606</width>
-             <height>816</height>
+             <width>598</width>
+             <height>799</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">
