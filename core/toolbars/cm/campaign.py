@@ -162,6 +162,14 @@ class Campaign:
             return
         self.dialog = dialog_class(self)
 
+        # Pre-calculate saved values before any widgets are manipulated
+        saved_dependent_values = {}
+        for field in form_fields:
+            if field.get("columnname") in ["expl_id", "sector_id"]:
+                value = field.get("selectedId", field.get("value"))
+                if value is not None:
+                    saved_dependent_values[field["columnname"]] = value
+
         # When open from campaign manager
         if campaign_id:
             widget = self.get_widget_by_columnname(self.dialog, "campaign_id")
@@ -183,6 +191,10 @@ class Campaign:
             widget = self.create_widget_from_field(field, response)
             if not widget:
                 continue
+            
+            # Block signals on the controlling widget to prevent premature updates
+            if field.get("columnname") == "organization_id":
+                widget.blockSignals(True)
 
             # Prioritize selectedId for combos, otherwise use value
             if isinstance(widget, QComboBox) and "selectedId" in field:
@@ -199,25 +211,15 @@ class Campaign:
             label = QLabel(field["label"]) if field.get("label") else None
             tools_gw.add_widget(self.dialog, field, label, widget)
 
-        # Manually populate dependent combos on initial load
-        saved_dependent_values = {}
-        for field in form_fields:
-            col_name = field.get("columnname")
-            if col_name in ["expl_id", "sector_id"]:
-                value = field.get("selectedId")
-                if value is not None:
-                    try:
-                        saved_dependent_values[col_name] = int(value)
-                    except (ValueError, TypeError):
-                        pass # Ignore non-integer values
-        
+        # Manually trigger the update now that all widgets are created, then unblock signals
         organization_widget = self.get_widget_by_columnname(self.dialog, "organization_id")
         if organization_widget:
             update_expl_sector_combos(
                 dialog=self.dialog, 
-                widget=organization_widget,
+                widget=organization_widget, 
                 saved_values=saved_dependent_values
             )
+            organization_widget.blockSignals(False)
 
         if campaign_id:
             self._load_campaign_relations(campaign_id)
@@ -955,15 +957,11 @@ def update_expl_sector_combos(**kwargs):
     Update exploitation and sector combos based on organization.
     This function is designed to be called from a widgetfunction.
     """
-
     dialog = kwargs.get('dialog')
     parent_widget = kwargs.get('widget')
     saved_values = kwargs.get('saved_values', {})
 
     try:
-        if not dialog or not parent_widget:
-            return
-
         # Find child widgets by their object name
         expl_widget = dialog.findChild(QComboBox, 'tab_data_expl_id')
         sector_widget = dialog.findChild(QComboBox, 'tab_data_sector_id')
@@ -991,41 +989,44 @@ def update_expl_sector_combos(**kwargs):
         
         # --- Update exploitation combo ---
         if expl_widget:
-            sql_expl = f"SELECT expl_id AS id, name AS idval FROM {schema}.exploitation"
+            sql_expl = f"SELECT expl_id, name FROM {schema}.exploitation"
             if expl_ids is not None:
                 if expl_ids:
-                    sql_expl += f" WHERE expl_id IN ({','.join(map(str, expl_ids))})"
+                    sql_expl += f" WHERE expl_id = ANY(ARRAY{expl_ids})"
                 else: 
-                    sql_expl += " WHERE 1=0" # No results
+                    sql_expl += " WHERE 1=0"
             sql_expl += " ORDER BY name"
             
             rows_expl = tools_db.get_rows(sql_expl)
-            tools_qt.fill_combo_values(expl_widget, rows_expl, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(expl_widget, rows_expl, add_empty=True)
 
+            # Manually set the value from saved_values after populating
             saved_expl_id = saved_values.get('expl_id')
             if saved_expl_id is not None:
-                index = expl_widget.findData(saved_expl_id)
-                if index > -1:
-                    expl_widget.setCurrentIndex(index)
+                # Create a temporary Campaign object to access the robust set_widget_value
+                temp_campaign_instance = Campaign(None, None, None, None, None)
+                temp_campaign_instance.set_widget_value(expl_widget, saved_expl_id)
+
 
         # --- Update sector combo ---
         if sector_widget:
-            sql_sector = f"SELECT sector_id AS id, name AS idval FROM {schema}.sector"
+            sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
             if sector_ids is not None:
                 if sector_ids:
-                    sql_sector += f" WHERE sector_id IN ({','.join(map(str, sector_ids))})"
+                    sql_sector += f" WHERE sector_id = ANY(ARRAY{sector_ids})"
                 else: 
-                    sql_sector += " WHERE 1=0" # No results
+                    sql_sector += " WHERE 1=0"
             sql_sector += " ORDER BY name"
 
             rows_sector = tools_db.get_rows(sql_sector)
-            tools_qt.fill_combo_values(sector_widget, rows_sector, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)
 
+            # Manually set the value from saved_values after populating
             saved_sector_id = saved_values.get('sector_id')
             if saved_sector_id is not None:
-                index = sector_widget.findData(saved_sector_id)
-                if index > -1:
-                    sector_widget.setCurrentIndex(index)
+                temp_campaign_instance = Campaign(None, None, None, None, None)
+                temp_campaign_instance.set_widget_value(sector_widget, saved_sector_id)
+
 
     except Exception as e:
         tools_qgis.show_warning(f"CRITICAL ERROR in update_expl_sector_combos: {e}", dialog=dialog)
