@@ -1500,7 +1500,7 @@ class GwSchemaI18NManager:
         query = f"SELECT language from {self.schema_org}.sys_version"
         self.cursor_org.execute(query)
         language_org = self.cursor_org.fetchone()[0]
-        if language_org != 'en_US':
+        if language_org not in ('en_US', 'no_TR'):
             return False
         return True
     

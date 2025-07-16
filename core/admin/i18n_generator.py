@@ -97,15 +97,16 @@ class GwI18NGenerator:
         self.lower_lang = self.language.lower()
         self.schema_i18n = "i18n"
 
-        py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
-        if py_msg:
-            status_py_msg = self._create_py_files()
-            if status_py_msg is True:
-                msg += f'''{tools_qt.tr('Python translation successful')}\n'''
-            elif status_py_msg is False:
-                msg += f'''{tools_qt.tr('Python translation failed')}\n'''
-            elif status_py_msg is None:
-                msg += f'''{tools_qt.tr('Python translation canceled')}\n'''
+        if self.language != 'no_TR':        
+            py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
+            if py_msg:
+                status_py_msg = self._create_py_files()
+                if status_py_msg is True:
+                    msg += f'''{tools_qt.tr('Python translation successful')}\n'''
+                elif status_py_msg is False:
+                    msg += f'''{tools_qt.tr('Python translation failed')}\n'''
+                elif status_py_msg is None:
+                    msg += f'''{tools_qt.tr('Python translation canceled')}\n'''
 
         self._create_path_dic()
         for type_db_file in self.path_dic:
@@ -334,6 +335,13 @@ class GwI18NGenerator:
         # Get All table values
         self._write_header(cfg_path + file_name, file_type)
         dbtables = self.path_dic[file_type]["tables"]
+        if self.language == 'no_TR':
+            if file_type not in ['i18n_ws', 'i18n_ud']:
+                print(f"file_type: {file_type}")
+                return True, f"{file_type}, not translated"
+            dbtables = ['dbconfig_form_fields', 'dbconfig_param_system', 'dbconfig_typevalue', 
+                              'dbconfig_form_tableview', 'dbconfig_form_fields_feat']
+            self.lower_lang = 'en_us'
         for dbtable in dbtables:
             dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
             if not dbtable_rows:
@@ -453,7 +461,11 @@ class GwI18NGenerator:
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY context;")
         except Exception as e:
-            print(e)
+            msg = "Error getting table values: {0}"
+            msg_params = (e,)
+            tools_log.log_error(msg, msg_params=msg_params)
+            return False, colums
+
         rows = self._get_rows(sql, self.cursor_i18n)
 
         # Return the corresponding information
@@ -632,7 +644,9 @@ class GwI18NGenerator:
             elif context == "config_form_fields":
                 column = "widgetcontrols"
             else:
-                print(f"Unknown context: {context}, skipping.")
+                msg = "Unknown context: {0}, skipping."
+                msg_params = (context,)
+                tools_log.log_error(msg, msg_params=msg_params)
                 continue
 
             # Parse JSON safely
@@ -640,14 +654,18 @@ class GwI18NGenerator:
                 try:
                     json_data = ast.literal_eval(original_text)
                 except (ValueError, SyntaxError):
-                    print(f"Error parsing JSON from text: {original_text}")
+                    msg = "Error parsing JSON from text: {0}"
+                    msg_params = (original_text,)
+                    tools_log.log_error(msg, msg_params=msg_params)
                     continue
             else:
                 modified = original_text.replace("'", "\"").replace("False", "false").replace("True", "true").replace("None", "null")
                 try:
                     json_data = json.loads(modified)
                 except json.JSONDecodeError as e:
-                    print(f"Error decoding JSON: {e}")
+                    msg = "Error decoding JSON: {0}"
+                    msg_params = (e,)
+                    tools_log.log_error(msg, msg_params=msg_params)
                     continue
 
             # Translate fields
@@ -680,7 +698,8 @@ class GwI18NGenerator:
                             if isinstance(item, dict) and key_hint in item and item[key_hint] == default_text:
                                 item[key_hint] = translated
                     else:
-                        print("Unexpected json_data structure!")
+                        msg = "Unexpected json_data structure!"
+                        tools_log.log_error(msg)
 
             # Encode new JSON safely
             new_text = json.dumps(json_data, ensure_ascii=False).replace("'", "''")
@@ -735,7 +754,7 @@ class GwI18NGenerator:
         elif file_type == "am":
             header += 'SET search_path = am, public;\n'
         elif file_type == "cm":
-            header += 'SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
+            header += 'SET search_path = cm, public, public;\n'
 
         file.write(header)
         file.close()
@@ -884,7 +903,7 @@ class GwI18NGenerator:
                     "dbconfig_form_fields_json"]
             },
             "am": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}am{os.sep}i18n{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}am{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["am"],
                 "checkbox": self.dlg_qm.chk_am_files,

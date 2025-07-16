@@ -70,7 +70,6 @@ class GwAdminButton:
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
-        self.enable_translation_files = True
         self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir)
                                             .replace('.', ''))
         self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '14.99', lib_vars.plugin_dir)
@@ -150,19 +149,12 @@ class GwAdminButton:
         self.project_epsg = project_srid
         self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
         self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
-        self.enable_translation_files = True
 
         # If the locale is no_TR, act as if it was en_US, but disable translation files
         self.locale = project_locale
         if self.locale == 'no_TR':
             self.project_epsg = '25831'
             project_srid = '25831'
-            self.locale = 'en_US'
-            project_locale = 'en_US'
-            self.folder_locale = os.path.join(self.sql_dir, 'i18n', project_locale)
-            tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', '25831')
-            tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
-            self.enable_translation_files = False
 
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
@@ -191,7 +183,7 @@ class GwAdminButton:
         tools_log.log_info(msg, msg_params=msg_params)      
 
         if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
-            if self.locale != 'en_US' or str(self.project_epsg) != '25831':
+            if self.locale not in ('en_US', 'no_TR') or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
                 title = "Info Message"
@@ -608,14 +600,12 @@ class GwAdminButton:
         folder_locale = os.path.join(self.sql_dir, 'i18n', lang)
 
         if self._process_folder(folder_locale) is False:
-            self.load_locale('en_US')
+            if lang != 'no_TR':
+                self.load_locale('en_US')
         else:
-            if self.enable_translation_files is False:
-                return True
-            else:
-                status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
-                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                    return False
+            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
+            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
+                return False
 
         return True
 
