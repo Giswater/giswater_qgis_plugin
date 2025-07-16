@@ -828,6 +828,8 @@ class GwAdminButton:
 
         self._manage_utils()
 
+        # Force reload to locale when opening admin dialog
+        lib_vars.schema_name = None 
         tools_qt._add_translator(True)
 
         # Set Listeners
