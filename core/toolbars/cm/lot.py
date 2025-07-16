@@ -445,15 +445,27 @@ class AddNewLot:
         elif isinstance(widget, QCheckBox):
             widget.setChecked(str(value).lower() in ["true", "1"])
         elif isinstance(widget, QComboBox):
-            # Find by data (ID)
-            index = widget.findData(value)
-            if index > -1:
-                widget.setCurrentIndex(index)
-            else:
-                # Fallback to text if data not found
-                index = widget.findText(str(value))
-                if index > -1:
-                    widget.setCurrentIndex(index)
+            target_id_to_find = None
+            try:
+                # Ensure we are searching for an integer ID
+                target_id_to_find = int(value)
+            except (ValueError, TypeError):
+                pass  # If it's not a number, we can't match it to the list's ID
+
+            if target_id_to_find is not None:
+                for i in range(widget.count()):
+                    item_data = widget.itemData(i)
+                    # Handle cases where itemData is a list like [2, 'expl_02']
+                    if isinstance(item_data, (list, tuple)) and item_data:
+                        if item_data[0] == target_id_to_find:
+                            widget.setCurrentIndex(i)
+                            return  # Exit after finding the correct item
+
+            # If we couldn't find it by data, fall back to a simple text search as a last resort.
+            # This handles cases where the data might not be a list.
+            fallback_index = widget.findText(str(value))
+            if fallback_index > -1:
+                widget.setCurrentIndex(fallback_index)
 
     def _check_enable_tab_relations(self):
         name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")

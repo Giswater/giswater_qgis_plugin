@@ -199,6 +199,26 @@ class Campaign:
             label = QLabel(field["label"]) if field.get("label") else None
             tools_gw.add_widget(self.dialog, field, label, widget)
 
+        # Manually populate dependent combos on initial load
+        saved_dependent_values = {}
+        for field in form_fields:
+            col_name = field.get("columnname")
+            if col_name in ["expl_id", "sector_id"]:
+                value = field.get("selectedId")
+                if value is not None:
+                    try:
+                        saved_dependent_values[col_name] = int(value)
+                    except (ValueError, TypeError):
+                        pass # Ignore non-integer values
+        
+        organization_widget = self.get_widget_by_columnname(self.dialog, "organization_id")
+        if organization_widget:
+            update_expl_sector_combos(
+                dialog=self.dialog, 
+                widget=organization_widget,
+                saved_values=saved_dependent_values
+            )
+
         if campaign_id:
             self._load_campaign_relations(campaign_id)
 
@@ -360,9 +380,32 @@ class Campaign:
         elif isinstance(widget, QCheckBox):
             widget.setChecked(str(value).lower() in ["true", "1"])
         elif isinstance(widget, QComboBox):
-            index = widget.findData(str(value))
-            if index >= 0:
-                widget.setCurrentIndex(index)
+            target_id_to_find = None
+            try:
+                # Ensure we are searching for an integer or string ID
+                target_id_to_find = value
+            except (ValueError, TypeError):
+                pass  # If it's not a number, we can't match it to the list's ID
+
+            if target_id_to_find is not None:
+                for i in range(widget.count()):
+                    item_data = widget.itemData(i)
+                    # Handle cases where itemData is a list like [2, 'expl_02']
+                    if isinstance(item_data, (list, tuple)) and item_data:
+                        # Compare as strings for safety
+                        if str(item_data[0]) == str(target_id_to_find):
+                            widget.setCurrentIndex(i)
+                            return  # Exit after finding the correct item
+                    # Also handle simple data types
+                    elif str(item_data) == str(target_id_to_find):
+                        widget.setCurrentIndex(i)
+                        return
+
+            # If we couldn't find it by data, fall back to a simple text search as a last resort.
+            # This handles cases where the data might not be a list.
+            fallback_index = widget.findText(str(value))
+            if fallback_index > -1:
+                widget.setCurrentIndex(fallback_index)
 
     def _on_tab_change(self, index):
         # Get the tab object at the changed index
@@ -915,6 +958,7 @@ def update_expl_sector_combos(**kwargs):
 
     dialog = kwargs.get('dialog')
     parent_widget = kwargs.get('widget')
+    saved_values = kwargs.get('saved_values', {})
 
     try:
         if not dialog or not parent_widget:
@@ -947,36 +991,41 @@ def update_expl_sector_combos(**kwargs):
         
         # --- Update exploitation combo ---
         if expl_widget:
-            sql_expl = f"SELECT expl_id, name FROM {schema}.exploitation"
-            # If expl_ids is a list (even an empty one), we apply a filter.
-            # If it's None, we don't, which results in loading all.
+            sql_expl = f"SELECT expl_id AS id, name AS idval FROM {schema}.exploitation"
             if expl_ids is not None:
                 if expl_ids:
-                    expl_ids_str = ','.join(map(str, expl_ids))
-                    sql_expl += f" WHERE expl_id IN ({expl_ids_str})"
+                    sql_expl += f" WHERE expl_id IN ({','.join(map(str, expl_ids))})"
                 else: 
-                    # List is empty, so select nothing
-                    sql_expl += " WHERE 1=0"
+                    sql_expl += " WHERE 1=0" # No results
             sql_expl += " ORDER BY name"
             
             rows_expl = tools_db.get_rows(sql_expl)
-            tools_qt.fill_combo_values(expl_widget, rows_expl, add_empty=True)
+            tools_qt.fill_combo_values(expl_widget, rows_expl, index_to_show=1, add_empty=True)
+
+            saved_expl_id = saved_values.get('expl_id')
+            if saved_expl_id is not None:
+                index = expl_widget.findData(saved_expl_id)
+                if index > -1:
+                    expl_widget.setCurrentIndex(index)
 
         # --- Update sector combo ---
         if sector_widget:
-            sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
-            # If sector_ids is a list, apply a filter. Otherwise, load all.
+            sql_sector = f"SELECT sector_id AS id, name AS idval FROM {schema}.sector"
             if sector_ids is not None:
                 if sector_ids:
-                    sector_ids_str = ','.join(map(str, sector_ids))
-                    sql_sector += f" WHERE sector_id IN ({sector_ids_str})"
+                    sql_sector += f" WHERE sector_id IN ({','.join(map(str, sector_ids))})"
                 else: 
-                    # List is empty, so select nothing
-                    sql_sector += " WHERE 1=0"
+                    sql_sector += " WHERE 1=0" # No results
             sql_sector += " ORDER BY name"
 
             rows_sector = tools_db.get_rows(sql_sector)
-            tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)
+            tools_qt.fill_combo_values(sector_widget, rows_sector, index_to_show=1, add_empty=True)
+
+            saved_sector_id = saved_values.get('sector_id')
+            if saved_sector_id is not None:
+                index = sector_widget.findData(saved_sector_id)
+                if index > -1:
+                    sector_widget.setCurrentIndex(index)
 
     except Exception as e:
         tools_qgis.show_warning(f"CRITICAL ERROR in update_expl_sector_combos: {e}", dialog=dialog)
