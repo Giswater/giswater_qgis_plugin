@@ -984,3 +984,25 @@ UPDATE config_form_fields SET layoutname='lyt_general_5', layoutorder=2, "dataty
 -- 02/07/2025
 UPDATE config_form_fields SET stylesheet='{"label":"color:green; font-weight:bold;"}'::json WHERE columnname='expl_id';
 UPDATE config_form_fields SET stylesheet='{"label":"color:blue; font-weight:bold;"}'::json WHERE columnname='sector_id';
+
+-- 16/07/2025
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_overflow_storage' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_chamber' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_change' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_highpoint' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_jump' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_junction' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_netelement' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_netgully' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_netinit' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_outfall' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_pump_station' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_rect_manhole' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_register' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_sandbox' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_sewer_storage' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_valve' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_virtual_node' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_weir' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_wwtp' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_circ_manhole' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
