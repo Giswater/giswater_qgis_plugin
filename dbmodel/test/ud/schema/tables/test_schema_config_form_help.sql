@@ -22,7 +22,7 @@ SELECT has_table('config_form_help'::name, 'Table config_form_help should exist'
 SELECT columns_are(
     'config_form_help',
     ARRAY[
-      'fortype', 'formname', 'tabname', 'path'
+      'formtype', 'formname', 'tabname', 'path'
     ],
     'Table config_form_help should have the correct columns'
 );
@@ -43,9 +43,7 @@ SELECT col_has_default('config_form_help', 'formtype', 'Column formtype should h
 
 
 -- check indexes
-SELECT has_index('config_form_help', 'formname', 'Table config_form_help should have index on formname');
-SELECT has_index('config_form_help', 'formtype', 'Table config_form_help should have index on formtype');
-SELECT has_index('config_form_help', 'tabname', 'Table config_form_help should have index on tabname');
+SELECT has_index('config_form_help', 'config_form_help_pkey', ARRAY['formtype', 'formname', 'tabname'], 'Table config_form_help should have index on formtype, formname and tabname');
 
 
 --check trigger 

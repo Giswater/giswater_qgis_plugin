@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('config_param_system', 'parameter', 'Column parameter should be primary key'); 
 
 -- Check check columns
-SELECT col_has_check('config_param_system', 'widgettype', 'Table should have check on widgettype');
+SELECT col_has_check('config_param_system', ARRAY['widgettype', 'dv_querytext'], 'Table should have check on widgettype and dv_querytext');
 
 -- Check column types
 SELECT col_type_is('config_param_system', 'parameter', 'varchar(50)', 'Column parameter should be varchar(50)');
@@ -57,7 +57,7 @@ SELECT col_type_is('config_param_system', 'standardvalue', 'text', 'Column stand
 SELECT col_type_is('config_param_system', 'layoutname', 'text', 'Column layoutname should be text');
 
 -- Check indexes
-SELECT has_index('config_param_system', 'parameter', 'Table should have index on parameter');
+SELECT has_index('config_param_system', 'config_param_system_pkey', ARRAY['parameter'], 'Table should have index on parameter');
 
 -- Finish
 SELECT * FROM finish();

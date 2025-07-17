@@ -44,7 +44,7 @@ SELECT col_type_is('config_function', 'actions', 'json', 'Column actions should 
 
 
 -- check indexes
-SELECT has_index('config_function', 'id', 'Table config_function should have index on id');
+SELECT has_index('config_function', 'config_function_pkey', ARRAY['id'], 'Table config_function should have index on id');
 
 
 

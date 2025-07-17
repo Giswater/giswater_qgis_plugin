@@ -54,7 +54,7 @@ SELECT fk_ok('cat_soil', 'm3excess_cost', 'plan_price', 'id','Table should have 
 SELECT fk_ok('cat_soil', 'm3fill_cost', 'plan_price', 'id','Table should have foreign key from m3fill_cost to plan_price.id');
 
 -- Check indexes
-SELECT has_index('cat_soil', 'id', 'Table should have index on id');
+SELECT has_index('cat_soil', 'cat_soil_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

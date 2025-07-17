@@ -45,7 +45,7 @@ SELECT col_has_default('cat_work', 'active', 'Column active should have default 
 
 
 -- check indexes
-SELECT has_index('cat_work', 'id', 'Table cat_work should have index on id');
+SELECT has_index('cat_work', 'cat_work_pkey', ARRAY['id'], 'Table cat_work should have index on id');
 
 --check trigger 
 

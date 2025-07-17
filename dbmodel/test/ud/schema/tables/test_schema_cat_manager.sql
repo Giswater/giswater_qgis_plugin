@@ -31,8 +31,8 @@ SELECT col_is_pk('cat_manager', 'id', 'Column id should be primary key');
 -- Check column types
 SELECT col_type_is('cat_manager', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('cat_manager', 'idval', 'text', 'Column idval should be text');
-SELECT col_type_is('cat_manager', 'expl_id', 'int4', 'Column expl_id should be int4');
-SELECT col_type_is('cat_manager', 'rolename', 'text', 'Column rolename should be text');
+SELECT col_type_is('cat_manager', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
+SELECT col_type_is('cat_manager', 'rolename', 'text[]', 'Column rolename should be text[]');
 SELECT col_type_is('cat_manager', 'active', 'bool', 'Column active should be bool');
 
 
@@ -40,7 +40,7 @@ SELECT col_type_is('cat_manager', 'active', 'bool', 'Column active should be boo
 SELECT col_has_default('cat_manager', 'active', 'Column active should have default value');
 
 -- Check indexes
-SELECT has_index('cat_manager', 'id', 'Table should have index on id');
+SELECT has_index('cat_manager', 'cat_manager_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

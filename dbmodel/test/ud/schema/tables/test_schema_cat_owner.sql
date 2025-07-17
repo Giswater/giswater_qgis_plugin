@@ -38,7 +38,7 @@ SELECT col_type_is('cat_owner', 'active', 'bool', 'Column active should be bool'
 SELECT col_has_default('cat_owner', 'active', 'Column active should have default value');
 
 -- Check indexes
-SELECT has_index('cat_owner', 'id', 'Table should have index on id');
+SELECT has_index('cat_owner', 'cat_owner_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

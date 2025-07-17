@@ -45,13 +45,7 @@ SELECT col_has_default('config_fprocess', 'active', 'Column active should have d
 
 
 -- check indexes
-SELECT has_index('config_fprocess', 'fid', 'Table config_fprocess should have index on fid');
-SELECT has_index('config_fprocess', 'tablename', 'Table config_fprocess should have index on tablename');
-SELECT has_index('config_fprocess', 'target', 'Table config_fprocess should have index on target');
-
-
-
-
+SELECT has_index('config_fprocess', 'config_fprocess_pkey', ARRAY['fid', 'tablename', 'target'], 'Table config_fprocess should have index on fid, tablename and target');
 
 --check trigger 
 

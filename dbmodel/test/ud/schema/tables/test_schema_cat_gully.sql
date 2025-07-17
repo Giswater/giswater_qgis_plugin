@@ -60,7 +60,7 @@ SELECT fk_ok('cat_gully', 'gully_type', 'cat_feature_gully', 'id','Table should 
 SELECT fk_ok('cat_gully', 'model_id', 'cat_brand_model', 'id','Table should have foreign key from model_id to cat_brand_model.id');
 
 -- Check indexes
-SELECT has_index('cat_gully', 'id', 'Table should have index on id');
+SELECT has_index('cat_gully', 'cat_gully_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('cat_gully', 'gw_trg_cat_material_fk_insert', 'Table should have trigger gw_trg_cat_material_fk_insert');

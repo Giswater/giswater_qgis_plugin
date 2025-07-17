@@ -24,7 +24,7 @@ SELECT columns_are(
         'arc_id', 'code', 'sys_code', 'node_1', 'nodetype_1', 'node_sys_top_elev_1', 'node_sys_elev_1', 'elev1',
         'custom_elev1', 'sys_elev1', 'y1', 'custom_y1', 'node_2', 'nodetype_2', 'node_sys_top_elev_2', 'node_sys_elev_2',
         'elev2', 'custom_elev2', 'sys_elev2', 'y2', 'custom_y2', 'feature_type', 'arc_type', 'matcat_id', 'arccat_id',
-        'epa_type', 'state', 'state_type', 'parent_id', 'expl_id', 'muni_id', 'sector_id', 'drainzone_id',
+        'epa_type', 'state', 'state_type', 'parent_id', 'expl_id', 'muni_id', 'sector_id', 'dma_id',
         'drainzone_outfall', 'dwfzone_id', 'dwfzone_outfall', 'omzone_id', 'omunit_id', 'minsector_id', 'pavcat_id',
         'soilcat_id', 'function_type', 'category_type', 'location_type', '_fluid_type', 'fluid_type', 'treatment_type',
         'custom_length', 'sys_slope', 'descript', 'annotation', 'observ', 'comment', 'link', 'num_value',
@@ -78,7 +78,7 @@ SELECT col_type_is('arc', 'parent_id', 'integer', 'Column parent_id should be in
 SELECT col_type_is('arc', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('arc', 'muni_id', 'integer', 'Column muni_id should be integer');
 SELECT col_type_is('arc', 'sector_id', 'integer', 'Column sector_id should be integer');
-SELECT col_type_is('arc', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
+SELECT col_type_is('arc', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('arc', 'drainzone_outfall', 'integer[]', 'Column drainzone_outfall should be integer[]');
 SELECT col_type_is('arc', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
 SELECT col_type_is('arc', 'dwfzone_outfall', 'integer[]', 'Column dwfzone_outfall should be integer[]');
@@ -154,7 +154,6 @@ SELECT col_has_default('arc', 'feature_type', 'Column feature_type should have d
 SELECT col_has_default('arc', 'expl_id', 'Column expl_id should have default value');
 SELECT col_has_default('arc', 'muni_id', 'Column muni_id should have default value');
 SELECT col_has_default('arc', 'sector_id', 'Column sector_id should have default value');
-SELECT col_has_default('arc', 'drainzone_id', 'Column drainzone_id should have default value');
 SELECT col_has_default('arc', 'dwfzone_id', 'Column dwfzone_id should have default value');
 SELECT col_has_default('arc', 'omzone_id', 'Column omzone_id should have default value');
 SELECT col_has_default('arc', 'omunit_id', 'Column omunit_id should have default value');
@@ -172,7 +171,7 @@ SELECT has_fk('arc', 'Table arc should have foreign keys');
 SELECT fk_ok('arc','arc_type','cat_feature_arc','id','Table should have foreign key from arc_type to cat_feature_arc.id');
 SELECT fk_ok('arc','arccat_id','cat_arc','id','Table should have foreign key from arccat_id to cat_arc.id');
 SELECT fk_ok('arc','district_id','ext_district','district_id','Table should have foreign key from district_id to ext_district.district_id');
-SELECT fk_ok('arc','drainzone_id','drainzone','drainzone_id','Table should have foreign key from drainzone_id to drainzone.drainzone_id');
+SELECT fk_ok('arc','dma_id','dma','dma_id','Table should have foreign key from dma_id to dma.dma_id');
 SELECT fk_ok('arc','dwfzone_id','dwfzone','dwfzone_id','Table should have foreign key from dwfzone_id to dwfzone.dwfzone_id');
 SELECT fk_ok('arc','expl_id','exploitation','expl_id','Table should have foreign key from expl_id to exploitation.expl_id');
 SELECT fk_ok('arc','feature_type','sys_feature_type','id','Table should have foreign key from feature_type to sys_feature_type.id');
@@ -194,19 +193,20 @@ SELECT fk_ok('arc','workcat_id','cat_work','id','Table should have foreign key f
 
 
 -- Check indexes
-SELECT has_index('arc', 'arccat_id', 'Table should have index on arccat_id');
-SELECT has_index('arc', 'asset_id', 'Table should have index on asset_id');
-SELECT has_index('arc', 'expl_visibility', 'Table should have index on expl_visibility');
-SELECT has_index('arc', 'expl_id', 'Table should have index on expl_id');
-SELECT has_index('arc', 'the_geom', 'Table should have index on the_geom');
-SELECT has_index('arc', 'muni_id', 'Table should have index on muni_id');
-SELECT has_index('arc', 'node_1', 'Table should have index on node_1');
-SELECT has_index('arc', 'node_2', 'Table should have index on node_2');
-SELECT has_index('arc', 'omzone_id', 'Table should have index on omzone_id');
-SELECT has_index('arc', 'sector_id', 'Table should have index on sector_id');
-SELECT has_index('arc', 'streetaxis_id', 'Table should have index on streetaxis_id');
-SELECT has_index('arc', 'streetaxis2_id', 'Table should have index on streetaxis2_id');
-SELECT has_index('arc', 'sys_code', 'Table should have index on sys_code');
+SELECT has_index('arc', 'arc_arccat', ARRAY['arccat_id'], 'Table should have index on arccat_id');
+SELECT has_index('arc', 'arc_pkey', ARRAY['arc_id'], 'Table should have index on arc_id');
+SELECT has_index('arc', 'arc_asset_id_idx', ARRAY['asset_id'], 'Table should have index on asset_id');
+SELECT has_index('arc', 'arc_expl_visibility_idx', ARRAY['expl_visibility'], 'Table should have index on expl_visibility');
+SELECT has_index('arc', 'arc_exploitation', ARRAY['expl_id'], 'Table should have index on expl_id');
+SELECT has_index('arc', 'arc_index', ARRAY['the_geom'], 'Table should have index on the_geom');
+SELECT has_index('arc', 'arc_muni', ARRAY['muni_id'], 'Table should have index on muni_id');
+SELECT has_index('arc', 'arc_node1', ARRAY['node_1'], 'Table should have index on node_1');
+SELECT has_index('arc', 'arc_node2', ARRAY['node_2'], 'Table should have index on node_2');
+SELECT has_index('arc', 'arc_omzone', ARRAY['omzone_id'], 'Table should have index on omzone_id');
+SELECT has_index('arc', 'arc_sector', ARRAY['sector_id'], 'Table should have index on sector_id');
+SELECT has_index('arc', 'arc_street1', ARRAY['streetaxis_id'], 'Table should have index on streetaxis_id');
+SELECT has_index('arc', 'arc_street2', ARRAY['streetaxis2_id'], 'Table should have index on streetaxis2_id');
+SELECT has_index('arc', 'arc_sys_code_idx', ARRAY['sys_code'], 'Table should have index on sys_code');
 
 -- Check triggers
 SELECT has_trigger('arc','gw_trg_cat_material_fk_insert','Table should have trigger gw_trg_cat_material_fk_insert');

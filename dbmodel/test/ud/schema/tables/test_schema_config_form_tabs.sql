@@ -46,8 +46,7 @@ SELECT col_type_is('config_form_tabs', 'device', '_int4', 'Column device should 
 
 
 -- check indexes
-SELECT has_index('config_form_tabs', 'formname', 'Table config_form_tabs should have index on formname');
-SELECT has_index('config_form_tabs', 'tabname', 'Table config_form_tabs should have index on tabname');
+SELECT has_index('config_form_tabs', 'config_form_tabs_pkey', ARRAY['formname', 'tabname'], 'Table config_form_tabs should have index on formname and tabname');
 
 
 

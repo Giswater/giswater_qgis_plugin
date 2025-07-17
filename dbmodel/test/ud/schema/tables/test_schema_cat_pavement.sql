@@ -37,7 +37,8 @@ SELECT col_type_is('cat_pavement', 'm2_cost', 'varchar(16)', 'Column m2_cost sho
 SELECT col_type_is('cat_pavement', 'active', 'bool', 'Column active should be bool');
 
 -- Check default values
-SELECT col_has_default('cat_pavement', 'id', 'Column id should have default value');
+SELECT col_has_default('cat_pavement', 'thickness', 'Column thickness should have default value');
+SELECT col_has_default('cat_pavement', 'active', 'Column active should have default value');
 
 -- Check foreign keys
 SELECT has_fk('cat_pavement', 'Table cat_pavement should have foreign keys');
@@ -45,7 +46,7 @@ SELECT has_fk('cat_pavement', 'Table cat_pavement should have foreign keys');
 SELECT fk_ok('cat_pavement', 'm2_cost', 'plan_price', 'id', 'Table should have foreign key from m2_cost to plan_price.id');
 
 -- Check indexes
-SELECT has_index('cat_pavement', 'id', 'Table should have index on id');
+SELECT has_index('cat_pavement', 'cat_pavement_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

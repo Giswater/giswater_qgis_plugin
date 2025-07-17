@@ -27,7 +27,7 @@ SELECT columns_are(
     'Table cat_hydrology should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('cat_hydrology', 'hydrology_id', 'serial4', 'Column hydrology_id should be serial4');
+SELECT col_type_is('cat_hydrology', 'hydrology_id', 'int4', 'Column hydrology_id should be int4');
 SELECT col_type_is('cat_hydrology', 'name', 'varchar(30)', 'Column name should be varchar(30)');
 SELECT col_type_is('cat_hydrology', 'infiltration', 'varchar(20)', 'Column infiltration should be varchar(20)');
 SELECT col_type_is('cat_hydrology', 'text', 'varchar(255)', 'Column text should be varchar(255)');
@@ -47,8 +47,8 @@ SELECT has_fk('cat_hydrology', 'Table cat_hydrology should have foreign keys');
 SELECT fk_ok('cat_hydrology','expl_id','exploitation','expl_id','Table should have foreign key from expl_id to exploitation.expl_id');
 
 -- check ind
-SELECT has_index('cat_hydrology', 'hydrology_id', 'Table cat_hydrology should have index on hydrology_id');
-SELECT has_index('cat_hydrology', 'name', 'Table cat_hydrology should have index on name');
+SELECT has_index('cat_hydrology', 'cat_hydrology_pkey', ARRAY['hydrology_id'], 'Table cat_hydrology should have index on hydrology_id');
+SELECT has_index('cat_hydrology', 'cat_hydrology_unique_name', ARRAY['name'], 'Table cat_hydrology should have index on name');
 
 
 --check trigger 

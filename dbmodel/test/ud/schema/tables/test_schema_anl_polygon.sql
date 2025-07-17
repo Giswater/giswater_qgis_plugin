@@ -49,9 +49,9 @@ SELECT col_has_default('anl_polygon', 'cur_user', 'Column cur_user should have d
 
 
 -- check index
-SELECT has_index('anl_polygon', 'the_geom', 'Table anl_polygon should have index on the_geom');
-SELECT has_index('anl_polygon', 'id', 'Table anl_polygon should have index on id');
-SELECT has_index('anl_polygon', 'pol_id', 'Table anl_polygon should have index on pol_id');
+SELECT has_index('anl_polygon', 'anl_polygon_index', ARRAY['the_geom'], 'Table anl_polygon should have index on the_geom');
+SELECT has_index('anl_polygon', 'anl_polygon_pkey', ARRAY['id'], 'Table anl_polygon should have index on id');
+SELECT has_index('anl_polygon', 'anl_polygon_pol_id', ARRAY['pol_id'], 'Table anl_polygon should have index on pol_id');
 
 --check trigger 
 

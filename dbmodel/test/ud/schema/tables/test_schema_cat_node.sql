@@ -22,8 +22,8 @@ SELECT has_table('cat_node'::name, 'Table cat_node should exist');
 SELECT columns_are(
     'cat_node',
     ARRAY[
- 'id', 'node_type', 'matcat_id', 'shape', 'geom1', 'geom2', 'geom3', 'descript', 'link', 'brand_id', 'model_id', 'svg', 
- 'estimated_y', 'cost_unit', 'cost', 'active', 'label', 'acoeff'
+        'id', 'node_type', 'matcat_id', 'shape', 'geom1', 'geom2', 'geom3', 'descript', 'link', 'brand_id', 'model_id', 'svg', 
+        'estimated_y', 'cost_unit', 'cost', 'active', 'label', 'acoeff'
     ],
     'Table cat_node should have the correct columns'
 );
@@ -65,8 +65,8 @@ SELECT fk_ok('cat_node','node_type','cat_feature_node','id','Table should have f
 SELECT fk_ok('cat_node','shape','cat_node_shape','id','Table should have foreign key from shape to cat_node_shape.id');
 
 -- check ind
-SELECT has_index('cat_node', 'cost', 'Table cat_node should have index on cost');
-SELECT has_index('cat_node', 'id', 'Table cat_node should have index on id');
+SELECT has_index('cat_node', 'cat_node_pkey', ARRAY['id'], 'Table cat_node should have index on id');
+SELECT has_index('cat_node', 'cat_node_cost_idx', ARRAY['cost'], 'Table cat_node should have index on cost');
 
 
 --check trigger 

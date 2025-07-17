@@ -48,8 +48,7 @@ SELECT col_type_is('config_form_list', 'addparam', 'json', 'Column addparam shou
 
 
 -- check indexes
-SELECT has_index('config_form_tableview', 'columnname', 'Table config_form_tableview should have index on columnname');
-SELECT has_index('config_form_tableview', 'objectname', 'Table config_form_tableview should have index on objectname');
+SELECT has_index('config_form_tableview', 'config_form_tableview_pkey', ARRAY['objectname', 'columnname'], 'Table config_form_tableview should have index on objectname and columnname');
 
 
 

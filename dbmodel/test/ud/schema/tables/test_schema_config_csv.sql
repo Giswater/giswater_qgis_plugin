@@ -47,7 +47,7 @@ SELECT col_has_default('config_csv', 'active', 'Column active should have defaul
 
 
 -- check indexes
-SELECT has_index('config_csv', 'fid', 'Table config_csv should have index on fid');
+SELECT has_index('config_csv', 'config_csv_pkey', ARRAY['fid'], 'Table config_csv should have index on fid');
 
 
 

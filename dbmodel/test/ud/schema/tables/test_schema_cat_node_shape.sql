@@ -37,7 +37,7 @@ SELECT col_type_is('cat_node_shape', 'active', 'bool', 'Column active should be 
 SELECT col_has_default('cat_node_shape', 'active', 'Column active should have default value');
 
 -- Check indexes
-SELECT has_index('cat_node_shape', 'id', 'Table should have index on id');
+SELECT has_index('cat_node_shape', 'cat_node_shape_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

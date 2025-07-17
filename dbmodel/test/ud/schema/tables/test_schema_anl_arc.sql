@@ -74,9 +74,9 @@ SELECT fk_ok('anl_arc', 'dwfzone_id', 'dwfzone', 'dwfzone_id', 'Table anl_arc sh
 
 -- check index
 
-SELECT has_index('anl_arc', 'arc_id', 'Table anl_arc should have index on arc_id');
-SELECT has_index('anl_arc', 'the_geom', 'Table anl_arc should have index on the_geom');
-SELECT has_index('anl_arc', 'id', 'Table anl_arc should have index on id');
+SELECT has_index('anl_arc', 'anl_arc_arc_id', ARRAY['arc_id'], 'Table anl_arc should have index on arc_id');
+SELECT has_index('anl_arc', 'anl_arc_index', ARRAY['the_geom'], 'Table anl_arc should have index on the_geom');
+SELECT has_index('anl_arc', 'anl_arc_pkey', ARRAY['id'], 'Table anl_arc should have index on id');
 
 --check trigger 
 

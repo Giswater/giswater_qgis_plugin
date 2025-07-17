@@ -23,7 +23,7 @@ SELECT columns_are(
     'arc_add',
     ARRAY[
         'arc_id', 'result_id', 'max_flow','max_veloc','mfull_flow', 'mfull_depth','manning_veloc', 'manning_flow','dwf_minflow',
-         'dwf_maxflow', 'dwf_minvel', 'dwf_maxvel', 'conduit_capacity', 
+         'dwf_maxflow', 'dwf_minvel', 'dwf_maxvel', 'conduit_capacity'
     ],
     'Table arc_add should have the correct columns'
 );
@@ -55,7 +55,7 @@ SELECT fk_ok('arc_add', 'arc_id', 'arc', 'arc_id', 'Table should have foreign ke
 
 
 -- check index
-SELECT has_index('arc_add', 'arc_id', 'Table arc_add should have index on arc_id');
+SELECT has_index('arc_add', 'arc_add_pkey', 'arc_id', 'Table arc_add should have index on arc_id');
 
 
 --check trigger 

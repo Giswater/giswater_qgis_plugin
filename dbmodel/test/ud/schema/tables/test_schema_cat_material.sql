@@ -31,8 +31,8 @@ SELECT col_is_pk('cat_material', 'id', 'Column id should be primary key');
 -- Check column types
 SELECT col_type_is('cat_material', 'id', 'varchar(30)', 'Column id should be varchar(30)');
 SELECT col_type_is('cat_material', 'descript', 'varchar(512)', 'Column descript should be varchar(512)');
-SELECT col_type_is('cat_material', 'feature_type', 'text', 'Column feature_type should be text');
-SELECT col_type_is('cat_material', 'featurecat_id', 'text', 'Column featurecat_id should be text');
+SELECT col_type_is('cat_material', 'feature_type', 'text[]', 'Column feature_type should be text[]');
+SELECT col_type_is('cat_material', 'featurecat_id', 'text[]', 'Column featurecat_id should be text[]');
 SELECT col_type_is('cat_material', 'n', 'numeric(12, 4)', 'Column n should be numeric(12, 4)');
 SELECT col_type_is('cat_material', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('cat_material', 'active', 'bool', 'Column active should be bool');
@@ -41,7 +41,7 @@ SELECT col_type_is('cat_material', 'active', 'bool', 'Column active should be bo
 SELECT col_has_default('cat_material', 'active', 'Column active should have default value');
 
 -- Check indexes
-SELECT has_index('cat_material', 'id', 'Table should have index on id');
+SELECT has_index('cat_material', 'cat_material_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('cat_material', 'gw_trg_config_control', 'Table should have trigger gw_trg_config_control');

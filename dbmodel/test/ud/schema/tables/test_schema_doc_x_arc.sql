@@ -43,8 +43,7 @@ SELECT fk_ok('doc_x_arc','arc_id','arc','arc_id','Table should have foreign key 
 SELECT fk_ok('doc_x_arc', 'doc_id','doc','id', 'Table should have foreign key from doc_id to doc.id');
 
 -- check indexes
-SELECT has_index('doc_x_arc', 'doc_id', 'Table doc_x_arc should have index on doc_id');
-SELECT has_index('doc_x_arc', 'arc_id', 'Table doc_x_arc should have index on arc_id');
+SELECT has_index('doc_x_arc', 'doc_x_arc_pkey', ARRAY['doc_id','arc_id'], 'Table doc_x_arc should have index on doc_id, arc_id');
 
 
 

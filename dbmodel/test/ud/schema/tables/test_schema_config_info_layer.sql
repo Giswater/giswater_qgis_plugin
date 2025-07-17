@@ -39,7 +39,7 @@ SELECT col_type_is('config_info_layer', 'tableparentepa_id', 'text', 'Column tab
 SELECT col_type_is('config_info_layer', 'addparam', 'json', 'Column addparam should be json');
 
 -- Check indexes
-SELECT has_index('config_info_layer', 'layer_id', 'Table should have index on layer_id');
+SELECT has_index('config_info_layer', 'config_info_layer_pkey', ARRAY['layer_id'], 'Table should have index on layer_id');
 
 -- Check triggers
 SELECT has_trigger('config_info_layer', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');

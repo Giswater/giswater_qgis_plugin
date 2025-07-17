@@ -46,8 +46,7 @@ SELECT col_type_is('config_form_list', 'addparam', 'json', 'Column addparam shou
 
 
 -- check indexes
-SELECT has_index('config_form_list', 'listname', 'Table config_form_help should have index on listname');
-SELECT has_index('config_form_list', 'listname', 'Table config_form_help should have index on listname');
+SELECT has_index('config_form_list', 'config_form_list_pkey', ARRAY['listname', 'device'], 'Table config_form_list should have index on listname and device');
 
 
 

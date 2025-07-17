@@ -14,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT * FROM no_plan();
 
 -- Check table
-SELECT has_table('achived_psector_gully_traceability'::name, 'Table arc should exist');
+SELECT has_table('archived_psector_gully_traceability'::name, 'Table archived_psector_gully_traceability should exist');
 
 -- Check columns
 SELECT columns_are(
@@ -51,7 +51,7 @@ SELECT col_type_is('archived_psector_gully_traceability', 'psector_state', 'int2
 SELECT col_type_is('archived_psector_gully_traceability', 'doable', 'bool', 'Column doable should be bool');
 SELECT col_type_is('archived_psector_gully_traceability', 'psector_arc_id', 'varchar(16)', 'Column psector_arc_id should be varchar(16)');
 SELECT col_type_is('archived_psector_gully_traceability', 'link_id', 'integer', 'Column link_id should be integer');
-SELECT col_type_is('archived_psector_gully_traceability', 'link_the_geom', 'geometry', 'Column link_the_geom should be geometry');
+SELECT col_type_is('archived_psector_gully_traceability', 'link_the_geom', 'geometry(LineString,25831)', 'Column link_the_geom should be geometry(LineString,25831)');
 SELECT col_type_is('archived_psector_gully_traceability', 'audit_tstamp', 'timestamp', 'Column audit_tstamp should be timestamp');
 SELECT col_type_is('archived_psector_gully_traceability', 'audit_user', 'text', 'Column audit_user should be text');
 SELECT col_type_is('archived_psector_gully_traceability', 'action', 'varchar(16)', 'Column action should be varchar(16)');
@@ -141,7 +141,7 @@ SELECT col_type_is('archived_psector_gully_traceability', 'omunit_id', 'integer'
 SELECT col_type_is('archived_psector_gully_traceability', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('archived_psector_gully_traceability', 'length', 'numeric(12,3)', 'Column length should be numeric(12,3)');
 SELECT col_type_is('archived_psector_gully_traceability', 'width', 'numeric(12,3)', 'Column width should be numeric(12,3)');
-SELECT col_type_is('archived_psector_gully_traceability', 'expl_visibility', 'integer', 'Column expl_visibility should be integer');
+SELECT col_type_is('archived_psector_gully_traceability', 'expl_visibility', 'integer[]', 'Column expl_visibility should be integer[]');
 
 -- Check default values
 SELECT col_has_default('archived_psector_gully_traceability', 'id', 'Column id should have default value');
@@ -151,7 +151,7 @@ SELECT col_has_default('archived_psector_gully_traceability', 'audit_user', 'Col
 -- Check foreign keys
 
 -- Check indexes
-SELECT has_index('archived_psector_gully_traceability', 'id', 'Table should have index on id');
+SELECT has_index('archived_psector_gully_traceability', 'audit_psector_gully_traceability_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('archived_psector_gully_traceability', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');

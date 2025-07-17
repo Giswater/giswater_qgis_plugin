@@ -41,7 +41,7 @@ SELECT col_type_is('cat_feature_node', 'isarcdivide', 'bool', 'Column isarcdivid
 SELECT col_type_is('cat_feature_node', 'isprofilesurface', 'bool', 'Column isprofilesurface should be bool');
 SELECT col_type_is('cat_feature_node', 'isexitupperintro', 'int2', 'Column isexitupperintro should be int2');
 SELECT col_type_is('cat_feature_node', 'double_geom', 'json', 'Column double_geom should be json');
-SELECT col_type_is('cat_feature_node', 'graph_delimiter', 'text', 'Column graph_delimiter should be text');
+SELECT col_type_is('cat_feature_node', 'graph_delimiter', 'text[]', 'Column graph_delimiter should be text[]');
 
 
 -- Check default values
@@ -56,7 +56,7 @@ SELECT has_fk('cat_feature_node', 'Table cat_feature_node should have foreign ke
 SELECT fk_ok('cat_feature_node', 'id', 'cat_feature', 'id','Table should have foreign key from id to cat_feature.id');
 
 -- Check indexes
-SELECT has_index('cat_feature_node', 'id', 'Table should have index on id');
+SELECT has_index('cat_feature_node', 'cat_feature_node_pkey', ARRAY['id'], 'Table should have index on id');
 
 
 -- Finish

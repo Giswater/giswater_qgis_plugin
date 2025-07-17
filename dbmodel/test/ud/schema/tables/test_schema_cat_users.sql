@@ -45,7 +45,7 @@ SELECT has_fk('cat_users', 'Table cat_users should have foreign keys');
 SELECT fk_ok('cat_users', 'sys_role', 'sys_role', 'id', 'Table should have foreign key from sys_role to sys_role.id');
 
 -- Check indexes
-SELECT has_index('cat_users', 'id', 'Table should have index on id');
+SELECT has_index('cat_users', 'cat_users_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

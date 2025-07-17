@@ -25,12 +25,12 @@ SELECT columns_are(
         'id', 'psector_id', 'psector_state','doable','psector_arc_id','link_id', 'link_the_geom', 'audit_tstamp',
          'audit_user', 'action','connec_id', 'code', 'top_elev','y1','y2','connec_type', 'conneccat_id', 
          'sector_id','customer_code', 'private_conneccat_id', 'demand','state', 'state_type','connec_depth','connec_length', 'arc_id', 'annotation', 'observ',
-         '"comment"','dma_id', 'soilcat_id', 'function_type','category_type', 'fluid_type','location_type','workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
+         'comment','dma_id', 'soilcat_id', 'function_type','category_type', 'fluid_type','location_type','workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
          'ownercat_id','muni_id', 'postcode', 'streetaxis_id', 'postnumber','postcomplement','streetaxis2_id', 'postnumber2', 'postcomplement2', 'descript',
          'link','verified', 'rotation', 'the_geom', 'label_x','label_y','label_rotation', 'accessibility', 'publish', 'inventory',
           'uncertain','expl_id', 'num_value', 'feature_type', 'pjoint_type','pjoint_id','lastupdate', 'lastupdate_user', 'insert_user', 'matcat_id',
           'district_id','workcat_id_plan', 'asset_id', 'drainzone_id', 'adate','adescript','plot_code', 'placement_type', 'access_type', 'label_quadrant',
-          'n_hydrometer','minsector_id', 'streetname', 'streetname2', 'dwfzone_id','datasource','omunit_id', 'lock_level', 'expl_visibility', 'label_quadrant'
+          'n_hydrometer','minsector_id', 'streetname', 'streetname2', 'dwfzone_id','datasource','omunit_id', 'lock_level', 'expl_visibility', 'label_quadrant', 'diagonal', 'tstamp'
     ],
     'Table archived_psector_connec_traceability should have the correct columns'
 );
@@ -135,7 +135,7 @@ SELECT col_has_default('archived_psector_connec_traceability', 'audit_user', 'Co
 
 
 -- check index
-SELECT has_index('archived_psector_connec_traceability', 'id', 'Table archived_psector_connec_traceability should have index on id');
+SELECT has_index('archived_psector_connec_traceability', 'audit_psector_connec_traceability_pkey', ARRAY['id'], 'Table archived_psector_connec_traceability should have index on id');
 
 --check trigger 
 SELECT has_trigger('archived_psector_connec_traceability', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');

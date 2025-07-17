@@ -61,7 +61,7 @@ SELECT col_type_is('cat_link', 'label', 'varchar(255)', 'Column label should be 
 
 
 -- check foreign keys
-SELECT has_fk('cat_hydrology', 'Table cat_hydrology should have foreign keys');
+SELECT has_fk('cat_link', 'Table cat_hydrology should have foreign keys');
 
 SELECT fk_ok('cat_link','brand_id','cat_brand','id','Table should have foreign key from brand_id to cat_brand.id');
 SELECT fk_ok('cat_link','cost','plan_price','id','Table should have foreign key from cost to plan_price.id');
@@ -71,10 +71,10 @@ SELECT fk_ok('cat_link','m3protec_cost','plan_price','id','Table should have for
 SELECT fk_ok('cat_link','model_id','cat_brand_model','id','Table should have foreign key from model_id to cat_brand_model.id');
 
 -- check ind
-SELECT has_index('cat_link', 'cost', 'Table cat_link should have index on cost');
-SELECT has_index('cat_link', 'm2bottom_cost', 'Table cat_link should have index on m2bottom_cost');
-SELECT has_index('cat_link', 'm2protec_cost', 'Table cat_link should have index on m2protec_cost');
-SELECT has_index('cat_link', 'id', 'Table cat_link should have index on id');
+SELECT has_index('cat_link', 'cat_link_pkey', ARRAY['id'], 'Table cat_link should have index on id');
+SELECT has_index('cat_link', 'cat_link_cost_idx', ARRAY['cost'], 'Table cat_link should have index on cost');
+SELECT has_index('cat_link', 'cat_link_m2bottom_cost_idx', ARRAY['m2bottom_cost'], 'Table cat_link should have index on m2bottom_cost');
+SELECT has_index('cat_link', 'cat_link_m3protec_cost_idx', ARRAY['m3protec_cost'], 'Table cat_link should have index on m3protec_cost');
 
 --check trigger 
 

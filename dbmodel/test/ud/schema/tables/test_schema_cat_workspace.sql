@@ -27,7 +27,7 @@ SELECT columns_are(
     'Table cat_workspace should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('cat_workspace', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('cat_workspace', 'id', 'int4', 'Column id should be int4');
 SELECT col_type_is('cat_workspace', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('cat_workspace', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('cat_workspace', 'config', 'json', 'Column config should be json');
@@ -53,8 +53,8 @@ SELECT col_has_default('cat_workspace', 'lastupdate_timestamp', 'Column lastupda
 
 
 -- check indexes
-SELECT has_index('cat_workspace', 'id', 'Table cat_workspace should have index on id');
-SELECT has_index('cat_workspace', 'name', 'Table cat_workspace should have index on name');
+SELECT has_index('cat_workspace', 'cat_workspace_pkey', ARRAY['id'], 'Table cat_workspace should have index on id');
+SELECT has_index('cat_workspace', 'cat_workspace_unique_name', ARRAY['name'], 'Table cat_workspace should have index on name');
 
 
 --check trigger 
