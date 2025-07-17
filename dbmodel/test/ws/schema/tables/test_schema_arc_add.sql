@@ -25,7 +25,7 @@ SELECT columns_are(
         'tot_headloss_max', 'tot_headloss_min',
         'mincut_connecs', 'mincut_hydrometers',
         'mincut_length', 'mincut_watervol', 'mincut_criticality', 'hydraulic_criticality',
-        'pipe_capacity', 'mincut_impact', 'mincut_affectation'
+        'pipe_capacity', 'mincut_impact_topo', 'mincut_impact_hydro'
     ],
     'Table arc_add should have the correct columns'
 );
@@ -51,8 +51,8 @@ SELECT col_type_is('arc_add', 'mincut_watervol', 'numeric(12,3)', 'Column mincut
 SELECT col_type_is('arc_add', 'mincut_criticality', 'numeric(12,3)', 'Column mincut_criticality should be numeric(12,3)');
 SELECT col_type_is('arc_add', 'hydraulic_criticality', 'numeric(12,3)', 'Column hydraulic_criticality should be numeric(12,3)');
 SELECT col_type_is('arc_add', 'pipe_capacity', 'float', 'Column pipe_capacity should be float');
-SELECT col_type_is('arc_add', 'mincut_impact', 'json', 'Column mincut_impact should be json');
-SELECT col_type_is('arc_add', 'mincut_affectation', 'json', 'Column mincut_affectation should be json');
+SELECT col_type_is('arc_add', 'mincut_impact_topo', 'json', 'Column mincut_impact_topo should be json');
+SELECT col_type_is('arc_add', 'mincut_impact_hydro', 'json', 'Column mincut_impact_hydro should be json');
 
 -- Check foreign keys
 SELECT has_fk('arc_add', 'Table arc_add should have foreign keys');
