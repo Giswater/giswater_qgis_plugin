@@ -20,5 +20,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived_psector_arc_traceability", "column":"staticpress2", "newName":"staticpressure2"}}$$);
 
 -- 15/07/2025
-SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc_add", "column":"mincut_impact", "newName":"mincut_impact_topo"}}$$)
-SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc_add", "column":"mincut_affectation", "newName":"mincut_impact_hydro"}}$$)
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc_add", "column":"mincut_impact", "newName":"mincut_impact_topo"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc_add", "column":"mincut_affectation", "newName":"mincut_impact_hydro"}}$$);
