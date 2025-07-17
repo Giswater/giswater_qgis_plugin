@@ -350,7 +350,6 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
     if dlg_name:
         tools_qt._translate_form(dlg_name, dlg)
 
-
     # Set window title
     if title is not None:
         dlg.setWindowTitle(title)
