@@ -19,6 +19,7 @@ DECLARE
   view_name text;
   feature_col text;
   constraint_name text;
+  v_cols text;
 
 BEGIN
 
@@ -40,11 +41,6 @@ BEGIN
       parent_s, rec.child_layer
       );
 
-      EXECUTE format(
-        'ALTER TABLE %s DROP COLUMN IF EXISTS the_geom;',
-        tbl_name
-      );
-
       EXECUTE format('ALTER TABLE %s ADD CONSTRAINT %I UNIQUE (lot_id,%I);', tbl_name, constraint_name, feature_col);
 
       EXECUTE format('ALTER TABLE %s ADD CONSTRAINT %I FOREIGN KEY (lot_id) REFERENCES om_campaign_lot (lot_id) ON UPDATE CASCADE ON DELETE CASCADE;',
@@ -64,6 +60,12 @@ BEGIN
       view_name := format('ve_%s_lot_%s', parent_s, lower(rec.id));
       tbl_name := format('%I_%s', parent_s, lower(rec.id));
 
+      -- Get columns for dynamic view creation
+      SELECT array_to_string(array_agg('a.' || column_name), ', ')
+      INTO v_cols
+      FROM information_schema.columns
+      WHERE table_schema = 'cm' AND table_name = lower(tbl_name) AND column_name <> 'the_geom';
+
       IF NOT EXISTS (
         SELECT 1
         FROM information_schema.views
@@ -76,7 +78,7 @@ BEGIN
                 SELECT selector_lot.lot_id FROM selector_lot
                 WHERE selector_lot.cur_user = current_user
             )
-            SELECT a.*, b.status 
+            SELECT %s b.status, b.the_geom
             FROM %s a
             LEFT JOIN om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%s_id = b.%s_id
             WHERE EXISTS (
@@ -85,6 +87,7 @@ BEGIN
               WHERE sel_lot.lot_id = a.lot_id
           );',
         view_name,
+        CASE WHEN v_cols IS NULL THEN '' ELSE v_cols || ', ' END,
         tbl_name,
         lower(rec.feature_type),
         lower(rec.feature_type),
