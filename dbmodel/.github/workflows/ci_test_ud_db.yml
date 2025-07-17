@@ -111,7 +111,8 @@ jobs:
           EXIT_CODE=0
           if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"schema"* ]]; then
             echo "Running SCHEMA tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/*.sql || EXIT_CODE=1
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/test_tables.sql || EXIT_CODE=1
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/tables/*.sql || EXIT_CODE=1
           fi
           
           if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"security"* ]]; then
