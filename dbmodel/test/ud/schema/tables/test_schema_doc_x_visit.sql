@@ -44,8 +44,7 @@ SELECT has_fk('doc_x_visit', 'Table doc_x_visit should have foreign keys');
 SELECT fk_ok('doc_x_visit','doc_id','doc','id','Table should have foreign key from doc_id to doc.id');
 SELECT fk_ok('doc_x_visit','visit_id','om_visit','id','Table should have foreign key from visit_id to om_visit.id');
 -- check indexes
-SELECT has_index('doc_x_visit', 'doc_id', 'Table doc_x_visit should have index on doc_id');
-SELECT has_index('doc_x_visit', 'visit_id', 'Table doc_x_visit should have index on visit_id');
+SELECT has_index('doc_x_visit', 'doc_x_visit_pkey', ARRAY['doc_id', 'visit_id'], 'Table should have index on doc_id, visit_id');
 
 
 --check trigger 

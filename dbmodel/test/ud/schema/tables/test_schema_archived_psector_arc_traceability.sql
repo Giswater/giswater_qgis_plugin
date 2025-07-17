@@ -22,25 +22,22 @@ SELECT has_table('archived_psector_arc_traceability'::name, 'Table archived_psec
 SELECT columns_are(
     'archived_psector_arc_traceability',
     ARRAY[
-    'id','psector_id','psector_state','doable','addparam',
-'audit_tstamp','audit_user','action','arc_id','code','node_1','node_2','y1','y2','elev1','elev2','custom_y1','custom_y2','custom_elev1',
-'custom_elev2','sys_elev1','sys_elev2','arc_type','arccat_id','matcat_id','epa_type','sector_id',
-'state','state_type','annotation','observ','comment','sys_slope','inverted_slope','custom_length','dma_id',
-'soilcat_id','function_type','category_type','fluid_type','location_type','workcat_id','workcat_id_end','builtdate','enddate','ownercat_id','muni_id','postcode','streetaxis_id',
-'postnumber','postcomplement','streetaxis2_id','postnumber2','postcomplement2','descript',
-'link','verified','the_geom','label_x','label_y','label_rotation','publish','inventory','uncertain','expl_id','num_value','feature_type','tstamp',
-'lastupdate','lastupdate_user','insert_user','district_id','workcat_id_plan','asset_id','pavcat_id','drainzone_id',
-'nodetype_1','node_sys_top_elev_1','node_sys_elev_1','nodetype_2','node_sys_top_elev_2','node_sys_elev_2','parent_id','adate','adescript','visitability',
-'label_quadrant','minsector_id','brand_id','model_id','serial_number','streetname','streetname2','dwfzone_id','initoverflowpath','omunit_id','registration_date',
-'meandering','conserv_state','om_state','last_visitdate','negative_offset','expl_visibility'
-         
- 
-
+        'id','psector_id','psector_state','doable','addparam',
+        'audit_tstamp','audit_user','action','arc_id','code','node_1','node_2','y1','y2','elev1','elev2','custom_y1','custom_y2','custom_elev1',
+        'custom_elev2','sys_elev1','sys_elev2','arc_type','arccat_id','matcat_id','epa_type','sector_id',
+        'state','state_type','annotation','observ','comment','sys_slope','inverted_slope','custom_length','dma_id',
+        'soilcat_id','function_type','category_type','fluid_type','location_type','workcat_id','workcat_id_end','builtdate','enddate','ownercat_id','muni_id','postcode','streetaxis_id',
+        'postnumber','postcomplement','streetaxis2_id','postnumber2','postcomplement2','descript',
+        'link','verified','the_geom','label_x','label_y','label_rotation','publish','inventory','uncertain','expl_id','num_value','feature_type','tstamp',
+        'lastupdate','lastupdate_user','insert_user','district_id','workcat_id_plan','asset_id','pavcat_id','drainzone_id',
+        'nodetype_1','node_sys_top_elev_1','node_sys_elev_1','nodetype_2','node_sys_top_elev_2','node_sys_elev_2','parent_id','adate','adescript','visitability',
+        'label_quadrant','minsector_id','brand_id','model_id','serial_number','streetname','streetname2','dwfzone_id','initoverflowpath','omunit_id','registration_date',
+        'meandering','conserv_state','om_state','last_visitdate','negative_offset','expl_visibility'
     ],
     'Table archived_psector_arc_traceability should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('archived_psector_arc_traceability', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('archived_psector_arc_traceability', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('archived_psector_arc_traceability', 'psector_id', 'int4', 'Column psector_id should be int4');
 SELECT col_type_is('archived_psector_arc_traceability', 'psector_state', 'int2', 'Column psector_state should be int2');
 SELECT col_type_is('archived_psector_arc_traceability', 'doable', 'bool', 'Column doable should be bool');
@@ -65,16 +62,16 @@ SELECT col_type_is('archived_psector_arc_traceability', 'sys_elev2', 'numeric(12
 SELECT col_type_is('archived_psector_arc_traceability', 'arc_type', 'varchar(18)', 'Column arc_type should be varchar(18)');
 SELECT col_type_is('archived_psector_arc_traceability', 'arccat_id', 'varchar(30)', 'Column arccat_id should be varchar(30)');
 SELECT col_type_is('archived_psector_arc_traceability', 'matcat_id', 'varchar(30)', 'Column matcat_id should be varchar(30)');
-SELECT col_type_is('archived_psector_arc_traceability', 'epa_type', 'varchar(30)', 'Column epa_type should be varchar(30)');
+SELECT col_type_is('archived_psector_arc_traceability', 'epa_type', 'varchar(16)', 'Column epa_type should be varchar(16)');
 SELECT col_type_is('archived_psector_arc_traceability', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('archived_psector_arc_traceability', 'state', 'int2', 'Column state should be int2');
 SELECT col_type_is('archived_psector_arc_traceability', 'state_type', 'int2', 'Column state_type should be int2');
 SELECT col_type_is('archived_psector_arc_traceability', 'annotation', 'text', 'Column annotation should be text');
 SELECT col_type_is('archived_psector_arc_traceability', 'observ', 'text', 'Column observ should be text');
-SELECT col_type_is('archived_psector_arc_traceability', '"comment"', 'text', 'Column comment should be text');
-SELECT col_type_is('archived_psector_arc_traceability', 'sys_slope', 'numeric(12, 3)', 'Column sys_slope should be numeric(12, 3)');
+SELECT col_type_is('archived_psector_arc_traceability', 'comment', 'text', 'Column comment should be text');
+SELECT col_type_is('archived_psector_arc_traceability', 'sys_slope', 'numeric(12, 4)', 'Column sys_slope should be numeric(12, 4)');
 SELECT col_type_is('archived_psector_arc_traceability', 'inverted_slope', 'bool', 'Column inverted_slope should be bool');
-SELECT col_type_is('archived_psector_arc_traceability', 'custom_length', 'numeric(12, 3)', 'Column custom_length should be numeric(12, 3)');
+SELECT col_type_is('archived_psector_arc_traceability', 'custom_length', 'numeric(12, 2)', 'Column custom_length should be numeric(12, 2)');
 SELECT col_type_is('archived_psector_arc_traceability', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('archived_psector_arc_traceability', 'soilcat_id', 'varchar(16)', 'Column soilcat_id should be varchar(16)');
 SELECT col_type_is('archived_psector_arc_traceability', 'function_type', 'varchar(50)', 'Column function_type should be varchar(50)');
@@ -100,7 +97,7 @@ SELECT col_type_is('archived_psector_arc_traceability', 'verified', 'int4', 'Col
 SELECT col_type_is('archived_psector_arc_traceability', 'the_geom', 'geometry(linestring, 25831)', 'Column the_geom should be geometry(linestring, 25831)');
 SELECT col_type_is('archived_psector_arc_traceability', 'label_x', 'varchar(30)', 'Column label_x should be varchar(30)');
 SELECT col_type_is('archived_psector_arc_traceability', 'label_y', 'varchar(30)', 'Column label_y should be varchar(30)');
-SELECT col_type_is('archived_psector_arc_traceability', 'label_rotation', 'numeric(12, 3)', 'Column label_rotation should be numeric(12, 3)');
+SELECT col_type_is('archived_psector_arc_traceability', 'label_rotation', 'numeric(6, 3)', 'Column label_rotation should be numeric(6, 3)');
 SELECT col_type_is('archived_psector_arc_traceability', 'publish', 'bool', 'Column publish should be bool');
 SELECT col_type_is('archived_psector_arc_traceability', 'inventory', 'bool', 'Column inventory should be bool');
 SELECT col_type_is('archived_psector_arc_traceability', 'uncertain', 'bool', 'Column uncertain should be bool');
@@ -142,7 +139,7 @@ SELECT col_type_is('archived_psector_arc_traceability', 'conserv_state', 'text',
 SELECT col_type_is('archived_psector_arc_traceability', 'om_state', 'text', 'Column om_state should be text');
 SELECT col_type_is('archived_psector_arc_traceability', 'last_visitdate', 'date', 'Column last_visitdate should be date');
 SELECT col_type_is('archived_psector_arc_traceability', 'negative_offset', 'bool', 'Column negative_offset should be bool');
-SELECT col_type_is('archived_psector_arc_traceability', 'expl_visibility', 'int4', 'Column expl_visibility should be int4');
+SELECT col_type_is('archived_psector_arc_traceability', 'expl_visibility', 'integer[]', 'Column expl_visibility should be int4');
 
 
 --check default values

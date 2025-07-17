@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('archived_rpt_subcatchwashoff_sum', 'id', 'Column id should be primary key'); 
 
 -- Check column types
-SELECT col_type_is('archived_rpt_subcatchwashoff_sum', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('archived_rpt_subcatchwashoff_sum', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('archived_rpt_subcatchwashoff_sum', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_subcatchwashoff_sum', 'subc_id', 'varchar(16)', 'Column subc_id should be varchar(16)');
 SELECT col_type_is('archived_rpt_subcatchwashoff_sum', 'poll_id', 'varchar(16)', 'Column poll_id should be varchar(16)');

@@ -45,8 +45,7 @@ SELECT fk_ok('doc_x_psector', 'doc_id','doc','id','Table should have foreign key
 SELECT fk_ok('doc_x_psector','psector_id','plan_psector','psector_id', 'Table should have foreign key from psector_id to plan_psector.psector_id');
 
 -- check indexes
-SELECT has_index('doc_x_psector', 'doc_id', 'Table doc_x_psector should have index on doc_id');
-SELECT has_index('doc_x_psector', 'psector_id', 'Table doc_x_psector should have index on psector_id');
+SELECT has_index('doc_x_psector', 'doc_x_psector_pkey', ARRAY['doc_id', 'psector_id'], 'Table should have index on doc_id, psector_id');
 
 
 --check trigger 

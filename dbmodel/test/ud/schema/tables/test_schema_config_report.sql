@@ -29,7 +29,7 @@ SELECT columns_are(
 );
 -- check columns names
 
-SELECT col_type_is('config_report', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('config_report', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('config_report', 'alias', 'text', 'Column alias should be text');
 SELECT col_type_is('config_report', 'query_text', 'text', 'Column query_text should be text');
 SELECT col_type_is('config_report', 'addparam', 'json', 'Column addparam should be json');
@@ -47,7 +47,7 @@ SELECT col_type_is('config_report', 'device', '_int4', 'Column device should be 
 SELECT fk_ok('config_report','sys_role', 'sys_role','id','Table should have foreign key from sys_role to sys_role.id');
 
 -- check indexes
-SELECT has_index('config_report', 'id', 'Table config_report should have index on id');
+SELECT has_index('config_report', 'config_report_pkey', ARRAY['id'], 'Table config_report should have index on id');
 
 
 

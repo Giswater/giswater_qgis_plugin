@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('archived_rpt_subcatchment', 'id', 'Column id should be primary key'); 
 
 -- Check column types
-SELECT col_type_is('archived_rpt_subcatchment', 'id', 'bigserial', 'Column id should be bigserial');
+SELECT col_type_is('archived_rpt_subcatchment', 'id', 'bigint', 'Column id should be bigint');
 SELECT col_type_is('archived_rpt_subcatchment', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_subcatchment', 'subc_id', 'varchar(16)', 'Column subc_id should be varchar(16)');
 SELECT col_type_is('archived_rpt_subcatchment', 'resultdate', 'varchar(16)', 'Column resultdate should be varchar(16)');
@@ -39,7 +39,7 @@ SELECT col_type_is('archived_rpt_subcatchment', 'losses', 'float8', 'Column loss
 SELECT col_type_is('archived_rpt_subcatchment', 'runoff', 'float8', 'Column runoff should be float8');
 
 -- Check indexes
-SELECT has_index('archived_rpt_subcatchment', 'id', 'Table should have index on id');
+SELECT has_index('archived_rpt_subcatchment', 'archived_rpt_subcatchment_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

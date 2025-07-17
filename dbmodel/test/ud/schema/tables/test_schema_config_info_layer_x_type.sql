@@ -26,8 +26,7 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('config_info_layer_x_type', 'tableinfo_id', 'Column tableinfo_id should be primary key'); 
-SELECT col_is_pk('config_info_layer_x_type', 'infotype_id', 'Column infotype_id should be primary key'); 
+SELECT col_is_pk('config_info_layer_x_type', ARRAY['tableinfo_id','infotype_id'], 'Columns tableinfo_id and infotype_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('config_info_layer_x_type', 'tableinfo_id', 'varchar(50)', 'Column tableinfo_id should be varchar(50)');
@@ -35,8 +34,7 @@ SELECT col_type_is('config_info_layer_x_type', 'infotype_id', 'int4', 'Column in
 SELECT col_type_is('config_info_layer_x_type', 'tableinfotype_id', 'text', 'Column tableinfotype_id should be text');
 
 -- Check indexes
-SELECT has_index('config_info_layer_x_type', 'tableinfo_id', 'Table should have index on tableinfo_id');
-SELECT has_index('config_info_layer_x_type', 'infotype_id', 'Table should have index on infotype_id');
+SELECT has_index('config_info_layer_x_type', 'config_info_layer_x_type_pkey', ARRAY['tableinfo_id','infotype_id'], 'Table should have index on tableinfo_id, infotype_id');
 
 -- Finish
 SELECT * FROM finish();

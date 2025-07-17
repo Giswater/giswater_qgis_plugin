@@ -56,7 +56,7 @@ SELECT has_fk('config_visit_class', 'Table config_visit_class should have foreig
 SELECT fk_ok('config_visit_class', 'sys_role', 'sys_role', 'id', 'Table should have foreign key from sys_role to sys_role.id');
 
 -- Check indexes
-SELECT has_index('config_visit_class', 'id', 'Table should have index on id');
+SELECT has_index('config_visit_class', 'config_visit_class_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('config_visit_class', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');

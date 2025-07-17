@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('audit_arc_traceability', 'id', 'Column id should be primary key'); 
 
 -- Check column types
-SELECT col_type_is('audit_arc_traceability', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('audit_arc_traceability', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('audit_arc_traceability', 'type', 'varchar(50)', 'Column type should be varchar(50)');
 SELECT col_type_is('audit_arc_traceability', 'arc_id', 'int4', 'Column arc_id should be int4');
 SELECT col_type_is('audit_arc_traceability', 'arc_id1', 'int4', 'Column arc_id1 should be int4');

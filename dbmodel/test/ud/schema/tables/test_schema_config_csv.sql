@@ -22,7 +22,7 @@ SELECT has_table('config_csv'::name, 'Table config_csv should exist');
 SELECT columns_are(
     'config_csv',
     ARRAY[
-      'fid', '"alias"', 'descript', 'functionname','active', 'orderby', 'addparam', 
+      'fid', 'alias', 'descript', 'functionname','active', 'orderby', 'addparam'
     ],
     'Table config_csv should have the correct columns'
 );

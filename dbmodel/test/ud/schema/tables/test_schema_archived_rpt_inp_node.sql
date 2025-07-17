@@ -37,7 +37,7 @@ SELECT columns_are(
 SELECT col_is_pk('archived_rpt_inp_node', 'id', 'Column id should be primary key');
 
 -- Check column types
-SELECT col_type_is('archived_rpt_inp_node', 'id', 'integer', 'Column id should be serial4 (integer)');
+SELECT col_type_is('archived_rpt_inp_node', 'id', 'integer', 'Column id should be integer (integer)');
 SELECT col_type_is('archived_rpt_inp_node', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_inp_node', 'node_id', 'integer', 'Column node_id should be int4');
 SELECT col_type_is('archived_rpt_inp_node', 'top_elev', 'numeric(12,3)', 'Column top_elev should be numeric(12,3)');

@@ -22,7 +22,7 @@ SELECT has_table('config_param_user'::name, 'Table config_param_user should exis
 SELECT columns_are(
     'config_param_user',
     ARRAY[
-      '"parameter"', 'value', 'cur_user'
+      'parameter', 'value', 'cur_user'
     ],
     'Table config_param_user should have the correct columns'
 
@@ -42,12 +42,9 @@ SELECT col_type_is('config_param_user', 'cur_user', 'varchar(50)', 'Column cur_u
 
 
 -- check indexes
-SELECT has_index('config_param_user', 'cur_user', 'Table config_param_user should have index on cur_user');
-SELECT has_index('config_param_user', 'parameter', 'Table config_param_user should have index on parameter');
-SELECT has_index('config_param_user', 'value', 'Table config_param_user should have index on value');
-
-
-
+SELECT has_index('config_param_user', 'config_param_user_cur_user', ARRAY['cur_user'], 'Table config_param_user should have index on cur_user');
+SELECT has_index('config_param_user', 'config_param_user_pkey', ARRAY['parameter','cur_user'], 'Table config_param_user should have index on parameter,cur_user');
+SELECT has_index('config_param_user', 'config_param_user_value', ARRAY['value'], 'Table config_param_user should have index on value');
 
 
 --check trigger 

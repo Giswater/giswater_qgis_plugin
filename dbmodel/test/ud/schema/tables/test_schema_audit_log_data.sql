@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('audit_log_data', 'id', 'Column id should be primary key'); 
 
 -- Check column types
-SELECT col_type_is('audit_log_data', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('audit_log_data', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('audit_log_data', 'fid', 'int2', 'Column fid should be int2');
 SELECT col_type_is('audit_log_data', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_type_is('audit_log_data', 'feature_id', 'int4', 'Column feature_id should be int4');

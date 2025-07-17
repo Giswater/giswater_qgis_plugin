@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'connec_id', 'code', 'sys_code', 'top_elev', 'y1', 'y2', 'feature_type', 'connec_type', 'matcat_id',
         'conneccat_id', 'customer_code', 'connec_depth', 'connec_length', 'state', 'state_type', 'arc_id',
-        'expl_id', 'muni_id', 'sector_id', 'drainzone_id', 'dwfzone_id', 'omzone_id', 'omunit_id',
+        'expl_id', 'muni_id', 'sector_id', 'dma_id', 'dwfzone_id', 'omzone_id', 'omunit_id',
         'minsector_id', 'drainzone_outfall', 'dwfzone_outfall', 'soilcat_id', 'function_type',
         'category_type', 'location_type', '_fluid_type', 'fluid_type', 'treatment_type', 'has_treatment',
         'n_hydrometer', 'n_inhabitants', 'demand', 'descript', 'annotation', 'observ', 'comment', 'link',
@@ -63,18 +63,17 @@ SELECT col_type_is('connec', 'arc_id', 'int4', 'Column arc_id should be int4');
 SELECT col_type_is('connec', 'expl_id', 'int4', 'Column expl_id should be int4');
 SELECT col_type_is('connec', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('connec', 'sector_id', 'int4', 'Column sector_id should be int4');
-SELECT col_type_is('connec', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
+SELECT col_type_is('connec', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('connec', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
 SELECT col_type_is('connec', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('connec', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('connec', 'minsector_id', 'int4', 'Column minsector_id should be int4');
-SELECT col_type_is('connec', 'drainzone_outfall', 'int4', 'Column drainzone_outfall should be int4');
-SELECT col_type_is('connec', 'dwfzone_outfall', 'int4', 'Column dwfzone_outfall should be int4');
+SELECT col_type_is('connec', 'drainzone_outfall', 'integer[]', 'Column drainzone_outfall should be integer[]');
+SELECT col_type_is('connec', 'dwfzone_outfall', 'integer[]', 'Column dwfzone_outfall should be integer[]');
 SELECT col_type_is('connec', 'soilcat_id', 'varchar(16)', 'Column soilcat_id should be varchar(16)');
 SELECT col_type_is('connec', 'function_type', 'varchar(50)', 'Column function_type should be varchar(50)');
 SELECT col_type_is('connec', 'category_type', 'varchar(50)', 'Column category_type should be varchar(50)');
 SELECT col_type_is('connec', 'location_type', 'varchar(50)', 'Column location_type should be varchar(50)');
-SELECT col_type_is('connec', 'fluid_type', 'varchar(50)', 'Column fluid_type should be varchar(50)');
 SELECT col_type_is('connec', 'fluid_type', 'int4', 'Column fluid_type should be int4');
 SELECT col_type_is('connec', 'treatment_type', 'int4', 'Column treatment_type should be int4');
 SELECT col_type_is('connec', 'has_treatment', 'bool', 'Column has_treatment should be bool');
@@ -122,7 +121,7 @@ SELECT col_type_is('connec', 'label_quadrant', 'varchar(12)', 'Column label_quad
 SELECT col_type_is('connec', 'inventory', 'bool', 'Column inventory should be bool');
 SELECT col_type_is('connec', 'publish', 'bool', 'Column publish should be bool');
 SELECT col_type_is('connec', 'lock_level', 'int4', 'Column lock_level should be int4');
-SELECT col_type_is('connec', 'expl_visibility', 'int2', 'Column expl_visibility should be int2');
+SELECT col_type_is('connec', 'expl_visibility', 'smallint[]', 'Column expl_visibility should be int2');
 SELECT col_type_is('connec', 'created_at', 'timestamptz', 'Column created_at should be timestamptz');
 SELECT col_type_is('connec', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
 SELECT col_type_is('connec', 'updated_at', 'timestamptz', 'Column updated_at should be timestamptz');
@@ -136,7 +135,7 @@ SELECT col_has_default('connec', 'feature_type', 'Column feature_type should hav
 SELECT col_has_default('connec', 'expl_id', 'Column expl_id should have default value');
 SELECT col_has_default('connec', 'muni_id', 'Column muni_id should have default value');
 SELECT col_has_default('connec', 'sector_id', 'Column sector_id should have default value');
-SELECT col_has_default('connec', 'drainzone_id', 'Column drainzone_id should have default value');
+SELECT col_has_default('connec', 'dma_id', 'Column dma_id should have default value');
 SELECT col_has_default('connec', 'dwfzone_id', 'Column dwfzone_id should have default value');
 SELECT col_has_default('connec', 'omzone_id', 'Column omzone_id should have default value');
 SELECT col_has_default('connec', 'omunit_id', 'Column omunit_id should have default value');
@@ -152,7 +151,7 @@ SELECT fk_ok('connec', 'arc_id', 'arc', 'arc_id', 'Table should have foreign key
 SELECT fk_ok('connec', 'conneccat_id', 'cat_connec', 'id', 'Table should have foreign key from conneccat_id to cat_connec.id');
 SELECT fk_ok('connec', 'connec_type', 'cat_feature_connec', 'id', 'Table should have foreign key from connec_type to cat_feature_connec.id');
 SELECT fk_ok('connec', 'district_id', 'ext_district', 'district_id', 'Table should have foreign key from district_id to ext_district.district_id');
-SELECT fk_ok('connec', 'drainzone_id', 'drainzone', 'drainzone_id', 'Table should have foreign key from drainzone_id to drainzone.drainzone_id');
+SELECT fk_ok('connec', 'dma_id', 'dma', 'dma_id', 'Table should have foreign key from dma_id to dma.dma_id');
 SELECT fk_ok('connec', 'dwfzone_id', 'dwfzone', 'dwfzone_id', 'Table should have foreign key from dwfzone_id to dwfzone.dwfzone_id');
 SELECT fk_ok('connec', 'expl_id', 'exploitation', 'expl_id', 'Table should have foreign key from expl_id to exploitation.expl_id');
 SELECT fk_ok('connec', 'feature_type', 'sys_feature_type', 'id', 'Table should have foreign key from feature_type to sys_feature_type.id');
@@ -164,24 +163,24 @@ SELECT fk_ok('connec', 'sector_id', 'sector', 'sector_id', 'Table should have fo
 SELECT fk_ok('connec', 'soilcat_id', 'cat_soil', 'id', 'Table should have foreign key from soilcat_id to cat_soil.id');
 SELECT fk_ok('connec', 'state', 'value_state', 'id', 'Table should have foreign key from state to value_state.id');
 SELECT fk_ok('connec', 'state_type', 'value_state_type', 'id', 'Table should have foreign key from state_type to value_state_type.id');
-SELECT fk_ok('connec', 'streetaxis2_id', 'ext_streetaxis', 'id', 'Table should have foreign key from streetaxis2_id to ext_streetaxis.id');
-SELECT fk_ok('connec', 'streetaxis_id', 'ext_streetaxis', 'id', 'Table should have foreign key from streetaxis_id to ext_streetaxis.id');
+SELECT fk_ok('connec', ARRAY['muni_id','streetaxis_id'], 'ext_streetaxis', ARRAY['muni_id','id'], 'Table should have foreign key from muni_id,streetaxis_id to ext_streetaxis.muni_id,id');
+SELECT fk_ok('connec', ARRAY['muni_id','streetaxis2_id'], 'ext_streetaxis', ARRAY['muni_id','id'], 'Table should have foreign key from muni_id,streetaxis2_id to ext_streetaxis.muni_id,id');
 SELECT fk_ok('connec', 'workcat_id_end', 'cat_work', 'id', 'Table should have foreign key from workcat_id_end to cat_work.id');
 SELECT fk_ok('connec', 'workcat_id', 'cat_work', 'id', 'Table should have foreign key from workcat_id to cat_work.id');
 
 -- Check indexes
-SELECT has_index('connec', 'asset_id', 'Table should have index on asset_id');
-SELECT has_index('connec', 'conneccat_id', 'Table should have index on conneccat_id');
-SELECT has_index('connec', 'expl_visibility', 'Table should have index on expl_visibility');
-SELECT has_index('connec', 'expl_id', 'Table should have index on expl_id');
-SELECT has_index('connec', 'the_geom', 'Table should have index on the_geom');
-SELECT has_index('connec', 'muni_id', 'Table should have index on muni_id');
-SELECT has_index('connec', 'omzone_id', 'Table should have index on omzone_id');
-SELECT has_index('connec', 'connec_id', 'Table should have index on connec_id');
-SELECT has_index('connec', 'sector_id', 'Table should have index on sector_id');
-SELECT has_index('connec', 'streetaxis_id', 'Table should have index on streetaxis_id');
-SELECT has_index('connec', 'streetaxis2_id', 'Table should have index on streetaxis2_id');
-SELECT has_index('connec', 'sys_code', 'Table should have index on sys_code');
+SELECT has_index('connec', 'connec_asset_id_idx', 'Table should have index on asset_id');
+SELECT has_index('connec', 'connec_connecat', 'Table should have index on conneccat_id');
+SELECT has_index('connec', 'connec_expl_visibility_idx', 'Table should have index on expl_visibility');
+SELECT has_index('connec', 'connec_exploitation', 'Table should have index on expl_id');
+SELECT has_index('connec', 'connec_index', 'Table should have index on the_geom');
+SELECT has_index('connec', 'connec_muni', 'Table should have index on muni_id');
+SELECT has_index('connec', 'connec_omzone', 'Table should have index on omzone_id');
+SELECT has_index('connec', 'connec_pkey', 'Table should have index on connec_id');
+SELECT has_index('connec', 'connec_sector', 'Table should have index on sector_id');
+SELECT has_index('connec', 'connec_street1', 'Table should have index on streetaxis_id');
+SELECT has_index('connec', 'connec_street2', 'Table should have index on streetaxis2_id');
+SELECT has_index('connec', 'connec_sys_code_idx', 'Table should have index on sys_code');
 
 -- Check triggers
 SELECT has_trigger('connec', 'gw_trg_cat_material_fk_insert', 'Table should have trigger gw_trg_cat_material_fk_insert');

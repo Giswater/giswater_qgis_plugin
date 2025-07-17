@@ -22,7 +22,7 @@ SELECT has_table('cat_brand'::name, 'Table cat_brand should exist');
 SELECT columns_are(
     'cat_brand',
     ARRAY[
-       'id', 'descript', 'link', 'active', 'featurecat_id', 
+       'id', 'descript', 'link', 'active', 'featurecat_id'
     ],
     'Table cat_brand should have the correct columns'
 );

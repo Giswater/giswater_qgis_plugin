@@ -27,7 +27,7 @@ SELECT columns_are(
     'Table anl_polygon should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('anl_polygon', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('anl_polygon', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('anl_polygon', 'pol_id', 'varchar(16)', 'Column pol_id should be varchar(16)');
 SELECT col_type_is('anl_polygon', 'pol_type', 'varchar(30)', 'Column pol_type should be varchar(30)');
 SELECT col_type_is('anl_polygon', 'state', 'integer', 'Column state should be integer');

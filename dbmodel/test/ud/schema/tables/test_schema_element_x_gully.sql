@@ -26,8 +26,7 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('element_x_gully', 'element_id', 'Column element_id should be primary key'); 
-SELECT col_is_pk('element_x_gully', 'gully_id', 'Column gully_id should be primary key'); 
+SELECT col_is_pk('element_x_gully', ARRAY['element_id', 'gully_id'], 'Columns element_id and gully_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('element_x_gully', 'element_id', 'int4', 'Column element_id should be int4');
@@ -40,8 +39,7 @@ SELECT fk_ok('element_x_gully', 'element_id', 'element', 'element_id', 'Table sh
 SELECT fk_ok('element_x_gully', 'gully_id', 'gully', 'gully_id', 'Table should have foreign key from gully_id to gully.gully_id');
 
 -- Check indexes
-SELECT has_index('element_x_gully', 'element_id', 'Table should have index on element_id');
-SELECT has_index('element_x_gully', 'gully_id', 'Table should have index on gully_id');
+SELECT has_index('element_x_gully', 'element_x_gully_pkey', ARRAY['element_id', 'gully_id'], 'Table should have index on element_id, gully_id');
 
 -- Finish
 SELECT * FROM finish();

@@ -30,15 +30,12 @@ SELECT columns_are(
          'link','verified', 'rotation', 'the_geom', 'label_x','label_y','label_rotation', 'accessibility', 'publish', 'inventory',
           'uncertain','expl_id', 'num_value', 'feature_type', 'pjoint_type','pjoint_id','lastupdate', 'lastupdate_user', 'insert_user', 'matcat_id',
           'district_id','workcat_id_plan', 'asset_id', 'drainzone_id', 'adate','adescript','plot_code', 'placement_type', 'access_type', 'label_quadrant',
-          'n_hydrometer','minsector_id', 'streetname', 'streetname2', 'dwfzone_id','datasource','omunit_id', 'lock_level', 'expl_visibility', 'label_quadrant',
-         
- 
-
+          'n_hydrometer','minsector_id', 'streetname', 'streetname2', 'dwfzone_id','datasource','omunit_id', 'lock_level', 'expl_visibility', 'label_quadrant'
     ],
     'Table archived_psector_connec_traceability should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('archived_psector_connec_traceability', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('archived_psector_connec_traceability', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('archived_psector_connec_traceability', 'psector_id', 'int4', 'Column psector_id should be int4');
 SELECT col_type_is('archived_psector_connec_traceability', 'psector_state', 'int2', 'Column psector_state should be int2');
 SELECT col_type_is('archived_psector_connec_traceability', 'doable', 'bool', 'Column doable should be bool');

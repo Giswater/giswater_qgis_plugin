@@ -22,12 +22,12 @@ SELECT has_table('cat_hydrology'::name, 'Table cat_hydrology should exist');
 SELECT columns_are(
     'cat_hydrology',
     ARRAY[
-       'hydrology_id', '"name"', 'infiltration', '"text"', 'active', 'expl_id', 'log'
+       'hydrology_id', 'name', 'infiltration', 'text', 'active', 'expl_id', 'log'
     ],
     'Table cat_hydrology should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('cat_hydrology', 'hydrology_id', 'serial14', 'Column hydrology_id should be serial14');
+SELECT col_type_is('cat_hydrology', 'hydrology_id', 'serial4', 'Column hydrology_id should be serial4');
 SELECT col_type_is('cat_hydrology', 'name', 'varchar(30)', 'Column name should be varchar(30)');
 SELECT col_type_is('cat_hydrology', 'infiltration', 'varchar(20)', 'Column infiltration should be varchar(20)');
 SELECT col_type_is('cat_hydrology', 'text', 'varchar(255)', 'Column text should be varchar(255)');

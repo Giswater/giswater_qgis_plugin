@@ -27,12 +27,12 @@ SELECT columns_are(
     'Table cat_dwf should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('cat_dwf', 'id', 'serial14', 'Column id should be serial14');
+SELECT col_type_is('cat_dwf', 'id', 'serial4', 'Column id should be serial4');
 SELECT col_type_is('cat_dwf', 'idval', 'varchar(30)', 'Column idval should be varchar(30)');
 SELECT col_type_is('cat_dwf', 'startdate', 'timestamp', 'Column startdate should be timestamp');
 SELECT col_type_is('cat_dwf', 'enddate', 'timestamp', 'Column enddate should be timestamp');
 SELECT col_type_is('cat_dwf', 'observ', 'text', 'Column observ should be text');
-SELECT col_type_is('cat_dwf', 'active', 'bool', 'Column active should be bool');++
+SELECT col_type_is('cat_dwf', 'active', 'bool', 'Column active should be bool');
 
 
 

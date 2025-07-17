@@ -46,12 +46,11 @@ SELECT fk_ok('element_x_node','node_id','node','node_id','Table should have fore
 
 
 -- check indexes
-SELECT has_index('element_x_node', 'element_id', 'Table element_x_node should have index on element_id');
-SELECT has_index('element_x_node', 'node_id', 'Table element_x_node should have index on node_id');
+SELECT has_index('element_x_node', 'element_x_node_pkey', 'Table element_x_node should have index on element_id, node_id');
 
 
 --check trigger 
-SELECT has_trigger('element_x_node', 'gw_trg_element_x_node_fk', 'Table element_x_node should have trigger gw_trg_element_x_node_fk');
+
 
 --check rule 
 

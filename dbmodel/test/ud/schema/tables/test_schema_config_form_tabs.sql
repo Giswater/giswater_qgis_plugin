@@ -22,7 +22,7 @@ SELECT has_table('config_form_tabs'::name, 'Table config_form_tabs should exist'
 SELECT columns_are(
     'config_form_tabs',
     ARRAY[
-      'formname', 'tabname', '"label"', 'tooltip', 'sys_role', 'tabfunction', 'tabactions', 'orderby', 'device'
+      'formname', 'tabname', 'label', 'tooltip', 'sys_role', 'tabfunction', 'tabactions', 'orderby', 'device'
     ],
     'Table config_form_tabs should have the correct columns'
 

@@ -42,8 +42,7 @@ SELECT col_type_is('edit_typevalue', 'addparam', 'json', 'Column addparam should
 -- check foreign keys
 
 -- check indexes
-SELECT has_index('edit_typevalue', 'id', 'Table edit_typevalue should have index on id');
-SELECT has_index('edit_typevalue', 'typevalue', 'Table edit_typevalue should have index on typevalue');
+SELECT has_index('edit_typevalue', 'value_type_pkey', ARRAY['typevalue','id'], 'Table edit_typevalue should have index on typevalue, id');
 
 
 --check trigger 

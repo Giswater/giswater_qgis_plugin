@@ -22,12 +22,12 @@ SELECT has_table('archived_rpt_subcatchrunoff_sum'::name, 'Table archived_rpt_su
 SELECT columns_are(
     'audit_check_project',
     ARRAY[
-       'id', 'table_id', 'table_host', 'table_dbname', 'table_schema', 'fid', 'criticity', 'enabled', 'message', 'tstamp', 'cur_user', 'observ', 'table_user',
+       'id', 'table_id', 'table_host', 'table_dbname', 'table_schema', 'fid', 'criticity', 'enabled', 'message', 'tstamp', 'cur_user', 'observ', 'table_user'
     ],
     'Table audit_check_project should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('audit_check_project', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('audit_check_project', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('audit_check_project', 'table_id', 'text', 'Column table_id should be text');
 SELECT col_type_is('audit_check_project', 'table_host', 'text', 'Column table_host should be text');
 SELECT col_type_is('audit_check_project', 'table_dbname', 'text', 'Column table_dbname should be text');

@@ -46,8 +46,7 @@ SELECT fk_ok('doc_x_link','link_id','link','link_id','Table should have foreign 
 
 
 -- check indexes
-SELECT has_index('doc_x_link', 'doc_id', 'Table doc_x_link should have index on doc_id');
-SELECT has_index('doc_x_link', 'link_id', 'Table doc_x_link should have index on link_id');
+SELECT has_index('doc_x_link', 'doc_x_link_pkey', ARRAY['doc_id', 'link_id'], 'Table should have index on doc_id, link_id');
 
 
 

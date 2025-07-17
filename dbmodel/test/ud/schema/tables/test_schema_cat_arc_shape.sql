@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('cat_arc_shape', 'id', 'Column id should be primary key'); 
 
 -- Check check columns
-SELECT col_has_check('cat_arc_shape', 'epa', Table should have check on 'epa');
+SELECT col_has_check('cat_arc_shape', 'epa', 'Table should have check on epa');
 
 -- Check column types
 SELECT col_type_is('cat_arc_shape', 'id', 'varchar(30)', 'Column id should be varchar(30)');

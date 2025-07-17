@@ -35,7 +35,7 @@ SELECT col_type_is('config_toolbox', 'functionparams', 'json', 'Column functionp
 SELECT col_type_is('config_toolbox', 'inputparams', 'json', 'Column inputparams should be json');
 SELECT col_type_is('config_toolbox', 'observ', 'text', 'Column observ should be text');
 SELECT col_type_is('config_toolbox', 'active', 'bool', 'Column active should be bool');
-SELECT col_type_is('config_toolbox', 'device', 'int4', 'Column device should be int4');
+SELECT col_type_is('config_toolbox', 'device', 'integer[]', 'Column device should be integer[]');
 
 -- Check default values
 SELECT col_has_default('config_toolbox', 'active', 'Column active should have default value');
@@ -46,7 +46,7 @@ SELECT has_fk('config_toolbox', 'Table config_toolbox should have foreign keys')
 SELECT fk_ok('config_toolbox', 'id', 'sys_function', 'id', 'Table should have foreign key from id to sys_function.id');
 
 -- Check indexes
-SELECT has_index('config_toolbox', 'id', 'Table should have index on id');
+SELECT has_index('config_toolbox', 'config_toolbox_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

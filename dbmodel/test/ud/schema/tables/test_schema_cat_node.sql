@@ -23,7 +23,7 @@ SELECT columns_are(
     'cat_node',
     ARRAY[
  'id', 'node_type', 'matcat_id', 'shape', 'geom1', 'geom2', 'geom3', 'descript', 'link', 'brand_id', 'model_id', 'svg', 
- 'estimated_y', 'cost_unit', 'cost', 'active', 'label', 'acoeff',
+ 'estimated_y', 'cost_unit', 'cost', 'active', 'label', 'acoeff'
     ],
     'Table cat_node should have the correct columns'
 );

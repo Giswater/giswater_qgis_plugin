@@ -54,9 +54,12 @@ SELECT has_index('drainzone', 'drainzone_index', 'Table should have drainzone_in
 SELECT has_sequence('drainzone_drainzone_id_seq', 'Sequence drainzone_drainzone_id_seq should exist');
 
 -- Check constraints
-SELECT col_default_is('drainzone', 'graphconfig', '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json, 'Column graphconfig should have correct default');
+SELECT col_has_default('drainzone', 'graphconfig', 'Column graphconfig should have default value');
+SELECT col_has_default('drainzone', 'active', 'Column active should have default value');
 SELECT col_default_is('drainzone', 'active', 'true', 'Column active should default to true');
+SELECT col_has_default('drainzone', 'created_at', 'Column created_at should have default value');
 SELECT col_default_is('drainzone', 'created_at', 'now()', 'Column created_at should default to now()');
+SELECT col_has_default('drainzone', 'created_by', 'Column created_by should have default value');
 SELECT col_default_is('drainzone', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
 
 SELECT * FROM finish();

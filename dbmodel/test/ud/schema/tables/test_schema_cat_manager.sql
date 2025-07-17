@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('cat_manager', 'id', 'Column id should be primary key'); 
 
 -- Check column types
-SELECT col_type_is('cat_manager', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('cat_manager', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('cat_manager', 'idval', 'text', 'Column idval should be text');
 SELECT col_type_is('cat_manager', 'expl_id', 'int4', 'Column expl_id should be int4');
 SELECT col_type_is('cat_manager', 'rolename', 'text', 'Column rolename should be text');

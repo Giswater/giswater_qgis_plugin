@@ -24,13 +24,12 @@ SELECT columns_are(
     ARRAY[
         'id', 'node_id', 'nodecat_id','state','num_arc','node_id_aux', 'nodecat_id_aux', 'state_aux',
          'expl_id', 'fid','cur_user', 'the_geom', 'arc_distance','arc_id','descript','result_id', 'total_distance', 
-         'sys_type','code', 'cat_geom1', 'top_elev','elev', 'ymax','state_type','sector_id', 'addparam', 'drainzone_id', 'dwzone_id',
-
+         'sys_type','code', 'cat_geom1', 'top_elev','elev', 'ymax','state_type','sector_id', 'addparam', 'drainzone_id', 'dwzone_id'
     ],
     'Table anl_node should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('anl_node', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('anl_node', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('anl_node', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
 SELECT col_type_is('anl_node', 'nodecat_id', 'varchar(30)', 'Column nodecat_id should be varchar(30)');
 SELECT col_type_is('anl_node', 'state', 'integer', 'Column state should be integer');

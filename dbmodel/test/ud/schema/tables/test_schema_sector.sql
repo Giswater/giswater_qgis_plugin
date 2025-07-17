@@ -61,9 +61,8 @@ SELECT col_default_is('sector', 'created_at', 'now()', 'Column created_at should
 SELECT col_default_is('sector', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
 
 -- Check foreign keys
-SELECT has_fk('sector', 'sector_macrosector_id_fkey', 'Table should have foreign key sector_macrosector_id_fkey');
+SELECT has_fk('sector', 'Table should have foreign key sector_macrosector_id_fkey');
 SELECT fk_ok('sector', 'macrosector_id', 'macrosector', 'macrosector_id', 'Foreign key macrosector_id should reference macrosector.macrosector_id');
-SELECT has_fk('sector', 'sector_parent_id_fkey', 'Table should have foreign key sector_parent_id_fkey');
 SELECT fk_ok('sector', 'parent_id', 'sector', 'sector_id', 'Foreign key parent_id should reference sector.sector_id');
 
 SELECT * FROM finish();

@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('dwfzone', 'dwfzone_id', 'Column dwfzone_id should be primary key'); 
 
 -- Check column types
-SELECT col_type_is('dwfzone', 'dwfzone_id', 'serial4', 'Column dwfzone_id should be serial4');
+SELECT col_type_is('dwfzone', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
 SELECT col_type_is('dwfzone', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('dwfzone', 'name', 'varchar(30)', 'Column name should bevarchar(30)');
 SELECT col_type_is('dwfzone', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
@@ -51,8 +51,12 @@ SELECT col_type_is('dwfzone', 'drainzone_id', 'int4', 'Column drainzone_id shoul
 -- Check default values
 SELECT col_has_default('dwfzone', 'graphconfig', 'Column graphconfig should have default value');
 SELECT col_has_default('dwfzone', 'active', 'Column active should have default value');
+SELECT col_default_is('dwfzone', 'active', 'true', 'Column active should default to true');
 SELECT col_has_default('dwfzone', 'created_at', 'Column created_at should have default value');
+SELECT col_default_is('dwfzone', 'created_at', 'now()', 'Column created_at should default to now()');
 SELECT col_has_default('dwfzone', 'created_by', 'Column created_by should have default value');
+SELECT col_default_is('dwfzone', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
+
 
 -- Check foreign keys
 SELECT has_fk('dwfzone', 'Table dwfzone should have foreign keys');
@@ -60,7 +64,7 @@ SELECT has_fk('dwfzone', 'Table dwfzone should have foreign keys');
 SELECT fk_ok('dwfzone', 'drainzone_id', 'drainzone', 'drainzone_id', 'Table should have foreign key from drainzone_id to drainzone.drainzone_id');
 
 -- Check indexes
-SELECT has_index('dwfzone', 'dwfzone_id', 'Table should have index on dwfzone_id');
+SELECT has_index('dwfzone', 'dwfzone_pkey', 'Table should have index on dwfzone_id');
 
 -- Check triggers
 SELECT has_trigger('dwfzone', 'gw_trg_edit_controls', 'Table should have trigger gw_trg_edit_controls');

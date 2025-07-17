@@ -22,7 +22,7 @@ SELECT has_table('config_function'::name, 'Table config_function should exist');
 SELECT columns_are(
     'config_function',
     ARRAY[
-      'id', 'function_name', '"style"', 'layermanager', 'actions'
+      'id', 'function_name', 'style', 'layermanager', 'actions'
     ],
     'Table config_function should have the correct columns'
 

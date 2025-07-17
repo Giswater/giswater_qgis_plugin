@@ -26,13 +26,12 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('config_visit_class_x_parameter', 'parameter_id', 'Column parameter_id should be primary key'); 
-SELECT col_is_pk('config_visit_class_x_parameter', 'class_id', 'Column class_id should be primary key'); 
+SELECT col_is_pk('config_visit_class_x_parameter', ARRAY['parameter_id','class_id'], 'Columns parameter_id and class_id should be primary key'); 
 
 -- Check column types
-SELECT col_type_is('config_visit_class_x_parameter', 'class_id', 'DATA_TYPE', 'Column class_id should be DATA_TYPE');
-SELECT col_type_is('config_visit_class_x_parameter', 'parameter_id', 'DATA_TYPE', 'Column parameter_id should be DATA_TYPE');
-SELECT col_type_is('config_visit_class_x_parameter', 'active', 'DATA_TYPE', 'Column active should be DATA_TYPE');
+SELECT col_type_is('config_visit_class_x_parameter', 'class_id', 'int4', 'Column class_id should be int4');
+SELECT col_type_is('config_visit_class_x_parameter', 'parameter_id', 'varchar(50)', 'Column parameter_id should be varchar(50)');
+SELECT col_type_is('config_visit_class_x_parameter', 'active', 'bool', 'Column active should be bool');
 
 -- Check default values
 SELECT col_has_default('config_visit_class_x_parameter', 'active', 'Column active should have default value');
@@ -44,8 +43,7 @@ SELECT fk_ok('config_visit_class_x_parameter', 'class_id', 'config_visit_class',
 SELECT fk_ok('config_visit_class_x_parameter', 'parameter_id', 'config_visit_parameter', 'id', 'Table should have foreign key from parameter_id to config_visit_parameter.id');
 
 -- Check indexes
-SELECT has_index('config_visit_class_x_parameter', 'parameter_id', 'Table should have index on parameter_id');
-SELECT has_index('config_visit_class_x_parameter', 'class_id', 'Table should have index on class_id');
+SELECT has_index('config_visit_class_x_parameter', 'config_visit_class_x_parameter_pkey', ARRAY['parameter_id','class_id'], 'Table should have index on parameter_id, class_id');
 
 -- Finish
 SELECT * FROM finish();

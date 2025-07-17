@@ -34,7 +34,7 @@ SELECT col_type_is('config_table', 'style', 'int4', 'Column style should be int4
 SELECT col_type_is('config_table', 'group_layer', 'text', 'Column group_layer should be text');
 
 -- Check indexes
-SELECT has_index('config_table', 'id', 'Table should have index on id');
+SELECT has_index('config_table', 'config_table_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

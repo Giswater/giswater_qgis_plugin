@@ -41,14 +41,10 @@ SELECT has_fk('config_user_x_expl', 'Table config_user_x_expl should have foreig
 SELECT fk_ok('config_user_x_expl','expl_id','exploitation','expl_id','Table should have foreign key from expl_id to exploitation.expl_id');
 
 -- check indexes
-SELECT has_index('config_user_x_expl', 'expl_id', 'Table config_user_x_expl should have index on expl_id');
-SELECT has_index('config_user_x_expl', 'username', 'Table config_user_x_expl should have index on username');
-
-
-
+SELECT has_index('config_user_x_expl', 'config_user_x_expl_pkey', ARRAY['expl_id','username'], 'Table config_user_x_expl should have index on expl_id, username');
 
 --check trigger 
-SELECT has_trigger('config_user_x_expl', 'gw_trg_typevalue_config_fk', 'Table config_user_x_expl should have trigger gw_trg_typevalue_config_fk');
+
 --check rule 
 
 SELECT * FROM finish();

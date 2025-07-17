@@ -24,7 +24,7 @@ SELECT columns_are(
     ARRAY[
       'id', 'link_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'descript', 'link', 
       'brand_id', 'model_id', 'svg', 'z1', 'z2', 'width', 'area', 'estimated_depth', 'thickness', 'cost_unit', 'cost',
-       'm2bottom_cost', 'm3protec_cost', 'active', 'label',
+       'm2bottom_cost', 'm3protec_cost', 'active', 'label'
     ],
     'Table cat_link should have the correct columns'
 );

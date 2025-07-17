@@ -51,11 +51,11 @@ SELECT fk_ok('ext_address', 'plot_id', 'ext_plot', 'id', 'Table should have fore
 SELECT fk_ok('ext_address', 'streetaxis_id', 'ext_streetaxis', 'id', 'Table should have foreign key from streetaxis_id to ext_streetaxis.id');
 
 -- Check indexes
-SELECT has_index('ext_address', 'id', 'Table should have index on id');
-SELECT has_index('ext_address', 'plot_id', 'Table should have index on plot_id');
-SELECT has_index('ext_address', 'postcode', 'Table should have index on postcode');
-SELECT has_index('ext_address', 'streetaxis_id', 'Table should have index on streetaxis_id');
-SELECT has_index('ext_address', 'the_geom', 'Table should have index on the_geom');
+SELECT has_index('ext_address', 'ext_address_pkey', 'Table should have index on id');
+SELECT has_index('ext_address', 'idx_ext_address_plot_id', 'Table should have index on plot_id');
+SELECT has_index('ext_address', 'idx_ext_address_postcode', 'Table should have index on postcode');
+SELECT has_index('ext_address', 'idx_ext_address_streetaxis_id', 'Table should have index on streetaxis_id');
+SELECT has_index('ext_address', 'idx_ext_address_the_geom', 'Table should have index on the_geom');
 
 -- Finish
 SELECT * FROM finish();

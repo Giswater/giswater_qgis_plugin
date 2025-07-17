@@ -32,7 +32,7 @@ SELECT col_is_pk('archived_rpt_inp_raingage', 'id', 'Column id should be primary
 
  
 -- Check column types
-SELECT col_type_is('archived_rpt_inp_raingage', 'id','bigserial', 'Column id should be bigserial');
+SELECT col_type_is('archived_rpt_inp_raingage', 'id','bigint', 'Column id should be bigint');
 SELECT col_type_is('archived_rpt_inp_raingage', 'result_id','varchar(30)','Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_inp_raingage', 'rg_id','varchar(16)', 'Column rg_id should be varchar(16)');
 SELECT col_type_is('archived_rpt_inp_raingage', 'form_type','varchar(12)','Column form_type should be varchar(12)');
@@ -52,7 +52,7 @@ SELECT col_has_default('archived_rpt_inp_raingage', 'scf', 'Column scf should ha
  
  
 -- Check indexes
-SELECT has_index('archived_rpt_inp_raingage', 'id', 'Table should have index on id');
+SELECT has_index('archived_rpt_inp_raingage', 'archived_rpt_inp_raingage_pkey', ARRAY['id'], 'Table should have index on id');
  
  
 -- Finish

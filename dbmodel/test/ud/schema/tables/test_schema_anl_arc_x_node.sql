@@ -28,7 +28,7 @@ SELECT columns_are(
     'Table anl_arc_x_node should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('anl_arc_x_node', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('anl_arc_x_node', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('anl_arc_x_node', 'arc_id', 'integer', 'Column arc_id should be integer');
 SELECT col_type_is('anl_arc_x_node', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
 SELECT col_type_is('anl_arc_x_node', 'arccat_id', 'varchar(30)', 'Column arccat_id should be varchar(30)');

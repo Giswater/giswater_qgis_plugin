@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('audit_fid_log', 'id', 'Column id should be primary key'); 
 
 -- Check column types
-SELECT col_type_is('audit_fid_log', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('audit_fid_log', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('audit_fid_log', 'fid', 'int2', 'Column fid should be int2');
 SELECT col_type_is('audit_fid_log', 'fcount', 'int4', 'Column fcount should be int4');
 SELECT col_type_is('audit_fid_log', 'groupby', 'text', 'Column groupby should be text');

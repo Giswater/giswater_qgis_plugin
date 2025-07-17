@@ -26,15 +26,13 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('element_x_arc', 'element_id', 'Column element_id should be primary key');
-SELECT col_is_pk('element_x_arc', 'arc_id', 'Column arc_id should be primary key'); 
+SELECT col_is_pk('element_x_arc', ARRAY['element_id', 'arc_id'], 'Columns element_id and arc_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('element_x_arc', 'element_id', 'int4', 'Column element_id should be int4');
 SELECT col_type_is('element_x_arc', 'arc_id', 'int4', 'Column arc_id should be int4');
 
 -- Check default values
-SELECT col_has_default('element_x_arc', 'COLUMNNAME', 'Column COLUMNNAME should have default value');
 
 -- Check foreign keys
 SELECT has_fk('element_x_arc', 'Table element_x_arc should have foreign keys');
@@ -43,8 +41,7 @@ SELECT fk_ok('element_x_arc', 'arc_id', 'arc', 'arc_id', 'Table should have fore
 SELECT fk_ok('element_x_arc', 'element_id', 'element', 'element_id', 'Table should have foreign key from element_id to element.element_id');
 
 -- Check indexes
-SELECT has_index('element_x_arc', 'element_id', 'Table should have index on element_id');
-SELECT has_index('element_x_arc', 'arc_id', 'Table should have index on arc_id');
+SELECT has_index('element_x_arc', 'element_x_arc_pkey', ARRAY['element_id', 'arc_id'], 'Table should have index on element_id, arc_id');
 
 -- Finish
 SELECT * FROM finish();

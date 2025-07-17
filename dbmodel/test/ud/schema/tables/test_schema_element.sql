@@ -26,14 +26,12 @@ SELECT columns_are(
   'expl_id', 'muni_id', 'sector_id', 'omzone_id', 'omunit_id', 'function_type', 'category_type', 'location_type', 'observ', 'comment', 'link',
   'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'brand_id', 'model_id', 'serial_number', 'asset_id', 'verified', 'datasource',
   'label_x', 'label_y', 'label_rotation', 'rotation', 'inventory', 'publish', 'trace_featuregeom', 'lock_level', 'expl_visibility', 'created_at', 
-  'created_by', 'updated_at', 'updated_by', 'the_geom',
+  'created_by', 'updated_at', 'updated_by', 'the_geom'
     ],
     'Table element should have the correct columns'
 
 );
 -- check columns names
-SQL-Select Statements
-Copiar
 SELECT col_type_is('element', 'element_id', 'int4', 'Column element_id should be int4 DEFAULT nextval(''ud_2025juli4.urn_id_seq''::regclass)');
 SELECT col_type_is('element', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('element', 'sys_code', 'text', 'Column sys_code should be text');
@@ -109,12 +107,12 @@ SELECT fk_ok('element','workcat_id','cat_work','id','Table should have foreign k
 
 
 -- check indexes
-SELECT has_index('element', 'asset_id', 'Table element should have index on asset_id');
-SELECT has_index('element', 'the_geom', 'Table element should have index on the_geom');
-SELECT has_index('element', 'muni_id', 'Table element should have index on muni_id');
-SELECT has_index('element', 'element_id', 'Table element should have index on element_id');
-SELECT has_index('element', 'sector_id', 'Table element should have index on sector_id');
-SELECT has_index('element', 'sys_code', 'Table element should have index on sys_code');
+SELECT has_index('element', 'element_asset_id_idx', 'Table element should have index on asset_id');
+SELECT has_index('element', 'element_index', 'Table element should have index on the_geom');
+SELECT has_index('element', 'element_muni', 'Table element should have index on muni_id');
+SELECT has_index('element', 'element_pkey', 'Table element should have index on element_id');
+SELECT has_index('element', 'element_sector', 'Table element should have index on sector_id');
+SELECT has_index('element', 'element_sys_code_idx', 'Table element should have index on sys_code');
 
 
 --check trigger 

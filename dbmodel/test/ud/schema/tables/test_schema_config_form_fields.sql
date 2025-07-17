@@ -24,7 +24,7 @@ SELECT columns_are(
     ARRAY[
       'formname', 'formtype', 'tabname', 'columnname', 'layoutname', 'layoutorder', 'datatype', 'widgettype', 'label', 'tooltip', 'placeholder',
       'ismandatory', 'isparent', 'iseditable', 'isautoupdate', 'isfilter', 'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc',
-      'stylesheet', 'widgetcontrols', 'widgetfunction', 'linkedobject', 'hidden', 'web_layoutorder',
+      'stylesheet', 'widgetcontrols', 'widgetfunction', 'linkedobject', 'hidden', 'web_layoutorder'
     ],
     'Table config_form_fields should have the correct columns'
 );

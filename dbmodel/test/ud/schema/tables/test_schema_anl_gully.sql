@@ -28,7 +28,7 @@ SELECT columns_are(
     'Table anl_arc should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('anl_arc', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('anl_arc', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('anl_arc', 'gully_id', 'varchar(16)', 'Column gully_id should be varchar(16)');
 SELECT col_type_is('anl_arc', 'gullycat_id', 'varchar(30)', 'Column gullycat_id should be varchar(30)');
 SELECT col_type_is('anl_arc', 'state', 'integer', 'Column state should be integer');

@@ -30,23 +30,23 @@ SELECT columns_are(
 SELECT col_is_pk('anl_connec', 'id', 'Column id should be primary key');
 
 -- Check column types
-SELECT col_type_is('anl_connec', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('anl_connec', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('anl_connec', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
 SELECT col_type_is('anl_connec', 'conneccat_id', 'varchar(30)', 'Column conneccat_id should be varchar(30)');
-SELECT col_type_is('anl_connec', 'state', 'interger', 'Column state should be interger');
+SELECT col_type_is('anl_connec', 'state', 'integer', 'Column state should be integer');
 SELECT col_type_is('anl_connec', 'connec_id_aux', 'varchar(16)', 'Column connec_id_aux should be varchar(16)');
 SELECT col_type_is('anl_connec', 'connecat_id_aux', 'varchar(30)', 'Column connecat_id_aux should be varchar(30)');
-SELECT col_type_is('anl_connec', 'state_aux', 'interger', 'Column state_aux should be interger');
-SELECT col_type_is('anl_connec', 'expl_id', 'interger', 'Column expl_id should be interger');
-SELECT col_type_is('anl_connec', 'fid', 'interger', 'Column fid should be interger');
+SELECT col_type_is('anl_connec', 'state_aux', 'integer', 'Column state_aux should be integer');
+SELECT col_type_is('anl_connec', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('anl_connec', 'fid', 'integer', 'Column fid should be integer');
 SELECT col_type_is('anl_connec', 'cur_user', 'varchar(50)', 'Column cur_user should be varchar(50)');
 SELECT col_type_is('anl_connec', 'the_geom', 'geometry(point, 25831)', 'Column the_geom should be geometry(point, 25831)');
 SELECT col_type_is('anl_connec', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('anl_connec', 'result_id', 'varchar(16)', 'Column result_id should be varchar(16)');
 SELECT col_type_is('anl_connec', 'dma_id', 'text', 'Column dma_id should be text');
 SELECT col_type_is('anl_connec', 'addparam', 'text', 'Column addparam should be text');
-SELECT col_type_is('anl_connec', 'dwfzone_id', 'interger', 'Column dwfzone_id should be interger');
-SELECT col_type_is('anl_connec', 'drainzone_id', 'interger', 'Column drainzone_id should be interger');
+SELECT col_type_is('anl_connec', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
+SELECT col_type_is('anl_connec', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
 
 -- Check default values
 SELECT col_has_default('anl_connec', 'cur_user', 'Column cur_user should have default value');

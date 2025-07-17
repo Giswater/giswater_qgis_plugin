@@ -26,8 +26,7 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('crm_typevalue', 'typevalue', 'Column typevalue should be primary key'); 
-SELECT col_is_pk('crm_typevalue', 'id', 'Column id should be primary key'); 
+SELECT col_is_pk('crm_typevalue', ARRAY['typevalue', 'id'], 'Columns typevalue and id should be primary key');
 
 -- Check column types
 SELECT col_type_is('crm_typevalue', 'typevalue', 'varchar(50)', 'Column typevalue should be varchar(50)');
@@ -37,8 +36,7 @@ SELECT col_type_is('crm_typevalue', 'descript', 'text', 'Column descript should 
 SELECT col_type_is('crm_typevalue', 'addparam', 'json', 'Column addparam should be json');
 
 -- Check indexes
-SELECT has_index('crm_typevalue', 'typevalue', 'Table should have index on typevalue');
-SELECT has_index('crm_typevalue', 'id', 'Table should have index on id');
+SELECT has_index('crm_typevalue', 'crm_typevalue_pkey', ARRAY['typevalue', 'id'], 'Table should have index on typevalue, id');
 
 -- Finish
 SELECT * FROM finish();

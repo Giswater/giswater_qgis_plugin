@@ -34,7 +34,7 @@ SELECT columns_are(
 -- Check primary key
 SELECT col_is_pk('dimensions', 'id', 'Column id should be primary key');
 
-SELECT col_type_is('dimensions', 'id', 'bigserial', 'Column id should be bigserial');
+SELECT col_type_is('dimensions', 'id', 'bigint', 'Column id should be bigint');
 SELECT col_type_is('dimensions', 'distance', 'numeric(12,4)', 'Column distance should be numeric(12,4)');
 SELECT col_type_is('dimensions', 'depth', 'numeric(12,4)', 'Column depth should be numeric(12,4)');
 SELECT col_type_is('dimensions', 'the_geom', 'geometry(linestring,25831)', 'Column the_geom should be geometry(linestring,25831)');
@@ -77,8 +77,11 @@ SELECT fk_ok('dimensions', 'state', 'value_state', 'id','Table should have forei
 SELECT fk_ok('dimensions', 'workcat_id', 'cat_work', 'id','Table should have foreign key from workcat_id to cat_work.id');
 
 -- Check indexes
-SELECT has_index('dimensions', 'muni_id', 'Table should have index on muni_id');
-SELECT has_index('dimensions', 'sector_id', 'Table should have index on sector_id');
+SELECT has_index('dimensions', 'dimensions_muni', 'Table should have index on muni_id');
+SELECT has_index('dimensions', 'dimensions_sector', 'Table should have index on sector_id');
+SELECT has_index('dimensions', 'dimensions_pkey', 'Table should have index on id');
+
+
 
 -- Finish
 SELECT * FROM finish();

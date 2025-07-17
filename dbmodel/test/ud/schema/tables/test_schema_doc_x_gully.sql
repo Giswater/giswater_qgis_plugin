@@ -26,8 +26,7 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('doc_x_gully', 'doc_id', 'Column doc_id should be primary key'); 
-SELECT col_is_pk('doc_x_gully', 'gully_id', 'Column gully_id should be primary key'); 
+SELECT col_is_pk('doc_x_gully', ARRAY['doc_id', 'gully_id'], 'Columns doc_id and gully_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('doc_x_gully', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
@@ -40,8 +39,7 @@ SELECT fk_ok('doc_x_gully', 'doc_id', 'doc', 'id', 'Table should have foreign ke
 SELECT fk_ok('doc_x_gully', 'gully_id', 'gully', 'gully_id', 'Table should have foreign key from gully_id to gully.gully_id');
 
 -- Check indexes
-SELECT has_index('doc_x_gully', 'doc_id', 'Table should have index on doc_id');
-SELECT has_index('doc_x_gully', 'gully_id', 'Table should have index on gully_id');
+SELECT has_index('doc_x_gully', 'doc_x_gully_pkey', ARRAY['doc_id', 'gully_id'], 'Table should have index on doc_id, gully_id');
 
 -- Finish
 SELECT * FROM finish();

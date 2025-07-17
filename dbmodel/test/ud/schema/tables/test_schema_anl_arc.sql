@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_is_pk('anl_arc', 'id', 'Column id should be primary key');
 
 --column types
-SELECT col_type_is('anl_arc', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('anl_arc', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('anl_arc', 'arc_id', 'varchar', 'Column arc_id should be varchar');
 SELECT col_type_is('anl_arc', 'arccat_id', 'varchar(30)', 'Column arccat_id should be varchar(30)');
 SELECT col_type_is('anl_arc', 'state', 'integer', 'Column state should be integer');
@@ -58,9 +58,9 @@ SELECT col_type_is('anl_arc', 'elev1', 'float8', 'Column elev1 should be float8'
 SELECT col_type_is('anl_arc', 'elev2', 'float8', 'Column elev2 should be float8');
 SELECT col_type_is('anl_arc', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('anl_arc', 'addparam', 'text', 'Column addparam should be text');
-SELECT col_type_is('anl_arc', 'sector_id', 'interger', 'Column sector_id should be interger');
-SELECT col_type_is('anl_arc', 'drainzone_id', 'interger', 'Column drainzone_id should be interger');
-SELECT col_type_is('anl_arc', 'dwfzone_id', 'interger', 'Column dwfzone_id should be interger')
+SELECT col_type_is('anl_arc', 'sector_id', 'integer', 'Column sector_id should be integer');
+SELECT col_type_is('anl_arc', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
+SELECT col_type_is('anl_arc', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer')
 
 -- Check check default values
 SELECT col_has_default('anl_arc', 'cur_user', 'Column cur_user should have default value');

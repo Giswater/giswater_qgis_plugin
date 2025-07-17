@@ -26,12 +26,11 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('element_x_connec', 'element_id', 'Column element_id should be primary key'); 
-SELECT col_is_pk('element_x_connec', 'connec_id', 'Column connec_id should be primary key'); 
+SELECT col_is_pk('element_x_connec', ARRAY['element_id', 'connec_id'], 'Columns element_id and connec_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('element_x_connec', 'element_id', 'int4', 'Column element_id should be int4');
-SELECT col_type_is('element_x_connec', 'connec_id', 'int4', 'Column connec_id should be int4')
+SELECT col_type_is('element_x_connec', 'connec_id', 'int4', 'Column connec_id should be int4');
 
 -- Check foreign keys
 SELECT has_fk('element_x_connec', 'Table element_x_connec should have foreign keys');
@@ -40,8 +39,7 @@ SELECT fk_ok('element_x_connec', 'connec_id', 'connec', 'connec_id', 'Table shou
 SELECT fk_ok('element_x_connec', 'element_id', 'element', 'element_id', 'Table should have foreign key from element_id to element.element_id');
 
 -- Check indexes
-SELECT has_index('element_x_connec', 'element_id', 'Table should have index on element_id');
-SELECT has_index('element_x_connec', 'connec_id', 'Table should have index on connec_id');
+SELECT has_index('element_x_connec', 'element_x_connec_pkey', ARRAY['element_id', 'connec_id'], 'Table should have index on element_id, connec_id');
 
 -- Finish
 SELECT * FROM finish();

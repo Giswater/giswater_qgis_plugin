@@ -22,12 +22,12 @@ SELECT has_table('archived_rpt_arc'::name, 'Table archived_rpt_arc should exist'
 SELECT columns_are(
     'archived_rpt_arc',
     ARRAY[
-        'id', 'result_id', 'arc_id','resultdate','resulttime', 'flow', 'velocity', 'fullpercent', 
+        'id', 'result_id', 'arc_id','resultdate','resulttime', 'flow', 'velocity', 'fullpercent'
     ],
     'Table archived_rpt_arc should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('archived_rpt_arc', 'id', 'bigserial', 'Column id should be bigserial');
+SELECT col_type_is('archived_rpt_arc', 'id', 'bigint', 'Column id should be bigint');
 SELECT col_type_is('archived_rpt_arc', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_arc', 'arc_id', 'int4', 'Column arc_id should be int4');
 SELECT col_type_is('archived_rpt_arc', 'resultdate', 'varchar(16)', 'Column resultdate should be varchar(16)');

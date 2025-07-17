@@ -26,8 +26,7 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('doc_x_element', 'doc_id', 'Column doc_id should be primary key'); 
-SELECT col_is_pk('doc_x_element', 'element_id', 'Column element_id should be primary key'); 
+SELECT col_is_pk('doc_x_element', ARRAY['doc_id', 'element_id'], 'Columns doc_id and element_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('doc_x_element', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
@@ -40,8 +39,7 @@ SELECT fk_ok('doc_x_element', 'doc_id', 'doc', 'id', 'Table should have foreign 
 SELECT fk_ok('doc_x_element', 'element_id', 'element', 'element_id', 'Table should have foreign key from element_id to element.element_id');
 
 -- Check indexes
-SELECT has_index('doc_x_element', 'doc_id', 'Table should have index on doc_id');
-SELECT has_index('doc_x_element', 'element_id', 'Table should have index on element_id');
+SELECT has_index('doc_x_element', 'doc_x_element_pkey', ARRAY['doc_id', 'element_id'], 'Table should have index on doc_id, element_id');
 
 -- Finish
 SELECT * FROM finish();

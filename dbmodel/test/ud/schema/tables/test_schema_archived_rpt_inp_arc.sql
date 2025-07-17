@@ -33,7 +33,7 @@ SELECT columns_are(
     'Table archived_rpt_inp_arc should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('archived_rpt_inp_arc', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('archived_rpt_inp_arc', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('archived_rpt_inp_arc', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_inp_arc', 'arc_id', 'int4', 'Column arc_id should be int4');
 SELECT col_type_is('archived_rpt_inp_arc', 'node_1', 'int4', 'Column node_1 should be int4');

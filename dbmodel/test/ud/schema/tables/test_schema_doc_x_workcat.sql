@@ -26,8 +26,7 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('doc_x_workcat', 'doc_id', 'Column doc_id should be part of primary key');
-SELECT col_is_pk('doc_x_workcat', 'workcat_id', 'Column workcat_id should be part of primary key');
+SELECT col_is_pk('doc_x_workcat', ARRAY['doc_id', 'workcat_id'], 'Columns doc_id and workcat_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('doc_x_workcat', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
@@ -40,8 +39,7 @@ SELECT fk_ok('doc_x_workcat', 'doc_id', 'doc', 'id', 'Table should have foreign 
 SELECT fk_ok('doc_x_workcat', 'workcat_id', 'cat_work', 'id', 'Table should have foreign key from workcat_id to cat_work.id');
 
 -- Check indexes
-SELECT has_index('doc_x_workcat', 'doc_id', 'Table should have index on doc_id');
-SELECT has_index('doc_x_workcat', 'workcat_id', 'Table should have index on workcat_id');
+SELECT has_index('doc_x_workcat', 'doc_x_workcat_pkey', ARRAY['doc_id', 'workcat_id'], 'Table should have index on doc_id, workcat_id');
 
 -- Finish
 SELECT * FROM finish();

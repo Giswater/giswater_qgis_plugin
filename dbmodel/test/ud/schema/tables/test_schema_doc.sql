@@ -22,7 +22,7 @@ SELECT has_table('doc'::name, 'Table doc should exist');
 SELECT columns_are(
     'doc',
     ARRAY[
-      'id', '"name"', 'doc_type', '"path"', 'observ', '"date"', 'user_name', 'tstamp', 'the_geom'
+      'id', 'name', 'doc_type', 'path', 'observ', 'date', 'user_name', 'tstamp', 'the_geom'
     ],
     'Table doc should have the correct columns'
 
@@ -42,15 +42,15 @@ SELECT col_type_is('doc', 'the_geom', 'public.geometry(point, 25831)', 'Column t
 
 
 --check default values
-SELECT col_has_default('doc', '"date"', 'Column "date" should have default value');
+SELECT col_has_default('doc', 'date', 'Column date should have default value');
 SELECT col_has_default('doc', 'user_name', 'Column user_name should have default value');
 SELECT col_has_default('doc', 'tstamp', 'Column tstamp should have default value');
 
 -- check foreign keys
 
 -- check indexes
-SELECT has_index('doc', 'id', 'Table doc should have index on id');
-SELECT has_index('doc', 'name', 'Table doc should have index on name');
+SELECT has_index('doc', 'doc_pkey', 'Table doc should have index on id');
+SELECT has_index('doc', 'name_chk', 'Table doc should have index on name');
 
 
 

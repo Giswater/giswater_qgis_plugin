@@ -22,12 +22,12 @@ SELECT has_table('cat_workspace'::name, 'Table cat_workspace should exist');
 SELECT columns_are(
     'cat_workspace',
     ARRAY[
-      'id', '"name"', 'descript', 'config', 'private','active', 'iseditable', 'insert_user', 'insert_timestamp', 'lastupdate_user','lastupdate_timestamp'
+      'id', 'name', 'descript', 'config', 'private','active', 'iseditable', 'insert_user', 'insert_timestamp', 'lastupdate_user','lastupdate_timestamp'
     ],
     'Table cat_workspace should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('cat_workspace', 'id', 'serial14', 'Column id should be serial14');
+SELECT col_type_is('cat_workspace', 'id', 'serial4', 'Column id should be serial4');
 SELECT col_type_is('cat_workspace', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('cat_workspace', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('cat_workspace', 'config', 'json', 'Column config should be json');

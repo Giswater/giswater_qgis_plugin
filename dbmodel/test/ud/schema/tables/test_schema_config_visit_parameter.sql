@@ -50,7 +50,7 @@ SELECT col_type_is('config_visit_parameter', 'active', 'bool', 'Column active sh
 SELECT col_has_default('config_visit_parameter', 'active', 'Column active should have default value');
 
 -- Check indexes
-SELECT has_index('config_visit_parameter', 'id', 'Table should have index on id');
+SELECT has_index('config_visit_parameter', 'config_visit_parameter_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('config_visit_parameter', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');

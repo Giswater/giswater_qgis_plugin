@@ -20,7 +20,7 @@ SELECT has_table('config_param_system'::name, 'Table config_param_system should 
 SELECT columns_are(
     'config_param_system',
     ARRAY[
-        'parameter', 'value', 'descript' 'label', 'dv_querytext', 'dv_filterbyfield', 'isenabled', 'layoutorder', 'project_type', 'dv_isparent', 'isautoupdate',
+        'parameter', 'value', 'descript', 'label', 'dv_querytext', 'dv_filterbyfield', 'isenabled', 'layoutorder', 'project_type', 'dv_isparent', 'isautoupdate',
         'datatype', 'widgettype', 'ismandatory', 'iseditable', 'dv_orderby_id', 'dv_isnullvalue', 'stylesheet', 'widgetcontrols', 'placeholder', 'standardvalue', 'layoutname'
     ],
     'Table config_param_system should have the correct columns'

@@ -27,7 +27,7 @@ SELECT columns_are(
         'epa_type', 'state', 'state_type', 'parent_id', 'expl_id', 'muni_id', 'sector_id', 'drainzone_id',
         'drainzone_outfall', 'dwfzone_id', 'dwfzone_outfall', 'omzone_id', 'omunit_id', 'minsector_id', 'pavcat_id',
         'soilcat_id', 'function_type', 'category_type', 'location_type', '_fluid_type', 'fluid_type', 'treatment_type',
-        'custom_length', 'sys_slope', 'descript', 'annotation', 'observ', '"comment"', 'link', 'num_value',
+        'custom_length', 'sys_slope', 'descript', 'annotation', 'observ', 'comment', 'link', 'num_value',
         'district_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id', 'postnumber2',
         'postcomplement2', 'workcat_id', 'workcat_id_end', 'workcat_id_plan', 'builtdate', 'registration_date',
         'enddate', 'ownercat_id', 'last_visitdate', 'visitability', 'om_state', 'conserv_state', 'brand_id',
@@ -43,7 +43,7 @@ SELECT columns_are(
 SELECT col_is_pk('arc', 'arc_id', 'Column arc_id should be primary key'); 
 
 -- Check check columns
-SELECT col_has_check('arc', 'epa_type', Table should have check on 'epa_type');
+SELECT col_has_check('arc', 'epa_type', 'Table should have check on epa_type');
 
 -- Check column types
 SELECT col_type_is('arc', 'arc_id', 'integer', 'Column arc_id should be integer');

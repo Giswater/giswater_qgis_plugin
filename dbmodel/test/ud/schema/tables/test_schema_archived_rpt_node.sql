@@ -22,12 +22,12 @@ SELECT has_table('archived_rpt_node'::name, 'Table archived_rpt_node should exis
 SELECT columns_are(
     'archived_rpt_node',
     ARRAY[
-        'id', 'result_id', 'node_id','resultdate','resulttime', 'flooding', '"depth"', 'head', 'inflow', 
+        'id', 'result_id', 'node_id','resultdate','resulttime', 'flooding', 'depth', 'head', 'inflow'
     ],
     'Table archived_rpt_node should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('archived_rpt_node', 'id', 'serial14', 'Column id should be serial14');
+SELECT col_type_is('archived_rpt_node', 'id', 'serial4', 'Column id should be serial4');
 SELECT col_type_is('archived_rpt_node', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_node', 'node_id', 'int4', 'Column node_id should be int4');
 SELECT col_type_is('archived_rpt_node', 'resultdate', 'varchar(16)', 'Column resultdate should be varchar(16)');
@@ -35,7 +35,7 @@ SELECT col_type_is('archived_rpt_node', 'resulttime', 'varchar(12)', 'Column res
 SELECT col_type_is('archived_rpt_node', 'flooding', 'float8', 'Column flooding should be float8');
 SELECT col_type_is('archived_rpt_node', 'depth', 'float8', 'Column depth should be float8');
 SELECT col_type_is('archived_rpt_node', 'head', 'float8', 'Column head should be float8');
-SELECT col_type_is('archived_rpt_node', 'inflow', 'numeric(12, 4)', 'Column inflow should be numeric(12, 4)');
+SELECT col_type_is('archived_rpt_node', 'inflow', 'numeric(12, 3)', 'Column inflow should be numeric(12, 3)');
 
 
 

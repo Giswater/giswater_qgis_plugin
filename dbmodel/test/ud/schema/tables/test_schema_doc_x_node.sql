@@ -45,8 +45,7 @@ SELECT fk_ok('doc_x_node','doc_id','doc','id','Table should have foreign key fro
 SELECT fk_ok('doc_x_node','node_id', 'node','node_id','Table should have foreign key from node_id to node.node_id');
 
 -- check indexes
-SELECT has_index('doc_x_node', 'doc_id', 'Table doc_x_node should have index on doc_id');
-SELECT has_index('doc_x_node', 'node_id', 'Table doc_x_node should have index on node_id');
+SELECT has_index('doc_x_node', 'doc_x_node_pkey', ARRAY['doc_id', 'node_id'], 'Table should have index on doc_id, node_id');
 
 
 --check trigger 

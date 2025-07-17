@@ -42,11 +42,7 @@ SELECT col_type_is('config_typevalue', 'addparam', 'json', 'Column addparam shou
 
 
 -- check indexes
-SELECT has_index('config_typevalue', 'id', 'Table config_typevalue should have index on id');
-SELECT has_index('config_typevalue', 'typevalue', 'Table config_typevalue should have index on typevalue');
-
-
-
+SELECT has_index('config_typevalue', 'config_typevalue_pkey', ARRAY['typevalue','id'], 'Table config_typevalue should have index on typevalue, id');
 
 --check trigger 
 SELECT has_trigger('config_typevalue', 'gw_trg_typevalue_config_fk', 'Table config_typevalue should have trigger gw_trg_typevalue_config_fk');

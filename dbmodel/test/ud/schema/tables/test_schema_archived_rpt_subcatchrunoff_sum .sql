@@ -1,4 +1,4 @@
-*
+/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -28,7 +28,7 @@ SELECT columns_are(
     'Table archived_rpt_subcatchrunoff_sum should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('archived_rpt_subcatchrunoff_sum', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('archived_rpt_subcatchrunoff_sum', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('archived_rpt_subcatchrunoff_sum', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_subcatchrunoff_sum', 'subc_id', 'varchar(16)', 'Column subc_id should be varchar(16)');
 SELECT col_type_is('archived_rpt_subcatchrunoff_sum', 'tot_precip', 'numeric(12, 4)', 'Column tot_precip should be numeric(12, 4)');
@@ -55,7 +55,7 @@ SELECT col_type_is('archived_rpt_subcatchrunoff_sum', 'vhmax', 'numeric(12, 6)',
 
 
 -- check index
-SELECT has_index('archived_rpt_subcatchrunoff_sum', 'id', 'Table archived_rpt_subcatchrunoff_sum should have index on id');
+SELECT has_index('archived_rpt_subcatchrunoff_sum', 'archived_rpt_subcathrunoff_sum_pkey', ARRAY['id'], 'Table archived_rpt_subcatchrunoff_sum should have index on id');
 
 --check trigger 
 

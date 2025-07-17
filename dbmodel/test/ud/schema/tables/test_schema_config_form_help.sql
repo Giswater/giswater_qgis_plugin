@@ -22,7 +22,7 @@ SELECT has_table('config_form_help'::name, 'Table config_form_help should exist'
 SELECT columns_are(
     'config_form_help',
     ARRAY[
-      'fortype', 'formname', 'tabname', '"path"', 
+      'fortype', 'formname', 'tabname', 'path'
     ],
     'Table config_form_help should have the correct columns'
 );

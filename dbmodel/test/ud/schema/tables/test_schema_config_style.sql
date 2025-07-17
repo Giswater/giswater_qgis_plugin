@@ -29,10 +29,10 @@ SELECT columns_are(
 );
 -- check columns names
 
-SELECT col_type_is('config_style', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('config_style', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('config_style', 'idval', 'text', 'Column idval should be text');
 SELECT col_type_is('config_style', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('config_style', 'sys_role', 'text', 'Column sys_role should be text');
+SELECT col_type_is('config_style', 'sys_role', 'varchar(30)', 'Column sys_role should be varchar(30)');
 SELECT col_type_is('config_style', 'addparam', 'json', 'Column addparam should be json');
 SELECT col_type_is('config_style', 'is_templayer', 'bool', 'Column is_templayer should be bool');
 SELECT col_type_is('config_style', 'active', 'bool', 'Column active should be bool');
@@ -45,8 +45,8 @@ SELECT col_type_is('config_style', 'active', 'bool', 'Column active should be bo
 
 
 -- check indexes
-SELECT has_index('config_style', 'id', 'Table config_style should have index on id');
-SELECT has_index('config_style', 'idval', 'Table config_style should have index on idval');
+SELECT has_index('config_style', 'config_style_pkey', ARRAY['id'], 'Table config_style should have index on id');
+SELECT has_index('config_style', 'idval_chk', ARRAY['idval'], 'Table config_style should have index on idval');
 
 
 
