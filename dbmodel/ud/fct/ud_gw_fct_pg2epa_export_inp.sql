@@ -569,19 +569,20 @@ BEGIN
 		 SELECT inp_lid_value.id,
 		    inp_lid_value.lidco_id,
 		    inp_typevalue.idval AS lidco_type,
-		    inp_lid_value.value_2 AS other1,
-		    inp_lid_value.value_3 AS other2,
-		    inp_lid_value.value_4 AS other3,
-		    inp_lid_value.value_5 AS other4,
-		    inp_lid_value.value_6 AS other5,
-		    inp_lid_value.value_7 AS other6,
-		    inp_lid_value.value_8 AS other7
+		    CASE WHEN inp_lid_value.value_2 = 0 THEN 0 ELSE inp_lid_value.value_2 END AS other1,
+		    CASE WHEN inp_lid_value.value_3 = 0 THEN 0 ELSE inp_lid_value.value_3 END AS other2,
+		    CASE WHEN inp_lid_value.value_4 = 0 THEN 0 ELSE inp_lid_value.value_4 END AS other3,
+		    CASE WHEN inp_lid_value.value_5 = 0 THEN 0 ELSE inp_lid_value.value_5 END AS other4,
+		    CASE WHEN inp_lid_value.value_6::numeric = 0 THEN 0 ELSE inp_lid_value.value_6::text END AS other5,
+		    CASE WHEN inp_lid_value.value_7::numeric = 0 THEN 0 ELSE inp_lid_value.value_7::text END AS other6,
+		    CASE WHEN inp_lid_value.value_8::numeric = 0 THEN 0 ELSE inp_lid_value.value_8::text END AS other7
 		   FROM inp_lid_value
 		     JOIN inp_lid USING (lidco_id)
 		     JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lids)a USING (lidco_id)
 		     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
 		  WHERE inp_lid.active AND inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
 	  ORDER BY a.lidco_id, a.id;
+
 
 	 CREATE OR REPLACE TEMP VIEW vi_t_lid_usage AS
 	 SELECT temp_t_lid_usage.subc_id,
@@ -627,7 +628,6 @@ BEGIN
 	  WHERE temp_t_arc.kentry > 0::numeric OR temp_t_arc.kexit > 0::numeric OR temp_t_arc.kavg > 0::numeric OR temp_t_arc.flap::text = 'YES'::text OR temp_t_arc.seepage IS NOT NULL;
 
 
-
 	CREATE OR REPLACE TEMP VIEW vi_t_map  AS
 	 SELECT inp_mapdim.type_dim,
 	    concat(inp_mapdim.x1, ' ', inp_mapdim.y1, ' ', inp_mapdim.x2, ' ', inp_mapdim.y2) AS other_val
@@ -667,7 +667,6 @@ BEGIN
 		    cat_hydrology
 		  WHERE config_param_user.parameter::text = 'inp_options_hydrology_current'::text AND config_param_user.cur_user::text = "current_user"()::text) a
 	  ORDER BY a.layoutname, a.layoutorder;
-
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_orifices AS
@@ -1077,8 +1076,6 @@ BEGIN
 	   FROM temp_t_arc_flowregulator
 	  WHERE temp_t_arc_flowregulator.type::text = ANY (ARRAY['ORIFICE'::character varying::text, 'WEIR'::character varying::text]);
 
-
-
 	-- temporal views related to other temporal views (last to create first to drop below)
 
 	CREATE OR REPLACE TEMP VIEW vi_t_patterns AS
@@ -1304,7 +1301,6 @@ BEGIN
 			-- nothing because this targets does not to be exported
 
 		ELSE
-
 			INSERT INTO temp_t_csv (csv1,fid) VALUES (NULL,v_fid);
 			EXECUTE 'INSERT INTO temp_t_csv(fid,csv1) VALUES ('||v_fid||','''|| rec_table.target||''');';
 
