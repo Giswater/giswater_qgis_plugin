@@ -6,10 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
+from typing import Optional, List, Any, Dict, Union
 
+from qgis.PyQt.QtCore import QDate, QModelIndex
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QTextEdit, QCompleter, QTableView
+from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QTextEdit, QCompleter, \
+    QTableView, QToolBar, QActionGroup, QDialog
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
@@ -21,21 +23,21 @@ from ...shared.selector import GwSelector
 class Campaign:
     """Handles campaign creation, management, and database operations"""
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        self.visitclass_combo = None
-        self.reviewclass_combo = None
+    def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QToolBar, action_group: QActionGroup):
+        self.visitclass_combo: Optional[QComboBox] = None
+        self.reviewclass_combo: Optional[QComboBox] = None
         self.iface = global_vars.iface
         self.campaign_date_format = 'yyyy-MM-dd'
         self.schema_parent = lib_vars.schema_name
         self.project_type = tools_gw.get_project_type()
-        self.dialog = None
-        self.campaign_type = None
-        self.campaign_id = None
+        self.dialog: Optional[QDialog] = None
+        self.campaign_type: Optional[int] = None
+        self.campaign_id: Optional[int] = None
         self.canvas = global_vars.canvas
         self.campaign_saved = False
         self.is_new_campaign = True
 
-    def create_campaign(self, campaign_id=None, is_new=True, dialog_type="review"):
+    def create_campaign(self, campaign_id: Optional[int] = None, is_new: bool = True, dialog_type: str = "review"):
         """ Entry point for campaign creation or editing """
 
         self.load_campaign_dialog(campaign_id=campaign_id, mode=dialog_type)
@@ -90,7 +92,7 @@ class Campaign:
         selector = GwSelector()
         selector.open_selector(selector_type, show_lot_tab=show_lot)
 
-    def load_campaign_dialog(self, campaign_id=None, mode="review"):
+    def load_campaign_dialog(self, campaign_id: Optional[int] = None, mode: str = "review"):
         """
         Load and initialize the campaign dialog.
 
@@ -293,7 +295,7 @@ class Campaign:
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
 
-    def _load_campaign_relations(self, campaign_id):
+    def _load_campaign_relations(self, campaign_id: int):
         """
         Load related elements into campaign relation tabs for the given ID.
         Includes 'gully' only if project type is UD.
@@ -313,7 +315,7 @@ class Campaign:
                 sql = f"SELECT * FROM cm.{db_table} WHERE campaign_id = {campaign_id}"
                 self.populate_tableview(view, sql)
 
-    def create_widget_from_field(self, field, response):
+    def create_widget_from_field(self, field: Dict[str, Any], response: Dict[str, Any]) -> Optional[QWidget]:
         """Create a Qt widget based on field metadata"""
         wtype = field.get("widgettype", "text")
         iseditable = field.get("iseditable", True)
@@ -365,7 +367,7 @@ class Campaign:
         creation_func = widget_map.get(wtype)
         return creation_func() if creation_func else None
 
-    def set_widget_value(self, widget, value):
+    def set_widget_value(self, widget: QWidget, value: Any):
         """Sets the widget value from JSON"""
         if value is None:
             return
@@ -409,13 +411,13 @@ class Campaign:
             if fallback_index > -1:
                 widget.setCurrentIndex(fallback_index)
 
-    def _on_tab_change(self, index):
+    def _on_tab_change(self, index: int):
         # Get the tab object at the changed index
         tab = self.dialog.tab_widget.widget(index)
         if tab.objectName() == "tab_relations" and self.is_new_campaign and not self.campaign_saved:
             self.save_campaign(from_tab_change=True)
 
-    def save_campaign(self, from_tab_change=False):
+    def save_campaign(self, from_tab_change: bool = False) -> Optional[bool]:
         """Save campaign data to the database. Updates ID and resets map on success."""
 
         fields_dict = self.extract_campaign_fields(self.dialog, as_dict=True)
@@ -483,11 +485,11 @@ class Campaign:
             msg = "Failed to save campaign"
             tools_qgis.show_warning(result.get("message", msg))
 
-    def _get_checkbox_value_as_string(self, dialog, widget):
+    def _get_checkbox_value_as_string(self, dialog: QDialog, widget: QCheckBox) -> str:
         """Helper to get QCheckBox value as a lowercase string ('true'/'false')."""
         return str(tools_qt.is_checked(dialog, widget)).lower()
 
-    def extract_campaign_fields(self, dialog, as_dict=False):
+    def extract_campaign_fields(self, dialog: QDialog, as_dict: bool = False) -> Union[Dict, str]:
         """Build a JSON string or dictionary of field values from the campaign dialog"""
         fields = {}
 
@@ -586,7 +588,7 @@ class Campaign:
     def _on_tab_feature_changed(self):
         self.feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
 
-    def get_widget_by_columnname(self, dialog, columnname):
+    def get_widget_by_columnname(self, dialog: QDialog, columnname: str) -> Optional[QWidget]:
         for widget in dialog.findChildren(QWidget):
             if widget.property("columnname") == columnname:
                 return widget
@@ -600,7 +602,7 @@ class Campaign:
         enable = bool(name_widget.text().strip())
         self.dialog.tab_widget.setTabEnabled(self.dialog.tab_widget.indexOf(self.dialog.tab_relations), enable)
 
-    def _update_feature_completer(self, dlg):
+    def _update_feature_completer(self, dlg: QDialog):
         tab_name = dlg.tab_feature.currentWidget().objectName()
         feature = tab_name.replace('tab_', '')
         id_column = f"{feature}_id"
@@ -640,7 +642,7 @@ class Campaign:
         completer.setCaseSensitivity(False)
         dlg.feature_id.setCompleter(completer)
 
-    def _on_class_changed(self, sender=None):
+    def _on_class_changed(self, sender: Optional[QComboBox] = None):
         """Called when the user changes the reviewclass or visitclass combo or when dialog opens"""
         # If sender is not passed, try get it from signal
         if sender is None:
@@ -671,7 +673,7 @@ class Campaign:
 
         self._manage_tabs_enabled(feature_types)
 
-    def get_allowed_feature_subtypes_visit(self, visitclass_id: int) -> list[str]:
+    def get_allowed_feature_subtypes_visit(self, visitclass_id: int) -> List[str]:
         """
         Returns a list of feature_type strings from cm.om_visitclass
         for the given visitclass_id.
@@ -691,7 +693,7 @@ class Campaign:
         # pull out non-null values
         return [r["feature_type"] for r in rows if r.get("feature_type")]
 
-    def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int):
+    def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int) -> List[str]:
         """
         Get allowed subtypes (e.g., TANK, PR_BREAK_VALVE) based on reviewclass_id.
         If the class is linked to 'ALL', it returns an empty list to enable all selections.
@@ -711,7 +713,7 @@ class Campaign:
         rows = tools_db.get_rows(sql)
         return [r["object_id"] for r in rows or []]
 
-    def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int):
+    def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int) -> List[str]:
         """
         Query om_reviewclass_x_object to get allowed feature types.
         Has special handling for a class linked to an 'ALL' object_id.
@@ -733,7 +735,7 @@ class Campaign:
         rows = tools_db.get_rows(sql)
         return [r["feature_type"] for r in rows or []]
 
-    def get_allowed_feature_types_from_visitclass(self, table_name: str, visitclass_id: int):
+    def get_allowed_feature_types_from_visitclass(self, table_name: str, visitclass_id: int) -> List[str]:
         """Function to get feature types directly from om_visitclass table."""
         sql = f"""
                 SELECT DISTINCT
@@ -757,7 +759,7 @@ class Campaign:
         sql = f"SELECT 1 FROM cm.om_reviewclass_x_object WHERE reviewclass_id = {reviewclass_id} AND upper(object_id) = 'ALL' LIMIT 1"
         return tools_db.get_row(sql) is not None
 
-    def _manage_tabs_enabled(self, feature_types):
+    def _manage_tabs_enabled(self, feature_types: List[str]):
         """ Enable or disable relation tabs depending on allowed feature types (e.g., ['node', 'arc']). """
 
         tab_widget = self.dialog.tab_feature
@@ -782,7 +784,7 @@ class Campaign:
             enabled = tab_type in normalized
             tab_widget.setTabEnabled(i, enabled)
 
-    def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
+    def populate_tableview(self, view: QTableView, query: str, columns: Optional[List[str]] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
@@ -923,7 +925,7 @@ class Campaign:
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.manager_dialog)
         self.filter_campaigns()
 
-    def open_campaign(self, index=None):
+    def open_campaign(self, index: Optional[QModelIndex] = None):
         """Open campaign from the clicked index safely (double click handler or button handler)."""
 
         # If called by double click, index is passed
@@ -952,7 +954,7 @@ class Campaign:
             tools_qgis.show_warning(msg)
 
 
-def update_expl_sector_combos(**kwargs):
+def update_expl_sector_combos(**kwargs: Any):
     """
     Update exploitation and sector combos based on organization.
     This function is designed to be called from a widgetfunction.
