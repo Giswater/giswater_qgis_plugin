@@ -49,13 +49,11 @@ SELECT col_has_default('cat_feature', 'code_autofill', 'Column code_autofill sho
 
 -- Check foreign keys
 SELECT has_fk('cat_feature', 'Table cat_feature should have foreign keys');
-
-SELECT fk_ok('cat_feature', 'feature_class', 'sys_feature_class', 'id', 'Table should have foreign key from feature_class to sys_feature_class.id');
-SELECT fk_ok('cat_feature', 'feature_type', 'sys_feature_class', 'type', 'Table should have foreign key from feature_type to sys_feature_class.type');
+SELECT fk_ok('cat_feature', ARRAY['feature_class','feature_type'], 'sys_feature_class', ARRAY['id','type'], 'Table should have foreign key from feature_class, feature_type to sys_feature_class.id, type');
 
 -- Check indexes
-SELECT has_index('cat_feature', 'id', 'Table should have index on id');
-SELECT has_index('cat_feature', 'shortcut_key', 'Table should have index on shortcut_key');
+SELECT has_index('cat_feature', 'cat_feature_pkey', ARRAY['id'], 'Table should have index on id');
+SELECT has_index('cat_feature', 'shortcut_unique', ARRAY['shortcut_key'], 'Table should have index on shortcut_key');
 
 -- Check triggers
 SELECT has_trigger('cat_feature', 'gw_trg_cat_feature_after', 'Table should have trigger gw_trg_cat_feature_after');

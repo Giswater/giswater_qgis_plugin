@@ -58,7 +58,7 @@ SELECT fk_ok('cat_element', 'element_type', 'cat_feature_element', 'id', 'Table 
 SELECT fk_ok('cat_element', 'model', 'cat_brand_model', 'id', 'Table should have foreign key from model to cat_brand_model.id');
 
 -- Check indexes
-SELECT has_index('cat_element', 'id', 'Table should have index on id');
+SELECT has_index('cat_element', 'cat_element_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('cat_element', 'gw_trg_cat_material_fk_insert', 'Table should have trigger gw_trg_cat_material_fk_insert');

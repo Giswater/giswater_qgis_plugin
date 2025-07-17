@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'id', 'arc_id', 'arccat_id', 'state', 'arc_id_aux', 'expl_id', 'fid','cur_user', 'the_geom', 'the_geom_p', 'descript',
          'result_id', 'node_1', 'node_2','sys_type', 'code', 'cat_geom1', 'length', 'slope', 'total_length', 'z1','z2', 'y1', 'y2', 'elev1',
-          'elev2', 'dma_id', 'addparams', 'sector_id', 'drainzone_id', 'dwfzone_id'
+          'elev2', 'dma_id', 'addparam', 'sector_id', 'drainzone_id', 'dwfzone_id'
     ],
     'Table anl_arc should have the correct columns'
 );
@@ -31,20 +31,20 @@ SELECT col_is_pk('anl_arc', 'id', 'Column id should be primary key');
 
 --column types
 SELECT col_type_is('anl_arc', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('anl_arc', 'arc_id', 'varchar', 'Column arc_id should be varchar');
-SELECT col_type_is('anl_arc', 'arccat_id', 'varchar(30)', 'Column arccat_id should be varchar(30)');
+SELECT col_type_is('anl_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
+SELECT col_type_is('anl_arc', 'arccat_id', 'character varying(30)', 'Column arccat_id should be character varying(30)');
 SELECT col_type_is('anl_arc', 'state', 'integer', 'Column state should be integer');
-SELECT col_type_is('anl_arc', 'arc_id_aux', 'integer', 'Column arc_id_aux should be integer');
+SELECT col_type_is('anl_arc', 'arc_id_aux', 'character varying(16)', 'Column arc_id_aux should be character varying(16)');
 SELECT col_type_is('anl_arc', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('anl_arc', 'fid', 'integer', 'Column fid should be integer');
-SELECT col_type_is('anl_arc', 'cur_user', 'varchar(50)', 'Column cur_user should be varchar(50)');
+SELECT col_type_is('anl_arc', 'cur_user', 'character varying(50)', 'Column cur_user should be character varying(50)');
 SELECT col_type_is('anl_arc', 'the_geom', 'geometry(linestring, 25831)', 'Column the_geom should be geometry(linestring, 25831)');
 SELECT col_type_is('anl_arc', 'the_geom_p', 'geometry(point, 25831)', 'Column the_geom_p should be geometry(point, 25831)');
 SELECT col_type_is('anl_arc', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('anl_arc', 'result_id', 'varchar(16)', 'Column result_id should be varchar(16)');
-SELECT col_type_is('anl_arc', 'node_1', 'varchar(16)', 'Column node_1 should be varchar(16)');
-SELECT col_type_is('anl_arc', 'node_2', 'varchar(16)', 'Column node_2 should be varchar(16)');
-SELECT col_type_is('anl_arc', 'sys_type', 'varchar(30)', 'Column sys_type should be varchar(30)');
+SELECT col_type_is('anl_arc', 'result_id', 'character varying(16)', 'Column result_id should be character varying(16)');
+SELECT col_type_is('anl_arc', 'node_1', 'character varying(16)', 'Column node_1 should be character varying(16)');
+SELECT col_type_is('anl_arc', 'node_2', 'character varying(16)', 'Column node_2 should be character varying(16)');
+SELECT col_type_is('anl_arc', 'sys_type', 'character varying(30)', 'Column sys_type should be character varying(30)');
 SELECT col_type_is('anl_arc', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('anl_arc', 'cat_geom1', 'float8', 'Column cat_geom1 should be float8');
 SELECT col_type_is('anl_arc', 'length', 'float8', 'Column length should be float8');
@@ -60,7 +60,7 @@ SELECT col_type_is('anl_arc', 'dma_id', 'integer', 'Column dma_id should be inte
 SELECT col_type_is('anl_arc', 'addparam', 'text', 'Column addparam should be text');
 SELECT col_type_is('anl_arc', 'sector_id', 'integer', 'Column sector_id should be integer');
 SELECT col_type_is('anl_arc', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
-SELECT col_type_is('anl_arc', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer')
+SELECT col_type_is('anl_arc', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
 
 -- Check check default values
 SELECT col_has_default('anl_arc', 'cur_user', 'Column cur_user should have default value');

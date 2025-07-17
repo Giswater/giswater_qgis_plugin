@@ -22,9 +22,9 @@ SELECT has_table('anl_node'::name, 'Table anl_node should exist');
 SELECT columns_are(
     'anl_node',
     ARRAY[
-        'id', 'node_id', 'nodecat_id','state','num_arc','node_id_aux', 'nodecat_id_aux', 'state_aux',
+        'id', 'node_id', 'nodecat_id','state','num_arcs','node_id_aux', 'nodecat_id_aux', 'state_aux',
          'expl_id', 'fid','cur_user', 'the_geom', 'arc_distance','arc_id','descript','result_id', 'total_distance', 
-         'sys_type','code', 'cat_geom1', 'top_elev','elev', 'ymax','state_type','sector_id', 'addparam', 'drainzone_id', 'dwzone_id'
+         'sys_type','code', 'cat_geom1', 'top_elev','elev', 'ymax','state_type','sector_id', 'addparam', 'drainzone_id', 'dwfzone_id'
     ],
     'Table anl_node should have the correct columns'
 );
@@ -33,7 +33,7 @@ SELECT col_type_is('anl_node', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('anl_node', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
 SELECT col_type_is('anl_node', 'nodecat_id', 'varchar(30)', 'Column nodecat_id should be varchar(30)');
 SELECT col_type_is('anl_node', 'state', 'integer', 'Column state should be integer');
-SELECT col_type_is('anl_node', 'num_arc', 'integer', 'Column num_arc should be integer');
+SELECT col_type_is('anl_node', 'num_arcs', 'integer', 'Column num_arcs should be integer');
 SELECT col_type_is('anl_node', 'node_id_aux', 'varchar(16)', 'Column node_id_aux should be varchar(16)');
 SELECT col_type_is('anl_node', 'nodecat_id_aux', 'varchar(30)', 'Column nodecat_id_aux should be varchar(30)');
 SELECT col_type_is('anl_node', 'state_aux', 'integer', 'Column state_aux should be integer');
@@ -56,7 +56,7 @@ SELECT col_type_is('anl_node', 'state_type', 'integer', 'Column state_type shoul
 SELECT col_type_is('anl_node', 'sector_id', 'integer', 'Column sector_id should be integer');
 SELECT col_type_is('anl_node', 'addparam', 'text', 'Column addparam should be text');
 SELECT col_type_is('anl_node', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
-SELECT col_type_is('anl_node', 'dwzone_id', 'integer', 'Column dwzone_id should be integer');
+SELECT col_type_is('anl_node', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
 
 --check defealt values
 SELECT col_has_default('anl_node', 'cur_user', 'Column cur_user should have default value');
@@ -71,10 +71,10 @@ SELECT fk_ok('anl_node', 'dwfzone_id', 'dwfzone', 'dwfzone_id', 'Table should ha
 
 -- check index
 
-SELECT has_index('anl_node', 'fid', 'Table anl_node should have index on fid');
-SELECT has_index('anl_node', 'the_geom', 'Table anl_node should have index on the_geom');
-SELECT has_index('anl_node', 'node_id', 'Table anl_node should have index on node_id');
-SELECT has_index('anl_node', 'id', 'Table anl_node should have index on id');
+SELECT has_index('anl_node', 'anl_node_fprocesscat_id_index', ARRAY['fid'], 'Table anl_node should have index on fid');
+SELECT has_index('anl_node', 'anl_node_index', ARRAY['the_geom'], 'Table anl_node should have index on the_geom');
+SELECT has_index('anl_node', 'anl_node_node_id_index', ARRAY['node_id'], 'Table anl_node should have index on node_id');
+SELECT has_index('anl_node', 'anl_node_pkey', ARRAY['id'], 'Table anl_node should have index on id');
 --check trigger 
 
 --check rule 

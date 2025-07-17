@@ -58,9 +58,9 @@ SELECT fk_ok('anl_connec', 'drainzone_id', 'drainzone', 'drainzone_id', 'Table s
 SELECT fk_ok('anl_connec', 'dwfzone_id', 'dwfzone', 'dwfzone_id', 'Table should have foreign key from dwfzone_id to dwfzone.dwfzone_id');
 
 -- Check indexes
-SELECT has_index('anl_connec', 'connec_id', 'Table should have index on connec_id');
-SELECT has_index('anl_connec', 'the_geom', 'Table should have index on the_geom');
-SELECT has_index('anl_connec', 'id', 'Table should have index on id');
+SELECT has_index('anl_connec', 'anl_connec_connec_id', ARRAY['connec_id'], 'Table should have index on connec_id');
+SELECT has_index('anl_connec', 'anl_connec_index', ARRAY['the_geom'], 'Table should have index on the_geom');
+SELECT has_index('anl_connec', 'anl_connec_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 

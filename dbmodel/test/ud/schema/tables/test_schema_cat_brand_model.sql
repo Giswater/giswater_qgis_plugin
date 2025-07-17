@@ -32,7 +32,7 @@ SELECT col_type_is('cat_brand_model', 'catbrand_id', 'varchar(30)', 'Column catb
 SELECT col_type_is('cat_brand_model', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('cat_brand_model', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('cat_brand_model', 'active', 'bool', 'Column active should be bool');
-SELECT col_type_is('cat_brand_model', 'featurecat_id', 'text', 'Column featurecat_id should be text');
+SELECT col_type_is('cat_brand_model', 'featurecat_id', 'text[]', 'Column featurecat_id should be text[]');
 
 
 
@@ -47,7 +47,7 @@ SELECT has_fk('cat_brand_model', 'Table cat_brand_model should have foreign keys
 SELECT fk_ok('cat_brand_model', 'catbrand_id', 'cat_brand', 'id', 'Table should have foreign key from catbrand_id to cat_brand.id');
 
 -- check ind
-SELECT has_index('cat_brand_model', 'id', 'Table cat_brand_model should have index on id');
+SELECT has_index('cat_brand_model', 'cat_brand_type_pkey', ARRAY['id'], 'Table cat_brand_model should have index on id');
 
 --check trigger 
 SELECT has_trigger('cat_brand_model', 'gw_trg_config_control', 'Table cat_brand_model should have trigger gw_trg_config_control');

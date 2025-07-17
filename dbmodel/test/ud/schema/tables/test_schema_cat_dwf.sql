@@ -27,7 +27,7 @@ SELECT columns_are(
     'Table cat_dwf should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('cat_dwf', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('cat_dwf', 'id', 'int4', 'Column id should be int4');
 SELECT col_type_is('cat_dwf', 'idval', 'varchar(30)', 'Column idval should be varchar(30)');
 SELECT col_type_is('cat_dwf', 'startdate', 'timestamp', 'Column startdate should be timestamp');
 SELECT col_type_is('cat_dwf', 'enddate', 'timestamp', 'Column enddate should be timestamp');
@@ -47,12 +47,11 @@ SELECT col_type_is('cat_dwf', 'log', 'text', 'Column log should be text');
 
 -- check foreign keys
 SELECT has_fk('cat_dwf', 'Table cat_dwf should have foreign keys');
-
 SELECT fk_ok('cat_dwf', 'expl_id', 'exploitation','expl_id','Table should have foreign key from expl_id to exploitation.expl_id');
 
 -- check ind
-SELECT has_index('cat_dwf', 'id', 'Table cat_dwf should have index on id');
-SELECT has_index('cat_dwf', 'idval', 'Table cat_dwf should have index on idval');
+SELECT has_index('cat_dwf', 'cat_dwf_scenario_pkey', 'id', 'Table cat_dwf should have index on id');
+SELECT has_index('cat_dwf', 'cat_dwf_scenario_unique_idval', 'idval', 'Table cat_dwf should have index on idval');
 
 
 --check trigger 

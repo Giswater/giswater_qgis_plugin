@@ -30,7 +30,7 @@ SELECT columns_are(
 SELECT col_type_is('cat_connec', 'id', 'varchar(30)', 'Column id should be varchar(30)');
 SELECT col_type_is('cat_connec', 'connec_type', 'text', 'Column connec_type should be text');
 SELECT col_type_is('cat_connec', 'matcat_id', 'varchar(16)', 'Column matcat_id should be varchar(16)');
-SELECT col_type_is('cat_connec', 'shape', 'text', 'Column shape should be text');
+SELECT col_type_is('cat_connec', 'shape', 'varchar(16)', 'Column shape should be varchar(16)');
 SELECT col_type_is('cat_connec', 'geom1', 'numeric(12, 4)', 'Column geom1 should be numeric(12, 4)');
 SELECT col_type_is('cat_connec', 'geom2', 'numeric(12, 4)', 'Column geom2 should be numeric(12, 4)');
 SELECT col_type_is('cat_connec', 'geom3', 'numeric(12, 4)', 'Column geom3 should be numeric(12, 4)');
@@ -40,7 +40,7 @@ SELECT col_type_is('cat_connec', 'descript', 'varchar(255)', 'Column descript sh
 SELECT col_type_is('cat_connec', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('cat_connec', 'brand_id', 'varchar(30)', 'Column brand_id should be varchar(30)');
 SELECT col_type_is('cat_connec', 'model_id', 'varchar(30)', 'Column model_id should be varchar(30)');
-SELECT col_type_is('cat_connec', 'svg', 'varchar(255)', 'Column svg should be varchar(255)');
+SELECT col_type_is('cat_connec', 'svg', 'varchar(50)', 'Column svg should be varchar(50)');
 SELECT col_type_is('cat_connec', 'active', 'bool', 'Column active should be bool');
 SELECT col_type_is('cat_connec', 'label', 'varchar(255)', 'Column label should be varchar(255)');
 SELECT col_type_is('cat_connec', 'estimated_depth', 'numeric(12, 3)', 'Column estimated_depth should be numeric(12, 3)');
@@ -62,7 +62,7 @@ SELECT fk_ok('cat_connec','brand_id','cat_brand','id','Table should have foreign
 SELECT fk_ok('cat_connec', 'connec_type', 'cat_feature_connec', 'id', 'Table should have foreign key from connec_type to cat_feature_connec.id');
 SELECT fk_ok('cat_connec', 'model_id', 'cat_brand_model', 'id', 'Table should have foreign key from model_id to cat_brand_model.id');
 -- check ind
-SELECT has_index('cat_connec', 'id', 'Table cat_connec should have index on id');
+SELECT has_index('cat_connec', 'cat_connec_pkey', ARRAY['id'], 'Table cat_connec should have index on id');
 
 --check trigger 
 

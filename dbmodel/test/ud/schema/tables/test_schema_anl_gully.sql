@@ -14,40 +14,40 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT * FROM no_plan();
 
 --check if table exists
-SELECT has_table('anl_arc_x_node'::name, 'Table anl_arc_x_node should exist');
+SELECT has_table('anl_gully'::name, 'Table anl_gully should exist');
 
 -- check columns names 
 
 
 SELECT columns_are(
-    'anl_arc',
+    'anl_gully',
     ARRAY[
         'id', 'gully_id', 'gullycat_id','state','gully_id_aux', 'gratecat_id_aux', 'state_aux', 'expl_id', 'fid','cur_user', 'the_geom', 'descript',
          'result_id', 'dma_id', 'addparam','dwzone_id', 'drainzone_id'
     ],
-    'Table anl_arc should have the correct columns'
+    'Table anl_gully should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('anl_arc', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('anl_arc', 'gully_id', 'varchar(16)', 'Column gully_id should be varchar(16)');
-SELECT col_type_is('anl_arc', 'gullycat_id', 'varchar(30)', 'Column gullycat_id should be varchar(30)');
-SELECT col_type_is('anl_arc', 'state', 'integer', 'Column state should be integer');
-SELECT col_type_is('anl_arc', 'gully_id_aux', 'varchar(16)', 'Column gully_id_aux should be varchar(16)');
-SELECT col_type_is('anl_arc', 'gratecat_id_aux', 'varchar(30)', 'Column gratecat_id_aux should be varchar(30)');
-SELECT col_type_is('anl_arc', 'state_aux', 'integer', 'Column state_aux should be integer');
-SELECT col_type_is('anl_arc', 'expl_id', 'integer', 'Column expl_id should be integer');
-SELECT col_type_is('anl_arc', 'fid', 'integer', 'Column fid should be integer');
-SELECT col_type_is('anl_arc', 'cur_user', 'varchar(50)', 'Column cur_user should be varchar(50)');
-SELECT col_type_is('anl_arc', 'the_geom', 'geometry(linestring, 25831)', 'Column the_geom should be geometry(linestring, 25831)');
-SELECT col_type_is('anl_arc', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('anl_arc', 'result_id', 'varchar(16)', 'Column result_id should be varchar(16)');
-SELECT col_type_is('anl_arc', 'dma_id', 'text', 'Column dma_id should be text');
-SELECT col_type_is('anl_arc', 'addparam', 'text', 'Column addparam should be text');
-SELECT col_type_is('anl_arc', 'dwzone_id', 'integer', 'Column dwzone_id should be integer');
-SELECT col_type_is('anl_arc', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
+SELECT col_type_is('anl_gully', 'id', 'integer', 'Column id should be integer');
+SELECT col_type_is('anl_gully', 'gully_id', 'varchar(16)', 'Column gully_id should be varchar(16)');
+SELECT col_type_is('anl_gully', 'gullycat_id', 'varchar(30)', 'Column gullycat_id should be varchar(30)');
+SELECT col_type_is('anl_gully', 'state', 'integer', 'Column state should be integer');
+SELECT col_type_is('anl_gully', 'gully_id_aux', 'varchar(16)', 'Column gully_id_aux should be varchar(16)');
+SELECT col_type_is('anl_gully', 'gratecat_id_aux', 'varchar(30)', 'Column gratecat_id_aux should be varchar(30)');
+SELECT col_type_is('anl_gully', 'state_aux', 'integer', 'Column state_aux should be integer');
+SELECT col_type_is('anl_gully', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('anl_gully', 'fid', 'integer', 'Column fid should be integer');
+SELECT col_type_is('anl_gully', 'cur_user', 'varchar(50)', 'Column cur_user should be varchar(50)');
+SELECT col_type_is('anl_gully', 'the_geom', 'geometry(linestring, 25831)', 'Column the_geom should be geometry(linestring, 25831)');
+SELECT col_type_is('anl_gully', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('anl_gully', 'result_id', 'varchar(16)', 'Column result_id should be varchar(16)');
+SELECT col_type_is('anl_gully', 'dma_id', 'text', 'Column dma_id should be text');
+SELECT col_type_is('anl_gully', 'addparam', 'text', 'Column addparam should be text');
+SELECT col_type_is('anl_gully', 'dwzone_id', 'integer', 'Column dwzone_id should be integer');
+SELECT col_type_is('anl_gully', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
 
 --check defealt values
-SELECT col_has_default('anl_arc', 'cur_user', 'Column cur_user should have default value');
+SELECT col_has_default('anl_gully', 'cur_user', 'Column cur_user should have default value');
 
 
 -- check foreign keys

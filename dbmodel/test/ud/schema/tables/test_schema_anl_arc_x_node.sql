@@ -23,7 +23,7 @@ SELECT columns_are(
     'anl_arc_x_node',
     ARRAY[
         'id', 'arc_id', 'arccat_id', 'node_id', 'state', 'arc_id_aux', 'fid','cur_user', 'the_geom', 'the_geom_p', 'descript',
-         'result_id', 
+         'result_id'
     ],
     'Table anl_arc_x_node should have the correct columns'
 );
