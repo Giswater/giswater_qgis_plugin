@@ -80,19 +80,19 @@ BEGIN
 	FOR rec_flowreg IN
 		SELECT element_id, to_arc, flwreg_length, flw_type, order_id, epa_type, node_id FROM
 		(
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, node_id, order_id, 'ORIFICE' as epa_type FROM inp_frorifice join man_frelem using (element_id)
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, node_id, order_id, 'FRORIFICE' as epa_type FROM inp_frorifice join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, node_id, order_id, 'OUTLET' as epa_type FROM inp_froutlet join man_frelem using (element_id)
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, node_id, order_id, 'FROUTLET' as epa_type FROM inp_froutlet join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, node_id, order_id, 'PUMP' as epa_type FROM inp_frpump join man_frelem using (element_id)
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, node_id, order_id, 'FRPUMP' as epa_type FROM inp_frpump join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, node_id, order_id, 'WEIR' as epa_type FROM inp_frweir join man_frelem using (element_id)
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, node_id, order_id, 'FRWEIR' as epa_type FROM inp_frweir join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 		) a

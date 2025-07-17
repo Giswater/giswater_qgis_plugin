@@ -680,7 +680,20 @@ BEGIN
 	    f.orate
 	   FROM temp_t_arc_flowregulator f
 	     JOIN temp_t_arc ON f.arc_id::text = temp_t_arc.arc_id
-	  WHERE f.type::text = 'ORIFICE'::text;
+	  WHERE f.type::text = 'ORIFICE'::text
+	  UNION
+	  SELECT a.arc_id,
+	    a.node_1,
+	    a.node_2,
+		w.orifice_type,
+		w.offsetval,
+		w.cd,
+		w.flap,
+		w.orate
+		from v_edit_inp_frorifice w
+			JOIN man_frelem m ON m.element_id = w.element_id
+			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
+		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRORIFICE'::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_outfalls AS
@@ -734,7 +747,26 @@ BEGIN
 	    f.flap::character varying AS other3
 	   FROM temp_t_arc_flowregulator f
 	     JOIN temp_t_arc ON f.arc_id::text = temp_t_arc.arc_id
-	  WHERE f.type::text = 'OUTLET'::text;
+	  WHERE f.type::text = 'OUTLET'::text
+	  UNION
+	  SELECT a.arc_id,
+	    a.node_1,
+	    a.node_2,
+		CASE
+		    WHEN w.offsetval IS NULL THEN '*'::text
+		    ELSE w.offsetval::text
+		END AS offsetval,
+		w.outlet_type,
+		CASE
+		    WHEN w.curve_id IS NULL THEN w.cd1::text::character varying
+		    ELSE w.curve_id
+		END AS other1,
+		w.cd2 as other2,
+		w.flap::character varying as other3
+		FROM v_edit_inp_froutlet w
+			JOIN man_frelem m ON m.element_id = w.element_id
+			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
+		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FROUTLET'::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_pollutants AS
@@ -769,7 +801,19 @@ BEGIN
 	    temp_t_arc_flowregulator.shutoff
 	   FROM temp_t_arc_flowregulator
 	     JOIN temp_t_arc ON temp_t_arc_flowregulator.arc_id::text = temp_t_arc.arc_id
-	  WHERE temp_t_arc_flowregulator.type::text = 'PUMP'::text;
+	  WHERE temp_t_arc_flowregulator.type::text = 'PUMP'::text
+	  UNION
+	  SELECT a.arc_id,
+	    a.node_1,
+	    a.node_2,
+		w.curve_id,
+		w.status,
+		w.startup,
+		w.shutoff
+		from v_edit_inp_frpump w
+			JOIN man_frelem m ON m.element_id = w.element_id
+			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
+		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRPUMP'::text;
 
 	CREATE OR REPLACE TEMP VIEW vi_t_raingages AS
 	 SELECT DISTINCT r.rg_id,
@@ -1016,10 +1060,10 @@ BEGIN
 		w.road_width,
 		w.road_surf,
 		w.coef_curve
-		from inp_frweir w
+		from v_edit_inp_frweir w
 			JOIN man_frelem m ON m.element_id = w.element_id
 			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
-		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'WEIR'::text;
+		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRWEIR'::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_xsections AS
