@@ -330,3 +330,237 @@ AS SELECT v_edit_link.link_id,
      JOIN man_link USING (link_id)
   WHERE v_edit_link.link_type::text = 'LINK'::text;
 
+CREATE OR REPLACE VIEW v_edit_arc
+AS WITH
+  typevalue AS
+    (
+      SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
+      FROM edit_typevalue
+      WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
+    ),
+	sector_table AS
+		(
+      SELECT sector_id, macrosector_id, stylesheet, id::varchar(16) AS sector_type
+      FROM sector
+      LEFT JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
+		),
+	dma_table AS
+		(
+      SELECT dma_id, macrodma_id, stylesheet, id::varchar(16) AS dma_type
+      FROM dma
+      LEFT JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
+		),
+	presszone_table AS
+		(
+      SELECT presszone_id, head AS presszone_head, stylesheet, id::varchar(16) AS presszone_type
+      FROM presszone
+      LEFT JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
+		),
+	dqa_table AS
+		(
+      SELECT dqa_id, stylesheet, id::varchar(16) AS dqa_type, macrodqa_id
+      FROM dqa
+      LEFT JOIN typevalue t ON t.id::text = dqa.dqa_type AND t.typevalue::text = 'dqa_type'::text
+		),
+  supplyzone_table AS
+    (
+      SELECT supplyzone_id, stylesheet, id::varchar(16) AS supplyzone_type
+      FROM supplyzone
+      LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type AND t.typevalue::text = 'supplyzone_type'::text
+    ),
+  omzone_table AS
+    (
+      SELECT omzone_id, id::varchar(16) AS omzone_type, macroomzone_id
+      FROM omzone
+      LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
+    ),
+	arc_psector AS
+		(
+      SELECT pp.arc_id, pp.state AS p_state
+      FROM plan_psector_x_arc pp
+      JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
+		),
+  arc_selector AS
+		(
+	    SELECT arc.arc_id
+      FROM arc
+      JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
+      LEFT JOIN (
+        SELECT arc_id FROM arc_psector WHERE p_state = 0
+      ) a USING (arc_id)
+      WHERE a.arc_id IS NULL
+      AND EXISTS (
+        SELECT 1 FROM selector_expl se
+        WHERE s.cur_user = current_user
+        AND se.expl_id = ANY (array_append(expl_visibility, arc.expl_id))
+      )
+      AND EXISTS (
+        SELECT 1 FROM selector_sector sc
+        WHERE sc.cur_user = current_user
+        AND sc.sector_id = arc.sector_id
+      )
+      AND EXISTS (
+        SELECT 1 FROM selector_municipality sm
+        WHERE sm.cur_user = current_user
+        AND sm.muni_id = arc.muni_id
+      )
+      UNION ALL
+      SELECT arc_id FROM arc_psector
+      WHERE p_state = 1
+    ),
+  arc_selected AS
+    (
+	  SELECT
+      arc.arc_id,
+      arc.code,
+      arc.sys_code,
+      arc.node_1,
+      arc.nodetype_1,
+      arc.elevation1,
+      arc.depth1,
+      arc.staticpress1,
+      arc.node_2,
+      arc.nodetype_2,
+      arc.staticpress2,
+      arc.elevation2,
+      arc.depth2,
+      ((COALESCE(arc.depth1) + COALESCE(arc.depth2)) / 2::numeric)::numeric(12,2) AS depth,
+      cat_arc.arc_type,
+      arc.arccat_id,
+      cat_feature.feature_class AS sys_type,
+      cat_arc.matcat_id AS cat_matcat_id,
+      cat_arc.pnom AS cat_pnom,
+      cat_arc.dnom AS cat_dnom,
+      cat_arc.dint AS cat_dint,
+      cat_arc.dr AS cat_dr,
+      arc.epa_type,
+      arc.state,
+      arc.state_type,
+      arc.parent_id,
+      arc.expl_id,
+      exploitation.macroexpl_id,
+      arc.muni_id,
+      arc.sector_id,
+      sector_table.macrosector_id,
+      sector_table.sector_type,
+      arc.supplyzone_id,
+      supplyzone_table.supplyzone_type,
+      arc.presszone_id,
+      presszone_table.presszone_type,
+      presszone_table.presszone_head,
+      arc.dma_id,
+      dma_table.macrodma_id,
+      dma_table.dma_type,
+      arc.dqa_id,
+      dqa_table.macrodqa_id,
+      dqa_table.dqa_type,
+      arc.omzone_id,
+      omzone_table.macroomzone_id,
+      omzone_table.omzone_type,
+      arc.minsector_id,
+      arc.pavcat_id,
+      arc.soilcat_id,
+      arc.function_type,
+      arc.category_type,
+      arc.location_type,
+      arc.fluid_type,
+      arc.descript,
+      st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+      arc.custom_length,
+      arc.annotation,
+      arc.observ,
+      arc.comment,
+      concat(cat_feature.link_path, arc.link) AS link,
+      arc.num_value,
+      arc.district_id,
+      arc.postcode,
+      arc.streetaxis_id,
+      arc.postnumber,
+      arc.postcomplement,
+      arc.streetaxis2_id,
+      arc.postnumber2,
+      arc.postcomplement2,
+      mu.region_id,
+      mu.province_id,
+      arc.workcat_id,
+      arc.workcat_id_end,
+      arc.workcat_id_plan,
+      arc.builtdate,
+      arc.enddate,
+      arc.ownercat_id,
+      arc.om_state,
+      arc.conserv_state,
+      CASE
+        WHEN arc.brand_id IS NULL THEN cat_arc.brand_id
+        ELSE arc.brand_id
+      END AS brand_id,
+      CASE
+        WHEN arc.model_id IS NULL THEN cat_arc.model_id
+        ELSE arc.model_id
+      END AS model_id,
+      arc.serial_number,
+      arc.asset_id,
+      arc.adate,
+      arc.adescript,
+      arc.verified,
+      arc.datasource,
+      cat_arc.label,
+      arc.label_x,
+      arc.label_y,
+      arc.label_rotation,
+      arc.label_quadrant,
+      arc.inventory,
+      arc.publish,
+      vst.is_operative,
+      arc.is_scadamap,
+      CASE
+        WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::text THEN arc.epa_type
+        ELSE NULL::text
+      END AS inp_type,
+      arc_add.result_id,
+      arc_add.flow_max,
+      arc_add.flow_min,
+      arc_add.flow_avg,
+      arc_add.vel_max,
+      arc_add.vel_min,
+      arc_add.vel_avg,
+      arc_add.tot_headloss_max,
+      arc_add.tot_headloss_min,
+      arc_add.mincut_connecs,
+      arc_add.mincut_hydrometers,
+      arc_add.mincut_length,
+      arc_add.mincut_watervol,
+      arc_add.mincut_criticality,
+      arc_add.hydraulic_criticality,
+      arc_add.pipe_capacity,
+      arc_add.mincut_impact_topo,
+      arc_add.mincut_impact_hydro,
+      sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
+      dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+      presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
+      dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
+      supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
+      arc.lock_level,
+      arc.expl_visibility,
+      date_trunc('second'::text, arc.created_at) AS created_at,
+      arc.created_by,
+      date_trunc('second'::text, arc.updated_at) AS updated_at,
+      arc.updated_by,
+      arc.the_geom
+      FROM arc_selector
+      JOIN arc ON arc.arc_id = arc_selector.arc_id
+      JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
+      JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
+      JOIN exploitation ON arc.expl_id = exploitation.expl_id
+      JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
+      JOIN sector_table ON sector_table.sector_id = arc.sector_id
+      LEFT JOIN presszone_table ON presszone_table.presszone_id = arc.presszone_id
+      LEFT JOIN dma_table ON dma_table.dma_id = arc.dma_id
+      LEFT JOIN dqa_table ON dqa_table.dqa_id = arc.dqa_id
+      LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = arc.supplyzone_id
+      LEFT JOIN omzone_table ON omzone_table.omzone_id = arc.omzone_id
+      LEFT JOIN arc_add ON arc_add.arc_id = arc.arc_id
+      LEFT JOIN value_state_type vst ON vst.id = arc.state_type
+    )
+  SELECT arc_selected.*
+  FROM arc_selected;
