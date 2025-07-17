@@ -761,7 +761,7 @@ BEGIN
 		    WHEN w.curve_id IS NULL THEN w.cd1::text::character varying
 		    ELSE w.curve_id
 		END AS other1,
-		w.cd2 as other2,
+		w.cd2::text as other2,
 		w.flap::character varying as other3
 		FROM v_edit_inp_froutlet w
 			JOIN man_frelem m ON m.element_id = w.element_id
