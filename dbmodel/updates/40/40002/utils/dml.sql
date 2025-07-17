@@ -45,3 +45,4 @@ UPDATE sys_table SET alias = 'Link' WHERE id='v_edit_link' AND alias='Link (pare
 UPDATE sys_table SET alias = 'Gully' WHERE id='v_edit_gully' AND alias='Gully (parent)';
 UPDATE sys_table SET alias = 'Flow Regulator Elements' WHERE id='ve_frelem';
 UPDATE sys_table SET alias = 'General Elements', context='{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}', orderby=1 WHERE id='ve_genelem';
+UPDATE sys_table SET alias = 'Municipality' WHERE id='v_ext_municipality';
