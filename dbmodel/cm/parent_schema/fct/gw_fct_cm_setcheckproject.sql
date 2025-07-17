@@ -172,29 +172,31 @@ BEGIN
 		FOR v_rec IN EXECUTE v_querytext USING v_lot_id_array LOOP
 			v_feature_view_name := 'PARENT_SCHEMA_' || v_rec.feature_type;
 
+			v_feature_table_name := 'om_campaign_lot_x_' || v_rec.feature_type;
+			v_feature_id_column := v_rec.feature_type || '_id';
+			v_feature_view_name := 'v_edit_' || v_rec.feature_type;
+
 			v_querytext_cfg := '
 				SELECT DISTINCT columnname FROM PARENT_SCHEMA.config_form_fields
 				WHERE ismandatory
-				AND formname ILIKE ''%ve_'||v_feature_table_name||'_'||v_rec.feature_type||'%''
+				AND formname ILIKE ''%v_edit_'||v_rec.feature_type||'%''
 			';
 
-			FOR v_rec_check IN EXECUTE v_querytext_cfg LOOP
-				EXECUTE '
-					SELECT cm.gw_fct_cm_check_fprocess($${
-					"data":{
-						"parameters":{
-							"functionFid":' || v_fid || ',
-							"checkFid":' || v_check_mandatory_fid || ', 
-							"replaceParams": {
-								"table_name": "' || v_feature_view_name || '", 
-								"feature_column": "' || v_feature_id_column || '",
-								"feature_ids": "' || array_to_string(v_rec.feature_ids, ',') || '",
-								"check_column": "' || v_rec_check.columnname || '"
-								}
-							}
-						}
-					}$$)
-				' INTO v_check_result;
+			FOR v_rec_check IN EXECUTE v_querytext_cfg
+			LOOP
+				EXECUTE
+					'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{
+						"functionFid":' || v_fid || ',
+						"checkFid":' || v_check_mandatory_fid || ',
+						"replaceParams": ' || 
+							jsonb_build_object(
+								'table_name', v_feature_view_name,
+								'feature_column', v_feature_id_column,
+								'feature_ids', array_to_string(v_rec.feature_ids, ','),
+								'check_column', v_rec_check.columnname
+							)::text || '
+					}}}$$/::json)'
+				INTO v_check_result;
 			END LOOP;
 		END LOOP;
 	END LOOP;

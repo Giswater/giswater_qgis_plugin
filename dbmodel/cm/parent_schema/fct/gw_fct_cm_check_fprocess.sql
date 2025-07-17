@@ -73,18 +73,18 @@ BEGIN
 
 	IF v_replace_params IS NOT NULL THEN
 		-- SELECT * FROM %table_name% WHERE %feature_column% IN (%feature_ids%) AND %check_column% IS NULL
-		v_process_query_text = replace(v_process_query_text, '%table_name%', v_replace_params->>'table_name');
-		v_process_query_text = replace(v_process_query_text, '%feature_column%', v_replace_params->>'feature_column');
-		v_process_query_text = replace(v_process_query_text, '%feature_ids%', v_replace_params->>'feature_ids');
-		v_process_query_text = replace(v_process_query_text, '%check_column%', v_replace_params->>'check_column');
+		v_process_query_text = regexp_replace(v_process_query_text, '%table_name%', v_replace_params->>'table_name', 'gi');
+		v_process_query_text = regexp_replace(v_process_query_text, '%feature_column%', v_replace_params->>'feature_column', 'gi');
+		v_process_query_text = regexp_replace(v_process_query_text, '%feature_ids%', v_replace_params->>'feature_ids', 'gi');
+		v_process_query_text = regexp_replace(v_process_query_text, '%check_column%', v_replace_params->>'check_column', 'gi');
 
 		-- value/s on column '%check_column%' in the '%table_name%' table.
-		v_process_except_msg = replace(v_process_except_msg, '%table_name%', v_replace_params->>'table_name');
-		v_process_except_msg = replace(v_process_except_msg, '%check_column%', v_replace_params->>'check_column');
+		v_process_except_msg = regexp_replace(v_process_except_msg, '%table_name%', v_replace_params->>'table_name', 'gi');
+		v_process_except_msg = regexp_replace(v_process_except_msg, '%check_column%', v_replace_params->>'check_column', 'gi');
 
 		-- The '%check_column%' column on '%table_name%' have correct values.
-		v_process_info_msg = replace(v_process_info_msg, '%table_name%', v_replace_params->>'table_name');
-		v_process_info_msg = replace(v_process_info_msg, '%check_column%', v_replace_params->>'check_column');
+		v_process_info_msg = regexp_replace(v_process_info_msg, '%table_name%', v_replace_params->>'table_name', 'gi');
+		v_process_info_msg = regexp_replace(v_process_info_msg, '%check_column%', v_replace_params->>'check_column', 'gi');
 	END IF;
 
     -- manage query count
