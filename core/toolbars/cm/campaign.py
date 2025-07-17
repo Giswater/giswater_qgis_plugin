@@ -1007,7 +1007,6 @@ def update_expl_sector_combos(**kwargs):
                 temp_campaign_instance = Campaign(None, None, None, None, None)
                 temp_campaign_instance.set_widget_value(expl_widget, saved_expl_id)
 
-
         # --- Update sector combo ---
         if sector_widget:
             sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
@@ -1026,7 +1025,6 @@ def update_expl_sector_combos(**kwargs):
             if saved_sector_id is not None:
                 temp_campaign_instance = Campaign(None, None, None, None, None)
                 temp_campaign_instance.set_widget_value(sector_widget, saved_sector_id)
-
 
     except Exception as e:
         tools_qgis.show_warning(f"CRITICAL ERROR in update_expl_sector_combos: {e}", dialog=dialog)
