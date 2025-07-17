@@ -27,7 +27,7 @@ SELECT columns_are(
     'Table archived_rpt_node should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('archived_rpt_node', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('archived_rpt_node', 'id', 'bigint', 'Column id should be bigint');
 SELECT col_type_is('archived_rpt_node', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_node', 'node_id', 'int4', 'Column node_id should be int4');
 SELECT col_type_is('archived_rpt_node', 'resultdate', 'varchar(16)', 'Column resultdate should be varchar(16)');
@@ -37,17 +37,13 @@ SELECT col_type_is('archived_rpt_node', 'depth', 'float8', 'Column depth should 
 SELECT col_type_is('archived_rpt_node', 'head', 'float8', 'Column head should be float8');
 SELECT col_type_is('archived_rpt_node', 'inflow', 'numeric(12, 3)', 'Column inflow should be numeric(12, 3)');
 
-
-
 --check default values
-
-
 
 -- check foreign keys
 
 
 -- check index
-SELECT has_index('archived_rpt_node', 'id', 'Table archived_rpt_node should have index on id');
+SELECT has_index('archived_rpt_node', 'archived_rpt_node_pkey', ARRAY['id'], 'Table archived_rpt_node should have index on id');
 
 --check trigger 
 

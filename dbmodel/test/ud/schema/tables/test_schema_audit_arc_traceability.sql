@@ -40,7 +40,7 @@ SELECT col_type_is('audit_arc_traceability', 'cur_user', 'varchar(50)', 'Column 
 SELECT col_type_is('audit_arc_traceability', 'code', 'text', 'Column code should be text');
 
 -- Check indexes
-SELECT has_index('audit_arc_traceability', 'id', 'Table should have index on id');
+SELECT has_index('audit_arc_traceability', 'audit_log_arc_traceability_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

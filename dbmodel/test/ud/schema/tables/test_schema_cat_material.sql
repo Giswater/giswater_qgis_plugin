@@ -41,7 +41,7 @@ SELECT col_type_is('cat_material', 'active', 'bool', 'Column active should be bo
 SELECT col_has_default('cat_material', 'active', 'Column active should have default value');
 
 -- Check indexes
-SELECT has_index('cat_material', 'cat_material_pkey', ARRAY['id'], 'Table should have index on id');
+SELECT has_index('cat_material', 'cat_mat_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('cat_material', 'gw_trg_config_control', 'Table should have trigger gw_trg_config_control');

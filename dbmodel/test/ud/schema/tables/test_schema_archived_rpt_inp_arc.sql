@@ -113,7 +113,7 @@ SELECT col_type_is('archived_rpt_inp_arc', 'flow_chang', 'numeric(12, 4)', 'Colu
 
 
 -- check index
-SELECT has_index('archived_rpt_inp_arc', 'id', 'Table archived_rpt_inp_arc should have index on id');
+SELECT has_index('archived_rpt_inp_arc', 'archived_rpt_inp_arc_pkey', ARRAY['id'], 'Table archived_rpt_inp_arc should have index on id');
 
 --check trigger 
 

@@ -37,7 +37,7 @@ SELECT has_fk('cat_feature_link', 'Table cat_feature_link should have foreign ke
 SELECT fk_ok('cat_feature_link', 'id', 'cat_feature', 'id', 'Table should have foreign key from id to cat_feature.id');
 
 -- Check indexes
-SELECT has_index('cat_feature_link', 'id', 'Table should have index on id');
+SELECT has_index('cat_feature_link', 'cat_feature_link_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

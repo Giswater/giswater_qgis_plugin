@@ -151,7 +151,7 @@ SELECT col_has_default('archived_psector_arc_traceability', 'audit_user', 'Colum
 
 
 -- check index
-SELECT has_index('archived_psector_arc_traceability', 'id', 'Table archived_psector_arc_traceability should have index on id');
+SELECT has_index('archived_psector_arc_traceability', 'audit_psector_arc_traceability_pkey', ARRAY['id'], 'Table archived_psector_arc_traceability should have index on id');
 
 --check trigger 
 SELECT has_trigger('archived_psector_arc_traceability', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');

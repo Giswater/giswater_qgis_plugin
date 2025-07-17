@@ -140,7 +140,7 @@ SELECT col_type_is('arc', 'lock_level', 'integer', 'Column lock_level should be 
 SELECT col_type_is('arc', 'initoverflowpath', 'boolean', 'Column initoverflowpath should be boolean');
 SELECT col_type_is('arc', 'inverted_slope', 'boolean', 'Column inverted_slope should be boolean');
 SELECT col_type_is('arc', 'negative_offset', 'boolean', 'Column negative_offset should be boolean');
-SELECT col_type_is('arc', 'expl_visibility', 'int2', 'Column expl_visibility should be int2');
+SELECT col_type_is('arc', 'expl_visibility', 'smallint[]', 'Column expl_visibility should be smallint[]');
 SELECT col_type_is('arc', 'created_at', 'timestamptz', 'Column created_at should be timestamptz');
 SELECT col_type_is('arc', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
 SELECT col_type_is('arc', 'updated_at', 'timestamptz', 'Column updated_at should be timestamptz');
@@ -186,8 +186,8 @@ SELECT fk_ok('arc','sector_id','sector','sector_id','Table should have foreign k
 SELECT fk_ok('arc','soilcat_id','cat_soil','id','Table should have foreign key from soilcat_id to cat_soil.id');
 SELECT fk_ok('arc','state','value_state','id','Table should have foreign key from state to value_state.id');
 SELECT fk_ok('arc','state_type','value_state_type','id','Table should have foreign key from state_type to value_state_type.id');
-SELECT fk_ok('arc','muni_id,streetaxis2_id','ext_streetaxis','muni_id,id','Table should have foreign key from muni_id,streetaxis2_id to ext_streetaxis.muni_id,id');
-SELECT fk_ok('arc','muni_id,streetaxis_id','ext_streetaxis','muni_id,id','Table should have foreign key from muni_id,streetaxis_id to ext_streetaxis.muni_id,id');
+SELECT fk_ok('arc',ARRAY['muni_id','streetaxis2_id'],'ext_streetaxis',ARRAY['muni_id','id'],'Table should have foreign key from muni_id,streetaxis2_id to ext_streetaxis.muni_id,id');
+SELECT fk_ok('arc',ARRAY['muni_id','streetaxis_id'],'ext_streetaxis',ARRAY['muni_id','id'],'Table should have foreign key from muni_id,streetaxis_id to ext_streetaxis.muni_id,id');
 SELECT fk_ok('arc','workcat_id_end','cat_work','id','Table should have foreign key from workcat_id_end to cat_work.id');
 SELECT fk_ok('arc','workcat_id','cat_work','id','Table should have foreign key from workcat_id to cat_work.id');
 

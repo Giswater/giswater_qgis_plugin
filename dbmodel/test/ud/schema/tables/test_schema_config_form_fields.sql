@@ -57,20 +57,13 @@ SELECT col_type_is('config_form_fields', 'linkedobject', 'text', 'Column linkedo
 SELECT col_type_is('config_form_fields', 'hidden', 'bool', 'Column hidden should be bool DEFAULT false');
 SELECT col_type_is('config_form_fields', 'web_layoutorder', 'int4', 'Column web_layoutorder should be int4');
 
-
-
-
 --check default values
-
-
 
 -- check foreign keys
 
 
 -- check indexes
-SELECT has_index('config_form_fields', 'formname', 'Table config_form_fields should have index on formname');
-
-
+SELECT has_index('config_form_fields', 'config_form_fields_pkey', ARRAY['formname', 'formtype', 'columnname', 'tabname'], 'Table config_form_fields should have index on formname, formtype, columnname and tabname');
 
 --check trigger 
 SELECT has_trigger('config_form_fields', 'gw_trg_config_control', 'Table config_form_fields should have trigger gw_trg_config_control');

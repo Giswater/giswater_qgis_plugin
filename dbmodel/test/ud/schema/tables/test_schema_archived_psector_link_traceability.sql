@@ -68,7 +68,7 @@ SELECT col_type_is('archived_psector_link_traceability', 'is_operative', 'boolea
 SELECT col_type_is('archived_psector_link_traceability', 'insert_user', 'varchar(50)', 'Column insert_user should be varchar(50)');
 SELECT col_type_is('archived_psector_link_traceability', 'lastupdate', 'timestamp', 'Column lastupdate should be timestamp');
 SELECT col_type_is('archived_psector_link_traceability', 'lastupdate_user', 'varchar(50)', 'Column lastupdate_user should be varchar(50)');
-SELECT col_type_is('archived_psector_link_traceability', 'staticpressure', 'numeric', 'Column staticpressure should be numeric(12,3)');
+SELECT col_type_is('archived_psector_link_traceability', 'staticpressure', 'numeric(12,3)', 'Column staticpressure should be numeric(12,3)');
 SELECT col_type_is('archived_psector_link_traceability', 'conneccat_id', 'varchar(30)', 'Column conneccat_id should be varchar(30)');
 SELECT col_type_is('archived_psector_link_traceability', 'workcat_id', 'varchar(255)', 'Column workcat_id should be varchar(255)');
 SELECT col_type_is('archived_psector_link_traceability', 'workcat_id_end', 'varchar(255)', 'Column workcat_id_end should be varchar(255)');
@@ -79,7 +79,7 @@ SELECT col_type_is('archived_psector_link_traceability', 'muni_id', 'integer', '
 SELECT col_type_is('archived_psector_link_traceability', 'verified', 'int2', 'Column verified should be int2');
 SELECT col_type_is('archived_psector_link_traceability', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
 SELECT col_type_is('archived_psector_link_traceability', 'n_hydrometer', 'integer', 'Column n_hydrometer should be integer');
-SELECT col_type_is('archived_psector_link_traceability', 'custom_length', 'numeric', 'Column custom_length should be numeric(12,2)');
+SELECT col_type_is('archived_psector_link_traceability', 'custom_length', 'numeric(12,2)', 'Column custom_length should be numeric(12,2)');
 SELECT col_type_is('archived_psector_link_traceability', 'datasource', 'integer', 'Column datasource should be integer');
 
 -- Check default values
@@ -90,7 +90,7 @@ SELECT col_has_default('archived_psector_link_traceability', 'audit_user', 'Colu
 -- Check foreign keys
 
 -- Check indexes
-SELECT has_index('archived_psector_link_traceability', 'id', 'Table should have index on id');
+SELECT has_index('archived_psector_link_traceability', 'archived_psector_link_traceability_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('archived_psector_link_traceability', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');

@@ -50,9 +50,9 @@ SELECT has_index('cat_dscenario', 'cat_dscenario_name_unique', ARRAY['name'], 'T
 SELECT has_index('cat_dscenario', 'cat_dscenario_pkey', ARRAY['dscenario_id'], 'Table cat_dscenario should have index on dscenario_id');
 
 --check trigger 
-SELECT has_trigger('cat_dscenario', 'gw_trg_cat_dscenario ', 'Table cat_dscenario should have trigger gw_trg_cat_dscenario');
-SELECT has_trigger('cat_dscenario', 'gw_trg_typevalue_fk_insert ', 'Table cat_dscenario should have trigger gw_trg_typevalue_fk_insert');
-SELECT has_trigger('cat_dscenario', 'gw_trg_typevalue_fk_update ', 'Table cat_dscenario should have trigger gw_trg_typevalue_fk_update');
+SELECT has_trigger('cat_dscenario', 'gw_trg_cat_dscenario', 'Table cat_dscenario should have trigger gw_trg_cat_dscenario');
+SELECT has_trigger('cat_dscenario', 'gw_trg_typevalue_fk_insert', 'Table cat_dscenario should have trigger gw_trg_typevalue_fk_insert');
+SELECT has_trigger('cat_dscenario', 'gw_trg_typevalue_fk_update', 'Table cat_dscenario should have trigger gw_trg_typevalue_fk_update');
 --check rule
 
 

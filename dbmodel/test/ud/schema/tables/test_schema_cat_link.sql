@@ -72,9 +72,9 @@ SELECT fk_ok('cat_link','model_id','cat_brand_model','id','Table should have for
 
 -- check ind
 SELECT has_index('cat_link', 'cat_link_pkey', ARRAY['id'], 'Table cat_link should have index on id');
-SELECT has_index('cat_link', 'cat_link_cost_idx', ARRAY['cost'], 'Table cat_link should have index on cost');
-SELECT has_index('cat_link', 'cat_link_m2bottom_cost_idx', ARRAY['m2bottom_cost'], 'Table cat_link should have index on m2bottom_cost');
-SELECT has_index('cat_link', 'cat_link_m3protec_cost_idx', ARRAY['m3protec_cost'], 'Table cat_link should have index on m3protec_cost');
+SELECT has_index('cat_link', 'cat_link_cost_pkey', ARRAY['cost'], 'Table cat_link should have index on cost');
+SELECT has_index('cat_link', 'cat_link_m2bottom_cost_pkey', ARRAY['m2bottom_cost'], 'Table cat_link should have index on m2bottom_cost');
+SELECT has_index('cat_link', 'cat_link_m3protec_cost_pkey', ARRAY['m3protec_cost'], 'Table cat_link should have index on m3protec_cost');
 
 --check trigger 
 

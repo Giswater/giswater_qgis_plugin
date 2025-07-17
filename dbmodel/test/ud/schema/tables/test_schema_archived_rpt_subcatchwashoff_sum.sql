@@ -36,7 +36,7 @@ SELECT col_type_is('archived_rpt_subcatchwashoff_sum', 'poll_id', 'varchar(16)',
 SELECT col_type_is('archived_rpt_subcatchwashoff_sum', 'value', 'numeric', 'Column value should be numeric');
 
 -- Check indexes
-SELECT has_index('archived_rpt_subcatchwashoff_sum', 'id', 'Table should have index on id');
+SELECT has_index('archived_rpt_subcatchwashoff_sum', 'archived_rpt_subcatchwashoff_sum_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

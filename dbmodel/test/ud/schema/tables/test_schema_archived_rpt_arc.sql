@@ -45,7 +45,7 @@ SELECT col_type_is('archived_rpt_arc', 'fullpercent', 'float8', 'Column fullperc
 
 
 -- check index
-SELECT has_index('archived_rpt_arc', 'id', 'Table archived_rpt_arc should have index on id');
+SELECT has_index('archived_rpt_arc', 'archived_rpt_arc_pkey', ARRAY['id'], 'Table archived_rpt_arc should have index on id');
 
 --check trigger 
 

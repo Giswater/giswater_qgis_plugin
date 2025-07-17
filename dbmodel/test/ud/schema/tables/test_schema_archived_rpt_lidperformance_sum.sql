@@ -27,7 +27,7 @@ SELECT columns_are(
     'Table archived_rpt_lidperformance_sum should have the correct columns'
 );
 -- check columns names
-SELECT col_type_is('archived_rpt_lidperformance_sum', 'id', 'serial4', 'Column id should be serial4');
+SELECT col_type_is('archived_rpt_lidperformance_sum', 'id', 'int4', 'Column id should be int4');
 SELECT col_type_is('archived_rpt_lidperformance_sum', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_lidperformance_sum', 'subc_id', 'varchar(16)', 'Column subc_id should be varchar(16)');
 SELECT col_type_is('archived_rpt_lidperformance_sum', 'lidco_id', 'varchar(16)', 'Column lidco_id should be varchar(16)');
@@ -49,7 +49,7 @@ SELECT col_type_is('archived_rpt_lidperformance_sum', 'per_error', 'numeric(12, 
 
 
 -- check index
-SELECT has_index('archived_rpt_lidperformance_sum', 'id', 'Table archived_rpt_lidperformance_sum should have index on id');
+SELECT has_index('archived_rpt_lidperformance_sum', 'archived_rpt_lidperformance_sum_pkey', ARRAY['id'], 'Table archived_rpt_lidperformance_sum should have index on id');
 
 --check trigger 
 

@@ -40,7 +40,7 @@ SELECT col_type_is('audit_fid_log', 'tstamp', 'timestamp', 'Column tstamp should
 SELECT col_has_default('audit_fid_log', 'tstamp', 'Column tstamp should have default value');
 
 -- Check indexes
-SELECT has_index('audit_fid_log', 'id', 'Table should have index on id');
+SELECT has_index('audit_fid_log', 'audit_fid_log_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

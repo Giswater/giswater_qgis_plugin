@@ -31,7 +31,6 @@ SELECT columns_are(
 SELECT col_is_pk('cat_arc', 'id', 'Column id should be primary key'); 
 
 -- Check check columns
-SELECT col_has_check(cat_arc, COLUMNAME, Table should have check on COLUMNNAME);
 
 -- Check column types
 SELECT col_type_is('cat_arc', 'id', 'varchar(30)', 'Column id should be varchar(30)');
@@ -66,7 +65,7 @@ SELECT col_type_is('cat_arc', 'active', 'bool', 'Column active should be bool');
 SELECT col_type_is('cat_arc', 'label', 'varchar(255)', 'Column label should be varchar(255)');
 SELECT col_type_is('cat_arc', 'tsect_id', 'varchar(16)', 'Column tsect_id should be varchar(16)');
 SELECT col_type_is('cat_arc', 'curve_id', 'varchar(16)', 'Column curve_id should be varchar(16)');
-SELECT col_type_is('cat_arc', 'acoeff', 'floa8', 'Column acoeff should be float8');
+SELECT col_type_is('cat_arc', 'acoeff', 'float8', 'Column acoeff should be float8');
 SELECT col_type_is('cat_arc', 'connect_cost', 'text', 'Column connect_cost should be text');
 SELECT col_type_is('cat_arc', 'visitability_vdef', 'int4', 'Column visitability_vdef should be int4');
 
@@ -91,10 +90,10 @@ SELECT fk_ok('cat_arc', 'shape', 'cat_arc_shape', 'id', 'Table should have forei
 SELECT fk_ok('cat_arc', 'tsect_id', 'inp_transects', 'id', 'Table should have foreign key from tsect_id to inp_transects.id');
 
 -- Check indexes
-SELECT has_index('cat_arc', 'cost', 'Table should have index on cost');
-SELECT has_index('cat_arc', 'm2bottom_cost', 'Table should have index on m2bottom_cost');
-SELECT has_index('cat_arc', 'm3bottom_cost', 'Table should have index on m3bottom_cost');
-SELECT has_index('cat_arc', 'id', 'Table should have index on id');
+SELECT has_index('cat_arc', 'cat_arc_pkey', ARRAY['id'], 'Table should have index on id');
+SELECT has_index('cat_arc', 'cat_arc_cost_idx', ARRAY['cost'], 'Table should have index on cost');
+SELECT has_index('cat_arc', 'cat_arc_m2bottom_cost_idx', ARRAY['m2bottom_cost'], 'Table should have index on m2bottom_cost');
+SELECT has_index('cat_arc', 'cat_arc_m3protec_cost_idx', ARRAY['m3protec_cost'], 'Table should have index on m3protec_cost');
 
 -- Finish
 SELECT * FROM finish();

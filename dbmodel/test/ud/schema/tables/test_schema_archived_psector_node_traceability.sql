@@ -89,7 +89,7 @@ SELECT col_type_is('archived_psector_node_traceability','descript','text','Colum
 SELECT col_type_is('archived_psector_node_traceability','rotation','numeric(6,3)','Column rotation should be numeric(6,3)');
 SELECT col_type_is('archived_psector_node_traceability','link','varchar(512)','Column link should be varchar(512)');
 SELECT col_type_is('archived_psector_node_traceability','verified','integer','Column verified should be integer');
-SELECT col_type_is('archived_psector_node_traceability','the_geom','geometry','Column the_geom should be geometry');
+SELECT col_type_is('archived_psector_node_traceability','the_geom','geometry(Point,25831)','Column the_geom should be geometry(Point,25831)');
 SELECT col_type_is('archived_psector_node_traceability','label_x','varchar(30)','Column label_x should be varchar(30)');
 SELECT col_type_is('archived_psector_node_traceability','label_y','varchar(30)','Column label_y should be varchar(30)');
 SELECT col_type_is('archived_psector_node_traceability','label_rotation','numeric(6,3)','Column label_rotation should be numeric(6,3)');
@@ -129,7 +129,7 @@ SELECT col_type_is('archived_psector_node_traceability','omunit_id','integer','C
 SELECT col_type_is('archived_psector_node_traceability','lock_level','integer','Column lock_level should be integer');
 SELECT col_type_is('archived_psector_node_traceability','pavcat_id','varchar(30)','Column pavcat_id should be varchar(30)');
 SELECT col_type_is('archived_psector_node_traceability','conserv_state','text','Column conserv_state should be text');
-SELECT col_type_is('archived_psector_node_traceability','expl_visibility','int4','Column expl_visibility should be int4');
+SELECT col_type_is('archived_psector_node_traceability','expl_visibility','integer[]','Column expl_visibility should be integer[]');
 
 
 -- Check default values

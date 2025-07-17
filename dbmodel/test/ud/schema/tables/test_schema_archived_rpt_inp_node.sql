@@ -99,7 +99,7 @@ SELECT col_type_is('archived_rpt_inp_node', 'max_out', 'numeric(12,4)', 'Column 
 
 
 -- Check indexes
-SELECT has_index('archived_rpt_inp_node', 'id', 'Table should have index on id');
+SELECT has_index('archived_rpt_inp_node', 'archived_rpt_inp_node_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

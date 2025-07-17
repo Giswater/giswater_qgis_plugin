@@ -42,7 +42,7 @@ SELECT col_type_is('cat_arc_shape', 'active', 'bool', 'Column active should be b
 SELECT col_has_default('cat_arc_shape', 'active', 'Column active should have default value');
 
 -- Check indexes
-SELECT has_index('cat_arc_shape', 'id', 'Table should have index on id');
+SELECT has_index('cat_arc_shape', 'cat_arc_shape_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('cat_arc_shape', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');

@@ -31,20 +31,15 @@ SELECT col_type_is('cat_brand', 'id', 'varchar(30)', 'Column id should be varcha
 SELECT col_type_is('cat_brand', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('cat_brand', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('cat_brand', 'active', 'bool', 'Column active should be bool');
-SELECT col_type_is('cat_brand', 'featurecat_id', 'text', 'Column featurecat_id should be text');
-
-
-
+SELECT col_type_is('cat_brand', 'featurecat_id', 'text[]', 'Column featurecat_id should be text[]');
 
 --check default values
-
-
 
 -- check foreign keys
 
 
 -- check ind
-SELECT has_index('cat_brand', 'id', 'Table cat_brand should have index on id');
+SELECT has_index('cat_brand', 'cat_brand_pkey', ARRAY['id'], 'Table cat_brand should have index on id');
 
 --check trigger 
 SELECT has_trigger('cat_brand', 'gw_trg_config_control', 'Table cat_brand should have trigger gw_trg_config_control');

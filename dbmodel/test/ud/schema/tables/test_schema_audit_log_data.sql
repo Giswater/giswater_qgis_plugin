@@ -45,7 +45,7 @@ SELECT col_has_default('audit_log_data', 'tstamp', 'Column tstamp should have de
 SELECT col_has_default('audit_log_data', 'cur_user', 'Column cur_user should have default value');
 
 -- Check indexes
-SELECT has_index('audit_log_data', 'id', 'Table should have index on id');
+SELECT has_index('audit_log_data', 'audit_log_data_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

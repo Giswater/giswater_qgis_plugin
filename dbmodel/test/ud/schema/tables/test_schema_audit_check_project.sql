@@ -53,7 +53,7 @@ SELECT has_fk('audit_check_project', 'Table audit_check_project should have fore
 SELECT fk_ok('audit_check_project', 'fid', 'sys_fprocess', 'fid', 'Table should have foreign key from fid to sys_fprocess.fid');
 
 -- check ind
-SELECT has_index('audit_check_project', 'id', 'Table audit_check_project should have index on id');
+SELECT has_index('audit_check_project', 'audit_check_project_pkey', ARRAY['id'], 'Table audit_check_project should have index on id');
 
 --check trigger 
 
