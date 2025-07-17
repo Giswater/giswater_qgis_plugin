@@ -1017,8 +1017,8 @@ BEGIN
 		w.road_surf,
 		w.coef_curve
 		from inp_frweir w
-			JOIN element_x_node n ON n.element_id = w.element_id
-			JOIN temp_t_arc a ON a.node_1 = n.node_id::text
+			JOIN man_frelem m ON m.element_id = w.element_id
+			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
 		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'WEIR'::text;
 
 

@@ -214,7 +214,7 @@ BEGIN
 
 				UPDATE temp_t_arc SET node_1 = rec_new_arc.node_2 WHERE arc_id = rec_flowreg.to_arc::text;
 
-				UPDATE temp_t_arc_flowregulator SET arc_id = concat(rec_new_arc.arc_id, 'hola') WHERE arc_id = rec_node.node_id::text;
+				UPDATE temp_t_arc_flowregulator SET arc_id = rec_new_arc.arc_id WHERE arc_id = rec_node.node_id::text;
 
 				-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
 				IF rec_flowreg.flw_type='PU' THEN

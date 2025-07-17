@@ -90,7 +90,6 @@ BEGIN
 
 	FOR v_arc_id, v_node_1, v_geom, v_curve IN EXECUTE v_query_text
 	LOOP
-raise notice 'hola';
 		-- New node
 		SELECT * INTO v_record FROM temp_t_node WHERE node_id = v_node_1;
 		v_record.node_id = concat (reverse(substring(reverse(v_record.node_id),2)), '3');
