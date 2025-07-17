@@ -211,7 +211,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('workorder', 'form_feature', 'tab_data', 'cost', 'lyt_data_1', 10, 'string', 'text', 'Cost:', 'Cost', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 
 INSERT INTO sys_version (giswater, project_type, postgres, postgis, "language", epsg)
-VALUES('', 'cm', (select version()), (select postgis_version()), '', 00000);
+VALUES('', 'cm', (select version()), (select postgis_version()), 'en_US', 00000);
 
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('ve_PARENT_SCHEMA_camp_arc', 've_PARENT_SCHEMA_camp_arc', 'role_basic', '{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, '{"levels": ["CM", "CAMPAIGN"]}', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('ve_PARENT_SCHEMA_camp_connec', 've_PARENT_SCHEMA_camp_connec', 'role_basic', '{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, '{"levels": ["CM", "CAMPAIGN"]}', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
