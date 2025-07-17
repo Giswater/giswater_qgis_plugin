@@ -94,6 +94,9 @@ BEGIN
         lower(rec.feature_type)
         );
 
+        EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', view_name);
+        EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_manager', view_name);
+
       END IF;
 
     END LOOP;
