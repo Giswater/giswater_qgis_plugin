@@ -28,8 +28,7 @@ ALTER TABLE node DROP CONSTRAINT node_epa_type_check;
 ALTER TABLE node ADD CONSTRAINT node_epa_type_check CHECK (epa_type IN ('JUNCTION', 'DIVIDER', 'OUTFALL', 'STORAGE', 'NETGULLY', 'INLET', 'UNDEFINED'));
 
 -- 17/07/2025
-ALTER TABLE connec DROP CONSTRAINT connec_drainzone_id_fkey;
-ALTER TABLE arc DROP CONSTRAINT arc_drainzone_id_fkey;
-ALTER TABLE gully DROP CONSTRAINT gully_drainzone_id_fkey;
-ALTER TABLE node DROP CONSTRAINT node_drainzone_id_fkey;
-ALTER TABLE link DROP CONSTRAINT link_drainzone_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_drainzone_id_fkey;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_drainzone_id_fkey;
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_drainzone_id_fkey;
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_drainzone_id_fkey;
