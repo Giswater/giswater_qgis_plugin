@@ -5,50 +5,54 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QDate, Qt
-from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QCheckBox, QComboBox, QLineEdit, \
-    QTableView, QWidget, QDateEdit, QLabel, QTextEdit, QCompleter
-
-from typing import Optional, List
 from functools import partial
 import json
+from typing import Any, Dict, List, Optional
+
+from qgis.PyQt.QtCore import QDate, Qt, QModelIndex
+from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
+from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
+                                  QComboBox, QCompleter, QDateEdit, QDialog,
+                                  QLabel, QLineEdit, QTableView, QTextEdit,
+                                  QToolBar, QWidget)
 
 from ...ui.ui_manager import TeamCreateUi, UserCreateUi, AddLotUi, LotManagementUi, \
     ResourcesManagementUi
 
 from .... import global_vars
-from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
+from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
 
 
 class AddNewLot:
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QToolBar, action_group: QActionGroup):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
 
-        self.ids = []
+        self.ids: List[Any] = []
         self.canvas = global_vars.canvas
         self.rb_red = tools_gw.create_rubberband(self.canvas)
         self.rb_red.setColor(Qt.darkRed)
         self.rb_red.setIconSize(20)
-        self.rb_list = []
+        self.rb_list: List[Any] = []
         self.schema_parent = lib_vars.schema_name
         # self.cm_schema = lib_vars.project_vars['cm_schema']
         self.lot_date_format = 'yyyy-MM-dd'
         self.max_id = 0
         self.signal_selectionChanged = False
-        self.param_options = None
+        self.param_options: Optional[Any] = None
         self.plugin_name = 'Giswater'
         self.plugin_dir = lib_vars.plugin_dir
         self.schemaname = lib_vars.schema_name
         self.iface = global_vars.iface
-        self.dict_tables = None
+        self.dict_tables: Optional[Dict[str, Any]] = None
         self.lot_saved = False
         self.is_new_lot = True
+        self.lot_id: Optional[int] = None
+        self.dlg_lot: Optional[AddLotUi] = None
 
-    def manage_lot(self, lot_id=None, is_new=True):
+    def manage_lot(self, lot_id: Optional[int] = None, is_new: bool = True):
         """Open the AddLot dialog and load dynamic fields from gw_fct_cm_getlot."""
 
         self.lot_id = lot_id
@@ -275,10 +279,10 @@ class AddNewLot:
                 team_combo.setCurrentIndex(index)
         team_combo.blockSignals(False)
 
-    def load_lot_dialog(self, lot_id):
+    def load_lot_dialog(self, lot_id: Optional[int]):
         """Dynamically load and populate lot dialog using gw_fct_cm_getlot"""
 
-        p_data = {
+        p_data: Dict[str, Any] = {
             "feature": {"tableName": "om_campaign_lot", "idName": "lot_id"},
             "data": {}
         }
@@ -313,7 +317,7 @@ class AddNewLot:
             label = QLabel(field["label"]) if field.get("label") else None
             tools_gw.add_widget(self.dlg_lot, field, label, widget)
 
-    def create_widget_from_field(self, field):
+    def create_widget_from_field(self, field: Dict[str, Any]) -> Optional[QWidget]:
         """Create a Qt widget based on field metadata"""
         wtype = field.get("widgettype", "text")
         iseditable = field.get("iseditable", True)
@@ -372,7 +376,7 @@ class AddNewLot:
         # Update self.feature_type just like in Campaign
         self.feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
 
-    def get_allowed_features_for_lot(self, lot_id, feature):
+    def get_allowed_features_for_lot(self, lot_id: int, feature: str) -> List[Any]:
         """Only be able to make the relations to the features id that come from campaign """
         # feature: "arc", "node", etc.
         row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
@@ -388,11 +392,11 @@ class AddNewLot:
             return []
         return [row[feature_id] for row in rows]
 
-    def enable_feature_tabs_by_campaign(self, lot_id):
+    def enable_feature_tabs_by_campaign(self, lot_id: int):
         row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
         campaign_id = row[0] if row else None
         if not campaign_id:
-            return []
+            return
 
         feature_types = ['arc', 'node', 'connec', 'link']
 
@@ -405,7 +409,7 @@ class AddNewLot:
                 idx = self.dlg_lot.tab_feature.indexOf(tab_widget)
                 self.dlg_lot.tab_feature.setTabEnabled(idx, count > 0)
 
-    def _load_lot_relations(self, lot_id):
+    def _load_lot_relations(self, lot_id: int):
         """
         Load related elements into lot relation tabs for the given ID.
         Includes 'gully' only if project type is UD.
@@ -422,14 +426,14 @@ class AddNewLot:
                 sql = f"SELECT * FROM cm.{db_table} WHERE lot_id = {lot_id}"
                 self.populate_tableview(view, sql)
 
-    def get_widget_by_columnname(self, dialog, columnname):
+    def get_widget_by_columnname(self, dialog: QWidget, columnname: str) -> Optional[QWidget]:
         """Find a widget in a dialog by its 'columnname' property."""
         for widget in dialog.findChildren(QWidget):
             if widget.property("columnname") == columnname:
                 return widget
         return None
 
-    def set_widget_value(self, widget, value):
+    def set_widget_value(self, widget: QWidget, value: Any):
         """Sets the widget value from JSON."""
         if value is None:
             return
@@ -475,7 +479,7 @@ class AddNewLot:
         enable = bool(name_widget.text().strip())
         self.dlg_lot.tab_widget.setTabEnabled(self.dlg_lot.tab_widget.indexOf(self.dlg_lot.RelationsTab), enable)
 
-    def _on_tab_change(self, index):
+    def _on_tab_change(self, index: int):
         tab = self.dlg_lot.tab_widget.widget(index)
         if tab.objectName() == "RelationsTab" and self.is_new_lot and not self.lot_saved:
             self.save_lot(from_change_tab=True)
@@ -541,7 +545,7 @@ class AddNewLot:
             cmb_ot.currentIndexChanged.connect(self.update_workorder_fields)
             self.update_workorder_fields()  # call once immediately
 
-    def save_lot(self, from_change_tab=False):
+    def save_lot(self, from_change_tab: bool = False) -> Optional[bool]:
         """Save lot using gw_fct_cm_setlot (dynamic form logic) with mandatory field validation."""
 
         fields = {}
@@ -614,7 +618,7 @@ class AddNewLot:
             msg = "Error saving lot."
             tools_qgis.show_warning(msg)
 
-    def reset_rb_list(self, rb_list=None):
+    def reset_rb_list(self, rb_list: Optional[List[Any]] = None):
         """Resets the main rubber band and clears all rubber band selections in the provided list,
         effectively removing any current feature highlights from the canvas."""
         # Use self.rb_list if no list is provided, for direct calls
@@ -673,7 +677,7 @@ class AddNewLot:
                                                selection_mode=GwSelectionMode.EXPRESSION_LOT)
         self._update_feature_completer_lot(self.dlg_lot)
 
-    def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
+    def populate_tableview(self, view: QTableView, query: str, columns: Optional[List[str]] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
@@ -696,7 +700,7 @@ class AddNewLot:
         view.setModel(model)
         view.resizeColumnsToContents()
 
-    def get_current_user(self):
+    def get_current_user(self) -> Optional[Dict[str, Any]]:
         """
         Gets the current user's complete data, including role and organization,
         from the CM schema.
@@ -822,7 +826,7 @@ class AddNewLot:
         query += " ORDER BY lot_id DESC"
         self.populate_tableview(self.dlg_lot_man.tbl_lots, query)
 
-    def open_lot(self, index=None):
+    def open_lot(self, index: Optional[QModelIndex] = None):
         """Open selected lot in edit mode, from button or double click."""
 
         if index and index.isValid():
@@ -872,7 +876,7 @@ class AddNewLot:
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.dlg_lot_man)
         self.filter_lot()
 
-    def _update_feature_completer_lot(self, dlg):
+    def _update_feature_completer_lot(self, dlg: QDialog):
         # Identify the current tab and derive feature info
         tab_widget = dlg.tab_feature.currentWidget()
         if not tab_widget:
@@ -1022,20 +1026,7 @@ class AddNewLot:
         self.dlg_resources_man.btn_user_delete.clicked.connect(partial(self.delete_registers, "cat_user"))
         self.dlg_resources_man.cmb_team.currentIndexChanged.connect(partial(self.filter_users_table))
 
-        # self.dlg_resources_man.cmb_team.currentIndexChanged.connect(self.populate_team_views)
-        # self.dlg_resources_man.cmb_vehicle.currentIndexChanged.connect(self.populate_vehicle_views)
-
-        # self.dlg_resources_man.btn_team_create.clicked.connect(partial(self.create_team))
-        # self.dlg_resources_man.btn_team_update.clicked.connect(partial(self.manage_team))
-        # self.dlg_resources_man.btn_team_selector.clicked.connect(partial(self.open_team_selector))
-        # self.dlg_resources_man.btn_team_delete.clicked.connect(partial(self.delete_team))
-
-        # #self.dlg_resources_man.btn_vehicle_create.clicked.connect(partial(self.create_vehicle))
-        # self.dlg_resources_man.btn_vehicle_update.clicked.connect(partial(self.manage_vehicle))
-        # self.dlg_resources_man.btn_vehicle_delete.clicked.connect(partial(self.delete_vehicle))
-
         self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
-        # self.dlg_resources_man.rejected.connect(partial(tools_gw.save_settings, self.dlg_resources_man))
 
         # Open form
         tools_gw.open_dialog(self.dlg_resources_man, "resources_management")
@@ -1127,7 +1118,7 @@ class AddNewLot:
         else:
             self.open_create_user(True)
 
-    def delete_registers(self, tablename):
+    def delete_registers(self, tablename: str):
         """ Delete selected registers from the table."""
 
         # Get idname
@@ -1283,7 +1274,7 @@ class AddNewLot:
 
         tools_gw.open_dialog(self.dlg_create_team, "create_user")
 
-    def get_selected_ids(self, tablename) -> List:
+    def get_selected_ids(self, tablename: str) -> List[str]:
         """Get selected ids from QTableView."""
 
         qtable = self.dict_tables[tablename]["widget"]
@@ -1306,7 +1297,7 @@ class AddNewLot:
         return values
 
 
-def upsert_team(**kwargs):
+def upsert_team(**kwargs: Any):
     """ Create organization """
 
     dlg = kwargs["dialog"]
@@ -1365,7 +1356,7 @@ def upsert_team(**kwargs):
         this.filter_teams_table()
 
 
-def upsert_user(**kwargs):
+def upsert_user(**kwargs: Any):
     """ Create or update a user and its corresponding database role. """
 
     dlg = kwargs["dialog"]
@@ -1499,6 +1490,6 @@ def upsert_user(**kwargs):
         this._populate_resource_tableview("cat_user")
 
 
-def close(**kwargs):
+def close(**kwargs: Any):
     """ Close dialog """
     tools_gw.close_dialog(kwargs["dialog"])
