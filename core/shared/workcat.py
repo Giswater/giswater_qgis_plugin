@@ -14,6 +14,7 @@ from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QLabel, QHeaderView, QTableView, QMenu, QAction, QPushButton
+from qgis.core import QgsExpression
 
 from .document import GwDocument
 from ..ui.ui_manager import GwWorkcatManagerUi, GwInfoWorkcatUi, GwSearchWorkcatUi
@@ -301,6 +302,21 @@ class GwWorkcat:
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self._workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_document, table_doc)
+
+        # Select workcat features
+        layers = [
+            tools_qgis.get_layer_by_tablename("v_edit_arc"),
+            tools_qgis.get_layer_by_tablename("v_edit_node"),
+            tools_qgis.get_layer_by_tablename("v_edit_connec"),
+            tools_qgis.get_layer_by_tablename("v_edit_link"),
+            # tools_qgis.get_layer_by_tablename("v_edit_element"),  # TODO: select elements too
+            tools_qgis.get_layer_by_tablename("v_edit_gully"),
+        ]
+        expr = QgsExpression(expr)
+        for lyr in layers:
+            if lyr is None:
+                continue
+            tools_qgis.select_features_by_expr(lyr, expr)
 
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
