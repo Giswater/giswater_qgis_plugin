@@ -204,7 +204,7 @@ BEGIN
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
-				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
+				EXECUTE ' SELECT string_agg(element_id::text,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -241,7 +241,7 @@ BEGIN
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
-				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
+				EXECUTE ' SELECT string_agg(element_id::text,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -270,7 +270,7 @@ BEGIN
 						select count(*)-1, element_id from b join c using(element_id) where state=1 group by b.element_id having count(*)>1';
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
-				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
+				EXECUTE ' SELECT string_agg(element_id::text,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
