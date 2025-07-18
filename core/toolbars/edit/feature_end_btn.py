@@ -440,7 +440,9 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work.arc_id.setCompleter(completer)
         model = QStringListModel()
 
-        model.setStringList(self.selected_list)
+        # Convert integers to strings for the QStringListModel
+        string_list = [str(item) for item in self.selected_list]
+        model.setStringList(string_list)
         completer.setModel(model)
 
     def _filter_by_id(self, table, widget_txt, tablename):
