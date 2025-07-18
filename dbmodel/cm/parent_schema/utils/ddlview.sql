@@ -12,158 +12,160 @@ SET search_path = cm, public, pg_catalog;
 -- CAMPAIGN x FEATURE
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_node as
 SELECT
-om_campaign_x_node.id,
-om_campaign.campaign_id,
-node.node_id,
-node.code,
-c.node_type,
-node.nodecat_id,
-om_campaign_x_node.status,
-om_campaign_x_node.admin_observ,
-om_campaign_x_node.org_observ,
-node.the_geom
-FROM selector_campaign sc , om_campaign
-JOIN om_campaign_x_node ON om_campaign_x_node.campaign_id = om_campaign.campaign_id
-JOIN PARENT_SCHEMA.node ON node.node_id::text = om_campaign_x_node.node_id::text
-join PARENT_SCHEMA.cat_node c on nodecat_id = c.id
-WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"()::text;
+ocn.id,
+oc.campaign_id,
+ocn.node_id,
+ocn.code,
+ocn.node_type,
+ocn.nodecat_id,
+ocn.status,
+ocn.admin_observ,
+ocn.org_observ,
+ocn.the_geom
+FROM selector_campaign sc
+JOIN om_campaign oc ON oc.campaign_id = sc.campaign_id
+JOIN om_campaign_x_node ocn ON ocn.campaign_id = oc.campaign_id
+WHERE sc.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_arc as
 SELECT
-om_campaign_x_arc.id,
-om_campaign.campaign_id,
-arc.arc_id,
-arc.code,
-c.arc_type,
-arc.arccat_id,
-om_campaign_x_arc.status,
-om_campaign_x_arc.admin_observ,
-om_campaign_x_arc.org_observ,
-arc.the_geom
-FROM selector_campaign sc , om_campaign
-JOIN om_campaign_x_arc ON om_campaign_x_arc.campaign_id = om_campaign.campaign_id
-JOIN PARENT_SCHEMA.arc ON arc.arc_id::text = om_campaign_x_arc.arc_id::text
-join PARENT_SCHEMA.cat_arc c on arccat_id = c.id
-WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"()::text;
+oca.id,
+oc.campaign_id,
+oca.arc_id,
+oca.code,
+oca.arc_type,
+oca.arccat_id,
+oca.status,
+oca.admin_observ,
+oca.org_observ,
+oca.the_geom
+FROM selector_campaign sc
+JOIN om_campaign oc ON oc.campaign_id = sc.campaign_id
+JOIN om_campaign_x_arc oca ON oca.campaign_id = oc.campaign_id
+WHERE sc.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_connec as
 SELECT
-om_campaign_x_connec.id,
-om_campaign.campaign_id,
-connec.connec_id,
-connec.code,
-c.connec_type,
-connec.conneccat_id,
-om_campaign_x_connec.status,
-om_campaign_x_connec.admin_observ,
-om_campaign_x_connec.org_observ,
-connec.the_geom
-FROM selector_campaign sc , om_campaign
-JOIN om_campaign_x_connec ON om_campaign_x_connec.campaign_id = om_campaign.campaign_id
-JOIN PARENT_SCHEMA.connec ON connec.connec_id::text = om_campaign_x_connec.connec_id::text
-join PARENT_SCHEMA.cat_connec c on conneccat_id = c.id
-WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"()::text;
+occ.id,
+oc.campaign_id,
+occ.connec_id,
+occ.code,
+occ.connectcat_id,
+occ.status,
+occ.admin_observ,
+occ.org_observ,
+occ.the_geom
+FROM selector_campaign sc
+JOIN om_campaign oc ON oc.campaign_id = sc.campaign_id
+JOIN om_campaign_x_connec occ ON occ.campaign_id = oc.campaign_id
+WHERE sc.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_camp_link AS
 SELECT
-om_campaign_x_link.id,
-om_campaign.campaign_id,
-link.link_id,
-link.code,
-c.link_type,
-link.linkcat_id,
-om_campaign_x_link.status,
-om_campaign_x_link.admin_observ,
-om_campaign_x_link.org_observ,
-link.the_geom
-FROM selector_campaign sc, om_campaign
-JOIN om_campaign_x_link ON om_campaign_x_link.campaign_id = om_campaign.campaign_id
-JOIN PARENT_SCHEMA.link ON link.link_id::text = om_campaign_x_link.link_id::text
-join PARENT_SCHEMA.cat_link c on linkcat_id = c.id
-WHERE om_campaign.campaign_id = sc.campaign_id AND sc.cur_user = "current_user"()::text;
+ocl.id,
+oc.campaign_id,
+ocl.link_id,
+ocl.code,
+ocl.linkcat_id,
+ocl.status,
+ocl.admin_observ,
+ocl.org_observ,
+ocl.the_geom
+FROM selector_campaign sc
+JOIN om_campaign oc ON oc.campaign_id = sc.campaign_id
+JOIN om_campaign_x_link ocl ON ocl.campaign_id = oc.campaign_id
+WHERE sc.cur_user = "current_user"()::text;
 
 
 -- LOT X FEATURE
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_node as
 SELECT
-om_campaign_lot_x_node.id,
-om_campaign_lot.lot_id,
-om_campaign_lot_x_node.node_id,
-om_campaign_lot_x_node.code,
-om_campaign_lot_x_node.status,
-om_campaign_lot_x_node.org_observ,
-om_campaign_lot_x_node.team_observ,
-om_campaign_lot_x_node.update_count,
-om_campaign_lot_x_node.update_log,
-qindex1,
-qindex2,
-action,
-om_campaign_lot_x_node.the_geom
-FROM selector_lot, om_campaign_lot
-JOIN om_campaign_lot_x_node ON om_campaign_lot_x_node.lot_id = om_campaign_lot.lot_id
-WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
+ocln.id,
+ocl.lot_id,
+ocln.node_id,
+ocln.code,
+ocln.status,
+ocln.org_observ,
+ocln.team_observ,
+ocln.update_count,
+ocln.update_log,
+ocln.qindex1,
+ocln.qindex2,
+ocln.action,
+ocn.the_geom
+FROM selector_lot sl
+JOIN om_campaign_lot ocl ON ocl.lot_id = sl.lot_id
+JOIN om_campaign_lot_x_node ocln ON ocln.lot_id = ocl.lot_id
+JOIN om_campaign_x_node ocn ON ocn.campaign_id = ocl.campaign_id AND ocn.node_id = ocln.node_id
+WHERE sl.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_arc as
 SELECT
-om_campaign_lot_x_arc.id,
-om_campaign_lot.lot_id,
-om_campaign_lot_x_arc.arc_id,
-om_campaign_lot_x_arc.code,
-om_campaign_lot_x_arc.status,
-om_campaign_lot_x_arc.org_observ,
-om_campaign_lot_x_arc.team_observ,
-om_campaign_lot_x_arc.update_count,
-om_campaign_lot_x_arc.update_log,
-qindex1,
-qindex2,
-action,
-om_campaign_lot_x_arc.the_geom
-FROM selector_lot, om_campaign_lot
-JOIN om_campaign_lot_x_arc ON om_campaign_lot_x_arc.lot_id = om_campaign_lot.lot_id
-WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
+ocla.id,
+ocl.lot_id,
+ocla.arc_id,
+ocla.code,
+ocla.status,
+ocla.org_observ,
+ocla.team_observ,
+ocla.update_count,
+ocla.update_log,
+ocla.qindex1,
+ocla.qindex2,
+ocla.action,
+oca.the_geom
+FROM selector_lot sl
+JOIN om_campaign_lot ocl ON ocl.lot_id = sl.lot_id
+JOIN om_campaign_lot_x_arc ocla ON ocla.lot_id = ocl.lot_id
+JOIN om_campaign_x_arc oca ON oca.campaign_id = ocl.campaign_id AND oca.arc_id = ocla.arc_id
+WHERE sl.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_connec as
 SELECT
-om_campaign_lot_x_connec.id,
-om_campaign_lot.lot_id,
-om_campaign_lot_x_connec.connec_id,
-om_campaign_lot_x_connec.code,
-om_campaign_lot_x_connec.status,
-om_campaign_lot_x_connec.org_observ,
-om_campaign_lot_x_connec.team_observ,
-om_campaign_lot_x_connec.update_count,
-om_campaign_lot_x_connec.update_log,
-om_campaign_lot_x_connec.qindex1,
-om_campaign_lot_x_connec.qindex2,
-action,
-om_campaign_lot_x_connec.the_geom
-FROM selector_lot, om_campaign_lot
-JOIN om_campaign_lot_x_connec ON om_campaign_lot_x_connec.lot_id = om_campaign_lot.lot_id
-WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
+oclc.id,
+ocl.lot_id,
+oclc.connec_id,
+oclc.code,
+oclc.status,
+oclc.org_observ,
+oclc.team_observ,
+oclc.update_count,
+oclc.update_log,
+oclc.qindex1,
+oclc.qindex2,
+oclc.action,
+occ.the_geom
+FROM selector_lot sl
+JOIN om_campaign_lot ocl ON ocl.lot_id = sl.lot_id
+JOIN om_campaign_lot_x_connec oclc ON oclc.lot_id = ocl.lot_id
+JOIN om_campaign_x_connec occ ON occ.campaign_id = ocl.campaign_id AND occ.connec_id = oclc.connec_id
+WHERE sl.cur_user = "current_user"()::text;
 
 
 
 CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_link AS
 SELECT
-om_campaign_lot_x_link.id,
-om_campaign_lot.lot_id,
-om_campaign_lot_x_link.link_id,
-om_campaign_lot_x_link.code,
-om_campaign_lot_x_link.status,
-om_campaign_lot_x_link.org_observ,
-om_campaign_lot_x_link.team_observ,
-om_campaign_lot_x_link.update_count,
-om_campaign_lot_x_link.update_log,
-om_campaign_lot_x_link.qindex1,
-om_campaign_lot_x_link.qindex2,
-action,
-om_campaign_lot_x_link.the_geom
-FROM selector_lot, om_campaign_lot
-JOIN om_campaign_lot_x_link ON om_campaign_lot_x_link.lot_id = om_campaign_lot.lot_id
-WHERE om_campaign_lot.lot_id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
+ocll.id,
+ocl.lot_id,
+ocll.link_id,
+ocll.code,
+ocll.status,
+ocll.org_observ,
+ocll.team_observ,
+ocll.update_count,
+ocll.update_log,
+ocll.qindex1,
+ocll.qindex2,
+ocll.action,
+oclink.the_geom
+FROM selector_lot sl
+JOIN om_campaign_lot ocl ON ocl.lot_id = sl.lot_id
+JOIN om_campaign_lot_x_link ocll ON ocll.lot_id = ocl.lot_id
+JOIN om_campaign_x_link oclink ON oclink.campaign_id = ocl.campaign_id AND oclink.link_id = ocll.link_id
+WHERE sl.cur_user = "current_user"()::text;
 

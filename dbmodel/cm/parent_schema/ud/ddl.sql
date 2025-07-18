@@ -16,6 +16,9 @@ CREATE TABLE om_campaign_x_gully (
 	status int2,
 	admin_observ text,
 	org_observ text,
+	gullycat_id text,
+	gully_type text,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	CONSTRAINT om_campaign_x_gully_pkey PRIMARY KEY (id),
 	CONSTRAINT om_campaign_x_gully_un UNIQUE (campaign_id, gully_id),
 	CONSTRAINT om_campaign_x_gully_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE

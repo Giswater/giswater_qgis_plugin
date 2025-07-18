@@ -432,56 +432,70 @@ CREATE TABLE om_campaign_inventory_x_link (
 );
 
 CREATE TABLE om_campaign_x_arc (
-  id serial4 NOT NULL,
-  campaign_id integer NOT NULL,
-  arc_id int4 NOT NULL,
-  code character varying(30),
-  status int2,
-  admin_observ text,
-  org_observ text,
-  CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_x_arc_un UNIQUE (campaign_id, arc_id),
-  CONSTRAINT om_campaign_x_arc_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+	id serial4 NOT NULL,
+	campaign_id int4 NOT NULL,
+	arc_id int4 NOT NULL,
+	pschema_id int4 NOT NULL,
+	code varchar(30) NULL,
+	status int2 NULL,
+	admin_observ text NULL,
+	org_observ text NULL,
+	arccat_id text NULL,
+	arc_type text NULL,
+	the_geom geometry(linestring, SRID_VALUE) NULL,
+	CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (id),
+	CONSTRAINT om_campaign_x_arc_un UNIQUE (campaign_id, arc_id, pschema_id),
+	CONSTRAINT om_campaign_x_arc_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE om_campaign_x_connec (
-  id serial4 NOT NULL,
-  campaign_id integer NOT NULL,
-  connec_id int4 NOT NULL,
-  code character varying(30),
-  status int2,
-  admin_observ text,
-  org_observ text,
-  CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_x_connec_un UNIQUE (campaign_id, connec_id),
-  CONSTRAINT om_campaign_x_connec_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+	id serial4 NOT NULL,
+	campaign_id int4 NOT NULL,
+	connec_id int4 NOT NULL,
+	pschema_id int4 NOT NULL,
+	code varchar(30) NULL,
+	status int2 NULL,
+	admin_observ text NULL,
+	org_observ text NULL,
+	connectcat_id text NULL,
+	the_geom geometry(point, SRID_VALUE) NULL,
+	CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (id),
+	CONSTRAINT om_campaign_x_connec_un UNIQUE (campaign_id, connec_id, pschema_id),
+	CONSTRAINT om_campaign_x_connec_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
 CREATE TABLE om_campaign_x_link (
-  id serial4 NOT NULL,
-  campaign_id integer NOT NULL,
-  link_id integer NOT NULL,
-  code character varying(30),
-  status int2,
-  admin_observ text,
-  org_observ text,
-  CONSTRAINT om_campaign_x_link_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_x_link_un UNIQUE (campaign_id, link_id),
-  CONSTRAINT om_campaign_x_link_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+	id serial4 NOT NULL,
+	campaign_id int4 NOT NULL,
+	link_id int4 NOT NULL,
+	pschema_id int4 NOT NULL,
+	code varchar(30) NULL,
+	status int2 NULL,
+	admin_observ text NULL,
+	org_observ text NULL,
+	linkcat_id text NULL,
+	the_geom geometry(polygon, SRID_VALUE) NULL,
+	CONSTRAINT om_campaign_x_link_pkey PRIMARY KEY (id),
+	CONSTRAINT om_campaign_x_link_un UNIQUE (campaign_id, link_id, pschema_id),
+	CONSTRAINT om_campaign_x_link_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE om_campaign_x_node (
-  id serial4 NOT NULL,
-  campaign_id integer NOT NULL,
-  node_id int4 NOT NULL,
-  code character varying(30),
-  status int2,
-  admin_observ text,
-  org_observ text,
-  CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_x_node_un UNIQUE (campaign_id, node_id),
-  CONSTRAINT om_campaign_x_node_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+	id serial4 NOT NULL,
+	campaign_id int4 NOT NULL,
+	node_id int4 NOT NULL,
+	pschema_id int4 NOT NULL,
+	code varchar(30) NULL,
+	status int2 NULL,
+	admin_observ text NULL,
+	org_observ text NULL,
+	nodecat_id text NULL,
+	node_type text NULL,
+	the_geom geometry(point, SRID_VALUE) NULL,
+	CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (id),
+	CONSTRAINT om_campaign_x_node_un UNIQUE (campaign_id, node_id, pschema_id),
+	CONSTRAINT om_campaign_x_node_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE om_campaign_lot (
@@ -509,81 +523,77 @@ CREATE TABLE om_campaign_lot (
 
 
 CREATE TABLE om_campaign_lot_x_arc (
-  id serial4 NOT NULL,
-  lot_id integer NOT NULL,
-  arc_id int4 NOT NULL,
-  code character varying(30),
-  status int2,
-  org_observ text,
-  team_observ text,
-  update_count integer,
-  update_log jsonb,
-  qindex1 numeric(12,3),
-  qindex2 numeric(12,3),
-  action int2,
-  the_geom geometry(LINESTRING, SRID_VALUE),
-  CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_lot_x_arc_un UNIQUE (lot_id, arc_id),
-  CONSTRAINT om_campaign_lot_x_arc_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+	id serial4 NOT NULL,
+	lot_id int4 NOT NULL,
+	arc_id int4 NOT NULL,
+	code varchar(30) NULL,
+	status int2 NULL,
+	org_observ text NULL,
+	team_observ text NULL,
+	update_count int4 NULL,
+	update_log jsonb NULL,
+	qindex1 numeric(12, 3) NULL,
+	qindex2 numeric(12, 3) NULL,
+	action int2 NULL,
+	CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (id),
+	CONSTRAINT om_campaign_lot_x_arc_un UNIQUE (lot_id, arc_id),
+	CONSTRAINT om_campaign_lot_x_arc_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot(lot_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE om_campaign_lot_x_connec (
-  id serial4 NOT NULL,
-  lot_id integer NOT NULL,
-  connec_id int4 NOT NULL,
-  code character varying(30),
-  status int2,
-  org_observ text,
-  team_observ text,
-  update_count integer,
-  update_log jsonb,
-  qindex1 numeric(12,3),
-  qindex2 numeric(12,3),
-  action int2,
-  the_geom geometry(POINT, SRID_VALUE),
-  CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_lot_x_connec_un UNIQUE (lot_id, connec_id),
-  CONSTRAINT om_campaign_lot_x_connec_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+	id serial4 NOT NULL,
+	lot_id int4 NOT NULL,
+	connec_id int4 NOT NULL,
+	code varchar(30) NULL,
+	status int2 NULL,
+	org_observ text NULL,
+	team_observ text NULL,
+	update_count int4 NULL,
+	update_log jsonb NULL,
+	qindex1 numeric(12, 3) NULL,
+	qindex2 numeric(12, 3) NULL,
+	action int2 NULL,
+	CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (id),
+	CONSTRAINT om_campaign_lot_x_connec_un UNIQUE (lot_id, connec_id),
+	CONSTRAINT om_campaign_lot_x_connec_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot(lot_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
 CREATE TABLE om_campaign_lot_x_link (
-  id serial4 NOT NULL,
-  lot_id integer NOT NULL,
-  link_id integer NOT NULL,
-  code character varying(30),
-  status int2,
-  org_observ text,
-  team_observ text,
-  update_count integer,
-  update_log jsonb,
-  qindex1 numeric(12,3),
-  qindex2 numeric(12,3),
-  action int2,
-  the_geom geometry(LINESTRING, SRID_VALUE),
-  CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_lot_x_link_un UNIQUE (lot_id, link_id),
-  CONSTRAINT om_campaign_lot_x_link_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+	id serial4 NOT NULL,
+	lot_id int4 NOT NULL,
+	link_id int4 NOT NULL,
+	code varchar(30) NULL,
+	status int2 NULL,
+	org_observ text NULL,
+	team_observ text NULL,
+	update_count int4 NULL,
+	update_log jsonb NULL,
+	qindex1 numeric(12, 3) NULL,
+	qindex2 numeric(12, 3) NULL,
+	action int2 NULL,
+	CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (id),
+	CONSTRAINT om_campaign_lot_x_link_un UNIQUE (lot_id, link_id),
+	CONSTRAINT om_campaign_lot_x_link_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot(lot_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
 CREATE TABLE om_campaign_lot_x_node (
-  id serial4 NOT NULL,
-  lot_id integer NOT NULL, -- fk om_campaign_lot
-  node_id int4 NOT NULL, -- fk node
-  code character varying(30),
-  status int2,
-  org_observ text,
-  team_observ text,
-  update_count integer,
-  update_log jsonb,
-  qindex1 numeric(12,3),
-  qindex2 numeric(12,3),
-  action int2,
-  the_geom geometry(POINT, SRID_VALUE),
-  CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (id),
-  CONSTRAINT om_campaign_lot_x_node_un UNIQUE (lot_id, node_id),
-  CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+	id serial4 NOT NULL,
+	lot_id int4 NOT NULL,
+	node_id int4 NOT NULL,
+	code varchar(30) NULL,
+	status int2 NULL,
+	org_observ text NULL,
+	team_observ text NULL,
+	update_count int4 NULL,
+	update_log jsonb NULL,
+	qindex1 numeric(12, 3) NULL,
+	qindex2 numeric(12, 3) NULL,
+	action int2 NULL,
+	CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (id),
+	CONSTRAINT om_campaign_lot_x_node_un UNIQUE (lot_id, node_id),
+	CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot(lot_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE selector_campaign (

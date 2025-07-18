@@ -66,38 +66,35 @@ BEGIN
       FROM information_schema.columns
       WHERE table_schema = 'cm' AND table_name = lower(tbl_name) AND column_name <> 'the_geom';
 
-      IF NOT EXISTS (
-        SELECT 1
-        FROM information_schema.views
-        WHERE table_schema = new_s
-        AND table_name = lower(format('ve_%s_lot_%s', parent_s, rec.id))
-      ) THEN
-        EXECUTE format(
-          'CREATE VIEW %s AS
-            WITH sel_lot AS (
-                SELECT selector_lot.lot_id FROM selector_lot
-                WHERE selector_lot.cur_user = current_user
-            )
-            SELECT %s b.status, b.the_geom
-            FROM %s a
-            LEFT JOIN om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%s_id = b.%s_id
-            WHERE EXISTS (
-              SELECT 1 
-              FROM sel_lot 
-              WHERE sel_lot.lot_id = a.lot_id
-          );',
-        view_name,
-        CASE WHEN v_cols IS NULL THEN '' ELSE v_cols || ', ' END,
-        tbl_name,
-        lower(rec.feature_type),
-        lower(rec.feature_type),
-        lower(rec.feature_type)
-        );
+      EXECUTE format(
+        'CREATE OR REPLACE VIEW %s AS
+          WITH sel_lot AS (
+              SELECT selector_lot.lot_id FROM selector_lot
+              WHERE selector_lot.cur_user = current_user
+          )
+          SELECT %s b.status, c.the_geom
+          FROM %s a
+          LEFT JOIN om_campaign_lot ocl ON a.lot_id = ocl.lot_id
+          LEFT JOIN om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%s_id = b.%s_id
+          LEFT JOIN om_campaign_x_%s c ON ocl.campaign_id = c.campaign_id AND a.%s_id = c.%s_id
+          WHERE EXISTS (
+            SELECT 1 
+            FROM sel_lot 
+            WHERE sel_lot.lot_id = a.lot_id
+        );',
+      view_name,
+      CASE WHEN v_cols IS NULL THEN '' ELSE v_cols || ', ' END,
+      tbl_name,
+      lower(rec.feature_type),
+      lower(rec.feature_type),
+      lower(rec.feature_type),
+      lower(rec.feature_type),
+      lower(rec.feature_type),
+      lower(rec.feature_type)
+      );
 
-        EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', view_name);
-        EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_manager', view_name);
-
-      END IF;
+      EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_field', view_name);
+      EXECUTE format('GRANT ALL ON TABLE %s TO role_cm_manager', view_name);
 
     END LOOP;
 
