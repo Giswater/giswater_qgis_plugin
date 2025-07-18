@@ -442,3 +442,5 @@ UPDATE config_form_fields SET formname='v_edit_inp_gully', formtype='form_featur
 UPDATE config_form_fields SET formname='v_edit_inp_netgully', formtype='form_feature', columnname='gully_method', tabname='tab_data' WHERE formname='v_edit_inp_netgully' AND formtype='form_feature' AND columnname='gully_method' AND tabname='tab_data';
 UPDATE config_form_fields SET formname='ve_epa_gully', formtype='form_feature', columnname='gully_method', tabname='tab_epa' WHERE formname='ve_epa_gully' AND formtype='form_feature' AND columnname='gully_method' AND tabname='tab_epa';
 UPDATE config_form_fields SET formname='ve_epa_netgully', formtype='form_feature', columnname='gully_method', tabname='tab_epa' WHERE formname='ve_epa_netgully' AND formtype='form_feature' AND columnname='gully_method' AND tabname='tab_epa';
+
+UPDATE sys_message SET error_message = 'The table chosen does not fit with any epa dscenario. Please try another one.' WHERE id = 3698;
