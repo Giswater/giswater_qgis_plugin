@@ -17,7 +17,7 @@ import psycopg2.extras
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_log
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
 
 from PyQt5.QtWidgets import QApplication
 
@@ -26,6 +26,13 @@ class GwI18NGenerator:
     def __init__(self):
         self.plugin_dir = lib_vars.plugin_dir
         self.schema_name = lib_vars.schema_name
+        self.multiple_languages = False
+        self.language = None
+        self.lower_lang = None
+        self.schema_i18n = None
+        self.last_error = None
+        self.path_dic = None
+        self.dlg_qm = None
 
     def init_dialog(self):
         """ Constructor """
@@ -94,30 +101,68 @@ class GwI18NGenerator:
         self.dlg_qm.lbl_info.clear()
         msg = ''
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
-        self.lower_lang = self.language.lower()
         self.schema_i18n = "i18n"
+        py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
+        error_langs = {"python": [], "db": {}}
+        canceled_langs = {"python": [], "db": {}}
+        translated_langs = {"python": [], "db": []}
+        type_db_file_translated = []
 
-        if self.language != 'no_TR':        
-            py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
-            if py_msg:
-                status_py_msg = self._create_py_files()
-                if status_py_msg is True:
-                    msg += f'''{tools_qt.tr('Python translation successful')}\n'''
-                elif status_py_msg is False:
-                    msg += f'''{tools_qt.tr('Python translation failed')}\n'''
-                elif status_py_msg is None:
-                    msg += f'''{tools_qt.tr('Python translation canceled')}\n'''
+        if self.language == 'All':
+            sql = f"SELECT id FROM {self.schema_i18n}.cat_language WHERE idval != 'no_TR' and idval != 'All'"
+            self.languages = self._get_rows(sql)
+            self.languages = [language['id'] for language in self.languages]
+            self.multiple_languages = True
+        else:
+            self.languages = [self.language]
 
-        self._create_path_dic()
-        for type_db_file in self.path_dic:
-            if tools_qt.is_checked(self.dlg_qm, self.path_dic[type_db_file]['checkbox']):
-                status_all_db_msg, dbtable = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
-                if status_all_db_msg is True:
-                    msg += f'''{type_db_file} {tools_qt.tr('translation successful')}\n'''
-                elif status_all_db_msg is False:
-                    msg += f'''{type_db_file} {tools_qt.tr('translation failed in table')}: {dbtable}\n'''
-                elif status_all_db_msg is None:
-                    msg += f'''{type_db_file} {tools_qt.tr('translation canceled')}\n'''
+        # Create the translation files and see which where successful, which failed and which were canceled
+        for self.language in self.languages:
+            self.lower_lang = self.language.lower()
+            if self.language != 'no_TR':        
+                if py_msg:
+                    status_py_msg = self._create_py_files()
+                    if status_py_msg is True:
+                        translated_langs['python'].append(self.language)
+                    elif status_py_msg is False:
+                        error_langs['python'].append(self.language)
+                    elif status_py_msg is None:
+                        canceled_langs['python'].append(self.language)
+                else:
+                    canceled_langs['python'].append(self.language)
+
+            self._create_path_dic()
+            for type_db_file in self.path_dic:
+                if tools_qt.is_checked(self.dlg_qm, self.path_dic[type_db_file]['checkbox']):
+                    status_all_db_msg, dbtable = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
+                    if status_all_db_msg is True:
+                        translated_langs['db'].append(self.language)
+                    elif status_all_db_msg is False:
+                        error_langs['db'][self.language].append(dbtable)
+                    elif status_all_db_msg is None:
+                        canceled_langs['db'][self.language].append(dbtable)
+                    type_db_file_translated.append(type_db_file)
+
+        # Write a message with the results
+        if py_msg:
+            if error_langs['python']:
+                msg += f'''{tools_qt.tr('Python translation failed:')} {", ".join(error_langs['python'])}\n'''
+            if canceled_langs['python']:
+                msg += f'''{tools_qt.tr('Python translation canceled:')} {", ".join(canceled_langs['python'])}\n'''
+            if translated_langs['python']:
+                msg += f'''{tools_qt.tr('Python translation successful:')} {", ".join(translated_langs['python'])}\n'''
+        
+        if type_db_file_translated:
+            for type_db_file in type_db_file_translated:
+                msg += f'''{tools_qt.tr('Schemas translated:')} {type_db_file}\n'''
+                if error_langs['db']:
+                    text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in error_langs['db'].items())
+                    msg += f'''\t{tools_qt.tr('Database translation failed:')}{text}\n'''
+                if canceled_langs['db']:
+                    text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in canceled_langs['db'].items())
+                    msg += f'''\t{tools_qt.tr('Database translation canceled:')}{text}\n'''
+                if translated_langs['db']:
+                    msg += f'''\t{tools_qt.tr('Database translation successful:')} {", ".join(translated_langs['db'])}\n'''
 
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
@@ -130,6 +175,13 @@ class GwI18NGenerator:
 
         # On the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
+
+        # Update the part the of the program in process
+        self.dlg_qm.lbl_info.clear()
+        msg = "{0} ({1}) - Updating python files..."
+        msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}")
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
+        QApplication.processEvents()
 
         key_label = f'lb_{self.lower_lang}'
         key_tooltip = f'tt_{self.lower_lang}'
@@ -162,12 +214,14 @@ class GwI18NGenerator:
         ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
 
         # Check if file exist
-        if os.path.exists(ts_path):
+        if os.path.exists(ts_path) and not self.multiple_languages:
             msg = "Are you sure you want to overwrite this file?"
             title = "Overwrite"
             answer = tools_qt.show_question(msg, title, parameter=f"\n\n{ts_path}")
             if not answer:
                 return None
+        elif not os.path.exists(ts_path):
+            os.makedirs(os.path.dirname(ts_path), exist_ok=True)
         ts_file = open(ts_path, "w")
 
         # Create header
@@ -323,13 +377,13 @@ class GwI18NGenerator:
         file_name = f"{self.path_dic[file_type]["name"]}"
 
         # Check if file exist
-        if os.path.exists(cfg_path + file_name):
+        if os.path.exists(cfg_path + file_name) and not self.multiple_languages:
             msg = "Are you sure you want to overwrite this file?"
             title = "Overwrite"
             answer = tools_qt.show_question(msg, title, parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
                 return None, ""
-        else:
+        elif not os.path.exists(cfg_path + file_name):
             os.makedirs(cfg_path, exist_ok=True)
 
         # Get All table values
@@ -362,8 +416,8 @@ class GwI18NGenerator:
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = "Updating {0}..."
-        msg_params = (table,)
+        msg = "{0} ({1}) - Updating {2}..."
+        msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}", table)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
         colums = []
