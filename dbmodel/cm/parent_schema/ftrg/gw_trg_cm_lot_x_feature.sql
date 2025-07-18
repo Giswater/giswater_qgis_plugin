@@ -31,11 +31,10 @@ BEGIN
     IF TG_WHEN = 'BEFORE' THEN
         IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
             -- Get the role for the current user
-            SELECT r.role_id INTO v_user_role_name
-            FROM cm.cat_user u
-            JOIN cm.cat_team t ON u.team_id = t.team_id
-            JOIN cm.cat_role r ON t.role_id = r.role_id
-            WHERE u.username = current_user;
+            SELECT rolname INTO v_user_role_name 
+            FROM pg_user u JOIN pg_auth_members m ON (m.member = u.usesysid) 
+            JOIN pg_roles r ON (r.oid = m.roleid)
+            WHERE u.usename = current_user and rolname ilike '%cm%';
 
             -- Only proceed if the user's role is 'role_cm_field'
             IF v_user_role_name = v_field_role_name THEN
