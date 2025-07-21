@@ -22,3 +22,24 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived
 -- 15/07/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc_add", "column":"mincut_impact", "newName":"mincut_impact_topo"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc_add", "column":"mincut_affectation", "newName":"mincut_impact_hydro"}}$$);
+
+-- 15/07/2025
+/*
+-- Change expl_id type to INT4[] in macrodma
+DROP VIEW IF EXISTS v_edit_macrodma;
+DROP VIEW IF EXISTS v_ui_macrodma;
+ALTER TABLE macrodma DROP CONSTRAINT IF EXISTS macrodma_expl_id_fkey;
+ALTER TABLE macrodma ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id]; 
+
+-- Change expl_id type to INT4[] in macrodqa
+DROP VIEW IF EXISTS v_edit_macrodqa;
+DROP VIEW IF EXISTS v_ui_macrodqa;
+ALTER TABLE macrodqa DROP CONSTRAINT IF EXISTS macrodqa_expl_id_fkey;
+ALTER TABLE macrodqa ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id]; 
+
+-- Change expl_id type to INT4[] in macroomzone
+DROP VIEW IF EXISTS v_edit_macroomzone;
+DROP VIEW IF EXISTS v_ui_macroomzone;
+ALTER TABLE macroomzone DROP CONSTRAINT IF EXISTS macroomzone_expl_id_fkey;
+ALTER TABLE macroomzone ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
+*/

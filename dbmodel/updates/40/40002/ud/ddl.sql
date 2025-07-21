@@ -106,7 +106,6 @@ ALTER TABLE dwfzone ADD CONSTRAINT dwfzone_drainzone_fk FOREIGN KEY (drainzone_i
 -- 14/07/2025
 DELETE FROM sys_foreignkey WHERE target_table = 'dma';
 
-
 DROP TABLE IF EXISTS inp_inlet;
 CREATE TABLE inp_inlet (
 	node_id integer NOT NULL,
@@ -157,3 +156,42 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_netg
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ve_epa_netgully", "column":"method", "newName":"gully_method"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_arc_flowregulator", "column":"arc_id", "dataType":"varchar(30)"}}$$);
+
+-- 15/07/2025
+DROP TABLE IF EXISTS macrominisector;
+
+/*
+-- Add expl_id and muni_id to sector
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"expl_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"muni_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+
+-- Add sector_id and muni_id to explotation
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"sector_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"muni_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+
+-- Add expl_id and sector_id to ext_municipality
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"expl_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"sector_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+
+
+-- Add muni_id and sector_id to drainzone
+DROP VIEW IF EXISTS v_edit_drainzone;
+DROP VIEW IF EXISTS v_ui_drainzone;
+ALTER TABLE drainzone ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone", "column":"muni_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone", "column":"sector_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+
+-- Add muni_id and sector_id to dwfzone
+DROP VIEW IF EXISTS v_edit_dwfzone;
+DROP VIEW IF EXISTS v_ui_dwfzone;
+ALTER TABLE dwfzone ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dwfzone", "column":"muni_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dwfzone", "column":"sector_id", "dataType":"INT4[]", "isUtils":"True"}}$$);
+
+-- Change expl_id type to INT4[] in Macroomzone
+DROP VIEW IF EXISTS v_edit_macroomzone;
+DROP VIEW IF EXISTS v_ui_macroomzone;
+ALTER TABLE macroomzone DROP CONSTRAINT IF EXISTS macroomzone_expl_id_fkey;
+ALTER TABLE macroomzone ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
+
+*/

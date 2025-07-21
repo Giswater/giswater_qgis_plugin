@@ -32,7 +32,7 @@ AS SELECT d.dwfzone_id,
    FROM selector_expl e,
     dwfzone d
      LEFT JOIN edit_typevalue et ON et.id::text = d.dwfzone_type::text AND et.typevalue::text = 'dwfzone_type'::text
-  WHERE d.expl_id = e.expl_id AND e.cur_user = "current_user"()::text;
+  WHERE e.expl_id = ANY(d.expl_id) AND e.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_ui_dwfzone
