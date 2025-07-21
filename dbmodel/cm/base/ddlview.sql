@@ -68,4 +68,14 @@ WITH campaign_reviewvisit AS (SELECT ocr.campaign_id, omr.idval FROM om_campaign
 	FROM om_campaign c
 	LEFT JOIN campaign_reviewvisit crv USING (campaign_id)
 	LEFT JOIN sys_typevalue st ON st.id = c.campaign_type::TEXT
-	WHERE st.typevalue = 'campaign_type'
+	WHERE st.typevalue = 'campaign_type';
+
+
+CREATE OR REPLACE VIEW v_selector_lot
+AS SELECT row_number() OVER () AS id,
+    selector_lot.lot_id,
+    om_campaign_lot.name,
+    selector_lot.cur_user
+   FROM selector_lot
+     JOIN om_campaign_lot USING (lot_id)
+  WHERE selector_lot.cur_user = CURRENT_USER;
