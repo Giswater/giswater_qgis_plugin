@@ -21,7 +21,7 @@ SELECT columns_are(
     'ext_rtc_hydrometer_x_data',
     ARRAY[
         'id', 'hydrometer_id', 'min', 'max', 'avg', 'sum', 'custom_sum', 'cat_period_id',
-        'value_date', 'pattern_id', 'value_type', 'value_status', 'value_state'
+        'value_date', 'pattern_id', 'value_type', 'value_status', 'value_state', 'crm_number'
     ],
     'Table ext_rtc_hydrometer_x_data should have the correct columns'
 );
@@ -43,6 +43,7 @@ SELECT col_type_is('ext_rtc_hydrometer_x_data', 'pattern_id', 'varchar(16)', 'Co
 SELECT col_type_is('ext_rtc_hydrometer_x_data', 'value_type', 'integer', 'Column value_type should be integer');
 SELECT col_type_is('ext_rtc_hydrometer_x_data', 'value_status', 'integer', 'Column value_status should be integer');
 SELECT col_type_is('ext_rtc_hydrometer_x_data', 'value_state', 'integer', 'Column value_state should be integer');
+SELECT col_type_is('ext_rtc_hydrometer_x_data', 'crm_number', 'text', 'Column crm_number should be text');
 
 -- Check indexes
 SELECT has_index('ext_rtc_hydrometer_x_data', 'ext_rtc_hydrometer_x_data_index_cat_period_id', 'Table should have index on cat_period_id');
