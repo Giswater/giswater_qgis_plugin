@@ -65,7 +65,7 @@ BEGIN
 
 						
 			UPDATE macrodqa 
-			SET macrodqa_id=NEW.macrodqa_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom,expl_id=NEW.expl_id, lock_level=NEW.lock_level
+			SET macrodqa_id=NEW.macrodqa_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, expl_id=NEW.expl_id, lock_level=NEW.lock_level
 			WHERE macrodqa_id=NEW.macrodqa_id;
 
       IF v_view_name = 'UI' THEN

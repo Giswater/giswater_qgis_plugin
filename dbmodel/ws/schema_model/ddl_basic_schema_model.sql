@@ -2796,6 +2796,8 @@ CREATE TABLE ext_hydrometer_category (
 CREATE TABLE ext_municipality (
     muni_id integer NOT NULL,
     name text NOT NULL,
+    sector_id INT4[],
+    expl_id INT4[],
     observ text,
     the_geom public.geometry(MultiPolygon,SRID_VALUE),
     active boolean DEFAULT true

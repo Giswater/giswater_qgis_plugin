@@ -402,7 +402,7 @@ BEGIN
 
 				-- get muni default from user variable or map
 				IF v_search_vdef IS NULL THEN
-					v_search_vdef = (SELECT muni_id FROM ext_municipality m, v_edit_exploitation e WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) limit 1);
+					v_search_vdef = (SELECT m.muni_id FROM ext_municipality m, v_edit_exploitation e WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) limit 1);
 				END IF;
 
 				-- Init combo json

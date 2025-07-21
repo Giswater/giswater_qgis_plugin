@@ -16,10 +16,11 @@ DECLARE
 name_id_column text;
 name_id_table text;
 name_array_column text;
-check_array_column record;
 all_exist boolean;
 v_data_type text;
 v_querystring text;
+v_value text;
+v_check_null_value boolean;
 
 BEGIN
 
@@ -34,9 +35,9 @@ BEGIN
 			"data":{"message":"3324", "function":"1320"}}$$);';
     END IF;
 
-    EXECUTE format('SELECT ($1).%I', name_array_column) USING NEW INTO check_array_column;
+    EXECUTE format('SELECT (($1).%I) IS NULL', name_array_column) USING NEW INTO v_check_null_value;
 
-    IF check_array_column IS NULL THEN
+    IF v_check_null_value IS TRUE THEN
         RETURN NEW;
     END IF;
 

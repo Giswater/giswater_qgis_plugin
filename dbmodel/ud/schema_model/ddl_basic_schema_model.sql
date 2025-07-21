@@ -2573,7 +2573,7 @@ ALTER SEQUENCE doc_x_workcat_id_seq OWNED BY doc_x_workcat.id;
 CREATE TABLE drainzone (
     drainzone_id integer NOT NULL,
     name character varying(30),
-    expl_id integer,
+    expl_id INT4 NULL,
     descript text,
     undelete boolean,
     the_geom public.geometry(MultiPolygon,SRID_VALUE),
@@ -3020,6 +3020,8 @@ CREATE TABLE ext_hydrometer_category_x_pattern (
 CREATE TABLE ext_municipality (
     muni_id integer NOT NULL,
     name text NOT NULL,
+    expl_id INT4[] NULL,
+    sector_id INT4[] NULL,
     observ text,
     the_geom public.geometry(MultiPolygon,SRID_VALUE),
     active boolean DEFAULT true
