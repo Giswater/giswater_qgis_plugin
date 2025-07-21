@@ -514,9 +514,6 @@ BEGIN
         ALTER TABLE raingage ADD CONSTRAINT raingage_muni_id FOREIGN KEY (muni_id)
         REFERENCES utils.municipality(muni_id);
 
-        ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_muni_id FOREIGN KEY (muni_id)
-        REFERENCES utils.municipality(muni_id);
-
         -- No utils.municipality BEFORE
         ALTER TABLE ONLY ext_address ADD CONSTRAINT ext_address_muni_id_fkey FOREIGN KEY (muni_id) 
         REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -559,9 +556,6 @@ BEGIN
         REFERENCES ext_municipality(muni_id);
 
         ALTER TABLE raingage ADD CONSTRAINT raingage_muni_id FOREIGN KEY (muni_id)
-        REFERENCES ext_municipality(muni_id);
-
-        ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_muni_id FOREIGN KEY (muni_id)
         REFERENCES ext_municipality(muni_id);
 
         -- No utils.municipality
