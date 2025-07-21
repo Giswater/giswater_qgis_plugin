@@ -147,6 +147,8 @@ BEGIN
     OR (role_id=''role_cm_admin'')
     ON CONFLICT DO NOTHING;';
 
+	PERFORM cm.gw_fct_cm_polygon_geom(json_build_object('id', v_newid, 'name', 'campaign'));
+
     -- Return success response
     RETURN json_build_object(
         'status', v_status,

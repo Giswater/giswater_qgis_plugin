@@ -19,7 +19,7 @@ SELECT cm.gw_fct_cm_polygon_geom('{"id":1, "name":"lot"}');
 */
 
 DECLARE 
-    p_lot_id integer;
+    p_campaign_lot_id integer;
     p_type text;
     collect_aux public.geometry;
     v_projecttype text;
@@ -27,15 +27,18 @@ DECLARE
     v_error_context text;
     v_version text;
     v_message text;
+    v_target_srid integer;
+    v_sql text;
 
 
 BEGIN 
     -- Get params
-    p_lot_id := p_params->>'id';
+    p_campaign_lot_id := p_params->>'id';
     p_type := p_params->>'name';
 
     -- Get version
-    SELECT giswater INTO v_version FROM public.sys_version ORDER BY id DESC LIMIT 1;
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
+    INTO v_version;
 
     --EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     SET search_path = "cm", public;
@@ -43,50 +46,76 @@ BEGIN
 
 	IF lower(p_type) = 'lot' then
 		
-		SELECT st_multi(the_geom) INTO collect_aux FROM 
-		(WITH polygon AS (SELECT st_collect(f.the_geom) g
-			FROM ( select the_geom from om_campaign_lot_x_arc where lot_id=p_lot_id
-			UNION
-			select the_geom from om_campaign_lot_x_node where lot_id=p_lot_id
-			UNION
-			select the_geom from om_campaign_lot_x_connec where lot_id=p_lot_id) f)
-			SELECT CASE 
-			WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text 
-			THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,8908)
-			ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,8908) 
-			END AS the_geom FROM polygon) a;
+        -- Dynamically get the SRID of the target geometry column
+        SELECT Find_SRID('cm', 'om_campaign_lot', 'the_geom') INTO v_target_srid;
+
+		v_sql := 'WITH polygon AS (SELECT st_collect(f.the_geom) g FROM (' ||
+            'SELECT c.the_geom FROM cm.om_campaign_x_arc c JOIN cm.om_campaign_lot_x_arc l ON c.arc_id = l.arc_id' ||
+            ' UNION ' ||
+            'SELECT c.the_geom FROM cm.om_campaign_x_node c JOIN cm.om_campaign_lot_x_node l ON c.node_id = l.node_id' ||
+            ' UNION ' ||
+            'SELECT c.the_geom FROM cm.om_campaign_x_connec c JOIN cm.om_campaign_lot_x_connec l ON c.connec_id = l.connec_id' ||
+            ' UNION ' ||
+            'SELECT c.the_geom FROM cm.om_campaign_x_link c JOIN cm.om_campaign_lot_x_link l ON c.link_id = l.link_id';
+
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'cm' AND table_name = 'om_campaign_lot_x_gully') THEN
+            v_sql := v_sql || ' UNION ' ||
+                'SELECT c.the_geom FROM cm.om_campaign_x_gully c JOIN cm.om_campaign_lot_x_gully l ON c.gully_id = l.gully_id';
+        END IF;
+
+        v_sql := v_sql || ') f) ' ||
+            'SELECT CASE ' ||
+            'WHEN st_geometrytype(st_concavehull(g, 0.85)) = ''ST_Polygon''::text ' ||
+            'THEN ST_Transform(st_buffer(st_concavehull(g, 0.85), 3), ' || v_target_srid || ') ' ||
+            'ELSE ST_Transform(st_expand(st_buffer(g, 3::double precision), 1::double precision), ' || v_target_srid || ') ' ||
+            'END AS the_geom FROM polygon';
+
+        EXECUTE 'SELECT st_multi(the_geom) FROM (' || v_sql || ') a' INTO collect_aux;
 	
 			-- Update geometry field
-			UPDATE om_campaign_lot SET the_geom=collect_aux WHERE lot_id=p_lot_id;
+			UPDATE cm.om_campaign_lot SET the_geom=collect_aux WHERE lot_id=p_campaign_lot_id;
 
 	ELSIF lower(p_type) = 'campaign' then
 		
-		SELECT st_multi(the_geom) INTO collect_aux FROM 
-		(WITH polygon AS (SELECT st_collect(f.the_geom) g
-			FROM ( select the_geom from om_campaign_x_arc where campaign_id=p_lot_id
-			UNION
-			select the_geom from om_campaign_x_node where campaign_id=p_lot_id
-			UNION
-			select the_geom from om_campaign_x_connec where campaign_id=p_lot_id) f)
-			SELECT CASE 
-			WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text 
-			THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,8908)
-			ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,8908) 
-			END AS the_geom FROM polygon) a;
+        -- Dynamically get the SRID of the target geometry column
+        SELECT Find_SRID('cm', 'om_campaign', 'the_geom') INTO v_target_srid;
+
+		v_sql := 'WITH polygon AS (SELECT st_collect(f.the_geom) g FROM (' ||
+            'select the_geom from om_campaign_x_arc where campaign_id = ' || p_campaign_lot_id ||
+            ' UNION ' ||
+            'select the_geom from om_campaign_x_node where campaign_id = ' || p_campaign_lot_id ||
+            ' UNION ' ||
+            'select the_geom from om_campaign_x_connec where campaign_id = ' || p_campaign_lot_id ||
+            ' UNION ' ||
+            'select the_geom from om_campaign_x_link where campaign_id = ' || p_campaign_lot_id;
+
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'cm' AND table_name = 'om_campaign_x_gully') THEN
+            v_sql := v_sql || ' UNION ' ||
+                'select the_geom from om_campaign_x_gully where campaign_id = ' || p_campaign_lot_id;
+        END IF;
+
+        v_sql := v_sql || ') f) ' ||
+            'SELECT CASE ' ||
+            'WHEN st_geometrytype(st_concavehull(g, 0.85)) = ''ST_Polygon''::text ' ||
+            'THEN ST_Transform(st_buffer(st_concavehull(g, 0.85), 3), ' || v_target_srid || ') ' ||
+            'ELSE ST_Transform(st_expand(st_buffer(g, 3::double precision), 1::double precision), ' || v_target_srid || ') ' ||
+            'END AS the_geom FROM polygon';
+        
+        EXECUTE 'SELECT st_multi(the_geom) FROM (' || v_sql || ') a' INTO collect_aux;
 	
 			-- Update geometry field
-			UPDATE om_campaign SET the_geom=collect_aux WHERE campaign_id=p_lot_id;
+			UPDATE om_campaign SET the_geom=collect_aux WHERE campaign_id=p_campaign_lot_id;
 
 	END IF;
     -- Return
-    v_message := format('Geometry for %s %s updated successfully', p_type, p_lot_id);
+    v_message := format('Geometry for %s %s updated successfully', p_type, p_campaign_lot_id);
 
     v_ret := json_build_object(
         'status', 'Accepted',
         'message', v_message,
         'version', v_version,
         'body', json_build_object(
-            'feature', json_build_object('id', p_lot_id),
+            'feature', json_build_object('id', p_campaign_lot_id),
             'data', json_build_object('info', 'lot/campaign geom updated')
         )
     );

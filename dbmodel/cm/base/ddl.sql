@@ -435,7 +435,6 @@ CREATE TABLE om_campaign_x_arc (
 	id serial4 NOT NULL,
 	campaign_id int4 NOT NULL,
 	arc_id int4 NOT NULL,
-	pschema_id int4 NOT NULL,
 	code varchar(30) NULL,
 	status int2 NULL,
 	admin_observ text NULL,
@@ -444,7 +443,7 @@ CREATE TABLE om_campaign_x_arc (
 	arc_type text NULL,
 	the_geom geometry(linestring, SRID_VALUE) NULL,
 	CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (id),
-	CONSTRAINT om_campaign_x_arc_un UNIQUE (campaign_id, arc_id, pschema_id),
+	CONSTRAINT om_campaign_x_arc_un UNIQUE (campaign_id, arc_id),
 	CONSTRAINT om_campaign_x_arc_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -452,7 +451,6 @@ CREATE TABLE om_campaign_x_connec (
 	id serial4 NOT NULL,
 	campaign_id int4 NOT NULL,
 	connec_id int4 NOT NULL,
-	pschema_id int4 NOT NULL,
 	code varchar(30) NULL,
 	status int2 NULL,
 	admin_observ text NULL,
@@ -460,7 +458,7 @@ CREATE TABLE om_campaign_x_connec (
 	connectcat_id text NULL,
 	the_geom geometry(point, SRID_VALUE) NULL,
 	CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (id),
-	CONSTRAINT om_campaign_x_connec_un UNIQUE (campaign_id, connec_id, pschema_id),
+	CONSTRAINT om_campaign_x_connec_un UNIQUE (campaign_id, connec_id),
 	CONSTRAINT om_campaign_x_connec_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -469,7 +467,6 @@ CREATE TABLE om_campaign_x_link (
 	id serial4 NOT NULL,
 	campaign_id int4 NOT NULL,
 	link_id int4 NOT NULL,
-	pschema_id int4 NOT NULL,
 	code varchar(30) NULL,
 	status int2 NULL,
 	admin_observ text NULL,
@@ -477,7 +474,7 @@ CREATE TABLE om_campaign_x_link (
 	linkcat_id text NULL,
 	the_geom geometry(polygon, SRID_VALUE) NULL,
 	CONSTRAINT om_campaign_x_link_pkey PRIMARY KEY (id),
-	CONSTRAINT om_campaign_x_link_un UNIQUE (campaign_id, link_id, pschema_id),
+	CONSTRAINT om_campaign_x_link_un UNIQUE (campaign_id, link_id),
 	CONSTRAINT om_campaign_x_link_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -485,7 +482,6 @@ CREATE TABLE om_campaign_x_node (
 	id serial4 NOT NULL,
 	campaign_id int4 NOT NULL,
 	node_id int4 NOT NULL,
-	pschema_id int4 NOT NULL,
 	code varchar(30) NULL,
 	status int2 NULL,
 	admin_observ text NULL,
@@ -494,7 +490,7 @@ CREATE TABLE om_campaign_x_node (
 	node_type text NULL,
 	the_geom geometry(point, SRID_VALUE) NULL,
 	CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (id),
-	CONSTRAINT om_campaign_x_node_un UNIQUE (campaign_id, node_id, pschema_id),
+	CONSTRAINT om_campaign_x_node_un UNIQUE (campaign_id, node_id),
 	CONSTRAINT om_campaign_x_node_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

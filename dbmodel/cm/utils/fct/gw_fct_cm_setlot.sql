@@ -77,6 +77,8 @@ BEGIN
         USING v_fields::jsonb, v_record.lot_id;
     END IF;
 
+	PERFORM cm.gw_fct_cm_polygon_geom(json_build_object('id', COALESCE(v_existing_id, v_record.lot_id), 'name', 'lot'));
+
     -- Retrieve admin version if defined
     SELECT value INTO v_version
     FROM config_param_system
