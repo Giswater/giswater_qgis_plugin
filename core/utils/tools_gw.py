@@ -4970,47 +4970,64 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
 
     widget = tools_qt.get_widget(dialog, f"tbl_campaign_x_{feature_type}")
     tablename = widget.property('tablename') or f"cm.om_campaign_x_{feature_type}"
-    pschema_id = lib_vars.project_vars['parent_schema_id']
     parent_table = f"{lib_vars.schema_name}.{feature_type}"
+    from_clause = f"FROM {parent_table} p"
 
     if not campaign_id:
         msg = "Campaign ID is missing."
         tools_qgis.show_warning(msg)
         return
 
-    # Define feature-specific columns to be inserted and selected
+    # Configuration for each feature type to define which columns to add and whether a join is needed.
+    feature_configs = {
+        'node':   {'cat_id_col': 'nodecat_id',   'type_col': 'node_type'},
+        'arc':    {'cat_id_col': 'arccat_id',    'type_col': 'arc_type'},
+        'gully':  {'cat_id_col': 'gullycat_id',  'type_col': 'gully_type'},
+        'connec': {'cat_id_col': 'conneccat_id', 'type_col': None},
+        'link':   {'cat_id_col': 'linkcat_id',   'type_col': None}
+    }
+
     extra_cols = []
-    if feature_type == 'node':
-        extra_cols = ['nodecat_id', 'node_type']
-    elif feature_type == 'arc':
-        extra_cols = ['arccat_id', 'arc_type']
-    elif feature_type == 'connec':
-        extra_cols = ['conneccat_id']
-    elif feature_type == 'link':
-        extra_cols = ['linkcat_id']
-    elif feature_type == 'gully':
-        extra_cols = ['gullycat_id', 'gully_type']
+    select_extras = []
+    
+    config = feature_configs.get(feature_type)
+    if config:
+        cat_id_col = config['cat_id_col']
+        type_col = config['type_col']
+        
+        # All configured features have at least a catalog ID
+        extra_cols.append(cat_id_col)
+        select_extras.append(f"p.{cat_id_col}")
+        
+        if type_col:
+            # This feature type requires a JOIN to get its type from the catalog table
+            cat_table = f"{lib_vars.schema_name}.cat_{feature_type}"
+            extra_cols.append(type_col)
+            select_extras.append(f"c.{type_col}")
+            from_clause = (
+                f"FROM {parent_table} p "
+                f"JOIN {cat_table} c ON p.{cat_id_col} = c.id"
+            )
 
     # Base columns for the INSERT statement
-    base_insert_cols = ['campaign_id', f'{feature_type}_id', 'pschema_id', 'status', 'the_geom']
+    base_insert_cols = ['campaign_id', f'{feature_type}_id', 'status', 'the_geom']
     
     # Corresponding values/columns for the SELECT statement
-    base_select_cols = [f"'{campaign_id}'", f'p.{feature_type}_id', f"'{pschema_id}'", '1', 'p.the_geom']
+    base_select_cols = [f"{campaign_id}", f'p.{feature_type}_id', "1", 'p.the_geom']
 
     # Combine base and extra columns for the final query
     insert_cols = ", ".join(base_insert_cols + extra_cols)
-    select_cols = ", ".join(base_select_cols + [f"p.{col}" for col in extra_cols])
+    select_cols = ", ".join(base_select_cols + select_extras)
 
     for feature_id in ids or []:
         sql = f"""
             INSERT INTO {tablename} ({insert_cols})
             SELECT {select_cols}
-            FROM {parent_table} p
+            {from_clause}
             WHERE p.{feature_type}_id = {feature_id}
             ON CONFLICT DO NOTHING;
         """
         tools_db.execute_sql(sql)
-
 
 def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
     """ Reload QTableView for campaign_x_<feature_type> """
@@ -5097,8 +5114,8 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
 
     for feature_id in ids or []:
         sql = f"""
-            INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code, the_geom)
-            SELECT {lot_id}, {feature_id}, 1, code, the_geom
+            INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
+            SELECT {lot_id}, {feature_id}, 1, code
             FROM {lib_vars.schema_name}.{feature_type}
             WHERE {feature_type}_id = {feature_id}
             ON CONFLICT DO NOTHING;
