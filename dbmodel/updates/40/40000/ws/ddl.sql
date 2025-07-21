@@ -220,8 +220,8 @@ CREATE TABLE sector (
 	"name" varchar(50) NOT NULL,
 	descript text NULL,
 	sector_type varchar(16) NULL,
-    muni_id int4[] NULL,
-    expl_id int4[] NULL,
+	expl_id int4[] NULL,
+	muni_id int4[] NULL,
 	macrosector_id int4 NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
@@ -1929,7 +1929,7 @@ ALTER TABLE macrodma RENAME TO _macrodma;
 ALTER TABLE dma DROP CONSTRAINT dma_macrodma_id_fkey;
 
 -- Drop foreign keys from table macrodma
-ALTER TABLE _macrodma DROP CONSTRAINT macrodma_expl_id_fkey;
+ALTER TABLE _macrodma DROP CONSTRAINT IF EXISTS macrodma_expl_id_fkey;
 
 -- Drop restrictions from table macrodma
 ALTER TABLE _macrodma DROP CONSTRAINT macrodma_pkey;
@@ -1951,7 +1951,7 @@ CREATE TABLE macrodma (
 	code text NULL,
 	"name" varchar(50) NOT NULL,
 	descript text NULL,
-	expl_id int4 NOT NULL,
+	expl_id int4[] NOT NULL,
 	lock_level int4 NULL,
 	active bool DEFAULT true NULL,
 	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
@@ -1959,8 +1959,7 @@ CREATE TABLE macrodma (
 	created_by varchar(50) DEFAULT CURRENT_USER NULL,
 	updated_at timestamp with time zone NULL,
 	updated_by varchar(50) NULL,
-	CONSTRAINT macrodma_pkey PRIMARY KEY (macrodma_id),
-	CONSTRAINT macrodma_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT macrodma_pkey PRIMARY KEY (macrodma_id)
 );
 CREATE INDEX macrodma_index ON macrodma USING gist (the_geom);
 
@@ -1971,7 +1970,7 @@ ALTER TABLE macrodqa RENAME TO _macrodqa;
 ALTER TABLE dqa DROP CONSTRAINT dqa_macrodqa_id_fkey;
 
 -- Drop foreign keys from table macrodqa
-ALTER TABLE _macrodqa DROP CONSTRAINT macrodqa_expl_id_fkey;
+ALTER TABLE _macrodqa DROP CONSTRAINT IF EXISTS macrodqa_expl_id_fkey;
 
 -- Drop restrictions from table macrodqa
 ALTER TABLE _macrodqa DROP CONSTRAINT macrodqa_pkey;
@@ -1992,7 +1991,7 @@ CREATE TABLE macrodqa (
 	code text NULL,
 	"name" varchar(50) NOT NULL,
 	descript text NULL,
-	expl_id int4 NOT NULL,
+	expl_id int4[] NOT NULL,
 	lock_level int4 NULL,
 	active bool DEFAULT true NULL,
 	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
@@ -2000,8 +1999,7 @@ CREATE TABLE macrodqa (
 	created_by varchar(50) DEFAULT CURRENT_USER NULL,
 	updated_at timestamp with time zone NULL,
 	updated_by varchar(50) NULL,
-	CONSTRAINT macrodqa_pkey PRIMARY KEY (macrodqa_id),
-	CONSTRAINT macrodqa_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT macrodqa_pkey PRIMARY KEY (macrodqa_id)
 );
 
 -- macroexploitation
@@ -2055,7 +2053,6 @@ BEGIN
 END $$;
 ALTER TABLE node DROP CONSTRAINT node_expl_fkey;
 ALTER TABLE config_user_x_expl DROP CONSTRAINT config_user_x_expl_expl_id_fkey;
-ALTER TABLE macrodqa DROP CONSTRAINT macrodqa_expl_id_fkey;
 ALTER TABLE om_streetaxis DROP CONSTRAINT om_streetaxis_exploitation_id_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_expl_fkey;
 ALTER TABLE om_waterbalance DROP CONSTRAINT om_waterbalance_expl_id_fkey;
@@ -2063,7 +2060,6 @@ ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_exploitation_id_fkey;
 ALTER TABLE dimensions DROP CONSTRAINT dimensions_exploitation_id_fkey;
 ALTER TABLE om_mincut DROP CONSTRAINT om_mincut_expl_id_fkey;
 ALTER TABLE selector_expl DROP CONSTRAINT selector_expl_id_fkey;
-ALTER TABLE macrodma DROP CONSTRAINT macrodma_expl_id_fkey;
 ALTER TABLE plan_psector DROP CONSTRAINT plan_psector_expl_id_fkey;
 ALTER TABLE plan_netscenario DROP CONSTRAINT plan_netscenario_expl_id_fkey;
 ALTER TABLE om_visit DROP CONSTRAINT om_visit_expl_id_fkey;
@@ -2100,6 +2096,8 @@ CREATE TABLE exploitation (
 	code text NULL,
 	"name" varchar(50) NOT NULL,
 	descript text NULL,
+	sector_id int4[] NULL,
+	muni_id int4[] NULL,
 	macroexpl_id int4 NOT NULL,
 	lock_level int4 NULL,
 	active bool DEFAULT true NULL,
@@ -2121,7 +2119,7 @@ CREATE TABLE IF NOT EXISTS macroomzone (
     code text NULL,
     "name" varchar(50) NOT NULL,
     descript text NULL,
-	expl_id int4 NOT NULL,
+	expl_id int4[] NOT NULL,
     lock_level int4 NULL,
 	active bool DEFAULT true NULL,
     the_geom public.geometry(MultiPolygon, SRID_VALUE),
@@ -2129,8 +2127,7 @@ CREATE TABLE IF NOT EXISTS macroomzone (
     created_by varchar(50) DEFAULT CURRENT_USER NULL,
     updated_at timestamp with time zone NULL,
     updated_by varchar(50) NULL,
-    CONSTRAINT macroomzone_pkey PRIMARY KEY (macroomzone_id),
-    CONSTRAINT macroomzone_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT macroomzone_pkey PRIMARY KEY (macroomzone_id)
 );
 
 
@@ -2177,3 +2174,85 @@ ALTER TABLE crmzone ADD COLUMN created_at timestamp with time zone DEFAULT now()
 ALTER TABLE crmzone ADD COLUMN created_by varchar(50) DEFAULT CURRENT_USER NULL;
 ALTER TABLE crmzone ADD COLUMN updated_at timestamp with time zone NULL;
 ALTER TABLE crmzone ADD COLUMN updated_by varchar(50) NULL;
+
+-- Drop foreign keys for muni_id
+ALTER TABLE selector_municipality DROP CONSTRAINT selector_municipality_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_muni_id_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_muni_id;
+ALTER TABLE om_visit DROP CONSTRAINT om_visit_muni_id_fkey;
+ALTER TABLE dimensions DROP CONSTRAINT dimensions_muni_id_fkey;
+ALTER TABLE dimensions DROP CONSTRAINT dimensions_muni_id;
+
+
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+
+		DROP INDEX IF EXISTS idx_municipality_name;
+		DROP INDEX IF EXISTS idx_municipality_the_geom;
+
+		DROP VIEW ext_municipality;
+
+		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_pkey TO _municipality_pkey;
+		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_region_id_fkey TO _municipality_region_id_fkey;
+		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_province_id_fkey TO _municipality_province_id_fkey;
+		ALTER TABLE utils.municipality RENAME TO _municipality;
+
+		CREATE TABLE utils.municipality (
+			muni_id integer NOT NULL,
+			name text NOT NULL,
+			expl_id INT4[] NULL,
+			sector_id INT4[] NULL,
+			observ text,
+			the_geom public.geometry(MultiPolygon,SRID_VALUE),
+			active boolean DEFAULT true,
+			region_id int4 NULL,
+			province_id int4 NULL,
+			ext_code text NULL,
+			CONSTRAINT municipality_pkey PRIMARY KEY (muni_id),
+			CONSTRAINT municipality_region_id_fkey FOREIGN KEY (region_id) REFERENCES ext_region(region_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+			CONSTRAINT municipality_province_id_fkey FOREIGN KEY (province_id) REFERENCES ext_province(province_id) ON DELETE RESTRICT ON UPDATE CASCADE
+		);
+
+    ELSE
+
+		DROP INDEX IF EXISTS idx_ext_municipality_name;
+		DROP INDEX IF EXISTS idx_ext_municipality_the_geom;
+
+		ALTER TABLE ext_address DROP CONSTRAINT ext_address_muni_id_fkey;
+		ALTER TABLE ext_district DROP CONSTRAINT ext_district_muni_id_fkey;
+		ALTER TABLE ext_plot DROP CONSTRAINT ext_plot_muni_id_fkey;
+		ALTER TABLE ext_streetaxis DROP CONSTRAINT ext_streetaxis_muni_id_fkey;
+		ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_streetaxis_muni_id_fkey;
+
+		DROP VIEW v_ext_municipality;
+
+		-- DROP TABLE ext_municipality;
+		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_pkey TO _ext_municipality_pkey;
+		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_region_id_fkey TO _ext_municipality_region_id_fkey;
+		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_province_id_fkey TO _ext_municipality_province_id_fkey;
+		ALTER TABLE ext_municipality RENAME TO _ext_municipality;
+
+		CREATE TABLE ext_municipality (
+			muni_id integer NOT NULL,
+			name text NOT NULL,
+			expl_id INT4[] NULL,
+			sector_id INT4[] NULL,
+			observ text,
+			the_geom public.geometry(MultiPolygon,SRID_VALUE),
+			active boolean DEFAULT true,
+			region_id int4 NULL,
+			province_id int4 NULL,
+			ext_code varchar(50) NULL,
+			CONSTRAINT ext_municipality_pkey PRIMARY KEY (muni_id),
+			CONSTRAINT ext_municipality_region_id_fkey FOREIGN KEY (region_id) REFERENCES ext_region(region_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+			CONSTRAINT ext_municipality_province_id_fkey FOREIGN KEY (province_id) REFERENCES ext_province(province_id) ON DELETE RESTRICT ON UPDATE CASCADE
+		);
+
+    END IF;
+END; $$;

@@ -6370,6 +6370,8 @@ AS SELECT e.expl_id,
     e.code,
     e.name,
     e.macroexpl_id,
+    e.sector_id,
+    e.muni_id,
     e.owner_vdefault,
     e.descript,
     e.lock_level,
@@ -6396,7 +6398,7 @@ AS SELECT DISTINCT ON (macrodma_id) macrodma_id,
     m.updated_at,
     m.updated_by
   FROM selector_expl se, macrodma m
-  WHERE m.expl_id = se.expl_id AND se.cur_user = CURRENT_USER
+  WHERE se.expl_id = ANY(m.expl_id) AND se.cur_user = CURRENT_USER
   AND m.active IS true;
 
 CREATE OR REPLACE VIEW v_edit_macrodqa
@@ -6412,7 +6414,7 @@ AS SELECT DISTINCT ON (macrodqa_id) macrodqa_id,
     m.updated_at,
     m.updated_by
   FROM selector_expl se, macrodqa m
-  WHERE m.expl_id = se.expl_id AND se.cur_user = CURRENT_USER
+  WHERE se.expl_id = ANY(m.expl_id) AND se.cur_user = CURRENT_USER
   AND m.active IS true;
 
 CREATE OR REPLACE VIEW v_edit_macrosector
@@ -6436,6 +6438,7 @@ AS SELECT DISTINCT ON (macroomzone_id) macroomzone_id,
     m.code,
     m.name,
     m.descript,
+    m.expl_id,
     m.lock_level,
     m.the_geom,
     m.created_at,
@@ -6444,7 +6447,7 @@ AS SELECT DISTINCT ON (macroomzone_id) macroomzone_id,
     m.updated_by
   FROM selector_expl se, macroomzone m
   LEFT JOIN omzone o USING (macroomzone_id)
-  WHERE m.expl_id = se.expl_id AND se.cur_user = CURRENT_USER OR o.macroomzone_id IS NULL
+  WHERE se.expl_id = ANY(m.expl_id) AND se.cur_user = CURRENT_USER OR o.macroomzone_id IS NULL
   AND m.active IS true;
 
 CREATE OR REPLACE VIEW v_edit_macroexploitation
@@ -6634,6 +6637,7 @@ AS SELECT DISTINCT ON (m.macrodqa_id) m.macrodqa_id,
     m.code,
     m.name,
     m.descript,
+    m.expl_id,
     m.active,
     m.lock_level,
     m.created_at,

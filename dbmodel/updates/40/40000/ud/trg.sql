@@ -60,3 +60,139 @@ UPDATE
     OF node_id,
     state ON
     plan_psector_x_node FOR EACH ROW EXECUTE FUNCTION gw_trg_plan_psector_x_node();
+
+
+-- Create fk for arrays thorught triggers:
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+
+        -- Expl_id 
+        CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"macroomzone":"expl_id", "dwfzone":"expl_id", "drainzone":"expl_id", "sector":"expl_id", "utils.municipality":"expl_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"macroomzone":"expl_id", "dwfzone":"expl_id", "drainzone":"expl_id", "sector":"expl_id", "utils.municipality":"expl_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON macroomzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON dwfzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON drainzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON utils.municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        -- Muni_id
+        CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON utils.municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON utils.municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON dwfzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'utils.municipality', 'muni_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON drainzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'utils.municipality', 'muni_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'utils.municipality', 'muni_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'utils.municipality', 'muni_id');
+
+        -- Sector_id
+        CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dwfzone":"sector_id", "drainzone":"sector_id", "exploitation":"sector_id", "utils.municipality":"sector_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dwfzone":"sector_id", "drainzone":"sector_id", "exploitation":"sector_id", "utils.municipality":"sector_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON dwfzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON drainzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON utils.municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
+
+    ELSE
+
+        -- Expl_id 
+        CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"macroomzone":"expl_id", "dwfzone":"expl_id", "drainzone":"expl_id", "sector":"expl_id", "ext_municipality":"expl_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"macroomzone":"expl_id", "dwfzone":"expl_id", "drainzone":"expl_id", "sector":"expl_id", "ext_municipality":"expl_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON macroomzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON dwfzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON drainzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON ext_municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
+
+        -- Muni_id
+        CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON ext_municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON ext_municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON dwfzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON drainzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
+
+        -- Sector_id
+        CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dwfzone":"sector_id", "drainzone":"sector_id", "exploitation":"sector_id", "ext_municipality":"sector_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dwfzone":"sector_id", "drainzone":"sector_id", "exploitation":"sector_id", "ext_municipality":"sector_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON dwfzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON drainzone
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE ON ext_municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('sector_id', 'sector', 'sector_id');
+
+    END IF;
+END; $$;

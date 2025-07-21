@@ -2781,7 +2781,7 @@ SELECT macrosector_id, macrosector_id::text, "name", descript, NULL, active, the
 FROM _macrosector;
 
 INSERT INTO macroomzone (macroomzone_id, code, "name", descript, expl_id, lock_level, active, the_geom, updated_at)
-SELECT macrodma_id, macrodma_id::text, "name", descript, expl_id, NULL, active, the_geom, now()
+SELECT macrodma_id, macrodma_id::text, "name", descript, ARRAY[expl_id], NULL, active, the_geom, now()
 FROM _macrodma;
 
 INSERT INTO omzone (omzone_id, code, "name", descript, omzone_type, expl_id, macroomzone_id, minc, maxc, effc, link,
@@ -2791,7 +2791,7 @@ graphconfig, stylesheet, lock_level, active, the_geom, tstamp, insert_user, last
 FROM _dma;
 
 INSERT INTO drainzone (drainzone_id, code, "name", drainzone_type, descript, expl_id, link, graphconfig, stylesheet, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
-SELECT drainzone_id, drainzone_id::text, "name", drainzone_type, descript, expl_id, link, graphconfig, stylesheet, NULL, active, the_geom, tstamp, insert_user, lastupdate, lastupdate_user
+SELECT drainzone_id, drainzone_id::text, "name", drainzone_type, descript, ARRAY[expl_id], link, graphconfig, stylesheet, NULL, active, the_geom, tstamp, insert_user, lastupdate, lastupdate_user
 FROM _drainzone;
 
 INSERT INTO sector (sector_id, code, "name", descript, macrosector_id, parent_id, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
@@ -3053,3 +3053,24 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 VALUES('om_typevalue', 'treatment_type', 'connec', 'treatment_type', NULL, true);
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+-- 17/07/2025
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+
+    INSERT INTO utils.municipality (muni_id, name, observ, the_geom, active, region_id, province_id, ext_code)
+    SELECT muni_id, name, observ, the_geom, active, region_id, province_id, ext_code FROM utils.municipality;
+
+  ELSE
+
+    INSERT INTO ext_municipality (muni_id, name, observ, the_geom, active, region_id, province_id, ext_code)
+    SELECT muni_id, name, observ, the_geom, active, region_id, province_id, ext_code FROM _ext_municipality;
+
+  END IF;
+END; $$;

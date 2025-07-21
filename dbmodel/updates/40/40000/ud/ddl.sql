@@ -561,7 +561,9 @@ CREATE TABLE dwfzone (
 	code text NULL,
 	"name" varchar(30) NULL,
 	dwfzone_type varchar(16) NULL,
-	expl_id int4 NULL,
+	expl_id int4[] NULL,
+	sector_id int4[] NULL,
+	muni_id int4[] NULL,
 	descript text NULL,
 	link text NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json NULL,
@@ -879,6 +881,7 @@ CREATE TABLE node (
 	dwfzone_id int4 DEFAULT 0 NULL,
 	omzone_id int4 DEFAULT 0 NULL,
 	omunit_id int4 DEFAULT 0 NULL,
+	omstate int4 DEFAULT 0 NULL,
 	minsector_id int4 DEFAULT 0 NULL,
 	dwfzone_outfall int4[] NULL,
 	drainzone_outfall int4[] NULL,
@@ -1193,8 +1196,6 @@ CREATE INDEX arc_street1 ON arc USING btree (streetaxis_id);
 CREATE INDEX arc_street2 ON arc USING btree (streetaxis2_id);
 CREATE INDEX arc_sys_code_idx ON arc USING btree (sys_code);
 CREATE INDEX arc_asset_id_idx ON arc USING btree (asset_id);
-
-
 
 
 
@@ -1898,6 +1899,8 @@ CREATE TABLE exploitation (
 	code text NULL,
 	"name" varchar(50) NOT NULL,
 	descript text NULL,
+	sector_id int4[] NULL,
+	muni_id int4[] NULL,
 	macroexpl_id int4 DEFAULT 0 NOT NULL,
 	lock_level int4 NULL,
 	active bool DEFAULT true NULL,
@@ -1920,7 +1923,7 @@ CREATE TABLE macroomzone (
 	macroomzone_id serial4 NOT NULL,
 	code text NULL,
 	"name" varchar(50) NOT NULL,
-	expl_id int4 NOT NULL,
+	expl_id int4[] NULL,
 	descript text NULL,
 	lock_level int4 NULL,
 	active bool DEFAULT true NULL,
@@ -1929,8 +1932,7 @@ CREATE TABLE macroomzone (
 	created_by varchar(50) DEFAULT CURRENT_USER NULL,
 	updated_at timestamp with time zone NULL,
 	updated_by varchar(50) NULL,
-	CONSTRAINT macroomzone_pkey PRIMARY KEY (macroomzone_id),
-	CONSTRAINT macroomzone_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT macroomzone_pkey PRIMARY KEY (macroomzone_id)
 );
 CREATE INDEX macroomzone_index ON macroomzone USING gist (the_geom);
 
@@ -2015,7 +2017,9 @@ CREATE TABLE drainzone (
 	"name" varchar(30) NULL,
 	drainzone_type varchar(16) NULL,
 	descript text NULL,
-	expl_id int4 NULL,
+	expl_id int4[] NULL,
+	sector_id int4[] NULL,
+	muni_id int4[] NULL,
 	link text NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
@@ -2061,6 +2065,8 @@ CREATE TABLE sector (
 	"name" varchar(50) NOT NULL,
 	descript text NULL,
 	sector_type varchar(50) NULL,
+	expl_id int4[] NULL, 
+	muni_id int4[] NULL,
 	macrosector_id int4 DEFAULT 0 NULL,
 	parent_id int4 NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
@@ -2082,3 +2088,86 @@ CREATE INDEX sector_index ON sector USING gist (the_geom);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"samplepoint", "column":"dma_id", "newName":"omzone_id"}}$$);
 
 ALTER TABLE man_type_fluid RENAME TO _man_type_fluid;
+
+ALTER TABLE selector_municipality DROP CONSTRAINT selector_municipality_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_muni_id_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_muni_id;
+ALTER TABLE om_visit DROP CONSTRAINT om_visit_muni_id_fkey;
+ALTER TABLE dimensions DROP CONSTRAINT dimensions_muni_id_fkey;
+ALTER TABLE dimensions DROP CONSTRAINT dimensions_muni_id;
+ALTER TABLE raingage DROP CONSTRAINT raingage_muni_id;
+
+DROP TABLE ext_municipality;
+
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+
+		DROP INDEX IF EXISTS idx_municipality_name;
+		DROP INDEX IF EXISTS idx_municipality_the_geom;
+
+		DROP VIEW ext_municipality;
+
+		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_pkey TO _municipality_pkey;
+		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_region_id_fkey TO _municipality_region_id_fkey;
+		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_province_id_fkey TO _municipality_province_id_fkey;
+		ALTER TABLE utils.municipality RENAME TO _municipality;
+
+		CREATE TABLE utils.municipality (
+			muni_id integer NOT NULL,
+			name text NOT NULL,
+			expl_id INT4[] NULL,
+			sector_id INT4[] NULL,
+			observ text,
+			the_geom public.geometry(MultiPolygon,SRID_VALUE),
+			active boolean DEFAULT true,
+			region_id int4 NULL,
+			province_id int4 NULL,
+			ext_code text NULL,
+			CONSTRAINT municipality_pkey PRIMARY KEY (muni_id),
+			CONSTRAINT municipality_region_id_fkey FOREIGN KEY (region_id) REFERENCES ext_region(region_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+			CONSTRAINT municipality_province_id_fkey FOREIGN KEY (province_id) REFERENCES ext_province(province_id) ON DELETE RESTRICT ON UPDATE CASCADE
+		);
+
+    ELSE
+
+		DROP INDEX IF EXISTS idx_ext_municipality_name;
+		DROP INDEX IF EXISTS idx_ext_municipality_the_geom;
+
+		ALTER TABLE ext_address DROP CONSTRAINT ext_address_muni_id_fkey;
+		ALTER TABLE ext_district DROP CONSTRAINT ext_district_muni_id_fkey;
+		ALTER TABLE ext_plot DROP CONSTRAINT ext_plot_muni_id_fkey;
+		ALTER TABLE ext_streetaxis DROP CONSTRAINT ext_streetaxis_muni_id_fkey;
+		ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_streetaxis_muni_id_fkey;
+
+		DROP VIEW v_ext_municipality;
+
+		-- DROP TABLE ext_municipality;
+		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_pkey TO _ext_municipality_pkey;
+		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_region_id_fkey TO _ext_municipality_region_id_fkey;
+		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_province_id_fkey TO _ext_municipality_province_id_fkey;
+		ALTER TABLE ext_municipality RENAME TO _ext_municipality;
+
+		CREATE TABLE ext_municipality (
+			muni_id integer NOT NULL,
+			name text NOT NULL,
+			expl_id INT4[] NULL,
+			sector_id INT4[] NULL,
+			observ text,
+			the_geom public.geometry(MultiPolygon,SRID_VALUE),
+			active boolean DEFAULT true,
+			region_id int4 NULL,
+			province_id int4 NULL,
+			ext_code varchar(50) NULL,
+			CONSTRAINT ext_municipality_pkey PRIMARY KEY (muni_id),
+			CONSTRAINT ext_municipality_region_id_fkey FOREIGN KEY (region_id) REFERENCES ext_region(region_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+			CONSTRAINT ext_municipality_province_id_fkey FOREIGN KEY (province_id) REFERENCES ext_province(province_id) ON DELETE RESTRICT ON UPDATE CASCADE
+		);
+
+    END IF;
+END; $$;

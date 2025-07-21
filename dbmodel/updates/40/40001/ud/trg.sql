@@ -260,7 +260,6 @@ FOR EACH ROW WHEN ((((old.outlet_type)::TEXT IS DISTINCT FROM (new.outlet_type):
 CREATE trigger gw_trg_v_ui_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_drainzone
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('UI');
 
-
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dwfzone_id');
 

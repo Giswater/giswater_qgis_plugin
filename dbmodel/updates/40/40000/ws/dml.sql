@@ -3309,11 +3309,11 @@ SELECT macrosector_id, macrosector_id::text, "name", descript, NULL, active, the
 FROM _macrosector;
 
 INSERT INTO macrodma (macrodma_id, code, "name", descript, expl_id, lock_level, active, the_geom, updated_at)
-SELECT macrodma_id, macrodma_id::text, "name", descript, expl_id, NULL, active, the_geom, now()
+SELECT macrodma_id, macrodma_id::text, "name", descript, ARRAY[expl_id], NULL, active, the_geom, now()
 FROM _macrodma;
 
 INSERT INTO macrodqa (macrodqa_id, code, "name", descript, expl_id, lock_level, active, the_geom, updated_at)
-SELECT macrodqa_id, macrodqa_id::text, "name", descript, expl_id, NULL, active, the_geom, now()
+SELECT macrodqa_id, macrodqa_id::text, "name", descript, ARRAY[expl_id], NULL, active, the_geom, now()
 FROM _macrodqa;
 
 INSERT INTO dma (dma_id, code, "name", descript, dma_type, muni_id, expl_id, sector_id, macrodma_id, minc, maxc, effc, pattern_id, link, graphconfig, stylesheet, avg_press, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
@@ -3335,7 +3335,7 @@ FROM _sector;
 
 INSERT INTO supplyzone VALUES (0, 'Undefined', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL) ON CONFLICT DO NOTHING;
 
-INSERT INTO macroomzone (macroomzone_id, code, "name", expl_id, descript, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by) VALUES(0, '0', 'Undefined', 0, NULL, NULL, true, NULL, '2025-04-14 12:57:25.809', current_user, NULL, NULL) ON CONFLICT DO NOTHING;
+INSERT INTO macroomzone (macroomzone_id, code, "name", expl_id, descript, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by) VALUES(0, '0', 'Undefined', '{0}', NULL, NULL, true, NULL, '2025-04-14 12:57:25.809', current_user, NULL, NULL) ON CONFLICT DO NOTHING;
 
 INSERT INTO omzone (omzone_id, code, "name", descript, omzone_type, expl_id, macroomzone_id, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by) VALUES(0, '0', 'Undefined', NULL, NULL, NULL, 0, NULL, true, NULL, '2025-04-14 12:57:25.809', current_user, NULL, NULL) ON CONFLICT DO NOTHING;
 
@@ -3474,3 +3474,24 @@ UPDATE sys_table SET id = 'crmzone'	WHERE id = 'crm_zone';
 UPDATE config_form_fields
 SET dv_querytext = REPLACE(dv_querytext, 'crm_zone', 'crmzone')
 WHERE dv_querytext ILIKE '%crm_zone%';
+
+-- 17/07/2025
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+
+    INSERT INTO utils.municipality (muni_id, name, observ, the_geom, active, region_id, province_id, ext_code)
+    SELECT muni_id, name, observ, the_geom, active, region_id, province_id, ext_code FROM utils.municipality;
+
+  ELSE
+
+    INSERT INTO ext_municipality (muni_id, name, observ, the_geom, active, region_id, province_id, ext_code)
+    SELECT muni_id, name, observ, the_geom, active, region_id, province_id, ext_code FROM _ext_municipality;
+
+  END IF;
+END; $$;

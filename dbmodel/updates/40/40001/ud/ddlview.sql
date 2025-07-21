@@ -113,15 +113,6 @@ AS SELECT ext_streetaxis.id,
    FROM selector_municipality s, ext_streetaxis
    WHERE ext_streetaxis.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
-CREATE OR REPLACE VIEW v_ext_municipality
-AS SELECT DISTINCT s.muni_id,
-    m.name,
-    m.active,
-    m.the_geom
-    FROM ext_municipality m, selector_municipality s
-	WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-
-
 DO $$
 DECLARE
     v_utils boolean;
@@ -170,15 +161,13 @@ BEGIN
      END IF;
 END $$;
 
-
-
--- ====
-
 CREATE OR REPLACE VIEW v_edit_exploitation
 AS SELECT exploitation.expl_id,
     exploitation.code,
     exploitation.name,
     exploitation.macroexpl_id,
+    exploitation.sector_id,
+    exploitation.muni_id,
     exploitation.owner_vdefault,
     exploitation.descript,
     exploitation.lock_level,
@@ -205,7 +194,7 @@ CREATE OR REPLACE VIEW v_edit_macroomzone AS
     macroomzone.updated_at,
     macroomzone.updated_by
    FROM selector_expl, macroomzone
-  WHERE macroomzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  WHERE selector_expl.expl_id = ANY(macroomzone.expl_id) AND selector_expl.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_omzone
@@ -233,6 +222,8 @@ AS SELECT s.sector_id,
     s.name,
     s.sector_type,
     s.macrosector_id,
+    s.expl_id,
+    s.muni_id,
     s.descript,
     s.graphconfig::text,
     s.stylesheet,
@@ -254,6 +245,8 @@ AS SELECT s.sector_id,
     s.name,
     s.sector_type,
     ms.name AS macrosector,
+    s.expl_id,
+    s.muni_id,
     s.descript,
     s.lock_level,
     s.graphconfig,
@@ -506,6 +499,8 @@ AS SELECT d.drainzone_id,
     d.stylesheet::text AS stylesheet,
     d.link,
     d.expl_id,
+    d.sector_id,
+    d.muni_id,
     d.lock_level,
     d.the_geom,
     d.created_at,
@@ -515,7 +510,7 @@ AS SELECT d.drainzone_id,
    FROM selector_expl,
     drainzone d
     LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
-  WHERE d.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  WHERE selector_expl.expl_id = ANY(d.expl_id) AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_dwfzone
 AS SELECT d.dwfzone_id,
@@ -527,6 +522,8 @@ AS SELECT d.dwfzone_id,
     d.stylesheet::text AS stylesheet,
     d.link,
     d.expl_id,
+    d.sector_id,
+    d.muni_id,
     d.lock_level,
     d.the_geom,
     d.created_at,
@@ -536,7 +533,7 @@ AS SELECT d.dwfzone_id,
    FROM selector_expl e,
     dwfzone d
     LEFT JOIN edit_typevalue et ON et.id::text = d.dwfzone_type::text AND et.typevalue::text = 'dwfzone_type'::text
-  WHERE d.expl_id = e.expl_id AND e.cur_user = "current_user"()::text;
+  WHERE e.expl_id = ANY(d.expl_id) AND e.cur_user = "current_user"()::text;
 
 
 -- recreate all deleted views: arc, node, connec, gully and dependencies
@@ -930,6 +927,7 @@ AS WITH
 			node.omzone_id,
 			omzone_table.macroomzone_id,
             node.omunit_id,
+            node.omstate,
 			node.minsector_id,
             node.pavcat_id,
 			node.soilcat_id,
@@ -1068,6 +1066,7 @@ AS WITH
 			omzone_id,
 			macroomzone_id,
             omunit_id,
+            omstate,
 			minsector_id,
             pavcat_id,
 			soilcat_id,
@@ -4760,6 +4759,8 @@ AS SELECT DISTINCT ON (d.drainzone_id) d.drainzone_id,
     d.stylesheet,
     d.link,
     d.expl_id,
+    d.sector_id,
+    d.muni_id,
     d.created_at,
     d.created_by,
     d.updated_at,
@@ -4779,6 +4780,8 @@ AS SELECT DISTINCT ON (d.dwfzone_id) d.dwfzone_id,
     d.stylesheet,
     d.link,
     d.expl_id,
+    d.sector_id,
+    d.muni_id,
     d.lock_level,
     d.active,
     d.created_at,

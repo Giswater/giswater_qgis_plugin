@@ -428,7 +428,6 @@ CREATE RULE macroexploitation_undefined AS
 
 ALTER TABLE node ADD CONSTRAINT node_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE config_user_x_expl ADD CONSTRAINT config_user_x_expl_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE macrodqa ADD CONSTRAINT macrodqa_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_streetaxis ADD CONSTRAINT om_streetaxis_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE connec ADD CONSTRAINT connec_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_waterbalance ADD CONSTRAINT om_waterbalance_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -436,7 +435,6 @@ ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_exploitation_id_fkey FOREIGN 
 ALTER TABLE dimensions ADD CONSTRAINT dimensions_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE selector_expl ADD CONSTRAINT selector_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE macrodma ADD CONSTRAINT macrodma_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE plan_netscenario ADD CONSTRAINT plan_netscenario_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_visit ADD CONSTRAINT om_visit_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -599,4 +597,103 @@ BEGIN
         EXECUTE 'ALTER TABLE ' || v_table_name || ' ALTER COLUMN ' || v_feature_name || ' TYPE int4 USING ' || v_feature_name || '::int4';
         EXECUTE 'ALTER TABLE ' || v_table_name || ' ADD CONSTRAINT ' || v_table_name || '_' || v_feature_name || '_fkey FOREIGN KEY (' || v_feature_name || ') REFERENCES '|| v_rec.feature_type ||'(' || v_feature_name || ') ON DELETE CASCADE';
     END LOOP;
+END $$;
+
+
+-- Recreate foreign keys for muni_id
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+    SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+    IF v_utils THEN
+
+        -- Index
+        CREATE INDEX idx_municipality_name ON utils.municipality USING btree (name);
+        CREATE INDEX idx_municipality_the_geom ON utils.municipality USING gist(the_geom);
+        
+        -- ext_municipality
+        ALTER TABLE selector_municipality ADD CONSTRAINT selector_municipality_fkey FOREIGN KEY (muni_id) 
+        REFERENCES utils.municipality(muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+        ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_muni_id_fkey FOREIGN KEY (muni_id)
+        REFERENCES utils.municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_muni_id FOREIGN KEY (muni_id) 
+        REFERENCES utils.municipality(muni_id);
+
+        ALTER TABLE om_visit ADD CONSTRAINT om_visit_muni_id_fkey FOREIGN KEY (muni_id)
+        REFERENCES utils.municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE dimensions ADD CONSTRAINT dimensions_muni_id_fkey FOREIGN KEY (muni_id)
+        REFERENCES utils.municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE dimensions ADD CONSTRAINT dimensions_muni_id FOREIGN KEY (muni_id)
+        REFERENCES utils.municipality(muni_id);
+
+        ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_muni_id FOREIGN KEY (muni_id)
+        REFERENCES utils.municipality(muni_id);
+
+        -- No utils.municipality BEFORE
+        ALTER TABLE ONLY ext_address ADD CONSTRAINT ext_address_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE ONLY ext_district ADD CONSTRAINT ext_district_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE ONLY ext_plot ADD CONSTRAINT ext_plot_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE ONLY ext_streetaxis ADD CONSTRAINT ext_streetaxis_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE ONLY samplepoint ADD CONSTRAINT samplepoint_streetaxis_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+    ELSE 
+
+        -- Index
+        CREATE INDEX idx_ext_municipality_name ON ext_municipality USING btree (name);
+        CREATE INDEX idx_ext_municipality_the_geom ON ext_municipality USING gist(the_geom);
+
+        -- ext_municipality
+        ALTER TABLE selector_municipality ADD CONSTRAINT selector_municipality_fkey FOREIGN KEY (muni_id) 
+        REFERENCES ext_municipality(muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+        ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_muni_id_fkey FOREIGN KEY (muni_id)
+        REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_muni_id FOREIGN KEY (muni_id) 
+        REFERENCES ext_municipality(muni_id);
+
+        ALTER TABLE om_visit ADD CONSTRAINT om_visit_muni_id_fkey FOREIGN KEY (muni_id)
+        REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE dimensions ADD CONSTRAINT dimensions_muni_id_fkey FOREIGN KEY (muni_id)
+        REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE dimensions ADD CONSTRAINT dimensions_muni_id FOREIGN KEY (muni_id)
+        REFERENCES ext_municipality(muni_id);
+
+        ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_muni_id FOREIGN KEY (muni_id)
+        REFERENCES ext_municipality(muni_id);
+
+        -- No utils.municipality
+        ALTER TABLE ONLY ext_address ADD CONSTRAINT ext_address_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES ext_municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE ONLY ext_district ADD CONSTRAINT ext_district_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES ext_municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE ONLY ext_plot ADD CONSTRAINT ext_plot_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES ext_municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE ONLY ext_streetaxis ADD CONSTRAINT ext_streetaxis_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES ext_municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE ONLY samplepoint ADD CONSTRAINT samplepoint_streetaxis_muni_id_fkey FOREIGN KEY (muni_id) 
+        REFERENCES ext_municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+    END IF;
 END $$;
