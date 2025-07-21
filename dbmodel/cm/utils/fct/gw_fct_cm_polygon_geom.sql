@@ -1,21 +1,41 @@
--- DROP FUNCTION cm.gw_fct_cm_lot_geom(int4, text);
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
 
-CREATE OR REPLACE FUNCTION cm.gw_fct_cm_lot_geom(p_lot_id integer, p_type text)
- RETURNS integer
+
+--FUNCTION CODE: 3468
+
+-- DROP FUNCTION cm.gw_fct_cm_polygon_geom(json);
+CREATE OR REPLACE FUNCTION cm.gw_fct_cm_polygon_geom(p_params json)
+ RETURNS json
  LANGUAGE plpgsql
 AS $function$
 
 /*
-SELECT cm.gw_fct_cm_lot_geom(1, 'LOT');
+SELECT cm.gw_fct_cm_polygon_geom('{"id":1, "name":"lot"}');
 */
 
 DECLARE 
-    
-collect_aux public.geometry;
-v_projecttype text;
+    p_lot_id integer;
+    p_type text;
+    collect_aux public.geometry;
+    v_projecttype text;
+    v_ret json;
+    v_error_context text;
+    v_version text;
+    v_message text;
 
 
 BEGIN 
+    -- Get params
+    p_lot_id := p_params->>'id';
+    p_type := p_params->>'name';
+
+    -- Get version
+    SELECT giswater INTO v_version FROM public.sys_version ORDER BY id DESC LIMIT 1;
 
     --EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     SET search_path = "cm", public;
@@ -58,9 +78,20 @@ BEGIN
 			UPDATE om_campaign SET the_geom=collect_aux WHERE campaign_id=p_lot_id;
 
 	END IF;
+    -- Return
+    v_message := format('Geometry for %s %s updated successfully', p_type, p_lot_id);
 
+    v_ret := json_build_object(
+        'status', 'Accepted',
+        'message', v_message,
+        'version', v_version,
+        'body', json_build_object(
+            'feature', json_build_object('id', p_lot_id),
+            'data', json_build_object('info', 'lot/campaign geom updated')
+        )
+    );
+    RETURN v_ret;
 
-	RETURN 0;
 END;
 $function$
 ;
