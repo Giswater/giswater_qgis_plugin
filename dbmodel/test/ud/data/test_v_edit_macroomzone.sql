@@ -15,7 +15,7 @@ SELECT plan(6);
 
 
 INSERT INTO v_edit_macroomzone (macroomzone_id, code, "name", descript, the_geom, expl_id)
-VALUES(-901, '-901', 'Undefined', NULL, NULL, 0);
+VALUES(-901, '-901', 'Undefined', NULL, NULL, '{0}');
 
 SELECT is((SELECT count(*)::integer FROM v_edit_macroomzone WHERE macroomzone_id = -901), 1, 'INSERT: v_edit_macroomzone -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM macroomzone WHERE macroomzone_id = -901), 1, 'INSERT: macroomzone -901 was inserted');

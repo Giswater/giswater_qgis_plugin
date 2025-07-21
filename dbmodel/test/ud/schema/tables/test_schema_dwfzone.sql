@@ -20,8 +20,8 @@ SELECT has_table('dwfzone'::name, 'Table dwfzone should exist');
 SELECT columns_are(
     'dwfzone',
     ARRAY[
-        'dwfzone_id', 'code', 'name', 'dwfzone_type', 'expl_id', 'descript', 'link', 'graphconfig', 'stylesheet', 'lock_level',
-        'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'drainzone_id'
+        'dwfzone_id', 'code', 'name', 'dwfzone_type', 'expl_id', 'muni_id', 'sector_id', 'descript', 'link', 'graphconfig', 
+        'stylesheet', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'drainzone_id'
     ],
     'Table dwfzone should have the correct columns'
 );
@@ -34,7 +34,9 @@ SELECT col_type_is('dwfzone', 'dwfzone_id', 'integer', 'Column dwfzone_id should
 SELECT col_type_is('dwfzone', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('dwfzone', 'name', 'varchar(30)', 'Column name should bevarchar(30)');
 SELECT col_type_is('dwfzone', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
-SELECT col_type_is('dwfzone', 'expl_id', 'int4', 'Column expl_id should be int4');
+SELECT col_type_is('dwfzone', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
+SELECT col_type_is('dwfzone', 'muni_id', 'int4[]', 'Column muni_id should be int4[]');
+SELECT col_type_is('dwfzone', 'sector_id', 'int4[]', 'Column sector_id should be int4[]');
 SELECT col_type_is('dwfzone', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('dwfzone', 'link', 'text', 'Column link should be text');
 SELECT col_type_is('dwfzone', 'graphconfig', 'json', 'Column graphconfig should be json');
@@ -60,13 +62,15 @@ SELECT col_default_is('dwfzone', 'created_by', 'CURRENT_USER', 'Column created_b
 
 -- Check foreign keys
 SELECT has_fk('dwfzone', 'Table dwfzone should have foreign keys');
-
 SELECT fk_ok('dwfzone', 'drainzone_id', 'drainzone', 'drainzone_id', 'Table should have foreign key from drainzone_id to drainzone.drainzone_id');
 
 -- Check indexes
 SELECT has_index('dwfzone', 'dwfzone_pkey', 'Table should have index on dwfzone_id');
 
 -- Check triggers
+SELECT has_trigger('dwfzone', 'gw_trg_fk_array_array_table_expl', 'Table should have trigger gw_trg_fk_array_array_table_expl');
+SELECT has_trigger('dwfzone', 'gw_trg_fk_array_array_table_muni', 'Table should have trigger gw_trg_fk_array_array_table_muni');
+SELECT has_trigger('dwfzone', 'gw_trg_fk_array_array_table_sector', 'Table should have trigger gw_trg_fk_array_array_table_sector');
 SELECT has_trigger('dwfzone', 'gw_trg_edit_controls', 'Table should have trigger gw_trg_edit_controls');
 SELECT has_trigger('dwfzone', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('dwfzone', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');

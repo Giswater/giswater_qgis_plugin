@@ -45,7 +45,7 @@ SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = -999
 
 
 -- Subtest 3: Testing macrodma operations
-INSERT INTO macrodma (macrodma_id, code, "name", expl_id, descript, the_geom, active) VALUES(-999, '-999', 'macrodma_03', 0, NULL, NULL, true);
+INSERT INTO macrodma (macrodma_id, code, "name", expl_id, descript, the_geom, active) VALUES(-999, '-999', 'macrodma_03', '{0}', NULL, NULL, true);
 SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 1, 'INSERT: macrodma "3" was inserted');
 
 UPDATE macrodma SET descript = 'updated test' WHERE macrodma_id = -999;
@@ -56,7 +56,7 @@ SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 0, 
 
 
 -- Subtest 4: Testing macrodqa operations
-INSERT INTO macrodqa (macrodqa_id, code, "name", expl_id, descript, the_geom, active) VALUES(-999, '-999', 'macrodqa_01', 0, NULL, NULL, true);
+INSERT INTO macrodqa (macrodqa_id, code, "name", expl_id, descript, the_geom, active) VALUES(-999, '-999', 'macrodqa_01', '{0}', NULL, NULL, true);
 SELECT is((SELECT count(*)::integer FROM macrodqa WHERE macrodqa_id = -999), 1, 'INSERT: macrodqa "1" was inserted');
 
 UPDATE macrodqa SET descript = 'updated test' WHERE macrodqa_id = -999;

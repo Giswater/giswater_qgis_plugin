@@ -20,7 +20,7 @@ SELECT has_table('ext_municipality'::name, 'Table ext_municipality should exist'
 SELECT columns_are(
     'ext_municipality',
     ARRAY[
-        'muni_id', 'name', 'observ', 'the_geom', 'active', 'region_id', 'province_id', 'ext_code'
+        'muni_id', 'name', 'observ', 'expl_id', 'sector_id', 'the_geom', 'active', 'region_id', 'province_id', 'ext_code'
     ],
     'Table ext_municipality should have the correct columns'
 );
@@ -32,6 +32,8 @@ SELECT col_is_pk('ext_municipality', ARRAY['muni_id'], 'Column muni_id should be
 SELECT col_type_is('ext_municipality', 'muni_id', 'integer', 'Column muni_id should be integer');
 SELECT col_type_is('ext_municipality', 'name', 'text', 'Column name should be text');
 SELECT col_type_is('ext_municipality', 'observ', 'text', 'Column observ should be text');
+SELECT col_type_is('ext_municipality', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
+SELECT col_type_is('ext_municipality', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');
 SELECT col_type_is('ext_municipality', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('ext_municipality', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('ext_municipality', 'region_id', 'integer', 'Column region_id should be integer');
@@ -44,6 +46,9 @@ SELECT fk_ok('ext_municipality', 'province_id', 'ext_province', 'province_id', '
 SELECT fk_ok('ext_municipality', 'region_id', 'ext_region', 'region_id', 'FK ext_municipality_region_id_fkey should exist');
 
 -- Check triggers
+SELECT has_trigger('ext_municipality', 'gw_trg_fk_array_array_table_expl', 'Table should have trigger gw_trg_fk_array_array_table_muni');
+SELECT has_trigger('ext_municipality', 'gw_trg_fk_array_array_table_sector', 'Table should have trigger gw_trg_fk_array_array_table_sector');
+SELECT has_trigger('ext_municipality', 'gw_trg_fk_array_id_table_update', 'Table should have trigger gw_trg_fk_array_id_table_update');
 
 -- Check rules
 

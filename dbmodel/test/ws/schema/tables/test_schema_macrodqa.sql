@@ -34,7 +34,7 @@ SELECT col_type_is('macrodqa', 'macrodqa_id', 'integer', 'Column macrodqa_id sho
 SELECT col_type_is('macrodqa', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('macrodqa', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('macrodqa', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('macrodqa', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('macrodqa', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('macrodqa', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('macrodqa', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('macrodqa', 'the_geom', 'geometry(MultiPolygon,SRID_VALUE)', 'Column the_geom should be geometry(MultiPolygon,SRID_VALUE)');
@@ -53,12 +53,9 @@ SELECT col_default_is('macrodqa', 'active', 'true', 'Column active should defaul
 SELECT col_default_is('macrodqa', 'created_at', 'now()', 'Column created_at should default to now()');
 SELECT col_default_is('macrodqa', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
 
--- Check foreign keys
-SELECT has_fk('macrodqa', 'Table macrodqa should have foreign keys');
-SELECT fk_ok('macrodqa', 'expl_id', 'exploitation', 'expl_id', 'FK macrodqa_expl_id_fkey should exist');
-
 -- Check triggers
 SELECT has_trigger('macrodqa', 'gw_trg_edit_controls', 'Trigger gw_trg_edit_controls should exist');
+SELECT has_trigger('macrodqa', 'gw_trg_fk_array_array_table_expl', 'Trigger gw_trg_fk_array_array_table_expl should exist');
 
 -- Check rules
 SELECT has_rule('macrodqa', 'macrodqa_del_undefined', 'Rule macrodqa_del_undefined should exist');

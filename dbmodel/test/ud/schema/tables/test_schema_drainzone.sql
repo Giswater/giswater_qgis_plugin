@@ -20,8 +20,9 @@ SELECT has_table('drainzone'::name, 'Table drainzone should exist');
 SELECT columns_are(
     'drainzone',
     ARRAY[
-        'drainzone_id', 'code', 'name', 'drainzone_type', 'descript', 'expl_id', 'link', 'graphconfig',
-        'stylesheet', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'drainzone_id', 'code', 'name', 'drainzone_type', 'descript', 'expl_id', 'muni_id', 'sector_id', 'link', 
+        'graphconfig', 'stylesheet', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at',
+        'updated_by'
     ],
     'Table drainzone should have the correct columns'
 );
@@ -35,7 +36,9 @@ SELECT col_type_is('drainzone', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('drainzone', 'name', 'varchar(30)', 'Column name should be varchar(30)');
 SELECT col_type_is('drainzone', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
 SELECT col_type_is('drainzone', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('drainzone', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('drainzone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
+SELECT col_type_is('drainzone', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
+SELECT col_type_is('drainzone', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');
 SELECT col_type_is('drainzone', 'link', 'text', 'Column link should be text');
 SELECT col_type_is('drainzone', 'graphconfig', 'json', 'Column graphconfig should be json');
 SELECT col_type_is('drainzone', 'stylesheet', 'json', 'Column stylesheet should be json');
@@ -49,6 +52,14 @@ SELECT col_type_is('drainzone', 'updated_by', 'varchar(50)', 'Column updated_by 
 
 -- Check indexes
 SELECT has_index('drainzone', 'drainzone_index', 'Table should have drainzone_index');
+
+-- Check triggers
+SELECT has_trigger('drainzone','gw_trg_fk_array_array_table_expl','Table should have trigger gw_trg_fk_array_array_table_expl');
+SELECT has_trigger('drainzone','gw_trg_fk_array_array_table_muni','Table should have trigger gw_trg_fk_array_array_table_muni');
+SELECT has_trigger('drainzone','gw_trg_fk_array_array_table_sector','Table should have trigger gw_trg_fk_array_array_table_sector');
+SELECT has_trigger('drainzone','gw_trg_edit_controls','Table should have trigger gw_trg_edit_controls');
+SELECT has_trigger('drainzone','gw_trg_typevalue_fk_insert','Table should have trigger gw_trg_typevalue_fk_insert');
+SELECT has_trigger('drainzone','gw_trg_typevalue_fk_update','Table should have trigger gw_trg_typevalue_fk_update');
 
 -- Check sequences
 SELECT has_sequence('drainzone_drainzone_id_seq', 'Sequence drainzone_drainzone_id_seq should exist');

@@ -20,7 +20,7 @@ SELECT has_table('sector'::name, 'Table sector should exist');
 SELECT columns_are(
     'sector',
     ARRAY[
-        'sector_id', 'code', 'name', 'descript', 'sector_type', 'macrosector_id', 'parent_id', 'graphconfig',
+        'sector_id', 'code', 'name', 'descript', 'sector_type', 'macrosector_id', 'expl_id', 'muni_id', 'parent_id', 'graphconfig',
         'stylesheet', 'link', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table sector should have the correct columns'
@@ -36,6 +36,8 @@ SELECT col_type_is('sector', 'name', 'varchar(50)', 'Column name should be varch
 SELECT col_type_is('sector', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('sector', 'sector_type', 'varchar(50)', 'Column sector_type should be varchar(50)');
 SELECT col_type_is('sector', 'macrosector_id', 'integer', 'Column macrosector_id should be integer');
+SELECT col_type_is('sector', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
+SELECT col_type_is('sector', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
 SELECT col_type_is('sector', 'parent_id', 'integer', 'Column parent_id should be integer');
 SELECT col_type_is('sector', 'graphconfig', 'json', 'Column graphconfig should be json');
 SELECT col_type_is('sector', 'stylesheet', 'json', 'Column stylesheet should be json');
@@ -50,6 +52,21 @@ SELECT col_type_is('sector', 'updated_by', 'varchar(50)', 'Column updated_by sho
 
 -- Check indexes
 SELECT has_index('sector', 'sector_index', 'Table should have sector_index');
+
+-- Check triggers
+SELECT has_trigger('sector', 'gw_trg_edit_controls', 'Table should have gw_trg_edit_controls trigger');
+SELECT has_trigger('sector', 'gw_trg_fk_array_array_table_expl', 'Table should have gw_trg_fk_array_array_table_expl trigger');
+SELECT has_trigger('sector', 'gw_trg_fk_array_array_table_muni', 'Table should have gw_trg_fk_array_array_table_muni trigger');
+SELECT has_trigger('sector', 'gw_trg_fk_array_id_table', 'Table should have gw_trg_fk_array_id_table trigger');
+SELECT has_trigger('sector', 'gw_trg_fk_array_id_table_update', 'Table should have gw_trg_fk_array_id_table_update trigger');
+SELECT has_trigger('sector', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
+SELECT has_trigger('sector', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
+
+-- Check rules
+SELECT has_rule('sector', 'sector_conflict', 'Table should have sector_conflict rule');
+SELECT has_rule('sector', 'sector_del_conflict', 'Table should have sector_del_conflict rule');
+SELECT has_rule('sector', 'sector_del_undefined', 'Table should have sector_del_undefined rule');
+SELECT has_rule('sector', 'sector_undefined', 'Table should have sector_undefined rule');
 
 -- Check sequences
 SELECT has_sequence('sector_sector_id_seq', 'Sequence sector_sector_id_seq should exist');

@@ -45,7 +45,7 @@ SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = -999
 
 
 -- Subtest 3: Testing macroomzone operations
-INSERT INTO macroomzone (macroomzone_id, "name", expl_id, descript, the_geom, active) VALUES(-999, 'macroomzone_03', 0, NULL, NULL, true);
+INSERT INTO macroomzone (macroomzone_id, "name", expl_id, descript, the_geom, active) VALUES(-999, 'macroomzone_03', '{0}', NULL, NULL, true);
 SELECT is((SELECT count(*)::integer FROM macroomzone WHERE macroomzone_id = -999), 1, 'INSERT: macroomzone "3" was inserted');
 
 UPDATE macroomzone SET descript = 'updated test' WHERE macroomzone_id = -999;

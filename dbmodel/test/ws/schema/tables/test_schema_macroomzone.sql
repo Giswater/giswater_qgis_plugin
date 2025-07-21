@@ -34,7 +34,7 @@ SELECT col_type_is('macroomzone', 'macroomzone_id', 'integer', 'Column macroomzo
 SELECT col_type_is('macroomzone', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('macroomzone', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('macroomzone', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('macroomzone', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('macroomzone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('macroomzone', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('macroomzone', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('macroomzone', 'the_geom', 'geometry(MultiPolygon,SRID_VALUE)', 'Column the_geom should be geometry(MultiPolygon,SRID_VALUE)');
@@ -43,9 +43,8 @@ SELECT col_type_is('macroomzone', 'created_by', 'varchar(50)', 'Column created_b
 SELECT col_type_is('macroomzone', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
 SELECT col_type_is('macroomzone', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 
--- Check foreign keys
-SELECT has_fk('macroomzone', 'Table macroomzone should have foreign keys');
-SELECT fk_ok('macroomzone', 'expl_id', 'exploitation', 'expl_id', 'FK macroomzone_expl_id_fkey should exist');
+-- Check triggers
+SELECT has_trigger('macroomzone', 'gw_trg_fk_array_array_table_expl', 'Trigger gw_trg_fk_array_array_table_expl should exist');
 
 -- Check constraints
 SELECT col_default_is('macroomzone', 'active', 'true', 'Column active should default to true');

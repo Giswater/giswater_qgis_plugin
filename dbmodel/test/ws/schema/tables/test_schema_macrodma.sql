@@ -34,7 +34,7 @@ SELECT col_type_is('macrodma', 'macrodma_id', 'integer', 'Column macrodma_id sho
 SELECT col_type_is('macrodma', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('macrodma', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('macrodma', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('macrodma', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('macrodma', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('macrodma', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('macrodma', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('macrodma', 'the_geom', 'geometry(MultiPolygon,SRID_VALUE)', 'Column the_geom should be geometry(MultiPolygon,SRID_VALUE)');
@@ -58,15 +58,11 @@ SELECT has_index('macrodma', 'macrodma_index', 'Should have index on the_geom');
 
 -- Check triggers
 SELECT has_trigger('macrodma', 'gw_trg_edit_controls', 'Trigger gw_trg_edit_controls should exist');
+SELECT has_trigger('macrodma', 'gw_trg_fk_array_array_table_expl', 'Trigger gw_trg_fk_array_array_table_expl should exist');
 
 -- Check rules
 SELECT has_rule('macrodma', 'macrodma_del_undefined', 'Rule macrodma_del_undefined should exist');
 SELECT has_rule('macrodma', 'macrodma_undefined', 'Rule macrodma_undefined should exist');
-
-
--- Check foreign keys
-SELECT has_fk('macrodma', 'Table macrodma should have foreign keys');
-SELECT fk_ok('macrodma', 'expl_id', 'exploitation', 'expl_id', 'FK macrodma_expl_id_fkey should exist');
 
 SELECT * FROM finish();
 
