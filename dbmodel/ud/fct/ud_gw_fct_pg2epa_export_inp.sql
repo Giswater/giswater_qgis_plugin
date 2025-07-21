@@ -1104,6 +1104,19 @@ BEGIN
 	    temp_t_arc.barrels AS other5,
 	    NULL::text AS other6
 	   FROM temp_t_arc
+	    JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
+	    JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+	  WHERE temp_t_arc.epa_type = 'FRWEIR' OR temp_t_arc.epa_type = 'FRORIFICE'
+	UNION
+	SELECT temp_t_arc.arc_id,
+	    cat_arc_shape.epa AS shape,
+	    cat_arc.tsect_id AS other1,
+	    0::character varying AS other2,
+	    0::text AS other3,
+	    0::text AS other4,
+	    temp_t_arc.barrels AS other5,
+	    NULL::text AS other6
+	   FROM temp_t_arc
 	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
 	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
 	  WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND NOT (temp_t_arc.arc_id IN ( SELECT temp_t_arc_flowregulator.arc_id::text

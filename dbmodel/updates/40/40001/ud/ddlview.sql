@@ -4581,7 +4581,7 @@ AS SELECT inp_orifice.arc_id,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
    FROM inp_orifice
-     LEFT JOIN rpt_arcflow_sum USING (arc_id);
+     LEFT JOIN rpt_arcflow_sum ON inp_orifice.arc_id::text = rpt_arcflow_sum.arc_id::text;
 
 
 -- 04/12/2024
@@ -6594,7 +6594,7 @@ AS SELECT inp_outlet.arc_id,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
    FROM inp_outlet
-     LEFT JOIN rpt_arcflow_sum USING (arc_id);
+     LEFT JOIN rpt_arcflow_sum ON inp_outlet.arc_id::text = rpt_arcflow_sum.arc_id::text;
 
 CREATE OR REPLACE VIEW ve_epa_weir
 AS SELECT inp_weir.arc_id,
@@ -6627,7 +6627,7 @@ AS SELECT inp_weir.arc_id,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
    FROM inp_weir
-     LEFT JOIN rpt_arcflow_sum USING (arc_id);
+     LEFT JOIN rpt_arcflow_sum ON inp_weir.arc_id::text = rpt_arcflow_sum.arc_id::text;
 
 CREATE OR REPLACE VIEW ve_epa_gully
 AS SELECT gully_id,

@@ -96,7 +96,7 @@ BEGIN
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 		) a
-		ORDER BY element_id, to_arc
+		ORDER BY flw_type, element_id, to_arc
 
 	LOOP
 		-- Getting data from node
@@ -214,7 +214,30 @@ BEGIN
 
 				UPDATE temp_t_arc SET node_1 = rec_new_arc.node_2 WHERE arc_id = rec_flowreg.to_arc::text;
 
-				UPDATE temp_t_arc_flowregulator SET arc_id = rec_new_arc.arc_id WHERE arc_id = rec_node.node_id::text;
+				IF rec_flowreg.epa_type = 'FRPUMP' THEN
+					INSERT INTO temp_t_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
+					SELECT rec_new_arc.arc_id, 'PUMP', curve_id, status, startup, shutoff
+					FROM v_edit_inp_frpump
+					WHERE v_edit_inp_frpump.element_id = rec_flowreg.element_id;
+				ELSIF rec_flowreg.epa_type = 'FRORIFICE' THEN
+					INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
+					SELECT rec_new_arc.arc_id, 'ORIFICE', orifice_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0
+					FROM v_edit_inp_frorifice
+					WHERE v_edit_inp_frorifice.element_id = rec_flowreg.element_id;
+				ELSIF rec_flowreg.epa_type = 'FROUTLET' THEN
+					INSERT INTO temp_t_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
+					SELECT rec_new_arc.arc_id, 'OUTLET', outlet_type, offsetval,curve_id, cd1, cd2, flap
+					FROM v_edit_inp_froutlet
+					WHERE v_edit_inp_froutlet.element_id = rec_flowreg.element_id;
+				ELSIF rec_flowreg.epa_type = 'FRWEIR' THEN
+					INSERT INTO temp_t_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width,
+					road_surf, coef_curve, surcharge)
+					SELECT rec_new_arc.arc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width,
+					road_surf, coef_curve, surcharge
+					FROM v_edit_inp_frweir
+					LEFT JOIN inp_typevalue ON inp_typevalue.id::text = v_edit_inp_frweir.weir_type::text
+					WHERE v_edit_inp_frweir.element_id = rec_flowreg.element_id;
+				END IF;
 
 				-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
 				IF rec_flowreg.flw_type='PU' THEN
