@@ -4980,11 +4980,11 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
 
     # Configuration for each feature type to define which columns to add and whether a join is needed.
     feature_configs = {
-        'node':   {'cat_id_col': 'nodecat_id',   'type_col': 'node_type'},
-        'arc':    {'cat_id_col': 'arccat_id',    'type_col': 'arc_type'},
-        'gully':  {'cat_id_col': 'gullycat_id',  'type_col': 'gully_type'},
+        'node': {'cat_id_col': 'nodecat_id', 'type_col': 'node_type'},
+        'arc': {'cat_id_col': 'arccat_id', 'type_col': 'arc_type'},
+        'gully': {'cat_id_col': 'gullycat_id', 'type_col': 'gully_type'},
         'connec': {'cat_id_col': 'conneccat_id', 'type_col': None},
-        'link':   {'cat_id_col': 'linkcat_id',   'type_col': None}
+        'link': {'cat_id_col': 'linkcat_id', 'type_col': None}
     }
 
     extra_cols = []
@@ -5028,6 +5028,7 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
             ON CONFLICT DO NOTHING;
         """
         tools_db.execute_sql(sql)
+
 
 def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
     """ Reload QTableView for campaign_x_<feature_type> """
