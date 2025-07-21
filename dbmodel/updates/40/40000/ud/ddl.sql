@@ -2097,8 +2097,6 @@ ALTER TABLE dimensions DROP CONSTRAINT dimensions_muni_id_fkey;
 ALTER TABLE dimensions DROP CONSTRAINT dimensions_muni_id;
 ALTER TABLE raingage DROP CONSTRAINT raingage_muni_id;
 
-DROP TABLE ext_municipality;
-
 DO $$
 DECLARE
     v_utils boolean;
