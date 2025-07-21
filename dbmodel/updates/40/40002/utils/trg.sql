@@ -7,3 +7,6 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+CREATE TRIGGER gw_trg_edit_frelem_x_node BEFORE INSERT ON element_x_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_frelem_x_node();
