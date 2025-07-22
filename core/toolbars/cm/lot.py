@@ -764,7 +764,7 @@ class AddNewLot:
 
         if not hasattr(self.dlg_lot_man, "tbl_lots"):
             return
-        query = "SELECT * FROM cm.om_campaign_lot ORDER BY lot_id DESC"
+        query = "SELECT * FROM cm.v_ui_campaign_lot ORDER BY lot_id DESC"
         self.populate_tableview(self.dlg_lot_man.tbl_lots, query)
 
     def init_filters(self):
