@@ -46,22 +46,32 @@ def main(project_type: str) -> None:
         logger.warning(f"Directory {i18n_dir} does not exist")
 
     # Define the base updates directory
-    updates_dir = ["updates/36", "updates/40"]
-
+    updates_dir = "updates"
     order = ['utils', f"{project_type}"]
 
-    for update_dir in updates_dir:
-        logger.info(f"Processing update directory: {update_dir}")
-        for subdir in sorted(os.listdir(update_dir)):
-            subdir_path = os.path.join(update_dir, subdir)
-            # Check if the updates subdirectory exists and process it
-            if os.path.isdir(subdir_path):
-                for root, dirs, files in os.walk(subdir_path):
-                    dirs[:] = sorted([d for d in dirs if d in order], key=lambda x: order.index(x))
-                    for file in sorted(files):
+    if os.path.isdir(updates_dir):
+        # Only process 3-level deep version folders: updates/3/6/1, updates/4/2/0, etc.
+        version_folders = []
+        for root, dirs, files in os.walk(updates_dir):
+            rel_path = os.path.relpath(root, updates_dir)
+            parts = rel_path.split(os.sep)
+            if len(parts) == 3 and all(p.isdigit() for p in parts):
+                version_folders.append((int(parts[0]), int(parts[1]), int(parts[2]), root))
+        # Sort by version number
+        version_folders.sort(key=lambda x: (x[0], x[1], x[2]))
+        for major, minor, patch, version_path in version_folders:
+            logger.info(f"Processing update version folder: {major}.{minor}.{patch} at {version_path}")
+            for sub in order:
+                sub_path = os.path.join(version_path, sub)
+                if os.path.isdir(sub_path):
+                    logger.info(f"Processing subdirectory: {sub_path}")
+                    for file in sorted(os.listdir(sub_path)):
                         if file.endswith(".sql"):
-                            file_path = os.path.join(root, file)
+                            file_path = os.path.join(sub_path, file)
+                            logger.info(f"Executing SQL file: {file_path}")
                             execute_sql_file(conn, file_path)
+    else:
+        logger.warning(f"Directory {updates_dir} does not exist")
 
     # Check if the i18n directory exists and process the en_US dml
     if os.path.isdir(i18n_dir):
