@@ -32,6 +32,9 @@ DECLARE
 	v_campaign_id integer;
 	v_lot_id integer;
 	v_lot_id_array integer[];
+	v_check_management_configs boolean;
+	v_check_data_related boolean;
+	v_fids_to_run integer[];
 
 	-- variables
     v_querytext text;
@@ -75,6 +78,8 @@ BEGIN
     v_project_type := COALESCE(p_data->'data'->'parameters'->>'project_type', 'cm');
     v_campaign_id := p_data->'data'->'parameters'->>'campaignId';
 	v_lot_id := p_data->'data'->'parameters'->>'lotId';
+	v_check_management_configs := COALESCE((p_data->'data'->'parameters'->>'checkManagementConfigs')::boolean, false);
+	v_check_data_related := COALESCE((p_data->'data'->'parameters'->>'checkDataRelated')::boolean, false);
 
     IF v_fid IS NULL THEN
         RETURN json_build_object('status', 'error', 'message', 'Missing parameter: functionFid');
@@ -144,81 +149,94 @@ BEGIN
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 1, '-------');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, '');
 
+	v_fids_to_run := '{}'::integer[];
+    IF v_check_management_configs IS TRUE THEN
+        v_fids_to_run := array_cat(v_fids_to_run, ARRAY[200, 201]);
+    END IF;
+    IF v_check_data_related IS TRUE THEN
+        v_fids_to_run := array_cat(v_fids_to_run, ARRAY[202, 203]);
+    END IF;
+
 	-- SECTION[epic=checkproject]: Check mandatory fields and foreign keys constraints
-	-- get lot_id_array
-	IF v_lot_id IS NOT NULL THEN
-		v_lot_id_array := array[v_lot_id];
-	ELSE
-		SELECT array_agg(lot_id) INTO v_lot_id_array FROM cm.om_campaign_lot WHERE campaign_id = v_campaign_id GROUP BY campaign_id;
-	END IF;
+	IF v_campaign_id IS NOT NULL AND v_check_data_related IS TRUE THEN
+		-- get lot_id_array
+		IF v_lot_id IS NOT NULL THEN
+			v_lot_id_array := array[v_lot_id];
+		ELSE
+			SELECT array_agg(lot_id) INTO v_lot_id_array FROM cm.om_campaign_lot WHERE campaign_id = v_campaign_id GROUP BY campaign_id;
+		END IF;
 
-	-- get node, arc, connec, link ids from campaign_lot_x_table
-	FOR i IN 1..array_length(v_features_array, 1) LOOP
-		v_feature_table_name := v_features_array[i];
-		v_feature_id_column := v_feature_table_name || '_id';
-		v_feature_cm_table := 'om_campaign_lot_x_' || v_feature_table_name;
+		-- get node, arc, connec, link ids from campaign_lot_x_table
+		FOR i IN 1..array_length(v_features_array, 1) LOOP
+			v_feature_table_name := v_features_array[i];
+			v_feature_id_column := v_feature_table_name || '_id';
+			v_feature_cm_table := 'om_campaign_lot_x_' || v_feature_table_name;
 
-		-- get all ids from campaign_lot_x_table
-		v_querytext := '
-			SELECT lower(cf.id) AS feature_type, array_agg(ocl.'|| v_feature_id_column || ') AS feature_ids
-			FROM ' || v_feature_cm_table || ' ocl
-			JOIN PARENT_SCHEMA.' || v_feature_table_name || ' t ON t.' || v_feature_id_column || ' = ocl.' || v_feature_id_column || '
-			JOIN PARENT_SCHEMA.cat_' || v_feature_table_name || ' c ON c.id = t.' || v_feature_table_name || 'cat_id 
-			JOIN PARENT_SCHEMA.cat_feature_' || v_feature_table_name || ' cf ON cf.id = c.' || v_feature_table_name || '_type
-			WHERE lot_id = ANY($1)
-			GROUP BY lower(cf.id)
-		';
-
-		FOR v_rec IN EXECUTE v_querytext USING v_lot_id_array LOOP
-			v_feature_view_name := 'PARENT_SCHEMA_' || v_rec.feature_type;
-
-			v_feature_table_name := 'om_campaign_lot_x_' || v_rec.feature_type;
-			v_feature_id_column := v_rec.feature_type || '_id';
-			v_feature_view_name := 'v_edit_' || v_rec.feature_type;
-
-			v_querytext_cfg := '
-				SELECT DISTINCT columnname FROM PARENT_SCHEMA.config_form_fields
-				WHERE ismandatory
-				AND formname ILIKE ''%v_edit_'||v_rec.feature_type||'%''
+			-- get all ids from campaign_lot_x_table
+			v_querytext := '
+				SELECT lower(cf.id) AS feature_type, array_agg(ocl.'|| v_feature_id_column || ') AS feature_ids
+				FROM ' || v_feature_cm_table || ' ocl
+				JOIN PARENT_SCHEMA.' || v_feature_table_name || ' t ON t.' || v_feature_id_column || ' = ocl.' || v_feature_id_column || '
+				JOIN PARENT_SCHEMA.cat_' || v_feature_table_name || ' c ON c.id = t.' || v_feature_table_name || 'cat_id 
+				JOIN PARENT_SCHEMA.cat_feature_' || v_feature_table_name || ' cf ON cf.id = c.' || v_feature_table_name || '_type
+				WHERE lot_id = ANY($1)
+				GROUP BY lower(cf.id)
 			';
 
-			FOR v_rec_check IN EXECUTE v_querytext_cfg
-			LOOP
-				EXECUTE
-					'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{
-						"functionFid":' || v_fid || ',
-						"checkFid":' || v_check_mandatory_fid || ',
-						"replaceParams": ' || 
-							jsonb_build_object(
-								'table_name', v_feature_view_name,
-								'feature_column', v_feature_id_column,
-								'feature_ids', array_to_string(v_rec.feature_ids, ','),
-								'check_column', v_rec_check.columnname
-							)::text || '
-					}}}$$/::json)'
-				INTO v_check_result;
+			FOR v_rec IN EXECUTE v_querytext USING v_lot_id_array LOOP
+				v_feature_view_name := 'PARENT_SCHEMA_' || v_rec.feature_type;
+
+				v_feature_table_name := 'om_campaign_lot_x_' || v_rec.feature_type;
+				v_feature_id_column := v_rec.feature_type || '_id';
+				v_feature_view_name := 'v_edit_' || v_rec.feature_type;
+
+				v_querytext_cfg := '
+					SELECT DISTINCT columnname FROM PARENT_SCHEMA.config_form_fields
+					WHERE ismandatory
+					AND formname ILIKE ''%v_edit_'||v_rec.feature_type||'%''
+				';
+
+				FOR v_rec_check IN EXECUTE v_querytext_cfg
+				LOOP
+					EXECUTE
+						'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{
+							"functionFid":' || v_fid || ',
+							"checkFid":' || v_check_mandatory_fid || ',
+							"replaceParams": ' || 
+								jsonb_build_object(
+									'table_name', v_feature_view_name,
+									'feature_column', v_feature_id_column,
+									'feature_ids', array_to_string(v_rec.feature_ids, ','),
+									'check_column', v_rec_check.columnname
+								)::text || '
+						}}}$$/::json)'
+					INTO v_check_result;
+				END LOOP;
 			END LOOP;
 		END LOOP;
-	END LOOP;
+	END IF;
 	-- ENDSECTION
 
 	-- SECTION[epic=checkproject]: Get fprocesses
-    v_querytext := '
-        SELECT fid, fprocess_name
-        FROM cm.sys_fprocess
-        WHERE project_type = LOWER(' || quote_literal(v_project_type) || ')
-        AND active
-        AND query_text IS NOT NULL
-        AND (addparam IS NULL)
-		AND function_name ILIKE ''%gw_fct_cm_check_project%''
-        ORDER BY fid ASC
-    ';
+	IF array_length(v_fids_to_run, 1) > 0 THEN
+		v_querytext := '
+			SELECT fid, fprocess_name
+			FROM cm.sys_fprocess
+			WHERE project_type = LOWER(' || quote_literal(v_project_type) || ')
+			AND active
+			AND query_text IS NOT NULL
+			AND (addparam IS NULL)
+			AND function_name ILIKE ''%gw_fct_cm_check_project%''
+			AND fid = ANY(' || quote_literal(v_fids_to_run) || ')
+			ORDER BY fid ASC
+		';
 
-    FOR v_rec IN EXECUTE v_querytext LOOP
-        EXECUTE
-            'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{"functionFid":' || v_fid || ',"checkFid":' || v_rec.fid || '}}}$$)'
-            INTO v_check_result;
-    END LOOP;
+		FOR v_rec IN EXECUTE v_querytext LOOP
+			EXECUTE
+				'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{"functionFid":' || v_fid || ',"checkFid":' || v_rec.fid || '}}}$$)'
+				INTO v_check_result;
+		END LOOP;
+	END IF;
 	-- ENDSECTION
 
 	-- not necessary to fill excep tables
@@ -226,8 +244,8 @@ BEGIN
 
 
 	-- SECTION[epic=checkproject]: Build return
-	EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
-	EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
+	EXECUTE 'SELECT cm.gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
+	EXECUTE 'SELECT cm.gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
 
 	--EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
 	--EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;

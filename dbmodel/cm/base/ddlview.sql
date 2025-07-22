@@ -47,7 +47,7 @@ CREATE OR REPLACE VIEW v_ui_campaign_lot AS
 	wo.workorder_id,
 	l.descript,
 	l.active,
-	t.name as team_name,
+	t.teamname as team_name,
 	l.duration,
 	st.idval as status,
 	l.expl_id,
