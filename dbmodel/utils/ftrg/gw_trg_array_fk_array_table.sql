@@ -35,16 +35,23 @@ BEGIN
 			"data":{"message":"3324", "function":"1320"}}$$);';
     END IF;
 
-    EXECUTE format('SELECT (($1).%I) IS NULL', name_array_column) USING NEW INTO v_check_null_value;
-
+    -- Get data type
+    EXECUTE 'SELECT data_type FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 AND column_name = $3'
+    USING TG_TABLE_SCHEMA, TG_TABLE_NAME, name_array_column
+    INTO v_data_type;
+    
+    -- Check for null values based on data type
+    IF v_data_type = 'ARRAY' THEN
+        EXECUTE format('SELECT ($1).%I IS NULL OR ($1).%I = ARRAY[NULL]::integer[] OR array_length(($1).%I, 1) IS NULL', 
+                      name_array_column, name_array_column, name_array_column) 
+        USING NEW INTO v_check_null_value;
+    ELSE
+        EXECUTE format('SELECT ($1).%I IS NULL', name_array_column) USING NEW INTO v_check_null_value;
+    END IF;
+    
     IF v_check_null_value IS TRUE THEN
         RETURN NEW;
     END IF;
-
-
-	EXECUTE 'SELECT data_type FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 AND column_name = $3'
-	USING TG_TABLE_SCHEMA, TG_TABLE_NAME, name_array_column
-	INTO v_data_type;
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
