@@ -2,15 +2,15 @@ name: CI Test WS database
 
 on:
   push:
-    branches: [dev-3.6, dev-4.0]
+    branches: [dev, master]
   pull_request:
-    branches: [dev-3.6, dev-4.0]
+    branches: [dev, master]
   workflow_dispatch:
     inputs:
       tests:
-        description: 'Tests to run'
+        description: "Tests to run"
         required: false
-        default: 'all'
+        default: "all"
 
 jobs:
   ci_test_ws_db:
@@ -113,7 +113,7 @@ jobs:
             echo "Running SCHEMA tests..."
             pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/schema/{tables,views}/*.sql || EXIT_CODE=1
           fi
-          
+
           if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"security"* ]]; then
             echo "Running SECURITY tests..."
             pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/security/*.sql || EXIT_CODE=1
