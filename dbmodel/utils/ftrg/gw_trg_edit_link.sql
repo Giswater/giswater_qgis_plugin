@@ -852,7 +852,7 @@ BEGIN
 				UPDATE connec SET arc_id = v_arc_id, dma_id = v_dma, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
 				omzone_id = v_omzone WHERE connec_id = NEW.feature_id;
 
-				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
+				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE feature_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type = 'GULLY' THEN
 				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
@@ -869,7 +869,7 @@ BEGIN
 			-- update values on plan_psector tables
 			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE plan_psector_x_connec.link_id=NEW.link_id;
-				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
+				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE feature_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE plan_psector_x_gully.link_id=NEW.link_id;
