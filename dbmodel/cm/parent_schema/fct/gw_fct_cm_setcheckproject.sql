@@ -154,11 +154,11 @@ BEGIN
         v_fids_to_run := array_cat(v_fids_to_run, ARRAY[200, 201]);
     END IF;
     IF v_check_data_related IS TRUE THEN
-        v_fids_to_run := array_cat(v_fids_to_run, ARRAY[202, 203]);
+        v_fids_to_run := array_cat(v_fids_to_run, ARRAY[100, 202, 203]);
     END IF;
 
-	-- SECTION[epic=checkproject]: Check mandatory fields and foreign keys constraints
-	IF v_campaign_id IS NOT NULL AND v_check_data_related IS TRUE THEN
+	-- SECTION[epic=checkproject]: Iterate through features and run checks
+	IF v_campaign_id IS NOT NULL AND array_length(v_fids_to_run, 1) > 0 THEN
 		-- get lot_id_array
 		IF v_lot_id IS NOT NULL THEN
 			v_lot_id_array := array[v_lot_id];
@@ -174,32 +174,31 @@ BEGIN
 
 			-- get all ids from campaign_lot_x_table
 			v_querytext := '
-				SELECT lower(cf.id) AS feature_type, array_agg(ocl.'|| v_feature_id_column || ') AS feature_ids
-				FROM ' || v_feature_cm_table || ' ocl
+				SELECT lower(feature_type) as feature_type, lower(cf.id) AS child_type, array_agg(ocl.' || v_feature_id_column || ') AS feature_ids
+				FROM cm.' || v_feature_cm_table || ' ocl
 				JOIN PARENT_SCHEMA.' || v_feature_table_name || ' t ON t.' || v_feature_id_column || ' = ocl.' || v_feature_id_column || '
 				JOIN PARENT_SCHEMA.cat_' || v_feature_table_name || ' c ON c.id = t.' || v_feature_table_name || 'cat_id 
 				JOIN PARENT_SCHEMA.cat_feature_' || v_feature_table_name || ' cf ON cf.id = c.' || v_feature_table_name || '_type
 				WHERE lot_id = ANY($1)
-				GROUP BY lower(cf.id)
+				GROUP BY feature_type, cf.id
 			';
 
 			FOR v_rec IN EXECUTE v_querytext USING v_lot_id_array LOOP
-				v_feature_view_name := 'PARENT_SCHEMA_' || v_rec.feature_type;
-
+				v_feature_view_name := 'PARENT_SCHEMA.' || v_rec.child_type;
 				v_feature_table_name := 'om_campaign_lot_x_' || v_rec.feature_type;
 				v_feature_id_column := v_rec.feature_type || '_id';
-				v_feature_view_name := 'v_edit_' || v_rec.feature_type;
 
-				v_querytext_cfg := '
-					SELECT DISTINCT columnname FROM PARENT_SCHEMA.config_form_fields
-					WHERE ismandatory
-					AND formname ILIKE ''%v_edit_'||v_rec.feature_type||'%''
-				';
+				-- Mandatory fields check (fid 100)
+				IF 100 = ANY(v_fids_to_run) THEN
+					v_querytext_cfg := '
+						SELECT DISTINCT columnname FROM PARENT_SCHEMA.config_form_fields
+						WHERE ismandatory
+						AND formname ILIKE ''%ve_'||v_rec.feature_type||'_'||v_rec.child_type||'%''
+					';
 
-				FOR v_rec_check IN EXECUTE v_querytext_cfg
-				LOOP
-					EXECUTE
-						'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{
+					FOR v_rec_check IN EXECUTE v_querytext_cfg
+					LOOP
+						PERFORM cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{
 							"functionFid":' || v_fid || ',
 							"checkFid":' || v_check_mandatory_fid || ',
 							"replaceParams": ' || 
@@ -209,32 +208,37 @@ BEGIN
 									'feature_ids', array_to_string(v_rec.feature_ids, ','),
 									'check_column', v_rec_check.columnname
 								)::text || '
-						}}}$$/::json)'
-					INTO v_check_result;
+						}}}$$::json);
+					END LOOP;
+				END IF;
+
+				-- Other checks
+				v_querytext := '
+					SELECT fid, fprocess_name
+					FROM cm.sys_fprocess
+					WHERE project_type = LOWER(' || quote_literal(v_project_type) || ')
+					AND active
+					AND query_text IS NOT NULL
+					AND (addparam IS NULL)
+					AND function_name ILIKE ''%gw_fct_cm_check_project%''
+					AND fid = ANY(' || quote_literal(v_fids_to_run) || ')
+					AND fid != 100 -- Already handled
+					ORDER BY fid ASC
+				';
+
+				FOR v_rec_check IN EXECUTE v_querytext LOOP
+					PERFORM cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{
+						"functionFid":' || v_fid || ',
+						"checkFid":' || v_rec_check.fid || ',
+						"replaceParams": ' || 
+							jsonb_build_object(
+								'table_name', v_feature_view_name,
+								'feature_column', v_feature_id_column,
+								'feature_ids', array_to_string(v_rec.feature_ids, ',')
+							)::text || '
+					}}}$$::json);
 				END LOOP;
 			END LOOP;
-		END LOOP;
-	END IF;
-	-- ENDSECTION
-
-	-- SECTION[epic=checkproject]: Get fprocesses
-	IF array_length(v_fids_to_run, 1) > 0 THEN
-		v_querytext := '
-			SELECT fid, fprocess_name
-			FROM cm.sys_fprocess
-			WHERE project_type = LOWER(' || quote_literal(v_project_type) || ')
-			AND active
-			AND query_text IS NOT NULL
-			AND (addparam IS NULL)
-			AND function_name ILIKE ''%gw_fct_cm_check_project%''
-			AND fid = ANY(' || quote_literal(v_fids_to_run) || ')
-			ORDER BY fid ASC
-		';
-
-		FOR v_rec IN EXECUTE v_querytext LOOP
-			EXECUTE
-				'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{"functionFid":' || v_fid || ',"checkFid":' || v_rec.fid || '}}}$$)'
-				INTO v_check_result;
 		END LOOP;
 	END IF;
 	-- ENDSECTION
