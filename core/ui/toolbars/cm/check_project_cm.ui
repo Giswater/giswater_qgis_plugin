@@ -94,13 +94,49 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QGroupBox" name="grb_system_check">
+        <widget class="QGroupBox" name="grb_system_health_check">
          <property name="title">
-          <string>Select campaign lot</string>
+          <string>System health check</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_8">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="chk_manage_config">
+            <property name="text">
+             <string>Check management configs</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="chk_data_related">
+            <property name="text">
+             <string>Check data related</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="grb_database_health_check">
+         <property name="title">
+          <string>Database health check</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_7">
           <item row="0" column="0">
            <layout class="QGridLayout" name="lyt_data_2"/>
+          </item>
+          <item row="1" column="0">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

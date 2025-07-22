@@ -121,10 +121,13 @@ class GwCheckCMProjectButton(GwAction):
 
         campaign_id = tools_qt.get_combo_value(self.dialog, "tab_data_campaign", index=0)
         lot_id = tools_qt.get_combo_value(self.dialog, "tab_data_lot", index=-1)
+        check_management_configs = self.dialog.chk_manage_config.isChecked()
+        check_data_related = self.dialog.chk_data_related.isChecked()
 
         # Set parameters and re-run the project check task.
         params = {"layers": layers, "init_project": "false", "dialog": self.dialog,
-                  "log_widget": log_widget, "campaign_id": campaign_id, "lot_id": lot_id}
+                  "log_widget": log_widget, "campaign_id": campaign_id, "lot_id": lot_id,
+                  "check_management_configs": check_management_configs, "check_data_related": check_data_related}
 
         self.project_check_task = GwProjectCheckCMTask('check_project_cm', params)
 

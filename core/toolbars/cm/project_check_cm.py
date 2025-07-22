@@ -47,6 +47,8 @@ class GwProjectCheckCMTask(GwTask):
 
             campaign_id = self.params.get("campaign_id")
             lot_id = self.params.get("lot_id")
+            check_management_configs = self.params.get("check_management_configs", False)
+            check_data_related = self.params.get("check_data_related", False)
 
             # Extract the actual ID values if they are lists [id, name]
             if isinstance(campaign_id, list) and len(campaign_id) > 0:
@@ -58,7 +60,9 @@ class GwProjectCheckCMTask(GwTask):
                 f'"parameters": {{'
                 f'"functionFid": {function_fid}, "project_type": "{project_type}", '
                 f'"campaignId": {campaign_id if campaign_id is not None else "null"}, '
-                f'"lotId": {lot_id if lot_id is not None else "null"}'
+                f'"lotId": {lot_id if lot_id is not None else "null"}, '
+                f'"checkManagementConfigs": {str(check_management_configs).lower()}, '
+                f'"checkDataRelated": {str(check_data_related).lower()}'
                 f'}}'
             )
             body = tools_gw.create_body(extras=extras)
