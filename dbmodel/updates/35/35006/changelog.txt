@@ -1,3 +1,0 @@
-3.5.006
-*************
--Remove value verified from system values

@@ -1,8 +1,0 @@
-3.2.015
-********
-- Add connec / gully / subcatchment / link-vnode on psector strategy
-- Change price_compost strategy
-- Create gw_fct_admin_manage_child_views to control creation of child custom views (2716)
-- Bug fix on v_plan_node definition
-- Enhance v_plan_current_psector definition adding affec_length and plan_length
-- Control NULL's on cat_presszone.descript

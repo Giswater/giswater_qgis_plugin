@@ -1,4 +1,0 @@
-3.3.017
-*************
-- Remove notifications on config tables
-- Add field 'comment' on dimensions table

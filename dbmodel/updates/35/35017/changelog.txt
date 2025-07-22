@@ -1,5 +1,0 @@
-3.5.017
-*************
-- Buf fix from prev commits
-- Check matcat_id on connecs (414)
-- Check pjoint_id and pjoint_type nulls for connecs/gullies (415 & 416)

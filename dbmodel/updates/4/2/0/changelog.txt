@@ -1,0 +1,3 @@
+4.0.002
+*************
+- Add new column 'crm_number' on 'ext_rtc_hydrometer_x_data' to store values from the device where the data has been taken. Eventually, it could be different from hydrometer_id

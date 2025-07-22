@@ -1,3 +1,0 @@
-3.2.002
-*******
-Enhance and update data on system tables: audit_cat_table, sys_csv2pg_cat, audit_cat_function

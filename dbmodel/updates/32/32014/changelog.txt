@@ -1,7 +1,0 @@
-3.2.014
-********
-- Add plan_typevalue table
-- Deprecate nodeorphandelete function
-- Drop sequence for catalog tables of arc & node
-- Create gw_fct_feature_replace to replace point features - node, connec and gully (2714)
-- Deprecate gw_fct_node_replace function

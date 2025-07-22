@@ -1,6 +1,0 @@
-3.3.009
-*************
-- Bug on hydraulics of options and curves on go2epa (ws)
-- Deprecate inp_typevalue_source table (ws)
-- Enhance go2epa check data
-- Dynamic algorithm of mapzones enhancement

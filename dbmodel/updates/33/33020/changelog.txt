@@ -1,5 +1,0 @@
-3.3.020
-*************
-Bug fix for v_rtc_hydrometer view
-New variables to manage init form on qgis
-Delete system_variable

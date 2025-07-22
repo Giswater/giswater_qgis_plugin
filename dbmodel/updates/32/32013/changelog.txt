@@ -1,7 +1,0 @@
-3.2.013
-********
-- Enhance go2epa capabilities
-- Change customer_code_autofill functionality
-- New functions gw_fct_pg2epa_singlenodescapacity and gw_fct_pg2epa_nodescouplecapacity to analysis capacity of full network in different demand scenarios
-- Add dattrib_type=6. Firetap capacity of network (H1, H2, H3, H4)
-- New trigger gw_trg_unique_field (2702) to check the unique fields for state = 1.

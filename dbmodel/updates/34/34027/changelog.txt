@@ -1,5 +1,0 @@
-3.4.027
-*************
-- Bug fix when import inp files on ws projects
-- Adapt quick start to start from scratch on web
-- Minor usability enhancements

@@ -1,5 +1,0 @@
-3.3.018
-*************
-- Add field table_user on table audit_check_project
-- New function 2780:gw_fct_admin_role_upsertuser
-- Modify cat_manager trg, allow assign same expl to many managers

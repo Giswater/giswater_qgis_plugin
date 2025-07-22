@@ -1,6 +1,0 @@
-3.2.003
-*******
-New table anl_polygon
-New columns (descpript, result_id) on tables: anl_node, anl_arc, anl_arc_x_node, anl_connec
-New column (parentlayer) on sys_feature_type table. New column (link) on dma table. New column (isdeprecated) on audit_cat_param_user table
-Enhance and update data on system tables: config_param_system, audit_cat_param_user

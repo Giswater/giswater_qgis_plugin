@@ -1,5 +1,0 @@
-3.3.033
-*************
-- New function to manage system roles of giswater
-- Add fluid_type (from arc) to v_edit_link
-- Add 'active' and 'external' columns to cat_users in order to manage users better
