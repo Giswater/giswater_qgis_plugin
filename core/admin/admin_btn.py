@@ -20,7 +20,7 @@ from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
-    QGridLayout, QTabWidget
+    QGridLayout, QTabWidget, QDialog
 from qgis.core import QgsProject, QgsApplication, QgsMessageLog
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
@@ -180,7 +180,7 @@ class GwAdminButton:
 
         msg = "Create schema of type '{0}': '{1}'"
         msg_params = (project_type, project_name_schema,)
-        tools_log.log_info(msg, msg_params=msg_params)      
+        tools_log.log_info(msg, msg_params=msg_params)
 
         if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
             if self.locale not in ('en_US', 'no_TR') or str(self.project_epsg) != '25831':
@@ -354,8 +354,17 @@ class GwAdminButton:
 
         return None
 
-    def execute_last_process(self, new_project=False, schema_name=None, schema_type='', locale=False, srid=None):
-        """ Execute last process function """
+    def execute_last_process(self, new_project: bool = False, schema_name: str | None = None, schema_type: str = '', locale: bool = False, srid: str | None = None):
+        """ 
+        Execute last process function
+        
+        :param new_project: Whether this is a new project (True) or an update to an existing one (False).
+        :param schema_name: The name of the schema to use. If None, uses self._get_schema_name().
+        :param schema_type: The type of the schema to use.
+        :param locale: Whether to use the locale.
+        :param srid: The SRID to use.
+        :return bool: True if all relevant folders were processed successfully, False otherwise.
+        """
 
         if new_project is True:
             extras = '"isNewProject":"' + str('TRUE') + '", '
@@ -454,8 +463,16 @@ class GwAdminButton:
             QgsApplication.taskManager().addTask(self.task_update_schema)
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
-    def load_updates(self, project_type=None, update_changelog=False, schema_name=None, dict_update_folders=None):
-        """"""
+    def load_updates(self, project_type: str | None = None, update_changelog: bool = False, schema_name: str | None = None) -> bool:
+        """
+        Load updates for a given project type.
+
+        :param project_type: The project type to use. If None, uses self.project_type_selected.
+        :param update_changelog: Whether to update the changelog.
+        :param schema_name: The name of the schema to use. If None, uses self._get_schema_name().
+
+        :return bool: True if all updates were loaded successfully, False otherwise.
+        """
 
         # Get current schema selected
         if schema_name is None:
@@ -471,7 +488,7 @@ class GwAdminButton:
         self.task1.setProgress(20)
         self.task1.setProgress(40)
         if status:
-            status = self.update_dict_folders(False, project_type=project_type, dict_update_folders=dict_update_folders)
+            status = self.update_dict_folders(False, project_type=project_type, folder_updates=self.folder_updates)
         self.task1.setProgress(60)
         if status:
             status = self.execute_last_process(schema_name=schema_name, locale=True)
@@ -555,8 +572,15 @@ class GwAdminButton:
 
     # region 'Create Project'
 
-    def load_base(self, dict_folders):
-        """"""
+    def load_base(self, dict_folders: dict) -> bool:
+        """
+        Load base files from a given dictionary of folders.
+        
+        :param dict_folders: A dictionary with the folders and the number of files in each folder.
+
+        :return bool: True if all files were loaded successfully, False otherwise.
+        """
+
         for folder in dict_folders.keys():
             status = self._execute_files(folder, set_progress_bar=True)
             if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
@@ -609,7 +633,15 @@ class GwAdminButton:
 
         return True
 
-    def update_minor_dict_folders(self, folder_update, new_project, project_type, no_ct):
+    def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: str | None = None, no_ct: bool = False) -> bool:
+        """
+        Update the patch folders for a given update directory.
+        :param folder_update (str): Path to the update directory containing patch folders.
+        :param new_project (bool): Whether this is a new project (True) or an update to an existing one (False).
+        :param project_type (str | None, optional): The project type to use. If None, uses self.project_type_selected.
+        :param no_ct (bool, optional): If True, skips certain processing steps (context-specific).
+        :return bool: True if all relevant folders were processed successfully, False otherwise.
+        """
 
         folder_utils = os.path.join(folder_update, 'utils')
         if self._process_folder(folder_utils) is True:
@@ -621,6 +653,10 @@ class GwAdminButton:
             folder_project = project_type
         else:
             folder_project = self.project_type_selected
+
+        if not isinstance(folder_project, str) or not folder_project:
+            return False
+
         folder_project_type = os.path.join(folder_update, folder_project)
         if self._process_folder(folder_project_type):
             status = self._load_sql(folder_project_type, no_ct, set_progress_bar=True)
@@ -629,29 +665,56 @@ class GwAdminButton:
 
         return True
 
-    def update_dict_folders(self, new_project=False, project_type=False, no_ct=False, dict_update_folders=None):
-        """"""
+    def update_dict_folders(self, new_project: bool, project_type: str | None = None, no_ct: bool = False, folder_updates: str = '') -> bool:
+        """
+        Update the dictionary folders for a given update directory.
 
-        if not os.path.exists(self.folder_updates):
+        :param new_project: Whether this is a new project (True) or an update to an existing one (False).
+        :param project_type: The project type to use. If None, uses self.project_type_selected.
+        :param no_ct: If True, skips certain processing steps (context-specific).
+        :param folder_updates: The path to the folder to use for updates. If empty, uses self.folder_updates.
+
+        :return bool: True if all relevant folders were processed successfully, False otherwise.
+        """
+
+        if not folder_updates:
+            folder_updates = self.folder_updates
+
+        if not os.path.exists(folder_updates):
             msg = "The update folder was not found in sql folder"
             tools_qgis.show_message(msg)
             self.error_count = self.error_count + 1
-            return
+            return False
 
-        for folder in dict_update_folders.keys():
-            sub_folders = sorted(os.listdir(folder))
-            for sub_folder in sub_folders:
-                folder_update = os.path.join(self.folder_updates, folder, sub_folder)
-                if new_project:
-                    if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                        status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
-                        if tools_os.set_boolean(status, False) is False:
-                            return False
-                else:
-                    if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                        status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
-                        if tools_os.set_boolean(status, False) is False:
-                            return False
+        # Collect all version folders and sort them
+        version_folders = []
+
+        # Walk through the updates directory to find all version folders
+        # EX: 3/6/1, 4/2/0 -> 3.6.1, 4.2.0
+        for root, _, _ in os.walk(folder_updates):
+            rel_path = os.path.relpath(root, folder_updates)
+            if rel_path == '.':
+                continue
+
+            parts = rel_path.split(os.sep)
+            if len(parts) == 3:
+                try:
+                    major, minor, patch = int(parts[0]), int(parts[1]), int(parts[2])
+                    version_folders.append((major, minor, patch, root))
+                except ValueError:
+                    continue
+
+        # Sort by version number (major.minor.patch)
+        version_folders.sort(key=lambda x: (x[0], x[1], x[2]))
+
+        # Process each version folder in order
+        for major, minor, patch, folder_path in version_folders:
+            current_folder_version = f"{major}.{minor}.{patch}"
+            if current_folder_version <= str(self.plugin_version):
+                status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
+                if tools_os.set_boolean(status, False) is False:
+                    return False
+
         return True
 
     def load_childviews(self):
@@ -829,7 +892,7 @@ class GwAdminButton:
         self._manage_utils()
 
         # Force reload to locale when opening admin dialog
-        lib_vars.schema_name = None 
+        lib_vars.schema_name = None
         tools_qt._add_translator(True)
 
         # Set Listeners
@@ -1242,10 +1305,19 @@ class GwAdminButton:
         # Open MainWindow
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
 
-    def _load_sql(self, path_folder, no_ct=False, utils_schema_name=None, set_progress_bar=False):
-        """"""
+    def _load_sql(self, path_folder: str, no_ct: bool = False, utils_schema_name: str | None = None, set_progress_bar: bool = False) -> bool:
+        """
+        Load SQL files from a given folder.
 
-        for (path, ficheros, archivos) in os.walk(path_folder):
+        :param path_folder: The path to the folder to load the SQL files from.
+        :param no_ct: Whether to skip the CT processing.
+        :param utils_schema_name: The name of the schema to use.
+        :param set_progress_bar: Whether to set the progress bar.
+
+        :return bool: True if all files were loaded successfully, False otherwise.
+        """
+
+        for (path, _, _) in os.walk(path_folder):
             status = self._execute_files(path, no_ct=no_ct, utils_schema_name=utils_schema_name,
                                          set_progress_bar=set_progress_bar)
             if not tools_os.set_boolean(status, False):
@@ -1356,10 +1428,20 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(self.task_rename_schema)
         QgsApplication.taskManager().triggerTask(self.task_rename_schema)
 
-    def _load_custom_sql_files(self, dialog, widget):
-        """"""
+    def _load_custom_sql_files(self, dialog: QDialog, widget: QWidget) -> None:
+        """
+        Load custom SQL files from a given folder.
+
+        :param dialog: The dialog to use.
+        :param widget: The widget to use.
+
+        :return bool: True if all files were loaded successfully, False otherwise.
+        """
 
         folder_path = tools_qt.get_text(dialog, widget)
+        if not isinstance(folder_path, str) or not folder_path:
+            return
+
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(50)
@@ -1376,13 +1458,27 @@ class GwAdminButton:
         # Reset count error variable to 0
         self.error_count = 0
 
-    def _get_schema_name(self):
-        """"""
+    def _get_schema_name(self) -> str:
+        """
+        Get the schema name from the dialog.
+
+        :return str: The schema name.
+        """
+        if not hasattr(self, 'dlg_readsql') or not self.dlg_readsql:
+            return ''
+
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        if not isinstance(schema_name, str) or not schema_name:
+            return ''
+
         return schema_name
 
-    def _load_fct_ftrg(self):
-        """"""
+    def _load_fct_ftrg(self) -> bool:
+        """
+        Load fct and ftrg files from utils and software folders.
+
+        :return bool: True if all files were loaded successfully, False otherwise.
+        """
 
         folder = os.path.join(self.folder_utils, self.file_pattern_fct)
 
@@ -1784,8 +1880,15 @@ class GwAdminButton:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             self.dlg_readsql.btn_info.setEnabled(False)
 
-    def _process_folder(self, folderpath, filepattern=''):
-        """"""
+    def _process_folder(self, folderpath: str, filepattern: str = '') -> bool:
+        """
+        Process a folder and return True if the folder exists, False otherwise.
+
+        :param folderpath: The path to the folder to process.
+        :param filepattern: The pattern to use to filter the files.
+
+        :return bool: True if the folder exists, False otherwise.
+        """
 
         try:
             os.listdir(os.path.join(folderpath, filepattern))
@@ -1793,8 +1896,13 @@ class GwAdminButton:
         except Exception:
             return False
 
-    def _reload_fct_ftrg(self):
-        """"""
+    def _reload_fct_ftrg(self) -> None:
+        """
+        Reload fct and ftrg files from utils and software folders.
+
+        :return None:
+        """
+
         self._load_fct_ftrg()
         status = (self.error_count == 0)
         if status:
@@ -2423,7 +2531,7 @@ class GwAdminButton:
         if result:
             sql = f'DROP SCHEMA IF EXISTS {schema} CASCADE;'
             status = tools_db.execute_sql(sql)
-            
+
             if schema == 'cm':
                 sql_audit = 'DROP SCHEMA IF EXISTS cm_audit CASCADE;'
                 tools_db.execute_sql(sql_audit)
@@ -3187,8 +3295,15 @@ class GwAdminButton:
             if str(k) == "info":
                 tools_gw.fill_tab_log(dialog, data)
 
-    def _manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):
-        """ Manage message depending result @status """
+    def _manage_result_message(self, status: bool, msg_ok: str | None = None, msg_error: str | None = None, parameter: str | None = None) -> None:
+        """ 
+        Manage message depending result @status 
+
+        :param status: The status of the process.
+        :param msg_ok: The message to show if the process finished successfully.
+        :param msg_error: The message to show if the process finished with some errors.
+        :param parameter: The parameter to show in the message.
+        """
 
         if status:
             if msg_ok is None:
