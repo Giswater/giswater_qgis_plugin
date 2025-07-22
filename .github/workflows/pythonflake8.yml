@@ -2,9 +2,9 @@ name: Python flake8
 
 on:
     push:
-        branches: ['dev-4.0', 'dev-4.0-ci']
+        branches: ['dev', 'master']
     pull_request:
-        branches: ['dev-4.0', 'dev-4.0-ci']
+        branches: ['dev', 'master']
 
 jobs:
   lint:
