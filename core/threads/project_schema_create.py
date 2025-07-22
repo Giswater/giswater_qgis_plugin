@@ -13,6 +13,10 @@ import os
 from .task import GwTask
 from ..utils import tools_gw
 from ...libs import tools_qt, tools_log, tools_os, tools_db
+# Avoid circular import by using TYPE_CHECKING and runtime import
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..admin.admin_btn import GwAdminButton
 
 
 class GwCreateSchemaTask(GwTask):
@@ -22,7 +26,7 @@ class GwCreateSchemaTask(GwTask):
     def __init__(self, admin, description, params, timer=None):
 
         super().__init__(description)
-        self.admin = admin
+        self.admin: GwAdminButton = admin
         self.params = params
         self.dict_folders_process = {}
         self.db_exception = (None, None, None)  # error, sql, filepath
@@ -30,21 +34,24 @@ class GwCreateSchemaTask(GwTask):
 
         # Manage buttons & other dlg-related widgets
         # Disable dlg_readsql_create_project buttons
-        self.admin.dlg_readsql_create_project.btn_cancel_task.show()
-        self.admin.dlg_readsql_create_project.btn_accept.hide()
-        self.admin.dlg_readsql_create_project.btn_close.setEnabled(False)
-        try:
-            self.admin.dlg_readsql_create_project.key_escape.disconnect()
-        except TypeError:
-            pass
+        if self.admin.dlg_readsql_create_project:
+            self.admin.dlg_readsql_create_project.btn_cancel_task.show()
+            self.admin.dlg_readsql_create_project.btn_accept.hide()
+            self.admin.dlg_readsql_create_project.btn_close.setEnabled(False)
+            try:
+                self.admin.dlg_readsql_create_project.key_escape.disconnect()
+            except TypeError:
+                pass
 
-        # Disable red 'X' from dlg_readsql_create_project
-        self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.admin.dlg_readsql_create_project.show()
-        # Disable dlg_readsql buttons
-        self.admin.dlg_readsql.btn_close.setEnabled(False)
+            # Disable red 'X' from dlg_readsql_create_project
+            self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
+            self.admin.dlg_readsql_create_project.show()
 
-    def run(self):
+        if self.admin.dlg_readsql:
+            # Disable dlg_readsql buttons
+            self.admin.dlg_readsql.btn_close.setEnabled(False)
+
+    def run(self) -> bool:
 
         super().run()
         self.is_test = self.params['is_test']
@@ -66,18 +73,20 @@ class GwCreateSchemaTask(GwTask):
         self.custom_execution()
         return True
 
-    def finished(self, result):
+    def finished(self, result) -> None:
 
         super().finished(result)
         # Enable dlg_readsql_create_project buttons
-        self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
-        self.admin.dlg_readsql_create_project.btn_accept.show()
-        self.admin.dlg_readsql_create_project.btn_close.setEnabled(True)
-        # Enable red 'X' from dlg_readsql_create_project
-        self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
-        self.admin.dlg_readsql_create_project.show()
-        # Disable dlg_readsql buttons
-        self.admin.dlg_readsql.btn_close.setEnabled(True)
+        if self.admin.dlg_readsql_create_project:
+            self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
+            self.admin.dlg_readsql_create_project.btn_accept.show()
+            self.admin.dlg_readsql_create_project.btn_close.setEnabled(True)
+            # Enable red 'X' from dlg_readsql_create_project
+            self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
+            self.admin.dlg_readsql_create_project.show()
+        if self.admin.dlg_readsql:
+            # Enable dlg_readsql buttons
+            self.admin.dlg_readsql.btn_close.setEnabled(True)
 
         if self.isCanceled():
             if self.timer:
@@ -105,17 +114,21 @@ class GwCreateSchemaTask(GwTask):
         self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                              is_test=self.is_test)
         self.setProgress(100)
-        
+
         # Emit task_finished signal with empty list
         self.task_finished.emit([])
 
-    def set_progress(self, value):
+    def set_progress(self, value) -> None:
 
         if not self.is_test:
             self.setProgress(value)
 
-    def main_execution(self):
-        """ Main common execution """
+    def main_execution(self) -> bool:
+        """ 
+        Main common execution 
+        
+        :return bool: True if the main execution finished successfully, False otherwise.
+        """
 
         project_type = self.params['project_type']
         exec_last_process = self.params['exec_last_process']
@@ -142,7 +155,7 @@ class GwCreateSchemaTask(GwTask):
                 or self.isCanceled():
             return False
 
-        status = self.admin.update_dict_folders(True, project_type, dict_update_folders=self.dict_folders_process['update_35to40'])
+        status = self.admin.update_dict_folders(True, project_type)
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
@@ -168,8 +181,12 @@ class GwCreateSchemaTask(GwTask):
 
         return True
 
-    def custom_execution(self):
-        """ Custom execution """
+    def custom_execution(self) -> None:
+        """ 
+        Custom execution 
+        
+        :return None:
+        """
 
         project_type = self.params['project_type']
         example_data = self.params['example_data']
@@ -191,12 +208,16 @@ class GwCreateSchemaTask(GwTask):
         elif self.admin.rdb_empty.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_empty', prefix=False)
 
-    def calculate_number_of_files(self):
-        """ Calculate total number of SQL to execute """
+    def calculate_number_of_files(self) -> int:
+        """ 
+        Calculate total number of SQL to execute 
+        
+        :return int: The total number of SQL files.
+        """
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_locale', 'load_base_locale', 'update_35to40']
+        list_process = ['load_base', 'load_locale', 'load_base_locale', 'updates']
 
         for process_name in list_process:
             # tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
@@ -210,7 +231,14 @@ class GwCreateSchemaTask(GwTask):
 
         return total_sql_files
 
-    def get_number_of_files_folder_update_minor(self, folder_update_minor):
+    def get_number_of_files_folder_update_minor(self, folder_update_minor: str) -> int:
+        """
+        Calculate number of files of all folders of selected @folder_update_minor 
+        
+        :param folder_update_minor: The path to the folder to get the number of files from.
+
+        :return int: The number of files.
+        """
 
         project_type = self.params['project_type']
         files_project_type = list(glob.iglob(folder_update_minor + f'**/**/{project_type}/*.sql', recursive=True))
@@ -220,8 +248,14 @@ class GwCreateSchemaTask(GwTask):
 
         return total
 
-    def get_number_of_files_process(self, process_name: str):
-        """ Calculate number of files of all folders of selected @process_name """
+    def get_number_of_files_process(self, process_name: str) -> tuple[dict, int]:
+        """ 
+        Calculate number of files of all folders of selected @process_name 
+        
+        :param process_name: The name of the process to get the number of files from.
+
+        :return tuple: A tuple with the dictionary of folders and the number of files.
+        """
 
         # tools_log.log_info(f"Task 'Create schema' execute function 'def get_folders_process' with parameters: '{process_name}'")
         dict_folders = self.get_folders_process(process_name)
@@ -236,8 +270,14 @@ class GwCreateSchemaTask(GwTask):
 
         return dict_folders, number_of_files
 
-    def get_folders_process(self, process_name):
-        """ Get list of folders related with this @process_name """
+    def get_folders_process(self, process_name: str) -> dict:
+        """ 
+        Get list of folders related with this @process_name 
+
+        :param process_name: The name of the process to get the folders from.
+
+        :return dict: A dictionary with the folders and the number of files in each folder.
+        """
 
         dict_folders = {}
         if process_name == 'load_base':
@@ -251,9 +291,8 @@ class GwCreateSchemaTask(GwTask):
         elif process_name == 'load_locale':
             dict_folders[self.admin.folder_locale] = 0
 
-        elif process_name == 'update_35to40':
-            dict_folders[os.path.join(self.admin.folder_updates, '36')] = 0
-            dict_folders[os.path.join(self.admin.folder_updates, '40')] = 0
+        elif process_name == 'updates':
+            dict_folders[os.path.join(self.admin.folder_updates)] = 0
 
         return dict_folders
 

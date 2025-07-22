@@ -12,6 +12,11 @@ from .task import GwTask
 from ..utils import tools_gw
 from ...libs import tools_qt, tools_log, tools_db
 
+# Avoid circular import by using TYPE_CHECKING and runtime import
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..admin.admin_btn import GwAdminButton
+
 
 class GwUpdateSchemaTask(GwTask):
 
@@ -20,7 +25,7 @@ class GwUpdateSchemaTask(GwTask):
     def __init__(self, admin, description, params, timer=None):
 
         super().__init__(description)
-        self.admin = admin
+        self.admin: GwAdminButton = admin
         self.params = params
         self.dict_folders_process = {}
         self.db_exception = (None, None, None)  # error, sql, filepath
@@ -107,28 +112,12 @@ class GwUpdateSchemaTask(GwTask):
         self.setProgress(100)
 
     def main_execution(self):
+        """ Main common execution """
+
         schema_name = self.admin._get_schema_name()
         sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
         tools_db.execute_sql(sql, commit=False)
         # Get all updates folders, to update
-        self.dict_folders_process['updates'] = self.get_updates_dict_folders()
-        self.status = self.admin.load_updates(self.params['project_type'], update_changelog=True, schema_name=schema_name, dict_update_folders=self.dict_folders_process['updates'])
+        self.dict_folders_process['updates'] = self.admin.folder_updates
+        self.status = self.admin.load_updates(self.params['project_type'], update_changelog=True, schema_name=schema_name)
         return True
-
-    def get_updates_dict_folders(self):
-        """ Get list of all updates folders """
-
-        dict_folders = {}
-
-        dict_folders[os.path.join(self.admin.folder_updates, '31', '31100')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '31', '31103')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '31', '31105')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '31', '31109')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '31', '31110')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '32')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '33')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '34')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '35')] = 0
-        dict_folders[os.path.join(self.admin.folder_updates, '36')] = 0
-
-        return dict_folders
