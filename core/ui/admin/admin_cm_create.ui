@@ -68,27 +68,6 @@
     <item row="4" column="0" colspan="5">
      <layout class="QGridLayout" name="lyt_buttons">
       <item row="0" column="2">
-       <widget class="QLabel" name="lbl_schema_name">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QPushButton" name="btn_cancel_task">
-        <property name="text">
-         <string>Cancel task</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="lbl_time">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5">
        <widget class="QPushButton" name="btn_close">
         <property name="text">
          <string>Close</string>
@@ -96,13 +75,13 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="label">
+       <widget class="QPushButton" name="btn_cancel_task">
         <property name="text">
-         <string>Schema name:</string>
+         <string>Cancel task</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item row="0" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
