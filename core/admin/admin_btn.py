@@ -1965,6 +1965,7 @@ class GwAdminButton:
 
         # checks if we have an existing cm project
         self.cm_schema = self._get_cm_schema_name()
+        if self.cm_schema:
             self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
 
             # checks if we have the parent linked to cm
