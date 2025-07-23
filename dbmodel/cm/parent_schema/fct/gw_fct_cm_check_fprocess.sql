@@ -80,10 +80,14 @@ BEGIN
 
 		-- value/s on column '%check_column%' in the '%table_name%' table.
 		v_process_except_msg = regexp_replace(v_process_except_msg, '%table_name%', v_replace_params->>'table_name', 'gi');
+		v_process_except_msg = regexp_replace(v_process_except_msg, '%feature_column%', v_replace_params->>'feature_column', 'gi');
+		v_process_except_msg = regexp_replace(v_process_except_msg, '%feature_ids%', v_replace_params->>'feature_ids', 'gi');
 		v_process_except_msg = regexp_replace(v_process_except_msg, '%check_column%', v_replace_params->>'check_column', 'gi');
 
 		-- The '%check_column%' column on '%table_name%' have correct values.
 		v_process_info_msg = regexp_replace(v_process_info_msg, '%table_name%', v_replace_params->>'table_name', 'gi');
+		v_process_info_msg = regexp_replace(v_process_info_msg, '%feature_column%', v_replace_params->>'feature_column', 'gi');
+		v_process_info_msg = regexp_replace(v_process_info_msg, '%feature_ids%', v_replace_params->>'feature_ids', 'gi');
 		v_process_info_msg = regexp_replace(v_process_info_msg, '%check_column%', v_replace_params->>'check_column', 'gi');
 	END IF;
 
