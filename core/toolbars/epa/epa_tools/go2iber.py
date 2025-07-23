@@ -49,6 +49,9 @@ class Go2Iber:
             tools_qgis.show_warning(msg)
             return
 
+        # Fill user values
+        self._fill_user_values()
+
         # Fill mesh combo
         sql = "SELECT id,name as idval FROM cat_file"
         rows = self.ig_tools_db.get_rows(sql)
@@ -152,8 +155,15 @@ class Go2Iber:
         tools_gw.set_config_parser('btn_go2iber', 'go2iber_result_name', f"{txt_result_name}")
         txt_path = f"{tools_qt.get_text(self.dlg_go2iber, 'txt_path', return_string_null=False)}"
         tools_gw.set_config_parser('btn_go2iber', 'go2iber_path', f"{txt_path}")
-        mesh = tools_qt.get_combo_value(self.dlg_go2iber, 'cmb_mesh')
-        tools_gw.set_config_parser('btn_go2iber', 'go2iber_mesh', f"{mesh}")
+
+    def _fill_user_values(self):
+        """ Fill dialog widgets' values """
+        txt_result_name = tools_gw.get_config_parser('btn_go2iber', 'go2iber_result_name', 'user', 'session')
+        if txt_result_name:
+            tools_qt.set_widget_text(self.dlg_go2iber, 'txt_result_name', txt_result_name)
+        txt_path = tools_gw.get_config_parser('btn_go2iber', 'go2iber_path', 'user', 'session')
+        if txt_path:
+            tools_qt.set_widget_text(self.dlg_go2iber, 'txt_path', txt_path)
 
     def _check_fields(self):
 
@@ -240,7 +250,7 @@ class Go2Iber:
                     tools_qgis.show_warning(msg)
                 else:
                     layer.loadNamedStyle(qml_path)
-                tools_qgis.add_layer_to_toc(layer, group='IBERGIS', sub_group=group_name, create_groups=True)
+                tools_qgis.add_layer_to_toc(layer, group=f'IBERGIS - {os.path.basename(file_path)}', sub_group=group_name, create_groups=True)
 
         # Save project path
         relative_path = os.path.relpath(file_path, QgsProject.instance().absolutePath())
