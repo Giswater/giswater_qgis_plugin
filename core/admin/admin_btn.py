@@ -1965,7 +1965,8 @@ class GwAdminButton:
 
         # checks if we have an existing cm project
         self.cm_schema = self._get_cm_schema_name()
-        if self.cm_schema:
+            self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
+
             # checks if we have the parent linked to cm
             schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
             if schema_name:
@@ -2039,7 +2040,6 @@ class GwAdminButton:
         self._run_create_cm_task(['load_base_schema'], 'Create cm base schema')
 
         if self.dlg_readsql_create_cm_project is not None:
-            self.dlg_readsql_create_cm_project.lbl_schema_name.setText(name)
             self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
             self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
             self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
