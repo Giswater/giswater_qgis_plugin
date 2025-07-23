@@ -491,7 +491,7 @@ class GwAdminButton:
             status = self.update_dict_folders(False, project_type=project_type, folder_updates=self.folder_updates)
         self.task1.setProgress(60)
         if status:
-            status = self.execute_last_process(schema_name=schema_name, locale=True)
+            status = self.execute_last_process(schema_name=schema_name, locale=True, schema_type=project_type)
         self.task1.setProgress(100)
 
         if update_changelog is False:
