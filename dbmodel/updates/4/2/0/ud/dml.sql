@@ -447,3 +447,6 @@ UPDATE sys_message SET error_message = 'The table chosen does not fit with any e
 
 UPDATE inp_typevalue SET typevalue='_inp_typevalue_gully_method' WHERE typevalue='inp_typevalue_gully_method' AND id='UPC';
 UPDATE inp_typevalue SET typevalue='_inp_typevalue_gully_type' WHERE typevalue='inp_typevalue_gully_type' AND id='Sink';
+
+UPDATE config_param_system SET value='{"sys_display_name":"concat(gully_id, '' : '', gullycat_id)","sys_tablename":"v_edit_gully","sys_pk":"gully_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}' WHERE "parameter"='basic_search_v2_tab_network_gully';
+UPDATE config_param_system SET value='{"sys_display_name":"concat(connec_id, '' : '', conneccat_id)","sys_tablename":"v_edit_connec","sys_pk":"connec_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}' WHERE "parameter"='basic_search_v2_tab_network_connec';
