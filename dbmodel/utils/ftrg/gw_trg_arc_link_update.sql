@@ -21,10 +21,14 @@ DECLARE
 v_link record;
 v_closest_point PUBLIC.geometry;
 v_debugmsg text;
+v_projecttype text;
 
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	-- select config values
+	SELECT upper(project_type)  INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- only if the geometry has changed (not reversed) because reverse may not affect links....
     IF st_orderingequals(OLD.the_geom, NEW.the_geom) IS FALSE THEN
@@ -42,12 +46,22 @@ BEGIN
 		
 		-- Redraw endpoint of link
 		FOR v_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
-		WHERE link.feature_type IN ('CONNEC', 'GULLY') AND exit_type='ARC' AND arc_id=NEW.arc_id
+		WHERE exit_type='ARC' AND arc_id=NEW.arc_id
 		LOOP
 			SELECT St_closestpoint(a.the_geom, St_endpoint(v_link.the_geom)) INTO v_closest_point FROM arc a WHERE arc_id = NEW.arc_id AND a.state > 0;
 			EXECUTE 'UPDATE v_edit_link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_link."link_id")
 			USING v_link.the_geom, v_closest_point;
 		END LOOP;
+
+		IF v_projecttype = 'UD' THEN
+			FOR v_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
+			WHERE exit_type='ARC' AND arc_id=NEW.arc_id
+			LOOP
+				SELECT St_closestpoint(a.the_geom, St_endpoint(v_link.the_geom)) INTO v_closest_point FROM arc a WHERE arc_id = NEW.arc_id AND a.state > 0;
+				EXECUTE 'UPDATE v_edit_link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_link."link_id")
+				USING v_link.the_geom, v_closest_point;
+			END LOOP;
+		END IF;
     END IF;
 
     RETURN NEW;
