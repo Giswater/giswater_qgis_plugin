@@ -458,7 +458,6 @@ class GwLoadProject(QObject):
         self._enable_toolbar("toc")
         self._enable_toolbar("am")
         self._enable_toolbar("cm")
-        self._hide_button("72")
 
         # Check if audit exists
         sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
