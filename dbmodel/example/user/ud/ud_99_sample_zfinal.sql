@@ -175,7 +175,7 @@ INSERT INTO element  (element_id, code, elementcat_id, epa_type, state, state_ty
 INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length) VALUES
 ('100020','18828',1,'18969',0.5),
 ('100021','237',1,'100014',0.5),
-('100022','18838',1,'18966',1);
+('100022','18828',1,'18966',1);
 
 INSERT INTO inp_frweir (element_id, weir_type, offsetval, cd, flap, geom1,geom2, geom3, geom4) VALUES
 ('100020', 'TRANSVERSE',17.15,1.5000,'NO',1.0000,1.0000,0.0000,0.0000),
