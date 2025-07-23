@@ -361,7 +361,7 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 ]'::json, NULL, true, '{4}');
 -- 30/06/2025
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_inlet_type', 'GULLY', 'GULLY', NULL, NULL);
-INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_inlet_type', 'CULVERT', 'CULVERT', NULL, NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('_inp_typevalue_inlet_type', 'CULVERT', 'CULVERT', NULL, NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'INLET', 'INLET', NULL, NULL);
 INSERT INTO sys_feature_epa_type (id,feature_type,epa_table,active)	VALUES ('INLET','NODE','inp_inlet',true);
 
@@ -444,3 +444,6 @@ UPDATE config_form_fields SET formname='ve_epa_gully', formtype='form_feature', 
 UPDATE config_form_fields SET formname='ve_epa_netgully', formtype='form_feature', columnname='gully_method', tabname='tab_epa' WHERE formname='ve_epa_netgully' AND formtype='form_feature' AND columnname='gully_method' AND tabname='tab_epa';
 
 UPDATE sys_message SET error_message = 'The table chosen does not fit with any epa dscenario. Please try another one.' WHERE id = 3698;
+
+UPDATE inp_typevalue SET typevalue='_inp_typevalue_gully_method' WHERE typevalue='inp_typevalue_gully_method' AND id='UPC';
+UPDATE inp_typevalue SET typevalue='_inp_typevalue_gully_type' WHERE typevalue='inp_typevalue_gully_type' AND id='Sink';
