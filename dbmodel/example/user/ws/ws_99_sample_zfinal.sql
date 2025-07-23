@@ -144,3 +144,5 @@ UPDATE ext_cat_period b SET end_date = a.end_date FROM (
 UPDATE ext_cat_period b SET period_seconds = a.period_seconds FROM (
 	SELECT id, LEFT((end_date::TIMESTAMP - start_date::TIMESTAMP)::TEXT, 2)::integer * 24 * 3600 AS period_seconds FROM ext_cat_period
 )a WHERE a.id = b.id;
+
+UPDATE connec SET connec_length = st_length(l.the_geom) FROM link l WHERE connec_id = l.feature_id;
