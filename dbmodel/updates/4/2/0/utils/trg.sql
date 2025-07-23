@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE TRIGGER gw_trg_edit_frelem_x_node BEFORE INSERT ON element_x_node
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_frelem_x_node();
+
+CREATE TRIGGER gw_trg_edit_municipality INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ext_municipality
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_municipality();
