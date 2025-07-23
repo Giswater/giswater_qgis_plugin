@@ -131,7 +131,7 @@ BEGIN
 					JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(i.indkey)
 				WHERE i.indisprimary AND t.relname = 'inp_dscenario_'||object_rec.table AND n.nspname = 'SCHEMA_NAME' AND a.attname <> 'dscenario_id') as t(value);
 
-				SELECT string_agg(value, ',') AS column_list INTO object_rec.column FROM 
+				SELECT string_agg(value, ',') AS column_list INTO object_rec.column FROM
 				json_array_elements_text(
 					(SELECT json_agg(column_name)::json FROM information_schema.columns
 					WHERE table_schema = 'SCHEMA_NAME' AND table_name = 'inp_dscenario_'||object_rec.table AND column_name <> 'dscenario_id')) AS t(value);
@@ -163,13 +163,11 @@ BEGIN
 						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
 						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 						' ON CONFLICT ('||object_rec.pk||') DO NOTHING';
-						RAISE NOTICE 'v_querytext %', v_querytext;
 					EXECUTE v_querytext;
 					ELSE
 						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
 						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 						' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
-						RAISE NOTICE 'v_querytext %', v_querytext;
 						EXECUTE v_querytext;
 					END IF;
 
@@ -189,12 +187,29 @@ BEGIN
 
 		ELSIF v_projecttype = 'WS' THEN
 
-			FOR object_rec IN SELECT json_array_elements_text('["demand", "shortpipe", "tank", "reservoir", "pipe", "pump", "valve"]'::json) as table,
-						json_array_elements_text('["", "node_id", "node_id", "node_id", "arc_id", "node_id", "node_id"]'::json) as pk,
-						json_array_elements_text('["", "node_id, minorloss, status", "node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id", 
-						 "node_id, pattern_id, head", "arc_id, minorloss, status, roughness, dint", "node_id, power, curve_id, speed, pattern_id, status", 
-						 "node_id, valve_type, setting, curve_id, minorloss, status, add_settings"]'::json) as column
+			FOR object_rec IN SELECT elem AS table, '' AS pk, '' AS column FROM  json_array_elements_text(
+                (SELECT json_agg(suffix)::json
+                FROM (
+                    SELECT DISTINCT substring(table_name FROM 'inp_dscenario_(.*)$') AS suffix
+                    FROM information_schema.tables
+                    WHERE table_schema = 'SCHEMA_NAME' AND table_name  LIKE 'inp_dscenario_%'
+                ) s
+              )
+          ) AS j(elem)
 			LOOP
+
+				SELECT string_agg(value, ',') AS column_list INTO object_rec.pk FROM
+					(SELECT json_array_elements_text(json_agg(a.attname)::json) AS pk FROM pg_index i
+					JOIN pg_class t ON t.oid = i.indrelid
+					JOIN pg_namespace n ON n.oid = t.relnamespace
+					JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(i.indkey)
+				WHERE i.indisprimary AND t.relname = 'inp_dscenario_'||object_rec.table AND n.nspname = 'SCHEMA_NAME' AND a.attname <> 'dscenario_id') as t(value);
+
+				SELECT string_agg(value, ',') AS column_list INTO object_rec.column FROM
+				json_array_elements_text(
+					(SELECT json_agg(column_name)::json FROM information_schema.columns
+					WHERE table_schema = 'SCHEMA_NAME' AND table_name = 'inp_dscenario_'||object_rec.table AND column_name <> 'dscenario_id')) AS t(value);
+
 				IF v_action = 'DELETE-COPY' THEN
 
 					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target;
@@ -222,16 +237,14 @@ BEGIN
 						INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
 						SELECT v_target, feature_id, feature_type, demand, pattern_id, demand_type, source
 						FROM inp_dscenario_demand WHERE dscenario_id = v_copyfrom;
-					ELSIF object_rec.table = 'controls' THEN
+					ELSIF object_rec.table IN ('controls', 'pump_additional', 'rules') THEN
 						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
 						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 						' ON CONFLICT ('||object_rec.pk||') DO NOTHING';
-						RAISE NOTICE 'v_querytext %', v_querytext;
 					ELSE
 						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
 						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 						' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
-						RAISE NOTICE 'v_querytext %', v_querytext;
 						EXECUTE v_querytext;
 					END IF;
 
