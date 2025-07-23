@@ -446,7 +446,6 @@ class GwLoadProject(QObject):
         self._enable_toolbar("basic")
         self._enable_toolbar("utilities")
         self._enable_toolbar("toc")
-        self._hide_button("308")
 
 
     def _create_toolbar(self, toolbar_id):
