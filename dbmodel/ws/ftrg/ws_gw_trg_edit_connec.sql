@@ -657,6 +657,7 @@ BEGIN
 		END IF;
 
 		-- UPDATE geom
+		UPDATE connec SET connec_length = NEW.connec_length WHERE connec_id = OLD.connec_id;
 		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='POINT'  THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
 
@@ -868,7 +869,7 @@ BEGIN
 			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode,
 			district_id =NEW.district_id, descript=NEW.descript, verified=NEW.verified, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
 			label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish,
-			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, updated_at=now(), updated_by=current_user,
+			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link, updated_at=now(), updated_by=current_user,
 			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
 			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority, access_type = NEW.access_type, placement_type = NEW.placement_type,

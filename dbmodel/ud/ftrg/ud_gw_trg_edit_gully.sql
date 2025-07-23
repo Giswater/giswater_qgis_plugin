@@ -664,6 +664,7 @@ BEGIN
 		END IF;
 
 		-- UPDATE geom
+		UPDATE gully SET connec_length = NEW.connec_length WHERE gully_id = OLD.gully_id;
 		IF st_equals(NEW.the_geom, OLD.the_geom)is false THEN
 			UPDATE gully SET the_geom=NEW.the_geom WHERE gully_id = OLD.gully_id;
 
@@ -899,7 +900,7 @@ BEGIN
 		IF v_matfromcat THEN
 			UPDATE gully
 			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gullycat_id=NEW.gullycat_id, units=NEW.units,
-			groove=NEW.groove, _connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
+			groove=NEW.groove, _connec_arccat_id=NEW.connec_arccat_id, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
 			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id,
 			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
@@ -915,7 +916,7 @@ BEGIN
 		ELSE
 			UPDATE gully
 			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gullycat_id=NEW.gullycat_id, units=NEW.units,
-			groove=NEW.groove, _connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
+			groove=NEW.groove, _connec_arccat_id=NEW.connec_arccat_id, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
 			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id,
 			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,

@@ -58,9 +58,9 @@ BEGIN
 			END IF;
 
 			IF (SELECT value::boolean FROM config_param_system WHERE parameter ='edit_link_autoupdate_connect_length') IS true AND NEW.uncertain IS FALSE THEN
-				UPDATE connec c SET connec_length = st_length(NEW.the_geom) WHERE c.connec_id = NEW.feature_id AND l.state > 0 AND link_id = NEW.link_id;
+				UPDATE connec c SET connec_length = st_length(NEW.the_geom) WHERE c.connec_id = NEW.feature_id;
 				IF v_projecttype = 'UD' THEN
-					UPDATE gully g SET connec_length = st_length(NEW.the_geom) WHERE g.gully_id = NEW.feature_id AND l.state > 0 AND link_id = NEW.link_id;
+					UPDATE gully g SET connec_length = st_length(NEW.the_geom) WHERE g.gully_id = NEW.feature_id;
 				END IF;
 			END IF;
 		END IF;
