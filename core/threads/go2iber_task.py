@@ -37,7 +37,7 @@ class GwGo2IberTask(GwTask):
         print("go2iber init 20")
         self.set_variables_from_go2iber()
         print("go2iber init 30")
-        self.drain_execute_model = importlib.import_module('.execute_model', package=f'{self.drain_folder}.core.threads')
+        self.ibergis_execute_model = importlib.import_module('.execute_model', package=f'{self.ibergis_folder}.core.threads')
         print("go2iber init 40")
 
     def initialize_variables(self):
@@ -56,7 +56,7 @@ class GwGo2IberTask(GwTask):
         self.dlg_go2iber = self.go2iber.dlg_go2iber
         self.result_name = self.go2iber.result_name
         self.folder_path = self.go2iber.folder_path
-        self.drain_folder = self.go2iber.drain_folder
+        self.ibergis_folder = self.go2iber.ibergis_folder
 
     def run(self):
 
@@ -82,18 +82,21 @@ class GwGo2IberTask(GwTask):
         self.go2epa_task.main_process()
         print("go2iber run 40")
 
-        # - Execute model with DRAIN plugin
-        # params = {
-        #     "folder_path": self.folder_path,
-        #     "do_generate_inp": False,
-        #     "do_export": True,
-        #     "do_run": True,
-        #     "do_import": True,
-        # }
-        # self.drain_execute_model = self.dr_execute_model.DrExecuteModel("Execute Drain Model", params)
-        # self.drain_execute_model.run()
+        # - Execute model with IBERGIS plugin
+        params = {
+            "dialog": self.dlg_go2iber,
+            "folder_path": self.folder_path,
+            "do_generate_inp": False,
+            "do_export": True,
+            "do_run": True,
+            "do_import": True,
+            "do_write_inlets": False,
+            "pinlet_layer": None,  # TODO: Generate pinlet layer from pgully
+        }
+        self.ibergis_execute_model = self.ig_execute_model.DrExecuteModel("Execute IberGIS Model", params)
+        self.ibergis_execute_model.run()
 
-        # - Import results to DRAIN mainly, but rpt to Giswater
+        # - Import results to IBERGIS mainly, but rpt to Giswater
 
         status = True
 

@@ -7,6 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 from functools import partial
+from typing import Optional
+from pathlib import Path
 
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QPoint
@@ -72,11 +74,10 @@ class GwEpaTools(GwAction):
             (cal_menu, ('ws'), tools_qt.tr('Static calibration'), None),
             (self.menu, ('ud', 'ws'), tools_qt.tr('Import INP file'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png"))
         ]
-        # Add Go2Iber action if drain plugin is available
-        if tools_qgis.is_plugin_active('drain'):
-            drain_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"), "DRAIN")
-            new_actions.append((drain_menu, ('ud'), tools_qt.tr('Add drain GPKG project'), None))
-            new_actions.append((drain_menu, ('ud'), tools_qt.tr('Go2IBER'), None))
+        # Add Go2Iber action if ibergis plugin is available
+        if tools_qgis.is_plugin_active('ibergis'):
+            ibergis_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"), "IberGIS")
+            new_actions.append((ibergis_menu, ('ud'), tools_qt.tr('Import IberGIS GPKG project'), None))
 
         for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:
@@ -129,14 +130,21 @@ class GwEpaTools(GwAction):
                 import_inp.clicked_event()
                 return
 
-        elif name == tools_qt.tr('Add drain GPKG project'):
-            print("add drain layer")
-
-        elif name == tools_qt.tr('Go2IBER'):
+        elif name == tools_qt.tr('Import IberGIS GPKG project'):
             go2iber = Go2Iber()
-            go2iber.clicked_event()
+            # Get file path from user
+            file_path: Optional[Path] = self._get_file()
+            if os.path.exists(file_path):
+                # Load project
+                import_result = go2iber.load_project(file_path)
+                if import_result:
+                    msg = "IBERGIS project imported successfully"
+                    tools_qgis.show_info(msg)
+                else:
+                    msg = "Error importing IBERGIS project"
+                    tools_qgis.show_warning(msg)
 
-    def _check_drain_project(self) -> bool:
+    def _check_ibergis_project(self) -> bool:
         gpkg_path = tools_qgis.get_project_variable('project_gpkg_path')
         if not gpkg_path or not os.path.exists(f"{QgsProject.instance().absolutePath()}{os.sep}{gpkg_path}"):
             return False
@@ -146,3 +154,17 @@ class GwEpaTools(GwAction):
                 return False
 
         return True
+
+    def _get_file(self) -> Optional[Path]:
+        """ Get the GPKG file path from the user. """
+        file_path = tools_qt.get_file(
+            "Select GPKG file", "", "GPKG files (*.gpkg)"
+        )
+
+        # Check if the file extension is .gpkg
+        if file_path and file_path.suffix == ".gpkg":
+            return file_path
+        else:
+            msg = "The file selected is not a GPKG file"
+            tools_qgis.show_warning(msg)
+            return
