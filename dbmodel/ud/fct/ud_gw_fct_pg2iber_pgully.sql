@@ -100,11 +100,15 @@ BEGIN
 		   FROM temp_t_pgully
 		     LEFT JOIN cat_gully ON cat_gully.id = temp_t_pgully.gullycat_id
 		)
-		SELECT jsonb_agg(features.feature)
+		SELECT 
+			jsonb_build_object(
+				''type'', ''FeatureCollection'',
+				''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+			)
 		FROM(
 			SELECT jsonb_build_object(
 			''type'', ''Feature'',
-			''geometry'', st_asgeojson(the_geom)::jsonb,
+			''geometry'', st_asgeojson(ST_ForcePolygonCCW(ST_Transform(the_geom, 4326)))::jsonb,
 			''properties'', to_jsonb(vi_t_pgully.*) - ''the_geom''
 			) AS feature from vi_t_pgully) features;' INTO v_result;
 
