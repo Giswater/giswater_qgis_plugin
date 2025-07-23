@@ -54,3 +54,5 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES (4320, 'The element is already linked to a node: %node_id%', 'Unlink the element from the node first', 1, true, 'utils', 'core', 'UI');
 
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_feature_element WHERE id IS NOT NULL' WHERE formname='cat_element' AND formtype='form_feature' AND columnname='elementtype_id' AND tabname='tab_none';
+
+UPDATE sys_table SET alias='Element feature catalog' WHERE id='v_edit_cat_feature_element';
