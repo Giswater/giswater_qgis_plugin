@@ -582,14 +582,12 @@ class GwLoadProject(QObject):
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("epa")
-            self._hide_button("72", False)
 
         elif project_role == 'role_master' or project_role == 'role_admin' or project_role == 'role_system':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("epa")
             self._enable_toolbar("plan")
-            self._hide_button("72", False)
 
     def _config_layers(self):
         """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """
