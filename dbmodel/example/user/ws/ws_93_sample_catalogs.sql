@@ -11,7 +11,7 @@ INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, activ
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FD', 'FD', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC', 'Fiberconcret', '{NODE,ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('CONCRET', 'Concret', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('CONCRETE', 'Concrete', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('BRICK+IRON', 'Brick and iron', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-HD', 'PE high density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-LD', 'PE low density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
@@ -58,9 +58,9 @@ INSERT INTO cat_dscenario VALUES (1, 'Hydrants_50%', NULL, NULL, 'DEMAND', true,
 INSERT INTO cat_element VALUES ('PROTECT-BAND', 'EPROTECT_BAND', 'PVC', '15cm', 'Protect band', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'protec_band.svg', true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('COVER', 'ECOVER', 'FD', '60 cm', 'Cover fd', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'cover_fd.svg', true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('COVER40X40', 'ECOVER', 'FD', '40x40 cm', 'Cover fd', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'cover_40x40.svg', true, NULL, NULL, NULL);
-INSERT INTO cat_element VALUES ('REGISTER40X40', 'ECOVER', 'CONCRET', '40x40 cm', 'Register concret 40x40', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_40x40.svg', true, NULL, NULL, NULL);
-INSERT INTO cat_element VALUES ('REGISTER60X60', 'ECOVER', 'CONCRET', '60x60 cm', 'Register concret 60x60', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_60x60.svg', true, NULL, NULL, NULL);
-INSERT INTO cat_element VALUES ('VREGISTER200X200', 'ECOVER', 'BRICK+IRON', '200x200 cm', 'Vertical register concret/Iron', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'v_register.svg', true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('REGISTER40X40', 'ECOVER', 'CONCRETE', '40x40 cm', 'Register concrete 40x40', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_40x40.svg', true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('REGISTER60X60', 'ECOVER', 'CONCRETE', '60x60 cm', 'Register concrete 60x60', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_60x60.svg', true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('VREGISTER200X200', 'ECOVER', 'BRICK+IRON', '200x200 cm', 'Vertical register concrete/Iron', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'v_register.svg', true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('HYDRANT_PLATE', 'EHYDRANT_PLATE', 'N/I', '50x60 cm', 'Generic hidrant plate', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'hdyrant_plate.svg', true, NULL, NULL, NULL);
 
 UPDATE cat_feature SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL_CONTR_VALVE' OR id = 'GEN_PURP_VALVE' OR id = 'PR_SUSTA.VALVE' OR id = 'PR_BREAK.VALVE'

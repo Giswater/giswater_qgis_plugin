@@ -8,7 +8,7 @@ or (at your option) any later version.
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, NULL, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Concret', 'Concret', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, 0.0140, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Concrete', 'Concrete', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, 0.0140, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Brick', 'Brick', '{NODE,ARC,CONNEC,GULLY,LINK}', NULL, 0.0140, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PEAD', 'PEAD', '{NODE,ARC,CONNEC,GULLY,LINK}', NULL, 0.0110, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PEC', 'PEC', '{ARC,CONNEC}', NULL, 0.0120, NULL, true);
@@ -52,11 +52,11 @@ INSERT INTO cat_brand_model VALUES ('model5', 'brand3', NULL, NULL, true, NULL);
 INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, NULL);
 
 INSERT INTO cat_connec VALUES ('PVC-CC025_D', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC040_I', 'CJOIN', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CON-CC040_I', 'CJOIN', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Concrete connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('PVC-CC025_T', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('PVC-CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC020_D', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CON-CC020_D', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Concrete connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_connec VALUES ('CON-CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Concrete connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('VIRTUAL', 'VCONNEC', NULL, 'VIRTUAL', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Virtual connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('CC025_D', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('CC040_I', 'CJOIN', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);

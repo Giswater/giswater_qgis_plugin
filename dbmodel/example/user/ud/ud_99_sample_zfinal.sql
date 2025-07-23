@@ -149,8 +149,8 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT muni_id as id, name as idva
 
 UPDATE config_form_fields SET hidden = true where columnname in ('apond') and formname like '%storage%';
 
-UPDATE arc SET y1 = 3, y2 = 3, matcat_id = 'Concret' WHERE arc_id = '100012';
-UPDATE arc SET y1 = 2.2, y2 = 3, matcat_id = 'Concret' WHERE arc_id = '100014';
+UPDATE arc SET y1 = 3, y2 = 3, matcat_id = 'Concrete' WHERE arc_id = '100012';
+UPDATE arc SET y1 = 2.2, y2 = 3, matcat_id = 'Concrete' WHERE arc_id = '100014';
 
 update cat_feature_node set isexitupperintro=2 where id in ('VIRTUAL_NODE', 'RECT_MANHOLE', 'CIRC_MANHOLE');
 

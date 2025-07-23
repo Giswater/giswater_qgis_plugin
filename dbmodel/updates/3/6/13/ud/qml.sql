@@ -1534,7 +1534,7 @@ INSERT INTO sys_style (layername, styleconfig_id, styletype, active, stylevalue)
       <Option name="map" type="Map">
        <Option value="" name="" type="QString"/>
        <Option value="Brick" name="Brick" type="QString"/>
-       <Option value="Concret" name="Concret" type="QString"/>
+       <Option value="Concrete" name="Concrete" type="QString"/>
        <Option value="PEAD" name="PEAD" type="QString"/>
        <Option value="PEC" name="PEC" type="QString"/>
        <Option value="PVC" name="PVC" type="QString"/>
