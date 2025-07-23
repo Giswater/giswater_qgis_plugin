@@ -11,7 +11,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
-from qgis.PyQt.QtWidgets import QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
+from qgis.PyQt.QtWidgets import QMenu, QPushButton, QTreeWidget, QTreeWidgetItem, QHeaderView
 from qgis.core import QgsApplication
 
 from .ui.ui_manager import GwLoadMenuUi
@@ -179,6 +179,10 @@ class GwMenuLoad(QObject):
         answer = tools_qt.show_question(msg, title)
         if not answer:
             return
+
+        # Resize columns
+        header = self.tree_config_files.header()
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_menu, dlg_name='load_menu', title="Advanced Menu")
