@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('om_waterbalance_dma_graph', ARRAY['node_id', 'dma_id'], 'Columns node_id and dma_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('om_waterbalance_dma_graph', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('om_waterbalance_dma_graph', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('om_waterbalance_dma_graph', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('om_waterbalance_dma_graph', 'flow_sign', 'smallint', 'Column flow_sign should be smallint');
 
@@ -46,4 +46,4 @@ SELECT col_not_null('om_waterbalance_dma_graph', 'dma_id', 'Column dma_id should
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

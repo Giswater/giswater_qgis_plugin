@@ -11,110 +11,71 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(6);
-
--- Create roles for testing
-CREATE USER plan_user;
-GRANT role_plan to plan_user;
-
-CREATE USER epa_user;
-GRANT role_epa to epa_user;
-
-CREATE USER edit_user;
-GRANT role_edit to edit_user;
-
-CREATE USER om_user;
-GRANT role_om to om_user;
-
-CREATE USER basic_user;
-GRANT role_basic to basic_user;
+SELECT plan(10);
 
 -- Extract and test the "status" field from the function's JSON response
 
-
+-- CPW
 SELECT is(
-    (gw_fct_waterbalance($${
-        "client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-        "form":{},
-        "feature":{},
-        "data":{"filterFields":{}, "pageInfo":{},
-        "parameters":{"exploitation":"1", "period":"5", "method":"DCW"},
-        "aux_params":null}
-    }$$)::JSON)->>'status',
+    (gw_fct_waterbalance($${"data":{"parameters":{"exploitation":"1", "period":"5", "method":"CPW"}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_waterbalance with exploitation 1, period 5 and method DCW returns status "Accepted"'
-);
-
-
-SELECT is(
-    (gw_fct_waterbalance($${
-        "client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-        "form":{},
-        "feature":{},
-        "data":{"filterFields":{}, "pageInfo":{},
-        "parameters":{"exploitation":"2", "period":"5", "method":"DCW"},
-        "aux_params":null}
-    }$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_waterbalance with exploitation 2, period 5 and method DCW returns status "Accepted"'
-);
-
-
-SELECT is(
-    (gw_fct_waterbalance($${
-        "client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-        "form":{},
-        "feature":{},
-        "data":{"filterFields":{}, "pageInfo":{},
-        "parameters":{"exploitation":"1", "period":"6", "method":"DCW"},
-        "aux_params":null}
-    }$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_waterbalance with exploitation 1, period 6 and method DCW returns status "Accepted"'
+    'Check if gw_fct_waterbalance with exploitation 1, period 5 and method CPW returns status "Accepted"'
 );
 
 SELECT is(
-    (gw_fct_waterbalance($${
-        "client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-        "form":{},
-        "feature":{},
-        "data":{"filterFields":{}, "pageInfo":{},
-        "parameters":{"exploitation":"2", "period":"6", "method":"DCW"},
-        "aux_params":null}
-    }$$)::JSON)->>'status',
+    (gw_fct_waterbalance($${"data":{"parameters":{"exploitation":"2", "period":"5", "method":"CPW"}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_waterbalance with exploitation 2, period 6 and method DCW returns status "Accepted"'
+    'Check if gw_fct_waterbalance with exploitation 2, period 5 and method CPW returns status "Accepted"'
 );
-
 
 SELECT is(
-    (gw_fct_waterbalance($${
-        "client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-        "form":{},
-        "feature":{},
-        "data":{"filterFields":{}, "pageInfo":{},
-        "parameters":{"exploitation":"1", "period":"7", "method":"DCW"},
-        "aux_params":null}
-    }$$)::JSON)->>'status',
+    (gw_fct_waterbalance($${"data":{"parameters":{"exploitation":"1", "period":"6", "method":"CPW"}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_waterbalance with exploitation 1, period 7 and method DCW returns status "Accepted"'
+    'Check if gw_fct_waterbalance with exploitation 1, period 6 and method CPW returns status "Accepted"'
 );
-
 
 SELECT is(
-    (gw_fct_waterbalance($${
-        "client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-        "form":{},
-        "feature":{},
-        "data":{"filterFields":{}, "pageInfo":{},
-        "parameters":{"exploitation":"2", "period":"7", "method":"DCW"},
-        "aux_params":null}
-    }$$)::JSON)->>'status',
+    (gw_fct_waterbalance($${"data":{"parameters":{"exploitation":"2", "period":"6", "method":"CPW"}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_waterbalance with exploitation 2, period 7 and method DCW returns status "Accepted"'
+    'Check if gw_fct_waterbalance with exploitation 2, period 6 and method CPW returns status "Accepted"'
 );
 
+SELECT is(
+    (gw_fct_waterbalance($${"data":{"parameters":{"exploitation":"1", "period":"7", "method":"CPW"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_waterbalance with exploitation 1, period 7 and method CPW returns status "Accepted"'
+);
 
+SELECT is(
+    (gw_fct_waterbalance($${"data":{"parameters":{"exploitation":"2", "period":"7", "method":"CPW"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_waterbalance with exploitation 2, period 7 and method CPW returns status "Accepted"'
+);
+
+-- CDI
+SELECT is(
+    (gw_fct_waterbalance($${ "data":{"parameters":{"exploitation":"1", "method":"CDI", "initDate":"2023/07/13", "endDate":"2025/07/03", "executeGraphDma":"false"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_waterbalance with exploitation 1, method CDI with initDate and endDate returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_waterbalance($${ "data":{"parameters":{"exploitation":"1", "method":"CDI", "initDate":"2023/07/13", "endDate":"2025/07/03", "executeGraphDma":"true"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_waterbalance with exploitation 1, method CDI with initDate and endDate and executeGraphDma returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_waterbalance($${ "data":{"parameters":{"exploitation":"2", "method":"CDI", "initDate":"2023/07/13", "endDate":"2025/07/03", "executeGraphDma":"false"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_waterbalance with exploitation 2, method CDI with initDate and endDate returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_waterbalance($${ "data":{"parameters":{"exploitation":"2", "method":"CDI", "initDate":"2023/07/13", "endDate":"2025/07/03", "executeGraphDma":"true"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_waterbalance with exploitation 2, method CDI with initDate and endDate and executeGraphDma returns status "Accepted"'
+);
 
 -- Finish the test
 SELECT finish();

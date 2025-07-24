@@ -29,13 +29,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc_add"
 DROP VIEW IF EXISTS v_edit_macrodma;
 DROP VIEW IF EXISTS v_ui_macrodma;
 ALTER TABLE macrodma DROP CONSTRAINT IF EXISTS macrodma_expl_id_fkey;
-ALTER TABLE macrodma ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id]; 
+ALTER TABLE macrodma ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
 
 -- Change expl_id type to INT4[] in macrodqa
 DROP VIEW IF EXISTS v_edit_macrodqa;
 DROP VIEW IF EXISTS v_ui_macrodqa;
 ALTER TABLE macrodqa DROP CONSTRAINT IF EXISTS macrodqa_expl_id_fkey;
-ALTER TABLE macrodqa ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id]; 
+ALTER TABLE macrodqa ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
 
 -- Change expl_id type to INT4[] in macroomzone
 DROP VIEW IF EXISTS v_edit_macroomzone;
@@ -43,3 +43,6 @@ DROP VIEW IF EXISTS v_ui_macroomzone;
 ALTER TABLE macroomzone DROP CONSTRAINT IF EXISTS macroomzone_expl_id_fkey;
 ALTER TABLE macroomzone ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
 */
+
+-- 24/07/2025
+ALTER TABLE om_waterbalance_dma_graph ALTER COLUMN node_id TYPE int4 USING node_id::int4;

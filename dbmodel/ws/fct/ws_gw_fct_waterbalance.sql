@@ -15,9 +15,7 @@ AS $function$
 EXAMPLE
 -------
 SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executeGraphDma":"false", "exploitation":1, "period":"5", "method":"CPW"}}}$$)::text;
-SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executeGraphDma":"false", "exploitation":1, "allPeriods":true, "method":"DCW"}}}$$)::text;
 CPW-CRM PERIOD
-DCW-DYNAMIC CENTROID
 
 CHECK
 -----
@@ -233,7 +231,7 @@ v_queryhydro =
 		END IF;
 
 
-		IF v_method in ('CPW', 'DCW') THEN -- time method: period_id
+		IF v_method = 'CPW' THEN -- time method: period_id
 			v_descript = 'Time method: period_id';
 			v_startdate = (SELECT start_date::date FROM ext_cat_period WHERE id = v_period);
 			v_enddate =  (SELECT end_date::date - 1 FROM ext_cat_period WHERE id = v_period);
@@ -547,14 +545,14 @@ v_queryhydro =
 		-- meters_in
 		EXECUTE '
 		UPDATE om_waterbalance w SET meters_in = meters FROM 
-		(SELECT string_agg (node_id, '', '') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = 1 group by dma_id) a
+		(SELECT string_agg (node_id::text, '', '') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = 1 group by dma_id) a
 		WHERE a.dma_id = w.dma_id AND w.startdate::date = '||quote_literal(v_startdate)||'::date 
 		and w.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 
 		-- meters_out
 		EXECUTE '
 		UPDATE om_waterbalance w SET meters_out = meters FROM 
-		(SELECT string_agg (node_id, '', '') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = -1 group by dma_id) a
+		(SELECT string_agg (node_id::text, '', '') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = -1 group by dma_id) a
 		WHERE a.dma_id = w.dma_id AND w.startdate::date = '||quote_literal(v_startdate)||'::date 
 		and w.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 
