@@ -450,3 +450,42 @@ UPDATE inp_typevalue SET typevalue='_inp_typevalue_gully_type' WHERE typevalue='
 
 UPDATE config_param_system SET value='{"sys_display_name":"concat(gully_id, '' : '', gullycat_id)","sys_tablename":"v_edit_gully","sys_pk":"gully_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}' WHERE "parameter"='basic_search_v2_tab_network_gully';
 UPDATE config_param_system SET value='{"sys_display_name":"concat(connec_id, '' : '', conneccat_id)","sys_tablename":"v_edit_connec","sys_pk":"connec_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}' WHERE "parameter"='basic_search_v2_tab_network_connec';
+
+-- 24/07/2025
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_raingage', 'tab_data', 'Data', 'Data', 'role_edit', NULL, '[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionHelp",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
+
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='rg_id' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='form_type' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='intvl' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='scf' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='rgage_type' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='timser_id' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='fname' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='sta' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='units' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+UPDATE config_form_fields SET tabname='tab_data' WHERE formname='v_edit_raingage' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+
+UPDATE config_info_layer SET formtemplate='info_feature' WHERE layer_id='v_edit_raingage';
+
