@@ -56,7 +56,7 @@ BEGIN
 
 			-- insert inp_dwf
 			INSERT INTO inp_dwf (dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4)
-			VALUES (rec_csv.csv1::integer, rec_csv.csv2, rec_csv.csv3::numeric, rec_csv.csv4, rec_csv.csv5, rec_csv.csv6, rec_csv.csv7);
+			VALUES (rec_csv.csv1::integer, rec_csv.csv2::integer, rec_csv.csv3::numeric, rec_csv.csv4, rec_csv.csv5, rec_csv.csv6, rec_csv.csv7);
 		END IF;
 	END LOOP;
 
