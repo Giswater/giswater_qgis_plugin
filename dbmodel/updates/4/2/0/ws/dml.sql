@@ -235,3 +235,80 @@ INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv
 -- 24/07/2025
 UPDATE sys_table SET alias='Catalog for elements' WHERE id='v_edit_cat_feature_element';
 UPDATE sys_table SET alias='Catalog of arc shapes'  WHERE id='cat_arc_shape';
+
+UPDATE config_toolbox SET inputparams='[
+  {
+    "widgetname": "exploitation",
+    "label": "Exploitation:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "isMandatory": true,
+    "tooltip": "Dscenario type",
+    "dvQueryText": "WITH aux AS (SELECT ''-9'' as id, ''ALL'' as idval, 0 AS rowid UNION SELECT expl_id::text as id, name as idval, row_number() over()+1 AS  rowid FROM exploitation where expl_id>0) SELECT id, idval FROM aux ORDER BY rowid ASC",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
+    "value": ""
+  },
+  {
+    "widgetname": "method",
+    "label": "Method:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "isMandatory": true,
+    "tooltip": "Water balance method",
+    "dvQueryText": "SELECT id, idval FROM om_typevalue WHERE typevalue = ''waterbalance_method''",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "value": ""
+  },
+  {
+    "widgetname": "period",
+    "label": "Period:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 4,
+    "dvQueryText": "SELECT id, code as idval FROM ext_cat_period ORDER BY id desc",
+    "selectedId": ""
+  },
+  {
+    "widgetname": "initDate",
+    "label": "Period (init date):",
+    "widgettype": "datetime",
+    "datatype": "text",
+    "isMandatory": true,
+    "tooltip": "Start date",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 5,
+    "value": null
+  },
+  {
+    "widgetname": "endDate",
+    "label": "Period (end date):",
+    "widgettype": "datetime",
+    "datatype": "text",
+    "isMandatory": true,
+    "tooltip": "End date",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 6,
+    "value": "9999-12-12"
+  },
+  {
+    "widgetname": "executeGraphDma",
+    "label": "Execute DMA:",
+    "widgettype": "check",
+    "datatype": "boolean",
+    "isMandatory": true,
+    "tooltip": "Execute DMA",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 7,
+    "value": ""
+  }
+]'::json
+WHERE id=3142;
+
+UPDATE sys_function SET descript='Function to calculate water balance according stardards of IWA. 
+You must select a period already created or manually select the date of the interval. One at a time. Before that:  
+1) tables ext_cat_period, ext_rtc_hydrometer_x_data, ext_rtc_scada_x_data need to be filled. 
+2) DMA graph need to be executed.  
+>End Date proposal for 1% of hydrometers which consum is out of the period: 2015-07-31 00:00:00' WHERE id=3142;
