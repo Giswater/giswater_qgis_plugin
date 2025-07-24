@@ -15,8 +15,8 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_getsearch($${"client":{"device": 5, "lang": "es_ES", "cur_user": "bgeo", "infoType": 1}, "form":{}, "feature":{}, "data":{"filterFields":{"searchText":{"filterSign":"", "value":""}}, "pageInfo":{}}}$$);
-SELECT SCHEMA_NAME.gw_fct_getsearch($${"client":{"device": 5, "lang": "es_ES", "cur_user": "bgeo", "infoType": 1}, "form":{}, "feature":{}, "data":{"filterFields":{"searchText":{"filterSign":"", "value":"calle"}}, "pageInfo":{}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getsearch($${"client":{"device": 5, "lang": "es_ES", "cur_user": "bgeo", "infoType": 1}, "form":{}, "feature":{}, "data":{"parameters":{"searchText":""}, "pageInfo":{}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getsearch($${"client":{"device": 5, "lang": "es_ES", "cur_user": "bgeo", "infoType": 1}, "form":{}, "feature":{}, "data":{"parameters":{"searchText":"calle"}}, "pageInfo":{}}}$$);
 
 */
 
