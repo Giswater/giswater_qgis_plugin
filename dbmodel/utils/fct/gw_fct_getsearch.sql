@@ -99,7 +99,7 @@ BEGIN
     -- get values from input
     v_addschema = (p_data ->>'data')::json->>'addSchema';
     v_singletab = (p_data ->>'form')::json->>'singleTab';
-   	v_filter = (((p_data ->>'data')::json->>'filterFields')::json->>'searchText')::json->>'value';
+	v_filter = ((p_data ->>'data')::json->>'parameters')::json->>'searchText';
     v_tiled = ((p_data ->>'client')::json->>'tiled')::boolean;
     v_device = ((p_data ->>'client')::json->>'device');
 	v_filter_poly = ((p_data ->>'data')::json->>'filterFields')::json->>'searchPoly';
