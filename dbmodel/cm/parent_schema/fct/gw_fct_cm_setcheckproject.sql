@@ -271,15 +271,18 @@ BEGIN
 		LOOP
 			v_feature_cat_id_col := v_feature_type_iterator || 'cat_id';
 
-			-- Get distinct subtypes for the feature type in the lot, and clean the name
+			-- Get distinct subtypes for the feature type in the lot
 			v_querytext := format(
-				'SELECT DISTINCT lower(regexp_replace(T2.%s, ''_[0-9]+$'', '''')) AS subtype
+				'SELECT DISTINCT lower(T3.%s_type) AS subtype
 				 FROM cm.om_campaign_lot_x_%s T1
 				 JOIN PARENT_SCHEMA.%s T2 ON T1.%s_id::text = T2.%s_id::text
+				 JOIN PARENT_SCHEMA.cat_%s T3 ON T2.%s = T3.id
 				 WHERE T1.lot_id = %s AND T2.%s IS NOT NULL',
-				 v_feature_cat_id_col,
+				 v_feature_type_iterator,
 				 v_feature_type_iterator,
 				 v_feature_type_iterator, v_feature_type_iterator, v_feature_type_iterator,
+				 v_feature_type_iterator,
+				 v_feature_cat_id_col,
 				 v_lot_id,
 				 v_feature_cat_id_col
 			);
@@ -318,7 +321,8 @@ BEGIN
 						v_querytext := format(
 							'UPDATE cm.om_campaign_lot_x_%1$s T1 SET %2$I = %3$s
 							 FROM PARENT_SCHEMA.%1$s T2
-							 WHERE T1.%1$s_id::text = T2.%1$s_id::text AND T1.lot_id = %4$s AND lower(regexp_replace(T2.%5$I, ''_[0-9]+$'', '''')) = %6$L',
+							 JOIN PARENT_SCHEMA.cat_%1$s T3 ON T2.%5$I = T3.id
+							 WHERE T1.%1$s_id::text = T2.%1$s_id::text AND T1.lot_id = %4$s AND lower(T3.%1$s_type) = %6$L',
 							v_feature_type_iterator, v_qindex_column, COALESCE(v_update_calculation, '0'),
 							v_lot_id, v_feature_cat_id_col, v_rec_subtype.subtype
 						);
@@ -347,15 +351,18 @@ BEGIN
 		LOOP
 			v_feature_cat_id_col := v_feature_type_iterator || 'cat_id';
 
-			-- Get distinct subtypes for the feature type in the campaign, and clean the name
+			-- Get distinct subtypes for the feature type in the campaign
 			v_querytext := format(
-				'SELECT DISTINCT lower(regexp_replace(T2.%s, ''_[0-9]+$'', '''')) AS subtype
+				'SELECT DISTINCT lower(T3.%s_type) AS subtype
 				 FROM cm.om_campaign_x_%s T1
 				 JOIN PARENT_SCHEMA.%s T2 ON T1.%s_id::text = T2.%s_id::text
+				 JOIN PARENT_SCHEMA.cat_%s T3 ON T2.%s = T3.id
 				 WHERE T1.campaign_id = %s AND T2.%s IS NOT NULL',
-				 v_feature_cat_id_col,
+				 v_feature_type_iterator,
 				 v_feature_type_iterator,
 				 v_feature_type_iterator, v_feature_type_iterator, v_feature_type_iterator,
+				 v_feature_type_iterator,
+				 v_feature_cat_id_col,
 				 v_campaign_id,
 				 v_feature_cat_id_col
 			);
@@ -394,7 +401,8 @@ BEGIN
 						v_querytext := format(
 							'UPDATE cm.om_campaign_x_%1$s T1 SET %2$I = %3$s
 							 FROM PARENT_SCHEMA.%1$s T2
-							 WHERE T1.%1$s_id::text = T2.%1$s_id::text AND T1.campaign_id = %4$s AND lower(regexp_replace(T2.%5$I, ''_[0-9]+$'', '''')) = %6$L',
+							 JOIN PARENT_SCHEMA.cat_%1$s T3 ON T2.%5$I = T3.id
+							 WHERE T1.%1$s_id::text = T2.%1$s_id::text AND T1.campaign_id = %4$s AND lower(T3.%1$s_type) = %6$L',
 							v_feature_type_iterator, v_qindex_column, COALESCE(v_update_calculation, '0'),
 							v_campaign_id, v_feature_cat_id_col, v_rec_subtype.subtype
 						);
