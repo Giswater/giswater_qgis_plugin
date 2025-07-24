@@ -134,6 +134,8 @@ class GwEpaTools(GwAction):
             go2iber = Go2Iber()
             # Get file path from user
             file_path: Optional[Path] = self._get_file()
+            if not file_path:
+                return
             if os.path.exists(file_path):
                 # Load project
                 import_result = go2iber.load_project(file_path)

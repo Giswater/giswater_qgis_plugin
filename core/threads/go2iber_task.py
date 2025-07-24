@@ -83,7 +83,7 @@ class GwGo2IberTask(GwTask):
         self.go2epa_task.go2epa_import_result = False
         self.go2epa_task.result_name = self.result_name
         self.go2epa_task.file_inp = self.folder_path + os.sep + "Iber_SWMM.inp"
-        self.go2epa_task.file_rpt = self.folder_path + os.sep + "Iber_SWMM.rpt"  # TODO: Check if this is necessary
+        self.go2epa_task.file_rpt = self.folder_path + os.sep + "Iber_SWMM.rpt"
         print("go2iber run 30")
         # Create folders path
         os.makedirs(self.folder_path, exist_ok=True)
@@ -108,10 +108,14 @@ class GwGo2IberTask(GwTask):
         # Show tab log
         tools_gw.set_tabs_enabled(self.dlg_go2iber)
         self.dlg_go2iber.mainTab.setCurrentIndex(1)
-
         self.ig_execute_model.run()
 
         # - Import results to IBERGIS mainly, but rpt to Giswater
+        # import rpt to Giswater
+        self.go2epa_task.go2epa_export_inp = False
+        self.go2epa_task.go2epa_execute_epa = False
+        self.go2epa_task.go2epa_import_result = True
+        self.go2epa_task.main_process()
 
         status = True
 
