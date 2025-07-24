@@ -490,7 +490,7 @@ class GwMincut:
 
         tools_gw.init_docker('qgis_form_docker')
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_mincut, 'mincut')
+            tools_gw.docker_dialog(self.dlg_mincut, 'mincut', 'mincut')
         else:
             tools_gw.open_dialog(self.dlg_mincut, 'mincut')
 

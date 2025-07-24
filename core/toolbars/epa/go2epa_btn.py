@@ -148,7 +148,7 @@ class GwGo2EpaButton(GwAction):
         self._set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         self.check_result_id()
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_go2epa, dlg_name='go2epa')
+            tools_gw.docker_dialog(self.dlg_go2epa, dlg_name='go2epa', title='go2epa')
             self.dlg_go2epa.btn_close.clicked.disconnect()
             self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
         else:
@@ -345,12 +345,12 @@ class GwGo2EpaButton(GwAction):
         # Open form
         if lib_vars.session_vars['dialog_docker']:
             # Set signals when have docker form
-            dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa, dlg_name='selector'))
+            dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa, dlg_name='selector', title='selector'))
             dlg_selector.btn_close.clicked.connect(partial(self._manage_form_settings, 'restore'))
             # Save widgets settings from go2epa form
             self._manage_form_settings('save')
             # Open form
-            tools_gw.docker_dialog(dlg_selector, dlg_name='selector')
+            tools_gw.docker_dialog(dlg_selector, dlg_name='selector', title='selector')
         else:
             # Set signals when have not docker form
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))

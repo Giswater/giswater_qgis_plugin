@@ -1246,11 +1246,11 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
         try:
             if hasattr(dialog, 'btn_cancel'):
                 dialog.btn_cancel.disconnect()
-                dialog.btn_cancel.setText("Close")
+                dialog.btn_cancel.setText(tools_qt.tr("Close"))
                 dialog.btn_cancel.clicked.connect(lambda: dialog.close())
             if hasattr(dialog, 'btn_close'):
                 dialog.btn_close.disconnect()
-                dialog.btn_close.setText("Close")
+                dialog.btn_close.setText(tools_qt.tr("Close"))
                 dialog.btn_close.clicked.connect(lambda: dialog.close())
         except AttributeError:
             # Control if btn_cancel exist
@@ -3760,10 +3760,11 @@ def docker_dialog(dialog, dlg_name=None, title=None):
         global_vars.iface.addDockWidget(positions[lib_vars.session_vars['dialog_docker'].position],
                                         lib_vars.session_vars['dialog_docker'])
 
-        if title:
-            lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
         if dlg_name:
             tools_qt._translate_form(dlg_name, dialog)
+        if title:
+            lib_vars.session_vars['dialog_docker'].setWindowTitle(tools_qt.tr(f'dlg_{title}', context_name=dlg_name))
+        
     except RuntimeError as e:
         msg = "{0}: {1}"
         msg_params = (type(e).__name__, e,)

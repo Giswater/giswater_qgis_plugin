@@ -147,7 +147,7 @@ class GwProfileButton(GwAction):
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_draw_profile, dlg_name='profile')
+            tools_gw.docker_dialog(self.dlg_draw_profile, dlg_name='profile', title='profile')
         else:
             tools_gw.open_dialog(self.dlg_draw_profile, dlg_name='profile')
 

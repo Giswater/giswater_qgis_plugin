@@ -232,7 +232,7 @@ class GwFileTransferButton(GwAction):
         else:
             if result['status'] == "Accepted":
                 tools_gw.fill_tab_log(dialog, result['body']['data'], close=False)
-                self.dlg_csv.btn_cancel.setText("Close")
+                self.dlg_csv.btn_cancel.setText(tools_qt.tr("Close"))
             message = result.get('message')
             if message:
                 msg = message.get('text')
