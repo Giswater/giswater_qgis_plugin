@@ -7,10 +7,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import importlib
+import json
 
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QTextEdit
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsVectorLayer
 
 from .epa_file_manager import GwEpaFileManager
 from ..utils import tools_gw
@@ -77,7 +78,7 @@ class GwGo2IberTask(GwTask):
         print("go2iber run 20")
         # TODO:
         # - Generate INP file with Giswater (go2iber)
-        self.go2epa_task = GwEpaFileManager("Go2Epa", self.dlg_go2iber)
+        self.go2epa_task = GwEpaFileManager("Go2Epa", self.dlg_go2iber, network_mode=2)
         self.go2epa_task.go2epa_export_inp = True
         self.go2epa_task.go2epa_execute_epa = False
         self.go2epa_task.go2epa_import_result = False
@@ -90,6 +91,13 @@ class GwGo2IberTask(GwTask):
         self.go2epa_task.main_process()
         print("go2iber run 40")
 
+        pgully_geojson = tools_gw.execute_procedure('gw_fct_pg2iber_pgully')
+        geojson_str: str = json.dumps(pgully_geojson['body']['data']['result'])
+        if geojson_str:
+            pgully_layer: QgsVectorLayer = QgsVectorLayer(geojson_str, 'pgully', 'ogr')
+        else:
+            pgully_layer = None
+
         # - Execute model with IBERGIS plugin
         params = {
             "dialog": self.dlg_go2iber,
@@ -99,7 +107,7 @@ class GwGo2IberTask(GwTask):
             "do_run": True,
             "do_import": True,
             "do_write_inlets": False,
-            "pinlet_layer": None,  # TODO: Generate pinlet layer from pgully
+            "pinlet_layer": pgully_layer,  # TODO: Generate pinlet layer from pgully
         }
         self.ig_feedback = self.ig_feedback_class.Feedback()
         self.ig_execute_model = self.ig_execute_model.DrExecuteModel("Execute IberGIS Model", params, self.ig_feedback)

@@ -24,7 +24,7 @@ class GwEpaFileManager(GwTask):
     fake_progress = pyqtSignal()
     step_completed = pyqtSignal(dict, str)
 
-    def __init__(self, description, go2epa, timer=None):
+    def __init__(self, description, go2epa, timer=None, network_mode=None):
 
         super().__init__(description)
         self.go2epa = go2epa
@@ -33,6 +33,7 @@ class GwEpaFileManager(GwTask):
         self.fid = 140
         self.function_name = None
         self.timer = timer
+        self.network_mode = network_mode
         self.initialize_variables()
         self.set_variables_from_go2epa()
 
@@ -315,11 +316,11 @@ class GwEpaFileManager(GwTask):
         sql = f"UPDATE rpt_cat_result SET inp_file = {psycopg2.Binary(file_binary)} WHERE result_id = '{self.result_name}';"
         tools_db.execute_sql(sql, log_sql=True)
 
-        networkmode = tools_gw.get_config_value('inp_options_networkmode')
-        if global_vars.project_type == 'ud' and networkmode and networkmode[0] == "2":
+        networkmode = self.network_mode
+        if global_vars.project_type == 'ud' and networkmode and networkmode == 2:
 
             # Replace extension .inp
-            aditional_path = folder_path.replace('.inp', '.dat')
+            aditional_path = folder_path.replace('.inp', '_inlet_info.dat')
             aditional_file = open(aditional_path, "w", errors='replace')
             read = True
             save_file = False

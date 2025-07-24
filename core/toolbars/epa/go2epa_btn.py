@@ -454,7 +454,7 @@ class GwGo2EpaButton(GwAction):
 
         # Set background task 'Go2Epa'
         description = "Go2Epa"
-        self.go2epa_task = GwEpaFileManager(description, self, timer=self.timer)
+        self.go2epa_task = GwEpaFileManager(description, self, timer=self.timer, network_mode=1)
         self.go2epa_task.step_completed.connect(self.step_completed)
         QgsApplication.taskManager().addTask(self.go2epa_task)
         QgsApplication.taskManager().triggerTask(self.go2epa_task)
