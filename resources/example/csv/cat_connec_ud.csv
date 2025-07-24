@@ -1,10 +1,10 @@
 id,matcat_id,shape,geom1,geom2,geom3,geom4,geom_r,descript,link,brand,model,svg,active,label,connec_type
 PVC-CC025_D,,CIRCULAR,0.2500,0.0000,0.0000,0.0000,,PVC connec,,,,,true,,CONNEC
-CON-CC040_I,,CIRCULAR,0.4000,0.0000,0.0000,0.0000,,Concret connec,,,,,true,,CONNEC
+CON-CC040_I,,CIRCULAR,0.4000,0.0000,0.0000,0.0000,,Concrete connec,,,,,true,,CONNEC
 PVC-CC025_T,,CIRCULAR,0.2500,0.0000,0.0000,0.0000,,PVC connec,,,,,true,,CONNEC
 PVC-CC030_D,,CIRCULAR,0.3000,0.0000,0.0000,0.0000,,PVC connec,,,,,true,,CONNEC
-CON-CC020_D,,CIRCULAR,0.2000,0.0000,0.0000,0.0000,,Concret connec,,,,,true,,CONNEC
-CON-CC030_D,,CIRCULAR,0.3000,0.0000,0.0000,0.0000,,Concret connec,,,,,true,,CONNEC
+CON-CC020_D,,CIRCULAR,0.2000,0.0000,0.0000,0.0000,,Concrete connec,,,,,true,,CONNEC
+CON-CC030_D,,CIRCULAR,0.3000,0.0000,0.0000,0.0000,,Concrete connec,,,,,true,,CONNEC
 VIRTUAL,,VIRTUAL,0.3000,0.0000,0.0000,0.0000,,Virtual connec,,,,,true,,VCONNEC
 CC025_D,,CIRCULAR,0.2500,0.0000,0.0000,0.0000,,Connec,,,,,true,,CONNEC
 CC040_I,,CIRCULAR,0.4000,0.0000,0.0000,0.0000,,Connec,,,,,true,,CONNEC
