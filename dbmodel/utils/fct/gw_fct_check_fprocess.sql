@@ -81,7 +81,7 @@ BEGIN
 
 	-- get text variables according to singular/plural values
 	IF v_count = 1 THEN
-		v_text_aux = 'There is ';
+		v_text_aux = concat((SELECT fprocess_name FROM sys_fprocess WHERE fid = -1), ' ');
 		v_process_except_msg =
 		concat(
 			substring(split_part(v_process_except_msg, ' ', 1) FROM 1 FOR length(split_part(v_process_except_msg, ' ', 1)) - 1),
@@ -89,7 +89,7 @@ BEGIN
 			substring(v_process_except_msg FROM length(split_part(v_process_except_msg, ' ', 1)) + 2)
 		);
 	ELSIF v_count > 1 THEN
-		v_text_aux = 'There are ';
+		v_text_aux = concat((SELECT fprocess_name FROM sys_fprocess WHERE fid = -2), ' ');
 	END IF;
 
 	-- manage result (audit_check_data)

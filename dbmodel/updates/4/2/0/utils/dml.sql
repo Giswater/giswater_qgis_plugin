@@ -56,3 +56,7 @@ VALUES (4320, 'The element is already linked to a node: %node_id%', 'Unlink the 
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_feature_element WHERE id IS NOT NULL' WHERE formname='cat_element' AND formtype='form_feature' AND columnname='elementtype_id' AND tabname='tab_none';
 
 UPDATE sys_table SET alias='Element feature catalog' WHERE id='v_edit_cat_feature_element';
+
+-- 23/07/2025
+INSERT INTO sys_fprocess (fid, fprocess_name) VALUES (-1, 'There is');
+INSERT INTO sys_fprocess (fid, fprocess_name) VALUES (-2, 'There are');
