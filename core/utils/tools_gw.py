@@ -3115,7 +3115,7 @@ def load_tableview_feature_end(class_object, dialog, table_object, feature_type,
         feature_idname = f"{feature_type}_id"
 
     if feature_type == 'element':
-        table_relation = f"v_ui_element"
+        table_relation = "v_ui_element"
     else:
         table_relation = f"v_edit_{feature_type}"
     widget_name = f"tbl_{table_object}_x_{feature_type}"
