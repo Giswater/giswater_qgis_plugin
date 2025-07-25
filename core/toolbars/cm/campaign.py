@@ -812,8 +812,7 @@ class Campaign:
         """Load campaign data into the campaign management table"""
         if not hasattr(self.manager_dialog, "tbl_campaign"):
             return
-        query = "SELECT * FROM cm.v_ui_campaign ORDER BY campaign_id DESC"
-        self.populate_tableview(self.manager_dialog.tbl_campaign, query)
+        self.filter_campaigns()
 
     def manage_date_filter(self):
         """Update date filters based on selected field (e.g., real_startdate)"""
@@ -846,6 +845,23 @@ class Campaign:
 
         filters = []
 
+        # Directly query the cm schema to get user's role and organization
+        username = tools_db.get_current_user()
+        sql = f"""
+            SELECT t.role_id, t.organization_id
+            FROM cm.cat_user u
+            JOIN cm.cat_team t ON u.team_id = t.team_id
+            WHERE u.loginname = '{username}'
+        """
+        user_info = tools_db.get_row(sql)
+
+        if user_info:
+            role = user_info[0]
+            org_id = user_info[1]
+            if role not in ('role_cm_admin'):
+                if org_id is not None:
+                    filters.append(f"organization_id = {org_id}")
+
         # State
         status_row = self.manager_dialog.campaign_cmb_state.currentData()
         if status_row and status_row[0]:
@@ -853,33 +869,29 @@ class Campaign:
 
         # Date
         date_type = tools_qt.get_combo_value(self.manager_dialog, self.manager_dialog.campaign_cmb_date_filter_type, 0)
-        if not date_type:
-            msg = "Select a valid date column to filter."
-            tools_qgis.show_warning(msg, dialog=self.manager_dialog)
-            return
+        if date_type and date_type != -1:
+            # Range of dates
+            date_from = self.manager_dialog.date_event_from.date()
+            date_to = self.manager_dialog.date_event_to.date()
 
-        # Range of dates
-        date_from = self.manager_dialog.date_event_from.date()
-        date_to = self.manager_dialog.date_event_to.date()
+            # Auto-correct date range
+            if date_from > date_to:
+                self.manager_dialog.date_event_to.setDate(date_from)
+                date_to = date_from  # Update variable too
 
-        # Auto-correct date range
-        if date_from > date_to:
-            self.manager_dialog.date_event_to.setDate(date_from)
-            date_to = date_from  # Update variable too
+            date_format_low = self.campaign_date_format + ' 00:00:00'
+            date_format_high = self.campaign_date_format + ' 23:59:59'
 
-        date_format_low = self.campaign_date_format + ' 00:00:00'
-        date_format_high = self.campaign_date_format + ' 23:59:59'
+            interval = f"'{date_from.toString(date_format_low)}' AND '{date_to.toString(date_format_high)}'"
+            date_filter = f"({date_type} BETWEEN {interval}"
 
-        interval = f"'{date_from.toString(date_format_low)}' AND '{date_to.toString(date_format_high)}'"
-        date_filter = f"({date_type} BETWEEN {interval}"
+            # Show null
+            if self.manager_dialog.campaign_chk_show_nulls.isChecked():
+                date_filter += f" OR {date_type} IS NULL)"
+            else:
+                date_filter += ")"
 
-        # Show null
-        if self.manager_dialog.campaign_chk_show_nulls.isChecked():
-            date_filter += f" OR {date_type} IS NULL)"
-        else:
-            date_filter += ")"
-
-        filters.append(date_filter)
+            filters.append(date_filter)
 
         # Build SQL
         where_clause = " AND ".join(filters)

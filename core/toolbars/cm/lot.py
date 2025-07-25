@@ -743,8 +743,8 @@ class AddNewLot:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_lot_man.cmb_estat, rows, index_to_show=1, add_empty=True)
 
-        self.load_lots_into_manager()
         self.init_filters()
+        self.load_lots_into_manager()
 
         self.dlg_lot_man.btn_cancel.clicked.connect(self.dlg_lot_man.reject)
         self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
@@ -761,20 +761,36 @@ class AddNewLot:
 
     def load_lots_into_manager(self):
         """Load campaign data into the campaign management table"""
-
         if not hasattr(self.dlg_lot_man, "tbl_lots"):
             return
-        query = "SELECT * FROM cm.v_ui_campaign_lot ORDER BY lot_id DESC"
-        self.populate_tableview(self.dlg_lot_man.tbl_lots, query)
+        self.filter_lot()
 
     def init_filters(self):
         current_date = QDate.currentDate()
-        sql = 'SELECT MIN(startdate), MAX(startdate) FROM cm.om_campaign_lot'
+        
+        where_clause = ""
+        username = tools_db.get_current_user()
+        sql = f"""
+            SELECT t.role_id, t.organization_id
+            FROM cm.cat_user u
+            JOIN cm.cat_team t ON u.team_id = t.team_id
+            WHERE u.loginname = '{username}'
+        """
+        user_info = tools_db.get_row(sql)
+
+        if user_info:
+            role = user_info[0]
+            org_id = user_info[1]
+            if role not in ('role_cm_admin'):
+                if org_id is not None:
+                    where_clause = f" WHERE campaign_id IN (SELECT campaign_id FROM cm.om_campaign WHERE organization_id = {org_id})"
+
+        sql = f'SELECT MIN(startdate), MAX(startdate) FROM cm.om_campaign_lot{where_clause}'
         row = tools_db.get_rows(sql)
 
-        if row and row[0]:
-            self.dlg_lot_man.date_event_from.setDate(row[0][0] or current_date)
-            self.dlg_lot_man.date_event_to.setDate(row[0][1] or current_date)
+        if row and row[0] and row[0][0] is not None:
+            self.dlg_lot_man.date_event_from.setDate(row[0][0])
+            self.dlg_lot_man.date_event_to.setDate(row[0][1])
         else:
             self.dlg_lot_man.date_event_from.setDate(current_date)
             self.dlg_lot_man.date_event_to.setDate(current_date)
@@ -783,30 +799,45 @@ class AddNewLot:
         """Filter lot records based on date range and date type."""
         filters = []
 
+        # Directly query the cm schema to get user's role and organization
+        username = tools_db.get_current_user()
+        sql = f"""
+            SELECT t.role_id, t.organization_id
+            FROM cm.cat_user u
+            JOIN cm.cat_team t ON u.team_id = t.team_id
+            WHERE u.loginname = '{username}'
+        """
+        user_info = tools_db.get_row(sql)
+
+        if user_info:
+            role = user_info[0]
+            org_id = user_info[1]
+            if role not in ('role_cm_admin'):
+                if org_id is not None:
+                    filters.append(f"campaign_id IN (SELECT campaign_id FROM cm.om_campaign WHERE organization_id = {org_id})")
+
         # get value to now column filter (startdate, enddate, real_startdate, real_enddate)
         date_type = tools_qt.get_combo_value(self.dlg_lot_man, self.dlg_lot_man.cmb_date_filter_type, 0)
-        if not date_type:
-            return
+        if date_type and date_type != -1:
+            # get dates
+            date_from = self.dlg_lot_man.date_event_from.date()
+            date_to = self.dlg_lot_man.date_event_to.date()
 
-        # get dates
-        date_from = self.dlg_lot_man.date_event_from.date()
-        date_to = self.dlg_lot_man.date_event_to.date()
+            # start date end date logic
+            if date_from > date_to:
+                self.dlg_lot_man.date_event_to.setDate(date_from)
+                date_to = date_from
 
-        # start date end date logic
-        if date_from > date_to:
-            self.dlg_lot_man.date_event_to.setDate(date_from)
-            date_to = date_from
+            interval = f"'{date_from.toString('yyyy-MM-dd')} 00:00:00' AND '{date_to.toString('yyyy-MM-dd')} 23:59:59'"
+            date_filter = f"({date_type} BETWEEN {interval}"
 
-        interval = f"'{date_from.toString('yyyy-MM-dd')} 00:00:00' AND '{date_to.toString('yyyy-MM-dd')} 23:59:59'"
-        date_filter = f"({date_type} BETWEEN {interval}"
+            # show nulls if checked
+            if hasattr(self.dlg_lot_man, "chk_show_nulls") and self.dlg_lot_man.chk_show_nulls.isChecked():
+                date_filter += f" OR {date_type} IS NULL)"
+            else:
+                date_filter += ")"
 
-        # show nulls if checked
-        if hasattr(self.dlg_lot_man, "chk_show_nulls") and self.dlg_lot_man.chk_show_nulls.isChecked():
-            date_filter += f" OR {date_type} IS NULL)"
-        else:
-            date_filter += ")"
-
-        filters.append(date_filter)
+            filters.append(date_filter)
 
         # filter by name logic
         name_value = self.dlg_lot_man.txt_lot_name.text().strip()
