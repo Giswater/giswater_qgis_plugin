@@ -11,7 +11,7 @@ import json
 
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QTextEdit
-from qgis.core import QgsApplication, QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from .epa_file_manager import GwEpaFileManager
 from ..utils import tools_gw
