@@ -123,8 +123,6 @@ class GwFeatureEndButton(GwAction):
             partial(tools_gw.select_with_expression_dialog, self, self.dlg_work_end, self.table_object, None))
 
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self._fill_workids))
-        self.dlg_work_end.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers))
 
         self.dlg_work_end.tbl_cat_work_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                      self.dlg_work_end.tbl_cat_work_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
@@ -138,6 +136,8 @@ class GwFeatureEndButton(GwAction):
                                                                          self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_work_end.tbl_cat_work_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
+        self.dlg_work_end.tab_feature.currentChanged.connect(
+            partial(lambda: setattr(self, 'rel_feature_type', tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers))))
 
         tools_gw.disable_tab_log(self.dlg_work_end)
 
@@ -152,7 +152,6 @@ class GwFeatureEndButton(GwAction):
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
-        tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end')
