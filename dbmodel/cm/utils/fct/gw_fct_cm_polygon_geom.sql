@@ -50,17 +50,22 @@ BEGIN
         SELECT Find_SRID('cm', 'om_campaign_lot', 'the_geom') INTO v_target_srid;
 
 		v_sql := 'WITH polygon AS (SELECT st_collect(f.the_geom) g FROM (' ||
-            'SELECT c.the_geom FROM cm.om_campaign_x_arc c JOIN cm.om_campaign_lot_x_arc l ON c.arc_id = l.arc_id' ||
+            'SELECT c.the_geom FROM cm.om_campaign_x_arc c JOIN cm.om_campaign_lot_x_arc l ON c.arc_id = l.arc_id 
+			WHERE l.lot_id=' ||p_campaign_lot_id||
             ' UNION ' ||
-            'SELECT c.the_geom FROM cm.om_campaign_x_node c JOIN cm.om_campaign_lot_x_node l ON c.node_id = l.node_id' ||
+            'SELECT c.the_geom FROM cm.om_campaign_x_node c JOIN cm.om_campaign_lot_x_node l ON c.node_id = l.node_id
+			WHERE l.lot_id=' ||p_campaign_lot_id||
             ' UNION ' ||
-            'SELECT c.the_geom FROM cm.om_campaign_x_connec c JOIN cm.om_campaign_lot_x_connec l ON c.connec_id = l.connec_id' ||
+            'SELECT c.the_geom FROM cm.om_campaign_x_connec c JOIN cm.om_campaign_lot_x_connec l ON c.connec_id = l.connec_id
+			WHERE l.lot_id=' ||p_campaign_lot_id||
             ' UNION ' ||
-            'SELECT c.the_geom FROM cm.om_campaign_x_link c JOIN cm.om_campaign_lot_x_link l ON c.link_id = l.link_id';
+            'SELECT c.the_geom FROM cm.om_campaign_x_link c JOIN cm.om_campaign_lot_x_link l ON c.link_id = l.link_id
+			WHERE l.lot_id=' ||p_campaign_lot_id||'';
 
         IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'cm' AND table_name = 'om_campaign_lot_x_gully') THEN
             v_sql := v_sql || ' UNION ' ||
-                'SELECT c.the_geom FROM cm.om_campaign_x_gully c JOIN cm.om_campaign_lot_x_gully l ON c.gully_id = l.gully_id';
+                'SELECT c.the_geom FROM cm.om_campaign_x_gully c JOIN cm.om_campaign_lot_x_gully l ON c.gully_id = l.gully_id
+				WHERE l.lot_id=' ||p_campaign_lot_id||'';
         END IF;
 
         v_sql := v_sql || ') f) ' ||
