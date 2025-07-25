@@ -61,7 +61,7 @@ class AddNewLot:
         self.lot_id_value = None
         self.ids = []
         self.rb_list = []
-        self.feature_type = 'arc'
+        self.rel_feature_type = 'arc'
         self.signal_selectionChanged = False
         self.cmb_position = 17
         self.srid = lib_vars.data_epsg
@@ -373,8 +373,8 @@ class AddNewLot:
         return creation_func() if creation_func else None
 
     def _on_tab_feature_changed(self):
-        # Update self.feature_type just like in Campaign
-        self.feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
+        # Update self.rel_feature_type just like in Campaign
+        self.rel_feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
 
     def get_allowed_features_for_lot(self, lot_id: int, feature: str) -> List[Any]:
         """Only be able to make the relations to the features id that come from campaign """

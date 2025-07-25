@@ -528,7 +528,7 @@ class Campaign:
 
     def setup_tab_relations(self):
         # self.dialog.tab_relations.setCurrentIndex(0)
-        self.feature_type = tools_gw.get_signal_change_tab(self.dialog)
+        self.rel_feature_type = tools_gw.get_signal_change_tab(self.dialog)
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         table_object = "campaign_inventory" if self.campaign_type == 3 else "campaign"
         tools_gw.get_signal_change_tab(self.dialog)
@@ -578,7 +578,7 @@ class Campaign:
         )
 
         self.dialog.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dialog, table_object,
+            partial(tools_gw.select_with_expression_dialog, self, self.dialog, "campaign",
                     selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN),
         )
         self.dialog.btn_expr_select.clicked.connect(
@@ -586,7 +586,7 @@ class Campaign:
         )
 
     def _on_tab_feature_changed(self):
-        self.feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
+        self.rel_feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
 
     def get_widget_by_columnname(self, dialog: QDialog, columnname: str) -> Optional[QWidget]:
         for widget in dialog.findChildren(QWidget):
