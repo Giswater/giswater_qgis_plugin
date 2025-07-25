@@ -55,7 +55,7 @@ class GwFeatureEndButton(GwAction):
         self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        self.rel_layers['element'] = [tools_qgis.get_layer_by_tablename('v_edit_element')]
+        self.rel_layers['element'] = [tools_qgis.get_layer_by_tablename('v_ui_element')]
         self.rel_layers['link'] = [tools_qgis.get_layer_by_tablename('v_edit_link')]
 
         self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
@@ -102,7 +102,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "ve_frelem", "ve_genelem", "v_edit_gully", "v_edit_link"]
         self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -133,7 +133,7 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.tbl_cat_work_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                        self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                         self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 10))
+                                                                         self.dlg_work_end.tbl_cat_work_x_element, "v_ui_element", "element_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_work_end.tbl_cat_work_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
         self.dlg_work_end.tab_feature.currentChanged.connect(
@@ -147,7 +147,10 @@ class GwFeatureEndButton(GwAction):
         # Adding auto-completion to a QLineEdit for default feature
         if self.rel_feature_type is None:
             self.rel_feature_type = "arc"
-        viewname = f"v_edit_{self.rel_feature_type}"
+        if self.rel_feature_type == 'element':
+            viewname = f"v_ui_element"
+        else:
+            viewname = f"v_edit_{self.rel_feature_type}"
         tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.rel_feature_type + "_id"))
 
         # Set default tab 'arc'

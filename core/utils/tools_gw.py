@@ -558,7 +558,7 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
+    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "ve_frelem", "ve_genelem", "v_edit_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("v_edit_gully")
 
@@ -3114,7 +3114,10 @@ def load_tableview_feature_end(class_object, dialog, table_object, feature_type,
     if feature_idname is None:
         feature_idname = f"{feature_type}_id"
 
-    table_relation = f"v_edit_{feature_type}"
+    if feature_type == 'element':
+        table_relation = f"v_ui_element"
+    else:
+        table_relation = f"v_edit_{feature_type}"
     widget_name = f"tbl_{table_object}_x_{feature_type}"
 
     exists = tools_db.check_table(table_relation)
@@ -3125,14 +3128,6 @@ def load_tableview_feature_end(class_object, dialog, table_object, feature_type,
         return
 
     if expr_filter is None:
-        sql = (f"SELECT {feature_type}_id "
-            f"FROM {table_relation} "
-            f"WHERE {feature_idname} = '{feature_id}'")
-        rows = tools_db.get_rows(sql, log_info=False)
-        if rows:
-            for row in rows:
-                class_object.rel_list_ids[feature_type].append(str(row[0]))
-                class_object.rel_ids.append(str(row[0]))
         expr_filter = get_expression_filter(feature_type, class_object.rel_list_ids, class_object.rel_layers)
 
     table_name = f"{class_object.schema_name}.{feature_type}"
@@ -3714,7 +3709,7 @@ def remove_selection(remove_groups=True, layers=None):
     :return: Dictionary of layers with removed selection
     """
 
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
+    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "ve_frelem", "ve_genelem", "v_edit_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("v_edit_gully")
 
@@ -4417,7 +4412,7 @@ def get_parent_layers_visibility():
     """
 
     layers_visibility = {}
-    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]:
+    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "ve_frelem", "ve_genelem", "v_edit_gully", "v_edit_link"]:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer:
             layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
