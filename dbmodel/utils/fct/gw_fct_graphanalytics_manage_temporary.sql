@@ -388,7 +388,6 @@ BEGIN
                         a.initoverflowpath,
                         a.expl_id,
                         a.sector_id,
-                        a.drainzone_id,
                         a.dwfzone_id,
                         a.omzone_id,
                         a.fluid_type,
@@ -429,7 +428,6 @@ BEGIN
                     cf.graph_delimiter,
                     node.expl_id,
                     node.sector_id,
-                    node.drainzone_id,
                     node.dwfzone_id,
                     node.omzone_id,
                     node.fluid_type,
@@ -478,7 +476,6 @@ BEGIN
                         connec.arc_id,
                         connec.expl_id,
                         connec.sector_id,
-                        connec.drainzone_id,
                         connec.dwfzone_id,
                         connec.omzone_id,
                         connec.fluid_type,
@@ -530,7 +527,6 @@ BEGIN
                         gully.arc_id,
                         gully.expl_id,
                         gully.sector_id,
-                        gully.drainzone_id,
                         gully.dwfzone_id,
                         gully.omzone_id,
                         gully.fluid_type,
@@ -583,12 +579,10 @@ BEGIN
                         l.feature_type,
                         l.expl_id,
                         l.sector_id,
-                        l.drainzone_id,
                         l.dwfzone_id,
                         l.omzone_id,
                         l.fluid_type,
                         l.muni_id,
-                        l.minsector_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -637,12 +631,10 @@ BEGIN
                         l.feature_type,
                         l.expl_id,
                         l.sector_id,
-                        l.drainzone_id,
                         l.dwfzone_id,
                         l.omzone_id,
                         l.fluid_type,
                         l.muni_id,
-                        l.minsector_id,
                         l.the_geom
                     FROM link_selector
                     JOIN link l USING (link_id)
@@ -750,7 +742,6 @@ BEGIN
                     a.initoverflowpath,
                     a.expl_id,
                     a.sector_id,
-                    a.drainzone_id,
                     a.dwfzone_id,
                     a.omzone_id,
                     a.fluid_type,
@@ -769,7 +760,6 @@ BEGIN
                     cf.graph_delimiter,
                     n.expl_id,
                     n.sector_id,
-                    n.drainzone_id,
                     n.dwfzone_id,
                     n.omzone_id,
                     n.fluid_type,
@@ -788,7 +778,6 @@ BEGIN
                     c.arc_id,
                     c.expl_id,
                     c.sector_id,
-                    c.drainzone_id,
                     c.dwfzone_id,
                     c.omzone_id,
                     c.fluid_type,
@@ -808,7 +797,6 @@ BEGIN
                     g.arc_id,
                     g.expl_id,
                     g.sector_id,
-                    g.drainzone_id,
                     g.dwfzone_id,
                     g.omzone_id,
                     g.fluid_type,
@@ -827,12 +815,10 @@ BEGIN
                     l.feature_type,
                     l.expl_id,
                     l.sector_id,
-                    l.drainzone_id,
                     l.dwfzone_id,
                     l.omzone_id,
                     l.fluid_type,
                     l.muni_id,
-                    l.minsector_id,
                     l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
@@ -849,12 +835,10 @@ BEGIN
                     l.feature_type,
                     l.expl_id,
                     l.sector_id,
-                    l.drainzone_id,
                     l.dwfzone_id,
                     l.omzone_id,
                     l.fluid_type,
                     l.muni_id,
-                    l.minsector_id,
                     l.the_geom
                 FROM link l
                 JOIN gully g ON l.feature_id = g.gully_id
