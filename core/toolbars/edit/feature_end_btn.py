@@ -148,7 +148,7 @@ class GwFeatureEndButton(GwAction):
         if self.rel_feature_type is None:
             self.rel_feature_type = "arc"
         if self.rel_feature_type == 'element':
-            viewname = f"v_ui_element"
+            viewname = "v_ui_element"
         else:
             viewname = f"v_edit_{self.rel_feature_type}"
         tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.rel_feature_type + "_id"))
