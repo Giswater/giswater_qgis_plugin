@@ -152,7 +152,8 @@ class GwFeatureEndButton(GwAction):
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
-
+        tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers)
+        
         # Open dialog
         tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end')
 
