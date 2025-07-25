@@ -70,6 +70,7 @@ v_code_prefix text;
 v_gully_id text;
 v_childtable_name text;
 v_schemaname text;
+v_featureclass text;
 
 BEGIN
 
@@ -392,7 +393,7 @@ BEGIN
 		END IF;
 
 		-- Code
-		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix
+		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix', feature_class INTO v_code_autofill_bool, v_featurecat, v_code_prefix, v_featureclass
 		FROM cat_feature WHERE id=NEW.gully_type;
 
 		IF v_featurecat IS NOT NULL THEN
@@ -556,7 +557,7 @@ BEGIN
 					INTO v_the_geom_pol;
 
 				INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id )
-				VALUES ('GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
+				VALUES (v_featureclass, v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 			END IF;
 		END IF;
 
@@ -884,7 +885,7 @@ BEGIN
 
 					IF (SELECT pol_id FROM polygon WHERE feature_id = NEW.gully_id) IS NULL THEN
 						INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id )
-						VALUES ('GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
+						VALUES (v_featureclass, v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 					ELSE
 						UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id =NEW.gully_id;
 					END IF;

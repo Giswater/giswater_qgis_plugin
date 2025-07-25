@@ -42,6 +42,7 @@ v_code_prefix text;
 v_connec_id text;
 v_childtable_name text;
 v_schemaname text;
+v_featureclass text;
 
 BEGIN
 
@@ -354,7 +355,7 @@ BEGIN
 		END IF;
 
 		-- Code
-		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix
+		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix', feature_class INTO v_code_autofill_bool, v_featurecat, v_code_prefix, v_featureclass
 		FROM cat_feature WHERE id=NEW.connec_type;
 
 		IF v_featurecat IS NOT NULL THEN
@@ -502,7 +503,7 @@ BEGIN
 		-- set and get id for polygon
 		IF (v_doublegeometry IS TRUE) THEN
 			INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id )
-			VALUES ('CONNEC', (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_doublegeom_buffer)))
+			VALUES (v_featureclass, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_doublegeom_buffer)))
 			from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
 		END IF;
 
