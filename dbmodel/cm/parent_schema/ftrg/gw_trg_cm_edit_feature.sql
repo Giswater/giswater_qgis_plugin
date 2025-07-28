@@ -28,6 +28,7 @@ v_search_schema TEXT;
 v_update_where TEXT;
 v_num_pkeys integer;
 v_json_data JSON;
+v_feature TEXT := TG_ARGV[0];
 
 BEGIN
 
@@ -46,12 +47,16 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 		IF NEW.id is null THEN
-			NEW.id = (SELECT nextval('om_campaign_lot_x_node_id_seq'));
+			EXECUTE 'SELECT nextval(''om_campaign_lot_x_'||v_feature||'_id_seq'')'
+			INTO NEW.id;
 		END IF;
 
-        -- enhance needed to manage any feature not only node
-		IF NEW.node_id is null THEN
-			NEW.node_id = (SELECT nextval('cm_urn_id_seq'));
+		IF v_feature = 'node' THEN
+		    NEW.node_id := nextval('cm_urn_id_seq');
+		ELSIF v_feature = 'arc' THEN
+		    NEW.arc_id := nextval('cm_urn_id_seq');
+		ELSIF v_feature = 'connec' THEN
+		    NEW.connec_id := nextval('cm_urn_id_seq');
 		END IF;
 
 		IF NEW.expl_id is null THEN
