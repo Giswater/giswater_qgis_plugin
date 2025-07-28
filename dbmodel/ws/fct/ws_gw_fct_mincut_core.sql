@@ -156,17 +156,9 @@ BEGIN
         AND n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
         );
 
-    -- STEP 2 flood with DIRECT cost/reverse_cost (without considering the cost of the checkvalves)
+    -- STEP 2 flood with DIRECT cost/reverse_cost without considering the checkvalves (using pgr_drivingdistance with UNDIRECTED GRAPH, a check valve is an open valve)
     IF cardinality(v_pgr_root_vids) >0 THEN
 
-        -- save cost/reverse_cost fot checkvalves using the fields cost_mincut/reverse_cost/mincut
-        UPDATE temp_pgr_arc
-        SET cost_mincut = "cost", reverse_cost_mincut = reverse_cost,
-        "cost" = 0, reverse_cost = 0
-        WHERE graph_delimiter = 'MINSECTOR'
-        AND "cost" <> reverse_cost;
-
-        -- query pgr_drivingdistance
         v_query_text='SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, 
                 cost, reverse_cost
                 FROM temp_pgr_arc a 
@@ -175,7 +167,7 @@ BEGIN
                 ';
         TRUNCATE temp_pgr_drivingdistance;
         INSERT INTO temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
-        (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
+        (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance, directed => false)
         );
 
         -- border valves that have on the other side a water source
@@ -203,7 +195,7 @@ BEGIN
         JOIN temp_pgr_arc a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
         WHERE a.graph_delimiter ='MINSECTOR'
         AND d.edge <> -1
-        AND a.cost_mincut <> a.reverse_cost_mincut;
+        AND a.cost <> a.reverse_cost;
 
         -- close the valves (not the border checkvalves) for the zones with water and without checkvalves
         UPDATE temp_pgr_arc a SET proposed = TRUE
@@ -233,13 +225,6 @@ BEGIN
         ) d
         WHERE d.node IN  (a.pgr_node_1, a.pgr_node_2)
         AND a.mapzone_id = 0;
-
-         -- recover cost/reverse_cost for checkvalves with the correct values saved in cost_mincut/reverse_cost_mincut
-        UPDATE temp_pgr_arc
-        SET "cost" = cost_mincut, reverse_cost = reverse_cost_mincut,
-        cost_mincut = 0, reverse_cost_mincut = 0
-        WHERE graph_delimiter = 'MINSECTOR'
-        AND cost_mincut <> reverse_cost_mincut;
 
         SELECT COALESCE(array_agg(start_vid), ARRAY[]::int[])
         INTO v_pgr_root_vids_chk_water
