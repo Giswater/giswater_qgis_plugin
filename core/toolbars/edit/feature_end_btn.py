@@ -56,7 +56,7 @@ class GwFeatureEndButton(GwAction):
         self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.rel_layers['element'] = [tools_qgis.get_layer_by_tablename('v_ui_element')]
-        self.rel_layers['link'] = [tools_qgis.get_layer_by_tablename('v_edit_link')]
+        self.rel_layers['link'] = [tools_qgis.get_layer_by_tablename('ve_link')]
 
         self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
 
@@ -102,7 +102,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "ve_frelem", "ve_genelem", "v_edit_gully", "v_edit_link"]
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_gully", "ve_link"]
         self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -125,17 +125,17 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self._fill_workids))
 
         self.dlg_work_end.tbl_cat_work_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                     self.dlg_work_end.tbl_cat_work_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+                                                                     self.dlg_work_end.tbl_cat_work_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
         self.dlg_work_end.tbl_cat_work_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                      self.dlg_work_end.tbl_cat_work_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+                                                                      self.dlg_work_end.tbl_cat_work_x_node, "ve_node", "node_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                        self.dlg_work_end.tbl_cat_work_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+                                                                        self.dlg_work_end.tbl_cat_work_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                       self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+                                                                       self.dlg_work_end.tbl_cat_work_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_work_end.tbl_cat_work_x_element, "v_ui_element", "element_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                         self.dlg_work_end.tbl_cat_work_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
+                                                                         self.dlg_work_end.tbl_cat_work_x_link, "ve_link", "link_id", self.rubber_band, 10))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(lambda: setattr(self, 'rel_feature_type', tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers))))
 
@@ -150,13 +150,13 @@ class GwFeatureEndButton(GwAction):
         if self.rel_feature_type == 'element':
             viewname = "v_ui_element"
         else:
-            viewname = f"v_edit_{self.rel_feature_type}"
+            viewname = f"ve_{self.rel_feature_type}"
         tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.rel_feature_type + "_id"))
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
         tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers)
-        
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end')
 
@@ -292,11 +292,11 @@ class GwFeatureEndButton(GwAction):
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self._open_selected_object, self.tbl_arc_x_relations))
             self.tbl_arc_x_relations.clicked.connect(
-                partial(tools_qgis.highlight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_connec', 'connec_id',
+                partial(tools_qgis.highlight_feature_by_id, self.tbl_arc_x_relations, 've_connec', 'connec_id',
                         self.rubber_band, 10, table_field='feature_id'))
             if str(self.project_type) == 'ud':
                 self.tbl_arc_x_relations.clicked.connect(
-                    partial(tools_qgis.highlight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_gully', 'gully_id',
+                    partial(tools_qgis.highlight_feature_by_id, self.tbl_arc_x_relations, 've_gully', 'gully_id',
                             self.rubber_band, 10, table_field='feature_id'))
 
             tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
@@ -392,13 +392,13 @@ class GwFeatureEndButton(GwAction):
 
         # Get sys_feature_cat.id from cat_feature.id
         sql = (f"SELECT sys_type"
-               f" FROM v_edit_arc"
+               f" FROM ve_arc"
                f" WHERE arc_id = '{arc_id}'")
         row = tools_db.get_row(sql)
         if not row:
             return
 
-        arc_table = "v_edit_arc"
+        arc_table = "ve_arc"
         layer_arc = tools_qgis.get_layer_by_tablename(arc_table)
 
         aux = "\"arc_id\" = "

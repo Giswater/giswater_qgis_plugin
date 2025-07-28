@@ -54,7 +54,7 @@ class GwLoadProject(QObject):
             return
 
         # Get SRID from table node
-        lib_vars.data_epsg = tools_db.get_srid('v_edit_node', lib_vars.schema_name)
+        lib_vars.data_epsg = tools_db.get_srid('ve_node', lib_vars.schema_name)
 
         # Manage schema name
         tools_db.get_current_user()
@@ -100,7 +100,7 @@ class GwLoadProject(QObject):
             msg = "Selected schema not found"
             tools_qgis.show_warning(msg, parameter=lib_vars.schema_name)
 
-        # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
+        # Check that there are no layers (ve_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
         if status is False:
             return
@@ -253,18 +253,18 @@ class GwLoadProject(QObject):
     def _check_project(self, show_warning):
         """ Check if loaded project is valid for Giswater """
 
-        # Check if table 'v_edit_node' is loaded
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-        layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+        # Check if table 've_node' is loaded
+        self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
+        layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
         if (self.layer_node, layer_arc) == (None, None):  # If no gw layers are present
             return False
 
         # Check missing layers
         missing_layers = {}
         if self.layer_node is None:
-            missing_layers['v_edit_node'] = True
+            missing_layers['ve_node'] = True
         if layer_arc is None:
-            missing_layers['v_edit_arc'] = True
+            missing_layers['ve_arc'] = True
 
         # Show message if layers are missing
         if missing_layers:
@@ -279,7 +279,7 @@ class GwLoadProject(QObject):
 
     def _check_project_type(self):
         """ Check if loaded project is valid for Giswater """
-        # Check if table 'v_edit_node' is loaded
+        # Check if table 've_node' is loaded
         if global_vars.project_type not in ('ws', 'ud'):
             return False
 
@@ -326,9 +326,9 @@ class GwLoadProject(QObject):
         repeated_layers = {}
         for layer in layers:
             layer_toc_name = tools_qgis.get_layer_source_table_name(layer)
-            if layer_toc_name == 'v_edit_node':
+            if layer_toc_name == 've_node':
                 layer_source = tools_qgis.get_layer_source(layer)
-                repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
+                repeated_layers[layer_source['schema'].replace('"', '')] = 've_node'
 
         if len(repeated_layers) > 1:
             if lib_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
@@ -337,7 +337,7 @@ class GwLoadProject(QObject):
                       "If you are looking to manage two schemas, it is mandatory to define which is the master and "
                       "which isn't. To do this, you need to configure the QGIS project setting this project's "
                       "variables: {1} and {2}.")
-                msg_params = ("v_edit_node", "gwMainSchema", "gwAddSchema")
+                msg_params = ("ve_node", "gwMainSchema", "gwAddSchema")
                 tools_qt.show_info_box(msg, msg_params=msg_params)
                 return False
 
@@ -546,10 +546,10 @@ class GwLoadProject(QObject):
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """
 
-        tools_qgis.manage_snapping_layer('v_edit_arc', snapping_type=2)
-        tools_qgis.manage_snapping_layer('v_edit_connec', snapping_type=0)
-        tools_qgis.manage_snapping_layer('v_edit_node', snapping_type=0)
-        tools_qgis.manage_snapping_layer('v_edit_gully', snapping_type=0)
+        tools_qgis.manage_snapping_layer('ve_arc', snapping_type=2)
+        tools_qgis.manage_snapping_layer('ve_connec', snapping_type=0)
+        tools_qgis.manage_snapping_layer('ve_node', snapping_type=0)
+        tools_qgis.manage_snapping_layer('ve_gully', snapping_type=0)
 
     def _check_user_roles(self):
         """ Check user roles and show/hide toolbars """

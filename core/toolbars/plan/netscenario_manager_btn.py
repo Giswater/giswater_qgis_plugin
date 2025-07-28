@@ -33,8 +33,8 @@ class GwNetscenarioManagerButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = 'node'
         self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'dma_id', 'presszone_id']
-        self.filter_dict = {"plan_netscenario_arc": {"filter_table": "v_edit_arc", "feature_type": "arc"},
-                            "plan_netscenario_node": {"filter_table": "v_edit_node", "feature_type": "node"},
+        self.filter_dict = {"plan_netscenario_arc": {"filter_table": "ve_arc", "feature_type": "arc"},
+                            "plan_netscenario_node": {"filter_table": "ve_node", "feature_type": "node"},
                             "plan_netscenario_connec": {"filter_table": "v_edit_inp_connec", "feature_type": "connec"},
                             "v_edit_plan_netscenario_dma": {"filter_table": "v_edit_dma", "feature_type": "dma"},
                             "v_edit_plan_netscenario_presszone": {"filter_table": "v_edit_presszone", "feature_type": "presszone"},
@@ -950,7 +950,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Set active layer
         view_name = self.dlg_netscenario.main_tab.currentWidget().objectName()
-        layer_name = 'v_edit_' + self.feature_type
+        layer_name = 've_' + self.feature_type
         if self.feature_type == 'nodarc':
             layer_name = view_name.replace("netscenario_", "")
         layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -1018,7 +1018,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Get current layer and feature type
         self._manage_feature_type()
         view_name = self.dlg_netscenario.main_tab.currentWidget().objectName()
-        layer_name = 'v_edit_' + self.feature_type
+        layer_name = 've_' + self.feature_type
         if self.feature_type == 'nodarc':
             layer_name = view_name.replace("netscenario_", "")
 

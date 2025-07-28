@@ -124,8 +124,8 @@ class Campaign:
             self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
         self.excluded_layers = [
-            "v_edit_arc", "v_edit_node", "v_edit_connec",
-            "v_edit_gully", "v_edit_link"
+            "ve_arc", "ve_node", "ve_connec",
+            "ve_gully", "ve_link"
         ]
 
         modes = {"review": 1, "visit": 2, "inventory": 3}
@@ -193,7 +193,7 @@ class Campaign:
             widget = self.create_widget_from_field(field, response)
             if not widget:
                 continue
-            
+
             # Block signals on the controlling widget to prevent premature updates
             if field.get("columnname") == "organization_id":
                 widget.blockSignals(True)
@@ -206,7 +206,7 @@ class Campaign:
 
             if "columnname" in field:
                 widget.setProperty("columnname", field["columnname"])
-            
+
             if "widgetname" in field:
                 widget.setObjectName(field["widgetname"])
 
@@ -217,8 +217,8 @@ class Campaign:
         organization_widget = self.get_widget_by_columnname(self.dialog, "organization_id")
         if organization_widget:
             update_expl_sector_combos(
-                dialog=self.dialog, 
-                widget=organization_widget, 
+                dialog=self.dialog,
+                widget=organization_widget,
                 saved_values=saved_dependent_values
             )
             organization_widget.blockSignals(False)
@@ -259,23 +259,23 @@ class Campaign:
 
         self.setup_tab_relations()
         self._check_enable_tab_relations()
-        
+
         # For inventory campaigns, enable all tabs from the start
         if self.campaign_type == 3:
             self._manage_tabs_enabled([])  # Pass empty list, the method will handle inventory case
-        
+
         self._update_feature_completer(self.dialog)
 
         self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                               self.dialog.tbl_campaign_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+                                                               self.dialog.tbl_campaign_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
         self.dialog.tbl_campaign_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                self.dialog.tbl_campaign_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+                                                                self.dialog.tbl_campaign_x_node, "ve_node", "node_id", self.rubber_band, 10))
         self.dialog.tbl_campaign_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                  self.dialog.tbl_campaign_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+                                                                  self.dialog.tbl_campaign_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
         self.dialog.tbl_campaign_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dialog.tbl_campaign_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+                                                                 self.dialog.tbl_campaign_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
         self.dialog.tbl_campaign_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dialog.tbl_campaign_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
+                                                                 self.dialog.tbl_campaign_x_link, "ve_link", "link_id", self.rubber_band, 10))
 
         for table_name in [
             "tbl_campaign_x_arc",
@@ -432,7 +432,7 @@ class Campaign:
         extras = f'"fields":{{{fields_str}}}, "campaign_type":{self.campaign_type}'
         if inventory_class_id:
             extras += f', "inventoryclass_id":{inventory_class_id}'
-        
+
         body = tools_gw.create_body(feature='"tableName":"om_campaign", "idName":"campaign_id"', extras=extras)
 
         # Check mandatory fields
@@ -518,7 +518,7 @@ class Campaign:
                     # For combo boxes, the value might be a list; we take the first element (the ID)
                     if isinstance(value, (list, tuple)) and value:
                         value = value[0]
-                    
+
                     fields[colname] = f'"{value}"' if config['quote'] else str(value)
 
         if as_dict:
@@ -544,7 +544,7 @@ class Campaign:
         for name, config in highlight_config.items():
             tbl = getattr(self.dialog, f"tbl_campaign_x_{name}", None)
             if tbl:
-                layer = f"v_edit_{name}"
+                layer = f"ve_{name}"
                 id_column = f"{name}_id"
                 size = config["size"]
                 tbl.clicked.connect(
@@ -619,6 +619,7 @@ class Campaign:
             # For inventory campaigns, allow all feature types - no restrictions
             return
 
+
         if not allowed_types:
             return
 
@@ -627,7 +628,7 @@ class Campaign:
         sql = f"""
             SELECT p.{id_column}::text
             FROM {self.schema_parent}.{feature} p
-            JOIN {self.schema_parent}.cat_{feature} c 
+            JOIN {self.schema_parent}.cat_{feature} c
                 ON p.{feature}cat_id = c.id
             WHERE c.{feature}_type IN ({allowed_types_str})
             LIMIT 100
@@ -763,7 +764,7 @@ class Campaign:
         """ Enable or disable relation tabs depending on allowed feature types (e.g., ['node', 'arc']). """
 
         tab_widget = self.dialog.tab_feature
-        
+
         # For inventory campaigns (type 3), enable all tabs
         if self.campaign_type == 3:
             for i in range(tab_widget.count()):
@@ -823,10 +824,10 @@ class Campaign:
             return
 
         sql = f"""
-            SELECT 
-                MIN({field})::date AS min_date, 
-                MAX({field})::date AS max_date 
-            FROM cm.om_campaign 
+            SELECT
+                MIN({field})::date AS min_date,
+                MAX({field})::date AS max_date
+            FROM cm.om_campaign
             WHERE {field} IS NOT NULL
         """
         result = tools_db.get_row(sql)
@@ -983,7 +984,7 @@ def update_expl_sector_combos(**kwargs: Any):
         # Get data from the currently selected item in the parent combo
         current_index = parent_widget.currentIndex()
         current_data = parent_widget.itemData(current_index) if current_index != -1 else None
-        
+
         organization_id = None
         if current_data and isinstance(current_data, list) and len(current_data) > 0:
             organization_id = current_data[0]
@@ -1000,17 +1001,17 @@ def update_expl_sector_combos(**kwargs: Any):
                 sector_ids = org_data_row.get('sector_id')
 
         schema = lib_vars.schema_name
-        
+
         # --- Update exploitation combo ---
         if expl_widget:
             sql_expl = f"SELECT expl_id, name FROM {schema}.exploitation"
             if expl_ids is not None:
                 if expl_ids:
                     sql_expl += f" WHERE expl_id = ANY(ARRAY{expl_ids})"
-                else: 
+                else:
                     sql_expl += " WHERE 1=0"
             sql_expl += " ORDER BY name"
-            
+
             rows_expl = tools_db.get_rows(sql_expl)
             tools_qt.fill_combo_values(expl_widget, rows_expl, add_empty=True)
 
@@ -1027,7 +1028,7 @@ def update_expl_sector_combos(**kwargs: Any):
             if sector_ids is not None:
                 if sector_ids:
                     sql_sector += f" WHERE sector_id = ANY(ARRAY{sector_ids})"
-                else: 
+                else:
                     sql_sector += " WHERE 1=0"
             sql_sector += " ORDER BY name"
 

@@ -300,7 +300,7 @@ class GwPsector:
         self.excluded_layers = ['v_edit_element']
 
         # Set signals
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "v_edit_element", "ve_gully",
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_plan_psector.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -2183,7 +2183,7 @@ class GwPsector:
         self.canvas.setMapTool(self.emit_point)
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()
-        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
 
         # Vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -2308,7 +2308,7 @@ class GwPsector:
         self.canvas.setMapTool(self.emit_point)
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()
-        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
 
         # Vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -2452,7 +2452,7 @@ class GwPsector:
         self.canvas.setMapTool(self.emit_point)
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
 
         # Vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -2729,10 +2729,10 @@ class GwPsector:
             return
 
         mapping_dict = {
-            "v_edit_node": ("node_id", self.qtbl_node),
-            "v_edit_arc": ("arc_id", self.qtbl_arc),
-            "v_edit_connec": ("connec_id", self.qtbl_connec),
-            "v_edit_gully": ("gully_id", self.qtbl_gully),
+            "ve_node": ("node_id", self.qtbl_node),
+            "ve_arc": ("arc_id", self.qtbl_arc),
+            "ve_connec": ("connec_id", self.qtbl_connec),
+            "ve_gully": ("gully_id", self.qtbl_gully),
         }
         idname, tableview = mapping_dict[tablename]
         if layer.selectedFeatureCount() > 0:
@@ -2865,10 +2865,10 @@ class GwPsector:
         """
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
         tableview_map = {
-            0: (self.qtbl_arc, "v_edit_arc", "arc_id"),
-            1: (self.qtbl_node, "v_edit_node", "node_id"),
-            2: (self.qtbl_connec, "v_edit_connec", "connec_id"),
-            3: (self.qtbl_gully, "v_edit_gully", "gully_id"),
+            0: (self.qtbl_arc, "ve_arc", "arc_id"),
+            1: (self.qtbl_node, "ve_node", "node_id"),
+            2: (self.qtbl_connec, "ve_connec", "connec_id"),
+            3: (self.qtbl_gully, "ve_gully", "gully_id"),
         }
         tableview, tablename, idname = tableview_map.get(tab_idx, (None, None, None))
         if (tableview, tablename, idname) == (None, None, None):
@@ -2893,10 +2893,10 @@ class GwPsector:
         Manage the selection changed signals for the tableview based on the feature type
         """
         tableview_map = {
-            GwFeatureTypes.ARC: (self.qtbl_arc, "v_edit_arc", "arc_id", "arc", "arc_id", self.rubber_band_line, 5),
-            GwFeatureTypes.NODE: (self.qtbl_node, "v_edit_node", "node_id", "node", "node_id", self.rubber_band_point, 10),
-            GwFeatureTypes.CONNEC: (self.qtbl_connec, "v_edit_connec", "connec_id", "connec", "connec_id", self.rubber_band_point, 10),
-            GwFeatureTypes.GULLY: (self.qtbl_gully, "v_edit_gully", "gully_id", "gully", "gully_id", self.rubber_band_point, 10),
+            GwFeatureTypes.ARC: (self.qtbl_arc, "ve_arc", "arc_id", "arc", "arc_id", self.rubber_band_line, 5),
+            GwFeatureTypes.NODE: (self.qtbl_node, "ve_node", "node_id", "node", "node_id", self.rubber_band_point, 10),
+            GwFeatureTypes.CONNEC: (self.qtbl_connec, "ve_connec", "connec_id", "connec", "connec_id", self.rubber_band_point, 10),
+            GwFeatureTypes.GULLY: (self.qtbl_gully, "ve_gully", "gully_id", "gully", "gully_id", self.rubber_band_point, 10),
         }
         tableview, tablename, feat_id, tablename_op, feat_id_op, rb, width = tableview_map.get(feature_type, (None, None, None, None, None, None, None))
         if tableview is None:

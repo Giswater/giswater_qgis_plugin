@@ -102,7 +102,7 @@ class GwMaptool(QgsMapTool):
 
     def canvasMoveEvent(self, event):
 
-        # Make sure active layer is always 'v_edit_node'
+        # Make sure active layer is always 've_node'
         cur_layer = self.iface.activeLayer()
         if cur_layer != self.layer_node and self.force_active_layer:
             self.iface.setActiveLayer(self.layer_node)

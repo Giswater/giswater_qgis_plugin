@@ -170,8 +170,8 @@ class GwDocument(QObject):
             partial(tools_gw.set_completer_object, self.dlg_add_doc, "visit"))
 
         # Set signals
-        self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                                "v_edit_element", "v_edit_link"]
+        self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "v_edit_element", "ve_gully",
+                                "v_edit_element", "ve_link"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         # Dialog
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
@@ -211,15 +211,15 @@ class GwDocument(QObject):
         )
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                               self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+                                                               self.dlg_add_doc.tbl_doc_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
         self.dlg_add_doc.tbl_doc_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                self.dlg_add_doc.tbl_doc_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+                                                                self.dlg_add_doc.tbl_doc_x_node, "ve_node", "node_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                  self.dlg_add_doc.tbl_doc_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+                                                                  self.dlg_add_doc.tbl_doc_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dlg_add_doc.tbl_doc_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+                                                                 self.dlg_add_doc.tbl_doc_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dlg_add_doc.tbl_doc_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
+                                                                 self.dlg_add_doc.tbl_doc_x_link, "ve_link", "link_id", self.rubber_band, 10))
 
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(

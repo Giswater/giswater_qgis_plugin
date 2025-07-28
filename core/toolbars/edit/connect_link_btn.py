@@ -220,7 +220,7 @@ class GwConnectLinkButton(GwMaptool):
             tools_gw.reset_rubberband(self.rubber_band)
 
             # Force reload dataProvider of layer
-            tools_qgis.set_layer_index('v_edit_link')
+            tools_qgis.set_layer_index('ve_link')
             tools_qgis.set_layer_index('v_edit_vnode')
 
     def manage_result(self, result):
@@ -237,7 +237,7 @@ class GwConnectLinkButton(GwMaptool):
         self.iface.actionPan().trigger()
 
         # Force reload dataProvider of layer
-        tools_qgis.set_layer_index('v_edit_link')
+        tools_qgis.set_layer_index('ve_link')
         tools_qgis.set_layer_index('v_edit_vnode')
 
     # endregion
@@ -275,7 +275,7 @@ class GwConnectLinkButton(GwMaptool):
         behaviour = QgsVectorLayer.RemoveFromSelection if key == (Qt.ControlModifier | Qt.ShiftModifier) else QgsVectorLayer.AddToSelection
 
         # Get arc layer
-        layer = tools_qgis.get_layer_by_tablename('v_edit_arc')
+        layer = tools_qgis.get_layer_by_tablename('ve_arc')
 
         # Check if layer exists
         if layer:
@@ -413,7 +413,7 @@ def accept(**kwargs):
         return
 
     # Get arc layer
-    layer_arc = tools_qgis.get_layer_by_tablename('v_edit_arc')
+    layer_arc = tools_qgis.get_layer_by_tablename('ve_arc')
     selected_arc = None
 
     # Check if the layer is valid and has selected arc

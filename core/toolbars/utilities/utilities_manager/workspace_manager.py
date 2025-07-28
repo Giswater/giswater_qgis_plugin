@@ -271,7 +271,7 @@ class GwWorkspaceManagerButton(GwAction):
             # Zoom to layer
             layer = tools_qgis.get_layer_by_tablename('v_edit_inp_junction')
             if not layer:
-                layer = tools_qgis.get_layer_by_tablename('v_edit_node')
+                layer = tools_qgis.get_layer_by_tablename('ve_node')
             tools_qgis.zoom_to_layer(layer)
 
             # Refresh selector docker if open

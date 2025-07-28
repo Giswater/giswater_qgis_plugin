@@ -345,7 +345,7 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
     # Check database connection before opening dialog
     if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not tools_db.check_db_connection():
         return
-    
+
     # Manage translate
     if dlg_name:
         tools_qt._translate_form(dlg_name, dlg)
@@ -526,9 +526,9 @@ def refresh_legend():
     Mysteriously this bug is solved by checking and unchecking the categorization of the tables.
     """
 
-    layers = [tools_qgis.get_layer_by_tablename('v_edit_node'),
-              tools_qgis.get_layer_by_tablename('v_edit_connec'),
-              tools_qgis.get_layer_by_tablename('v_edit_gully')]
+    layers = [tools_qgis.get_layer_by_tablename('ve_node'),
+              tools_qgis.get_layer_by_tablename('ve_connec'),
+              tools_qgis.get_layer_by_tablename('ve_gully')]
 
     for layer in layers:
         if layer:
@@ -558,9 +558,9 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "ve_frelem", "ve_genelem", "v_edit_link"]
+    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_link"]
     if global_vars.project_type == 'ud':
-        list_layers.append("v_edit_gully")
+        list_layers.append("ve_gully")
 
     for layer_name in list_layers:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -727,7 +727,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
 
-    auth_id = tools_db.get_srid('v_edit_node', schema_name) if auth_id is None else auth_id
+    auth_id = tools_db.get_srid('ve_node', schema_name) if auth_id is None else auth_id
     extent = _get_extent_parameters(schema_name) if extent is None else extent
 
     field_id = field_id.replace(" ", "")
@@ -3252,7 +3252,7 @@ def get_role_permissions(qgis_project_role):
 
 
 def get_config_value(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True, schema_name=None):
-    
+
     if schema_name is None:
         schema_name = lib_vars.schema_name
 
@@ -3541,21 +3541,21 @@ def set_model_signals(class_object):
 
     # Set selectionModel signals
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "v_edit_arc", "arc_id", class_object.rubber_band_point, 5
+        tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "ve_arc", "arc_id", class_object.rubber_band_point, 5
     ))
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
         class_object._highlight_features_by_id, class_object.qtbl_arc, "arc", "arc_id", class_object.rubber_band_op, 5
     ))
 
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_node, "v_edit_node", "node_id", class_object.rubber_band_point, 10
+        tools_qgis.highlight_features_by_id, class_object.qtbl_node, "ve_node", "node_id", class_object.rubber_band_point, 10
     ))
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
         class_object._highlight_features_by_id, class_object.qtbl_node, "node", "node_id", class_object.rubber_band_op, 5
     ))
 
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "v_edit_connec", "connec_id", class_object.rubber_band_point, 10
+        tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "ve_connec", "connec_id", class_object.rubber_band_point, 10
     ))
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
         class_object._highlight_features_by_id, class_object.qtbl_connec, "connec", "connec_id", class_object.rubber_band_op, 5
@@ -3566,7 +3566,7 @@ def set_model_signals(class_object):
 
     if class_object.project_type.upper() == 'UD':
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "v_edit_gully", "gully_id", class_object.rubber_band_point, 10
+            tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "ve_gully", "gully_id", class_object.rubber_band_point, 10
         ))
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
             class_object._highlight_features_by_id, class_object.qtbl_gully, "gully", "gully_id", class_object.rubber_band_op, 5
@@ -3709,9 +3709,9 @@ def remove_selection(remove_groups=True, layers=None):
     :return: Dictionary of layers with removed selection
     """
 
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "ve_frelem", "ve_genelem", "v_edit_link"]
+    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_link"]
     if global_vars.project_type == 'ud':
-        list_layers.append("v_edit_gully")
+        list_layers.append("ve_gully")
 
     for layer_name in list_layers:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -3759,7 +3759,7 @@ def docker_dialog(dialog, dlg_name=None, title=None):
             tools_qt._translate_form(dlg_name, dialog)
         if title:
             lib_vars.session_vars['dialog_docker'].setWindowTitle(tools_qt.tr(f'dlg_{title}', context_name=dlg_name))
-        
+
     except RuntimeError as e:
         msg = "{0}: {1}"
         msg_params = (type(e).__name__, e,)
@@ -4412,7 +4412,7 @@ def get_parent_layers_visibility():
     """
 
     layers_visibility = {}
-    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "ve_frelem", "ve_genelem", "v_edit_gully", "v_edit_link"]:
+    for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_gully", "ve_link"]:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer:
             layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
@@ -4985,16 +4985,16 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
 
     extra_cols = []
     select_extras = []
-    
+
     config = feature_configs.get(feature_type)
     if config:
         cat_id_col = config['cat_id_col']
         type_col = config['type_col']
-        
+
         # All configured features have at least a catalog ID
         extra_cols.append(cat_id_col)
         select_extras.append(f"p.{cat_id_col}")
-        
+
         if type_col:
             # This feature type requires a JOIN to get its type from the catalog table
             cat_table = f"{lib_vars.schema_name}.cat_{feature_type}"
@@ -5007,7 +5007,7 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
 
     # Base columns for the INSERT statement
     base_insert_cols = ['campaign_id', f'{feature_type}_id', 'status', 'the_geom']
-    
+
     # Corresponding values/columns for the SELECT statement
     base_select_cols = [f"{campaign_id}", f'p.{feature_type}_id', "1", 'p.the_geom']
 

@@ -850,9 +850,9 @@ class GwDscenarioManagerButton(GwAction):
             btn_menu = QMenu()
 
             action_node = btn_menu.addAction("NODE")
-            action_node.triggered.connect(partial(self._set_active_layer, action_node, 'v_edit_node'))
+            action_node.triggered.connect(partial(self._set_active_layer, action_node, 've_node'))
             action_connec = btn_menu.addAction("CONNEC")
-            action_connec.triggered.connect(partial(self._set_active_layer, action_connec, 'v_edit_connec'))
+            action_connec.triggered.connect(partial(self._set_active_layer, action_connec, 've_connec'))
             self.dlg_dscenario.btn_snapping.setMenu(btn_menu)
             self.dlg_dscenario.btn_snapping.setPopupMode(QToolButton.MenuButtonPopup)
 
@@ -920,7 +920,7 @@ class GwDscenarioManagerButton(GwAction):
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
         tablename = tableview.objectName().replace('tbl_', '')
-        # if 'v_edit_' not in tablename:
+        # if 've_' not in tablename:
         #     tablename = f'v_edit_{tablename}'
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -1271,7 +1271,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Set active layer
         view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()
-        layer_name = 'v_edit_' + self.feature_type
+        layer_name = 've_' + self.feature_type
         if view_name != 'inp_dscenario_demand':
             if self.feature_type == 'nodarc':
                 layer_name = view_name.replace("dscenario_", "")
@@ -1358,7 +1358,7 @@ class GwDscenarioManagerButton(GwAction):
         # Get current layer and feature type
         self._manage_feature_type()
         view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()
-        layer_name = 'v_edit_' + self.feature_type
+        layer_name = 've_' + self.feature_type
 
         if view_name != 'inp_dscenario_demand':
             if self.feature_type == 'nodarc':

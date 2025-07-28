@@ -88,7 +88,7 @@ class GwInfo(QObject):
         if global_vars.project_type == 'ud':
             self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.rel_feature_type = None
-        self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]
+        self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "v_edit_element", "ve_gully", "ve_link"]
         self.point_xy = {"x": None, "y": None}
 
     def get_info_from_coordinates(self, point, tab_type):
@@ -874,13 +874,13 @@ class GwInfo(QObject):
             partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points,
                     id_name))
         self.action_set_to_arc.triggered.connect(
-            partial(self.get_snapped_feature_id, dlg_cf, self.action_set_to_arc, 'v_edit_arc', 'set_to_arc', 'tab_data_to_arc',
+            partial(self.get_snapped_feature_id, dlg_cf, self.action_set_to_arc, 've_arc', 'set_to_arc', 'tab_data_to_arc',
                     child_type))
         self.action_get_arc_id.triggered.connect(
-            partial(self.get_snapped_feature_id, dlg_cf, self.action_get_arc_id, 'v_edit_arc', 'arc', 'tab_data_arc_id',
+            partial(self.get_snapped_feature_id, dlg_cf, self.action_get_arc_id, 've_arc', 'arc', 'tab_data_arc_id',
                     child_type))
         self.action_get_parent_id.triggered.connect(
-            partial(self.get_snapped_feature_id, dlg_cf, self.action_get_parent_id, 'v_edit_node', 'node',
+            partial(self.get_snapped_feature_id, dlg_cf, self.action_get_parent_id, 've_node', 'node',
                     'tab_data_parent_id', child_type))
         self.action_centered.triggered.connect(partial(self._manage_action_centered, self.canvas, self.layer))
         self.action_copy_paste.triggered.connect(
@@ -1156,7 +1156,7 @@ class GwInfo(QObject):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
         global_vars.iface.setActiveLayer(self.layer_node)
 
         self.node1 = None
@@ -2445,7 +2445,7 @@ class GwInfo(QObject):
         if self.feature_type == 'arc':
             msg = f"{msg} both (elev & y) values. Review it and use only one."
             fields1 = 'y1, custom_y1, elev1, custom_elev1'
-            sql = f"SELECT {fields1} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            sql = f"SELECT {fields1} FROM ve_arc WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 has_y = (row[0], row[1]) != (None, None)
@@ -2455,7 +2455,7 @@ class GwInfo(QObject):
                     return False
 
             fields2 = 'y2, custom_y2, elev2, custom_elev2'
-            sql = f"SELECT {fields2} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            sql = f"SELECT {fields2} FROM ve_arc WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 has_y = (row[0], row[1]) != (None, None)
@@ -2467,7 +2467,7 @@ class GwInfo(QObject):
         elif self.feature_type == 'node':
             msg = f"{msg} all (elev & ymax & top_elev) values. Review it and use at most two."
             fields = 'ymax, custom_ymax, elev, custom_elev, top_elev, custom_top_elev'
-            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            sql = f"SELECT {fields} FROM ve_node WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 has_y = (row[0], row[1]) != (None, None)
@@ -2632,14 +2632,14 @@ class GwInfo(QObject):
             if arc_n not in (1, 2):
                 arc_n = 1
             fields = f'y{arc_n}, custom_y{arc_n}'
-            sql = f"SELECT {fields} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            sql = f"SELECT {fields} FROM ve_arc WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 return (row[0], row[1]) != (None, None)
 
         elif self.feature_type == 'node':
             fields = 'ymax, custom_ymax'
-            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            sql = f"SELECT {fields} FROM ve_node WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 return (row[0], row[1]) != (None, None)
@@ -2653,14 +2653,14 @@ class GwInfo(QObject):
             if arc_n not in (1, 2):
                 arc_n = 1
             fields = f'elev{arc_n}, custom_elev{arc_n}'
-            sql = f"SELECT {fields} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            sql = f"SELECT {fields} FROM ve_arc WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 return (row[0], row[1]) != (None, None)
 
         elif self.feature_type == 'node':
             fields = 'elev, custom_elev'
-            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            sql = f"SELECT {fields} FROM ve_node WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 return (row[0], row[1]) != (None, None)
@@ -2672,7 +2672,7 @@ class GwInfo(QObject):
 
         if self.feature_type == 'node':
             fields = 'top_elev, custom_top_elev'
-            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            sql = f"SELECT {fields} FROM ve_node WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 return (row[0], row[1]) != (None, None)
@@ -3744,7 +3744,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
     tools_gw.add_icon(action_set_to_arc, "157")
 
     action_set_to_arc.triggered.connect(
-        partial(info.get_snapped_feature_id, info.add_dlg, action_set_to_arc, 'v_edit_arc', 'set_to_arc_simple', 'tab_none_to_arc',
+        partial(info.get_snapped_feature_id, info.add_dlg, action_set_to_arc, 've_arc', 'set_to_arc_simple', 'tab_none_to_arc',
                 None))
 
 

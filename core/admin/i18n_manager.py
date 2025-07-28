@@ -65,7 +65,7 @@ class GwSchemaI18NManager:
     def _check_all(self):
         if not tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_all):
             return
-        
+
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_dialogs, True)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_am_dialogs, True)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_cm_dialogs, True)
@@ -220,7 +220,7 @@ class GwSchemaI18NManager:
     def _update_i18n_datbase(self):
         """ Determine which part of the database update (ws, ud, am, pyhton...) """
         self.project_types = []
-            
+
         if tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_dialogs):
             self.project_types.extend(["ws", "ud"])
         if tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_am_dialogs):
@@ -285,7 +285,7 @@ class GwSchemaI18NManager:
 
             # Loop through the tables to update
             text_error += f'\n{self.project_type}:\n'
-            self.dlg_qm.lbl_info.clear()            
+            self.dlg_qm.lbl_info.clear()
             for table_i18n in tables_i18n:
                 table_i18n = f"{self.schema_i18n}.{table_i18n}"
 
@@ -298,7 +298,7 @@ class GwSchemaI18NManager:
                         msg_params = (table_i18n,)
                         tools_qt.show_info_box(msg, msg_params=msg_params)
                         no_repeat_table.append(table_i18n)
-                
+
                     # Change the table layout
                     self._change_table_lyt(table_i18n.split(".")[1])
 
@@ -336,10 +336,10 @@ class GwSchemaI18NManager:
             else:
                 query += self._update_any_table(table_i18n, table_org)
 
-        # Determine the return message acording to the query message 
+        # Determine the return message acording to the query message
         if query == '':
             text_return = f'{table_i18n.split(".")[1]}: 1- No update needed. '
-            
+
         else:
             try:
                 self.cursor_i18n.execute(query)
@@ -369,7 +369,7 @@ class GwSchemaI18NManager:
         # Get the primary keys
         pk_columns = [col for col in columns_i18n if not col.endswith("_en_us")]
         pk_columns_str = ", ".join(pk_columns)
-        
+
         # Insert the rows
         query_insert = ""
         if diff_rows:
@@ -389,7 +389,7 @@ class GwSchemaI18NManager:
                 # Get the query to insert
                 values_str = ", ".join(values)
                 update_values_str = ", ".join(update_values)
-                query_insert += f"""INSERT INTO {table_i18n} ({columns_to_insert}) VALUES ({values_str}) 
+                query_insert += f"""INSERT INTO {table_i18n} ({columns_to_insert}) VALUES ({values_str})
                                 ON CONFLICT ({pk_columns_str}) DO UPDATE SET {update_values_str};\n"""
         return query_insert
 
@@ -447,7 +447,7 @@ class GwSchemaI18NManager:
         elif 'dbtypevalue' in table_i18n:
             columns_i18n = ["typevalue", "source", "vl_en_us", "ds_en_us"]
             columns_org = ["typevalue", "id", "idval", "descript"]
-    
+
         elif 'dbconfig_form_tableview' in table_i18n:
             columns_i18n = ["location_type", "columnname", "source", "al_en_us"]
             columns_org = ["location_type", "columnname", "objectname", "alias"]
@@ -459,9 +459,9 @@ class GwSchemaI18NManager:
         # Update the su_basic_tables table (It has a different format, more than one table_org)
         elif 'su_basic_tables' in table_i18n:
             columns_i18n = ["source", "na_en_us", "ob_en_us"]
-            columns_org = ["id", "name"]            
+            columns_org = ["id", "name"]
             if table_org == "value_state" and self.project_type in ["ud", "ws"]:
-                columns_org = ["id", "name", "observ"]      
+                columns_org = ["id", "name", "observ"]
             elif table_org == "sys_label":
                 columns_org = ["id", "idval"]
             elif self.project_type == "am":
@@ -533,7 +533,7 @@ class GwSchemaI18NManager:
                         clean_row[col] = ''
                 cleaned_org.append(clean_row)
             rows_org = cleaned_org
-        
+
         # Efficient diff using set of tuples
         diff_rows = self._set_operation_on_dict(rows_org, rows_i18n, op='-', compare='values')
         print(f"diff_rows: {diff_rows}")
@@ -550,7 +550,7 @@ class GwSchemaI18NManager:
         if self.project_type in ["cm", "am"]:
             query += f" WHERE project_type = '{self.project_type}' OR project_type = 'utils'"
         query += ";"
-        rows_i18n = self._get_rows(query, self.cursor_i18n) 
+        rows_i18n = self._get_rows(query, self.cursor_i18n)
 
         # Create the query to get the rows from the original table
         columns = ", ".join(columns_org)
@@ -569,7 +569,7 @@ class GwSchemaI18NManager:
             self.conflict_project_type = ["source_code", "context", "formname", "formtype", "source", "hint", "text", "lb_en_us"]
         elif table_i18n.split('.')[1] == "dbjson":
             self.conflict_project_type = ["source_code", "context", "hint", "text", "source", "lb_en_us"]
-        
+
         self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
         self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
 
@@ -632,60 +632,60 @@ class GwSchemaI18NManager:
             INSERT INTO {table_i18n}
             select distinct on (feature_type, project_type, source) *
             FROM (
-                SELECT 'ARC' AS feature_type, * 
-                FROM {table_org} 
-                WHERE formtype = 'form_feature' AND (formname LIKE 've_arc%' OR formname = 'v_edit_arc')
-                
+                SELECT 'ARC' AS feature_type, *
+                FROM {table_org}
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_arc%' OR formname = 've_arc')
+
                 UNION
-                
-                SELECT 'NODE', * 
-                FROM {table_org} 
-                WHERE formtype = 'form_feature' AND (formname LIKE 've_node%' OR formname = 'v_edit_node')
-                
+
+                SELECT 'NODE', *
+                FROM {table_org}
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_node%' OR formname = 've_node')
+
                 UNION
-                
-                SELECT 'CONNEC', * 
-                FROM {table_org} 
-                WHERE formtype = 'form_feature' AND (formname LIKE 've_connec%' OR formname = 'v_edit_connec')
-                
+
+                SELECT 'CONNEC', *
+                FROM {table_org}
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_connec%' OR formname = 've_connec')
+
                 UNION
-                
-                SELECT 'GULLY', * 
-                FROM {table_org} 
-                WHERE formtype = 'form_feature' AND (formname LIKE 've_gully%' OR formname = 'v_edit_gully')
-                
+
+                SELECT 'GULLY', *
+                FROM {table_org}
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_gully%' OR formname = 've_gully')
+
                 UNION
-                
-                SELECT 'ELEMENT', * 
-                FROM {table_org} 
+
+                SELECT 'ELEMENT', *
+                FROM {table_org}
                 WHERE formtype = 'form_feature' AND (formname LIKE 've_element%' OR formname = 'v_edit_element')
-                
+
                 UNION
-                
-                SELECT 'LINK', * 
-                FROM {table_org} 
-                WHERE formtype = 'form_feature' AND (formname LIKE 've_link%' OR formname = 'v_edit_link')
-                
+
+                SELECT 'LINK', *
+                FROM {table_org}
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_link%' OR formname = 've_link')
+
                 UNION
-                
-                SELECT 'FLWREG', * 
-                FROM {table_org} 
+
+                SELECT 'FLWREG', *
+                FROM {table_org}
                 WHERE formtype = 'form_feature' AND (formname LIKE 've_flwreg%' OR formname = 'v_edit_flwreg')
             ) AS unioned
             ON CONFLICT (feature_type, source_code, project_type, context, formtype, source)
             DO NOTHING;
 
-            delete from {table_org}  where formtype = 'form_feature' and (formname like 've_arc%' or formname in ('v_edit_arc'));
+            delete from {table_org}  where formtype = 'form_feature' and (formname like 've_arc%' or formname in ('ve_arc'));
 
-            delete from {table_org} where formtype = 'form_feature' and (formname like 've_node%' or formname in ('v_edit_node'));
+            delete from {table_org} where formtype = 'form_feature' and (formname like 've_node%' or formname in ('ve_node'));
 
-            delete from {table_org} where formtype = 'form_feature' and (formname like 've_connec%' or formname in ('v_edit_connec'));
+            delete from {table_org} where formtype = 'form_feature' and (formname like 've_connec%' or formname in ('ve_connec'));
 
-            delete from {table_org} where formtype = 'form_feature' and (formname like 've_gully%' or formname in ('v_edit_gully'));
+            delete from {table_org} where formtype = 'form_feature' and (formname like 've_gully%' or formname in ('ve_gully'));
 
             delete from {table_org} where formtype = 'form_feature' and (formname like 've_element%' or formname in ('v_edit_element'));
 
-            delete from {table_org} where formtype = 'form_feature'and (formname like 've_link%' or formname in ('v_edit_link'));
+            delete from {table_org} where formtype = 'form_feature'and (formname like 've_link%' or formname in ('ve_link'));
 
             delete from {table_org} where formtype = 'form_feature'  and (formname like 've_flwreg%' or formname in ('v_edit_flwreg'));
         """
@@ -693,7 +693,7 @@ class GwSchemaI18NManager:
 
     # endregion
     # region Rewrite Project_type
-        
+
     def _rewrite_project_type(self, table):
         """Rewrite the project_type to the correct value"""
 
@@ -741,7 +741,7 @@ class GwSchemaI18NManager:
         values_en_us_ud = []
         values_en_us_ws = []
         values_en_us_utils = []
-        
+
 
         fake_pks_ud = self._get_fake_primary_keys(table, "ud")
         if fake_pks_ud:
@@ -750,7 +750,7 @@ class GwSchemaI18NManager:
         fake_pks_ws = self._get_fake_primary_keys(table, "ws")
         if fake_pks_ws:
             values_en_us_ws = self._get_values_en_us(table, fake_pks_ws, "ws")
-        
+
         fake_pks_utils = self._get_fake_primary_keys(table, "utils")
         if fake_pks_utils:
             values_en_us_utils = self._get_values_en_us(table, fake_pks_utils, "utils")
@@ -772,7 +772,7 @@ class GwSchemaI18NManager:
 
             if delete_values_en_us:
                self._delete_fake_utils(table, delete_values_en_us)
-        
+
 
     def _get_values_en_us(self, table, fake_pks, project_type):
         """Get the values of the en_us column using a single query"""
@@ -821,7 +821,7 @@ class GwSchemaI18NManager:
                     escaped_value = str(row[column]).replace("'", "''")
                     text.append(f"{column} = '{escaped_value}'")
             clause_sql.append(f"({' AND '.join(text)} AND project_type = 'utils')")
-        
+
         where_clause = ' OR '.join(clause_sql)
 
         # Fetch full matching rows
@@ -892,7 +892,7 @@ class GwSchemaI18NManager:
             UPDATE {table} AS t
             SET {set_clause}
             FROM (
-            VALUES {values_block} 
+            VALUES {values_block}
             )AS v ({', '.join(all_cols)})
             WHERE t.project_type = 'utils' AND {join_condition};
         """
@@ -926,8 +926,8 @@ class GwSchemaI18NManager:
         fake_rows = [dict(zip(self.primary_keys_no_project_type_i18n, values)) for values in fake_values]
 
         return fake_rows
-    
-    
+
+
     def _get_duplicates_rows(self, table):
         """Get the duplicated rows"""
         columns = ",".join(self.conflict_project_type)
@@ -939,11 +939,11 @@ class GwSchemaI18NManager:
             HAVING COUNT(*) > 1;
         """
         return query
-    
+
 
     def _update_project_type(self, table, duplicated_rows):
         """Update the project_type to the correct value"""
-        
+
         all_columns = self._get_all_columns(table)
         pk_columns = []
         update_query = ""
@@ -961,9 +961,9 @@ class GwSchemaI18NManager:
 
             where_clause = " AND ".join(text)
             pk_colums_str = ", ".join(pk_columns)
-            
+
             delete_query += f"""
-                WITH Ranked AS (SELECT ctid, ROW_NUMBER() OVER (PARTITION BY {pk_colums_str} ORDER BY lastupdate ASC) AS rn 
+                WITH Ranked AS (SELECT ctid, ROW_NUMBER() OVER (PARTITION BY {pk_colums_str} ORDER BY lastupdate ASC) AS rn
                 FROM {table} WHERE {where_clause})
                 DELETE FROM {table} WHERE ctid IN (SELECT ctid FROM Ranked WHERE rn > 1);
                 """
@@ -975,7 +975,7 @@ class GwSchemaI18NManager:
 
     def _delete_fake_utils(self, table, fake_rows):
         """Delete the fake utils rows"""
-        
+
         delete_query = ""
         columns = self.primary_keys_no_project_type_i18n
         for k, row in enumerate(fake_rows):
@@ -988,7 +988,7 @@ class GwSchemaI18NManager:
 
             where_clause = " AND ".join(text)
             where_clause += f" AND project_type = 'utils'"
-            
+
             delete_query += f"""
                 DELETE FROM {table} WHERE {where_clause};\n
                 """
@@ -1011,7 +1011,7 @@ class GwSchemaI18NManager:
         # Find the files to search for messages
         path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         files = self._find_files(path, ".ui")
-        
+
         # Determine the key and find the messages
         processed_entries = {}  # Use a dictionary to store unique entries
         keys = ["<string>", "<widget", 'name=']
@@ -1065,10 +1065,10 @@ class GwSchemaI18NManager:
                     continue
                 # Escape single quotes
                 esc_actual_source = actual_source.replace("'", "''")
-                esc_dialog_name = dialog_name.replace("'", "''") 
+                esc_dialog_name = dialog_name.replace("'", "''")
                 esc_toolbar_name = toolbar_name.replace("'", "''")
                 delete_values.append(f"(source = '{esc_actual_source}' AND dialog_name = '{esc_dialog_name}' AND toolbar_name = '{esc_toolbar_name}')")
-            
+
             # Single delete query for all old keys
             if delete_values: # Ensure there's something to delete
                 delete_query = f"DELETE FROM {self.schema_i18n}.pydialog WHERE {' OR '.join(delete_values)}"
@@ -1097,12 +1097,12 @@ class GwSchemaI18NManager:
         if values_list:
             # Single upsert query with all values
             query = f"""
-                INSERT INTO {self.schema_i18n}.pydialog 
+                INSERT INTO {self.schema_i18n}.pydialog
                 (source_code, project_type, dialog_name, toolbar_name, source, lb_en_us)
-                VALUES 
+                VALUES
                 {',\n'.join(values_list)}
-                ON CONFLICT (source_code, project_type, dialog_name, toolbar_name, source) 
-                DO UPDATE SET 
+                ON CONFLICT (source_code, project_type, dialog_name, toolbar_name, source)
+                DO UPDATE SET
                     lb_en_us = EXCLUDED.lb_en_us;
             """
 
@@ -1130,7 +1130,7 @@ class GwSchemaI18NManager:
             os.path.join(os.path.dirname(__file__), "..", "..")
         )
         files = self._find_files(path, ".py")
-        
+
         messages = []
         fields = ['message', 'msg', 'title']
         patterns = ['=', ' =', '= ', ' = ']
@@ -1183,7 +1183,7 @@ class GwSchemaI18NManager:
                         tools_qt.show_exception_message(title, msg, msg_params=msg_params)
 
         # Insert new messages
-        
+
         msg = ""
         msg_params = None
         new_messages = primary_keys_final_set - primary_keys_org_set
@@ -1217,7 +1217,7 @@ class GwSchemaI18NManager:
         else:
             return [message]
 
-        
+
     def _find_files(self, path, file_type):
         """ Find all files with the given file type in the given path """
 
@@ -1244,7 +1244,7 @@ class GwSchemaI18NManager:
 
                 for num_line, raw_line in enumerate(f):
                     line = raw_line.strip()
-                    
+
                     if in_multiline:
                         full_text += line
                         if line.endswith(")"):
@@ -1274,7 +1274,7 @@ class GwSchemaI18NManager:
             title = "Error reading file"
             tools_qt.show_exception_message(title, msg, msg_params=msg_params)
         return found_lines
-    
+
 
     def _msg_multines_end(self, found_lines, full_text, num_line):
         """ Extract the message from the multiline """
@@ -1291,7 +1291,7 @@ class GwSchemaI18NManager:
                 tools_qt.show_exception_message(title, msg, msg_params=msg_params)
             found_lines.append((num_line, full_text.strip()))
         return found_lines
-    
+
 
     def _search_dialog_info(self, file, key_row, key_text, num_line, avoid_keys=None):
         """ Search for the dialog info in the file """
@@ -1304,15 +1304,15 @@ class GwSchemaI18NManager:
 
             # Read all lines into a list
             lines = f.readlines()
-            
+
             # Search for the key in the file, starting from the given line
             while num_line >= 0 and key_row not in lines[num_line]:
                 if avoid_keys and any(avoid_key in lines[num_line] for avoid_key in avoid_keys):
                     return dialog_name, toolbar_name, False
-                num_line -= 1  
-            
+                num_line -= 1
+
             if num_line < 0:
-                return None  
+                return None
 
             # Now extract the value between quotes using regex
             pattern = rf'{re.escape(key_text)}"(.*?)"'
@@ -1322,10 +1322,10 @@ class GwSchemaI18NManager:
                 source = match.group(1)
             else:
                 source = ""
-            
+
             return dialog_name, toolbar_name, source
 
-    
+
     #endregion
     # region Global funcitons
 
@@ -1503,7 +1503,7 @@ class GwSchemaI18NManager:
         if language_org not in ('en_US', 'no_TR'):
             return False
         return True
-    
+
 
     def save_and_open_text_error(self, text_error, filename="i18n_error_log.txt"):
         # Save the text_error to a file in the user's home directory or temp directory
@@ -1570,11 +1570,11 @@ class GwSchemaI18NManager:
     def _get_all_columns(self, table_i18n):
         """ Get all columns from the table """
         query = f"""
-            SELECT column_name 
-            FROM information_schema.columns 
+            SELECT column_name
+            FROM information_schema.columns
             WHERE table_name = '{table_i18n.split('.')[1]}'
             AND table_schema = '{table_i18n.split('.')[0]}'
-            ORDER BY ordinal_position;"""   
+            ORDER BY ordinal_position;"""
         self.cursor_i18n.execute(query)
         return [row[0] for row in self.cursor_i18n.fetchall()]
 

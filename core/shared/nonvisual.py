@@ -47,7 +47,7 @@ class GwNonVisual:
                                  'v_edit_inp_pattern': f'{tr("patterns")}', 'v_edit_inp_controls': f'{tr("controls")}',
                                  'v_edit_inp_rules': f'{tr("rules")}'},
                            'ud': {'v_edit_inp_curve': f'{tr("curves")}', 'v_edit_inp_pattern': f'{tr("patterns")}',
-                                 'v_edit_inp_timeseries': f'{tr("timeseries")}', 
+                                 'v_edit_inp_timeseries': f'{tr("timeseries")}',
                                  'v_edit_inp_controls': f'{tr("controls")}', 'inp_lid': f'{tr("lids")}'}}
         self.dict_ids = {'cat_mat_roughness': 'id', 'v_edit_inp_curve': 'id', 'v_edit_inp_curve_value': 'curve_id',
                          'v_edit_inp_pattern': 'pattern_id', 'v_edit_inp_pattern_value': 'pattern_id',
@@ -166,7 +166,7 @@ class GwNonVisual:
     def _manage_toggle_active(self):
         """ Toggle the active state of selected items in the current table. """
         tableview = self.manager_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
+        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"

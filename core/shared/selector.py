@@ -410,11 +410,11 @@ class GwSelector:
                 pass
 
         # Refresh canvas
-        tools_qgis.set_layer_index('v_edit_arc')
-        tools_qgis.set_layer_index('v_edit_node')
-        tools_qgis.set_layer_index('v_edit_connec')
-        tools_qgis.set_layer_index('v_edit_gully')
-        tools_qgis.set_layer_index('v_edit_link')
+        tools_qgis.set_layer_index('ve_arc')
+        tools_qgis.set_layer_index('ve_node')
+        tools_qgis.set_layer_index('ve_connec')
+        tools_qgis.set_layer_index('ve_gully')
+        tools_qgis.set_layer_index('ve_link')
         tools_qgis.set_layer_index('v_edit_plan_psector')
         tools_qgis.refresh_map_canvas()
 

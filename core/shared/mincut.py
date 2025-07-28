@@ -576,7 +576,7 @@ class GwMincut:
         # Parametrize list of layers
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers_connec = self.layers['connec']
-        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
 
         # Set active and current layer
         self.iface.setActiveLayer(self.layer_arc)
@@ -662,7 +662,7 @@ class GwMincut:
                 global_vars.iface.removeDockWidget(lib_vars.session_vars['dialog_docker'])
                 lib_vars.session_vars['docker_type'] = None
         else:
-            tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
+            tools_qgis.restore_user_layer('ve_node', self.user_current_layer)
             self._remove_selection()
             tools_qgis.reset_rubber_band(self.search.rubber_band)
 
@@ -1029,7 +1029,7 @@ class GwMincut:
         self.dlg_mincut.btn_cancel.setText('Close')
         self.dlg_mincut.btn_cancel.disconnect()
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, 'v_edit_node', self.user_current_layer))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, 've_node', self.user_current_layer))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self._remove_selection))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.reset_rubber_band, self.search.rubber_band))
         self._refresh_tab_hydro()
@@ -1149,7 +1149,7 @@ class GwMincut:
         """ Set autocompleter for 'customer_code' """
 
         # Get list of 'customer_code'
-        sql = f"SELECT DISTINCT({self.col1}) FROM v_edit_connec"
+        sql = f"SELECT DISTINCT({self.col1}) FROM ve_connec"
         rows = tools_db.get_rows(sql)
         values = []
         if rows:
@@ -1545,7 +1545,7 @@ class GwMincut:
     def _get_connec_id_from_customer_code(self, customer_code):
         """ Get 'connec_id' from @customer_code """
 
-        sql = (f"SELECT connec_id FROM v_edit_connec"
+        sql = (f"SELECT connec_id FROM ve_connec"
                f" WHERE {self.col1} = '{customer_code}'")
         row = tools_db.get_row(sql)
         if not row:
@@ -1559,7 +1559,7 @@ class GwMincut:
         """ Reload contents of table 'connec' with selected @expr_filter """
 
         expr = tools_qt.set_table_model(self.dlg_connec, 'tbl_mincut_connec', "connec", expr_filter)
-        tools_gw.set_tablemodel_config(self.dlg_connec, 'tbl_mincut_connec', 'v_edit_connec')
+        tools_gw.set_tablemodel_config(self.dlg_connec, 'tbl_mincut_connec', 've_connec')
         return expr
 
     def _reload_table_hydro(self, expr_filter=None):
@@ -1840,7 +1840,7 @@ class GwMincut:
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Set active and current layer
-        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
         self.iface.setActiveLayer(self.layer_arc)
         self.current_layer = self.layer_arc
 
@@ -2504,7 +2504,7 @@ class GwMincut:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Set active and current layer
-        self.layer = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.layer = tools_qgis.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
 

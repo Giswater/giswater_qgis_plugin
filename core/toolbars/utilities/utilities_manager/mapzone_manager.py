@@ -600,14 +600,14 @@ class GwMapzoneManager:
         # nodeParent
         self.config_dlg.btn_snapping_nodeParent.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_nodeParent,
-                    'v_edit_node', 'nodeParent', None,
+                    've_node', 'nodeParent', None,
                     self.child_type))
         self.config_dlg.btn_expr_nodeParent.clicked.connect(
             partial(self._select_with_expression_dialog, self.config_dlg, 'nodeParent'))
         self.config_dlg.txt_nodeParent.textEdited.connect(partial(self._txt_node_parent_finished))
         # toArc
         self.config_dlg.btn_snapping_toArc.clicked.connect(
-            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 'v_edit_arc',
+            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 've_arc',
                     'toArc', None,
                     self.child_type))
         self.config_dlg.btn_expr_toArc.clicked.connect(
@@ -621,7 +621,7 @@ class GwMapzoneManager:
         # Force closed
         self.config_dlg.btn_snapping_forceClosed.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_forceClosed,
-                    'v_edit_node', 'forceClosed', None,
+                    've_node', 'forceClosed', None,
                     self.child_type))
         self.config_dlg.btn_expr_forceClosed.clicked.connect(
             partial(self._select_with_expression_dialog, self.config_dlg, 'forceClosed'))
@@ -634,7 +634,7 @@ class GwMapzoneManager:
         # Ignore
         self.config_dlg.btn_snapping_ignore.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_ignore,
-                    'v_edit_node', 'ignore', None, self.child_type))
+                    've_node', 'ignore', None, self.child_type))
         self.config_dlg.btn_expr_ignore.clicked.connect(
             partial(self._select_with_expression_dialog, self.config_dlg, 'ignore'))
         self.config_dlg.btn_add_ignore.clicked.connect(
@@ -1146,9 +1146,9 @@ class GwMapzoneManager:
         """Select features by expression for mapzone config"""
 
         # Get current layer and feature type
-        layer_name = 'v_edit_node'  # Default to node layer
+        layer_name = 've_node'  # Default to node layer
         if option == 'toArc':
-            layer_name = 'v_edit_arc'
+            layer_name = 've_arc'
         self.feature_type = layer_name.split('_')[-1]
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if not layer:

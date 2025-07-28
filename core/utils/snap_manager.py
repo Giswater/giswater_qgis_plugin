@@ -43,10 +43,10 @@ class GwSnapManager(object):
     def set_snapping_layers(self):
         """ Set main snapping layers """
 
-        self.layer_arc = tools_qgis.get_layer_by_tablename('v_edit_arc')
-        self.layer_connec = tools_qgis.get_layer_by_tablename('v_edit_connec')
-        self.layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
-        self.layer_node = tools_qgis.get_layer_by_tablename('v_edit_node')
+        self.layer_arc = tools_qgis.get_layer_by_tablename('ve_arc')
+        self.layer_connec = tools_qgis.get_layer_by_tablename('ve_connec')
+        self.layer_gully = tools_qgis.get_layer_by_tablename('ve_gully')
+        self.layer_node = tools_qgis.get_layer_by_tablename('ve_node')
 
     def get_snapping_options(self):
         """ Function that collects all the snapping options """

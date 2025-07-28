@@ -43,7 +43,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             self.actions = ['ARC', 'NODE', 'CONNEC']
         self.list_tables = list_tables
         if not self.list_tables:
-            self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
+            self.list_tables = ['ve_arc', 've_node', 've_connec', 've_gully']
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -100,7 +100,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)
 
-        # Snapping layers 'v_edit_'
+        # Snapping layers 've_'
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
@@ -141,8 +141,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
     def _set_active_layer(self, name):
         """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
 
-        layers = {"ARC": "v_edit_arc", "NODE": "v_edit_node",
-                  "CONNEC": "v_edit_connec", "GULLY": "v_edit_gully"}
+        layers = {"ARC": "ve_arc", "NODE": "ve_node",
+                  "CONNEC": "ve_connec", "GULLY": "ve_gully"}
         tablename = layers.get(name.upper())
         self.current_layer = tools_qgis.get_layer_by_tablename(tablename)
         self.iface.setActiveLayer(self.current_layer)
@@ -243,13 +243,13 @@ class GwFeatureTypeChangeButton(GwMaptool):
         layer = self.snapper_manager.get_snapped_layer(result)
         tablename = tools_qgis.get_layer_source_table_name(layer)
         if tablename and 'v_edit' in tablename:
-            if tablename == 'v_edit_node':
+            if tablename == 've_node':
                 self.feature_type = 'node'
-            elif tablename == 'v_edit_connec':
+            elif tablename == 've_connec':
                 self.feature_type = 'connec'
-            elif tablename == 'v_edit_gully':
+            elif tablename == 've_gully':
                 self.feature_type = 'gully'
-            elif tablename == 'v_edit_arc':
+            elif tablename == 've_arc':
                 self.feature_type = 'arc'
 
         self.tablename = tablename

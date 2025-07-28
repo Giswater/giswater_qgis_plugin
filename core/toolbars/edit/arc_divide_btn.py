@@ -63,12 +63,12 @@ class GwArcDivideButton(GwMaptool):
         # Get active layer
         self.active_layer = self.iface.activeLayer()
 
-        # Set active layer to 'v_edit_node'
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        # Set active layer to 've_node'
+        self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer_node)
 
-        # Get layer to 'v_edit_arc'
-        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+        # Get layer to 've_arc'
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
 
         # Set the mapTool's parent cursor
         self.canvas.setCursor(self.cursor)
@@ -162,7 +162,7 @@ class GwArcDivideButton(GwMaptool):
     def _move_event_snap_to_node(self, event_point, x, y):
         """ Snap to node. First step: Any node selected """
 
-        # Make sure active layer is 'v_edit_node'
+        # Make sure active layer is 've_node'
         cur_layer = self.iface.activeLayer()
         if cur_layer != self.layer_node:
             self.iface.setActiveLayer(self.layer_node)
@@ -182,7 +182,7 @@ class GwArcDivideButton(GwMaptool):
     def _move_event_snap_to_arc(self, event_point, x, y):
         """ Snap to arc. Second step: After a node is selected """
 
-        # Make sure active layer is 'v_edit_arc'
+        # Make sure active layer is 've_arc'
         cur_layer = self.iface.activeLayer()
         if cur_layer != self.layer_arc:
             self.iface.setActiveLayer(self.layer_arc)
@@ -307,10 +307,10 @@ class GwArcDivideButton(GwMaptool):
             answer = tools_qt.show_question(msg, title)
         if answer:
             self._move_node(node_id, point)
-            tools_qgis.set_layer_index('v_edit_arc')
-            tools_qgis.set_layer_index('v_edit_connec')
-            tools_qgis.set_layer_index('v_edit_gully')
-            tools_qgis.set_layer_index('v_edit_node')
+            tools_qgis.set_layer_index('ve_arc')
+            tools_qgis.set_layer_index('ve_connec')
+            tools_qgis.set_layer_index('ve_gully')
+            tools_qgis.set_layer_index('ve_node')
             self.iface.mapCanvas().refresh()
 
             # Refresh psector's relations tables

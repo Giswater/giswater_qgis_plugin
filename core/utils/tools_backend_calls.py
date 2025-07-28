@@ -518,7 +518,7 @@ def get_info_node(**kwargs):
     if widget.property('value') not in (None, ''):
         feature_id = widget.property('value')
     custom_form = GwInfo('tab_data')
-    complet_result, dialog = custom_form.open_form(table_name='v_edit_node', feature_id=feature_id,
+    complet_result, dialog = custom_form.open_form(table_name='ve_node', feature_id=feature_id,
                                                        tab_type='tab_data', is_docker=False)
     if not complet_result:
         msg = "FAIL {0}"
@@ -765,7 +765,7 @@ def set_read_only(**kwargs):
 
 def load_qml(**kwargs):
     """ Apply QML style located in @qml_path in @layer
-    :param kwargs:{"layerName": "v_edit_arc", "qmlPath": "C:\\xxxx\\xxxx\\xxxx\\qml_file.qml"}
+    :param kwargs:{"layerName": "ve_arc", "qmlPath": "C:\\xxxx\\xxxx\\xxxx\\qml_file.qml"}
     :return: Boolean value
     """
 
