@@ -17,6 +17,7 @@ DECLARE
     v_feature_id INTEGER;
     v_campaign_id INTEGER;
     v_exists BOOLEAN;
+	v_new_feature BOOLEAN := false;
 BEGIN
     -- Get the lot_id and feature_id from the new record
     v_lot_id := NEW.lot_id;
@@ -43,6 +44,20 @@ BEGIN
 	)
 	INTO v_exists
 	USING v_campaign_id, v_feature_id;
+	
+	-- Exception for new feature coming from other app, using a '-' id
+	EXECUTE format('SELECT ($1).%I_id::text LIKE ''-%%''', v_feature)
+	INTO v_new_feature
+	USING NEW;
+	
+	IF v_new_feature THEN
+		EXECUTE format('INSERT INTO cm.om_campaign_x_%I (campaign_id, %I_id, status)
+		     VALUES ($1, $2, $3)',
+		    v_feature, v_feature)
+		USING v_campaign_id, v_feature_id, NEW.status;
+
+	    RETURN NEW;
+	END IF;
 
     IF NOT v_exists THEN
         RETURN NULL;

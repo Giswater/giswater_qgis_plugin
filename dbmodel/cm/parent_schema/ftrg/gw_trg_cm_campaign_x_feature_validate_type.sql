@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3472
 
-DROP FUNCTION IF EXISTS cm.gw_trg_cm_campaign_x_feature_validate_type() CASCADE;
+--DROP FUNCTION IF EXISTS cm.gw_trg_cm_campaign_x_feature_validate_type() CASCADE;
 CREATE OR REPLACE FUNCTION cm.gw_trg_cm_campaign_x_feature_validate_type()
  RETURNS trigger AS
 $BODY$
@@ -19,9 +19,19 @@ DECLARE
     v_allowed boolean;
     v_object_id TEXT;
     v_sql TEXT;
+	v_new_feature BOOLEAN := false;
 
 
 BEGIN
+
+	-- Exception for new feature coming from other app, using a '-' id
+	EXECUTE format('SELECT ($1).%I_id::text LIKE ''-%%''', v_feature)
+	INTO v_new_feature
+	USING NEW;
+
+	IF v_new_feature THEN
+	    RETURN NEW;
+	END IF;
 
     -- Get allowed object_ids (feature_type list)
     SELECT to_json(array_agg(object_id)) INTO v_feature_types_allowed
