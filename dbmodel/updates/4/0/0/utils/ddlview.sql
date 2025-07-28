@@ -160,6 +160,9 @@ DROP VIEW IF EXISTS v_edit_review_arc;
 DROP VIEW IF EXISTS v_edit_review_connec;
 DROP VIEW IF EXISTS v_edit_review_gully;
 
+DROP VIEW IF EXISTS v_edit_link_connec;
+DROP VIEW IF EXISTS v_edit_link_gully;
+
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 
@@ -196,9 +199,7 @@ DROP VIEW IF EXISTS vu_node;
 DROP VIEW IF EXISTS ve_connec CASCADE;
 DROP VIEW IF EXISTS vu_connec;
 
-DROP view IF EXISTS v_edit_link_connec;
-DROP view IF EXISTS v_edit_link_gully;
-DROP view IF EXISTS v_edit_link;
+DROP VIEW IF EXISTS v_edit_link;
 
 DROP VIEW IF EXISTS v_edit_minsector;
 DROP VIEW IF EXISTS v_edit_samplepoint;

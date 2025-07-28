@@ -60,3 +60,19 @@ UPDATE sys_table SET alias='Element feature catalog' WHERE id='v_edit_cat_featur
 -- 23/07/2025
 INSERT INTO sys_fprocess (fid, fprocess_name) VALUES (-1, 'There is');
 INSERT INTO sys_fprocess (fid, fprocess_name) VALUES (-2, 'There are');
+
+-- 28/07/2025
+UPDATE sys_table SET id='ve_arc' WHERE id='v_edit_arc';
+UPDATE sys_table SET id='ve_node' WHERE id='v_edit_node';
+UPDATE sys_table SET id='ve_connec' WHERE id='v_edit_connec';
+UPDATE sys_table SET id='ve_link' WHERE id='v_edit_link';
+
+UPDATE sys_style SET layername = 've_node' WHERE layername = 'v_edit_node';
+UPDATE sys_style SET layername = 've_arc' WHERE layername = 'v_edit_arc';
+UPDATE sys_style SET layername = 've_connec' WHERE layername = 'v_edit_connec';
+UPDATE sys_style SET layername = 've_link' WHERE layername = 'v_edit_link';
+
+UPDATE cat_feature SET parent_layer = 've_node' WHERE parent_layer = 'v_edit_node';
+UPDATE cat_feature SET parent_layer = 've_arc' WHERE parent_layer = 'v_edit_arc';
+UPDATE cat_feature SET parent_layer = 've_connec' WHERE parent_layer = 'v_edit_connec';
+UPDATE cat_feature SET parent_layer = 've_link' WHERE parent_layer = 'v_edit_link';
