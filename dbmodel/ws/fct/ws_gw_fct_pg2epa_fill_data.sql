@@ -57,10 +57,10 @@ BEGIN
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	EXECUTE ' INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
-		WITH b AS (SELECT v_edit_arc.* FROM selector_sector, v_edit_arc
-		JOIN value_state_type ON v_edit_arc.state_type = value_state_type.id
-		WHERE v_edit_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
-		AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0'
+		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
+		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
+		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
+		AND ve_arc.sector_id > 0 AND ve_arc.state > 0'
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
 		n.node_id, top_elev, top_elev-depth as elev, node_type, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
@@ -82,7 +82,7 @@ BEGIN
 			c.connec_id, top_elev, top_elev-depth as elev, ''CONNEC'', conneccat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, 
 			c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
-			FROM selector_sector, v_edit_connec c
+			FROM selector_sector, ve_connec c
 			JOIN value_state_type ON id = state_type
 			WHERE c.sector_id = selector_sector.sector_id 
 			AND c.sector_id > 0 AND c.state > 0 
@@ -137,28 +137,28 @@ BEGIN
 	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
 		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		SELECT DISTINCT ON (arc_id)
-		v_edit_arc.arc_id, node_1, node_2, v_edit_arc.arc_type, arccat_id, epa_type, v_edit_arc.sector_id, v_edit_arc.state, v_edit_arc.state_type, v_edit_arc.annotation,
+		ve_arc.arc_id, node_1, node_2, ve_arc.arc_type, arccat_id, epa_type, ve_arc.sector_id, ve_arc.state, ve_arc.state_type, ve_arc.annotation,
 		CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END AS roughness,
-		(CASE WHEN v_edit_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
-		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
-		v_edit_arc.the_geom,
-		v_edit_arc.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
-		(case when v_edit_arc.builtdate is not null then (now()::date-v_edit_arc.builtdate)/30 else 0 end)
-		FROM selector_sector, v_edit_arc
+		(CASE WHEN ve_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
+		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from ve_arc (dint)...
+		ve_arc.the_geom,
+		ve_arc.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
+		(case when ve_arc.builtdate is not null then (now()::date-ve_arc.builtdate)/30 else 0 end)
+		FROM selector_sector, ve_arc
 			LEFT JOIN value_state_type ON id=state_type
-			LEFT JOIN cat_arc ON v_edit_arc.arccat_id = cat_arc.id
+			LEFT JOIN cat_arc ON ve_arc.arccat_id = cat_arc.id
 			LEFT JOIN cat_material ON cat_arc.matcat_id = cat_material.id
-			LEFT JOIN inp_pipe ON v_edit_arc.arc_id = inp_pipe.arc_id
-			LEFT JOIN inp_virtualpump ON v_edit_arc.arc_id = inp_virtualpump.arc_id
-			LEFT JOIN inp_virtualvalve ON v_edit_arc.arc_id = inp_virtualvalve.arc_id
+			LEFT JOIN inp_pipe ON ve_arc.arc_id = inp_pipe.arc_id
+			LEFT JOIN inp_virtualpump ON ve_arc.arc_id = inp_virtualpump.arc_id
+			LEFT JOIN inp_virtualvalve ON ve_arc.arc_id = inp_virtualvalve.arc_id
 			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_material.id
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
-			||v_statetype||' AND v_edit_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
+			||v_statetype||' AND ve_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND ''ARC'' = ANY(cat_material.feature_type)
 			AND epa_type != ''UNDEFINED''
-			AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0
-			AND st_length(v_edit_arc.the_geom) >= '||v_minlength;
+			AND ve_arc.sector_id > 0 AND ve_arc.state > 0
+			AND st_length(ve_arc.the_geom) >= '||v_minlength;
 
 	IF v_networkmode =  4 THEN
 
@@ -172,7 +172,7 @@ BEGIN
 			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
 			(CASE WHEN l.custom_length IS NOT NULL THEN l.custom_length ELSE st_length(l.the_geom) END), 
-			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
+			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from ve_arc (dint)...
 			l.the_geom,
 			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)

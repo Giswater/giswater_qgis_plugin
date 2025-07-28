@@ -39,9 +39,9 @@ UPDATE cat_arc SET geom2 = null WHERE id = 'EG150';
 
 
 -- refactoring flowregulators for node pump station on expl_1
-UPDATE v_edit_arc SET epa_type = 'PUMP' WHERE arc_id = '303';
+UPDATE ve_arc SET epa_type = 'PUMP' WHERE arc_id = '303';
 UPDATE inp_pump set curve_id = 'PUMP-01', status='OFF', startup=2, shutoff=0.4 WHERE arc_id = '303';
-UPDATE v_edit_arc SET epa_type = 'WEIR' WHERE arc_id = '342';
+UPDATE ve_arc SET epa_type = 'WEIR' WHERE arc_id = '342';
 UPDATE inp_weir SET weir_type ='TRANSVERSE', offsetval = 17, cd=1.5, geom1=1, geom2=1;
 
 

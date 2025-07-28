@@ -59,8 +59,8 @@ BEGIN
 
 	-- check number of times each node appears in terms of identify nodearcs <> 2
 	v_query_number = 'SELECT count(*)as numarcs, node_id FROM node n JOIN 
-						      (SELECT node_1 as node_id FROM v_edit_arc 
-							UNION ALL SELECT node_2 FROM v_edit_arc) a using (node_id) group by n.node_id';
+						      (SELECT node_1 as node_id FROM ve_arc 
+							UNION ALL SELECT node_2 FROM ve_arc) a using (node_id) group by n.node_id';
 
 	-- query text for mandatory node2arcs
 	v_querytext = 'SELECT a.*, v.to_arc FROM temp_t_node a JOIN man_valve v ON a.node_id=v.node_id::text WHERE to_arc is not null

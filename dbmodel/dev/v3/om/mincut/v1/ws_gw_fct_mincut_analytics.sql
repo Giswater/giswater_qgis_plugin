@@ -37,10 +37,10 @@ BEGIN
     INSERT INTO anl_mincut_result_cat (work_order) VALUES(p_work_order) RETURNING id INTO v_result_id ;
 
 	IF p_sector_id=0 THEN
-			v_query_text:= 'SELECT arc_id, the_geom FROM v_edit_arc WHERE state=1 AND expl_id='|| p_expl_id;
+			v_query_text:= 'SELECT arc_id, the_geom FROM ve_arc WHERE state=1 AND expl_id='|| p_expl_id;
 				
 	        ELSE 
-       			v_query_text:= 'SELECT arc_id, the_geom FROM v_edit_arc 
+       			v_query_text:= 'SELECT arc_id, the_geom FROM ve_arc 
 				JOIN value_state_type ON state_type=id 
 				WHERE state=1 AND is_operative=TRUE AND expl_id='|| p_expl_id||'AND sector_id='||p_sector_id;
 		END IF;	

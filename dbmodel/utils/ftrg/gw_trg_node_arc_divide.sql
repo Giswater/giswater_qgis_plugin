@@ -50,12 +50,12 @@ BEGIN
 		SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
 
 		-- get if another node exists
-		SELECT node_id INTO node_id_aux FROM node JOIN v_edit_node USING (node_id) WHERE st_dwithin((NEW.the_geom), node.the_geom, v_node_proximity)
-		AND NEW.node_id != node_id AND node.state=1 AND v_edit_node.state=1 LIMIT 1;
+		SELECT node_id INTO node_id_aux FROM node JOIN ve_node USING (node_id) WHERE st_dwithin((NEW.the_geom), node.the_geom, v_node_proximity)
+		AND NEW.node_id != node_id AND node.state=1 AND ve_node.state=1 LIMIT 1;
 
 		IF node_id_aux IS NULL THEN
 
-			SELECT arc_id INTO arc_id_aux FROM arc JOIN v_edit_arc USING (arc_id)
+			SELECT arc_id INTO arc_id_aux FROM arc JOIN ve_arc USING (arc_id)
 			WHERE st_dwithin((NEW.the_geom), arc.the_geom, v_node_proximity)
 			AND arc.node_1 is not null and arc.node_2 is not null
 			LIMIT 1;
@@ -67,7 +67,7 @@ BEGIN
 
 				perform gw_fct_arc_repair(concat('
 				{"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":', v_srid, '}, "form":{},
-				"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":["',arc_id,'"]},
+				"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":["',arc_id,'"]},
 				"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{},
 				"aux_params":null}}')::json) from arc a where st_dwithin(a.the_geom, new.the_geom, v_node_proximity);
 

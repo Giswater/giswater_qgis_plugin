@@ -51,18 +51,18 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			IF v_review_status=1 AND NEW.connec_id NOT IN (SELECT connec_id FROM connec) THEN
 
-				INSERT INTO v_edit_connec (connec_id, y1, y2, connec_type, conneccat_id, annotation, observ, expl_id, the_geom, matcat_id)
+				INSERT INTO ve_connec (connec_id, y1, y2, connec_type, conneccat_id, annotation, observ, expl_id, the_geom, matcat_id)
 				VALUES (NEW.connec_id, NEW.new_y1, NEW.new_y2, NEW.new_connec_type, NEW.new_conneccat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id,
 				NEW.the_geom, NEW.new_matcat_id);
 
 			ELSIF v_review_status=2 THEN
-				UPDATE v_edit_connec SET the_geom=NEW.the_geom, y1=NEW.new_y1, y2=NEW.new_y2, conneccat_id=NEW.new_conneccat_id,
+				UPDATE ve_connec SET the_geom=NEW.the_geom, y1=NEW.new_y1, y2=NEW.new_y2, conneccat_id=NEW.new_conneccat_id,
 				connec_type=NEW.new_connec_type, annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE connec_id=NEW.connec_id;
 
 			ELSIF v_review_status=3 THEN
 
-				UPDATE v_edit_connec SET y1=NEW.new_y1, y2=NEW.new_y2, conneccat_id=NEW.new_conneccat_id, connec_type=NEW.new_connec_type,
+				UPDATE ve_connec SET y1=NEW.new_y1, y2=NEW.new_y2, conneccat_id=NEW.new_conneccat_id, connec_type=NEW.new_connec_type,
 				annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE connec_id=NEW.connec_id;
 

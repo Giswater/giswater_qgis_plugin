@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(p_feature_id character vary
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_mincut(arc_id, 'arc', 1, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.v_edit_arc)) FROM SCHEMA_NAME.v_edit_arc;
+SELECT SCHEMA_NAME.gw_fct_mincut(arc_id, 'arc', 1, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.ve_arc)) FROM SCHEMA_NAME.ve_arc;
 */
 
 DECLARE
@@ -150,18 +150,18 @@ BEGIN
 		END IF;
 		
         -- Check an existing arc
-        SELECT COUNT(*) INTO controlValue FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
+        SELECT COUNT(*) INTO controlValue FROM ve_arc JOIN value_state_type ON state_type=value_state_type.id 
         WHERE (arc_id = element_id_arg) AND (is_operative IS TRUE);
         IF controlValue = 1 THEN
 
             -- Select public.geometry
-            SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+            SELECT the_geom INTO arc_aux FROM ve_arc WHERE arc_id = element_id_arg;
 
             -- Insert arc id
             INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
         
             -- Run for extremes node
-            SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+            SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM ve_arc WHERE arc_id = element_id_arg;
 
             IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -185,7 +185,7 @@ BEGIN
 					-- Compute the tributary area using DFS
 					PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);	
 				ELSE
-					SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_1_aux;
+					SELECT the_geom INTO node_aux FROM ve_node WHERE node_id = node_1_aux;
 					INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES (node_1_aux, node_aux, result_id_arg);	
 				END IF;
 			END IF;
@@ -212,7 +212,7 @@ BEGIN
 					-- Compute the tributary area using DFS
 					PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);	
 				ELSE 
-					SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_2_aux;
+					SELECT the_geom INTO node_aux FROM ve_node WHERE node_id = node_2_aux;
 					INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_2_aux, node_aux, result_id_arg);		
 				END IF;	
 			END IF;
@@ -231,7 +231,7 @@ BEGIN
 		END IF;
 	
 		-- Check an existing node
-        SELECT COUNT(*) INTO controlValue FROM v_edit_node JOIN value_state_type ON state_type=value_state_type.id  
+        SELECT COUNT(*) INTO controlValue FROM ve_node JOIN value_state_type ON state_type=value_state_type.id  
         WHERE node_id = element_id_arg AND (is_operative IS TRUE);
         IF controlValue = 1 THEN
             -- Compute the tributary area using DFS

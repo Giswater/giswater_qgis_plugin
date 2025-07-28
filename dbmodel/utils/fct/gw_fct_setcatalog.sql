@@ -19,14 +19,14 @@ feature:
 SELECT SCHEMA_NAME.gw_fct_setcatalog($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"},
-"feature":{"tableName":"v_edit_node", "idName":"node_id", "id":"2001", "feature_type":"JUNCTION"},
+"feature":{"tableName":"ve_node", "idName":"node_id", "id":"2001", "feature_type":"JUNCTION"},
 "data":{"fields":{"builtdate": "2020-05-05", "id": "21XY1111", "descript":"test 54", "link":null,"workid_key1": "132", "workid_key2": "vdf"}}}$$);
 
 
 SELECT SCHEMA_NAME.gw_fct_setcatalog($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"new_workcat"},
-"feature":{"tableName":"v_edit_node"},
+"feature":{"tableName":"ve_node"},
 "data":{"fields":{"builtdate": "2020-05-05", "id": "21XY1111", "descript":"test 54", "link":null,"workid_key1": "132", "workid_key2": "vdf"}}}$$);
 
 

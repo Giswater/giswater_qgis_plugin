@@ -72,7 +72,7 @@ BEGIN
 	v_exploitation = (SELECT array_agg(expl_id) FROM selector_expl where cur_user = current_user);
 	v_exploitation = replace(replace (v_exploitation,'{',''), '}','');
 
-	v_count = (SELECT COUNT(*) FROM (SELECT node_1 FROM v_edit_arc WHERE node_1 = v_id UNION ALL SELECT node_2 FROM v_edit_arc WHERE node_2 = v_id)a);
+	v_count = (SELECT COUNT(*) FROM (SELECT node_1 FROM ve_arc WHERE node_1 = v_id UNION ALL SELECT node_2 FROM ve_arc WHERE node_2 = v_id)a);
 
 	IF v_type = 'VALVE' AND v_closedstatus IS NOT NULL AND v_count = 2 THEN
 

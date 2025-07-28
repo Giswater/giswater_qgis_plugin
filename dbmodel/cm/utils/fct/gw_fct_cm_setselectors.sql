@@ -204,7 +204,7 @@ BEGIN
 
 
 	-- get envelope
-	--SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
+	--SELECT count(the_geom) INTO v_count_2 FROM ve_node LIMIT 1;
 
 	IF v_tabname='tab_campaign' THEN
 		SELECT row_to_json (a)

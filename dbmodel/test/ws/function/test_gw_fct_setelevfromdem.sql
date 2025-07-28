@@ -32,10 +32,10 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setelevfromdem --> tableName : v_edit_connec returns status "Accepted"'
+    'Check if gw_fct_setelevfromdem --> tableName : ve_connec returns status "Accepted"'
 );
 
 SELECT is(
@@ -48,10 +48,10 @@ SELECT is(
 
 SELECT is(
     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setelevfromdem --> tableName : v_edit_node returns status "Accepted"'
+    'Check if gw_fct_setelevfromdem --> tableName : ve_node returns status "Accepted"'
 );
 
 SELECT is(

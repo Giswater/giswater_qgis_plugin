@@ -224,9 +224,9 @@ UPDATE config_param_system
 
 UPDATE config_form_fields SET columnname='staticpressure1' WHERE formname ILIKE '%arc%' AND columnname='staticpress1';
 UPDATE config_form_fields SET columnname='staticpressure2' WHERE formname ILIKE '%arc%' AND columnname='staticpress2';
-UPDATE config_form_fields SET columnname='pressure_exit' WHERE formname ILIKE '%valve%' AND columnname='pression_exit';
-UPDATE config_form_fields SET columnname='pressure_entry' WHERE formname ILIKE '%valve%' AND columnname='pression_entry';
-UPDATE config_form_fields SET columnname='pressure_exit' WHERE formname ILIKE '%pump%' AND columnname='pressure';
+-- UPDATE config_form_fields SET columnname='pressure_exit' WHERE formname ILIKE '%valve%' AND columnname='pression_exit';
+-- UPDATE config_form_fields SET columnname='pressure_entry' WHERE formname ILIKE '%valve%' AND columnname='pression_entry';
+-- UPDATE config_form_fields SET columnname='pressure_exit' WHERE formname ILIKE '%pump%' AND columnname='pressure';
 UPDATE config_form_fields SET columnname='staticpressure1' WHERE formname ILIKE '%link%' AND columnname='staticpressure';
 
 
@@ -312,3 +312,18 @@ You must select a period already created or manually select the date of the inte
 1) tables ext_cat_period, ext_rtc_hydrometer_x_data, ext_rtc_scada_x_data need to be filled. 
 2) DMA graph need to be executed.  
 >End Date proposal for 1% of hydrometers which consum is out of the period: 2015-07-31 00:00:00' WHERE id=3142;
+
+UPDATE sys_table SET id='ve_arc' WHERE id='v_edit_arc';
+UPDATE sys_table SET id='ve_node' WHERE id='v_edit_node';
+UPDATE sys_table SET id='ve_connec' WHERE id='v_edit_connec';
+UPDATE sys_table SET id='ve_link' WHERE id='v_edit_link';
+
+UPDATE sys_style SET layername = 've_node' WHERE layername = 'v_edit_node';
+UPDATE sys_style SET layername = 've_arc' WHERE layername = 'v_edit_arc';
+UPDATE sys_style SET layername = 've_connec' WHERE layername = 'v_edit_connec';
+UPDATE sys_style SET layername = 've_link' WHERE layername = 'v_edit_link';
+
+UPDATE cat_feature SET parent_layer = 've_node' WHERE parent_layer = 'v_edit_node';
+UPDATE cat_feature SET parent_layer = 've_arc' WHERE parent_layer = 'v_edit_arc';
+UPDATE cat_feature SET parent_layer = 've_connec' WHERE parent_layer = 'v_edit_connec';
+UPDATE cat_feature SET parent_layer = 've_link' WHERE parent_layer = 'v_edit_link';

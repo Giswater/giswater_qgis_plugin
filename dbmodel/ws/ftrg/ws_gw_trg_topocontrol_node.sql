@@ -27,7 +27,7 @@ xvar double precision;
 yvar double precision;
 pol_id_var varchar;
 v_arc record;
-v_arcrecord "SCHEMA_NAME".v_edit_arc;
+v_arcrecord "SCHEMA_NAME".ve_arc;
 v_arcrecordtb "SCHEMA_NAME".arc;
 v_plan_statetype_ficticius int2;
 v_node_proximity_control boolean;
@@ -132,8 +132,8 @@ BEGIN
 				INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0) ON CONFLICT (psector_id, node_id) DO NOTHING;
 
 				-- looking for all the arcs (1 and 2) using existing node
-				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM v_edit_arc WHERE node_1=node_rec.node_id AND state >0
-				UNION SELECT arc_id, node_2 FROM v_edit_arc WHERE node_2=node_rec.node_id AND state >0)
+				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM ve_arc WHERE node_1=node_rec.node_id AND state >0
+				UNION SELECT arc_id, node_2 FROM ve_arc WHERE node_2=node_rec.node_id AND state >0)
 				LOOP
 
 					-- if exists some arc planified on same alternative attached to that existing node
@@ -181,8 +181,8 @@ BEGIN
 						UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
 						-- getting table child information (man_table)
-						v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN v_edit_arc ON c.id=arc_type WHERE arc_id=v_arc.arc_id);
-						v_epatable = (SELECT epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON epa_default = s.id JOIN v_edit_arc ON c.id=arc_type WHERE arc_id=v_arc.arc_id);
+						v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN ve_arc ON c.id=arc_type WHERE arc_id=v_arc.arc_id);
+						v_epatable = (SELECT epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON epa_default = s.id JOIN ve_arc ON c.id=arc_type WHERE arc_id=v_arc.arc_id);
 
 						-- building querytext for man_table
 						v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','')
@@ -315,8 +315,8 @@ BEGIN
 				FOR arcrec IN EXECUTE v_querytext
 				LOOP
 					-- Initial and final node of the arc
-					SELECT * INTO nodeRecord1 FROM v_edit_node WHERE node_id = arcrec.node_1;
-					SELECT * INTO nodeRecord2 FROM v_edit_node WHERE node_id = arcrec.node_2;
+					SELECT * INTO nodeRecord1 FROM ve_node WHERE node_id = arcrec.node_1;
+					SELECT * INTO nodeRecord2 FROM ve_node WHERE node_id = arcrec.node_2;
 
 					-- Control de lineas de longitud 0
 					IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN

@@ -344,11 +344,11 @@ BEGIN
 
 			ELSIF upper(v_catfeature.feature_type) ='ARC' THEN
 
-				SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
-				ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
+				SELECT * INTO v_noderecord1 FROM ve_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), ve_node.the_geom, v_arc_searchnodes)
+				ORDER BY ST_Distance(ve_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
 
-				SELECT * INTO v_noderecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(v_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
-				ORDER BY ST_Distance(v_edit_node.the_geom, ST_endpoint(v_reduced_geometry)) LIMIT 1;
+				SELECT * INTO v_noderecord2 FROM ve_node WHERE ST_DWithin(ST_endpoint(v_reduced_geometry), ve_node.the_geom, v_arc_searchnodes)
+				ORDER BY ST_Distance(ve_node.the_geom, ST_endpoint(v_reduced_geometry)) LIMIT 1;
 
 				IF (v_noderecord1.node_id IS NOT NULL) AND (v_noderecord2.node_id IS NOT NULL) THEN
 
@@ -507,15 +507,15 @@ BEGIN
 			-- TODO: Review if this is correct. Reference 'FLWREG' in this function
             ELSIF upper(v_catfeature.feature_type) = 'FLWREG' THEN
                 -- Get toarc
-                SELECT arc_id , the_geom into v_toarc, v_toarc_geom FROM v_edit_arc WHERE ST_DWithin(ST_endpoint(v_reduced_geometry), v_edit_arc.the_geom, 0.001) LIMIT 1;
+                SELECT arc_id , the_geom into v_toarc, v_toarc_geom FROM ve_arc WHERE ST_DWithin(ST_endpoint(v_reduced_geometry), ve_arc.the_geom, 0.001) LIMIT 1;
                 -- Get flwreg_length
                 SELECT abs(ST_LineLocatePoint(v_toarc_geom, ST_startpoint(v_reduced_geometry)) - ST_LineLocatePoint(v_toarc_geom, ST_endpoint(v_reduced_geometry))) * ST_Length(v_toarc_geom)
                 INTO v_flwreg_length;
 
                 -- WARNING: this code is also in gw_fct_infofromid. If it needs to be changed here, it will most likely have to be changed there too.
                 -- Get node id from initial clicked point
-                SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
-                ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
+                SELECT * INTO v_noderecord1 FROM ve_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), ve_node.the_geom, v_arc_searchnodes)
+                ORDER BY ST_Distance(ve_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
                 -- Get flowreg_type
                 v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(v_table_id) ,' LIMIT 1');
                 EXECUTE v_querystring INTO v_flwreg_type;
@@ -540,8 +540,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_presszone_id = (SELECT presszone_id FROM presszone WHERE ST_DWithin(v_reduced_geometry, presszone.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
-				v_presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(v_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
-				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+				v_presszone_id =(SELECT presszone_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -551,15 +551,15 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(v_reduced_geometry, sector.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
-				v_sector_id =(SELECT sector_id FROM v_edit_arc WHERE ST_DWithin(v_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
-				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+				v_sector_id =(SELECT sector_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
 		-- Node ID
 		IF upper(v_catfeature.feature_type) = 'ELEMENT' AND upper(v_catfeature.feature_class) = 'FRELEM' THEN
-			SELECT node_id INTO v_node_id FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
-			ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
+			SELECT node_id INTO v_node_id FROM ve_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), ve_node.the_geom, v_arc_searchnodes)
+			ORDER BY ST_Distance(ve_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
 			if v_node_id is NULL THEN
 				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3694", "function":"2560","parameters":null, "is_process":true}}$$);
@@ -572,8 +572,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_dma_id = (SELECT dma_id FROM dma WHERE ST_DWithin(v_reduced_geometry, dma.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
-				v_dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(v_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
-				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+				v_dma_id =(SELECT dma_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -582,8 +582,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_omzone_id = (SELECT omzone_id FROM omzone WHERE ST_DWithin(v_reduced_geometry, omzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
-				v_omzone_id =(SELECT omzone_id FROM v_edit_arc WHERE ST_DWithin(v_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
-				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+				v_omzone_id =(SELECT omzone_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -593,8 +593,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_expl_id = (SELECT expl_id FROM exploitation WHERE ST_DWithin(v_reduced_geometry, exploitation.the_geom,0.001)  AND active=true LIMIT 1);
 			ELSE
-				v_expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(v_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
-				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+				v_expl_id =(SELECT expl_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -604,8 +604,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_supplyzone_id = (SELECT supplyzone_id FROM supplyzone WHERE ST_DWithin(v_reduced_geometry, supplyzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
-				v_supplyzone_id =(SELECT supplyzone_id FROM v_edit_arc WHERE ST_DWithin(v_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
-				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+				v_supplyzone_id =(SELECT supplyzone_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -615,8 +615,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_dwfzone_id = (SELECT dwfzone_id FROM dwfzone WHERE ST_DWithin(v_reduced_geometry, dwfzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
-				v_dwfzone_id =(SELECT dwfzone_id FROM v_edit_arc WHERE ST_DWithin(v_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
-				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+				v_dwfzone_id =(SELECT dwfzone_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -626,8 +626,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_drainzone_id = (SELECT drainzone_id FROM drainzone WHERE ST_DWithin(v_reduced_geometry, drainzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
-				v_drainzone_id =(SELECT drainzone_id FROM v_edit_arc WHERE ST_DWithin(v_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
-				order by ST_Distance (v_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+				v_drainzone_id =(SELECT drainzone_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 

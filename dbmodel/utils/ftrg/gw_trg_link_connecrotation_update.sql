@@ -29,7 +29,7 @@ BEGIN
 
 		IF NEW.feature_type='CONNEC' THEN
 			
-			SELECT connec_id, the_geom INTO rec_connec FROM v_edit_connec WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC';
+			SELECT connec_id, the_geom INTO rec_connec FROM ve_connec WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC';
 			SELECT feature_id, the_geom INTO rec_link FROM link WHERE link.feature_id = rec_connec.connec_id;
 
 			IF rec_link.feature_id=rec_connec.connec_id THEN
@@ -40,7 +40,7 @@ BEGIN
 			END IF;
 
 			label_side_aux= degrees(ST_Azimuth(rec_connec.the_geom,ST_EndPoint(link.the_geom)))
-						from v_edit_connec 
+						from ve_connec 
 						join link on link.feature_id=rec_connec.connec_id
 						WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC' LIMIT 1;
 			label_rotation_aux=(azm_aux*(180/3.14159)-90);
@@ -59,7 +59,7 @@ BEGIN
 				
 		ELSIF NEW.feature_type='GULLY' THEN
 		
-			SELECT gully_id, the_geom INTO rec_gully FROM v_edit_gully WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY';
+			SELECT gully_id, the_geom INTO rec_gully FROM ve_gully WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY';
 			SELECT feature_id, the_geom INTO rec_link FROM link WHERE link.feature_id = rec_gully.gully_id;
 			
 			IF rec_link.feature_id=rec_gully.gully_id THEN
@@ -70,7 +70,7 @@ BEGIN
 			END IF;
 
 			label_side_aux= degrees(ST_Azimuth(rec_gully.the_geom,ST_EndPoint(link.the_geom)))
-						from v_edit_gully
+						from ve_gully
 						join link on link.feature_id=rec_gully.gully_id 
 						WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY' LIMIT 1;
 			label_rotation_aux=(azm_aux*(180/3.14159)-90);

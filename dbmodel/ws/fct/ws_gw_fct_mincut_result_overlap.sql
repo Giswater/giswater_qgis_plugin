@@ -218,7 +218,7 @@ BEGIN
 					FROM om_mincut_arc JOIN arc a USING (arc_id) WHERE result_id = -2;
 
 					-- getting the number of connecs with additional affectation
-					SELECT count(*) FROM v_edit_connec JOIN temp_anl_arc USING (arc_id) WHERE fid = 131 AND result_id::integer = -2	INTO v_addaffconnecs;
+					SELECT count(*) FROM ve_connec JOIN temp_anl_arc USING (arc_id) WHERE fid = 131 AND result_id::integer = -2	INTO v_addaffconnecs;
 
 					IF v_addaffconnecs > 0 THEN -- there is a overlap (temporal & spatial intersection) with additional connecs affected
 
@@ -426,8 +426,8 @@ BEGIN
 		SELECT v_mincutid,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec
 		JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id
 		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-		JOIN v_edit_connec ON om_mincut_connec.connec_id=v_edit_connec.connec_id
-		WHERE om_mincut_connec.result_id=v_mincutid AND v_edit_connec.is_operative=TRUE
+		JOIN ve_connec ON om_mincut_connec.connec_id=ve_connec.connec_id
+		WHERE om_mincut_connec.result_id=v_mincutid AND ve_connec.is_operative=TRUE
 		ON CONFLICT (hydrometer_id, result_id) DO NOTHING;
 
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)

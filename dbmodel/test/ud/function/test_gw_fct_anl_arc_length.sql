@@ -36,7 +36,7 @@ SET role basic_user;
 
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[132,133]},
     "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
     'Failed',
     'Check if gw_fct_anl_arc_length -> previousSelection returns status "Failed" for basic user'
@@ -46,7 +46,7 @@ SET role om_user;
 
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[132,133]},
     "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for om user'
@@ -56,7 +56,7 @@ SET role edit_user;
 
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[132,133]},
     "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for edit user'
@@ -66,7 +66,7 @@ SET role epa_user;
 
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[132,133]},
     "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for epa user'
@@ -76,7 +76,7 @@ SET role plan_user;
 
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[132,133]},
+    "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[132,133]},
     "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for plan user'
@@ -84,7 +84,7 @@ SELECT is (
 
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},
-    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+    "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]},
     "data":{"selectionMode":"wholeSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_length -> wholeSelection returns status "Accepted"'

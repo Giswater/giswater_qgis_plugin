@@ -36,7 +36,7 @@ SET ROLE basic_user;
 
 SELECT is (
     (gw_fct_anl_connec_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
+    "form":{}, "feature":{"tableName":"ve_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"connecTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Failed',
@@ -47,7 +47,7 @@ SET ROLE om_user;
 
 SELECT is (
     (gw_fct_anl_connec_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
+    "form":{}, "feature":{"tableName":"ve_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"connecTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -58,7 +58,7 @@ SET ROLE edit_user;
 
 SELECT is (
     (gw_fct_anl_connec_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
+    "form":{}, "feature":{"tableName":"ve_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"connecTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -69,7 +69,7 @@ SET ROLE epa_user;
 
 SELECT is (
     (gw_fct_anl_connec_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
+    "form":{}, "feature":{"tableName":"ve_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"connecTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -80,7 +80,7 @@ SET ROLE plan_user;
 
 SELECT is (
     (gw_fct_anl_connec_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
+    "form":{}, "feature":{"tableName":"ve_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"connecTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',

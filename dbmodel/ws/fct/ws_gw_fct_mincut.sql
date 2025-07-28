@@ -154,7 +154,7 @@ BEGIN
 	INSERT INTO om_mincut_valve (result_id, node_id, unaccess, closed, broken, the_geom)
 	SELECT result_id_arg, n.node_id, false::boolean, closed, broken, n.the_geom
 	FROM cat_feature_node f
-	JOIN v_edit_node n on n.node_type=id
+	JOIN ve_node n on n.node_type=id
 	JOIN man_valve USING (node_id)
 	WHERE 'MINSECTOR' = ANY(graph_delimiter);
 
@@ -178,13 +178,13 @@ BEGIN
 		END IF;
 
 		-- Check an existing arc
-		SELECT COUNT(*) INTO controlValue FROM v_edit_arc
+		SELECT COUNT(*) INTO controlValue FROM ve_arc
 		WHERE (arc_id::text = element_id_arg) AND (is_operative IS TRUE);
 
 		IF controlValue = 1 THEN
 
 			-- Select public.geometry
-			SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id::text = element_id_arg;
+			SELECT the_geom INTO arc_aux FROM ve_arc WHERE arc_id::text = element_id_arg;
 
 			-- call engine to determinate the isolated area
 			IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
@@ -200,7 +200,7 @@ BEGIN
 				SELECT arc_id, the_geom, result_id_arg FROM arc WHERE arc_id::text = element_id_arg;
 
 				-- Run for extremes node
-				SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id::text = element_id_arg;
+				SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM ve_arc WHERE arc_id::text = element_id_arg;
 
 				IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
 					v_querystring = 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -227,7 +227,7 @@ BEGIN
 						-- Compute the tributary area using DFS
 						PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
 					ELSE
-						SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_1_aux;
+						SELECT the_geom INTO node_aux FROM ve_node WHERE node_id = node_1_aux;
 						INSERT INTO om_mincut_node (node_id, the_geom, result_id) VALUES (node_1_aux, node_aux, result_id_arg);
 					END IF;
 				END IF;
@@ -254,7 +254,7 @@ BEGIN
 						-- Compute the tributary area using DFS
 						PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);
 					ELSE
-						SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_2_aux;
+						SELECT the_geom INTO node_aux FROM ve_node WHERE node_id = node_2_aux;
 						INSERT INTO om_mincut_node (node_id, the_geom, result_id) VALUES(node_2_aux, node_aux, result_id_arg);
 					END IF;
 				END IF;
@@ -308,7 +308,7 @@ BEGIN
 	-- insert connecs
 	IF p_usepsectors IS TRUE AND 'role_plan' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
-		SELECT result_id_arg, connec_id, c.the_geom, c.customer_code FROM v_edit_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
+		SELECT result_id_arg, connec_id, c.the_geom, c.customer_code FROM ve_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
 	ELSE
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 		SELECT result_id_arg, connec_id, connec.the_geom, customer_code FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state = 1;

@@ -31,14 +31,14 @@ GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_anl_connec_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_connec"},
+    (gw_fct_anl_connec_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"ve_connec"},
     "data":{"selectionMode":"wholeSelection", "parameters":{"connecTolerance":10}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_connec_duplicated -> wholeSelection returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_anl_connec_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_connec",
+    (gw_fct_anl_connec_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"ve_connec",
     "id":[3101, 3102]}, "data":{"selectionMode":"previousSelection", "parameters":{"connecTolerance":10}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_connec_duplicated -> previousSelection returns status "Accepted"'
@@ -46,10 +46,10 @@ SELECT is (
 
 SELECT is (
     (gw_fct_anl_connec_duplicated($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{"connecTolerance":"0.01"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_connec_duplicated with aux_params and tableName : v_edit_connec returns status "Accepted"'
+    'Check if gw_fct_anl_connec_duplicated with aux_params and tableName : ve_connec returns status "Accepted"'
 );
 
 SELECT is (

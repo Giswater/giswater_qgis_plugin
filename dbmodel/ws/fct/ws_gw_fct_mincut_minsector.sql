@@ -104,7 +104,7 @@ BEGIN
 		     WHERE t.flag < 2 AND t.water = 0 AND a.flag = 0;
 
 	-- Getting values from arc
-	SELECT expl_id, state, is_operative, muni_id, macroexpl_id, minsector_id INTO v_expl, v_state, v_isoperative, v_muni, v_macroexpl, v_minsector FROM v_edit_arc WHERE arc_id=p_arc_id;
+	SELECT expl_id, state, is_operative, muni_id, macroexpl_id, minsector_id INTO v_expl, v_state, v_isoperative, v_muni, v_macroexpl, v_minsector FROM ve_arc WHERE arc_id=p_arc_id;
 
 	-- Delaing with temp_om_mincut
 	INSERT INTO temp_om_mincut SELECT * FROM om_mincut WHERE id=p_mincut_id;
@@ -114,14 +114,14 @@ BEGIN
 	IF p_arc_id IS NULL THEN SELECT anl_feature_id INTO p_arc_id FROM om_mincut WHERE id = p_mincut_id;END IF;
 
 	--- controling exceptions
-	SELECT COUNT(*) INTO v_count FROM v_edit_arc WHERE arc_id = p_arc_id;
+	SELECT COUNT(*) INTO v_count FROM ve_arc WHERE arc_id = p_arc_id;
 	IF v_count = 0 THEN RAISE EXCEPTION 'Arc does not exists'; END IF;
 	IF v_state = 0 THEN RAISE EXCEPTION 'Arc with state 0'; END IF;
 	IF v_isoperative = FALSE THEN RAISE EXCEPTION 'Arc with is operative false'; END IF;
 
 	-- insert network features into mincut tables
-	INSERT INTO temp_om_mincut_arc (result_id, arc_id, the_geom, minsector_id) SELECT p_mincut_id, arc_id, the_geom, minsector_id FROM v_edit_arc WHERE minsector_id = v_minsector;
-	INSERT INTO temp_om_mincut_node (result_id, node_id, the_geom, minsector_id) SELECT p_mincut_id, node_id, the_geom, minsector_id FROM v_edit_node WHERE minsector_id = v_minsector;
+	INSERT INTO temp_om_mincut_arc (result_id, arc_id, the_geom, minsector_id) SELECT p_mincut_id, arc_id, the_geom, minsector_id FROM ve_arc WHERE minsector_id = v_minsector;
+	INSERT INTO temp_om_mincut_node (result_id, node_id, the_geom, minsector_id) SELECT p_mincut_id, node_id, the_geom, minsector_id FROM ve_node WHERE minsector_id = v_minsector;
 
 	INSERT INTO temp_om_mincut_valve (result_id, node_id, unaccess, closed, broken, the_geom)
 	SELECT p_mincut_id, node.node_id, false, closed, broken, node.the_geom
@@ -150,9 +150,9 @@ BEGIN
 
 			-- insert network features into mincut tables
 			INSERT INTO temp_om_mincut_arc (result_id, arc_id, the_geom, minsector_id) SELECT p_mincut_id, arc_id, the_geom, minsector_id
-			FROM v_edit_arc WHERE minsector_id = v_minsector_check;
+			FROM ve_arc WHERE minsector_id = v_minsector_check;
 			INSERT INTO temp_om_mincut_node (result_id, node_id, the_geom, minsector_id) SELECT p_mincut_id, node_id, the_geom, minsector_id
-			FROM v_edit_node WHERE minsector_id = v_minsector_check;
+			FROM ve_node WHERE minsector_id = v_minsector_check;
 		END IF;
 	END LOOP;
 

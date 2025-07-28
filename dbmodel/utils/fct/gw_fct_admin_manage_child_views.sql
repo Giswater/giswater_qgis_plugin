@@ -38,7 +38,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "inf
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 
 
-select *  from SCHEMA_NAME.config_form_fields where formname = 'v_edit_arc' and columnname = 'workcat_id_plan'
+select *  from SCHEMA_NAME.config_form_fields where formname = 've_arc' and columnname = 'workcat_id_plan'
 */
 
 DECLARE
@@ -97,7 +97,7 @@ BEGIN
 
 	IF v_action = 'MULTI-DELETE' THEN
 
-		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE feature_type <> 'LINK' AND child_layer IS NOT NULL
+		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE child_layer IS NOT NULL
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||'';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);

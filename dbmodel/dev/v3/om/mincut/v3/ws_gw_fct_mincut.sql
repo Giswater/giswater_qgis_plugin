@@ -111,12 +111,12 @@ BEGIN
 		END IF;
 		
         -- Check an existing arc
-        SELECT COUNT(*) INTO controlValue FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
+        SELECT COUNT(*) INTO controlValue FROM ve_arc JOIN value_state_type ON state_type=value_state_type.id 
         WHERE (arc_id = element_id_arg) AND (is_operative IS TRUE);
         IF controlValue = 1 THEN
 
 		-- Select public.geometry
-		SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+		SELECT the_geom INTO arc_aux FROM ve_arc WHERE arc_id = element_id_arg;
        
 		-- call graf analytics function (MCBASE)
 		v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "parameters":{"id":', result_id_arg ,', "process":"base"}}}');

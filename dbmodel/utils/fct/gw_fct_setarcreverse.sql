@@ -13,11 +13,11 @@ $BODY$
 /*EXAMPLE
 
 SELECT gw_fct_setarcreverse($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":["331"]},
+"form":{}, "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":["331"]},
  "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection", "parameters":{}}}$$);
 
 SELECT gw_fct_setarcreverse($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}}}$$);
 
 -- fid: 357

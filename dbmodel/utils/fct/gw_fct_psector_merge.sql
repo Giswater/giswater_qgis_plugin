@@ -247,7 +247,7 @@ BEGIN
 			WHEN id='GULLY' THEN 4 END) LOOP
 
 			EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
-			FROM information_schema.columns where table_name=''v_edit_'||lower(rec_type.id)||''' and table_schema='''||v_schemaname||'''
+			FROM information_schema.columns where table_name=''ve_'||lower(rec_type.id)||''' and table_schema='''||v_schemaname||'''
 			and column_name IN (SELECT column_name FROM information_schema.columns where table_name='''||lower(rec_type.id)||''' and table_schema='''||v_schemaname||''') 
 			AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'' and column_name != ''node_1'' and  column_name != ''node_2'' and column_name != ''code'';'
 			INTO v_insert_fields;
@@ -276,7 +276,7 @@ BEGIN
 					UPDATE config_param_system SET value ='TRUE' WHERE parameter='edit_topocontrol_disable_error';
 				END IF;
 
-				EXECUTE 'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
+				EXECUTE 'INSERT INTO ve_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
 				WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
 
 

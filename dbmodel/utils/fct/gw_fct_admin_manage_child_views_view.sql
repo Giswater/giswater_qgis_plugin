@@ -65,12 +65,12 @@ BEGIN
   v_man_fields = ((p_data ->> 'body')::json->>'man_fields')::text;
   v_view_type =((p_data ->> 'body')::json->>'view_type')::integer;
 
-  -- list all columns from v_edit_node excluding 'broken_valve' and 'closed_valve' in order to take those from man_valve table
+  -- list all columns from ve_node excluding 'broken_valve' and 'closed_valve' in order to take those from man_valve table
   EXECUTE 'SELECT 
   REPLACE(REPLACE(array_agg('''||v_parent_layer||'.'' || column_name)::text, ''{'', ''''), ''}'', '''') 
   FROM information_schema.columns
   WHERE table_schema = '||quote_literal(v_schemaname)||' 
-  AND table_name = ''v_edit_node'' 
+  AND table_name = ''ve_node'' 
   AND column_name NOT IN (''closed_valve'', ''broken_valve'')'
   INTO v_node_fields;
 

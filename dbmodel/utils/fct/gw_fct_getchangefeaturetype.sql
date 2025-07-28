@@ -14,7 +14,7 @@ $BODY$
 /*
 -- Button GwFeatureTypeChangeButton
 
-SELECT gw_fct_getchangefeaturetype($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},"form":{},"feature":{"tableName":"v_edit_node", "id":"1058"},"data":{"newFeatureCat":"HYDRANT"}}$$);
+SELECT gw_fct_getchangefeaturetype($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},"form":{},"feature":{"tableName":"ve_node", "id":"1058"},"data":{"newFeatureCat":"HYDRANT"}}$$);
 
 fid = 216
 
@@ -98,7 +98,7 @@ BEGIN
     -- setting new featurecat as same as current
     IF v_new_featurecat IS NULL then
         -- get current feature_cat
-        v_sql := concat('SELECT ', v_feature_type, '_type FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
+        v_sql := concat('SELECT ', v_feature_type, '_type FROM ve_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
         EXECUTE v_sql INTO v_new_featurecat;
         v_curr_featurecat = v_new_featurecat;
     else
@@ -112,7 +112,7 @@ BEGIN
 	    ''category_type'', category_type,
 		''',v_feature_type,'cat_id'', ',v_feature_type,'cat_id
 	    ) AS combined_data
-	    FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
+	    FROM ve_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
 
     EXECUTE v_sql INTO v_feature_type_values;
 

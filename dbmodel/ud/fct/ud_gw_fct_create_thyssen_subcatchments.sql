@@ -37,7 +37,7 @@ BEGIN
 	v_delete_previous := (((p_data ->>'data')::json->>'parameters')::json->>'deletePrevious')::boolean;
 
 
-	EXECUTE 'select distinct string_agg('||v_clip||'_id::text, '','') from v_edit_node'
+	EXECUTE 'select distinct string_agg('||v_clip||'_id::text, '','') from ve_node'
 	INTO v_mapzone_id;
 
 	IF v_delete_previous IS TRUE THEN

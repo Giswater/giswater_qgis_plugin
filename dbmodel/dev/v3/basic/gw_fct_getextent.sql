@@ -52,7 +52,7 @@ BEGIN
 -- get envelope
 	EXECUTE 'SELECT row_to_json (a) 
 	FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
-	FROM (SELECT st_collect(the_geom) as the_geom FROM v_edit_arc '||v_filterfrominput||') b) a' INTO v_geometry;
+	FROM (SELECT st_collect(the_geom) as the_geom FROM ve_arc '||v_filterfrominput||') b) a' INTO v_geometry;
 
 	IF v_geometry::json->>'x1' IS NOT NULL THEN
 		v_geometry_aux = concat('[',v_geometry::json->>'x1',', ', v_geometry::json->>'y1',', ',v_geometry::json->>'x2',', ',v_geometry::json->>'y2',']');

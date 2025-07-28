@@ -153,9 +153,9 @@ BEGIN
 		END LOOP;
 		IF v_querytext IS NOT NULL THEN EXECUTE v_querytext; END IF;
 
-		-- get db source using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
+		-- get db source using ve_node as 'current'  (in case ve_node is wrong all will he wrong)
 		SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema
-		FROM t_audit_check_project where table_id = 'v_edit_node' and cur_user=current_user;
+		FROM t_audit_check_project where table_id = 've_node' and cur_user=current_user;
 
 		--check layers host (350)
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list

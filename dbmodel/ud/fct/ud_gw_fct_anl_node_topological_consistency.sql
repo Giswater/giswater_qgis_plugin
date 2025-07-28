@@ -61,7 +61,7 @@ BEGIN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fid, the_geom, state)
 				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 108, '||v_worklayer||'.the_geom , '||v_worklayer||'.state
 				FROM '||v_worklayer||' 
-				INNER JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id 
+				INNER JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id 
 				WHERE '||v_worklayer||'.node_type != ''OUTFALL'' AND  node_id IN ('||v_array||')
 				GROUP BY '||v_worklayer||'.node_id,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,
 				'||v_worklayer||'.state 
@@ -70,7 +70,7 @@ BEGIN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fid, the_geom, state)
 				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 108, '||v_worklayer||'.the_geom,'||v_worklayer||'.state 
 				FROM '||v_worklayer||'
-				INNER JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id 
+				INNER JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id 
 				WHERE '||v_worklayer||'.node_type != ''OUTFALL'' 
 				GROUP BY '||v_worklayer||'.node_id,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,
 				'||v_worklayer||'.state

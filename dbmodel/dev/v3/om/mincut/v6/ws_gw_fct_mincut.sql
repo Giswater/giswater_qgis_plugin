@@ -149,10 +149,10 @@ BEGIN
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT arc_id INTO v_arc FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+		SELECT arc_id INTO v_arc FROM ve_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 
 		IF v_arc IS NULL THEN
-			SELECT connec_id INTO v_connec FROM v_edit_connec WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+			SELECT connec_id INTO v_connec FROM ve_connec WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 		END IF;
 	END IF;
 

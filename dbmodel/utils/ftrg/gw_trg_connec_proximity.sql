@@ -40,7 +40,7 @@ BEGIN
 			AND c.connec_id != NEW.connec_id AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
-		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001) LIMIT 1);
+		v_arc:= (SELECT arc_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, 0.001) LIMIT 1);
 
 		-- If there is an arc
 		IF v_arc IS NOT NULL THEN
@@ -57,7 +57,7 @@ BEGIN
 		AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
-		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001) LIMIT 1);
+		v_arc:= (SELECT arc_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, 0.001) LIMIT 1);
 		IF v_arc IS NOT NULL THEN
 			UPDATE connec SET pjoint_type = 'CONNEC', pjoint_id = NEW.connec_id, arc_id = v_arc WHERE connec_id = OLD.connec_id;
 			DELETE FROM link WHERE feature_id = NEW.connec_id AND feature_type ='CONNEC' RETURNING exit_id, exit_type INTO v_id, v_type;

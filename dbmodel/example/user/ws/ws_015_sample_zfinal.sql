@@ -133,9 +133,9 @@ INSERT INTO macroexploitation (macroexpl_id, "name", descript, lock_level, activ
 
 UPDATE config_param_system SET isenabled = false where parameter = ' basic_selector_tab_municipality';
 
-insert into sys_style select 'v_edit_node', 106, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101 ON CONFLICT (layername, styleconfig_id) DO NOTHING;
-insert into sys_style select 'v_edit_node', 107, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101 ON CONFLICT (layername, styleconfig_id) DO NOTHING;;
-insert into sys_style select 'v_edit_node', 108, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101 ON CONFLICT (layername, styleconfig_id) DO NOTHING;;
+insert into sys_style select 've_node', 106, 'qml', stylevalue, true from sys_style where layername = 've_node' and styleconfig_id = 101 ON CONFLICT (layername, styleconfig_id) DO NOTHING;
+insert into sys_style select 've_node', 107, 'qml', stylevalue, true from sys_style where layername = 've_node' and styleconfig_id = 101 ON CONFLICT (layername, styleconfig_id) DO NOTHING;;
+insert into sys_style select 've_node', 108, 'qml', stylevalue, true from sys_style where layername = 've_node' and styleconfig_id = 101 ON CONFLICT (layername, styleconfig_id) DO NOTHING;;
 
 UPDATE ext_cat_period b SET end_date = a.end_date FROM (
 	SELECT id, end_date + INTERVAL '1 day' AS end_date FROM ext_cat_period

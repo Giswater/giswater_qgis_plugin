@@ -292,13 +292,13 @@ BEGIN
 	IF v_action = 'create' THEN
 		INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf, trace, user_defined)
 		SELECT arc_id, node_1, node_2, 0, 0, 0, unit_id, False 
-		FROM v_edit_arc 
+		FROM ve_arc 
 		JOIN om_visit_lot_x_arc USING (arc_id)
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND lot_id = v_lot;
 	    ELSE
 		INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf, trace, user_defined)
 		SELECT arc_id, ve.node_1, ve.node_2, 0, 0, 0, lot_unit.unit_id, lot_unit.user_defined
-		FROM v_edit_arc AS ve
+		FROM ve_arc AS ve
 		JOIN om_visit_lot_x_arc USING (arc_id)
 		JOIN om_visit_lot_x_unit AS lot_unit USING (lot_id, unit_id)
 		WHERE ve.node_1 IS NOT NULL AND ve.node_2 IS NOT NULL AND lot_unit.lot_id = v_lot;
@@ -308,7 +308,7 @@ BEGIN
 	UPDATE temp_anlgraph SET trace = arc_id::integer WHERE trace is null;
 
 	-- setting graph by usign isprofilesurface = true
-	UPDATE temp_anlgraph SET flag=1 FROM v_edit_node JOIN cat_feature_node ON id = node_type WHERE node_2 = node_id AND isprofilesurface =  true;
+	UPDATE temp_anlgraph SET flag=1 FROM ve_node JOIN cat_feature_node ON id = node_type WHERE node_2 = node_id AND isprofilesurface =  true;
 	
 	LOOP
 	    -- starting engine
@@ -355,8 +355,8 @@ BEGIN
 
 	    -- insert nodes_1
 	    FOR rec_2 IN
-		SELECT v_lot, node_id, v_edit_node.code AS code, v_unit, 'JOINED', 1
-		FROM temp_anlgraph a JOIN v_edit_node ON node_id = node_1
+		SELECT v_lot, node_id, ve_node.code AS code, v_unit, 'JOINED', 1
+		FROM temp_anlgraph a JOIN ve_node ON node_id = node_1
 		WHERE node_type = ANY(v_stopper::text[]) AND a.trace = rec.trace
 	    LOOP
 		INSERT INTO om_visit_lot_x_node (lot_id, node_id, code, unit_id, source, status)
@@ -366,8 +366,8 @@ BEGIN
 
 	    -- insert nodes_2
 	    FOR rec_2 IN
-		SELECT v_lot, node_id, v_edit_node.code AS code, v_unit, 'JOINED', 1
-		FROM temp_anlgraph a JOIN v_edit_node ON node_id = node_2
+		SELECT v_lot, node_id, ve_node.code AS code, v_unit, 'JOINED', 1
+		FROM temp_anlgraph a JOIN ve_node ON node_id = node_2
 		WHERE a.trace = rec.trace
 	    LOOP
 		INSERT INTO om_visit_lot_x_node (lot_id, node_id, code, unit_id, source, status)
@@ -403,15 +403,15 @@ BEGIN
 	INSERT INTO om_visit_lot_x_gully (lot_id, gully_id, code, unit_id, source, status)
 	SELECT lot_id, gully_id, g.code, unit_id, 'NODE', 1
 	FROM om_visit_lot_x_node
-	JOIN v_edit_link ON exit_id =node_id
-	JOIN v_edit_gully g ON gully_id = feature_id
+	JOIN ve_link ON exit_id =node_id
+	JOIN ve_gully g ON gully_id = feature_id
 	WHERE lot_id = v_lot
 	ON CONFLICT (lot_id, gully_id) DO NOTHING;
 
 	raise notice 'end 1';
 
 	--draw units for orphan nodes (wich are selected manually by user)
-	FOR rec_node IN (SELECT node_id, the_geom FROM om_visit_lot_x_node JOIN v_edit_node using (node_id) where lot_id=v_lot and source='ORPHAN')
+	FOR rec_node IN (SELECT node_id, the_geom FROM om_visit_lot_x_node JOIN ve_node using (node_id) where lot_id=v_lot and source='ORPHAN')
 	LOOP
 		INSERT INTO om_visit_lot_x_unit(lot_id, status, orderby, the_geom, unit_type, way_type, way_in, way_out, trace_type, trace_id, node_1, node_2)
 		VALUES (v_lot, 1, null, ST_Multi(st_buffer(rec_node.the_geom,2)), 'NODE', 'REGISTRE', rec_node.node_id, rec_node.node_id, 'NODE', rec_node.node_id::INTEGER, rec_node.node_id, rec_node.node_id )
@@ -436,7 +436,7 @@ BEGIN
 	WHERE feature_type = 'GULLY' and feature_id IN (SELECT text_column FROM temp_table WHERE fid = 134) AND st_length(the_geom) > v_maxlinklength;
 
 	-- draw units for integrated gullys (wich flows with selected node)
-	FOR rec_gully IN (SELECT g.gully_id, l.the_geom, gis_length, exit_id AS node_id FROM gully g JOIN v_edit_link l ON feature_id = gully_id
+	FOR rec_gully IN (SELECT g.gully_id, l.the_geom, gis_length, exit_id AS node_id FROM gully g JOIN ve_link l ON feature_id = gully_id
 		    JOIN om_visit_lot_x_gully USING (gully_id) WHERE source= 'NODE' AND lot_id = v_lot)
 	LOOP
 		INSERT INTO om_visit_lot_x_unit(lot_id, status, orderby, the_geom, unit_type, length, way_type, way_in, way_out, trace_type, trace_id, node_1, node_2)
@@ -450,7 +450,7 @@ BEGIN
 
 	raise notice 'end 3';
 	--draw units for orphan gullies (wich are selected manually by user)
-	FOR rec_gully IN (SELECT g.gully_id, l.the_geom, gis_length, arc_id FROM gully g JOIN v_edit_link l ON feature_id = gully_id
+	FOR rec_gully IN (SELECT g.gully_id, l.the_geom, gis_length, arc_id FROM gully g JOIN ve_link l ON feature_id = gully_id
 		    JOIN om_visit_lot_x_gully USING (gully_id) WHERE source='ORPHAN' AND lot_id = v_lot)
 	LOOP
 		INSERT INTO om_visit_lot_x_unit(lot_id, status, orderby, the_geom, unit_type, length, way_type, way_in, way_out, trace_type, trace_id, node_1, node_2)

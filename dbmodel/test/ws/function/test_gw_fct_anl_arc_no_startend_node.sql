@@ -31,7 +31,7 @@ GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"tableName":"v_edit_arc",
+    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"tableName":"ve_arc",
     "featureType":"ARC"}, "data":{"parameters":{"arcSearchNodes":"0.1"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_no_startend_node returns status "Accepted"'
@@ -39,10 +39,10 @@ SELECT is (
 
 SELECT is (
     (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{},
+    "form":{}, "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"arcSearchNodes":"0.5"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_no_startend_node with aux_params and tableName : v_edit_arc returns status "Accepted"'
+    'Check if gw_fct_anl_arc_no_startend_node with aux_params and tableName : ve_arc returns status "Accepted"'
 );
 
 SELECT is (

@@ -129,7 +129,7 @@ BEGIN
 
 	-- manage log (fid: 143)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	
+
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"1", "is_process":true, "is_header":"true"}}$$)';
 
 	-- get input parameters
@@ -157,7 +157,7 @@ BEGIN
 	END IF;
 
 	--define columns used for feature_cat
-	v_feature_layer = concat('v_edit_',v_feature_type);
+	v_feature_layer = concat('ve_',v_feature_type);
 	v_feature_type_table = concat('cat_feature_',v_feature_type);
 	v_id_column:=concat(v_feature_type,'_id');
 	v_type_column=concat(v_feature_type,'_type');
@@ -328,7 +328,7 @@ BEGIN
 				v_the_geom, v_verified_id, v_category, v_function, 0, v_location, v_link, v_dwfzone_id);
 			END IF;
 
-			
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3318", "function":"2714", "parameters":{"v_id":"'||v_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
@@ -346,7 +346,7 @@ BEGIN
 				v_verified_id, v_inventory, v_category, v_function, 0, v_location, v_link, v_dwfzone_id);
 			END IF;
 
-			
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3308", "function":"2714", "parameters":{"v_id":"'||v_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
@@ -357,7 +357,7 @@ BEGIN
 			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_omzone_id, v_expl_id, v_muni_id, 0, v_state_type, v_the_geom, v_workcat_id_end,
 			v_verified_id, v_inventory, v_category, v_function, 0, v_location, v_epa_type_new, v_link, v_dwfzone_id);
 
-		
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3310", "function":"2714", "parameters":{"v_id":"'||v_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
@@ -469,7 +469,7 @@ BEGIN
 										'WHERE '||v_feature_childtable_name_old||'.'||v_id_column||' = '||quote_literal(v_old_id)||';';
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update;
-					
+
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3312", "function":"2714", "parameters":{"rec_addfields.column_name":"'||rec_addfields.column_name||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
@@ -488,7 +488,7 @@ BEGIN
 			IF v_count > 0 THEN
 				v_element_table:=concat('element_x_',v_feature_type);
 				EXECUTE 'UPDATE '||v_element_table||' SET '||v_id_column||'='''||v_id||''' WHERE '||v_id_column||'='''||v_old_id||''';';
-				
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3344", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
@@ -502,7 +502,7 @@ BEGIN
 			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_1=v_old_id
 			LOOP
 				UPDATE arc SET node_1=v_id where arc_id=rec_arc.arc_id;
-				
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3314", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END LOOP;
@@ -510,7 +510,7 @@ BEGIN
 			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_2=v_old_id
 			LOOP
 				UPDATE arc SET node_2=v_id where arc_id=rec_arc.arc_id;
-				
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3314", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
@@ -519,7 +519,7 @@ BEGIN
 			FOR rec_connec IN SELECT connec_id FROM connec WHERE pjoint_id = v_old_id AND  pjoint_type = 'NODE'
 			LOOP
 				UPDATE connec SET pjoint_id=v_id where connec_id=rec_connec.connec_id;
-				
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3316", "function":"2714", "parameters":{"rec_connec.connec_id":"'||rec_connec.connec_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
@@ -545,26 +545,26 @@ BEGIN
 
 			UPDATE connec SET arc_id = v_id WHERE arc_id = v_old_id;
 			GET DIAGNOSTICS v_count = row_count;
-			
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3290", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 			UPDATE plan_psector_x_connec SET arc_id = v_id WHERE arc_id = v_old_id;
 			GET DIAGNOSTICS v_count = row_count;
-			
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3292", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 			IF v_project_type='UD' then
 				UPDATE gully SET arc_id = v_id WHERE arc_id = v_old_id;
 				GET DIAGNOSTICS v_count = row_count;
-				
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3294", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 				UPDATE plan_psector_x_gully SET arc_id = v_id WHERE arc_id = v_old_id;
 				GET DIAGNOSTICS v_count = row_count;
-				
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3296", "function":"2714", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
@@ -572,7 +572,7 @@ BEGIN
 		ELSIF v_feature_type='connec' or  v_feature_type='gully' THEN
 
 			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_id AND state > 0;
-			
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3298", "function":"2714", "parameters":{"v_count":"'||quote_nullable(v_count)||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
@@ -684,7 +684,7 @@ BEGIN
 
 			FOR rec_arc IN SELECT arc_id, nodetype_1 FROM arc WHERE node_1=v_id
 			loop
-				select node_type from v_edit_node where node_id=v_id into v_nodetype;
+				select node_type from ve_node where node_id=v_id into v_nodetype;
 				UPDATE arc SET nodetype_1=v_nodetype where arc_id=rec_arc.arc_id;
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3340", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
@@ -692,7 +692,7 @@ BEGIN
 
 			FOR rec_arc IN SELECT arc_id, nodetype_2 FROM arc WHERE node_2=v_id
 			loop
-				select node_type from v_edit_node where node_id=v_id into v_nodetype;
+				select node_type from ve_node where node_id=v_id into v_nodetype;
 				UPDATE arc SET nodetype_2=v_nodetype where arc_id=rec_arc.arc_id;
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3340", "function":"2714", "parameters":{"rec_arc.arc_id":"'||rec_arc.arc_id||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
@@ -744,18 +744,18 @@ BEGIN
 
 					ELSIF  v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
 
-						
+
 										EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3336", "function":"2714", "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 					ELSIF  v_mapzone_old is null AND v_mapzone_new is not null THEN
-						
+
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3334", "function":"2714", "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 					ELSIF v_mapzone_old!=v_mapzone_new AND  v_mapzone_old is not null AND v_mapzone_new is not null THEN
 
-					
+
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3332", "function":"2714", "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 					END IF;
@@ -773,8 +773,8 @@ BEGIN
 								THEN NULL
 								ELSE ARRAY(SELECT lower(unnest(graph_delimiter)))
 							END AS graph, node_1 
-						FROM v_edit_arc a 
-						JOIN v_edit_node n1 ON n1.node_id = node_1
+						FROM ve_arc a 
+						JOIN ve_node n1 ON n1.node_id = node_1
 						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
 						WHERE a.arc_id = '''||v_id||''';'
 					INTO v_node1_graph, v_node_1;
@@ -788,8 +788,8 @@ BEGIN
 								THEN NULL
 								ELSE ARRAY(SELECT lower(unnest(graph_delimiter)))
 							END AS graph, node_2
-						FROM v_edit_arc a 
-						JOIN v_edit_node n2 ON n2.node_id=node_2
+						FROM ve_arc a 
+						JOIN ve_node n2 ON n2.node_id=node_2
 						JOIN cat_feature_node cf2 ON n2.node_type = cf2.id
 						WHERE a.arc_id = '''||v_id||''';'
 					INTO v_node2_graph, v_node_2;
@@ -799,10 +799,10 @@ BEGIN
 						"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
 						"arcIdOld":'||v_old_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
 
-						
+
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
-						
+
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3322", "function":"2714", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 					END IF;
@@ -813,10 +813,10 @@ BEGIN
 						"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 
 						"arcIdOld":'||v_old_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
 
-						
+
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
-					
+
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3320", "function":"2714", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 					END IF;

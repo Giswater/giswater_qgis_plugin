@@ -107,13 +107,13 @@ BEGIN
 
         -- get element_type and associated feature
         SELECT element_type INTO v_element_type FROM cat_element WHERE id=NEW.elementcat_id;
-		SELECT node_id, 'node'::text INTO v_feature, v_tablefeature FROM v_edit_node WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
+		SELECT node_id, 'node'::text INTO v_feature, v_tablefeature FROM ve_node WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 		IF v_feature IS NULL THEN
-			SELECT connec_id, 'connec'::text INTO v_feature, v_tablefeature FROM v_edit_connec WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
+			SELECT connec_id, 'connec'::text INTO v_feature, v_tablefeature FROM ve_connec WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 			IF v_feature IS NULL THEN
-				SELECT arc_id, 'arc'::text INTO v_feature, v_tablefeature FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
+				SELECT arc_id, 'arc'::text INTO v_feature, v_tablefeature FROM ve_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 				IF v_feature IS NULL AND v_project_type='UD' THEN
-					SELECT gully_id, 'gully'::text INTO v_feature, v_tablefeature FROM v_edit_gully WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
+					SELECT gully_id, 'gully'::text INTO v_feature, v_tablefeature FROM ve_gully WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 				END IF;
 			END IF;
 		END IF;

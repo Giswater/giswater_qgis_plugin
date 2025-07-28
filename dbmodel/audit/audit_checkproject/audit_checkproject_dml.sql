@@ -10,7 +10,7 @@ SET search_path = audit, public, pg_catalog;
 
 INSERT INTO config_fprocess
 (fid, tablename, target, querytext, orderby, addparam, active)
-VALUES(9000, 'audit_fid_log', 'DATA', 'SELECT sum(gis_length) FROM v_edit_arc WHERE state=1', NULL, NULL, true);
+VALUES(9000, 'audit_fid_log', 'DATA', 'SELECT sum(gis_length) FROM ve_arc WHERE state=1', NULL, NULL, true);
 
 INSERT INTO sys_fprocess
 (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)

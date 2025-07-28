@@ -66,11 +66,11 @@ SELECT is (
 
 SELECT is (
     (gw_fct_getfeatureinsert($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_link"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
+    "feature":{"tableName":"ve_link"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
     "coordinates":{"x1":418889.8779684811, "y1":4576511.2800332215, "x2":418914.19046890794,
     "y2":4576511.80856584}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getfeatureinsert -> v_edit_link returns status "Accepted"'
+    'Check if gw_fct_getfeatureinsert -> ve_link returns status "Accepted"'
 );
 
 -- Finish the test

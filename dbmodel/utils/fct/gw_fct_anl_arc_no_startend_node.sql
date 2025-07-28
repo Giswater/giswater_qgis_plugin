@@ -14,7 +14,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${ "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, "data":{"parameters":{"arcSearchNodes":"0.1"}}}$$)::text
+"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]}, "data":{"parameters":{"arcSearchNodes":"0.1"}}}$$)::text
 
 WARNINGS: This function only works with node with state = 1
 

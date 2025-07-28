@@ -65,7 +65,7 @@ BEGIN
 	IF v_numarcs = 0 THEN
 
 		-- Find closest arc inside tolerance
-		SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
+		SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM ve_arc AS a 
 		WHERE ST_DWithin(NEW.the_geom, a.the_geom, 0.01) ORDER BY ST_Distance(NEW.the_geom, a.the_geom) LIMIT 1;
 
 		IF arc_id_aux IS NOT NULL THEN 

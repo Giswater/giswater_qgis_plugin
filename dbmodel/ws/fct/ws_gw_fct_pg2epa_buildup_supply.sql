@@ -74,7 +74,7 @@ BEGIN
 	SELECT (value::json->>'pumpStation')::json->>'defaultCurve' INTO v_defaultcurve2 FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 
 	RAISE NOTICE 'switch to junction an specific list of RESERVOIRS';
-	UPDATE temp_t_link n SET epa_type = 'JUNCTION' FROM v_edit_node v
+	UPDATE temp_t_link n SET epa_type = 'JUNCTION' FROM ve_node v
 	JOIN (select unnest((replace (replace((v_switch2junction::text),'[','{'),']','}'))::text[]) as type)a ON a.type = v.node_type WHERE v.node_id = n.node_id;
 
 	RAISE NOTICE 'setting pump curves (pump_type = 1) where curve_id is null';

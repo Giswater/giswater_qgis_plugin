@@ -40,14 +40,14 @@ BEGIN
 	geom1, area, azimuth, sys_elev, f_factor, best_candidate)
 	select * from (
 	SELECT arc_id, p_sourcenode, node_2 as targetnode, nodetype_2 as nodetype, isprofilesurface, 'DOWNSTREAM' AS direction, 
-	cat_geom1 geom1, COALESCE(area,0::FLOAT), st_azimuth(st_startpoint(a.the_geom),st_lineinterpolatepoint(a.the_geom,0.01)) azimuth, sys_elev1, 9, null::boolean FROM v_edit_arc a 
+	cat_geom1 geom1, COALESCE(area,0::FLOAT), st_azimuth(st_startpoint(a.the_geom),st_lineinterpolatepoint(a.the_geom,0.01)) azimuth, sys_elev1, 9, null::boolean FROM ve_arc a 
 	JOIN cat_feature_node ON nodetype_2 = id 
 	JOIN cat_arc c ON c.id = arccat_id 
 	JOIN (SELECT arc_id FROM temp_anlgraph)z USING (arc_id)
 	WHERE node_1::integer = p_node
 	UNION ALL
 	SELECT arc_id, p_sourcenode, node_1, nodetype_1, isprofilesurface, 'UPSTREAM',
-	cat_geom1, COALESCE(area,0::FLOAT), st_azimuth(st_lineinterpolatepoint(a.the_geom,0.99),st_endpoint(a.the_geom)), sys_elev2, 9, null::boolean FROM v_edit_arc a 
+	cat_geom1, COALESCE(area,0::FLOAT), st_azimuth(st_lineinterpolatepoint(a.the_geom,0.99),st_endpoint(a.the_geom)), sys_elev2, 9, null::boolean FROM ve_arc a 
 	JOIN cat_feature_node ON nodetype_1 = id 
 	JOIN cat_arc c ON c.id = arccat_id
 	JOIN (SELECT arc_id FROM temp_anlgraph)z USING (arc_id)

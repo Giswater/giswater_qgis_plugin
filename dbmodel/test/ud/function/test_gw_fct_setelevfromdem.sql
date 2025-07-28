@@ -32,11 +32,11 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+    "form":{}, "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, 
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > v_edit_node and updateValues > allValues returns status "Accepted"'
+    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_node and updateValues > allValues returns status "Accepted"'
 );
 
 SELECT is (
@@ -77,11 +77,11 @@ SELECT is (
 
 SELECT is (
     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+    "form":{}, "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, 
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > v_edit_node and updateValues > nullValues returns status "Accepted"'
+    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_node and updateValues > nullValues returns status "Accepted"'
 );
 
 SELECT is (
@@ -122,20 +122,20 @@ SELECT is (
 
 SELECT is (
     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_gully", "featureType":"GULLY", "id":[]}, 
+    "form":{}, "feature":{"tableName":"ve_gully", "featureType":"GULLY", "id":[]}, 
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > GULLY and tablename > v_edit_gully and updateValues > allValues returns status "Accepted"'
+    'Check if gw_fct_setelevfromdem with featuretype > GULLY and tablename > ve_gully and updateValues > allValues returns status "Accepted"'
 );
 
 SELECT is (
     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_gully", "featureType":"GULLY", "id":[]}, 
+    "form":{}, "feature":{"tableName":"ve_gully", "featureType":"GULLY", "id":[]}, 
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > GULLY and tablename > v_edit_gully and updateValues > nullValues returns status "Accepted"'
+    'Check if gw_fct_setelevfromdem with featuretype > GULLY and tablename > ve_gully and updateValues > nullValues returns status "Accepted"'
 );
 
 SELECT is (

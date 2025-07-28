@@ -68,10 +68,10 @@ BEGIN
 	update config_param_user set value ='true' where parameter = 'edit_disable_update_nodevalues' and cur_user = current_user; -- node_values
 
 	IF v_nodetype = '' OR v_nodetype IS NULL THEN	
-		v_querytext = 'UPDATE arc SET the_geom = arc.the_geom FROM (SELECT arc_id FROM v_edit_arc) v WHERE v.arc_id = arc.arc_id';
+		v_querytext = 'UPDATE arc SET the_geom = arc.the_geom FROM (SELECT arc_id FROM ve_arc) v WHERE v.arc_id = arc.arc_id';
 	ELSE
 		v_querytext = 'UPDATE arc SET the_geom = arc.the_geom FROM (
-		SELECT arc_id FROM v_edit_arc WHERE (node_1 IN (SELECT node_id FROM v_edit_node WHERE node_type IN ('||v_nodetype||')) OR  (node_2 IN (SELECT node_id FROM v_edit_node WHERE node_type IN ('||v_nodetype||'))))
+		SELECT arc_id FROM ve_arc WHERE (node_1 IN (SELECT node_id FROM ve_node WHERE node_type IN ('||v_nodetype||')) OR  (node_2 IN (SELECT node_id FROM ve_node WHERE node_type IN ('||v_nodetype||'))))
 		) v WHERE v.arc_id = arc.arc_id';
 	END IF;
 	EXECUTE v_querytext;

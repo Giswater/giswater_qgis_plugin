@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang"
 		"feature":{"featureType":"visit", "tableName":"om_visit", "id":10465, "idName": "id"}}')
 connec:
 SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang":"ES"},
-		"feature":{"featureType":"connec", "tableName":"v_edit_connec", "id":3008, "idName": "connec_id"}}')
+		"feature":{"featureType":"connec", "tableName":"ve_connec", "id":3008, "idName": "connec_id"}}')
 file:
 SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"featureType":"file", "tableName":"om_visit_file", "id":2, "idName": "id"}}')

@@ -156,10 +156,10 @@ BEGIN
 				FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph''';
 			
 	EXECUTE 'INSERT INTO temp_anlgraph ( arc_id, node_1, node_2, water, flag, checkf, length, cost, value )
-	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, st_length(the_geom), '||v_costfield||', 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, st_length(the_geom), '||v_costfield||', 0 FROM ve_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE AND arc_id NOT IN ('||v_queryarc||')
 	UNION
-	SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0, st_length(the_geom), '||v_costfield||', 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0, st_length(the_geom), '||v_costfield||', 0 FROM ve_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE AND arc_id NOT IN ('||v_queryarc||');';
 
 	-- getting v_querys of node header (node_id and toarc) from config variable
@@ -242,7 +242,7 @@ BEGIN
 				EXECUTE 'INSERT INTO temp_anl_node (fid, nodecat_id, node_id, the_geom, descript) 
 				SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, '||v_end_node::text||', the_geom, 
 				concat (''{"value":"'','||v_acc_value||',''", "header":"'||v_feature.node_1||'"}'')
-				FROM v_edit_node WHERE node_id= '''||v_end_node||''';';
+				FROM ve_node WHERE node_id= '''||v_end_node||''';';
 		
 				EXECUTE 'UPDATE temp_anlgraph n SET water= 1, flag=n.flag+1, checkf=1, value = '||v_acc_value||'
 				FROM v_anl_graph a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id and a.arc_id='''||v_header_arc::text||''';';
@@ -330,7 +330,7 @@ BEGIN
 	EXECUTE 'INSERT INTO temp_anl_node (fid, nodecat_id, node_id, the_geom, descript) 
 	SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id,node_id, the_geom, 
 	concat (''{"value":"0", "header":"'',node_id,''"}'')
-	FROM v_edit_node WHERE v_edit_node.node_id::text IN ('||v_node_string||') AND node_id NOT IN (select node_id FROM temp_anl_node WHERE fid = '||v_fid||');';
+	FROM ve_node WHERE ve_node.node_id::text IN ('||v_node_string||') AND node_id NOT IN (select node_id FROM temp_anl_node WHERE fid = '||v_fid||');';
 
 	-- update fields for node layers (value and header)
 	FOR rec IN execute 'SELECT * FROM cat_feature JOIN sys_addfields on cat_feature_id=cat_feature.id 

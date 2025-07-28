@@ -13,12 +13,12 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check view v_edit_arc
-SELECT has_view('v_edit_arc'::name, 'View v_edit_arc should exist');
+-- Check view ve_arc
+SELECT has_view('ve_arc'::name, 'View ve_arc should exist');
 
 -- Check view columns
 SELECT columns_are(
-    'v_edit_arc',
+    've_arc',
     ARRAY[
         'arc_id', 'code', 'sys_code', 'datasource', 'node_1', 'nodetype_1', 'elevation1', 'depth1', 'staticpressure1',
         'node_2', 'nodetype_2', 'staticpressure2', 'elevation2', 'depth2', 'depth', 'arccat_id',
@@ -39,11 +39,11 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'lock_level', 'inp_type', 'is_scadamap', 'omzone_id', 'omzone_type', 'pipe_capacity', 'mincut_impact_topo', 'mincut_impact_hydro'
     ],
-    'View v_edit_arc should have the correct columns'
+    'View ve_arc should have the correct columns'
 );
 
 -- Check if trigger exists
-SELECT has_trigger('v_edit_arc', 'gw_trg_edit_arc', 'Trigger gw_trg_edit_arc should exist on v_edit_arc');
+SELECT has_trigger('ve_arc', 'gw_trg_edit_arc', 'Trigger gw_trg_edit_arc should exist on ve_arc');
 
 SELECT * FROM finish();
 

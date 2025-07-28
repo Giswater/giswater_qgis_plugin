@@ -160,20 +160,20 @@ BEGIN
 		END IF;
 
 		-- arc as end point
-		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom, v_link_searchbuffer) AND state>0
-		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom) LIMIT 1;
+		SELECT * INTO v_arc FROM ve_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), ve_arc.the_geom, v_link_searchbuffer) AND state>0
+		ORDER by st_distance(ST_EndPoint(NEW.the_geom), ve_arc.the_geom) LIMIT 1;
 
 		-- check if arc diameter is bigger than configured
         IF v_projectype = 'WS' THEN
-            IF (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_arc.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
+            IF (SELECT cat_dnom::integer FROM ve_arc WHERE arc_id=v_arc.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 "data":{"message":"3232", "function":"1116","parameters":{"diameter":"'||v_check_arcdnom||'"}}}$$);';
             END IF;
         END IF;
 
 		-- node as end point
-		SELECT * INTO v_node FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom, v_link_searchbuffer) AND state>0
-		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom) LIMIT 1;
+		SELECT * INTO v_node FROM ve_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), ve_node.the_geom, v_link_searchbuffer) AND state>0
+		ORDER by st_distance(ST_EndPoint(NEW.the_geom), ve_node.the_geom) LIMIT 1;
 
 
 		-- for ws projects control of link related to nodarc
@@ -190,22 +190,22 @@ BEGIN
 		END IF;
 
 		-- connec as init point
-		SELECT * INTO v_connec1 FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state>0
-		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
+		SELECT * INTO v_connec1 FROM ve_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), ve_connec.the_geom,v_link_searchbuffer) AND state>0
+		ORDER by st_distance(ST_StartPoint(NEW.the_geom), ve_connec.the_geom) LIMIT 1;
 
 		-- connec as end point
-		SELECT * INTO v_connec2 FROM v_edit_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state>0
-		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
+		SELECT * INTO v_connec2 FROM ve_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), ve_connec.the_geom,v_link_searchbuffer) AND state>0
+		ORDER by st_distance(ST_EndPoint(NEW.the_geom), ve_connec.the_geom) LIMIT 1;
 
 		IF v_projectype='UD' then
 
 			--gully as init point
-			SELECT * INTO v_gully1 FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer)
-			AND state>0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+			SELECT * INTO v_gully1 FROM ve_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), ve_gully.the_geom,v_link_searchbuffer)
+			AND state>0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), ve_gully.the_geom) LIMIT 1;
 
 			--gully as end point
-			SELECT * INTO v_gully2 FROM v_edit_gully WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer)
-			AND state > 0 ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+			SELECT * INTO v_gully2 FROM ve_gully WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), ve_gully.the_geom, v_link_searchbuffer)
+			AND state > 0 ORDER by st_distance(ST_EndPoint(NEW.the_geom), ve_gully.the_geom) LIMIT 1;
 
 			IF v_gully1.gully_id IS NOT NULL THEN
 				NEW.feature_id=v_gully1.gully_id;
@@ -228,8 +228,8 @@ BEGIN
 			ORDER by st_distance(ST_StartPoint(NEW.the_geom), connec.the_geom) LIMIT 1;
 
 			IF v_projectype='UD' then
-				SELECT * INTO v_gully1 FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer)
-				AND state=0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+				SELECT * INTO v_gully1 FROM ve_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), ve_gully.the_geom,v_link_searchbuffer)
+				AND state=0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), ve_gully.the_geom) LIMIT 1;
 				IF v_gully1.gully_id IS NOT NULL THEN
 					NEW.feature_id=v_gully1.gully_id;
 					NEW.feature_type='GULLY';

@@ -34,8 +34,8 @@ BEGIN
 	FOR linkrec IN EXECUTE querystring
 	LOOP
 		-- Initial and final gully of the LINK
-		SELECT * INTO gullyRecord1 FROM v_edit_gully WHERE v_edit_gully.gully_id = linkrec.feature_id;
-		SELECT * INTO gullyRecord2 FROM v_edit_gully WHERE v_edit_gully.gully_id = linkrec.exit_id;
+		SELECT * INTO gullyRecord1 FROM ve_gully WHERE ve_gully.gully_id = linkrec.feature_id;
+		SELECT * INTO gullyRecord2 FROM ve_gully WHERE ve_gully.gully_id = linkrec.exit_id;
 
 		-- Update link
 		IF (gullyRecord1.gully_id = NEW.gully_id) THEN

@@ -52,16 +52,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			IF v_review_status=1 AND NEW.connec_id NOT IN (SELECT connec_id FROM connec) THEN
 
-				INSERT INTO v_edit_connec (connec_id,  conneccat_id, annotation, observ, expl_id, the_geom)
+				INSERT INTO ve_connec (connec_id,  conneccat_id, annotation, observ, expl_id, the_geom)
 				VALUES (NEW.connec_id,  NEW.new_conneccat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom);
 
 
 			ELSIF v_review_status=2 THEN
-				UPDATE v_edit_connec SET the_geom=NEW.the_geom, conneccat_id=NEW.new_conneccat_id, annotation=NEW.new_annotation, observ=NEW.new_observ WHERE connec_id=NEW.connec_id;
+				UPDATE ve_connec SET the_geom=NEW.the_geom, conneccat_id=NEW.new_conneccat_id, annotation=NEW.new_annotation, observ=NEW.new_observ WHERE connec_id=NEW.connec_id;
 
 			ELSIF v_review_status=3 THEN
 
-				UPDATE v_edit_connec SET conneccat_id=NEW.new_conneccat_id, annotation=NEW.new_annotation, observ=NEW.new_observ
+				UPDATE ve_connec SET conneccat_id=NEW.new_conneccat_id, annotation=NEW.new_annotation, observ=NEW.new_observ
 				WHERE connec_id=NEW.connec_id;
 
 			END IF;

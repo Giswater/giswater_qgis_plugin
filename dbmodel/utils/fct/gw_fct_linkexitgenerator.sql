@@ -46,21 +46,21 @@ BEGIN
 
 	-- insert features temp_link
 	INSERT INTO temp_link SELECT link_id, link_id, exit_type, feature_id, feature_type, exit_id, exit_type, state, expl_id,
-	sector_id, top_elev2, elevation2, the_geom, st_endpoint(the_geom), false FROM v_edit_link where exit_type = 'ARC';
+	sector_id, top_elev2, elevation2, the_geom, st_endpoint(the_geom), false FROM ve_link where exit_type = 'ARC';
 
 	IF v_project_type = 'WS' THEN
-		UPDATE temp_link SET dma_id = l.dma_id FROM v_edit_link l WHERE temp_link.link_id = l.link_id AND l.exit_type = 'ARC';
+		UPDATE temp_link SET dma_id = l.dma_id FROM ve_link l WHERE temp_link.link_id = l.link_id AND l.exit_type = 'ARC';
 	END IF;
 
 	INSERT INTO temp_link SELECT link_id, exit_id::integer, exit_type, feature_id, feature_type, exit_id, exit_type, state, expl_id,
-	sector_id, top_elev2, elevation2, the_geom, st_endpoint(the_geom), false FROM v_edit_link where exit_type IN ('NODE', 'CONNEC');
+	sector_id, top_elev2, elevation2, the_geom, st_endpoint(the_geom), false FROM ve_link where exit_type IN ('NODE', 'CONNEC');
 
 	IF v_project_type = 'WS' THEN
-		UPDATE temp_link SET dma_id = l.dma_id FROM v_edit_link l WHERE temp_link.link_id = l.link_id AND l.exit_type IN ('NODE', 'CONNEC');
+		UPDATE temp_link SET dma_id = l.dma_id FROM ve_link l WHERE temp_link.link_id = l.link_id AND l.exit_type IN ('NODE', 'CONNEC');
 	END IF;
 
 	-- insert duplicated features on temp_vnode
-	IF p_input = 1 THEN -- the whole v_edit_link
+	IF p_input = 1 THEN -- the whole ve_link
 		INSERT INTO temp_vnode (l1,v1,l2,v2)
 		SELECT n1.link_id AS l1, n1.vnode_id AS v1, n2.link_id AS l2, n2.vnode_id AS v2 FROM temp_link n1, temp_link n2
 		WHERE st_dwithin(n1.the_geom_endpoint, n2.the_geom_endpoint, 0.02)

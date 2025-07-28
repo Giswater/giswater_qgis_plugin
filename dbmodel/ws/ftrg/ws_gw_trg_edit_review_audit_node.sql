@@ -52,16 +52,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			IF v_review_status=1 AND NEW.node_id NOT IN (SELECT node_id FROM node) THEN
 
-				INSERT INTO v_edit_node (node_id, top_elev, depth,  nodecat_id, annotation, observ, expl_id, the_geom)
+				INSERT INTO ve_node (node_id, top_elev, depth,  nodecat_id, annotation, observ, expl_id, the_geom)
 				VALUES (NEW.node_id, NEW.new_top_elev, NEW.new_depth, NEW.new_nodecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom);
 
 
 			ELSIF v_review_status=2 THEN
-				UPDATE v_edit_node SET the_geom=NEW.the_geom, top_elev=NEW.new_top_elev, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id, annotation=NEW.new_annotation, observ=NEW.new_observ WHERE node_id=NEW.node_id;
+				UPDATE ve_node SET the_geom=NEW.the_geom, top_elev=NEW.new_top_elev, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id, annotation=NEW.new_annotation, observ=NEW.new_observ WHERE node_id=NEW.node_id;
 
 			ELSIF v_review_status=3 THEN
 
-				UPDATE v_edit_node SET top_elev=NEW.new_top_elev, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id,
+				UPDATE ve_node SET top_elev=NEW.new_top_elev, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id,
 				annotation=NEW.new_annotation, observ=NEW.new_observ WHERE node_id=NEW.node_id;
 
 			END IF;

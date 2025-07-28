@@ -133,21 +133,21 @@ BEGIN
 		-- Make geom point
 		v_geom0:= (SELECT ST_SetSRID(ST_MakePoint(p_x, p_y), v_srid));
 		--getting node_id
-		SELECT node_id INTO v_node FROM v_edit_node WHERE st_equals(the_geom, v_geom0) LIMIT 1;
+		SELECT node_id INTO v_node FROM ve_node WHERE st_equals(the_geom, v_geom0) LIMIT 1;
 	end if;
 
 
 	-- Get node1 system values
 	v_geom1:= (SELECT the_geom FROM node WHERE node_id=p_node1);
 	IF v_project='UD' THEN
-		v_top1:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node1);
-		v_elev1:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node1);
+		v_top1:= (SELECT sys_top_elev FROM ve_node WHERE node_id=p_node1);
+		v_elev1:= (SELECT sys_elev FROM ve_node WHERE node_id=p_node1);
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (213, 4, concat('System values of node 1 (',p_node1,') - top elev:',v_top1 , ', elev:', v_elev1));
 	ELSE
-		v_top1:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node1);
-		v_elev1:= (SELECT top_elev - depth FROM v_edit_node WHERE node_id=p_node1);
-		v_depth1:= (SELECT depth FROM v_edit_node WHERE node_id=p_node1);
+		v_top1:= (SELECT sys_top_elev FROM ve_node WHERE node_id=p_node1);
+		v_elev1:= (SELECT top_elev - depth FROM ve_node WHERE node_id=p_node1);
+		v_depth1:= (SELECT depth FROM ve_node WHERE node_id=p_node1);
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (213, 4, concat('System values of node 1 (',p_node1,') - top elev:',v_top1 , ', depth:', v_depth1));
 
@@ -157,14 +157,14 @@ BEGIN
 	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
 	IF v_project='UD' THEN
-		v_top2:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node2);
-		v_elev2:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node2);
+		v_top2:= (SELECT sys_top_elev FROM ve_node WHERE node_id=p_node2);
+		v_elev2:= (SELECT sys_elev FROM ve_node WHERE node_id=p_node2);
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (213, 4, concat('System values of node 2 (',p_node2,') - top elev:',v_top2 , ', elev:', v_elev2));
 	ELSE
-		v_top2:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node2);
-		v_elev2:= (SELECT top_elev - depth FROM v_edit_node WHERE node_id=p_node2);
-		v_depth2:= (SELECT depth FROM v_edit_node WHERE node_id=p_node2);
+		v_top2:= (SELECT sys_top_elev FROM ve_node WHERE node_id=p_node2);
+		v_elev2:= (SELECT top_elev - depth FROM ve_node WHERE node_id=p_node2);
+		v_depth2:= (SELECT depth FROM ve_node WHERE node_id=p_node2);
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (213, 4, concat('System values of node 2 (',p_node2,') - top elev:',v_top2 , ', depth:', v_depth2));
 	END IF;

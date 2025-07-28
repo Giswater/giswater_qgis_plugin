@@ -49,14 +49,14 @@ BEGIN
 	-- get system variables
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_version := (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
-	
+
 	-- post-procesed variables
 	SELECT ST_GeomFromText(v_geometry, v_epsg) INTO v_polygon;
 	v_idname =  concat(v_featuretype, '_id');
-	v_layer = concat('v_edit_',v_featuretype);
-	IF v_layer = 'v_edit_arc'  THEN
+	v_layer = concat('ve_',v_featuretype);
+	IF v_layer = 've_arc'  THEN
 		v_geometrytype = 'LineString';
-	ELSE 
+	ELSE
 		v_geometrytype = 'Point';
 	END IF;
 
@@ -73,20 +73,20 @@ BEGIN
 	FROM (SELECT '||v_idname||', the_geom FROM '||v_layer||' WHERE st_contains($1, '||v_layer||'.the_geom))row)features'
 	INTO v_result
 	USING v_polygon;
-	
+
 	v_result = concat ('{"geometryType":"',v_geometrytype,'", "features":',v_result,'}');
-	v_result := COALESCE(v_result, '{}'); 
-	
+	v_result := COALESCE(v_result, '{}');
+
 	-- return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Selection done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":'||v_result||
 		       '}'||
 	    '}')::json, 2436, null, null, null);
-	
+
 	-- exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
 	RETURN json_build_objects('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 

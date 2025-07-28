@@ -22,12 +22,12 @@ BEGIN
 		
 		UPDATE arc a SET nodetype_1 = node_type, node_sys_top_elev_1 = sys_top_elev,
 		node_sys_elev_1 = sys_elev
-		FROM v_edit_node
+		FROM ve_node
 		WHERE a.arc_id = NEW.arc_id AND node_id = node_1;
 
 		UPDATE arc a SET nodetype_2 = node_type ,node_sys_top_elev_2 = sys_top_elev, 
 		node_sys_elev_2 = sys_elev
-		FROM v_edit_node
+		FROM ve_node
 		WHERE a.arc_id = NEW.arc_id AND node_id = node_2;
 		
 	END IF;

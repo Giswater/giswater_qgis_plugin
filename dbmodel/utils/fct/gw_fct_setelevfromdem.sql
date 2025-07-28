@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setelevfromdem(p_data json)
 $BODY$
 /*
 SELECT gw_fct_setelevfromdem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-"feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":["3235", "3239", "3197"]},
+"feature":{"tableName":"ve_connec", "featureType":"CONNEC", "id":["3235", "3239", "3197"]},
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"updateValues":"allValues"}}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_setelevfromdem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},

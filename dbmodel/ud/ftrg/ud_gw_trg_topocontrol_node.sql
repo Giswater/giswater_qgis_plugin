@@ -22,7 +22,7 @@ v_y double precision;
 v_pol varchar;
 v_topelev double precision;
 v_arc record;
-v_arcrecord "SCHEMA_NAME".v_edit_arc;
+v_arcrecord "SCHEMA_NAME".ve_arc;
 v_arcrecordtb "SCHEMA_NAME".arc;
 v_node_proximity_control boolean;
 v_node_proximity double precision;
@@ -136,8 +136,8 @@ BEGIN
 				INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node.node_id, 0) ON CONFLICT (psector_id, node_id) DO NOTHING;
 
 				-- looking for all the arcs (1 and 2) using existing node
-				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM v_edit_arc WHERE node_1=v_node.node_id
-				AND state >0 UNION SELECT arc_id, node_2 FROM v_edit_arc WHERE node_2=v_node.node_id AND state >0)
+				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM ve_arc WHERE node_1=v_node.node_id
+				AND state >0 UNION SELECT arc_id, node_2 FROM ve_arc WHERE node_2=v_node.node_id AND state >0)
 				LOOP
 
 					-- if exists some arc planified on same alternative attached to that existing node
@@ -183,8 +183,8 @@ BEGIN
 						UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
 						-- getting table child information (man_table)
-						v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN v_edit_arc ON c.id=arc_type WHERE arc_id=v_arc.arc_id);
-						v_epatable = (SELECT epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON epa_default = s.id JOIN v_edit_arc ON c.id=arc_type
+						v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN ve_arc ON c.id=arc_type WHERE arc_id=v_arc.arc_id);
+						v_epatable = (SELECT epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON epa_default = s.id JOIN ve_arc ON c.id=arc_type
 						WHERE arc_id=v_arc.arc_id);
 
 						-- building querytext for man_table

@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_connect_update() RETURNS trigger L
 
 /*
 This trigger updates mapzone connect columns ( if that connecs are connected) and redraw link geometry if end connect geometry is also updated
-As updateable links only must be class 2 (wich geometry is stored on link table, it is not need to work with v_edit_link, and as a result this trigger works with table link)
+As updateable links only must be class 2 (wich geometry is stored on link table, it is not need to work with ve_link, and as a result this trigger works with table link)
 */
 
 DECLARE
@@ -72,14 +72,14 @@ BEGIN
 		IF st_equals (NEW.the_geom, OLD.the_geom) IS FALSE THEN
 
 			--Select links with start on the updated connec
-			querystring := 'SELECT * FROM v_edit_link WHERE feature_id = ' || quote_literal(NEW.connec_id) || ' AND feature_type=''CONNEC''';
+			querystring := 'SELECT * FROM ve_link WHERE feature_id = ' || quote_literal(NEW.connec_id) || ' AND feature_type=''CONNEC''';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom;
 			END LOOP;
 
 			--Select links with end on the updated connec
-			querystring := 'SELECT * FROM v_edit_link WHERE exit_id = ' || quote_literal(NEW.connec_id) || ' AND exit_type=''CONNEC''';
+			querystring := 'SELECT * FROM ve_link WHERE exit_id = ' || quote_literal(NEW.connec_id) || ' AND exit_type=''CONNEC''';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id")
@@ -88,7 +88,7 @@ BEGIN
 		END IF;
 
 		-- update the rest of the feature parameters for state = 1 connects
-		FOR v_link IN SELECT * FROM v_edit_link WHERE (exit_type='CONNEC' AND exit_id=OLD.connec_id) AND state = 1
+		FOR v_link IN SELECT * FROM ve_link WHERE (exit_type='CONNEC' AND exit_id=OLD.connec_id) AND state = 1
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
 
@@ -111,7 +111,7 @@ BEGIN
 
 
 		-- update planned links (and planned connects as well)
-		FOR v_link IN SELECT * FROM v_edit_link WHERE (exit_type='CONNEC' AND exit_id=OLD.connec_id) AND state = 2
+		FOR v_link IN SELECT * FROM ve_link WHERE (exit_type='CONNEC' AND exit_id=OLD.connec_id) AND state = 2
 		LOOP
 			IF v_projectype = 'WS' THEN
 				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = NEW.dma_id, omzone_id = NEW.omzone_id,
@@ -159,14 +159,14 @@ BEGIN
 		IF st_equals (NEW.the_geom, OLD.the_geom) IS FALSE THEN
 
 			--Select links with start on the updated gully
-			querystring := 'SELECT * FROM v_edit_link WHERE feature_id = ' || quote_literal(NEW.gully_id) || ' AND feature_type=''GULLY''';
+			querystring := 'SELECT * FROM ve_link WHERE feature_id = ' || quote_literal(NEW.gully_id) || ' AND feature_type=''GULLY''';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom;
 			END LOOP;
 
 			--Select links with end on the updated gully
-			querystring := 'SELECT * FROM v_edit_link WHERE exit_id = ' || quote_literal(NEW.gully_id) || ' AND exit_type=''GULLY''';
+			querystring := 'SELECT * FROM ve_link WHERE exit_id = ' || quote_literal(NEW.gully_id) || ' AND exit_type=''GULLY''';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id")
@@ -175,7 +175,7 @@ BEGIN
 		END IF;
 
 		-- update the rest of the feature parameters for state = 1 connects
-		FOR v_link IN SELECT * FROM v_edit_link WHERE (exit_type='GULLY' AND exit_id=OLD.gully_id) AND state = 1
+		FOR v_link IN SELECT * FROM ve_link WHERE (exit_type='GULLY' AND exit_id=OLD.gully_id) AND state = 1
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
 
@@ -200,7 +200,7 @@ BEGIN
 		END LOOP;
 
 		-- update planned links (and planned connects as well)
-		FOR v_link IN SELECT * FROM v_edit_link WHERE (exit_type='GULLY' AND exit_id=OLD.gully_id) AND state = 2
+		FOR v_link IN SELECT * FROM ve_link WHERE (exit_type='GULLY' AND exit_id=OLD.gully_id) AND state = 2
 		LOOP
 			IF v_projectype = 'WS' THEN
 				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = v_dma_value, omzone_id = NEW.omzone_id, fluid_type = v_fluidtype_value

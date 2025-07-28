@@ -128,7 +128,7 @@ BEGIN
 	END IF;
 
 	-- control null tabname when layout of municipalities appear
-	IF v_tabname IS NULL AND v_selectortype = 'explfrommuni' THEN 
+	IF v_tabname IS NULL AND v_selectortype = 'explfrommuni' THEN
 		v_tabname = 'tab_municipality';
 	END IF;
 
@@ -486,9 +486,9 @@ BEGIN
 
 	-- manage addschema
 	IF v_addschema IS NOT NULL AND v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
-	
+
 		EXECUTE 'SET search_path = '||v_addschema||', public';
-	
+
 		EXECUTE' DELETE FROM selector_municipality WHERE cur_user = current_user';
 		EXECUTE' INSERT INTO selector_municipality 
 		SELECT muni_id, current_user FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
@@ -538,9 +538,9 @@ BEGIN
 	END IF;
 
 	IF v_addschema IS NOT NULL AND v_tabname IN ('tab_exploitation_add', 'tab_macroexploitation_add') THEN
-	
+
 		EXECUTE 'SET search_path = '||v_addschema||', public';
-	
+
 		-- manage cross-reference tables
 		select count(*) into v_count from node;
 		IF v_count > 0 THEN
@@ -603,21 +603,21 @@ BEGIN
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
-				
+
 			EXECUTE' DELETE FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
 			EXECUTE' INSERT INTO '||v_schemaname||'.selector_municipality 
 			SELECT muni_id, current_user FROM selector_municipality WHERE cur_user = current_user';
-		
+
 			SELECT row_to_json (a)
 			INTO v_geometry
-			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, 
+			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1,
 			st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 			FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc) b) a;
-		
+
 		END IF;
-	
+
 		EXECUTE 'SET search_path = '||v_schemaname||', public';
-								
+
 		-- macroexpl
 		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 		INSERT INTO selector_macroexpl
@@ -657,13 +657,13 @@ BEGIN
 
 		-- psector
 		DELETE FROM selector_psector WHERE psector_id NOT IN
-		(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN 
+		(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN
 	    (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
 	END IF;
 
 	-- get envelope
-	SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
+	SELECT count(the_geom) INTO v_count_2 FROM ve_node LIMIT 1;
 
 	IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 		SELECT row_to_json (a)
@@ -672,12 +672,12 @@ BEGIN
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc where sector_id IN
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)) b) a;
-			
+
 	ELSIF (v_count_2 > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc) b) a;
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
 
 	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
@@ -698,7 +698,7 @@ BEGIN
 
 	END IF;
 
-	-- force 0 
+	-- force 0
 	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
 

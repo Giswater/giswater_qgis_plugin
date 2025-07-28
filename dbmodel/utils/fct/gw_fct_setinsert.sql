@@ -31,7 +31,7 @@ feature:
 SELECT "SCHEMA_NAME".gw_fct_setinsert($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"node", "tableName":"v_edit_node", "id":"1251521", "idName": "node_id"},
+"feature":{"featureType":"node", "tableName":"ve_node", "id":"1251521", "idName": "node_id"},
 	"data":{"fields":{"macrosector_id": "1", "sector_id": "2", "nodecat_id":"JUNCTION DN63", "dma_id":"2", "inventory": "False",
 		"epa_type": "JUNCTION", "state": "1", "arc_id": "113854", "publish": "False", "verified": "TO REVIEW",
 		"expl_id": "1", "builtdate": "2018/11/29", "muni_id": "2", "workcat_id": null, "buildercat_id": "builder1", "enddate": "2018/11/29",

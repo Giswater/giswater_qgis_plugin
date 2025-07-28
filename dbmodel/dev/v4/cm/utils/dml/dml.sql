@@ -79,9 +79,9 @@ INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('visit_manager', 'tab_data', 
 INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('visit_manager', 'tab_done', 'Executed visits', 'Executed visits', 'role_om', '{"name":"gwGetVisitManager", "parameters":{"form":{"tabData":{"active":false}, "tabLots":{"active":false},"tabDone":{"active":true}}}}', '[{"actionName":"actionDelete", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "actionTable":{"tableName":"om_visit","idName":"id"}, "disabled":false},{"actionName":"changeAction", "actionFunction":"gwGetVisit", "disabled":false}]', 3)ON CONFLICT (formname, tabname) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('visit_manager', 'tab_lot', 'Lots', 'Lots', 'role_om', '{"name":"gwGetVisitManager", "parameters":{"form":{"tabData":{"active":false}, "tabLots":{"active":true}}}}', '[{"actionName":"actionDelete", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "actionTable":{"tableName":"om_visit_lot","idName":"id"}, "disabled":false},{"actionName":"changeAction", "actionFunction":"gwGetLot", "disabled":false}]', 3)ON CONFLICT (formname, tabname) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('lot', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGetLot", "parameters":{"form":{"tabData":{"active":true}}}}', '{}', 3) ON CONFLICT (formname, tabname) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('v_edit_arc', 'tab_visit', 'Visit', 'List of visits', 'role_basic', NULL, NULL, 4) ON CONFLICT (formname, tabname) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('v_edit_node', 'tab_visit', 'Visit', 'List of visits', 'role_basic', NULL, NULL, 4) ON CONFLICT (formname, tabname) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('v_edit_connec', 'tab_visit', 'Visit', 'List of visits', 'role_basic', NULL, NULL, 4) ON CONFLICT (formname, tabname) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('ve_arc', 'tab_visit', 'Visit', 'List of visits', 'role_basic', NULL, NULL, 4) ON CONFLICT (formname, tabname) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('ve_node', 'tab_visit', 'Visit', 'List of visits', 'role_basic', NULL, NULL, 4) ON CONFLICT (formname, tabname) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('ve_connec', 'tab_visit', 'Visit', 'List of visits', 'role_basic', NULL, NULL, 4) ON CONFLICT (formname, tabname) DO NOTHING;
 
 
 /*config_form_list*/

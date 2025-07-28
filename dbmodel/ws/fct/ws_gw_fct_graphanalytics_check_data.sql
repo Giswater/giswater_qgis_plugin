@@ -86,7 +86,7 @@ BEGIN
 	IF v_selectionmode = 'wholeSystem' THEN
 		v_edit = '';
 	ELSIF v_selectionmode = 'userSelectors' THEN
-		v_edit = 'v_edit_';
+		v_edit = 've_';
 	END IF;
 
 	IF v_fid = 211 OR v_fid = 101 THEN

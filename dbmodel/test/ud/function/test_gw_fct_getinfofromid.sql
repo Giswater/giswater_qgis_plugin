@@ -33,37 +33,37 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_node", "id":"89"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_node", "id":"89"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid tableName --> v_edit_node returns status "Accepted"'
+    'Check if gw_fct_getinfofromid tableName --> ve_node returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_connec", "id":"3149"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_connec", "id":"3149"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid tableName --> v_edit_connec returns status "Accepted"'
+    'Check if gw_fct_getinfofromid tableName --> ve_connec returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_gully", "id":"30087"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_gully", "id":"30087"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid tableName --> v_edit_gully returns status "Accepted"'
+    'Check if gw_fct_getinfofromid tableName --> ve_gully returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_arc", "id":"204"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_arc", "id":"204"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid tableName --> v_edit_arc returns status "Accepted"'
+    'Check if gw_fct_getinfofromid tableName --> ve_arc returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_link", "id":"550"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_link", "id":"550"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid tableName --> v_edit_link returns status "Accepted"'
+    'Check if gw_fct_getinfofromid tableName --> ve_link returns status "Accepted"'
 );
 
 SELECT is(

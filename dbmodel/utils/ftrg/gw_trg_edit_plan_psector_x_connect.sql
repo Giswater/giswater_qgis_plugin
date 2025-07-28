@@ -252,10 +252,10 @@ BEGIN
 
 		IF v_table = 'plan_psector_x_connec' then
 
-			EXECUTE 'SELECT state, arc_id FROM v_edit_connec where connec_id = '''||new.connec_id||''''
+			EXECUTE 'SELECT state, arc_id FROM ve_connec where connec_id = '''||new.connec_id||''''
 			INTO v_rec;
 
-			select link_id, exit_type INTO v_link_id, v_exit_type from v_edit_link where feature_id = new.connec_id and feature_type = 'CONNEC' AND feature_id = new.connec_id LIMIT 1;
+			select link_id, exit_type INTO v_link_id, v_exit_type from ve_link where feature_id = new.connec_id and feature_type = 'CONNEC' AND feature_id = new.connec_id LIMIT 1;
 
 			UPDATE plan_psector_x_connec SET doable = NEW.doable, descript = NEW.descript, arc_id = NEW.arc_id, link_id = NEW.link_id
 			WHERE id = NEW.id;
@@ -271,10 +271,10 @@ BEGIN
 
 		ELSIF v_table = 'plan_psector_x_gully' THEN
 
-			EXECUTE 'SELECT state, arc_id FROM v_edit_gully where gully_id = '''||new.gully_id||''''
+			EXECUTE 'SELECT state, arc_id FROM ve_gully where gully_id = '''||new.gully_id||''''
 			INTO v_rec;
 
-			select link_id, exit_type INTO v_link_id, v_exit_type from v_edit_link where feature_id = new.gully_id and feature_type = 'GULLY' AND feature_id = new.gully_id LIMIT 1;
+			select link_id, exit_type INTO v_link_id, v_exit_type from ve_link where feature_id = new.gully_id and feature_type = 'GULLY' AND feature_id = new.gully_id LIMIT 1;
 
 			UPDATE plan_psector_x_gully SET doable = NEW.doable, descript = NEW.descript, arc_id = NEW.arc_id, link_id = NEW.link_id
 			WHERE id = NEW.id;

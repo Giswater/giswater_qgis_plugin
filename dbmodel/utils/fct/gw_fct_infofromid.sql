@@ -36,7 +36,7 @@ SELECT SCHEMA_NAME.gw_fct_infofromid($${
 SELECT SCHEMA_NAME.gw_fct_infofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
-		"feature":{"tableName":"v_edit_arc","id":"2001"},
+		"feature":{"tableName":"ve_arc","id":"2001"},
 		"data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_infofromid($${
@@ -313,7 +313,7 @@ BEGIN
 
 
 		--check if is delimiter
-		IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
+		IF upper(v_project_type) = 'WS' AND v_table_parent='ve_node' THEN
 			IF (SELECT ARRAY(SELECT upper(unnest(graph_delimiter))) FROM cat_feature_node JOIN cat_feature USING (id)
 				WHERE child_layer=v_tablename) && ARRAY['DMA','PRESSZONE'] THEN
 				v_isgraphdelimiter = TRUE;
@@ -331,10 +331,10 @@ BEGIN
 
 		if v_tablename = 've_epa_junction' then
 			v_table_epa = v_tablename;
-			v_table_parent = 'v_edit_node';
+			v_table_parent = 've_node';
 		elsif v_tablename = 've_epa_connec' then
 			v_table_epa = v_tablename;
-			v_table_parent = 'v_edit_connec';
+			v_table_parent = 've_connec';
 		else
 			v_table_epa = concat('ve_epa_', lower(v_epatype));
 			v_querystring = concat('SELECT concat(''v_edit_'', lower(feature_type)) FROM sys_feature_epa_type WHERE id =''', v_epatype,'''');
@@ -347,7 +347,7 @@ BEGIN
 
 		IF v_id IS NOT NULL THEN
 
-			IF v_table_parent='v_edit_node' THEN
+			IF v_table_parent='ve_node' THEN
 
 				v_querystring = concat('SELECT node_type FROM ',v_table_parent,' WHERE node_id = ',v_id::integer,';');
 
@@ -766,8 +766,8 @@ BEGIN
             ELSIF v_id IS NULL AND v_featuretype = 'flwreg' THEN
                 -- WARNING: this code is also in gw_fct_getfeatureupsert. If it needs to be changed here, it will most likely have to be changed there too.
                 -- Get node id from initial clicked point
-                SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_inputgeometry), v_edit_node.the_geom, v_arc_searchnodes)
-                ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_inputgeometry)) LIMIT 1;
+                SELECT * INTO v_noderecord1 FROM ve_node WHERE ST_DWithin(ST_startpoint(v_inputgeometry), ve_node.the_geom, v_arc_searchnodes)
+                ORDER BY ST_Distance(ve_node.the_geom, ST_startpoint(v_inputgeometry)) LIMIT 1;
                 -- Get order_id
                 SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM ve_frelem WHERE node_id = v_noderecord1.node_id ::text; -- afegir flwreg_type
                 -- Get flowreg_type

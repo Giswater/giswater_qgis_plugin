@@ -33,7 +33,7 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_getinfofromcoordinates($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
-    "pageInfo":{}, "toolBar":"basic", "activeLayer":"v_edit_link", "visibleLayers":["v_edit_node", "v_edit_connec", "v_edit_gully", "v_edit_arc", "v_edit_link",
+    "pageInfo":{}, "toolBar":"basic", "activeLayer":"ve_link", "visibleLayers":["ve_node", "ve_connec", "ve_gully", "ve_arc", "ve_link",
     "ve_pol_node", "ve_pol_gully", "ve_pol_connec", "v_edit_dimensions", "v_edit_element", "v_edit_inp_junction", "v_edit_inp_outfall", "v_edit_inp_divider",
     "v_edit_inp_storage", "v_edit_inp_netgully", "v_edit_inp_conduit", "v_edit_inp_virtual", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_outlet",
     "v_edit_inp_orifice", "v_edit_inp_gully", "vi_gully2node", "v_edit_inp_frorifice", "v_edit_inp_froutlet", "v_edit_inp_frpump",
@@ -46,7 +46,7 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromcoordinates($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
-    "pageInfo":{}, "toolBar":"basic", "activeLayer":"v_edit_link", "visibleLayers":["v_edit_node", "v_edit_connec", "v_edit_gully", "v_edit_arc", "v_edit_link",
+    "pageInfo":{}, "toolBar":"basic", "activeLayer":"ve_link", "visibleLayers":["ve_node", "ve_connec", "ve_gully", "ve_arc", "ve_link",
     "ve_pol_node", "ve_pol_gully", "ve_pol_connec", "v_edit_dimensions", "v_edit_element", "v_edit_inp_junction", "v_edit_inp_outfall", "v_edit_inp_divider",
     "v_edit_inp_storage", "v_edit_inp_netgully", "v_edit_inp_conduit", "v_edit_inp_virtual", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_outlet",
     "v_edit_inp_orifice", "v_edit_inp_gully", "vi_gully2node", "v_edit_inp_frorifice", "v_edit_inp_froutlet", "v_edit_inp_frpump",
@@ -59,7 +59,7 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromcoordinates($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
-    "pageInfo":{}, "toolBar":"basic", "activeLayer":"v_edit_link", "visibleLayers":["v_edit_node", "v_edit_connec", "v_edit_gully", "v_edit_arc", "v_edit_link",
+    "pageInfo":{}, "toolBar":"basic", "activeLayer":"ve_link", "visibleLayers":["ve_node", "ve_connec", "ve_gully", "ve_arc", "ve_link",
     "ve_pol_node", "ve_pol_gully", "ve_pol_connec", "v_edit_dimensions", "v_edit_element", "v_edit_inp_junction", "v_edit_inp_outfall", "v_edit_inp_divider",
     "v_edit_inp_storage", "v_edit_inp_netgully", "v_edit_inp_conduit", "v_edit_inp_virtual", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_outlet",
     "v_edit_inp_orifice", "v_edit_inp_gully", "vi_gully2node", "v_edit_inp_frorifice", "v_edit_inp_froutlet", "v_edit_inp_frpump",
@@ -72,7 +72,7 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromcoordinates($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
-    "pageInfo":{}, "toolBar":"basic", "activeLayer":"v_edit_link", "visibleLayers":["v_edit_node", "v_edit_connec", "v_edit_gully", "v_edit_arc", "v_edit_link",
+    "pageInfo":{}, "toolBar":"basic", "activeLayer":"ve_link", "visibleLayers":["ve_node", "ve_connec", "ve_gully", "ve_arc", "ve_link",
     "ve_pol_node", "ve_pol_gully", "ve_pol_connec", "v_edit_dimensions", "v_edit_element", "v_edit_inp_junction", "v_edit_inp_outfall", "v_edit_inp_divider",
     "v_edit_inp_storage", "v_edit_inp_netgully", "v_edit_inp_conduit", "v_edit_inp_virtual", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_outlet",
     "v_edit_inp_orifice", "v_edit_inp_gully", "vi_gully2node", "v_edit_inp_frorifice", "v_edit_inp_froutlet", "v_edit_inp_frpump",
@@ -85,7 +85,7 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromcoordinates($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
-    "pageInfo":{}, "toolBar":"basic", "activeLayer":"v_edit_link", "visibleLayers":["v_edit_node", "v_edit_connec", "v_edit_gully", "v_edit_arc", "v_edit_link",
+    "pageInfo":{}, "toolBar":"basic", "activeLayer":"ve_link", "visibleLayers":["ve_node", "ve_connec", "ve_gully", "ve_arc", "ve_link",
     "ve_pol_node", "ve_pol_gully", "ve_pol_connec", "v_edit_dimensions", "v_edit_element", "v_edit_inp_junction", "v_edit_inp_outfall", "v_edit_inp_divider",
     "v_edit_inp_storage", "v_edit_inp_netgully", "v_edit_inp_conduit", "v_edit_inp_virtual", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_outlet",
     "v_edit_inp_orifice", "v_edit_inp_gully", "vi_gully2node", "v_edit_inp_frorifice", "v_edit_inp_froutlet", "v_edit_inp_frpump",

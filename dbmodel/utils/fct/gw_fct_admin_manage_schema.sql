@@ -68,7 +68,7 @@ BEGIN
 			FOR v_view IN EXECUTE 'SELECT table_name, replace(view_definition, concat('||quote_literal(v_source)||',''.''),
 			concat('||quote_literal(v_target)||',''.'')) as definition 
 			FROM information_schema.VIEWS WHERE  table_schema = '||quote_literal(v_target)||' AND (table_name IN (''v_arc'', ''v_node'',''v_connec'',''v_gully'',
-			''v_edit_arc'', ''v_edit_node'',''v_edit_connec'',''v_edit_gully''))'
+			''ve_arc'', ''ve_node'',''ve_connec'',''ve_gully''))'
 			LOOP
 			
 				EXECUTE 'CREATE OR REPLACE VIEW ' ||v_view.table_name || ' AS ' || v_view.definition;

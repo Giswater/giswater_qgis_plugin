@@ -56,13 +56,13 @@ BEGIN
 					-- NODE
 					v_feature = 'node';
 			        v_select_node = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
-			                          lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM v_edit_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''';
+			                          lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM ve_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''';
 
 					-- CONNEC
 					v_feature = 'connec';
 					v_select_connec = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
 					-- Combine the query parts and execute it
-			                          lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM v_edit_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''';
+			                          lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM ve_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''';
 					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
 					               v_select_node, v_select_connec)
 					INTO v_fields_array;
@@ -94,12 +94,12 @@ BEGIN
 					-- NODE
 					v_feature = 'node';
 					v_select_node = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
-				    				lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM v_edit_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||''' and '||v_feature||'_id IN (SELECT newdata->>''node_id'' as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_element_x_%'' AND schema = ''SCHEMA_NAME''))';
+				    				lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM ve_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||''' and '||v_feature||'_id IN (SELECT newdata->>''node_id'' as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_element_x_%'' AND schema = ''SCHEMA_NAME''))';
 					-- CONNEC
 					v_feature = 'connec';
 					v_select_connec = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
 					-- Combine the query parts and execute it
-		                   			lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM v_edit_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||''' and '||v_feature||'_id IN (SELECT newdata->>''connec_id'' as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_element_x_%'' AND schema = ''SCHEMA_NAME''))';
+		                   			lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM ve_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||''' and '||v_feature||'_id IN (SELECT newdata->>''connec_id'' as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_element_x_%'' AND schema = ''SCHEMA_NAME''))';
 
 					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
 					               v_select_node, v_select_connec)

@@ -80,7 +80,7 @@ BEGIN
 	if v_location = '' then v_location = null; end if;
 
 	--define columns used for feature_cat
-	v_feature_layer = concat('v_edit_',v_feature_type);
+	v_feature_layer = concat('ve_',v_feature_type);
 	v_id_column:=concat(v_feature_type,'_id');
 	v_cat_column= concat(v_feature_type,'cat_id');
 
@@ -127,7 +127,7 @@ BEGIN
     ) THEN
     	EXECUTE 'UPDATE '||concat('ve_', v_feature_type, '_', lower(v_feature_type_new))||' SET to_arc= NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
     END IF;
-   
+
 	-- get log (fid: 143)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;

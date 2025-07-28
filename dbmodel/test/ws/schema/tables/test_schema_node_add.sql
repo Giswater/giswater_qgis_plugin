@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table node_addv_edit_link
+-- Check table node_addve_link
 SELECT has_table('node_add'::name, 'Table node_add should exist');
 
 -- Check columns

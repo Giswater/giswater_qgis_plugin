@@ -60,7 +60,7 @@ BEGIN
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT node_id INTO v_node_id FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+		SELECT node_id INTO v_node_id FROM ve_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 	END IF;
 
 	SELECT anl_feature_id INTO feature_id_aux FROM om_mincut WHERE id=v_result_id;

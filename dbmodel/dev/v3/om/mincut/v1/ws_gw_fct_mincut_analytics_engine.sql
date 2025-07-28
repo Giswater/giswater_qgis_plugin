@@ -36,7 +36,7 @@ BEGIN
         node_id_arg = stack[array_length(stack, 1)];
 
         -- Get node public.geometry
-        SELECT the_geom INTO node_aux FROM v_edit_node  JOIN value_state_type ON state_type=value_state_type.id WHERE (node_id = node_id_arg) AND (is_operative IS TRUE);
+        SELECT the_geom INTO node_aux FROM ve_node  JOIN value_state_type ON state_type=value_state_type.id WHERE (node_id = node_id_arg) AND (is_operative IS TRUE);
 
         -- Check node_id being a valve
         SELECT node_id INTO exists_id FROM anl_mincut_result_valve WHERE node_id = node_id_arg 
@@ -68,7 +68,7 @@ BEGIN
                 INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_aux, result_id_arg);         
                                        
                 -- Loop for all the upstream nodes
-                FOR rec_table IN SELECT arc_id, node_1 FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
+                FOR rec_table IN SELECT arc_id, node_1 FROM ve_arc JOIN value_state_type ON state_type=value_state_type.id 
                 WHERE (node_2 = node_id_arg) AND (is_operative IS TRUE)
                 LOOP
 
@@ -91,7 +91,7 @@ BEGIN
                 END LOOP;
 
                 -- Loop for all the downstream nodes
-                FOR rec_table IN SELECT arc_id, node_2 FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
+                FOR rec_table IN SELECT arc_id, node_2 FROM ve_arc JOIN value_state_type ON state_type=value_state_type.id 
                 WHERE (node_1 = node_id_arg) AND (is_operative IS TRUE)
                 LOOP
                     -- Insert into tables

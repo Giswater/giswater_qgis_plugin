@@ -213,11 +213,11 @@ UPDATE config_form_fields SET hidden=false WHERE columnname = 'arc_id' AND formn
 
 
 -- reorder sample
-UPDATE config_form_fields SET layoutorder =90, layoutname = 'lyt_data_1' WHERE columnname ='link' AND (formname not in ('v_edit_link'));;
+UPDATE config_form_fields SET layoutorder =90, layoutname = 'lyt_data_1' WHERE columnname ='link' AND (formname not in ('ve_link'));;
 UPDATE config_form_fields SET layoutorder =2 , layoutname ='lyt_bot_2' WHERE columnname ='verified';
-UPDATE config_form_fields SET layoutorder =1 , layoutname ='lyt_bot_2' WHERE columnname ='sector_id' AND (formname not in ('v_edit_link'));;
+UPDATE config_form_fields SET layoutorder =1 , layoutname ='lyt_bot_2' WHERE columnname ='sector_id' AND (formname not in ('ve_link'));;
 UPDATE config_form_fields SET layoutorder =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE columnname ='dqa_id';
-UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE columnname ='macrosector_id' AND (formname not in ('v_edit_link'));;
+UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE columnname ='macrosector_id' AND (formname not in ('ve_link'));;
 UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id');
 
 SELECT gw_fct_admin_manage_triggers('fk','ALL');
@@ -252,7 +252,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 18 where 
 
 UPDATE config_form_fields SET  hidden = true where columnname = 'macrodma_id';
 UPDATE config_form_fields SET  hidden = true where columnname = 'inventory';
-UPDATE config_form_fields SET  hidden = true where columnname = 'feature_id' AND (formname not in ('v_edit_link'));;
+UPDATE config_form_fields SET  hidden = true where columnname = 'feature_id' AND (formname not in ('ve_link'));;
 UPDATE config_form_fields SET  hidden = true where columnname = 'featurecat_id';
 UPDATE config_form_fields SET  hidden = true where columnname = 'connec_length';
 
@@ -261,17 +261,17 @@ UPDATE config_form_fields SET  hidden = true where columnname = 'function_type' 
 UPDATE config_form_fields SET  hidden = true where columnname = 'descript' AND formname LIKE '%_connec_%';
 UPDATE config_form_fields SET  hidden = true where columnname = 'annotation' AND formname LIKE '%_connec_%';
 
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state' AND (formname not in ('v_edit_link','v_edit_dimensions','mincut_manager'));
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state' AND (formname not in ('ve_link','v_edit_dimensions','mincut_manager'));
 UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state_type';
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id' AND (formname not in ('ve_link','v_edit_dimensions'));
 UPDATE config_form_fields SET layoutname = 'lyt_data_1',layoutorder = 997 where columnname ='hemisphere';
---UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
+--UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id' AND (formname not in ('ve_link','v_edit_dimensions'));
 
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 30 where columnname ='verified' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 31 where columnname ='presszone_id' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 32 where columnname ='dqa_id' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where columnname ='expl_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where columnname ='expl_id' AND (formname not in ('ve_link','v_edit_dimensions'));
 UPDATE config_form_fields SET layoutname = 'lyt_data_1', layoutorder = 998 where columnname ='parent_id' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
 
 
@@ -283,7 +283,7 @@ UPDATE man_type_function SET function_type = replace (function_type, 'Standard',
 
 update config_form_fields SET widgettype = 'text' WHERE columnname  = 'macrosector_id' AND dv_querytext = null;
 
-UPDATE v_edit_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
+UPDATE ve_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 
 --add tooltips for specific fields
 UPDATE config_form_fields SET tooltip = 'broken - Para establecer si la válvula esta rota o no' WHERE columnname = 'broken' AND tooltip IS NULL;
@@ -338,7 +338,7 @@ UPDATE config_form_fields SET tooltip = 'name - Nombre específico del elemento'
 
 UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 32;
 
-UPDATE v_edit_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
+UPDATE ve_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
 
 UPDATE cat_mat_roughness set roughness  = 0.003;
 DELETE FROM cat_arc WHERE arc_type = 'VARC' AND id !='VIRTUAL';
@@ -391,24 +391,24 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', '
 
 --arc
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%ve_arc_%';
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%v_edit_arc%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_arc%';
+UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%ve_arc%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
 
 --node
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%ve_node_%';
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%v_edit_node%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_node%';
+UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%ve_node%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_node%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_node%';
 
 --connec
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'connec_id' and formname like '%ve_connec_%';
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'connec_id' and formname like '%v_edit_connec%';
+UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'connec_id' and formname like '%ve_connec%';
 UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%ve_connec_%';
-UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%v_edit_connec%';
+UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%ve_connec%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_connec_%';
-update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%v_edit_connec%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_connec%';
+update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_connec%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_connec%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_connec%';
 
 --placeholders
@@ -438,7 +438,7 @@ UPDATE config_param_system SET value = '{"activated" : "TRUE", "updateField" : "
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_status_vdefault', '4', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 -- fill missed data for connecs
-UPDATE v_edit_connec SET epa_type = 'JUNCTION';
+UPDATE ve_connec SET epa_type = 'JUNCTION';
 UPDATE connec SET epa_type = 'UNDEFINED' where epa_type is null;
 ALTER TABLE connec ALTER COLUMN epa_type SET NOT NULL;
 
@@ -652,9 +652,9 @@ UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHE
 
 UPDATE man_hydrant set customer_code = concat('cc', node_id);
 
-INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('v_edit_arc', 106, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
-INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('v_edit_arc', 107, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
-INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('v_edit_arc', 108, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
+INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 106, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
+INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 107, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
+INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 108, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
 
 UPDATE config_form_fields SET hidden=false WHERE formtype='form_featuretype_change' AND columnname='featurecat_id';
 
@@ -799,7 +799,7 @@ UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='
 UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='top_elev' WHERE formname='v_edit_inp_shortpipe' AND formtype='form_feature' AND columnname='elevation' AND tabname='tab_none';
 UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='top_elev' WHERE formname='v_edit_inp_tank' AND formtype='form_feature' AND columnname='elevation' AND tabname='tab_none';
 UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='top_elev' WHERE formname='v_edit_inp_valve' AND formtype='form_feature' AND columnname='elevation' AND tabname='tab_none';
-UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='top_elev' WHERE formname='v_edit_node' AND formtype='form_feature' AND columnname='elevation' AND tabname='tab_data';
+UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='top_elev' WHERE formname='ve_node' AND formtype='form_feature' AND columnname='elevation' AND tabname='tab_data';
 UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='top_elev' WHERE formname='v_edit_element' AND formtype='form_feature' AND columnname='elevation' AND tabname='tab_data';
 UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='top_elev' WHERE formname='v_edit_review_node' AND formtype='form_feature' AND columnname='elevation' AND tabname='tab_none';
 UPDATE config_form_fields SET columnname='top_elev', label='top_elev', tooltip='top_elev' WHERE formname='v_rpt_node' AND formtype='form_feature' AND columnname='elevation' AND tabname='tab_none';
@@ -1015,14 +1015,14 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=53 WHERE form
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=54 WHERE formname ILIKE 've_connec_%' AND formtype='form_feature' AND columnname='cat_dint' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=55 WHERE formname ILIKE 've_connec_%' AND formtype='form_feature' AND columnname='supplyzone_id' AND tabname='tab_data';
 
--- update datasource to v_edit_arc, ve_arc, v_edit_connec, ve_connec and ve_element
-UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL WHERE formname='v_edit_arc' AND formtype='form_feature' AND columnname='datasource' AND tabname='tab_data';
+-- update datasource to ve_arc, ve_arc, ve_connec, ve_connec and ve_element
+UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='datasource' AND tabname='tab_data';
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='datasource' AND tabname='tab_data';
-UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL WHERE formname='v_edit_connec' AND formtype='form_feature' AND columnname='datasource' AND tabname='tab_data';
+UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='datasource' AND tabname='tab_data';
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL WHERE formname ILIKE 've_connec_%*' AND formtype='form_feature' AND columnname='datasource' AND tabname='tab_data';
 
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL
-WHERE (formname='v_edit_arc' OR formname ILIKE 've_arc_%' OR formname='v_edit_connec' OR formname ILIKE 've_connec_%' OR formname='v_edit_node' OR formname ILIKE 've_node_%' OR formname='v_edit_element' OR formname ILIKE 've_element_%' )
+WHERE (formname='ve_arc' OR formname ILIKE 've_arc_%' OR formname='ve_connec' OR formname ILIKE 've_connec_%' OR formname='ve_node' OR formname ILIKE 've_node_%' OR formname='v_edit_element' OR formname ILIKE 've_element_%' )
 AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_data';
 -- 18/02/2025
 UPDATE config_form_fields SET widgetcontrols= '{"setMultiline": false}' WHERE columnname ='verified' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');

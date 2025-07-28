@@ -12,7 +12,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_epa_setjunctionsoutlet($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+"form":{},"feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"minDistance":"20.0"}}}$$)::text
 
@@ -69,7 +69,7 @@ BEGIN
 
 	raise notice '1- Insert';
 	INSERT INTO temp_node (node_id, nodecat_id, expl_id, the_geom, sector_id, state)
-	SELECT node_id, nodecat_id, expl_id,  the_geom, sector_id, state FROM v_edit_node where epa_type = 'JUNCTION';
+	SELECT node_id, nodecat_id, expl_id,  the_geom, sector_id, state FROM ve_node where epa_type = 'JUNCTION';
 
 	select count(*) into v_count from temp_node;
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 

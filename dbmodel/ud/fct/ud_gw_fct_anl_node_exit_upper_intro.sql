@@ -16,7 +16,7 @@ $BODY$
 
 SELECT gw_fct_anl_node_exit_upper_intro($${
 "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]},
+"feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}}}$$);
 -- fid: 111
 
@@ -75,11 +75,11 @@ BEGIN
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
-		v_sql:= 'SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from v_edit_arc) 
-		and node_id in (select node_2 from v_edit_arc) and node_id IN ('||v_array||') AND verified != ''VERIFIED'')';
+		v_sql:= 'SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from ve_arc) 
+		and node_id in (select node_2 from ve_arc) and node_id IN ('||v_array||') AND verified != ''VERIFIED'')';
 	ELSE
-		v_sql:= ('SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from v_edit_arc) 
-		and node_id in (select node_2 from v_edit_arc) AND verified != ''VERIFIED''');
+		v_sql:= ('SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from ve_arc) 
+		and node_id in (select node_2 from ve_arc) AND verified != ''VERIFIED''');
 	END IF;
 
 
@@ -94,7 +94,7 @@ BEGIN
 			v_sys_elev2=0;
 
 			-- as node1
-			v_querytext = 'SELECT * FROM v_edit_arc where node_1::integer='||rec_node.node_id;
+			v_querytext = 'SELECT * FROM ve_arc where node_1::integer='||rec_node.node_id;
 			EXECUTE v_querytext INTO v_querytextres;
 			IF v_querytextres.arc_id IS NOT NULL THEN
 				FOR rec_arc IN EXECUTE v_querytext
@@ -106,7 +106,7 @@ BEGIN
 			END IF;
 
 			-- as node2
-			v_querytext = 'SELECT * FROM v_edit_arc where node_2::integer='||rec_node.node_id;
+			v_querytext = 'SELECT * FROM ve_arc where node_2::integer='||rec_node.node_id;
 			EXECUTE v_querytext INTO v_querytextres;
 			IF v_querytextres.arc_id IS NOT NULL THEN
 				FOR rec_arc IN EXECUTE v_querytext

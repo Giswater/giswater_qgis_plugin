@@ -172,7 +172,7 @@ BEGIN
 	-- posiciones a banda i banda de la posición original del connec
 	v_sql_final_point = '
 		with mec as ( --cojo el connec tal y el arco está debajo suyo
-			select c.connec_id, c.the_geom as connec_geom, a.arc_id, a.the_geom as arc_geom from v_edit_arc a, v_edit_connec c 
+			select c.connec_id, c.the_geom as connec_geom, a.arc_id, a.the_geom as arc_geom from ve_arc a, ve_connec c 
 			where st_dwithin(a.the_geom, c.the_geom, 0.01) and c.connec_id = '||quote_literal(v_connec)||'
 		), percent_line as ( --porcentaje de la linia dnde se encuentra el connec
 			select mec.*, st_linelocatepoint(arc_geom, connec_geom) as percent_connec from mec

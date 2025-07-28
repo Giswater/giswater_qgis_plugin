@@ -33,7 +33,7 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_setsearch($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"tabName":"network"},
-    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"arc", "net_type":{"id":"v_edit_arc", "name":"Arcs"},
+    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"arc", "net_type":{"id":"ve_arc", "name":"Arcs"},
     "net_code":{"text":"100011 : CC040"}, "addSchema":"NULL"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setsearch --> tabName":"network" returns status "Accepted"'

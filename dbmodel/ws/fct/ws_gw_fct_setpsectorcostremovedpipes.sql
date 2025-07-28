@@ -59,7 +59,7 @@ BEGIN
 	v_sql = 'INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, observ)
 	SELECT '||quote_literal(v_price)||', sum(gis_length), psector_id, '||quote_literal(v_observ)||' 
 	from plan_psector_x_arc ppxa 
-	JOIN v_edit_arc USING (arc_id)
+	JOIN ve_arc USING (arc_id)
 	WHERE cat_matcat_id = '||quote_literal(v_material)||' and 
 	expl_id = '||v_expl||' and ppxa.state=0 group by 3';
 
@@ -67,7 +67,7 @@ BEGIN
 
 	-- create log
 	INSERT INTO anl_arc (arc_id, arccat_id, node_1, node_2, state, expl_id, the_geom, descript, fid)
-	SELECT arc_id, arccat_id, node_1, node_2, a.state, expl_id, the_geom, v_observ, v_fid FROM plan_psector_x_arc JOIN v_edit_arc a USING (arc_id)
+	SELECT arc_id, arccat_id, node_1, node_2, a.state, expl_id, the_geom, v_observ, v_fid FROM plan_psector_x_arc JOIN ve_arc a USING (arc_id)
 	WHERE cat_matcat_id = v_material and expl_id = v_expl;
 
 	-- get results

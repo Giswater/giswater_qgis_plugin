@@ -47,7 +47,7 @@ BEGIN
 	TRUNCATE t_rpt_inp_raingage;
 	DELETE FROM rpt_inp_raingage WHERE result_id = result_id_var;
 	TRUNCATE temp_t_lid_usage;
-	
+
 	ALTER TABLE temp_t_lid_usage DROP constraint if exists  temp_t_lid_usage_subc_lidco;
 	ALTER TABLE temp_t_lid_usage ADD CONSTRAINT temp_t_lid_usage_subc_lidco unique (subc_id, lidco_id);
 
@@ -71,80 +71,80 @@ BEGIN
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom, age)
 	SELECT '||quote_literal(result_id_var)||',
-	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
+	node.node_id, sys_top_elev, sys_ymax, ve_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node
-		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
+		LEFT JOIN ve_node USING (node_id) -- we need to use ve_node to work with sys_* fields
 		JOIN inp_junction ON node.node_id=inp_junction.node_id
 		JOIN (
-		SELECT node_1 AS node_id FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_1 AS node_id FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||' UNION 
-		SELECT node_2 FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_2 FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||')a ON node.node_id=a.node_id
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
-	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
+	node.node_id, sys_top_elev, sys_ymax, ve_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node 
-		LEFT JOIN v_edit_node USING (node_id) 
+		LEFT JOIN ve_node USING (node_id) 
 		JOIN inp_divider ON node.node_id=inp_divider.node_id
 		JOIN (
-		SELECT node_1 AS node_id FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_1 AS node_id FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||' UNION 
-		SELECT node_2 FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_2 FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||')a ON node.node_id=a.node_id
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
-	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
+	node.node_id, sys_top_elev, sys_ymax, ve_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, NULL, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node 
-		LEFT JOIN v_edit_node USING (node_id) 	
+		LEFT JOIN ve_node USING (node_id) 	
 		JOIN inp_storage ON node.node_id=inp_storage.node_id
 		JOIN (
-		SELECT node_1 AS node_id FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_1 AS node_id FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||' UNION 
-		SELECT node_2 FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_2 FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||')a ON node.node_id=a.node_id
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
-	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
+	node.node_id, sys_top_elev, sys_ymax, ve_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, null, null, null, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node 
-		LEFT JOIN v_edit_node USING (node_id)
+		LEFT JOIN ve_node USING (node_id)
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
 		JOIN (
-		SELECT node_1 AS node_id FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_1 AS node_id FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||' UNION 
-		SELECT node_2 FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_2 FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||')a ON node.node_id=a.node_id
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
-	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
+	node.node_id, sys_top_elev, sys_ymax, ve_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node 
-		LEFT JOIN v_edit_node USING (node_id)
+		LEFT JOIN ve_node USING (node_id)
 		JOIN inp_netgully ON node.node_id=inp_netgully.node_id
 		JOIN (
-		SELECT node_1 AS node_id FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_1 AS node_id FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||' UNION 
-		SELECT node_2 FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_2 FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||')a ON node.node_id=a.node_id
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
-	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
+	node.node_id, sys_top_elev, sys_ymax, ve_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node
-		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
+		LEFT JOIN ve_node USING (node_id) -- we need to use ve_node to work with sys_* fields
 		JOIN inp_inlet ON node.node_id=inp_inlet.node_id
 		JOIN (
-		SELECT node_1 AS node_id FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_1 AS node_id FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||' UNION 
-		SELECT node_2 FROM selector_sector s, v_edit_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
+		SELECT node_2 FROM selector_sector s, ve_arc a JOIN value_state_type ON id=state_type WHERE a.sector_id > 0 AND a.sector_id = s.sector_id and current_user = cur_user AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||')a ON node.node_id=a.node_id';
 
 
 	-- node on the fly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
-	-- PERFORM gw_fct_anl_node_sink($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_node"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
+	-- PERFORM gw_fct_anl_node_sink($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"ve_node"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
 
 	-- update child param for divider
 	UPDATE temp_t_node SET addparam=concat('{"divider_type":"',divider_type,'", "arc_id":"',arc_id,'", "curve_id":"',curve_id,'", "qmin":"',
@@ -195,7 +195,7 @@ BEGIN
 	barrels,
 	slope,
 	culvert, kentry, kexit, kavg, flap, seepage, (now()::date-a.builtdate)/30
-	FROM selector_sector, v_edit_arc a
+	FROM selector_sector, ve_arc a
 		LEFT JOIN value_state_type ON id=state_type
 		LEFT JOIN cat_material ON matcat_id = cat_material.id
 		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id

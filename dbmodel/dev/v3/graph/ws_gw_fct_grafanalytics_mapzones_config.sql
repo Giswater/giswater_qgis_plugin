@@ -117,7 +117,7 @@ BEGIN
 		LEFT JOIN man_addfields_value b ON a.id=b.parameter_id AND b.feature_id=arc.arc_id
 		WHERE a.param_name = ''',v_mapzone_addfield,''' and b.value_param is not null) a');
 
-	    FOR rec IN EXECUTE '(SELECT node_id::text FROM v_edit_node WHERE nodetype_id IN 
+	    FOR rec IN EXECUTE '(SELECT node_id::text FROM ve_node WHERE nodetype_id IN 
 	    	(SELECT id FROM cat_feature_node WHERE graf_delimiter IN '||v_graf_class_list||'))' LOOP
 		
 			--find defined sector value of node

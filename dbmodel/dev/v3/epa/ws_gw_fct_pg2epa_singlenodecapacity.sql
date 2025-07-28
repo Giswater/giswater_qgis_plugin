@@ -128,7 +128,7 @@ BEGIN
 			ON CONFLICT DO UPDATE set idval='H3';
 			
 			INSERT INTO dattrib
-			SELECT 6, node_id, 'NODE', 'H4', FROM v_edit_node
+			SELECT 6, node_id, 'NODE', 'H4', FROM ve_node
 			WHERE node_id NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
 			ON CONFLICT DO UPDATE set idval='H4';
 		

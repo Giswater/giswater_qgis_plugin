@@ -42,7 +42,7 @@ SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100014"]},"data":{"feature_type":"GULLY"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
-{"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
+{"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM ve_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
 
 --fid: 217
 
@@ -146,7 +146,7 @@ BEGIN
 	IF v_check_status IS FALSE OR v_check_maxdistance IS NULL THEN v_check_maxdistance = 999; END IF;
   	IF v_check_status IS TRUE and v_projecttype = 'WS' THEN
   	  	IF v_check_arcdnom IS NULL THEN v_check_arcdnom = 2000; END IF;
-		IF v_check_arcdnom <= (SELECT min(cat_dnom::float) FROM v_edit_arc) THEN
+		IF v_check_arcdnom <= (SELECT min(cat_dnom::float) FROM ve_arc) THEN
 		  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		  "data":{"message":"3260", "function":"3188","parameters":{"edit_link_check_arcdnom":"'||v_check_arcdnom||'"}, "is_process":true}}$$);';
 		END IF;
@@ -161,8 +161,8 @@ BEGIN
 		v_forcedarcs = concat (' AND arc_id::integer IN ', replace (v_forcedarcs, '}',')'));
 		v_isforcedarcs = True;
 
-		-- check if forced arcs really exists on v_edit_arc
-		v_querytext = 'SELECT count(arc_id) FROM v_edit_arc WHERE arc_id IS NOT NULL '||v_forcedarcs||';';
+		-- check if forced arcs really exists on ve_arc
+		v_querytext = 'SELECT count(arc_id) FROM ve_arc WHERE arc_id IS NOT NULL '||v_forcedarcs||';';
 		EXECUTE v_querytext INTO v_count;
 		IF v_count=0 THEN
 			v_forcedarcs= '';
@@ -241,7 +241,7 @@ BEGIN
 
 		-- get feature information
 		IF v_feature_type ='CONNEC' THEN
-			SELECT * INTO v_connect FROM v_edit_connec WHERE connec_id = v_connect_id;
+			SELECT * INTO v_connect FROM ve_connec WHERE connec_id = v_connect_id;
 
 			IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id = v_psector_current AND psector_id
 				IN (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
@@ -251,7 +251,7 @@ BEGIN
 			END IF;
 
 		ELSIF v_feature_type ='GULLY' THEN
-			SELECT * INTO v_connect FROM v_edit_gully WHERE gully_id = v_connect_id;
+			SELECT * INTO v_connect FROM ve_gully WHERE gully_id = v_connect_id;
 
 			IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_current AND psector_id IN
 			   (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
@@ -272,11 +272,11 @@ BEGIN
 				SELECT * INTO v_link FROM link WHERE link_id =  v_linkfrompsector;
 			END IF;
 		ELSE
-			SELECT * INTO v_link FROM v_edit_link WHERE feature_id = v_connect_id limit 1;
+			SELECT * INTO v_link FROM ve_link WHERE feature_id = v_connect_id limit 1;
 		END IF;
 
 		-- exception control. It is not possible to create a link for connec over arc
-		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(v_connect.the_geom, v_edit_arc.the_geom, 0.001);
+		SELECT * INTO v_arc FROM ve_arc WHERE ST_DWithin(v_connect.the_geom, ve_arc.the_geom, 0.001);
 
 		-- Use connect.arc_id as forced arcs in case of exists
 		IF v_connect.arc_id IS NOT NULL AND v_isforcedarcs is False THEN
@@ -284,7 +284,7 @@ BEGIN
 
 			-- check if forced arc diameter is smaller than configured
 			IF v_projecttype = 'WS' then
-				if (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_status IS TRUE THEN
+				if (SELECT cat_dnom::integer FROM ve_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_status IS TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3232", "function":"3188", "fid": 217, "parameters"{"diameter":'||v_check_arcdnom||'}:, "is_process":true}}$$);';
 				end if;
@@ -305,14 +305,14 @@ BEGIN
 			IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
 				EXECUTE 'WITH index_query AS(
 				SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id 
-				FROM v_edit_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
+				FROM ve_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 				SELECT arc_id FROM index_query WHERE distance < '||v_check_maxdistance||'  ORDER BY distance limit 1'
 				INTO v_connect.arc_id;
 
 			ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
 				EXECUTE 'WITH index_query AS(
 				SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id 
-				FROM v_edit_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
+				FROM ve_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 				SELECT arc_id FROM index_query WHERE distance < '||v_check_maxdistance||'  ORDER BY distance limit 1'
 				INTO v_connect.arc_id;
 
@@ -329,7 +329,7 @@ BEGIN
 			--pass
 			else
 
-				-- get v_edit_arc information
+				-- get ve_arc information
 				SELECT * INTO v_arc FROM arc WHERE arc_id = v_connect.arc_id;
 
 				-- state control
@@ -346,7 +346,7 @@ BEGIN
 					v_link.exit_id = v_pjointid;
 
 					-- case when planned node over existing node
-					SELECT count(*) INTO v_count2 FROM v_edit_node WHERE node_id = v_link.exit_id;
+					SELECT count(*) INTO v_count2 FROM ve_node WHERE node_id = v_link.exit_id;
 					IF v_count2 = 0 AND v_ispsector IS TRUE THEN
 						SELECT node_id INTO v_link.exit_id FROM node WHERE state = 2 AND st_dwithin(the_geom,v_link.the_geom,0.01) ORDER BY tstamp DESC LIMIT 1;
 					END IF;

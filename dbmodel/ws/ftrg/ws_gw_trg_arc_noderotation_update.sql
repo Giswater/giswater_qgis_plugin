@@ -49,10 +49,10 @@ BEGIN
 
 		IF TG_OP='INSERT' THEN
 
-			FOR rec_node IN SELECT * FROM v_edit_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
+			FOR rec_node IN SELECT * FROM ve_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 			LOOP
-				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
-				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM ve_node JOIN cat_feature_node ON rec_node.node_type=id;
+				SELECT hemisphere INTO hemisphere_rotation_aux FROM ve_node WHERE node_id=rec_node.node_id;
 
 				-- init variables
 				ang_aux=0;
@@ -107,10 +107,10 @@ BEGIN
 
 		ELSIF TG_OP='UPDATE' THEN
 
-			FOR rec_node IN SELECT * FROM v_edit_node WHERE node_id = NEW.node_1 OR node_id = NEW.node_2--NEW.node_1 = node_id OR NEW.node_2 = node_id
+			FOR rec_node IN SELECT * FROM ve_node WHERE node_id = NEW.node_1 OR node_id = NEW.node_2--NEW.node_1 = node_id OR NEW.node_2 = node_id
 			LOOP
-				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
-				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM ve_node JOIN cat_feature_node ON rec_node.node_type=id;
+				SELECT hemisphere INTO hemisphere_rotation_aux FROM ve_node WHERE node_id=rec_node.node_id;
 
 				-- init variables
 				ang_aux=0;
@@ -241,16 +241,16 @@ BEGIN
 
 		ELSIF TG_OP='DELETE' THEN
 
-			FOR rec_node IN SELECT node_id, node_type, the_geom FROM v_edit_node WHERE OLD.node_1 = node_id OR OLD.node_2 = node_id
+			FOR rec_node IN SELECT node_id, node_type, the_geom FROM ve_node WHERE OLD.node_1 = node_id OR OLD.node_2 = node_id
 			LOOP
-				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
-				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM ve_node JOIN cat_feature_node ON rec_node.node_type=id;
+				SELECT hemisphere INTO hemisphere_rotation_aux FROM ve_node WHERE node_id=rec_node.node_id;
 
 				-- init variables
 				ang_aux=0;
 				count=0;
 
-				FOR rec_arc IN SELECT arc_id, node_1, node_2, the_geom FROM v_edit_arc WHERE (node_1 = rec_node.node_id OR node_2 = rec_node.node_id) AND old.arc_id!=arc_id
+				FOR rec_arc IN SELECT arc_id, node_1, node_2, the_geom FROM ve_arc WHERE (node_1 = rec_node.node_id OR node_2 = rec_node.node_id) AND old.arc_id!=arc_id
 				LOOP
 					IF rec_arc.node_1=rec_node.node_id THEN
 						azm_aux=st_azimuth(ST_LineInterpolatePoint(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom));

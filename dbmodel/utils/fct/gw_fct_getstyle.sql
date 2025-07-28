@@ -15,7 +15,7 @@ $BODY$
 
 /*
 
-	SELECT SCHEMA_NAME.gw_fct_getstyle($${"data":{"layername":"v_edit_arc"}}$$);
+	SELECT SCHEMA_NAME.gw_fct_getstyle($${"data":{"layername":"ve_arc"}}$$);
 	SELECT SCHEMA_NAME.gw_fct_getstyle($${"data":{"layername":"point", "style_id":"103"}}$$);
 
 */

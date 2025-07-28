@@ -32,7 +32,7 @@ GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_graphanalytics_hydrant($${"client":{"device":4, "lang":"C", "version":"4.0.001", "infoType":1, "epsg":25831}, "form":{}, "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+    (gw_fct_graphanalytics_hydrant($${"client":{"device":4, "lang":"C", "version":"4.0.001", "infoType":1, "epsg":25831}, "form":{}, "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, 
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"distance":"100", "mode":"0", "useProposal":"true", "usePsector":"true"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_graphanalytics_hydrant returns status "Accepted"'

@@ -88,19 +88,19 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (980,  concat('--------------------------------'));
 
 	IF v_selectionmode = 'previousSelection' THEN
-		v_query = 'SELECT * FROM v_edit_node WHERE sys_ymax IS NULL AND the_geom IS NOT NULL AND node_id IN ('||v_array ||')';
+		v_query = 'SELECT * FROM ve_node WHERE sys_ymax IS NULL AND the_geom IS NOT NULL AND node_id IN ('||v_array ||')';
 	ELSE
-		v_query = 'SELECT * FROM v_edit_node WHERE sys_ymax IS NULL AND the_geom IS NOT NULL';
+		v_query = 'SELECT * FROM ve_node WHERE sys_ymax IS NULL AND the_geom IS NOT NULL';
 	END IF;
 
 	FOR rec IN EXECUTE v_query LOOP
 
-		SELECT arc_id, node_1 as node_id INTO rec_arc_1 FROM v_edit_arc WHERE state=1 and node_2 = rec.node_id;
-		SELECT arc_id, node_2 as node_id  INTO rec_arc_2 FROM v_edit_arc WHERE  state=1 and node_1 = rec.node_id;
+		SELECT arc_id, node_1 as node_id INTO rec_arc_1 FROM ve_arc WHERE state=1 and node_2 = rec.node_id;
+		SELECT arc_id, node_2 as node_id  INTO rec_arc_2 FROM ve_arc WHERE  state=1 and node_1 = rec.node_id;
 
 
-		SELECT sys_top_elev, sys_elev INTO v_sys_top_elev1, v_sys_elev1 FROM v_edit_node WHERE state=1 and node_id=rec_arc_1.node_id;
-		SELECT sys_top_elev, sys_elev INTO v_sys_top_elev2, v_sys_elev2 FROM v_edit_node WHERE state=1 and node_id=rec_arc_2.node_id;
+		SELECT sys_top_elev, sys_elev INTO v_sys_top_elev1, v_sys_elev1 FROM ve_node WHERE state=1 and node_id=rec_arc_1.node_id;
+		SELECT sys_top_elev, sys_elev INTO v_sys_top_elev2, v_sys_elev2 FROM ve_node WHERE state=1 and node_id=rec_arc_2.node_id;
 
 
 		IF v_sys_top_elev1 IS NOT NULL AND v_sys_elev1 IS NOT NULL AND v_sys_top_elev2 IS NOT NULL AND v_sys_elev2 IS NOT NULL AND 
@@ -116,8 +116,8 @@ BEGIN
 		ELSIF v_sys_top_elev1 IS NOT NULL AND v_sys_elev1 IS NOT NULL AND ((v_sys_top_elev2 IS NULL OR v_sys_elev2 IS NULL) OR (v_sys_top_elev2 = 0 OR v_sys_elev2= 0)) THEN
 		
 
-			SELECT arc_id, node_1 as node_id  INTO rec_arc_2 FROM v_edit_arc WHERE state=1 and node_2 = rec_arc_1.node_id;
-			SELECT sys_top_elev, sys_elev INTO v_sys_top_elev2, v_sys_elev2 FROM v_edit_node WHERE state=1 and node_id=rec_arc_2.node_id;
+			SELECT arc_id, node_1 as node_id  INTO rec_arc_2 FROM ve_arc WHERE state=1 and node_2 = rec_arc_1.node_id;
+			SELECT sys_top_elev, sys_elev INTO v_sys_top_elev2, v_sys_elev2 FROM ve_node WHERE state=1 and node_id=rec_arc_2.node_id;
 
 			if v_sys_top_elev2 IS NOT NULL and v_sys_elev2 IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_node_interpolate($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_srid||'}, 
@@ -132,8 +132,8 @@ BEGIN
 		ELSIF ((v_sys_top_elev1 IS NULL OR v_sys_elev1 IS NULL) OR (v_sys_top_elev1 = 0 OR v_sys_elev1 = 0) ) AND v_sys_top_elev2 IS NOT NULL AND v_sys_elev2 IS NOT NULL THEN
 		
 
-			SELECT arc_id, node_2 AS node_id  INTO rec_arc_1 FROM v_edit_arc WHERE state=1 and node_1 = rec_arc_2.node_id;
-			SELECT sys_top_elev, sys_elev INTO v_sys_top_elev1, v_sys_elev1 FROM v_edit_node WHERE state=1 and node_id=rec_arc_1.node_id;
+			SELECT arc_id, node_2 AS node_id  INTO rec_arc_1 FROM ve_arc WHERE state=1 and node_1 = rec_arc_2.node_id;
+			SELECT sys_top_elev, sys_elev INTO v_sys_top_elev1, v_sys_elev1 FROM ve_node WHERE state=1 and node_id=rec_arc_1.node_id;
 
 			if v_sys_top_elev1 IS NOT NULL AND v_sys_elev1 IS NOT NULL then
 				EXECUTE 'SELECT gw_fct_node_interpolate($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_srid||'}, 
@@ -177,7 +177,7 @@ BEGIN
 				IF v_data_custom_ymax!='' OR v_data_custom_ymax!='' OR v_data_custom_elev !='' THEN
 					EXECUTE 'INSERT INTO anl_node (node_id,  descript,  fid, the_geom)
 					SELECT node_id, ''Interpolated data.'', 980, n.the_geom
-					FROM v_edit_node n WHERE node_id='||quote_literal(rec.node_id)||';';
+					FROM ve_node n WHERE node_id='||quote_literal(rec.node_id)||';';
 
 					INSERT INTO audit_check_data (fid, error_message) 
 					SELECT 980, message FROM 

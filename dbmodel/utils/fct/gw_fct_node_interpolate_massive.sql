@@ -57,7 +57,7 @@ BEGIN
 	SELECT  giswater, upper(project_type) INTO v_version, v_project FROM sys_version order by id desc limit 1;
 	v_queryfilter = ((p_data->>'data')::json->>'parameters')::json->>'queryFilter';
 
-	v_querytext = 'SELECT * FROM v_edit_node '||v_queryfilter;
+	v_querytext = 'SELECT * FROM ve_node '||v_queryfilter;
 
 	DELETE FROM anl_node WHERE fid = v_fid and cur_user = current_user;
 		
@@ -67,22 +67,22 @@ BEGIN
 		v_y = st_y(v_node.the_geom);
 
 		-- getting for node_1
-		SELECT node_1 INTO v_node1 FROM v_edit_arc JOIN v_edit_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL AND sys_elev IS NOT NULL 
+		SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL AND sys_elev IS NOT NULL 
 		AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
 		IF v_node1 IS NULL THEN
-			SELECT node_1 INTO v_node1 FROM v_edit_arc JOIN v_edit_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL ORDER BY sys_elev asc limit 1;
+			SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL ORDER BY sys_elev asc limit 1;
 			IF v_node1 IS NOT NULL THEN
-				SELECT node_1 INTO v_node1 FROM v_edit_arc JOIN v_edit_node ON node_2 = node_id WHERE node_2 = v_node1 AND node_1 IS NOT NULL AND sys_elev IS NOT NULL 
+				SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node1 AND node_1 IS NOT NULL AND sys_elev IS NOT NULL 
 				AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
 			END IF;
 		END IF;
 
 		-- getting for node_2		
-		SELECT node_2 INTO v_node2 FROM v_edit_arc JOIN v_edit_node ON node_1 = node_id WHERE node_1 = v_node.node_id AND node_2 IS NOT NULL ORDER BY sys_elev asc limit 1;
+		SELECT node_2 INTO v_node2 FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node.node_id AND node_2 IS NOT NULL ORDER BY sys_elev asc limit 1;
 		IF v_node2 IS NULL THEN
-			SELECT node_1 INTO v_node2  FROM v_edit_arc JOIN v_edit_node ON node_1 = node_id WHERE node_1 = v_node.node_id AND node_2 IS NOT NULL ORDER BY sys_elev asc limit 1;
+			SELECT node_1 INTO v_node2  FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node.node_id AND node_2 IS NOT NULL ORDER BY sys_elev asc limit 1;
 			IF v_node2 IS NOT NULL THEN
-				SELECT node_2 INTO v_node2 FROM v_edit_arc JOIN v_edit_node ON node_1 = node_id WHERE node_1 = v_node2 AND node_2 IS NOT NULL AND sys_elev IS NOT NULL 
+				SELECT node_2 INTO v_node2 FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node2 AND node_2 IS NOT NULL AND sys_elev IS NOT NULL 
 				AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
 			END IF;
 		END IF;

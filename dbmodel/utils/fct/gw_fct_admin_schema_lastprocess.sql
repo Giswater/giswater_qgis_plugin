@@ -309,10 +309,10 @@ BEGIN
 				WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
 
 				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''NODE'' = ANY(feature_type)'
-				WHERE columnname='matcat_id' AND formname IN ('v_edit_node');
+				WHERE columnname='matcat_id' AND formname IN ('ve_node');
 
 				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type)'
-				WHERE columnname='matcat_id' AND formname IN ('v_edit_arc', 'v_edit_connec');
+				WHERE columnname='matcat_id' AND formname IN ('ve_arc', 've_connec');
 
 			END IF;
 
@@ -356,9 +356,9 @@ BEGIN
 				columnname IN ('om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id'))
 				AND formname ilike 've_connec%';
 
-				UPDATE config_form_fields SET hidden=true WHERE formname = 'v_edit_arc' AND columnname='parent_id';
+				UPDATE config_form_fields SET hidden=true WHERE formname = 've_arc' AND columnname='parent_id';
 				UPDATE config_form_fields SET hidden=true WHERE formname like 've_arc%' AND columnname='parent_id';
-				UPDATE config_form_fields SET hidden=true WHERE formname = 'v_edit_arc' AND columnname='observ';
+				UPDATE config_form_fields SET hidden=true WHERE formname = 've_arc' AND columnname='observ';
 				UPDATE config_form_fields SET hidden=true WHERE formname like 've_arc%' AND columnname='observ';
 
 				-- setting mapzone graph analytics without value in terms of mapzone constructor and graphclass
@@ -380,17 +380,17 @@ BEGIN
 				WHERE id = 2768;
 
 			ELSIF v_projecttype = 'UD' THEN
-				UPDATE config_form_fields SET layoutorder=30 WHERE formname = 'v_edit_arc' AND columnname='pavcat_id';
+				UPDATE config_form_fields SET layoutorder=30 WHERE formname = 've_arc' AND columnname='pavcat_id';
 				UPDATE config_form_fields SET layoutorder=30 WHERE formname like 've_arc%' AND columnname='pavcat_id';
 			END IF;
 
 			-- setting search where search_field is arc_id, node_id, connec_id, gully_id
 			UPDATE config_param_system SET value =
-			'{"sys_table_id":"v_edit_arc","sys_id_field":"arc_id","sys_search_field":"arc_id","alias":"Arcs","cat_field":"arccat_id","orderby":"1","search_type":"arc"}'
+			'{"sys_table_id":"ve_arc","sys_id_field":"arc_id","sys_search_field":"arc_id","alias":"Arcs","cat_field":"arccat_id","orderby":"1","search_type":"arc"}'
 			WHERE parameter = 'basic_search_network_arc';
 
 			UPDATE config_param_system SET value =
-			'{"sys_table_id":"v_edit_connec","sys_id_field":"connec_id","sys_search_field":"connec_id","alias":"Connecs","cat_field":"conneccat_id","orderby":"3","search_type":"connec"}'
+			'{"sys_table_id":"ve_connec","sys_id_field":"connec_id","sys_search_field":"connec_id","alias":"Connecs","cat_field":"conneccat_id","orderby":"3","search_type":"connec"}'
 			WHERE parameter = 'basic_search_network_connec';
 
 			UPDATE config_param_system SET value =
@@ -398,11 +398,11 @@ BEGIN
 			WHERE parameter = 'basic_search_network_element';
 
 			UPDATE config_param_system SET value =
-			'{"sys_table_id":"v_edit_node","sys_id_field":"node_id","sys_search_field":"node_id","alias":"Nodes","cat_field":"nodecat_id","orderby":"2","search_type":"node"}'
+			'{"sys_table_id":"ve_node","sys_id_field":"node_id","sys_search_field":"node_id","alias":"Nodes","cat_field":"nodecat_id","orderby":"2","search_type":"node"}'
 			WHERE  parameter = 'basic_search_network_node';
 
 			UPDATE config_param_system SET value =
-			'{"sys_table_id":"v_edit_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gullycat_id","orderby":"3","search_type":"gully"}'
+			'{"sys_table_id":"ve_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gullycat_id","orderby":"3","search_type":"gully"}'
 			WHERE  parameter = 'basic_search_network_gully';
 
 		ELSIF v_isnew IS FALSE THEN

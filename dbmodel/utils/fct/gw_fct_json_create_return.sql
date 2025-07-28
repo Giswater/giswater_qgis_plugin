@@ -90,7 +90,7 @@ BEGIN
 
 	-- ACTIONS
 	-- The name of the function must match the name of the function in python, and if the python function requires parameters, they must be called as required by that function.
-	-- example how fill column actions :	[{"funcName":"test1","params":{"layerName":"v_edit_arc","qmlPath":"C:\\Users\\Nestor\\Desktop\\11111.qml"}},
+	-- example how fill column actions :	[{"funcName":"test1","params":{"layerName":"ve_arc","qmlPath":"C:\\Users\\Nestor\\Desktop\\11111.qml"}},
 	--					 {"funcName":"test2"}]
 	v_body = gw_fct_json_object_set_key((p_data->>'body')::json, 'python_actions', v_actions);
 	p_data = gw_fct_json_object_set_key((p_data)::json, 'body', v_body);

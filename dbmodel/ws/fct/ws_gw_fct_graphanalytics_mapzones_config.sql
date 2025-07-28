@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_mapzones_config($${"client":{"device":9
 
 
 Mains:
-1) This function works with v_edit_arc and v_edit_node. WARNING with selectors of state, exploitation and psector
+1) This function works with ve_arc and ve_node. WARNING with selectors of state, exploitation and psector
 2) Main issue is that takes header from mapconfig. If it is a false header we recommend to change the node_type
 3) It takes value from arc_id two arcs from header in order to act after arcdivide
 
@@ -109,7 +109,7 @@ BEGIN
 	VALUES (249, 1, concat('Delimitier node type: ', v_mapzone_nodetype,'.'));
 
 
-	FOR rec IN EXECUTE '(SELECT node_id::text, expl_id FROM v_edit_node WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN '||v_graph_class_list||'))' 
+	FOR rec IN EXECUTE '(SELECT node_id::text, expl_id FROM ve_node WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN '||v_graph_class_list||'))' 
 	LOOP	
 		--find defined sector value of node
 		EXECUTE 'SELECT '||v_mapzonefield||' FROM node WHERE node_id = '||rec.node_id||'::text'
@@ -120,7 +120,7 @@ BEGIN
 			--check first direction
 			IF v_node_mapzoneval IS NOT NULL AND v_node_mapzoneval != '' THEN
 			
-				EXECUTE 'SELECT arc_id FROM v_edit_arc WHERE node_1 = '||rec.node_id||'::text 
+				EXECUTE 'SELECT arc_id FROM ve_arc WHERE node_1 = '||rec.node_id||'::text 
 				AND '||v_mapzonefield||'::text = '||quote_literal(v_node_mapzoneval)||'::text'
 				into v_arc_id1;
 				
@@ -133,11 +133,11 @@ BEGIN
 			IF v_arc_id1 IS NOT NULL THEN
 			
 				--find final node of the first arc
-				EXECUTE 'SELECT node_2 FROM v_edit_arc WHERE arc_id ='||v_arc_id1||'::text'
+				EXECUTE 'SELECT node_2 FROM ve_arc WHERE arc_id ='||v_arc_id1||'::text'
 				INTO v_final_node_id;
 				
 				--find arc_id of the next arc (it is mandatory to search next arc looking for case when header is done by arcdivide process where both arcs (up and down will has the same mapzone)
-				EXECUTE 'SELECT arc_id FROM v_edit_arc WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
+				EXECUTE 'SELECT arc_id FROM ve_arc WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
 				AND arc_id != '''||v_arc_id1||''''
 				INTO v_next_arc_id;
 
@@ -166,18 +166,18 @@ BEGIN
 			
 				v_flag = FALSE;
 
-				EXECUTE 'SELECT arc_id FROM v_edit_arc WHERE node_2 = '||rec.node_id||'::text 
+				EXECUTE 'SELECT arc_id FROM ve_arc WHERE node_2 = '||rec.node_id||'::text 
 				AND '||v_mapzonefield||'::text = '||quote_literal(v_node_mapzoneval)||'::text'
 				into v_arc_id2;
 
 				IF v_arc_id2 IS NOT NULL THEN
 			
 					--find final node of the first arc
-					EXECUTE 'SELECT node_1 FROM v_edit_arc WHERE arc_id ='||v_arc_id2||'::text'
+					EXECUTE 'SELECT node_1 FROM ve_arc WHERE arc_id ='||v_arc_id2||'::text'
 					INTO v_final_node_id;		
 					
 					--find arc_id of the next arc (it is mandatory to search next arc looking for case when header is done by arcdivide process where both arcs (up and down will has the same mapzone)
-					EXECUTE 'SELECT arc_id FROM v_edit_arc WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
+					EXECUTE 'SELECT arc_id FROM ve_arc WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
 					AND arc_id != '''||v_arc_id2||''''
 					INTO v_next_arc_id;
 

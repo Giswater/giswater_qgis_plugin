@@ -105,9 +105,9 @@ BEGIN
 
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
-		SELECT node_id INTO v_node FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+		SELECT node_id INTO v_node FROM ve_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 		IF v_node IS NULL THEN
-			SELECT node_1 INTO v_node FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point, 100)  order by st_distance (the_geom, v_point) LIMIT 1;
+			SELECT node_1 INTO v_node FROM ve_arc WHERE ST_DWithin(the_geom, v_point, 100)  order by st_distance (the_geom, v_point) LIMIT 1;
 		END IF;
 	END IF;
 
@@ -124,7 +124,7 @@ BEGIN
 		WITH 
 			arc_selected AS (
 				SELECT a.arc_id, a.node_1, a.node_2
-				FROM v_edit_arc a
+				FROM ve_arc a
 				WHERE a.node_1 IS NOT NULL 
 				AND a.node_2 IS NOT NULL 
 				AND a.state > 0 
@@ -136,7 +136,7 @@ BEGIN
 			FROM arc_selected a
 	';
 
-	EXECUTE 'select count(*)::int from v_edit_arc'
+	EXECUTE 'select count(*)::int from ve_arc'
 	INTO v_distance;
 
 	INSERT INTO anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
@@ -145,14 +145,14 @@ BEGIN
 		SELECT node
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
 	) p
-	JOIN v_edit_node n ON n.node_id =p.node;
+	JOIN ve_node n ON n.node_id =p.node;
 
 	-- mainstream
 	v_query = '
 		WITH 
 			arc_selected AS (
 				SELECT a.arc_id, a.node_1, a.node_2
-				FROM v_edit_arc a
+				FROM ve_arc a
 				WHERE a.node_1 IS NOT NULL 
 				AND a.node_2 IS NOT NULL 
 				AND a.state > 0 
@@ -181,7 +181,7 @@ BEGIN
 
 	INSERT INTO anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
 	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
-	FROM v_edit_arc a
+	FROM ve_arc a
 	JOIN anl_node n1 ON a.node_1::text = n1.node_id
 	JOIN anl_node n2 ON a.node_2::text = n2.node_id
 	WHERE n1.cur_user="current_user"() AND n1.fid = v_fid
@@ -213,13 +213,13 @@ BEGIN
 	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
 	UNION
 	SELECT v_context as context, c.expl_id, c.connec_id::text, c.state, c.connec_type, 'CONNEC' as feature_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
-	FROM anl_arc a JOIN v_edit_connec c ON c.arc_id::text = a.arc_id
+	FROM anl_arc a JOIN ve_connec c ON c.arc_id::text = a.arc_id
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND c.state > 0
 	AND c.is_operative = TRUE
 	UNION
 	SELECT v_context as context, g.expl_id, g.gully_id::text, g.state, g.gully_type, 'GULLY' as feature_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
-	FROM anl_arc a JOIN v_edit_gully g ON g.arc_id::text = a.arc_id
+	FROM anl_arc a JOIN ve_gully g ON g.arc_id::text = a.arc_id
 	WHERE cur_user="current_user"() AND fid=v_fid
 	AND g.state > 0
 	AND g.is_operative = TRUE) row) features;

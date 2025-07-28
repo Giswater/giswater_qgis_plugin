@@ -32,10 +32,10 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_node and selectionMode : wholeSelection returns status "Accepted"'
+    'Check if gw_fct_anl_node_orphan --> tableName : ve_node and selectionMode : wholeSelection returns status "Accepted"'
 );
 
 SELECT is(
@@ -88,10 +88,10 @@ SELECT is(
 
 SELECT is(
     (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"previousSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_node and selectionMode : previousSelection returns status "Accepted"'
+    'Check if gw_fct_anl_node_orphan --> tableName : ve_node and selectionMode : previousSelection returns status "Accepted"'
 );
 
 SELECT is(

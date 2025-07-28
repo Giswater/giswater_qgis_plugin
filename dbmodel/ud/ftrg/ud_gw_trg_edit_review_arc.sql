@@ -37,7 +37,7 @@ BEGIN
 	--getting original values
 	SELECT arc_id,y1,y2,arc_type, arccat_id, matcat_id,
 	annotation, observ, cat_shape, cat_geom1, cat_geom2, the_geom, expl_id INTO rec_arc
-	FROM v_edit_arc WHERE arc_id=NEW.arc_id;
+	FROM ve_arc WHERE arc_id=NEW.arc_id;
 
 	IF NEW.field_checked=TRUE THEN
 

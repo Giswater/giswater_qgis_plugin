@@ -220,11 +220,11 @@ BEGIN
             ELSE
 
                 -- node_1
-                SELECT * INTO nodeRecord1 FROM v_edit_node WHERE node_id = nodeRecord1.node_id;
+                SELECT * INTO nodeRecord1 FROM ve_node WHERE node_id = nodeRecord1.node_id;
                 NEW.node_1 := nodeRecord1.node_id;
 
                 -- node_2
-                SELECT * INTO nodeRecord2 FROM v_edit_node WHERE node_id = nodeRecord2.node_id;
+                SELECT * INTO nodeRecord2 FROM ve_node WHERE node_id = nodeRecord2.node_id;
                 NEW.node_2 := nodeRecord2.node_id;
 
                 -- the_geom
@@ -407,7 +407,7 @@ BEGIN
                 END IF;
 
                 -- Inserting new node
-                INSERT INTO v_edit_node (node_id, sector_id, state, state_type, omzone_id, soilcat_id, workcat_id, builtdate, nodecat_id, ownercat_id, muni_id,
+                INSERT INTO ve_node (node_id, sector_id, state, state_type, omzone_id, soilcat_id, workcat_id, builtdate, nodecat_id, ownercat_id, muni_id,
                 postcode, district_id, expl_id, the_geom)
                 VALUES ((SELECT nextval('urn_id_seq')), NEW.sector_id, NEW.state, NEW.state_type, NEW.omzone_id, NEW.soilcat_id, NEW.workcat_id, NEW.builtdate, v_nodecat,
                 NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.expl_id, st_endpoint(NEW.the_geom))

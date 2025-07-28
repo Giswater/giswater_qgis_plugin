@@ -51,16 +51,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 			IF v_review_status=1 AND NEW.arc_id NOT IN (SELECT arc_id FROM arc) THEN 
 
-				INSERT INTO v_edit_arc (arc_id,  arccat_id, annotation, observ, expl_id, the_geom)
+				INSERT INTO ve_arc (arc_id,  arccat_id, annotation, observ, expl_id, the_geom)
 				VALUES (NEW. arc_id, NEW.new_arccat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom); 
 				
 		
 			ELSIF v_review_status=2 THEN
-				UPDATE v_edit_arc SET the_geom=NEW.the_geom, arccat_id=NEW.new_arccat_id,  annotation=NEW.new_annotation, observ=NEW.new_observ WHERE arc_id=NEW.arc_id;
+				UPDATE ve_arc SET the_geom=NEW.the_geom, arccat_id=NEW.new_arccat_id,  annotation=NEW.new_annotation, observ=NEW.new_observ WHERE arc_id=NEW.arc_id;
 					
 			ELSIF v_review_status=3 THEN
 
-				UPDATE v_edit_arc SET  arccat_id=NEW.new_arccat_id,  annotation=NEW.new_annotation, observ=NEW.new_observ
+				UPDATE ve_arc SET  arccat_id=NEW.new_arccat_id,  annotation=NEW.new_annotation, observ=NEW.new_observ
 				WHERE arc_id=NEW.arc_id;
 	
 			END IF;	

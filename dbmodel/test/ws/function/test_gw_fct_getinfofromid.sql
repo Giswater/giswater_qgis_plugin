@@ -33,28 +33,28 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_node", "id":"1051"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_node", "id":"1051"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getinfofromid returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_connec", "id":"3156"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_connec", "id":"3156"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getinfofromid returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_arc", "id":"2028"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_arc", "id":"2028"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getinfofromid returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_link", "id":"413"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_link", "id":"413"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getinfofromid returns status "Accepted"'
 );

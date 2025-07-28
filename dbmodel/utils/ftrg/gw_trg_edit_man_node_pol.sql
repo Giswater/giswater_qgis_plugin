@@ -22,8 +22,8 @@ BEGIN
 	
 		-- Node ID	
 		IF (NEW.feature_id IS NULL) THEN
-			NEW.feature_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
-			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
+			NEW.feature_id:= (SELECT node_id FROM ve_node WHERE ST_DWithin(NEW.the_geom, ve_node.the_geom,0.001) 
+			ORDER BY ST_distance(ST_centroid(NEW.the_geom),ve_node.the_geom) ASC LIMIT 1);
 			IF (NEW.feature_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	       		"data":{"message":"2052", "function":"2462","parameters":null}}$$);';
@@ -33,7 +33,7 @@ BEGIN
 		-- Insert into polygon table
 		INSERT INTO polygon (sys_type, the_geom, feature_id, featurecat_id) 
 		SELECT sys_type, NEW.the_geom, NEW.feature_id, node_type
-		FROM v_edit_node WHERE node_id=NEW.feature_id 
+		FROM ve_node WHERE node_id=NEW.feature_id 
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 		
 		RETURN NEW;
@@ -45,7 +45,7 @@ BEGIN
 		
 		IF (NEW.feature_id != OLD.feature_id) THEN
 			UPDATE polygon SET feature_id=NEW.feature_id, featurecat_id =node_type 
-			FROM v_edit_node WHERE node_id=OLD.feature_id AND pol_id=NEW.pol_id;
+			FROM ve_node WHERE node_id=OLD.feature_id AND pol_id=NEW.pol_id;
 		END IF;
 		
 		RETURN NEW;

@@ -33,7 +33,7 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_setclosestaddress($${"client":{"device":4, "lang":"C", "version":"4.0.001", "infoType":1, "epsg":25831}, "form":{}, 
-    "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{}, 
+    "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{}, 
     "selectionMode":"wholeSelection", "parameters":{"catFeature":"ALL NODES", "fieldToUpdate":"postcomplement", "searchBuffer":"50", 
     "updateValues":"allValues", "insersectPolygonLayer":"NONE"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',

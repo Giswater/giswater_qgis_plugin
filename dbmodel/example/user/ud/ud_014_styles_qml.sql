@@ -544,7 +544,7 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>1</layerGeometryType>
-</qgis>' WHERE styleconfig_id=107 and layername='v_edit_arc';
+</qgis>' WHERE styleconfig_id=107 and layername='ve_arc';
 
 
 UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
@@ -1399,4 +1399,4 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>1</layerGeometryType>
-</qgis>' WHERE styleconfig_id=108 and layername='v_edit_arc';
+</qgis>' WHERE styleconfig_id=108 and layername='ve_arc';

@@ -290,8 +290,8 @@ BEGIN
 		-- setting as non-stopper only one from divider is profile true (lower sys_elev1) in order to enable algorithm to flow upstream
 		UPDATE temp_anlgraph t SET flag = 0 FROM 
 
-			(SELECT b.node_1, unit_id FROM v_edit_arc a JOIN om_visit_lot_x_arc USING (arc_id)
-			JOIN   (SELECT node_1, min(sys_elev1) as sys_elev1 FROM v_edit_arc 
+			(SELECT b.node_1, unit_id FROM ve_arc a JOIN om_visit_lot_x_arc USING (arc_id)
+			JOIN   (SELECT node_1, min(sys_elev1) as sys_elev1 FROM ve_arc 
 				JOIN (SELECT node_1 FROM arc 
 					JOIN node ON node_1 =node_id
 					JOIN cat_feature_node f ON f.id = node_type
@@ -360,7 +360,7 @@ BEGIN
 
 		-- update macrounit for gully linked to nodes
 		UPDATE om_visit_lot_x_gully g SET macrounit_id = a.macrounit_id FROM
-		(SELECT feature_id as gully_id, macrounit_id FROM v_edit_link JOIN om_visit_lot_x_node ON exit_id = node_id AND exit_type = 'NODE' AND lot_id = v_lot) a
+		(SELECT feature_id as gully_id, macrounit_id FROM ve_link JOIN om_visit_lot_x_node ON exit_id = node_id AND exit_type = 'NODE' AND lot_id = v_lot) a
 		WHERE a.gully_id = g.gully_id;
 
 		-- update macrounit for gully those linked to arc but arc does not exists on unit
@@ -372,7 +372,7 @@ BEGIN
 		UPDATE om_visit_lot_x_gully SET macrounit_id = gully_id::integer WHERE source = 'ORPHAN' AND macrounit_id IS NULL  AND lot_id  = v_lot;
 
 		-- update macrounit for gully linked to arcs
-		UPDATE om_visit_lot_x_gully a SET macrounit_id = b.macrounit_id FROM (SELECT gully_id, arc_id, macrounit_id FROM v_edit_gully
+		UPDATE om_visit_lot_x_gully a SET macrounit_id = b.macrounit_id FROM (SELECT gully_id, arc_id, macrounit_id FROM ve_gully
 		JOIN om_visit_lot_x_arc USING (arc_id) WHERE lot_id = v_lot)b WHERE a.gully_id = b.gully_id;
 
 		-- update unit for gully

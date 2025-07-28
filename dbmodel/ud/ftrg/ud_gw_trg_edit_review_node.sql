@@ -33,7 +33,7 @@ BEGIN
 
 	--getting original values
 	SELECT node_id, top_elev, ymax, node_type, nodecat_id, matcat_id, annotation, observ, expl_id, the_geom INTO rec_node
-	FROM v_edit_node WHERE node_id=NEW.node_id;
+	FROM ve_node WHERE node_id=NEW.node_id;
 
 	IF NEW.field_checked=TRUE THEN
 

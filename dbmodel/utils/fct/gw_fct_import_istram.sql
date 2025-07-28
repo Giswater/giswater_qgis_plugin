@@ -75,7 +75,7 @@ BEGIN
 
 			--insert values into catalogs
 			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript)
-			VALUES ('MANHOLE','MANHOLE','NODE', 'v_edit_node', 'Manhole') ON CONFLICT (id) DO NOTHING;
+			VALUES ('MANHOLE','MANHOLE','NODE', 've_node', 'Manhole') ON CONFLICT (id) DO NOTHING;
 
 			INSERT INTO cat_node(id)
 			VALUES ('MANHOLE') ON CONFLICT (id) DO NOTHING;
@@ -83,7 +83,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert basic catalogs for node - type MANHOLE'));
 
 			--insert data of nodes
-			INSERT INTO v_edit_node (code, top_elev, ymax,  node_type, nodecat_id, matcat_id, epa_type, expl_id,
+			INSERT INTO ve_node (code, top_elev, ymax,  node_type, nodecat_id, matcat_id, epa_type, expl_id,
       sector_id, state, state_type, annotation, descript, dma_id, muni_id, the_geom)
       SELECT DISTINCT csv1, csv5::float,csv5::float - csv4::float, 'MANHOLE', 'MANHOLE', null, 'JUNCTION', 0,
       0, 1, 2, csv6, csv7, 0, 0, ST_SetSRID(ST_MakePoint(csv2::float, csv3::float),v_srid)
@@ -95,7 +95,7 @@ BEGIN
 
       INSERT INTO exploitation (expl_id, name, macroexpl_id, the_geom)
       SELECT max(e.expl_id)+1, 'IMPORT ISTREAM', v_expl_id, ST_multi(ST_Buffer(ST_ConvexHull(ST_Collect(n.the_geom)),50))
-      FROM exploitation e, v_edit_node n
+      FROM exploitation e, ve_node n
       RETURNING expl_id into v_expl_id;
 
 
@@ -115,7 +115,7 @@ BEGIN
 
       INSERT INTO selector_expl (expl_id) VALUES (v_expl_id) ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
-      SELECT count(*) INTO v_count FROM v_edit_node WHERE expl_id=v_expl_id;
+      SELECT count(*) INTO v_count FROM ve_node WHERE expl_id=v_expl_id;
       INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert ',v_count, ' nodes'));
 
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Create import istream mapzones.'));
@@ -130,7 +130,7 @@ BEGIN
 			ELSE
 				--insert values into catalogs
 				INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript)
-				VALUES ('CONDUIT','CONDUIT','ARC', 'v_edit_arc', 'Conduit') ON CONFLICT (id) DO NOTHING;
+				VALUES ('CONDUIT','CONDUIT','ARC', 've_arc', 'Conduit') ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_material (id, feature_type)
 				SELECT DISTINCT (csv6), '{ARC}'::text[]
@@ -147,7 +147,7 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert basic catalogs for arc type CONDUIT'));
 
 				--insert data of arcs
-				INSERT INTO v_edit_arc (code, elev1, elev2, arc_type,
+				INSERT INTO ve_arc (code, elev1, elev2, arc_type,
 	      arccat_id, matcat_id, epa_type,  state, state_type,
 	      annotation,  muni_id, descript, the_geom, expl_id)
 	      SELECT csv1, csv3::float, csv5::float, 'CONDUIT',
@@ -165,7 +165,7 @@ BEGIN
 	      --reset selector values
 	      INSERT INTO selector_expl (expl_id) VALUES (v_expl_id) ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
-	      SELECT count(*) INTO v_count FROM v_edit_arc WHERE expl_id=v_expl_id;
+	      SELECT count(*) INTO v_count FROM ve_arc WHERE expl_id=v_expl_id;
 
 	      INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert ',v_count,' arcs'));
 

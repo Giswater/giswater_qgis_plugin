@@ -23,7 +23,7 @@ BEGIN
 			
 		-- Gully ID	
 		IF (NEW.feature_id IS NULL) THEN
-			NEW.feature_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
+			NEW.feature_id:= (SELECT gully_id FROM ve_gully WHERE ST_DWithin(NEW.the_geom, ve_gully.the_geom,0.001) LIMIT 1);
 			IF (NEW.feature_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
       		 	"data":{"message":"2048", "function":"2416","parameters":null}}$$);'; 
@@ -33,7 +33,7 @@ BEGIN
 		-- Insert into polygon table
 		INSERT INTO polygon (sys_type, the_geom, feature_id, featurecat_id, trace_featuregeom) 
 		SELECT sys_type, NEW.the_geom, NEW.feature_id, gully_type, NEW.trace_featuregeom
-		FROM v_edit_gully WHERE gully_id=NEW.feature_id
+		FROM ve_gully WHERE gully_id=NEW.feature_id
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 		
 		
@@ -52,7 +52,7 @@ BEGIN
 			END IF;
 
 			UPDATE polygon SET feature_id=NEW.feature_id, featurecat_id =gully_type 
-			FROM v_edit_gully WHERE gully_id=OLD.feature_id AND pol_id=NEW.pol_id;
+			FROM ve_gully WHERE gully_id=OLD.feature_id AND pol_id=NEW.pol_id;
 		END IF;
 		
 		RETURN NEW;

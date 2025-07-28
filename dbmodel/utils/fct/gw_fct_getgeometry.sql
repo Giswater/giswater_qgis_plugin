@@ -16,7 +16,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_getgeometry($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"arc", "tableName":"v_edit_arc", "id":"2001"},
+"feature":{"featureType":"arc", "tableName":"ve_arc", "id":"2001"},
 "data":{}}$$)
 
 */

@@ -132,8 +132,8 @@ CREATE OR REPLACE VIEW ws1_2802.v_state_node AS
 				  AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
 
 
--- refactor of v_edit_link 
-create or replace view ws1_2802.v_edit_link as
+-- refactor of ve_link 
+create or replace view ws1_2802.ve_link as
 SELECT link.link_id,
     link.feature_type,
     link.feature_id,

@@ -36,7 +36,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"}, 
-		"feature":{"tableName":"v_edit_arc","id":"2001"},
+		"feature":{"tableName":"ve_arc","id":"2001"},
 		"data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${

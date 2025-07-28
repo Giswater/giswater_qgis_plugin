@@ -15,19 +15,19 @@ $BODY$
 /*EXAMPLE
 "action":"SAVE-VIEW"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_vnode","v_arc_x_vnode","v_edit_link"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
+"data":{"viewName":["v_vnode","v_arc_x_vnode","ve_link"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
 "action":"DELETE-FIELD"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["ve_connec"], "fieldName":"featurecat_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
 
 "action":"DELETE-FIELD" onlyChilds modifica sólo vistas childs
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
+"data":{"viewName":["ve_node"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
 
 "action":"DELETE-FIELD" delete field that has alias
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_man_register"], "fieldName":"_pol_id_","alias":"man_register._pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
+"data":{"viewName":["ve_man_register"], "fieldName":"_pol_id_","alias":"man_register._pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
 
 "action":"RESTORE-VIEW"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
@@ -35,7 +35,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 "action":"ADD-FIELD"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node], "fieldName":"asset_id", "systemId":"METER", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["ve_node], "fieldName":"asset_id", "systemId":"METER", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 "action":"RENAME-VIEW"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
@@ -276,8 +276,8 @@ BEGIN
 				--insert trigger into temp table
 				EXECUTE 'UPDATE temp_csv SET csv3 = '||quote_literal(v_trgquery)||' WHERE fid=380 AND source = '||quote_literal(rec_view)||'';
 			END LOOP;
-			IF rec_view  IN ('v_edit_node', 'v_edit_arc', 'v_edit_connec', 'v_edit_') and v_onlychilds is true then
-						DELETE FROM temp_csv WHERE fid=380 and source IN ('v_edit_node', 'v_edit_arc', 'v_edit_connec', 'v_edit_');
+			IF rec_view  IN ('ve_node', 've_arc', 've_connec', 've_') and v_onlychilds is true then
+						DELETE FROM temp_csv WHERE fid=380 and source IN ('ve_node', 've_arc', 've_connec', 've_');
 			else
 				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||rec_view||';';
 			end if;

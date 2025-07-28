@@ -12,11 +12,11 @@ $BODY$
 /*EXAMPLE
 
 SELECT gw_fct_anl_slope_consistency($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":["18920", "18945", "18921", "18922", "18944", "18923"]},
+"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":["18920", "18945", "18921", "18922", "18944", "18923"]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{}}}$$);
 
 SELECT gw_fct_anl_slope_consistency($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{},
+"form":{}, "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{},
  "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}}}$$);
 -- fid: 250
 

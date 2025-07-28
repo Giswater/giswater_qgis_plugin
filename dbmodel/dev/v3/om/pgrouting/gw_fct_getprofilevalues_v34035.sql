@@ -161,9 +161,9 @@ BEGIN
 
 	-- Check start-end nodes
 	v_nodemessage = 'Start/End nodes is/are not valid(s). CHECK elev data AND cat_feature.isprofilesurface. Only NOT start/end nodes may have missed elev data OR may have cat_feature.isprofilesurface = false';
-	SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init;
+	SELECT isprofilesurface INTO v_nodevalid FROM ve_node JOIN cat_feature_node ON node_type = id WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init;
 	IF v_nodevalid THEN
-		SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end;
+		SELECT isprofilesurface INTO v_nodevalid FROM ve_node JOIN cat_feature_node ON node_type = id WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end;
 
 		IF v_nodevalid IS NOT TRUE THEN	
 			v_level = 2;
@@ -188,14 +188,14 @@ BEGIN
 			v_querytext1 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode1, total_length
 				FROM v_arc_x_vnode 
 				JOIN anl_arc USING (arc_id)
-				JOIN v_edit_gully c ON c.gully_id = v_arc_x_vnode.feature_id
+				JOIN ve_gully c ON c.gully_id = v_arc_x_vnode.feature_id
 				WHERE fid=222 AND cur_user = current_user
 				AND anl_arc.node_1 = v_arc_x_vnode.node_1';
 
 			v_querytext2 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode2, total_length
 				FROM v_arc_x_vnode 
 				JOIN anl_arc USING (arc_id)
-				JOIN v_edit_gully c ON c.gully_id = v_arc_x_vnode.feature_id
+				JOIN ve_gully c ON c.gully_id = v_arc_x_vnode.feature_id
 				WHERE fid=222 AND cur_user = current_user
 				AND anl_arc.node_1 = v_arc_x_vnode.node_2';
 
@@ -226,18 +226,18 @@ BEGIN
 		-- insert edge values on anl_arc table
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
 			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
-			||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
+			||v_elev1||', '||v_elev2||' FROM ve_arc b JOIN cat_arc ON arccat_id = id JOIN 
 			(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM dblink(''host=serverip port=serverport user=username password=pwd dbname=gis'' ,''SELECT * FROM pgr_dijkstra(''''SELECT arc_id::int8 as id, 
-			node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, gis_length::float as reverse_cost FROM ud_fdw.v_edit_arc WHERE node_1 is not null AND node_2 is not null'''', '||v_init||'::int8,'||v_end||'::int8)'')
+			node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, gis_length::float as reverse_cost FROM ud_fdw.ve_arc WHERE node_1 is not null AND node_2 is not null'''', '||v_init||'::int8,'||v_end||'::int8)'')
 			as return(seq integer, path_seq integer, node bigint, edge bigint, cost double precision, agg_cost double precision))a
 			USING (arc_id)
 			WHERE b.state > 0';
 
 		-- insert node values on anl_node table
 		EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance)
-			SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
+			SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM ve_node n JOIN cat_node ON nodecat_id = id JOIN
 			(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM dblink(''host=serverip port=serverport user=username password=pwd dbname=gis'' ,''SELECT * FROM pgr_dijkstra(''''SELECT arc_id::int8 as id, 
-			node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, gis_length::float as reverse_cost FROM ud_fdw.v_edit_arc WHERE node_1 is not null AND node_2 is not null'''', '||v_init||'::int8,'||v_end||'::int8)'')
+			node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, gis_length::float as reverse_cost FROM ud_fdw.ve_arc WHERE node_1 is not null AND node_2 is not null'''', '||v_init||'::int8,'||v_end||'::int8)'')
 			as return(seq integer, path_seq integer, node bigint, edge bigint, cost double precision, agg_cost double precision))a
 			USING (node_id)';
 
@@ -254,7 +254,7 @@ BEGIN
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode1 as dist, total_length
 					FROM v_arc_x_vnode 
 					JOIN anl_arc USING (arc_id)
-					JOIN v_edit_connec c ON c.connec_id = v_arc_x_vnode.feature_id
+					JOIN ve_connec c ON c.connec_id = v_arc_x_vnode.feature_id
 					WHERE fid=222 AND cur_user = current_user
 					AND anl_arc.node_1 = v_arc_x_vnode.node_1
 				'||v_querytext1||'-- gully on same sense (pg_routing & arc)
@@ -263,7 +263,7 @@ BEGIN
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode2 as dist, total_length
 					FROM v_arc_x_vnode 
 					JOIN anl_arc USING (arc_id)
-					JOIN v_edit_connec c ON c.connec_id = v_arc_x_vnode.feature_id
+					JOIN ve_connec c ON c.connec_id = v_arc_x_vnode.feature_id
 					WHERE fid=222 AND cur_user = current_user
 					AND anl_arc.node_1 = v_arc_x_vnode.node_2
 				'||v_querytext2||' -- gully on reverse sense (pg_routing & arc)

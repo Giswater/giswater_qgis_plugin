@@ -162,11 +162,11 @@ BEGIN
                 SELECT v_field, ST_Multi(ST_Buffer(ST_Collect(geom), 0.01)) AS geom
                 FROM (
                     SELECT v_field, ST_Buffer(ST_Collect(the_geom), v_geomparamupdate) AS geom
-                    FROM v_edit_arc arc
+                    FROM ve_arc arc
                     GROUP BY v_field
                     UNION
                     SELECT v_field, st_collect(z.geom) AS geom FROM v_crm_zone z
-                    JOIN v_edit_node using (node_id)
+                    JOIN ve_node using (node_id)
                     WHERE v_field::INTEGER> 0 GROUP BY v_field
                 ) a GROUP BY v_field
             ) b

@@ -51,7 +51,7 @@ BEGIN
 	-- update geometries for units from gullies (orphan and not orphan)
 	UPDATE om_visit_lot_x_unit u SET the_geom = a.geom FROM (
 		SELECT unit_id, st_multi(st_buffer(st_collect(link.the_geom),v_linkbuffer)) 
-		as geom FROM v_edit_link link
+		as geom FROM ve_link link
 		JOIN gully on gully_id = feature_id
 		JOIN om_visit_lot_x_gully USING (gully_id)
 		WHERE lot_id=v_lot
@@ -63,7 +63,7 @@ BEGIN
 		(SELECT unit_id, ST_Multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 		(SELECT unit_id, ST_Multi((st_buffer(st_collect(the_geom),v_nodebuffer))) as geom 
 		from om_visit_lot_x_node 
-		JOIN v_edit_node USING (node_id) 
+		JOIN ve_node USING (node_id) 
 		WHERE lot_id=v_lot AND source='ORPHAN' group by unit_id::integer)a
 		group by unit_id)a
 	WHERE u.unit_id=a.unit_id;
@@ -73,7 +73,7 @@ BEGIN
 		(SELECT unit_id, ST_Multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 		(SELECT unit_id, ST_Multi((st_buffer(st_collect(the_geom),v_arcbuffer))) as geom 
 		from om_visit_lot_x_arc 
-		JOIN v_edit_arc USING (arc_id) 
+		JOIN ve_arc USING (arc_id) 
 		WHERE lot_id=v_lot group by unit_id::integer)a
 		group by unit_id)a
 	WHERE u.unit_id=a.unit_id;
@@ -81,13 +81,13 @@ BEGIN
 	-- update arc length
 	UPDATE om_visit_lot_x_arc l
 	SET length = gis_length::numeric(12,2)
-	FROM v_edit_arc a
+	FROM ve_arc a
 	WHERE l.arc_id = a.arc_id AND lot_id = v_lot ;
 
 	-- update link length	
 	UPDATE om_visit_lot_x_gully l
 	SET length = gis_length::numeric(12,2)
-	FROM v_edit_link a
+	FROM ve_link a
 	WHERE l.gully_id = a.feature_id AND feature_type='GULLY';
 
 	-- update unit length

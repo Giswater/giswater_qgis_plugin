@@ -70,22 +70,22 @@ BEGIN
 	ELSIF v_type = 'feature' THEN
 		v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'node'),'[','('),']',')'),'()') ;
 		IF v_array != '()' THEN
-			v_querynode = concat('SELECT the_geom FROM v_edit_node WHERE node_id::integer IN ', v_array);
+			v_querynode = concat('SELECT the_geom FROM ve_node WHERE node_id::integer IN ', v_array);
 		END IF;
 
 		v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'arc'),'[','('),']',')'),'()') ;
 		IF v_array != '()' THEN
-			v_queryarc = concat('SELECT the_geom FROM v_edit_arc WHERE arc_id::integer IN ', v_array);
+			v_queryarc = concat('SELECT the_geom FROM ve_arc WHERE arc_id::integer IN ', v_array);
 		END IF;
 
 		v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'connec'),'[','('),']',')'),'()') ;
 		IF v_array != '()' THEN
-			v_queryconnec = concat('SELECT the_geom FROM v_edit_connec WHERE connec_id::integer IN ', v_array);
+			v_queryconnec = concat('SELECT the_geom FROM ve_connec WHERE connec_id::integer IN ', v_array);
 		END IF;
 
 		v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'gully'),'[','('),']',')'),'()') ;
 		IF v_array != '()' THEN
-			v_querygully = concat('SELECT the_geom FROM v_edit_gully WHERE gully_id::integer IN ', v_array);
+			v_querygully = concat('SELECT the_geom FROM ve_gully WHERE gully_id::integer IN ', v_array);
 		END IF;
 
 		-- Building the query text

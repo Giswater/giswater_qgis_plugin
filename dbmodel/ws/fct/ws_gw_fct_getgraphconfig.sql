@@ -74,7 +74,7 @@ BEGIN
 		UNION
 
 			SELECT node_id::text AS feature_id, ''closedValve''::text AS graph_type, ',v_mapzone_id,'::integer, ',v_mapzone_name,', NULL AS rotation, n.the_geom
-			FROM v_edit_node n JOIN ',v_mapzone ,' USING (',v_mapzone_id,') WHERE closed_valve IS TRUE
+			FROM ve_node n JOIN ',v_mapzone ,' USING (',v_mapzone_id,') WHERE closed_valve IS TRUE
 		UNION
 			SELECT arc_id::text AS feature_id, ''toArc''::text AS graph_type, mp.',v_mapzone_id,'::integer, mp.',v_mapzone_name,',
 			CASE WHEN node_1 IN (SELECT (json_array_elements_text((mp.graphconfig::json ->> ''use''::text)::json)::json ->> ''nodeParent'')::integer AS node_id) THEN

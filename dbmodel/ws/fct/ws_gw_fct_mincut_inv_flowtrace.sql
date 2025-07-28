@@ -59,13 +59,13 @@ BEGIN
 		(case when (a.id = b.id and a.source::text = b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_graph_checkvalve only direct sense
 		(case when (a.id = b.id and a.source::text != b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_graph_checkvalve only reverse sense
 		FROM (
-			SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target,
+			SELECT ve_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target,
 			(case when a.closed=true then -1 else 1 end) as cost,
 			(case when a.closed=true then -1 else 1 end) as reverse_cost
-			FROM v_edit_arc
-			JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
+			FROM ve_arc
+			JOIN exploitation ON ve_arc.expl_id=exploitation.expl_id
 			LEFT JOIN (
-				SELECT arc_id, true as closed FROM v_edit_arc JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
+				SELECT arc_id, true as closed FROM ve_arc JOIN exploitation ON ve_arc.expl_id=exploitation.expl_id
 				WHERE
 				(node_1 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id=result_id_arg))
 				AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id=result_id_arg))
@@ -79,7 +79,7 @@ BEGIN
 				UNION
 				SELECT (json_array_elements_text((parameters->>'inletArc')::json))::int as arc_id, true as closed FROM config_graph_mincut
 				)a
-			ON a.arc_id=v_edit_arc.arc_id
+			ON a.arc_id=ve_arc.arc_id
 			WHERE node_1 is not null and node_2 is not null
 		)a
 		LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM config_graph_checkvalve)b USING (id);
@@ -92,11 +92,11 @@ BEGIN
 			RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
 		END IF;
 		FOR rec_tank IN
-		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_mincut
-		JOIN v_edit_node ON v_edit_node.node_id=config_graph_mincut.node_id
-		JOIN exploitation ON exploitation.expl_id=v_edit_node.expl_id
+		SELECT ve_node.node_id, ve_node.the_geom FROM config_graph_mincut
+		JOIN ve_node ON ve_node.node_id=config_graph_mincut.node_id
+		JOIN exploitation ON exploitation.expl_id=ve_node.expl_id
 		WHERE (is_operative IS TRUE) AND config_graph_mincut.active IS TRUE
-		AND v_edit_node.the_geom IS NOT NULL
+		AND ve_node.the_geom IS NOT NULL
 		ORDER BY 1
 		LOOP
 			/*
@@ -152,7 +152,7 @@ BEGIN
 				RAISE NOTICE 'Finding additional affectations for valve %', rec_valve.node_id;
 			END IF;
 
-			SELECT arc_id INTO element_id_arg FROM v_edit_arc WHERE (node_1=rec_valve.node_id OR node_2=rec_valve.node_id)
+			SELECT arc_id INTO element_id_arg FROM ve_arc WHERE (node_1=rec_valve.node_id OR node_2=rec_valve.node_id)
 			AND arc_id NOT IN (SELECT arc_id FROM om_mincut_arc WHERE result_id=result_id_arg);
 
 			IF element_id_arg IS NOT NULL THEN
@@ -165,12 +165,12 @@ BEGIN
 				IF v_mincutversion =  3 THEN
 
 					-- Select public.geometry
-					SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+					SELECT the_geom INTO arc_aux FROM ve_arc WHERE arc_id = element_id_arg;
 
 					INSERT INTO "om_mincut_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
 
 					-- Run for extremes node
-					SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+					SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM ve_arc WHERE arc_id = element_id_arg;
 
 					-- Check extreme being a closed valve
 					SELECT COUNT(*) INTO controlValue FROM om_mincut_valve

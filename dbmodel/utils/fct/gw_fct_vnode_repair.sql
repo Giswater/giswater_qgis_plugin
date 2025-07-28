@@ -34,7 +34,7 @@ BEGIN
 
 	
 	-- create vnode
-	FOR v_link IN SELECT l.* FROM v_edit_link l LEFT JOIN vnode v ON vnode_id = exit_id::integer where l.exit_type ='VNODE' AND vnode_id IS NULL
+	FOR v_link IN SELECT l.* FROM ve_link l LEFT JOIN vnode v ON vnode_id = exit_id::integer where l.exit_type ='VNODE' AND vnode_id IS NULL
 	LOOP 
 		INSERT INTO vnode (state, the_geom) VALUES (v_link.state, st_endpoint(v_link.the_geom)) RETURNING vnode_id INTO v_id;
 		UPDATE link SET exit_id = v_id WHERE link_id = v_link.link_id;

@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_elev(p_data json) RETUR
 $BODY$
 /*EXAMPLE
 SELECT gw_fct_anl_node_elev($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]},
+"form":{},"feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{}}}$$)::text
 

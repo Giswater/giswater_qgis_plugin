@@ -58,7 +58,7 @@ SELECT is (
 
 SELECT is (
     (gw_fct_getfeatureinsert($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_link"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
+    "feature":{"tableName":"ve_link"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
     "coordinates":{"x1":419148.4628078682, "y1":4576733.636729475, "x2":419159.9655259207,
     "y2":4576733.757810717}}}$$)::JSON)->>'status',
     'Accepted',

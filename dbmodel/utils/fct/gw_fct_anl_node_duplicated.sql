@@ -12,7 +12,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT gw_fct_anl_node_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]},
+"form":{},"feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"nodeTolerance":"3.0"}}}$$)::text
 

@@ -193,7 +193,7 @@ BEGIN
 	   FROM inp_coverage
 	     JOIN v_edit_inp_subcatchment ON inp_coverage.subc_id::text = v_edit_inp_subcatchment.subc_id::text
 	     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
-		    v_edit_node.node_id
+		    ve_node.node_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
 			    inp_subcatchment.subc_id,
 			    inp_subcatchment.outlet_id,
@@ -228,7 +228,7 @@ BEGIN
 			    inp_subcatchment.descript
 			   FROM inp_subcatchment
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-		     JOIN v_edit_node ON v_edit_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
+		     JOIN ve_node ON ve_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
 
 
 	 CREATE OR REPLACE TEMP VIEW vi_t_dividers AS
@@ -346,7 +346,7 @@ BEGIN
 	   FROM v_edit_inp_subcatchment
 	     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text
 	     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
-		    v_edit_node.node_id
+		    ve_node.node_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
 			    inp_subcatchment.subc_id,
 			    inp_subcatchment.outlet_id,
@@ -381,7 +381,7 @@ BEGIN
 			    inp_subcatchment.descript
 			   FROM inp_subcatchment
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-		     JOIN v_edit_node ON v_edit_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
+		     JOIN ve_node ON ve_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_gully AS

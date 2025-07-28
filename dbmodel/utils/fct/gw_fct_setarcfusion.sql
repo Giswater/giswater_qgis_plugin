@@ -127,7 +127,7 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2112", "fid":"214", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- Check if the node exists
-	SELECT node_id INTO v_exists_node_id FROM v_edit_node WHERE node_id = v_node_id;
+	SELECT node_id INTO v_exists_node_id FROM ve_node WHERE node_id = v_node_id;
 	SELECT the_geom INTO v_node_geom FROM node WHERE node_id = v_node_id;
 
 	-- Compute proceed
@@ -136,7 +136,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3372", "function":"2112", "parameters":{"v_exists_node_id":"'||v_exists_node_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 
 		-- Find arcs sharing node
-		SELECT COUNT(*) INTO v_count FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id AND state > 0;
+		SELECT COUNT(*) INTO v_count FROM ve_arc WHERE node_1 = v_node_id OR node_2 = v_node_id AND state > 0;
 
 		-- Accepted if there are just two distinct arcs
 		IF v_count = 2 THEN
@@ -199,8 +199,8 @@ BEGIN
 				-- setting values of new record
 				v_new_record.arccat_id = v_record1.arccat_id;
 				v_new_record.the_geom := v_arc_geom;
-				v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
-				v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
+				v_new_record.node_1 := (SELECT node_id FROM ve_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), ve_node.the_geom, 0.01) LIMIT 1);
+				v_new_record.node_2 := (SELECT node_id FROM ve_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), ve_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3376", "function":"2112", "parameters":{"arc_id":"'||v_new_record.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
@@ -414,7 +414,7 @@ BEGIN
 						IF v_project_type = 'WS' THEN
 
 							-- update to_arc for mapzones and system tables
-							EXECUTE 'SELECT node_1, node_2 FROM v_edit_arc a WHERE a.arc_id='''||v_new_record.arc_id||''';'
+							EXECUTE 'SELECT node_1, node_2 FROM ve_arc a WHERE a.arc_id='''||v_new_record.arc_id||''';'
 							INTO v_node_1,v_node_2;
 
 							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
@@ -477,20 +477,20 @@ BEGIN
 					VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
 					-- orphan nodes with arc_id not null
-					SELECT count(*) INTO v_count FROM v_edit_node WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
+					SELECT count(*) INTO v_count FROM ve_node WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
 					IF v_count > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3460", "function":"2112", "parameters":{"v_count":"'||v_count||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END IF;
 
 					-- links from connec related to node
-					FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = v_node_id AND feature_type = 'CONNEC' LOOP
+					FOR rec_link IN SELECT * FROM ve_link WHERE exit_type = 'NODE' AND exit_id = v_node_id AND feature_type = 'CONNEC' LOOP
 						INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable) VALUES (rec_link.feature_id, v_new_record.arc_id, v_psector_id, 1, false);
 
 						EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3462", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 					END LOOP;
 
 					-- links from gully related to node
-					FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = v_node_id AND feature_type = 'GULLY' LOOP
+					FOR rec_link IN SELECT * FROM ve_link WHERE exit_type = 'NODE' AND exit_id = v_node_id AND feature_type = 'GULLY' LOOP
 						INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable) VALUES (rec_link.feature_id, v_new_record.arc_id, v_psector_id, 1, false);
 
 						EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3464", "function":"2112", "parameters":{"feature_id":"'||rec_link.feature_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';

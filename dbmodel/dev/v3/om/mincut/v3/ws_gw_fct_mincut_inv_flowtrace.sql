@@ -51,13 +51,13 @@ BEGIN
 			RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
 		END IF;
 		FOR rec_tank IN 
-		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM anl_mincut_inlet_x_exploitation
-		JOIN v_edit_node ON v_edit_node.node_id=anl_mincut_inlet_x_exploitation.node_id
+		SELECT ve_node.node_id, ve_node.the_geom FROM anl_mincut_inlet_x_exploitation
+		JOIN ve_node ON ve_node.node_id=anl_mincut_inlet_x_exploitation.node_id
 		JOIN value_state_type ON state_type=value_state_type.id 
 		JOIN node_type ON node_type.id=nodetype_id
 		JOIN exploitation ON exploitation.expl_id=anl_mincut_inlet_x_exploitation.expl_id
 		WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) 
-		AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM anl_mincut_result_node WHERE result_id=result_id_arg)
+		AND ve_node.the_geom IS NOT NULL AND ve_node.node_id NOT IN (select node_id FROM anl_mincut_result_node WHERE result_id=result_id_arg)
 		ORDER BY 1
 		LOOP
 		
@@ -70,12 +70,12 @@ BEGIN
 			*/
 		
 			query_text:= 'SELECT * FROM pgr_dijkstra( 
-				''SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
+				''SELECT ve_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
 				(case when closed=true then -1 else 1 end) as cost,
 				(case when closed=true then -1 else 1 end) as reverse_cost
-				FROM SCHEMA_NAME.v_edit_arc
+				FROM SCHEMA_NAME.ve_arc
 				LEFT JOIN (
-					SELECT arc_id, true as closed FROM SCHEMA_NAME.v_edit_arc
+					SELECT arc_id, true as closed FROM SCHEMA_NAME.ve_arc
 					WHERE 
 						(node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
 						AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||'))
@@ -87,7 +87,7 @@ BEGIN
 						
 						OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
 
-					)a ON a.arc_id=v_edit_arc.arc_id
+					)a ON a.arc_id=ve_arc.arc_id
 				WHERE node_1 is not null and node_2 is not null'','||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)';
 
 			IF query_text IS NOT NULL THEN	
@@ -129,13 +129,13 @@ BEGIN
 			IF v_debug THEN
 				RAISE NOTICE 'Finding additional affectations to valve %', rec_valve.node_id;
 			END IF;
-			SELECT arc_id INTO element_id_arg FROM v_edit_arc WHERE (node_1=rec_valve.node_id OR node_2=rec_valve.node_id)
+			SELECT arc_id INTO element_id_arg FROM ve_arc WHERE (node_1=rec_valve.node_id OR node_2=rec_valve.node_id)
 			AND arc_id NOT IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id=result_id_arg);
 	
 			IF element_id_arg IS NOT NULL THEN
 		
 				-- Select public.geometry
-				SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+				SELECT the_geom INTO arc_aux FROM ve_arc WHERE arc_id = element_id_arg;
 	
 				-- Insert arc id
 				IF v_debug THEN

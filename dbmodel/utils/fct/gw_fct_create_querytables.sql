@@ -66,18 +66,18 @@ BEGIN
 	END IF;
 
 	-- create query tables for om
-	DROP TABLE IF EXISTS t_arc;	EXECUTE 'CREATE TEMP TABLE t_arc AS SELECT * FROM v_edit_arc'||v_filter;
-	DROP TABLE IF EXISTS t_node;EXECUTE 'CREATE TEMP TABLE  t_node AS SELECT * FROM v_edit_node'||v_filter;
-	DROP TABLE IF EXISTS t_connec;EXECUTE 'CREATE TEMP TABLE t_connec AS SELECT * FROM v_edit_connec'||v_filter;
+	DROP TABLE IF EXISTS t_arc;	EXECUTE 'CREATE TEMP TABLE t_arc AS SELECT * FROM ve_arc'||v_filter;
+	DROP TABLE IF EXISTS t_node;EXECUTE 'CREATE TEMP TABLE  t_node AS SELECT * FROM ve_node'||v_filter;
+	DROP TABLE IF EXISTS t_connec;EXECUTE 'CREATE TEMP TABLE t_connec AS SELECT * FROM ve_connec'||v_filter;
 	DROP TABLE IF EXISTS t_element;	EXECUTE 'CREATE TEMP TABLE t_element AS SELECT * FROM element'||v_filter;
-	DROP TABLE IF EXISTS t_link;EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM v_edit_link';
+	DROP TABLE IF EXISTS t_link;EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM ve_link';
 	DROP TABLE IF EXISTS t_dma;	CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
 	IF v_project_type = 'WS' THEN
 		DROP TABLE IF EXISTS t_dqa;	CREATE TEMP TABLE t_dqa AS SELECT * FROM v_edit_dqa;
 		DROP TABLE IF EXISTS t_presszone; CREATE TEMP TABLE t_presszone AS SELECT * FROM v_edit_presszone;
 		DROP TABLE IF EXISTS t_sector; CREATE TEMP TABLE t_sector AS SELECT * FROM v_edit_sector;
 	ELSIF v_project_type  = 'UD' THEN
-		DROP TABLE IF EXISTS t_gully;EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM v_edit_gully'||v_filter;
+		DROP TABLE IF EXISTS t_gully;EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM ve_gully'||v_filter;
 		DROP TABLE IF EXISTS t_drainzone; CREATE TEMP TABLE t_drainzone AS SELECT * FROM v_edit_drainzone;
 	END IF;
 

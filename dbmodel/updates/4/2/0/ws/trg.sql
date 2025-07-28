@@ -14,3 +14,15 @@ v_edit_link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');
 
 CREATE TRIGGER gw_trg_edit_link_link INSTEAD OF INSERT OR DELETE OR UPDATE ON
 ve_link_link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
+
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');

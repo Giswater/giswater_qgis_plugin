@@ -118,10 +118,10 @@ BEGIN
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT arc_id INTO v_arc FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+		SELECT arc_id INTO v_arc FROM ve_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 
 		IF v_arc IS NULL THEN
-			SELECT connec_id INTO v_connec FROM v_edit_connec WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+			SELECT connec_id INTO v_connec FROM ve_connec WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 		END IF;
 	END IF;
 
@@ -143,7 +143,7 @@ BEGIN
 		END IF;
 
 		-- check if there is no node_id configured on config_graph_mincut for the macroexploitation
-		IF (SELECT count (node_id) FROM v_edit_node WHERE node_id IN (SELECT node_id FROM config_graph_mincut)) = 0 THEN
+		IF (SELECT count (node_id) FROM ve_node WHERE node_id IN (SELECT node_id FROM config_graph_mincut)) = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3274", "function":"2980","parameters":null, "is_process":true}}$$)';
 		END IF;
@@ -187,8 +187,8 @@ BEGIN
 				DELETE FROM om_mincut_connec WHERE result_id = v_mincut;
 				INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code) VALUES (
 					v_mincut, v_connec,
-					(SELECT the_geom FROM v_edit_connec WHERE connec_id = v_connec),
-					(SELECT customer_code FROM v_edit_connec WHERE connec_id = v_connec)
+					(SELECT the_geom FROM ve_connec WHERE connec_id = v_connec),
+					(SELECT customer_code FROM ve_connec WHERE connec_id = v_connec)
 				);
 
 				DELETE FROM om_mincut_hydrometer WHERE result_id = v_mincut;
@@ -198,9 +198,9 @@ BEGIN
 				END LOOP;
 
 				v_querytext = concat('UPDATE om_mincut SET mincut_class = ', v_mincut_class, ', ',
-							'expl_id = ', (SELECT expl_id FROM v_edit_connec WHERE connec_id = v_connec), ', ',
-							'macroexpl_id = ', (SELECT macroexpl_id FROM v_edit_connec WHERE connec_id = v_connec), ', ',
-							'muni_id = ', (SELECT muni_id FROM v_edit_connec WHERE connec_id = v_connec), ', ',
+							'expl_id = ', (SELECT expl_id FROM ve_connec WHERE connec_id = v_connec), ', ',
+							'macroexpl_id = ', (SELECT macroexpl_id FROM ve_connec WHERE connec_id = v_connec), ', ',
+							'muni_id = ', (SELECT muni_id FROM ve_connec WHERE connec_id = v_connec), ', ',
 							'anl_the_geom = ''', ST_SetSRID(ST_Point(v_xcoord, v_ycoord), v_client_epsg), ''', ',
 							'anl_user = ''', v_cur_user, ''', ',
 							'anl_feature_type = ''CONNEC'', ',

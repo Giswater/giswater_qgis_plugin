@@ -19,4 +19,4 @@ JOIN om_visit ON om_visit.id=v_ui_om_visitman_x_gully.visit_id
 JOIN config_visit_class ON config_visit_class.id=om_visit.class_id' WHERE query_text='SELECT visit_id AS sys_id, visitcat_name, visit_start, visit_end, user_name FROM v_ui_om_visitman_x_gully'
 AND table_id='gully_x_visit_manager';
 
-INSERT INTO config_form_tabs VALUES ('v_edit_gully', 'tab_visit', 'Visit', 'List of visits', 'role_basic', NULL, NULL, 4) ON CONFLICT (formname, tabname, device) DO NOTHING;
+INSERT INTO config_form_tabs VALUES ('ve_gully', 'tab_visit', 'Visit', 'List of visits', 'role_basic', NULL, NULL, 4) ON CONFLICT (formname, tabname, device) DO NOTHING;

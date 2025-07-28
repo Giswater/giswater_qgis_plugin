@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1
 
 -- input as array
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
-{"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
+{"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM ve_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
 
 -- using pure SQL
 SELECT ap.gw_fct_setlinktonetwork(concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["',connec_id,'"]},"data":{"feature_type":"CONNEC"}}')::json)

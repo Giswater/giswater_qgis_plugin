@@ -81,7 +81,7 @@ BEGIN
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::integer;
 
-	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
+	EXECUTE 'SELECT '||v_feature_type||'_type FROM ve_'||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_featurecat;
 	v_feature_childview_name := 've_' || v_feature_type || '_' || lower(v_featurecat);
 
@@ -143,11 +143,11 @@ BEGIN
 		END IF;
 
 		--remove link related to node
-		EXECUTE 'SELECT count(*) FROM v_edit_link where exit_type=''NODE'' and exit_id = '||v_feature_id||''
+		EXECUTE 'SELECT count(*) FROM ve_link where exit_type=''NODE'' and exit_id = '||v_feature_id||''
 		INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE 'DELETE FROM v_edit_link WHERE exit_type=''NODE'' and exit_id = '||v_feature_id||';';
+			EXECUTE 'DELETE FROM ve_link WHERE exit_type=''NODE'' and exit_id = '||v_feature_id||';';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3486", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
@@ -207,12 +207,12 @@ BEGIN
 
 	ELSIF v_feature_type='arc' THEN
 		--remove links related to arc
-		EXECUTE 'SELECT count(*) FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN 
+		EXECUTE 'SELECT count(*) FROM ve_link WHERE feature_type=''CONNEC'' AND feature_id IN 
 		(SELECT connec_id FROM connec  WHERE connec.arc_id='||v_feature_id||');'
 		INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN (SELECT connec_id FROM connec  WHERE connec.arc_id='||v_feature_id||');';
+			EXECUTE 'DELETE FROM ve_link WHERE feature_type=''CONNEC'' AND feature_id IN (SELECT connec_id FROM connec  WHERE connec.arc_id='||v_feature_id||');';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3496", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
@@ -241,12 +241,12 @@ BEGIN
 		IF v_project_type='UD' THEN
 
 			--remove links related to arc
-			EXECUTE 'SELECT count(*) FROM v_edit_link WHERE feature_type=''GULLY'' AND feature_id IN 
+			EXECUTE 'SELECT count(*) FROM ve_link WHERE feature_type=''GULLY'' AND feature_id IN 
 			(SELECT gully_id FROM gully  WHERE gully.arc_id='||v_feature_id||');'
 			INTO v_count;
 
 			IF v_count > 0 THEN
-				EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''GULLY'' AND feature_id IN (SELECT gully_id FROM gully  WHERE gully.arc_id='||v_feature_id||');';
+				EXECUTE 'DELETE FROM ve_link WHERE feature_type=''GULLY'' AND feature_id IN (SELECT gully_id FROM gully  WHERE gully.arc_id='||v_feature_id||');';
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3502", "function":"2736", "parameters":{"v_count":"'||v_count||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 			END IF;
@@ -289,8 +289,8 @@ BEGIN
 		END IF;
 
 		IF v_related_id IS NOT NULL THEN
-			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND feature_id ='||v_feature_id||';';
-	  		EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND exit_id ='||v_feature_id||';';
+			EXECUTE 'DELETE FROM ve_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND feature_id ='||v_feature_id||';';
+	  		EXECUTE 'DELETE FROM ve_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND exit_id ='||v_feature_id||';';
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3510", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';

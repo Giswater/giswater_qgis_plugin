@@ -25,7 +25,7 @@ BEGIN
 	
 
 	--grab closest node_id/subc_id to line endpoint
-	SELECT node_id from v_edit_node n where st_dwithin (st_endpoint(new.the_geom), n.the_geom, 0.01) into v_outlet_id;
+	SELECT node_id from ve_node n where st_dwithin (st_endpoint(new.the_geom), n.the_geom, 0.01) into v_outlet_id;
 	SELECT subc_id from v_edit_inp_subcatchment s where st_dwithin (st_endpoint(new.the_geom), s.the_geom, 0.01) into v_subc_id;
 
 	IF TG_OP = 'INSERT' THEN

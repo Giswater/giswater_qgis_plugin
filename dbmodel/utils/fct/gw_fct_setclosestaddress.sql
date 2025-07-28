@@ -13,7 +13,7 @@ $BODY$
 
 /*
 SELECT gw_fct_setclosestaddress($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{},
- "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[""]},
+ "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[""]},
  "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection",
  "parameters":{"catFeature":"ALL NODES", "fieldToUpdate":"postcomplement", "searchBuffer":"50", "updateValues":"nullPostcomplement"}}}$$);
 */

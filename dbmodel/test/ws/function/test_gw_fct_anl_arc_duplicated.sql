@@ -33,7 +33,7 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client": {"device": 4, "infoType": 1, "lang": "ES"},
-    "form": {}, "feature": {"tableName": "v_edit_arc", "id": []}, "data": { "filterFields": {}, "pageInfo": {},
+    "form": {}, "feature": {"tableName": "ve_arc", "id": []}, "data": { "filterFields": {}, "pageInfo": {},
     "selectionMode": "wholeSelection", "parameters": {"checkType": "finalNodes"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_duplicated -> wholeSelection returns status "Accepted"'
@@ -41,7 +41,7 @@ SELECT is(
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client": {"device": 4, "infoType": 1, "lang": "ES"},
-    "form": {}, "feature": {"tableName": "v_edit_arc", "id": [2001, 2002]}, "data": {"filterFields": {}, "pageInfo": {},
+    "form": {}, "feature": {"tableName": "ve_arc", "id": [2001, 2002]}, "data": {"filterFields": {}, "pageInfo": {},
     "selectionMode": "previousSelection","parameters": {"checkType": "finalNodes"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_duplicated -> previousSelection returns status "Accepted"'
@@ -49,10 +49,10 @@ SELECT is(
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with aux_params, tableName : v_edit_arc, and checkType : finalNodes returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with aux_params, tableName : ve_arc, and checkType : finalNodes returns status "Accepted"'
 );
 
 SELECT is(
@@ -73,10 +73,10 @@ SELECT is(
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with aux_params, tableName : v_edit_arc, and checkType : geometry returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with aux_params, tableName : ve_arc, and checkType : geometry returns status "Accepted"'
 );
 
 SELECT is(

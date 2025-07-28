@@ -18,20 +18,20 @@ $BODY$
 -- MODE 1: individual
 SELECT gw_fct_arc_repair($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{}, "feature":{"tableName":"v_edit_arc",
+"form":{}, "feature":{"tableName":"ve_arc",
 "featureType":"ARC", "id":["2094"]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection",
 "parameters":{}}}$$);
 
 -- MODE 2: massive using id as array
 SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
-"SELECT array_to_json(array_agg(arc_id::text)) FROM v_edit_arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)"},
+"SELECT array_to_json(array_agg(arc_id::text)) FROM ve_arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)"},
 "data":{}}$$);';
 
 -- MODE 3: massive usign pure SQL
 SELECT gw_fct_arc_repair(concat('
-{"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "feature":{"tableName":"v_edit_arc","featureType":"ARC", "id":["',arc_id,'"]},
-"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}')::json) FROM v_edit_arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
+{"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "feature":{"tableName":"ve_arc","featureType":"ARC", "id":["',arc_id,'"]},
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}')::json) FROM ve_arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
 
 */
 
@@ -92,23 +92,23 @@ BEGIN
 	-- execute
 	IF v_selectionmode != 'previousSelection' THEN
 		INSERT INTO anl_arc(fid, arc_id, the_geom, descript)
-		SELECT 103, arc_id, the_geom, 'b' FROM arc WHERE arc_id IN (SELECT arc_id FROM v_edit_arc WHERE state=1 AND (node_1 IS NULL OR node_2 IS NULL ));
+		SELECT 103, arc_id, the_geom, 'b' FROM arc WHERE arc_id IN (SELECT arc_id FROM ve_arc WHERE state=1 AND (node_1 IS NULL OR node_2 IS NULL ));
 
-		EXECUTE 'UPDATE arc SET the_geom=the_geom WHERE arc_id IN (SELECT arc_id FROM v_edit_arc WHERE state=1)';
+		EXECUTE 'UPDATE arc SET the_geom=the_geom WHERE arc_id IN (SELECT arc_id FROM ve_arc WHERE state=1)';
 
 		INSERT INTO anl_arc(fid, arc_id, the_geom, descript)
-		SELECT 103, arc_id, the_geom, 'a' FROM arc WHERE arc_id IN (SELECT arc_id FROM v_edit_arc WHERE state=1 AND (node_1 IS NULL OR node_2 IS NULL));
+		SELECT 103, arc_id, the_geom, 'a' FROM arc WHERE arc_id IN (SELECT arc_id FROM ve_arc WHERE state=1 AND (node_1 IS NULL OR node_2 IS NULL));
 
 		INSERT INTO anl_arc(fid, arc_id, the_geom) SELECT 118, arc_id, the_geom FROM (SELECT arc_id, the_geom FROM anl_arc WHERE fid=103 AND descript='b'
 		AND cur_user=current_user AND arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE fid=103 AND descript ='a' AND cur_user=current_user))a;
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
-		SELECT 103, arc_id, the_geom, ''b'' FROM v_edit_arc WHERE arc_id IN (' ||v_array || ') AND state=1 AND node_1 IS NULL OR node_2 IS NULL';
+		SELECT 103, arc_id, the_geom, ''b'' FROM ve_arc WHERE arc_id IN (' ||v_array || ') AND state=1 AND node_1 IS NULL OR node_2 IS NULL';
 
 		EXECUTE 'UPDATE arc SET the_geom=the_geom WHERE arc_id IN (' ||v_array || ') AND state=1';
 
 		EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
-		SELECT 103, arc_id, the_geom, ''a'' FROM v_edit_arc WHERE arc_id IN (' ||v_array || ') AND state=1 AND node_1 IS NULL OR node_2 IS NULL';
+		SELECT 103, arc_id, the_geom, ''a'' FROM ve_arc WHERE arc_id IN (' ||v_array || ') AND state=1 AND node_1 IS NULL OR node_2 IS NULL';
 
 		INSERT INTO anl_arc(fid, arc_id, the_geom) SELECT 118, arc_id, the_geom FROM (SELECT arc_id, the_geom FROM anl_arc WHERE fid=103 AND descript='b'
 		AND cur_user=current_user AND arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE fid=103 AND descript ='a' AND cur_user=current_user))a;

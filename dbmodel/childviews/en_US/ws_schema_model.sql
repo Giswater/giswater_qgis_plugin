@@ -5213,15 +5213,15 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_connec_wjoin', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 
 -- triggers
-DROP TRIGGER IF EXISTS gw_trg_edit_arc ON v_edit_arc;
-CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON ve_arc;
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
 DROP TRIGGER IF EXISTS gw_trg_edit_arc_pipe ON ve_arc_pipe;
 CREATE TRIGGER gw_trg_edit_arc_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_pipe FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('PIPE');
 DROP TRIGGER IF EXISTS gw_trg_edit_arc_varc ON ve_arc_varc;
 CREATE TRIGGER gw_trg_edit_arc_varc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_varc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('VARC');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_connec ON v_edit_connec;
-CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_connec ON ve_connec;
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 DROP TRIGGER IF EXISTS gw_trg_edit_connec_fountain ON ve_connec_fountain;
 CREATE TRIGGER gw_trg_edit_connec_fountain INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_fountain FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('FOUNTAIN');
 DROP TRIGGER IF EXISTS gw_trg_edit_connec_greentap ON ve_connec_greentap;
@@ -5233,8 +5233,8 @@ CREATE TRIGGER gw_trg_edit_connec_vconnec INSTEAD OF INSERT OR DELETE OR UPDATE 
 DROP TRIGGER IF EXISTS gw_trg_edit_connec_wjoin ON ve_connec_wjoin;
 CREATE TRIGGER gw_trg_edit_connec_wjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_wjoin FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('WJOIN');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_node ON v_edit_node;
-CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_node ON ve_node;
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
 DROP TRIGGER IF EXISTS gw_trg_edit_node_adaptation ON ve_node_adaptation;
 CREATE TRIGGER gw_trg_edit_node_adaptation INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_adaptation FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ADAPTATION');
 DROP TRIGGER IF EXISTS gw_trg_edit_node_air_valve ON ve_node_air_valve;

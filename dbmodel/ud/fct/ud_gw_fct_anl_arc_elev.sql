@@ -11,7 +11,7 @@
 	$BODY$
 	/*EXAMPLE
 	SELECT gw_fct_anl_arc_elev($${"client":{"device":4, "infoType":1, "lang":"ES"},
-	"form":{},"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+	"form":{},"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]},
 	"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 	"parameters":{}}}$$)::text
 

@@ -52,7 +52,7 @@ BEGIN
 		END IF;
 
 		IF quote_nullable(NEW.arc_id) != quote_nullable(OLD.arc_id) THEN
-			UPDATE v_edit_connec SET arc_id=NEW.arc_id
+			UPDATE ve_connec SET arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
 		END IF;
 

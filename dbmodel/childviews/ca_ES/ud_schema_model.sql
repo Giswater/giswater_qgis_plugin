@@ -3102,8 +3102,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 
 -- triggers
-DROP TRIGGER IF EXISTS gw_trg_edit_arc ON v_edit_arc;
-CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON ve_arc;
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_arc_conducte ON ve_arc_conducte;
 CREATE TRIGGER gw_trg_edit_arc_conducte INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_conducte FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('CONDUCTE');
@@ -3120,8 +3120,8 @@ CREATE TRIGGER gw_trg_edit_arc_rapid INSTEAD OF INSERT OR DELETE OR UPDATE ON ve
 DROP TRIGGER IF EXISTS gw_trg_edit_arc_sifo ON ve_arc_sifo;
 CREATE TRIGGER gw_trg_edit_arc_sifo INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_sifo FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('SIFO');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_connec ON v_edit_connec;
-CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_connec ON ve_connec;
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_connec_escomesa ON ve_connec_escomesa;
 CREATE TRIGGER gw_trg_edit_connec_escomesa INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_escomesa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('ESCOMESA');
@@ -3129,8 +3129,8 @@ CREATE TRIGGER gw_trg_edit_connec_escomesa INSTEAD OF INSERT OR DELETE OR UPDATE
 DROP TRIGGER IF EXISTS gw_trg_edit_connec_escomesa_ficticia ON ve_connec_escomesa_ficticia;
 CREATE TRIGGER gw_trg_edit_connec_escomesa_ficticia INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_escomesa_ficticia FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('ESCOMESA_FICTICIA');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_gully ON v_edit_gully;
-CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_gully ON ve_gully;
+CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_gully_embornal ON ve_gully_embornal;
 CREATE TRIGGER gw_trg_edit_gully_embornal INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_embornal FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('EMBORNAL');
@@ -3141,8 +3141,8 @@ CREATE TRIGGER gw_trg_edit_gully_embornal_fictici INSTEAD OF INSERT OR DELETE OR
 DROP TRIGGER IF EXISTS gw_trg_edit_gully_reixa ON ve_gully_reixa;
 CREATE TRIGGER gw_trg_edit_gully_reixa INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_reixa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('REIXA');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_node ON v_edit_node;
-CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_node ON ve_node;
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node_arqueta_sorrera ON ve_node_arqueta_sorrera;
 CREATE TRIGGER gw_trg_edit_node_arqueta_sorrera INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_arqueta_sorrera FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ARQUETA_SORRERA');

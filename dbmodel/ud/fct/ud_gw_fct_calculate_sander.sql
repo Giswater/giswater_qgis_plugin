@@ -49,11 +49,11 @@ BEGIN
 	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::text;
 
-	SELECT sys_ymax, concat('man_',lower(sys_type)) INTO v_sys_ymax, v_man_table FROM v_edit_node WHERE node_id = v_id;
+	SELECT sys_ymax, concat('man_',lower(sys_type)) INTO v_sys_ymax, v_man_table FROM ve_node WHERE node_id = v_id;
 
 	IF (v_man_table='man_chamber' OR  v_man_table='man_manhole' OR  v_man_table='man_wjump') THEN
 
-		FOR rec_arc IN (SELECT * FROM v_edit_arc WHERE node_1 = v_id AND state=1) LOOP
+		FOR rec_arc IN (SELECT * FROM ve_arc WHERE node_1 = v_id AND state=1) LOOP
 
 			v_calc = v_sys_ymax - rec_arc.sys_y1;
 

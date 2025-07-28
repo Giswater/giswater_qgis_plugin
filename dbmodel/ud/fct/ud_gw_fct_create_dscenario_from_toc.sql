@@ -15,7 +15,7 @@ $BODY$
 
 -- fid: 403
 SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{},
-"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
+"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"name":"test", "type":"CONDUIT"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{},

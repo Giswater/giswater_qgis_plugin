@@ -47,7 +47,7 @@ BEGIN
         END IF;
 
         -- Get node public.geometry
-        SELECT the_geom, node_type INTO node_aux, v_node_type FROM v_edit_node WHERE (node_id = node_id_arg) AND (is_operative IS TRUE);
+        SELECT the_geom, node_type INTO node_aux, v_node_type FROM ve_node WHERE (node_id = node_id_arg) AND (is_operative IS TRUE);
 
         -- Check node_id being a valve
         SELECT node_id INTO exists_id FROM om_mincut_valve WHERE node_id = node_id_arg 
@@ -82,7 +82,7 @@ BEGIN
                 INSERT INTO om_mincut_node (node_id, the_geom, result_id, node_type) VALUES(node_id_arg, node_aux, result_id_arg, v_node_type);
 
                 -- Loop for all the upstream nodes
-                FOR rec_table IN SELECT * FROM v_edit_arc 
+                FOR rec_table IN SELECT * FROM ve_arc 
                 WHERE (node_2 = node_id_arg) AND (is_operative IS TRUE)
                 LOOP
 					SELECT arc_id INTO exists_id FROM om_mincut_arc WHERE arc_id = rec_table.arc_id AND result_id=result_id_arg;
@@ -101,7 +101,7 @@ BEGIN
                 END LOOP;
 
                 -- Loop for all the downstream nodes
-                FOR rec_table IN SELECT * FROM v_edit_arc 
+                FOR rec_table IN SELECT * FROM ve_arc 
                 WHERE (node_1 = node_id_arg) AND (is_operative IS TRUE)
                 LOOP
                     -- Insert into tables

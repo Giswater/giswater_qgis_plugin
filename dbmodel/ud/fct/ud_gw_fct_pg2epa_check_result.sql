@@ -404,8 +404,8 @@ BEGIN
 	RAISE NOTICE '2 - Check if there are features with sector_id = 0';
 
 	v_querytext = 'SELECT a.feature , count(*)  FROM  (
-				SELECT arc_id, ''ARC'' as feature FROM v_edit_arc WHERE sector_id = 0 UNION
-				SELECT node_id, ''NODE'' FROM v_edit_node WHERE sector_id = 0 )a GROUP BY feature ';
+				SELECT arc_id, ''ARC'' as feature FROM ve_arc WHERE sector_id = 0 UNION
+				SELECT node_id, ''NODE'' FROM ve_node WHERE sector_id = 0 )a GROUP BY feature ';
 
 	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')b'
 	INTO v_count;
@@ -551,7 +551,7 @@ BEGIN
 	IF v_networkmode = 2 or v_networkmode = 3 THEN
 
 		RAISE NOTICE '6 - Check arc_id null for gully (455)';
-		SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_gully g,  selector_sector s
+		SELECT count(*) INTO v_count FROM (SELECT * FROM ve_gully g,  selector_sector s
 		WHERE g.sector_id = s.sector_id AND cur_user=current_user AND arc_id IS NULL) a1;
 
 		IF v_count > 0 THEN

@@ -52,7 +52,7 @@ BEGIN
 		select * from (
 		SELECT arc_id, node_1 as sourcenode, node_2 as targetnode, nodetype_2 as nodetype, isprofilesurface, 'DOWNSTREAM' AS direction, 
 		cat_geom1 geom1, COALESCE(area,0::FLOAT), st_azimuth(st_startpoint(a.the_geom),st_lineinterpolatepoint(a.the_geom,0.01)) azimuth, sys_elev1, 9 as f_factor, null::boolean 
-		as best_candidate, unit_id, macrounit_id FROM v_edit_arc a 
+		as best_candidate, unit_id, macrounit_id FROM ve_arc a 
 		JOIN cat_feature_node ON nodetype_2 = id 
 		JOIN cat_arc c ON c.id = arccat_id 
 		JOIN (SELECT arc_id, unit_id, macrounit_id FROM om_visit_lot_x_arc WHERE lot_id = p_lot) z USING (arc_id)
@@ -60,7 +60,7 @@ BEGIN
 		UNION ALL
 		SELECT arc_id, node_2 , node_1, nodetype_1, isprofilesurface, 'UPSTREAM',
 		cat_geom1, COALESCE(area,0::FLOAT), st_azimuth(st_lineinterpolatepoint(a.the_geom,0.99),st_endpoint(a.the_geom)), sys_elev2, 9, null::boolean, unit_id, macrounit_id 
-		FROM v_edit_arc a JOIN cat_feature_node ON nodetype_1 = id 
+		FROM ve_arc a JOIN cat_feature_node ON nodetype_1 = id 
 		JOIN cat_arc c ON c.id = arccat_id
 		JOIN (SELECT arc_id, unit_id, macrounit_id FROM om_visit_lot_x_arc WHERE lot_id = p_lot)z USING (arc_id)
 		WHERE node_2::integer = p_node)a;
@@ -72,14 +72,14 @@ BEGIN
 		select * from (
 		SELECT arc_id, node_1 as sourcenode, node_2 as targetnode, nodetype_2 as nodetype, isprofilesurface, 'DOWNSTREAM' AS direction, 
 		cat_geom1 geom1, COALESCE(area,0::FLOAT), st_azimuth(st_startpoint(a.the_geom),st_lineinterpolatepoint(a.the_geom,0.01)) azimuth, sys_elev1, 9 as f_factor, null::boolean as best_candidate, macrounit_id
-		FROM v_edit_arc a 
+		FROM ve_arc a 
 		JOIN cat_feature_node ON nodetype_2 = id 
 		JOIN cat_arc c ON c.id = arccat_id 
 		JOIN (SELECT arc_id, macrounit_id FROM om_visit_lot_x_arc WHERE lot_id = 207) z USING (arc_id)
 		WHERE node_1::integer = 16539
 		UNION ALL
 		SELECT arc_id, node_2 , node_1, nodetype_1, isprofilesurface, 'UPSTREAM',
-		cat_geom1, COALESCE(area,0::FLOAT), st_azimuth(st_lineinterpolatepoint(a.the_geom,0.99),st_endpoint(a.the_geom)), sys_elev2, 9, null::boolean, macrounit_id FROM v_edit_arc a 
+		cat_geom1, COALESCE(area,0::FLOAT), st_azimuth(st_lineinterpolatepoint(a.the_geom,0.99),st_endpoint(a.the_geom)), sys_elev2, 9, null::boolean, macrounit_id FROM ve_arc a 
 		JOIN cat_feature_node ON nodetype_1 = id 
 		JOIN cat_arc c ON c.id = arccat_id
 		JOIN (SELECT arc_id, macrounit_id FROM om_visit_lot_x_arc WHERE lot_id = 207)z USING (arc_id)

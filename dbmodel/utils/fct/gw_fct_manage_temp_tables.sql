@@ -302,14 +302,14 @@ BEGIN
         END IF;
 
         IF 'OMCHECK' = ANY(v_group_array) THEN
-            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_arc AS SELECT * FROM v_edit_arc'||v_filter;
-            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_node AS SELECT * FROM v_edit_node'||v_filter;
-            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_connec AS SELECT * FROM v_edit_connec'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_arc AS SELECT * FROM ve_arc'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_node AS SELECT * FROM ve_node'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_connec AS SELECT * FROM ve_connec'||v_filter;
             EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_element AS SELECT * FROM element'||v_filter;
-            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_link AS SELECT * FROM v_edit_link'; -- TODO: add filter
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_link AS SELECT * FROM ve_link'; -- TODO: add filter
 
             IF v_project_type = 'UD' THEN
-                EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_gully AS SELECT * FROM v_edit_gully'||v_filter;
+                EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_gully AS SELECT * FROM ve_gully'||v_filter;
             END IF;
         END IF;
         -- return message:: 'Log tables created' or 'Anl tables created' ...

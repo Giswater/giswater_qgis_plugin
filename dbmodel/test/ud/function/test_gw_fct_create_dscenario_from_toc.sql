@@ -38,7 +38,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -54,7 +54,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > CONDUIT and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > CONDUIT and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -62,7 +62,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -78,7 +78,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > CONDUIT and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > CONDUIT and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -86,7 +86,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -102,7 +102,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > CONDUIT and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > CONDUIT and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -110,7 +110,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -126,7 +126,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > JOINED and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > JOINED and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -134,7 +134,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -150,7 +150,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > JOINED and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > JOINED and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -158,7 +158,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -174,7 +174,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > JOINED and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > JOINED and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -182,7 +182,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -198,7 +198,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > JUNCTION and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > JUNCTION and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -206,7 +206,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -222,7 +222,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > JUNCTION and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > JUNCTION and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -230,7 +230,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -246,7 +246,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > JUNCTION and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > JUNCTION and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -254,7 +254,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -270,7 +270,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OTHER and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OTHER and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -278,7 +278,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -294,7 +294,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OTHER and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OTHER and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -302,7 +302,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -318,7 +318,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OTHER and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OTHER and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -326,7 +326,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -342,7 +342,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > RAINGAGE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > RAINGAGE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -350,7 +350,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -366,7 +366,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > RAINGAGE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > RAINGAGE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -374,7 +374,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -390,7 +390,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > RAINGAGE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > RAINGAGE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -398,7 +398,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -414,7 +414,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OUTFALL and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTFALL and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -422,7 +422,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -438,7 +438,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OUTFALL and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTFALL and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -446,7 +446,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -462,7 +462,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OUTFALL and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTFALL and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -470,7 +470,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -486,7 +486,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > STORAGE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > STORAGE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -494,7 +494,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -510,7 +510,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > STORAGE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > STORAGE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -518,7 +518,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -534,7 +534,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > STORAGE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > STORAGE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -542,7 +542,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -558,7 +558,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -566,7 +566,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -582,7 +582,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -590,7 +590,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -606,7 +606,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -614,7 +614,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -630,7 +630,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -638,7 +638,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -654,7 +654,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -662,7 +662,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -678,7 +678,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -686,7 +686,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -702,7 +702,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -710,7 +710,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -726,7 +726,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -734,7 +734,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -750,7 +750,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -758,7 +758,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -774,7 +774,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -782,7 +782,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -798,7 +798,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -806,7 +806,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -822,7 +822,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -830,7 +830,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -846,7 +846,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > INFLOWS and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > INFLOWS and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -854,7 +854,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -870,7 +870,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > INFLOWS and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > INFLOWS and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -878,7 +878,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -894,7 +894,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > INFLOWS and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > INFLOWS and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -902,7 +902,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -918,7 +918,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > TREATMENT and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > TREATMENT and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -926,7 +926,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -942,7 +942,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > TREATMENT and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > TREATMENT and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -950,7 +950,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -966,7 +966,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > TREATMENT and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > TREATMENT and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -974,7 +974,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -990,7 +990,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > CONTROLS and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > CONTROLS and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -998,7 +998,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -1014,7 +1014,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > CONTROLS and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > CONTROLS and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1022,7 +1022,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -1038,7 +1038,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > CONTROLS and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > CONTROLS and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1046,7 +1046,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -1062,7 +1062,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > NETWORK and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > NETWORK and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1070,7 +1070,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -1086,7 +1086,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > NETWORK and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > NETWORK and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1094,7 +1094,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Arc", "featureType": "ARC", "id": []},
+        "feature": {"tableName": "ve_arc", "featureType": "ARC", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -1110,7 +1110,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Arc and featureType > ARC and type > NETWORK and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > NETWORK and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7598,7 +7598,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7614,7 +7614,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > CONDUIT and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > CONDUIT and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7622,7 +7622,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7638,7 +7638,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > CONDUIT and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > CONDUIT and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7646,7 +7646,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7662,7 +7662,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > CONDUIT and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > CONDUIT and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7670,7 +7670,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7686,7 +7686,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > JOINED and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > JOINED and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7694,7 +7694,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7710,7 +7710,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > JOINED and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > JOINED and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7718,7 +7718,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7734,7 +7734,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > JOINED and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > JOINED and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7742,7 +7742,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7758,7 +7758,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > JUNCTION and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > JUNCTION and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7766,7 +7766,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7782,7 +7782,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > JUNCTION and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > JUNCTION and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7790,7 +7790,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7806,7 +7806,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > JUNCTION and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > JUNCTION and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7814,7 +7814,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7830,7 +7830,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OTHER and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OTHER and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7838,7 +7838,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7854,7 +7854,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OTHER and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OTHER and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7862,7 +7862,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7878,7 +7878,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OTHER and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OTHER and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7886,7 +7886,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7902,7 +7902,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > RAINGAGE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > RAINGAGE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7910,7 +7910,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7926,7 +7926,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > RAINGAGE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > RAINGAGE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7934,7 +7934,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7950,7 +7950,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > RAINGAGE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > RAINGAGE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7958,7 +7958,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7974,7 +7974,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OUTFALL and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTFALL and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7982,7 +7982,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -7998,7 +7998,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OUTFALL and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTFALL and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8006,7 +8006,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8022,7 +8022,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OUTFALL and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTFALL and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8030,7 +8030,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8046,7 +8046,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > STORAGE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > STORAGE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8054,7 +8054,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8070,7 +8070,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > STORAGE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > STORAGE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8078,7 +8078,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8094,7 +8094,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > STORAGE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > STORAGE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8102,7 +8102,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8118,7 +8118,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > WEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8126,7 +8126,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8142,7 +8142,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > WEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8150,7 +8150,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8166,7 +8166,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > WEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8174,7 +8174,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8190,7 +8190,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > PUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8198,7 +8198,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8214,7 +8214,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > PUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8222,7 +8222,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8238,7 +8238,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > PUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8246,7 +8246,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8262,7 +8262,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > ORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8270,7 +8270,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8286,7 +8286,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > ORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8294,7 +8294,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8310,7 +8310,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > ORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8318,7 +8318,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8334,7 +8334,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8342,7 +8342,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8358,7 +8358,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8366,7 +8366,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8382,7 +8382,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8390,7 +8390,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8406,7 +8406,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > INFLOWS and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > INFLOWS and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8414,7 +8414,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8430,7 +8430,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > INFLOWS and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > INFLOWS and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8438,7 +8438,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8454,7 +8454,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > INFLOWS and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > INFLOWS and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8462,7 +8462,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8478,7 +8478,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > TREATMENT and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > TREATMENT and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8486,7 +8486,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8502,7 +8502,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > TREATMENT and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > TREATMENT and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8510,7 +8510,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8526,7 +8526,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > TREATMENT and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > TREATMENT and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8534,7 +8534,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8550,7 +8550,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > CONTROLS and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > CONTROLS and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8558,7 +8558,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8574,7 +8574,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > CONTROLS and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > CONTROLS and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8582,7 +8582,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8598,7 +8598,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > CONTROLS and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > CONTROLS and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8606,7 +8606,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8622,7 +8622,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > NETWORK and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > NETWORK and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8630,7 +8630,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8646,7 +8646,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > NETWORK and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > NETWORK and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8654,7 +8654,7 @@ SELECT is (
     {
         "client": {"device": 4, "lang": "nl_NL", "infoType": 1, "epsg": 25831},
         "form": {},
-        "feature": {"tableName": "v_edit_Node", "featureType": "NODE", "id": []},
+        "feature": {"tableName": "ve_node", "featureType": "NODE", "id": []},
         "data": {
             "filterFields": {}, 
             "pageInfo": {}, 
@@ -8670,7 +8670,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > v_edit_Node and featureType > NODE and type > NETWORK and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > NETWORK and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (

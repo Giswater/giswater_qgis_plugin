@@ -2823,8 +2823,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_vertedouro', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 
 -- triggers
-DROP TRIGGER IF EXISTS gw_trg_edit_arc ON v_edit_arc;
-CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON ve_arc;
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_arc_sifao ON ve_arc_sifao;
 CREATE TRIGGER gw_trg_edit_arc_sifao INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_sifao FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('SIFAO');
@@ -2841,14 +2841,14 @@ CREATE TRIGGER gw_trg_edit_arc_tubulacao_recalque INSTEAD OF INSERT OR DELETE OR
 DROP TRIGGER IF EXISTS gw_trg_edit_arc_tubulacao_virtual ON ve_arc_tubulacao_virtual;
 CREATE TRIGGER gw_trg_edit_arc_tubulacao_virtual INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_tubulacao_virtual FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('TUBULACAO_VIRTUAL');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_connec ON v_edit_connec;
-CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_connec ON ve_connec;
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_connec_ligacao ON ve_connec_ligacao;
 CREATE TRIGGER gw_trg_edit_connec_ligacao INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_ligacao FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('LIGACAO');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_gully ON v_edit_gully;
-CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_gully ON ve_gully;
+CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_gully_boca_lobo ON ve_gully_boca_lobo;
 CREATE TRIGGER gw_trg_edit_gully_boca_lobo INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_boca_lobo FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('BOCA_LOBO');
@@ -2856,8 +2856,8 @@ CREATE TRIGGER gw_trg_edit_gully_boca_lobo INSTEAD OF INSERT OR DELETE OR UPDATE
 DROP TRIGGER IF EXISTS gw_trg_edit_gully_boca_lobo_mayor ON ve_gully_boca_lobo_mayor;
 CREATE TRIGGER gw_trg_edit_gully_boca_lobo_mayor INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_boca_lobo_mayor FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('BOCA_LOBO_MAYOR');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_node ON v_edit_node;
-CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+DROP TRIGGER IF EXISTS gw_trg_edit_node ON ve_node;
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node_boca_lobo_topo ON ve_node_boca_lobo_topo;
 CREATE TRIGGER gw_trg_edit_node_boca_lobo_topo INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_boca_lobo_topo FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('BOCA_LOBO_TOPO');

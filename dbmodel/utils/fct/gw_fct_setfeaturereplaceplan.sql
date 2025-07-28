@@ -111,7 +111,7 @@ BEGIN
 				END IF;
 				IF v_project_type ='WS' THEN
 					-- insert new arc (also insert on psector table)
-					INSERT INTO v_edit_arc
+					INSERT INTO ve_arc
 					(arccat_id, epa_type, expl_id, sector_id, state, state_type, minsector_id, dma_id, presszone_id, dqa_id, soilcat_id,
 					function_type, category_type, fluid_type, location_type, workcat_id_plan, ownercat_id, the_geom,
 					muni_id, postcode, district_id, postnumber, postcomplement, postnumber2, postcomplement2,
@@ -131,7 +131,7 @@ BEGIN
 						v_arc_type=rec.arc_type;
 					END IF;
 
-					 INSERT INTO v_edit_arc
+					 INSERT INTO ve_arc
 					(arccat_id, arc_type, epa_type, expl_id, sector_id, state, state_type,  dma_id, soilcat_id,
 					function_type, category_type, fluid_type, location_type, workcat_id_plan, ownercat_id, the_geom,
 					muni_id, postcode, district_id, postnumber, postcomplement, postnumber2, postcomplement2,
@@ -148,7 +148,7 @@ BEGIN
 
 				-- add connecs from related arc_id but without link
 				FOR v_connec IN select connec_id, arc_id from connec where arc_id=v_id and connec_id not in
-				(SELECT l.feature_id FROM v_edit_connec c JOIN link l on feature_id = connec_id
+				(SELECT l.feature_id FROM ve_connec c JOIN link l on feature_id = connec_id
 				WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE')
 				LOOP
 
@@ -166,7 +166,7 @@ BEGIN
 				END LOOP;
 
 				-- add connecs and links from related arc_id
-				FOR v_link IN SELECT l.* FROM v_edit_connec c JOIN link l on feature_id = connec_id
+				FOR v_link IN SELECT l.* FROM ve_connec c JOIN link l on feature_id = connec_id
 				WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE'
 				LOOP
 
@@ -196,7 +196,7 @@ BEGIN
 
 					-- add gullys from related arc_id but without link
 					FOR v_gully IN select gully_id, arc_id from gully where arc_id=v_id and gully_id not in
-					(SELECT l.feature_id FROM v_edit_gully g JOIN link l on feature_id = gully_id
+					(SELECT l.feature_id FROM ve_gully g JOIN link l on feature_id = gully_id
 					WHERE l.state = 1 and arc_id = v_id AND g.state > 0 AND exit_type <> 'NODE')
 					LOOP
 
@@ -214,7 +214,7 @@ BEGIN
 					END LOOP;
 
 					-- add gullys and links from related arc_id
-					FOR v_link IN SELECT l.* FROM v_edit_gully g JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND g.state > 0 AND exit_type <> 'NODE'
+					FOR v_link IN SELECT l.* FROM ve_gully g JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND g.state > 0 AND exit_type <> 'NODE'
 					LOOP
 						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
 						VALUES (v_currentpsector, v_link.feature_id, rec.arc_id, 0, false, v_link.link_id)

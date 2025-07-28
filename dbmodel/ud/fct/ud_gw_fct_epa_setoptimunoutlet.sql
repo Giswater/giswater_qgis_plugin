@@ -81,11 +81,11 @@ BEGIN
 
 	IF v_selectionmode = 'previousSelection' then
 		if v_array is not null then
-			EXECUTE 'INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM v_edit_node 
+			EXECUTE 'INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM ve_node 
 			WHERE epa_type = ''JUNCTION'' AND state > 0 AND sector_id in (select sector_id from v_edit_sector) and node_id in ('||v_array||')';
 		end if;
 	else
-		INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM v_edit_node
+		INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM ve_node
 		WHERE epa_type = 'JUNCTION' AND state > 0 AND sector_id in (select sector_id from v_edit_sector);
 	end if;
 

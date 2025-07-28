@@ -109,10 +109,10 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
 
 	-- fill the graph table
 	INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
-	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc
+	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM ve_arc
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
-	SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc
+	SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM ve_arc
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 
@@ -187,7 +187,7 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM v_edit_arc WHERE arc_id::text IN
+  	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM ve_arc WHERE arc_id::text IN
 	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)) row) features;
 
 	v_result := COALESCE(v_result, '{}');

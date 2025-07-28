@@ -78,7 +78,7 @@ BEGIN
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
 
-	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
+	EXECUTE 'SELECT '||v_feature_type||'_type FROM ve_'||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_featurecat;
 
 	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id = '''||v_featurecat||''';'
@@ -105,10 +105,10 @@ BEGIN
 		END IF;
 
 		--check final nodes related to arc
-		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_edit_arc
-		LEFT JOIN node a ON a.node_id::text = v_edit_arc.node_1::text
-     	LEFT JOIN node b ON b.node_id::text = v_edit_arc.node_2::text
-     	WHERE v_edit_arc.arc_id = v_feature_id;
+		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM ve_arc
+		LEFT JOIN node a ON a.node_id::text = ve_arc.node_1::text
+     	LEFT JOIN node b ON b.node_id::text = ve_arc.node_2::text
+     	WHERE ve_arc.arc_id = v_feature_id;
 
 		IF v_connect_node IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

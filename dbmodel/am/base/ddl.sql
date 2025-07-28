@@ -287,9 +287,9 @@ CREATE VIEW ext_arc_asset AS
     n1.press_avg AS press1,
     n2.press_avg AS press2,
     a.flow_avg
-   FROM PARENT_SCHEMA.v_edit_arc AS a
-   JOIN PARENT_SCHEMA.v_edit_node AS n1 ON (a.node_1 = n1.node_id)
-   JOIN PARENT_SCHEMA.v_edit_node AS n2 ON (a.node_2 = n2.node_id)
+   FROM PARENT_SCHEMA.ve_arc AS a
+   JOIN PARENT_SCHEMA.ve_node AS n1 ON (a.node_1 = n1.node_id)
+   JOIN PARENT_SCHEMA.ve_node AS n2 ON (a.node_2 = n2.node_id)
    WHERE a.state = 1;
 
 CREATE VIEW v_asset_arc_input AS
