@@ -784,7 +784,7 @@ class AddNewLot:
                 if org_id is not None:
                     where_clause = f" WHERE campaign_id IN (SELECT campaign_id FROM cm.om_campaign WHERE organization_id = {org_id})"
 
-        sql = f'SELECT MIN(startdate), MAX(startdate) FROM cm.om_campaign_lot{where_clause}'
+        sql = f'SELECT MIN(startdate), MAX(startdate) FROM cm.v_ui_campaign_lot{where_clause}'
         row = tools_db.get_rows(sql)
 
         if row and row[0] and row[0][0] is not None:
@@ -850,7 +850,7 @@ class AddNewLot:
 
         # build and execute full query
         where_clause = " AND ".join(filters)
-        query = "SELECT * FROM cm.om_campaign_lot"
+        query = "SELECT * FROM cm.v_ui_campaign_lot"
         if where_clause:
             query += f" WHERE {where_clause}"
         query += " ORDER BY lot_id DESC"
