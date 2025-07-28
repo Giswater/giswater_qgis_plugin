@@ -99,6 +99,9 @@ BEGIN
 	-- discard non-updatable tables from INSERT/UPDATE statement
 	DELETE FROM temp_new_vals WHERE table_name ILIKE '%selector_%' OR table_name ILIKE 'cat_%';
 	DELETE FROM temp_new_vals WHERE table_name IS NULL;
+	
+	DELETE FROM temp_new_vals 
+	WHERE table_name in ('om_campaign_x_node', 'om_campaign_x_arc', 'om_campaign_x_connec', 'om_campaign_lot');
 
 
 	-- adjust geometry column
