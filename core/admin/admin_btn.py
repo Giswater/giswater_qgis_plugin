@@ -147,7 +147,8 @@ class GwAdminButton:
         self.descript = project_descript
         self.schema_type = project_type
         self.project_epsg = project_srid
-        self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
+        self.folder_final_pass = os.path.join(self.sql_dir, 'final_pass', self.project_type)
+        self.folder_locale = os.path.join(self.folder_final_pass, project_type, 'i18n')
         self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
 
         # If the locale is no_TR, act as if it was en_US, but disable translation files
@@ -183,7 +184,7 @@ class GwAdminButton:
         tools_log.log_info(msg, msg_params=msg_params)
 
         if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
-            if self.locale not in ('en_US', 'no_TR') or str(self.project_epsg) != '25831':
+            if self.locale not in ('en_US', 'no_TR', 'es_CR') or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
                 title = "Info Message"
@@ -193,7 +194,7 @@ class GwAdminButton:
                     project_srid = '25831'
                     self.locale = 'en_US'
                     project_locale = 'en_US'
-                    self.folder_locale = os.path.join(self.sql_dir, 'i18n', project_locale)
+                    self.folder_locale = os.path.join(self.folder_final_pass, project_type, 'i18n')
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', '25831')
                     tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
                 else:
@@ -606,33 +607,36 @@ class GwAdminButton:
 
         return True
 
-    def load_base_locale(self):
-
-        folder_locale = os.path.join(self.sql_dir, 'i18n', 'en_US')
-        if self._process_folder(folder_locale) is False:
-            return False
-        else:
-            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=True)
-            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
-
-        return True
-
-    def load_locale(self, lang=None):
+    def load_final_pass(self, lang=None, utils=False):
 
         lang = lang or self.locale
-        folder_locale = os.path.join(self.sql_dir, 'i18n', lang)
+        project_type = 'utils' if utils else self.project_type
+        folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
+        folders = sorted(os.listdir(folder_final_pass))
+        
+        if self._process_folder(folder_final_pass) is False:
+            msg = '{0} folder not found'
+            msg_params = ("Final_pass",)
+            tools_log.log_info(msg, msg_params)
+            return False
 
-        if self._process_folder(folder_locale) is False:
-            if lang != 'no_TR':
-                self.load_locale('en_US')
-        else:
-            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
-            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
+        for folder in folders:
+            folder_path = os.path.join(folder_final_pass, folder)
 
+            if folder == 'i18n' and utils:
+                continue
+            if self._process_folder(folder_path) is False:
+                if folder == 'i18n' and lang != 'en_US':
+                    self.load_final_pass(lang='en_US')
+                else:
+                    return False
+            else:
+                status = self._execute_files(folder_path, set_progress_bar=True, do_schema_model_i18n=False)
+                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
+                    return False
+                
         return True
-
+                
     def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: str | None = None, no_ct: bool = False) -> bool:
         """
         Update the patch folders for a given update directory.
@@ -1699,8 +1703,8 @@ class GwAdminButton:
     def _update_locale(self):
         """"""
         # TODO: Check this!
-        cmb_locale = tools_qt.get_combo_value(self.dlg_readsql, self.cmb_locale, 0)
-        self.folder_locale = os.path.join(self.sql_dir, 'i18n', cmb_locale)
+        self.locale = tools_qt.get_combo_value(self.dlg_readsql, self.cmb_locale, 0)
+        self.folder_locale = os.path.join(self.sql_dir, 'final_pass', 'i18n')
 
     def _populate_data_schema_name(self, widget):
         """"""
@@ -2108,7 +2112,7 @@ class GwAdminButton:
         self.dlg_readsql_rename.schema_rename_copy.setText(schema)
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
-    def _execute_files(self, filedir, i18n=False, no_ct=False, utils_schema_name=None, set_progress_bar=False, do_schema_model_i18n=True):
+    def _execute_files(self, filedir, no_ct=False, utils_schema_name=None, set_progress_bar=False, do_schema_model_i18n=True):
         """"""
 
         if not os.path.exists(filedir):
@@ -2136,17 +2140,9 @@ class GwAdminButton:
             tools_qgis.show_warning(msg)
 
         # Manage folders 'i18n'
-        manage_i18n = i18n
         if 'i18n' in filedir:
-            manage_i18n = True
-
-        if manage_i18n:
             files_to_execute = []
-            if do_schema_model_i18n:
-                files_to_execute = [f"{self.project_type_selected}_schema_model.sql"]
-            else:
-                # files_to_execute = [f"dml.sql", f"{self.project_type_selected}_dml.sql"]
-                files_to_execute = [f"{self.project_type_selected}_dml.sql"]
+            files_to_execute = [f"{self.locale}.sql"]
 
             for file in files_to_execute:
                 status = True
@@ -3604,14 +3600,14 @@ class GwAdminButton:
                             status = self._load_sql(folder_update, utils_schema_name=schema_name)
                             if tools_os.set_boolean(status, False) is False:
                                 return False
-                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'i18n', self.locale)
+                    folder_update = os.path.join(self.sql_dir, 'final_pass', 'utils', 'i18n', self.locale)
                     if self._process_folder(folder_update) is True:
                         status = self._execute_files(folder_update, True)
                         if tools_os.set_boolean(status, False) is False:
                             return False
 
         return True
-
+    
     def _calculate_elapsed_time(self, dialog):
 
         tf = time()  # Final time

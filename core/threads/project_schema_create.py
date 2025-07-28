@@ -65,12 +65,19 @@ class GwCreateSchemaTask(GwTask):
         tools_log.log_info(msg, msg_params=msg_params)
         status = self.main_execution()
         if not tools_os.set_boolean(status, False):
-            message = "Function {0} returned False"
+            message = "During task '{0}, function {1} returned False"
             tools_log.log_info(message, msg_params=msg_params)
             return False
         msg_params = ("Create schema", "custom_execution",)
         tools_log.log_info(msg, msg_params=msg_params)
         self.custom_execution()
+        status = self.final_pass_execution()
+        msg_params = ("Create schema", "final_pass_execution",)
+        tools_log.log_info(msg, msg_params=msg_params)
+        if not tools_os.set_boolean(status, False):
+            message = "During task '{0}, function {1} returned False"
+            tools_log.log_info(message, msg_params=msg_params)
+            return False
         return True
 
     def finished(self, result) -> None:
@@ -150,20 +157,11 @@ class GwCreateSchemaTask(GwTask):
                 or self.isCanceled():
             return False
 
-        status = self.admin.load_base_locale()
-        if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
-                or self.isCanceled():
-            return False
-
         status = self.admin.update_dict_folders(True, project_type)
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
 
-        status = self.admin.load_locale()
-        if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
-                or self.isCanceled():
-            return False
         # status = self.admin.load_childviews()
         # if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
         #         or self.isCanceled():
@@ -208,6 +206,14 @@ class GwCreateSchemaTask(GwTask):
         elif self.admin.rdb_empty.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_empty', prefix=False)
 
+    def final_pass_execution(self) -> None:
+        status = self.admin.load_final_pass()
+        if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
+                or self.isCanceled():
+            return False
+        
+        return True
+
     def calculate_number_of_files(self) -> int:
         """ 
         Calculate total number of SQL to execute 
@@ -217,7 +223,7 @@ class GwCreateSchemaTask(GwTask):
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_locale', 'load_base_locale', 'updates']
+        list_process = ['load_base', 'load_final_pass', 'updates']
 
         for process_name in list_process:
             # tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
@@ -288,8 +294,8 @@ class GwCreateSchemaTask(GwTask):
             dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_ftrg)] = 0
             dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_schema_model)] = 0
 
-        elif process_name == 'load_locale':
-            dict_folders[self.admin.folder_locale] = 0
+        elif process_name == 'load_final_pass':
+            dict_folders[self.admin.folder_final_pass] = 0
 
         elif process_name == 'updates':
             dict_folders[os.path.join(self.admin.folder_updates)] = 0
