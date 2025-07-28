@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
--- FUNCTION CODE: 3490
+-- FUNCTION CODE: 3492
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_omunit(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_omunit(p_data json)
@@ -117,12 +117,12 @@ BEGIN
 
 
 	-- Starting process
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3490", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true", "separator_id":"2049", "tempTable":"temp_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3492", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true", "separator_id":"2049", "tempTable":"temp_"}}$$)';
 
-    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3490", "fid":"'||v_fid||'","criticity":"3", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2011"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3490", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "separator_id":"2000", "tempTable":"temp_"}}$$)';
-    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3490", "fid":"'||v_fid||'","criticity":"2", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2014"}}$$)';
-    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3490", "fid":"'||v_fid||'","criticity":"1", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2007"}}$$)';
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3492", "fid":"'||v_fid||'","criticity":"3", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2011"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3492", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "separator_id":"2000", "tempTable":"temp_"}}$$)';
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3492", "fid":"'||v_fid||'","criticity":"2", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2014"}}$$)';
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3492", "fid":"'||v_fid||'","criticity":"1", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2007"}}$$)';
 
     -- Initialize process
 	-- =======================
@@ -167,7 +167,7 @@ BEGIN
         '"line":' || v_result_line || ',' ||
         '"polygon":' || v_result_polygon || '}' ||
         '}' ||
-        '}')::json, 3490, NULL, ('{"visible": [' || v_visible_layer || ']}')::json, NULL
+        '}')::json, 3492, NULL, ('{"visible": [' || v_visible_layer || ']}')::json, NULL
     );
 
 END;
