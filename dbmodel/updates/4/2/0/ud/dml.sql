@@ -499,3 +499,21 @@ UPDATE sys_style SET layername = 've_gully' WHERE layername = 'v_edit_gully';
 UPDATE cat_feature SET parent_layer = 've_gully' WHERE parent_layer = 'v_edit_gully';
 UPDATE config_info_layer SET layer_id = 've_gully' WHERE layer_id = 'v_edit_gully';
 UPDATE config_form_tabs SET formname = 've_gully' WHERE formname = 'v_edit_gully';
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('arc', 'form_feature', 'tab_data', 'initoverflowpath', 'lyt_data_1',
+(SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname  = 'arc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1' GROUP BY formname, tabname, layoutname),
+'boolean', 'check', 'Init Over Flow Path', 'initoverflowpath', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, TRUE, NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc', 'form_feature', 'tab_data', 'initoverflowpath', 'lyt_data_1',
+(SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname  = 've_arc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1' GROUP BY formname, tabname, layoutname),
+'boolean', 'check', 'Init Over Flow Path', 'initoverflowpath', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, TRUE, NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_arc', 'form_feature', 'tab_data', 'initoverflowpath', 'lyt_data_1',
+(SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname  = 'v_edit_arc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1' GROUP BY formname, tabname, layoutname),
+'boolean', 'check', 'Init Over Flow Path', 'initoverflowpath', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, TRUE, NULL)
+ON CONFLICT DO NOTHING;
