@@ -344,7 +344,6 @@ CREATE TABLE om_campaign (
   descript text,
   active boolean DEFAULT true,
   organization_id integer,
-  duration text,
   status integer not NULL,
   expl_id integer,
   sector_id integer,
@@ -516,7 +515,6 @@ CREATE TABLE om_campaign_lot (
   descript text,
   active boolean DEFAULT true,
   team_id integer, -- fk cat_team
-  duration text,
   status int2 not NULL,
   expl_id integer,
   sector_id integer,

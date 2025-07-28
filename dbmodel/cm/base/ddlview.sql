@@ -27,7 +27,6 @@ WITH campaign_reviewvisit AS (SELECT ocr.campaign_id, omr.idval FROM om_campaign
 	c.descript,
 	c.active,
 	c.organization_id,
-	c.duration,
 	c.status,
 	c.the_geom
 	FROM om_campaign c
@@ -48,7 +47,6 @@ CREATE OR REPLACE VIEW v_ui_campaign_lot AS
 	l.descript,
 	l.active,
 	t.teamname as team_name,
-	l.duration,
 	st.idval as status,
 	l.expl_id,
 	l.sector_id,
