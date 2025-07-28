@@ -31,8 +31,7 @@ WITH campaign_reviewvisit AS (SELECT ocr.campaign_id, omr.idval FROM om_campaign
 	c.the_geom
 	FROM om_campaign c
 	LEFT JOIN campaign_reviewvisit crv USING (campaign_id)
-	LEFT JOIN sys_typevalue st ON st.id = c.campaign_type::TEXT
-	WHERE st.typevalue = 'campaign_type';
+	LEFT JOIN sys_typevalue st ON st.id = c.campaign_type::TEXT	AND st.typevalue = 'campaign_type';
 
 CREATE OR REPLACE VIEW v_ui_campaign_lot AS
 	SELECT
@@ -43,7 +42,7 @@ CREATE OR REPLACE VIEW v_ui_campaign_lot AS
 	l.real_startdate,
 	l.real_enddate,
 	c.name AS campaign_name,
-	wo.workorder_id,
+	wo.workorder_name,
 	l.descript,
 	l.active,
 	t.teamname as team_name,
@@ -55,7 +54,7 @@ CREATE OR REPLACE VIEW v_ui_campaign_lot AS
 	LEFT JOIN om_campaign c ON l.campaign_id = c.campaign_id
 	LEFT JOIN workorder wo ON l.workorder_id = wo.workorder_id
 	LEFT JOIN cat_team t ON l.team_id = t.team_id
-	LEFT JOIN sys_typevalue st ON st.id = l.status::text AND st.typevalue = 'status_type';
+	LEFT JOIN sys_typevalue st ON st.id = l.status::text AND st.typevalue = 'lot_status';
 
 CREATE OR REPLACE VIEW v_selector_lot
 AS SELECT row_number() OVER () AS id,
@@ -65,3 +64,15 @@ AS SELECT row_number() OVER () AS id,
    FROM selector_lot
      JOIN om_campaign_lot USING (lot_id)
   WHERE selector_lot.cur_user = CURRENT_USER;
+
+CREATE OR REPLACE VIEW v_filter_lot AS 
+ SELECT ocl.lot_id, name, status, campaign_id, the_geom 
+   FROM selector_lot sl 
+     JOIN om_campaign_lot ocl ON ocl.lot_id = sl.lot_id
+  WHERE sl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_filter_campaign AS 
+ SELECT oc.campaign_id, name, status, the_geom 
+   FROM selector_campaign sc
+     JOIN om_campaign oc ON oc.campaign_id = sc.campaign_id
+  WHERE sc.cur_user = "current_user"()::text;
