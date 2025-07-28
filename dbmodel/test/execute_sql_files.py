@@ -19,7 +19,7 @@ def main(project_type: str) -> None:
     # Define the root directories to process
     root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg"]
     exclude_prefix = "ud_" if project_type == "ws" else "ws_"
-    exculude_files = "trg_schema_model.sql"
+    exculude_files = "07_trg_schema_model.sql"
 
     # Execute SQL files in the root directories
     for root_dir in root_directories:
@@ -31,7 +31,7 @@ def main(project_type: str) -> None:
                     execute_sql_file(conn, file_path)
 
     # Execute the trg_schema_model.sql file after the utils/ftrg and ws/ftrg directories
-    execute_sql_file(conn, f"{project_type}/schema_model/trg_schema_model.sql")
+    execute_sql_file(conn, f"{project_type}/schema_model/07_trg_schema_model.sql")
 
     i18n_dir = f"i18n/en_US"
 
