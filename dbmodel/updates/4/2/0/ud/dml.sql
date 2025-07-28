@@ -497,3 +497,5 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 UPDATE sys_table SET id='ve_gully' WHERE id='v_edit_gully';
 UPDATE sys_style SET layername = 've_gully' WHERE layername = 'v_edit_gully';
 UPDATE cat_feature SET parent_layer = 've_gully' WHERE parent_layer = 'v_edit_gully';
+UPDATE config_info_layer SET layer_id = 've_gully' WHERE layer_id = 'v_edit_gully';
+UPDATE config_form_tabs SET formname = 've_gully' WHERE formname = 'v_edit_gully';

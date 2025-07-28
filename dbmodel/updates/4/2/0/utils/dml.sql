@@ -76,3 +76,13 @@ UPDATE cat_feature SET parent_layer = 've_node' WHERE parent_layer = 'v_edit_nod
 UPDATE cat_feature SET parent_layer = 've_arc' WHERE parent_layer = 'v_edit_arc';
 UPDATE cat_feature SET parent_layer = 've_connec' WHERE parent_layer = 'v_edit_connec';
 UPDATE cat_feature SET parent_layer = 've_link' WHERE parent_layer = 'v_edit_link';
+
+UPDATE config_info_layer SET layer_id = 've_node' WHERE layer_id = 'v_edit_node';
+UPDATE config_info_layer SET layer_id = 've_arc' WHERE layer_id = 'v_edit_arc';
+UPDATE config_info_layer SET layer_id = 've_connec' WHERE layer_id = 'v_edit_connec';
+UPDATE config_info_layer SET layer_id = 've_link' WHERE layer_id = 'v_edit_link';
+
+UPDATE config_form_tabs SET formname = 've_node' WHERE formname = 'v_edit_node';
+UPDATE config_form_tabs SET formname = 've_arc' WHERE formname = 'v_edit_arc';
+UPDATE config_form_tabs SET formname = 've_connec' WHERE formname = 'v_edit_connec';
+UPDATE config_form_tabs SET formname = 've_link' WHERE formname = 'v_edit_link';
