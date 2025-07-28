@@ -84,10 +84,8 @@ BEGIN
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges')::BOOLEAN;
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
-    v_ignore_broken_valves = TRUE;
-	v_ignore_check_valves = TRUE;
-	--v_ignore_broken_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreBrokenOnlyMassiveMincut');
-	--v_ignore_check_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreCheckValvesMincut')::BOOLEAN;
+    v_ignore_broken_valves = (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreBrokenOnlyMassiveMincut');
+    v_ignore_check_valves = (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreCheckValvesMincut');
     v_execute_massive_mincut = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'executeMassiveMincut')::BOOLEAN;
 
     -- it's not allowed to commit changes when psectors are used
