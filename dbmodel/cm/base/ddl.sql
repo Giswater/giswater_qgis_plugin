@@ -604,6 +604,16 @@ CREATE TABLE om_campaign_lot_x_node (
 	CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id) REFERENCES om_campaign_lot(lot_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE config_outlayers (
+	feature_type text NOT NULL,
+	column_name text NOT NULL,
+	min_value numeric,
+	max_value numeric,
+	except_error boolean,
+	except_message text,
+	CONSTRAINT config_outlayers_pkey PRIMARY KEY (feature_type, column_name)
+);
+
 CREATE TABLE selector_campaign (
   campaign_id integer, -- fk om_campaign
   cur_user text DEFAULT "current_user"(),

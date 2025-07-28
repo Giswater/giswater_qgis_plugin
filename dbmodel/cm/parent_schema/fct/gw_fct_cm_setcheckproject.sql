@@ -91,6 +91,10 @@ DECLARE
 	v_avg_q2_text text;
 	v_lot_summary_msg text;
 	v_campaign_summary_msg text;
+	v_combo_table text;
+	v_table_exists boolean;
+	v_criticity integer;
+	v_conditions text[];
 
 BEGIN
 
@@ -175,6 +179,77 @@ BEGIN
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 1, 'INFO');
 	INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 1, '-------');
 
+	-- SECTION[epic=checkproject]: Check for empty combo-populating tables
+    FOREACH v_combo_table IN ARRAY ARRAY['sys_typevalue', 'cat_team', 'om_campaign', 'cat_organization']
+    LOOP
+        EXECUTE format('SELECT EXISTS (SELECT 1 FROM cm.%I LIMIT 1)', v_combo_table) INTO v_table_exists;
+        
+        IF NOT v_table_exists THEN
+            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+            VALUES (
+                v_fid,
+                current_user,
+                2, -- Warning level
+                format('WARNING: Table cm.%I is empty. Related combo boxes in the UI may be empty.', v_combo_table),
+                1
+            );
+        END IF;
+    END LOOP;
+	-- ENDSECTION
+
+	-- SECTION[epic=checkproject]: Perform outlier checks based on config_outlayers
+    FOR v_rec IN SELECT * FROM cm.config_outlayers
+    LOOP
+		v_conditions := ARRAY[]::text[];
+		IF v_rec.min_value IS NOT NULL THEN
+			v_conditions := array_append(v_conditions, format('%I < %s', v_rec.column_name, v_rec.min_value));
+		END IF;
+		IF v_rec.max_value IS NOT NULL THEN
+			v_conditions := array_append(v_conditions, format('%I > %s', v_rec.column_name, v_rec.max_value));
+		END IF;
+
+		IF array_length(v_conditions, 1) > 0 THEN
+			v_querytext := format(
+				'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
+				v_rec.column_name,
+				v_rec.feature_type,
+				array_to_string(v_conditions, ' OR ')
+			);
+
+			EXECUTE 'SELECT count(*) FROM (' || v_querytext || ') AS outliers' INTO v_count;
+		ELSE
+			v_count := 0;
+		END IF;
+
+        IF v_count > 0 THEN
+			-- Determine criticity level
+			IF v_rec.except_error IS TRUE THEN
+				v_criticity := 3; -- ERROR
+			ELSE
+				v_criticity := 2; -- WARNING
+			END IF;
+
+            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+            VALUES (
+                v_fid,
+                current_user,
+                v_criticity,
+                -- Use the custom message if provided, otherwise a default one
+                COALESCE(v_rec.except_message, format('Found %s outlier(s) for field %I in table %I.', v_count, v_rec.column_name, v_rec.feature_type)),
+                v_count
+            );
+        ELSE
+            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+            VALUES (
+                v_fid,
+                current_user,
+                1, -- Info level
+                format('INFO: All values for field %I in table %I are within the defined range.', v_rec.column_name, v_rec.feature_type),
+                0
+            );
+        END IF;
+    END LOOP;
+    -- ENDSECTION
 
 	-- SECTION[epic=checkproject]: Get fids to run
 	SELECT array_agg(fid) INTO v_fids_to_run
