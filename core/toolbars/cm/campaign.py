@@ -619,7 +619,6 @@ class Campaign:
             # For inventory campaigns, allow all feature types - no restrictions
             return
 
-
         if not allowed_types:
             return
 
