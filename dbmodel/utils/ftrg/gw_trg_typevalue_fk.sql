@@ -55,7 +55,7 @@ BEGIN
 					WHERE typevalue='''||rec.typevalue_name||''';'
 					INTO v_list;
 					--compare the new value with the list of possible options
-					IF  v_new_field = ANY(v_list) OR v_new_field IS NULL  THEN
+					IF  v_new_field = ANY(v_list) OR v_new_field IS NULL THEN
 						CONTINUE;
 					ELSE
 						IF rec.target_field = 'value_param' THEN

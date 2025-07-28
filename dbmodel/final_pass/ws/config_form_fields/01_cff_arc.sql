@@ -1,3 +1,16 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+TRUNCATE config_form_fields RESTART IDENTITY;
+
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,dv_parent_id,dv_querytext_filterc,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder) VALUES
 	 ('arc','form_feature','tab_documents','date_from','lyt_document_1',1,'date','datetime','Date from:','Date from:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":">="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_arc',false,1),
 	 ('arc','form_feature','tab_documents','date_to','lyt_document_1',2,'date','datetime','Date to:','Date to:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":"<="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_arc',false,2),
@@ -142,10 +155,10 @@ WHERE typevalue = ''price_units''',true,false,NULL,NULL,NULL,'{"setMultiline":fa
 	 ('search','form_feature','tab_none','visit_search','lyt_data_1',NULL,'string','nowidget','Visit','Visit',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('search','form_feature','tab_none','add_postnumber','lyt_data_1',NULL,'string','nowidget','Number','Number',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('search','form_feature','tab_none','add_street','lyt_data_1',NULL,'string','nowidget','Street','add_street - Add street ',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
-	 ('upsert_catalog_arc','form_catalog','tab_none','matcat_id','lyt_data_1',1,'string','combo','Material','Material',NULL,false,true,true,false,NULL,'SELECT DISTINCT(matcat_id) AS id,  matcat_id  AS idval FROM cat_arc WHERE id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
-	 ('upsert_catalog_arc','form_catalog','tab_none','pnom','lyt_data_1',2,'string','combo','pnom','pnom',NULL,false,false,true,false,NULL,'SELECT DISTINCT(pnom) AS id,  pnom  AS idval FROM cat_arc WHERE id IS NOT NULL',true,false,'matcat_id',' AND cat_arc.matcat_id   ',NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('upsert_catalog_arc','form_catalog','tab_none','dnom','lyt_data_1',3,'string','combo','dn','dn',NULL,false,false,true,false,NULL,'SELECT DISTINCT(dnom) AS id,  dnom  AS idval FROM cat_arc WHERE id IS NOT NULL',true,false,'matcat_id',' AND cat_arc.matcat_id   ',NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('upsert_catalog_arc','form_catalog','tab_none','id','lyt_data_1',4,'string','combo','ID','ID',NULL,false,false,true,false,NULL,'SELECT DISTINCT (id) AS id, id AS idval FROM cat_arc WHERE id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
+	 ('upsert_catalog_arc','form_catalog','tab_none','matcat_id','lyt_data_1',1,'string','combo','Material','Material',NULL,false,true,true,false,NULL,'SELECT DISTINCT(matcat_id) AS id,  matcat_id  AS idval FROM cat_arc WHERE id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
+	 ('upsert_catalog_arc','form_catalog','tab_none','pnom','lyt_data_1',2,'string','combo','pnom','pnom',NULL,false,false,true,false,NULL,'SELECT DISTINCT(pnom) AS id,  pnom  AS idval FROM cat_arc WHERE id IS NOT NULL',true,false,'matcat_id',' AND cat_arc.matcat_id   ',NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('v_edit_arc','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID','sector_id - Hydraulic sector identifier related to the primary key of sector table',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
 	 ('v_edit_arc','form_feature','tab_data','presszone_id','lyt_bot_1',2,'integer','combo','Presszone','presszone_id',NULL,false,false,true,false,NULL,'SELECT presszone.presszone_id as id, name as idval FROM presszone WHERE presszone_id=''0'' UNION SELECT presszone.presszone_id AS id, presszone.name AS idval FROM presszone WHERE presszone_id IS NOT NULL AND active IS TRUE ',true,false,'expl_id',' AND presszone.expl_id',NULL,'{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_presszone", "activated": true, "keyColumn": "presszone_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
 	 ('v_edit_arc','form_feature','tab_data','dma_id','lyt_bot_1',3,'integer','combo','omzone','omzone_id',NULL,false,false,true,false,NULL,'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL AND active IS TRUE ',true,false,'expl_id',' AND dma.expl_id',NULL,'{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_dma", "activated": true, "keyColumn": "dma_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),

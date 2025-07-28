@@ -1,3 +1,12 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,dv_parent_id,dv_querytext_filterc,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder) VALUES
 	 ('v_edit_link','form_feature','tab_data','dqa_id','lyt_bot_1',1,'integer','text','Dqa','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,NULL),
 	 ('v_edit_link','form_feature','tab_data','link_id','lyt_data_1',1,'integer','text','Link ID','Link ID',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),

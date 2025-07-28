@@ -1,3 +1,12 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,dv_parent_id,dv_querytext_filterc,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder) VALUES
 	 ('cat_feature_node','form_feature','tab_none','isarcdivide',NULL,NULL,'boolean','check','Divides arc','Divides arc',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
 	 ('cat_feature_node','form_feature','tab_none','graph_delimiter',NULL,NULL,'string','combo','Graph delimiter','Graph delimiter',NULL,true,false,true,false,false,'SELECT id, idval FROM edit_typevalue WHERE typevalue =''graphdelimiter_type''',true,false,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
