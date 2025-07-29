@@ -15,9 +15,9 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_import_scada_values($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)
 
--- fid 469 for generic import scada values 
+-- fid 469 for generic import scada values
        502 for specific flowmeter_daily_values wich has an own fid but uses this function to work with.
-  
+
 */
 
 
@@ -55,13 +55,13 @@ BEGIN
 							"data":{"message":"3846", "function":"3166", "fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 	END IF;
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-------------------------------------'));
-   
+
  	-- starting process
 	FOR v_addfields IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
 	LOOP
 		i = i+1;
 		INSERT INTO ext_rtc_scada_x_data (scada_id, node_id, value_date, value, value_status, annotation) VALUES
-		(v_addfields.csv1, v_addfields.csv2, v_addfields.csv3::date, v_addfields.csv4::float, v_addfields.csv5::integer, v_addfields.csv6);			
+		(v_addfields.csv1, v_addfields.csv2::integer, v_addfields.csv3::date, v_addfields.csv4::float, v_addfields.csv5::integer, v_addfields.csv6);
 	END LOOP;
 
 	SELECT count(*) INTO v_count FROM (SELECT DISTINCT csv1 FROM temp_csv WHERE cur_user=current_user AND fid = v_fid)a;
@@ -79,15 +79,15 @@ BEGIN
 						"data":{"message":"3856", "function":"3166", "parameters":{"v_count":"'||v_count||'"},"fid":'||v_fid||', "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 	-- get log (fid: v_fid)
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-		
+
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
- 
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"Process executed"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
