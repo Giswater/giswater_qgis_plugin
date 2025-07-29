@@ -10,7 +10,7 @@ UPDATE config_param_system SET value = true WHERE parameter='admin_config_contro
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FD', 'FD', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC', 'Fiberconcret', '{NODE,ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC', 'Fiberconcrete', '{NODE,ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('CONCRETE', 'Concrete', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('BRICK+IRON', 'Brick and iron', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-HD', 'PE high density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
