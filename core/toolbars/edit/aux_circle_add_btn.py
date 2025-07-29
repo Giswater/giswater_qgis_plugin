@@ -103,7 +103,7 @@ class GwAuxCircleAddButton(GwMaptool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
-        self.layer_circle = tools_qgis.get_layer_by_tablename('v_edit_cad_auxcircle', True, True)
+        self.layer_circle = tools_qgis.get_layer_by_tablename('ve_cad_auxcircle', True, True)
         if self.layer_circle is None:
             self.iface.actionPan().trigger()
             self.cancel_circle = True
@@ -141,14 +141,14 @@ class GwAuxCircleAddButton(GwMaptool):
     def _load_missing_layers(self):
         """ Adds any missing Mincut layers to TOC """
 
-        sql = "SELECT id, alias FROM sys_table WHERE id LIKE 'v_edit_cad_aux%' AND alias IS NOT NULL"
+        sql = "SELECT id, alias FROM sys_table WHERE id LIKE 've_cad_aux%' AND alias IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
             for tablename, alias in rows:
                 lyr = tools_qgis.get_layer_by_tablename(tablename)
                 if not lyr:
                     geom = f'geom_{alias.lower()}'
-                    if tablename == 'v_edit_cad_auxcircle':
+                    if tablename == 've_cad_auxcircle':
                         geom = 'geom_multicurve'
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
 

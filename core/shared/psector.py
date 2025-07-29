@@ -258,7 +258,7 @@ class GwPsector:
 
             if not list_coord:
 
-                sql = f"SELECT st_astext(st_envelope(the_geom)) FROM v_edit_plan_psector WHERE psector_id = {psector_id}"
+                sql = f"SELECT st_astext(st_envelope(the_geom)) FROM ve_plan_psector WHERE psector_id = {psector_id}"
                 row = tools_db.get_row(sql)
                 if row[0]:
                     list_coord = re.search('\(\((.*)\)\)', str(row[0]))
@@ -296,12 +296,12 @@ class GwPsector:
         rows = tools_db.get_rows(sql)
         self.all_states = rows
 
-        # Exclude the layer v_edit_element for adding relations
-        self.excluded_layers = ['v_edit_element']
+        # Exclude the layer ve_element for adding relations
+        self.excluded_layers = ['ve_element']
 
         # Set signals
-        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "v_edit_element", "ve_gully",
-                           "v_edit_element"]
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_element", "ve_gully",
+                           "ve_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_plan_psector.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_plan_psector.tabwidget.currentChanged.connect(partial(self.check_tab_position))
@@ -338,7 +338,7 @@ class GwPsector:
             partial(tools_qgis.disconnect_snapping, False, self.emit_point, self.vertex_marker))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(self._manage_tab_feature_buttons))
-        viewname = 'v_edit_plan_psector_x_other'
+        viewname = 've_plan_psector_x_other'
 
         # Create corner buttons
         self.corner_widget = QWidget()
@@ -833,7 +833,7 @@ class GwPsector:
         self.psector_id = psector_id
         if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
             tableleft = "v_price_compost"
-            tableright = "v_edit_plan_psector_x_other"
+            tableright = "ve_plan_psector_x_other"
             if not self.load_signals:
                 self.price_selector(self.dlg_plan_psector, tableleft, tableright)
         elif self.dlg_plan_psector.tabwidget.currentIndex() == 4:
@@ -934,7 +934,7 @@ class GwPsector:
             tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return
 
-        viewname = "'v_edit_plan_psector'"
+        viewname = "'ve_plan_psector'"
         sql = (f"SELECT column_name FROM information_schema.columns "
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
@@ -952,7 +952,7 @@ class GwPsector:
 
             values = "VALUES("
             if columns:
-                sql = "INSERT INTO v_edit_plan_psector ("
+                sql = "INSERT INTO ve_plan_psector ("
                 for column_name in columns:
                     if tools_qt.get_widget(self.dlg_plan_psector, f"tab_general_{column_name}") is not None:
                         column_name = "tab_general_" + column_name
@@ -1239,7 +1239,7 @@ class GwPsector:
                     if sub_key == 'price_id':
                         _filter = self.dict_to_update[main_key][sub_key]
                     else:
-                        sql += f"UPDATE v_edit_plan_psector_x_other SET {sub_key} = '{self.dict_to_update[main_key][sub_key]}' " \
+                        sql += f"UPDATE ve_plan_psector_x_other SET {sub_key} = '{self.dict_to_update[main_key][sub_key]}' " \
                                f"WHERE psector_id = {tools_qt.get_text(self.dlg_plan_psector, self.psector_id)} AND price_id = '{_filter}';\n"
             tools_db.execute_sql(sql)
 
@@ -1544,7 +1544,7 @@ class GwPsector:
 
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector",
-                col_id_name="psector_id", view_name="v_edit_plan_psector"))
+                col_id_name="psector_id", view_name="ve_plan_psector"))
 
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
         self.dlg_psector_mng.btn_merge.clicked.connect(self.psector_merge)
@@ -1717,7 +1717,7 @@ class GwPsector:
         """
         if self.dlg_psector_mng.chk_filter_canvas.isChecked():
             # Save initial visibility of target layer
-            self._save_visibility_state('v_edit_plan_psector')
+            self._save_visibility_state('ve_plan_psector')
 
             # Ensure layer is loaded and visible
             self._enable_layers_for_filtering()
@@ -1745,7 +1745,7 @@ class GwPsector:
         # Get current map canvas extent
         canvas_extent = self.iface.mapCanvas().extent()
         # Retrieve the target layer
-        psector_layer = tools_qgis.get_layer_by_tablename('v_edit_plan_psector')
+        psector_layer = tools_qgis.get_layer_by_tablename('ve_plan_psector')
 
         # Find features within the current extent
         visible_feature_ids = []
@@ -1771,19 +1771,19 @@ class GwPsector:
         model.setFilter(filter_expression)
 
     def _enable_layers_for_filtering(self):
-        """Ensures `v_edit_plan_psector` is loaded and visible in QGIS."""
+        """Ensures `ve_plan_psector` is loaded and visible in QGIS."""
 
-        plan_layer = tools_qgis.get_layer_by_tablename('v_edit_plan_psector')
+        plan_layer = tools_qgis.get_layer_by_tablename('ve_plan_psector')
         if not plan_layer:
             # Load layer if not present in project
-            self._load_layer_to_project('v_edit_plan_psector', "the_geom", "psector_id")
+            self._load_layer_to_project('ve_plan_psector', "the_geom", "psector_id")
             # Reload reference after adding
-            plan_layer = tools_qgis.get_layer_by_tablename('v_edit_plan_psector')
+            plan_layer = tools_qgis.get_layer_by_tablename('ve_plan_psector')
         if plan_layer:
             self._activate_layer(plan_layer)
 
     def _load_layer_to_project(self, tablename, geom_field, field_id):
-        """Loads a specified database layer yo load v_edit_plan_psector."""
+        """Loads a specified database layer yo load ve_plan_psector."""
 
         tools_gw.add_layer_database(tablename=tablename, the_geom=geom_field, field_id=field_id, style_id=None)
 
@@ -3004,7 +3004,7 @@ def accept(**kwargs):
         updates += f"{key} = '{value}', "
     if updates:
         updates = updates[:-2]
-        sql = f"UPDATE v_edit_plan_psector SET {updates} WHERE psector_id = {psector_id}"
+        sql = f"UPDATE ve_plan_psector SET {updates} WHERE psector_id = {psector_id}"
         if tools_db.execute_sql(sql):
             msg = "Psector values updated successfully"
             tools_qgis.show_info(msg)

@@ -103,7 +103,7 @@ class GwGo2EpaManagerButton(GwAction):
         menu.exec(QCursor.pos())
                        
     def _fill_manager_table(self, filter_id=None):
-        """ Fill dscenario manager table with data from v_edit_cat_dscenario """
+        """ Fill dscenario manager table with data from ve_cat_dscenario """
 
         complet_list = self._get_list("v_ui_rpt_cat_result", filter_id)
 

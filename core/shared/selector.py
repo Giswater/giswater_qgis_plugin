@@ -415,7 +415,7 @@ class GwSelector:
         tools_qgis.set_layer_index('ve_connec')
         tools_qgis.set_layer_index('ve_gully')
         tools_qgis.set_layer_index('ve_link')
-        tools_qgis.set_layer_index('v_edit_plan_psector')
+        tools_qgis.set_layer_index('ve_plan_psector')
         tools_qgis.refresh_map_canvas()
 
         # Refresh raster layer

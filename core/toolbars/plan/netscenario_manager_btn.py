@@ -35,9 +35,9 @@ class GwNetscenarioManagerButton(GwAction):
         self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'dma_id', 'presszone_id']
         self.filter_dict = {"plan_netscenario_arc": {"filter_table": "ve_arc", "feature_type": "arc"},
                             "plan_netscenario_node": {"filter_table": "ve_node", "feature_type": "node"},
-                            "plan_netscenario_connec": {"filter_table": "v_edit_inp_connec", "feature_type": "connec"},
-                            "v_edit_plan_netscenario_dma": {"filter_table": "v_edit_dma", "feature_type": "dma"},
-                            "v_edit_plan_netscenario_presszone": {"filter_table": "v_edit_presszone", "feature_type": "presszone"},
+                            "plan_netscenario_connec": {"filter_table": "ve_inp_connec", "feature_type": "connec"},
+                            "ve_plan_netscenario_dma": {"filter_table": "ve_dma", "feature_type": "dma"},
+                            "ve_plan_netscenario_presszone": {"filter_table": "ve_presszone", "feature_type": "presszone"},
                             "plan_netscenario_valve": {"filter_table": "man_valve", "feature_type": "node"},
                             }
         self.filter_disabled = []
@@ -509,7 +509,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Populate typeahead
         if enable:
             self._manage_feature_type()
-            table_name = f"v_edit_{tab_name.replace('plan_netscenario_', '').replace('v_edit_', '')}"
+            table_name = f"ve_{tab_name.replace('plan_netscenario_', '').replace('ve_', '')}"
             feature_type = self.feature_type
             if self.filter_dict.get(tab_name):
                 table_name = self.filter_dict[tab_name]['filter_table']
@@ -588,7 +588,7 @@ class GwNetscenarioManagerButton(GwAction):
                 feature_type = x
                 break
 
-        table = f"v_edit_{view}"
+        table = f"ve_{view}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
     def _manage_config(self):
@@ -871,7 +871,7 @@ class GwNetscenarioManagerButton(GwAction):
             graphconfig = json.dumps(row[2])
             the_geom = row[3]
             active = str(row[4]).lower()
-            sql = f"INSERT INTO v_edit_{view} (netscenario_id, dma_id, name, pattern_id, graphconfig, the_geom, active) " \
+            sql = f"INSERT INTO ve_{view} (netscenario_id, dma_id, name, pattern_id, graphconfig, the_geom, active) " \
                   f"VALUES ({self.selected_netscenario_id}, '{feature_id}', '{dma_name}', '{pattern_id}', $${graphconfig}$$, $${the_geom}$$, {active});"
             result = tools_db.execute_sql(sql)
         elif view == 'plan_netscenario_presszone':
@@ -887,7 +887,7 @@ class GwNetscenarioManagerButton(GwAction):
             graphconfig = json.dumps(row[2])
             the_geom = row[3]
             active = str(row[4]).lower()
-            sql = f"INSERT INTO v_edit_{view} (netscenario_id, presszone_id, name, head, graphconfig, the_geom, active) " \
+            sql = f"INSERT INTO ve_{view} (netscenario_id, presszone_id, name, head, graphconfig, the_geom, active) " \
                   f"VALUES ({self.selected_netscenario_id}, '{feature_id}', '{presszone_name}', '{head}', $${graphconfig}$$, $${the_geom}$$, {active});"
             result = tools_db.execute_sql(sql)
         else:

@@ -269,7 +269,7 @@ class GwWorkspaceManagerButton(GwAction):
             global_vars.iface.mapCanvas().refresh()
 
             # Zoom to layer
-            layer = tools_qgis.get_layer_by_tablename('v_edit_inp_junction')
+            layer = tools_qgis.get_layer_by_tablename('ve_inp_junction')
             if not layer:
                 layer = tools_qgis.get_layer_by_tablename('ve_node')
             tools_qgis.zoom_to_layer(layer)

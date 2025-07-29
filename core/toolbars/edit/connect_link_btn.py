@@ -221,7 +221,7 @@ class GwConnectLinkButton(GwMaptool):
 
             # Force reload dataProvider of layer
             tools_qgis.set_layer_index('ve_link')
-            tools_qgis.set_layer_index('v_edit_vnode')
+            tools_qgis.set_layer_index('ve_vnode')
 
     def manage_result(self, result):
 
@@ -238,7 +238,7 @@ class GwConnectLinkButton(GwMaptool):
 
         # Force reload dataProvider of layer
         tools_qgis.set_layer_index('ve_link')
-        tools_qgis.set_layer_index('v_edit_vnode')
+        tools_qgis.set_layer_index('ve_vnode')
 
     # endregion
 

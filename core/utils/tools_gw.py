@@ -938,41 +938,41 @@ def configure_layers_from_table_name(table_name):
     # Define table groups dynamically
     table_groups = {
         "curve_id": [
-            "v_edit_inp_pump", "v_edit_inp_pump_additional", "v_edit_inp_virtualpump", "v_edit_inp_virtualvalve",
-            "v_edit_inp_inlet", "v_edit_inp_tank", "v_edit_inp_flgreg_outlet", "v_edit_inp_outlet",
-            "v_edit_inp_flgreg_pump", "v_edit_inp_outfall", "v_edit_inp_storage"
+            "ve_inp_pump", "ve_inp_pump_additional", "ve_inp_virtualpump", "ve_inp_virtualvalve",
+            "ve_inp_inlet", "ve_inp_tank", "ve_inp_flgreg_outlet", "ve_inp_outlet",
+            "ve_inp_flgreg_pump", "ve_inp_outfall", "ve_inp_storage"
         ],
         "curve_id_dscenario": [
-            "v_edit_inp_dscenario_pump", "v_edit_inp_dscenario_pump_additional", "v_edit_inp_dscenario_virtualpump",
-            "v_edit_inp_dscenario_virtualvalve", "v_edit_inp_dscenario_inlet", "v_edit_inp_dscenario_tank",
-            "v_edit_inp_dscenario_flgreg_outlet", "v_edit_inp_dscenario_outlet", "v_edit_inp_dscenario_flgreg_pump",
-            "v_edit_inp_dscenario_outfall", "v_edit_inp_dscenario_storage"
+            "ve_inp_dscenario_pump", "ve_inp_dscenario_pump_additional", "ve_inp_dscenario_virtualpump",
+            "ve_inp_dscenario_virtualvalve", "ve_inp_dscenario_inlet", "ve_inp_dscenario_tank",
+            "ve_inp_dscenario_flgreg_outlet", "ve_inp_dscenario_outlet", "ve_inp_dscenario_flgreg_pump",
+            "ve_inp_dscenario_outfall", "ve_inp_dscenario_storage"
         ],
         "pattern_id": [
-            "v_edit_inp_pump", "v_edit_inp_pump_additional", "v_edit_inp_virtualpump", "v_edit_inp_reservoir",
-            "v_edit_inp_demand", "v_edit_inp_junction", "v_edit_inp_inlet", "v_edit_inp_tank", "v_edit_inp_inflows",
-            "v_edit_inp_inflows_poll", "v_edit_inp_dwf"
+            "ve_inp_pump", "ve_inp_pump_additional", "ve_inp_virtualpump", "ve_inp_reservoir",
+            "ve_inp_demand", "ve_inp_junction", "ve_inp_inlet", "ve_inp_tank", "ve_inp_inflows",
+            "ve_inp_inflows_poll", "ve_inp_dwf"
         ],
         "pattern_id_dscenario": [
-            "v_edit_inp_dscenario_pump", "v_edit_inp_dscenario_pump_additional", "v_edit_inp_dscenario_virtualpump",
-            "v_edit_inp_dscenario_reservoir", "v_edit_inp_dscenario_demand", "v_edit_inp_dscenario_junction",
-            "v_edit_inp_dscenario_inlet", "v_edit_inp_dscenario_tank", "v_edit_inp_dscenario_inflows",
-            "v_edit_inp_dscenario_inflows_poll"
+            "ve_inp_dscenario_pump", "ve_inp_dscenario_pump_additional", "ve_inp_dscenario_virtualpump",
+            "ve_inp_dscenario_reservoir", "ve_inp_dscenario_demand", "ve_inp_dscenario_junction",
+            "ve_inp_dscenario_inlet", "ve_inp_dscenario_tank", "ve_inp_dscenario_inflows",
+            "ve_inp_dscenario_inflows_poll"
         ],
         "timeseries": [
-            "v_edit_inp_inflows", "v_edit_inp_outfall", "v_edit_inp_raingage"
+            "ve_inp_inflows", "ve_inp_outfall", "ve_inp_raingage"
         ],
         "timeseries_dscenario": [
-            "v_edit_inp_dscenario_inflows", "v_edit_inp_dscenario_outfall", "v_edit_inp_dscenario_raingage"
+            "ve_inp_dscenario_inflows", "ve_inp_dscenario_outfall", "ve_inp_dscenario_raingage"
         ],
         "lids_dscenario": [
-            "v_edit_inp_dscenario_lid_usage"
+            "ve_inp_dscenario_lid_usage"
         ],
         "hydrology_id": [
-            "v_edit_inp_subcatchment"
+            "ve_inp_subcatchment"
         ],
         "dwf_id": [
-            "v_edit_inp_dwf"
+            "ve_inp_dwf"
         ]
     }
 
@@ -4087,7 +4087,7 @@ def set_completer_object(dialog, tablename, field_id="id"):
     """
 
     widget_name = tablename + "_id"
-    if tablename == "v_edit_element":  # TODO: remove this when refactored
+    if tablename == "ve_element":  # TODO: remove this when refactored
         widget_name = "element_id"
 
     widget = tools_qt.get_widget(dialog, widget_name)

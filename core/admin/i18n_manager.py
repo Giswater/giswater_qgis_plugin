@@ -657,7 +657,7 @@ class GwSchemaI18NManager:
 
                 SELECT 'ELEMENT', *
                 FROM {table_org}
-                WHERE formtype = 'form_feature' AND (formname LIKE 've_element%' OR formname = 'v_edit_element')
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_element%' OR formname = 've_element')
 
                 UNION
 
@@ -669,7 +669,7 @@ class GwSchemaI18NManager:
 
                 SELECT 'FLWREG', *
                 FROM {table_org}
-                WHERE formtype = 'form_feature' AND (formname LIKE 've_flwreg%' OR formname = 'v_edit_flwreg')
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_flwreg%' OR formname = 've_flwreg')
             ) AS unioned
             ON CONFLICT (feature_type, source_code, project_type, context, formtype, source)
             DO NOTHING;
@@ -682,11 +682,11 @@ class GwSchemaI18NManager:
 
             delete from {table_org} where formtype = 'form_feature' and (formname like 've_gully%' or formname in ('ve_gully'));
 
-            delete from {table_org} where formtype = 'form_feature' and (formname like 've_element%' or formname in ('v_edit_element'));
+            delete from {table_org} where formtype = 'form_feature' and (formname like 've_element%' or formname in ('ve_element'));
 
             delete from {table_org} where formtype = 'form_feature'and (formname like 've_link%' or formname in ('ve_link'));
 
-            delete from {table_org} where formtype = 'form_feature'  and (formname like 've_flwreg%' or formname in ('v_edit_flwreg'));
+            delete from {table_org} where formtype = 'form_feature'  and (formname like 've_flwreg%' or formname in ('ve_flwreg'));
         """
         return query
 

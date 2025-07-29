@@ -101,8 +101,8 @@ class GwMassiveComposer:
 
     def generate_composer_pages(self, dialog, path):
 
-        # Check 'v_edit_plan_psector.atlas_id' values
-        sql = "SELECT atlas_id FROM v_edit_plan_psector order by atlas_id::integer"
+        # Check 've_plan_psector.atlas_id' values
+        sql = "SELECT atlas_id FROM ve_plan_psector order by atlas_id::integer"
         rows = tools_db.get_rows(sql, log_info=False)
         for row in rows:
             if row[0] is not None:
@@ -152,9 +152,9 @@ class GwMassiveComposer:
             designer.setAtlasPreviewEnabled(True)
         if not atlas.enabled():
             atlas.setEnabled(True)
-        layer = tools_qgis.get_layer_by_tablename("v_edit_plan_psector")
+        layer = tools_qgis.get_layer_by_tablename("ve_plan_psector")
         if atlas.coverageLayer() != layer:
-            msg = ("Generation of atlas uses v_edit_plan_psector as coverage layer ordered by atlas_id column. "
+            msg = ("Generation of atlas uses ve_plan_psector as coverage layer ordered by atlas_id column. "
                       "Please update the atlas' coverage layer before continuing.")
             tools_qgis.show_warning(msg)
             # TODO: set the coverage layer here with "atlas.setCoverageLayer(layer)". It doesn't work for some reason, QGIS crash.

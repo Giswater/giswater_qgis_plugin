@@ -1182,7 +1182,7 @@ def manage_duplicate_dscenario_copyfrom(dialog):
     """ Function called in def build_dialog_options(...) -->  getattr(module, signal)(dialog) """
 
     dscenario_id = tools_qt.get_combo_value(dialog, 'copyFrom')
-    sql = f"SELECT descript, parent_id, dscenario_type, active, expl_id FROM v_edit_cat_dscenario WHERE dscenario_id = {dscenario_id}"
+    sql = f"SELECT descript, parent_id, dscenario_type, active, expl_id FROM ve_cat_dscenario WHERE dscenario_id = {dscenario_id}"
     row = tools_db.get_row(sql)
 
     if row:

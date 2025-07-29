@@ -89,7 +89,7 @@ class GwVisit(QObject):
         tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
-        for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_link", "v_edit_element", "ve_gully"]:
+        for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_link", "ve_frelem", "ve_genelem", "ve_gully"]:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer:
                 layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
@@ -227,8 +227,8 @@ class GwVisit(QObject):
         self._event_feature_type_selected(self.dlg_add_visit, "link")
 
         # Force _visit_tab_feature_changed
-        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "v_edit_element", "ve_gully",
-                           "v_edit_element", "ve_link"]
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_gully",
+                           "ve_link"]
         self.excluded_layers = excluded_layers
         self._visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=excluded_layers)
 
@@ -245,7 +245,7 @@ class GwVisit(QObject):
             # self.dlg_add_visit.tab_feature.tabBar().setEnabled(False)
 
             # Zoom to selected geometry or relations
-            visit_layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
+            visit_layer = tools_qgis.get_layer_by_tablename('ve_om_visit')
             if visit_layer:
                 visit_layer.selectByExpression(f'"id"={visit_id}')
                 box = visit_layer.boundingBoxOfSelected()
@@ -590,7 +590,7 @@ class GwVisit(QObject):
         if self.point_xy['x'] is not None:
             self._update_geom()
 
-        layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
+        layer = tools_qgis.get_layer_by_tablename('ve_om_visit')
         if layer:
             layer.dataProvider().reloadData()
 
@@ -601,7 +601,7 @@ class GwVisit(QObject):
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
 
-        layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
+        layer = tools_qgis.get_layer_by_tablename('ve_om_visit')
         if layer:
             layer.dataProvider().reloadData()
         tools_qgis.refresh_map_canvas()
@@ -915,8 +915,8 @@ class GwVisit(QObject):
     def _manage_tabs_enabled(self, enable_tabs=False):
         """ Enable/Disable tabs depending feature_type """
 
-        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_link", "v_edit_element", "ve_gully",
-                          "v_edit_element"]
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_link", "ve_element", "ve_gully",
+                          "ve_element"]
         self.excluded_layers = excluded_layers
         if self.feature_type is None:
             return

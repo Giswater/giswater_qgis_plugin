@@ -40,7 +40,7 @@ class GwDimensioning:
 
         self.user_current_layer = self.iface.activeLayer()
         # Set layers dimensions, node and connec
-        self.layer_dimensions = tools_qgis.get_layer_by_tablename("v_edit_dimensions")
+        self.layer_dimensions = tools_qgis.get_layer_by_tablename("ve_dimensions")
         self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
         self.layer_connec = tools_qgis.get_layer_by_tablename("ve_connec")
 
@@ -197,7 +197,7 @@ class GwDimensioning:
         # remove last character (,) from fields
         fields = fields[:-1]
 
-        feature = '"tableName":"v_edit_dimensions", '
+        feature = '"tableName":"ve_dimensions", '
         feature += f'"id":"{self.fid}"'
         extras = f'"fields":{{{fields}}}'
         body = tools_gw.create_body(feature=feature, extras=extras)

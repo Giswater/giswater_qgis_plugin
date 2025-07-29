@@ -88,7 +88,7 @@ class GwInfo(QObject):
         if global_vars.project_type == 'ud':
             self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.rel_feature_type = None
-        self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "v_edit_element", "ve_gully", "ve_link"]
+        self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_element", "ve_gully", "ve_link"]
         self.point_xy = {"x": None, "y": None}
 
     def get_info_from_coordinates(self, point, tab_type):
@@ -230,7 +230,7 @@ class GwInfo(QObject):
                 return result, dialog
 
             elif template == 'dimensioning':
-                self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
+                self.lyr_dim = tools_qgis.get_layer_by_tablename("ve_dimensions", show_warning_=True)
                 if self.lyr_dim:
                     self.dimensioning = GwDimensioning()
                     feature_id = self.complet_result['body']['feature']['id']
@@ -919,8 +919,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl", "view": "inp_flwreg_orifice", "add_view": "v_edit_inp_flwreg_orifice", "pk": "nodarc_id", "add_dlg_title": "Orifice - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_orifice", "add_view": "v_edit_inp_dscenario_flwreg_orifice", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Orifice - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_flwreg_orifice", "add_view": "ve_inp_flwreg_orifice", "pk": "nodarc_id", "add_dlg_title": "Orifice - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_orifice", "add_view": "ve_inp_dscenario_flwreg_orifice", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Orifice - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Orifice", **kwargs)
@@ -929,8 +929,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl", "view": "inp_flwreg_outlet", "add_view": "v_edit_inp_flwreg_outlet", "pk": "nodarc_id", "add_dlg_title": "Outlet - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_outlet", "add_view": "v_edit_inp_dscenario_flwreg_outlet", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Outlet - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_flwreg_outlet", "add_view": "ve_inp_flwreg_outlet", "pk": "nodarc_id", "add_dlg_title": "Outlet - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_outlet", "add_view": "ve_inp_dscenario_flwreg_outlet", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Outlet - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Outlet", **kwargs)
@@ -939,8 +939,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl", "view": "inp_flwreg_pump", "add_view": "v_edit_inp_flwreg_pump", "pk": "nodarc_id", "add_dlg_title": "Pump - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_pump", "add_view": "v_edit_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Pump - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_flwreg_pump", "add_view": "ve_inp_flwreg_pump", "pk": "nodarc_id", "add_dlg_title": "Pump - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_pump", "add_view": "ve_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Pump - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Pump", **kwargs)
@@ -949,8 +949,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl", "view": "inp_pump_additional", "add_view": "v_edit_inp_pump_additional", "pk": ["node_id", "order_id"], "add_dlg_title": "Pump Additional - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_pump_additional", "add_view": "v_edit_inp_dscenario_pump_additional", "pk": ["dscenario_id", "node_id", "order_id"], "add_dlg_title": "Pump Additional - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_pump_additional", "add_view": "ve_inp_pump_additional", "pk": ["node_id", "order_id"], "add_dlg_title": "Pump Additional - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_pump_additional", "add_view": "ve_inp_dscenario_pump_additional", "pk": ["dscenario_id", "node_id", "order_id"], "add_dlg_title": "Pump Additional - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Additional Pump", **kwargs)
@@ -959,8 +959,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl", "view": "inp_flwreg_weir", "add_view": "v_edit_inp_flwreg_weir", "pk": "nodarc_id", "add_dlg_title": "Weir - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_weir", "add_view": "v_edit_inp_dscenario_flwreg_weir", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Weir - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_flwreg_weir", "add_view": "ve_inp_flwreg_weir", "pk": "nodarc_id", "add_dlg_title": "Weir - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_weir", "add_view": "ve_inp_dscenario_flwreg_weir", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Weir - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Weir", **kwargs)
@@ -969,7 +969,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand", "id_name": "feature_id", "pk": ["dscenario_id", "feature_id"], "add_dlg_title": "Demand - Dscenario"}
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_demand", "add_view": "ve_inp_dscenario_demand", "id_name": "feature_id", "pk": ["dscenario_id", "feature_id"], "add_dlg_title": "Demand - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Demand", **kwargs)
@@ -978,8 +978,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl_dwf", "view": "inp_dwf", "pk": ["node_id", "dwfscenario_id"], "add_view": "v_edit_inp_dwf", "add_dlg_title": "DWF"},
-                        {"tbl": "tbl_inflows", "view": "inp_dscenario_inflows", "pk": ["dscenario_id", "node_id", "order_id"], "add_view": "v_edit_inp_dscenario_inflows", "add_dlg_title": "INFLOWS - Dscenario"}
+                        {"tbl": "tbl_dwf", "view": "inp_dwf", "pk": ["node_id", "dwfscenario_id"], "add_view": "ve_inp_dwf", "add_dlg_title": "DWF"},
+                        {"tbl": "tbl_inflows", "view": "inp_dscenario_inflows", "pk": ["dscenario_id", "node_id", "order_id"], "add_view": "ve_inp_dscenario_inflows", "add_dlg_title": "INFLOWS - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("DWF & INFLOWS", **kwargs)
