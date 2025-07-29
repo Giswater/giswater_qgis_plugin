@@ -97,6 +97,8 @@ class AddNewLot:
             campaign_combo.currentIndexChanged.connect(self._on_campaign_changed)
             # Initial population when the dialog opens
             self._on_campaign_changed()
+            # Clear initial data cache after first run
+            self.initial_lot_data = {}
         else:
             print("[DEBUG] Critical: Could not find 'tab_data_campaign_id' widget to connect signal.")
 
@@ -221,14 +223,12 @@ class AddNewLot:
         # Populate Teams
         teams = response_body.get("data", [])
         if teams:
-            current_team_id = team_combo.currentData()
             team_combo.blockSignals(True)
             for team in teams:
                 team_combo.addItem(str(team['idval']), team['id'])
-            if current_team_id is not None:
-                index = team_combo.findData(current_team_id)
-                if index > -1:
-                    team_combo.setCurrentIndex(index)
+            # Restore the lot's original team_id if it exists
+            if self.initial_lot_data.get("team_id"):
+                self.set_widget_value(team_combo, self.initial_lot_data["team_id"])
             team_combo.blockSignals(False)
 
         # Get campaign details for expl and sector
@@ -257,6 +257,9 @@ class AddNewLot:
         if rows_expl:
             tools_qt.fill_combo_values(expl_combo, rows_expl, index_to_show=1, add_empty=False)
             expl_combo.setEnabled(True)
+            # Restore the lot's original expl_id if it exists
+            if self.initial_lot_data.get("expl_id"):
+                self.set_widget_value(expl_combo, self.initial_lot_data["expl_id"])
 
         # Populate sector combo
         sql_sector = f"SELECT sector_id, name FROM {self.schema_parent}.sector"
@@ -269,6 +272,9 @@ class AddNewLot:
         if rows_sector:
             tools_qt.fill_combo_values(sector_combo, rows_sector, index_to_show=1, add_empty=False)
             sector_combo.setEnabled(True)
+            # Restore the lot's original sector_id if it exists
+            if self.initial_lot_data.get("sector_id"):
+                self.set_widget_value(sector_combo, self.initial_lot_data["sector_id"])
 
         # Set pre-selected values from campaign
         campaign_expl_id = campaign_data.get('expl_id')
@@ -300,6 +306,13 @@ class AddNewLot:
         form_fields = response["body"]["data"].get("fields", [])
         self.fields_form = form_fields
         self.lot_id_value = response["body"].get("feature", {}).get("id")
+
+        # Cache original selected IDs from the server response for the initial load
+        self.initial_lot_data = {}
+        if not self.is_new_lot:
+            for field in form_fields:
+                if field.get("columnname") in ["team_id", "expl_id", "sector_id"]:
+                    self.initial_lot_data[field.get("columnname")] = field.get("selectedId")
 
         for field in form_fields:
             widget = self.create_widget_from_field(field)
@@ -453,8 +466,8 @@ class AddNewLot:
         elif isinstance(widget, QComboBox):
             target_id_to_find = None
             try:
-                # Ensure we are searching for an integer ID
-                target_id_to_find = int(value)
+                # Ensure we are searching for an integer or string ID
+                target_id_to_find = value
             except (ValueError, TypeError):
                 pass  # If it's not a number, we can't match it to the list's ID
 
@@ -463,9 +476,14 @@ class AddNewLot:
                     item_data = widget.itemData(i)
                     # Handle cases where itemData is a list like [2, 'expl_02']
                     if isinstance(item_data, (list, tuple)) and item_data:
-                        if item_data[0] == target_id_to_find:
+                        # Compare as strings for safety
+                        if str(item_data[0]) == str(target_id_to_find):
                             widget.setCurrentIndex(i)
                             return  # Exit after finding the correct item
+                    # Also handle simple data types
+                    elif str(item_data) == str(target_id_to_find):
+                        widget.setCurrentIndex(i)
+                        return
 
             # If we couldn't find it by data, fall back to a simple text search as a last resort.
             # This handles cases where the data might not be a list.
@@ -785,7 +803,7 @@ class AddNewLot:
             org_id = user_info[1]
             if role not in ('role_cm_admin'):
                 if org_id is not None:
-                    where_clause = f" WHERE campaign_id IN (SELECT campaign_id FROM cm.om_campaign WHERE organization_id = {org_id})"
+                    where_clause = f" WHERE campaign_name IN (SELECT name FROM cm.om_campaign WHERE organization_id = {org_id})"
 
         sql = f'SELECT MIN(startdate), MAX(startdate) FROM cm.v_ui_campaign_lot{where_clause}'
         row = tools_db.get_rows(sql)
@@ -816,7 +834,7 @@ class AddNewLot:
             org_id = user_info[1]
             if role not in ('role_cm_admin'):
                 if org_id is not None:
-                    filters.append(f"campaign_id IN (SELECT campaign_id FROM cm.om_campaign WHERE organization_id = {org_id})")
+                    filters.append(f"campaign_name IN (SELECT name FROM cm.om_campaign WHERE organization_id = {org_id})")
 
         # get value to now column filter (startdate, enddate, real_startdate, real_enddate)
         date_type = tools_qt.get_combo_value(self.dlg_lot_man, self.dlg_lot_man.cmb_date_filter_type, 0)
