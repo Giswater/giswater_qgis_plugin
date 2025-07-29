@@ -69,6 +69,7 @@ class Go2Iber:
         tools_qgis.show_warning(msg, dialog=self.dlg_go2iber)  # TODO: remove this
         tools_gw.open_dialog(self.dlg_go2iber, dlg_name='go2iber')
 
+
     def _btn_swmm_options_clicked(self):
         # tools_gw.execute_class_function(GwGo2EpaUI, '_go2epa_options')
         from ..go2epa_btn import GwGo2EpaButton
@@ -85,6 +86,13 @@ class Go2Iber:
 
     def _btn_accept_clicked(self):
         """ Save INP, RPT and result name"""
+
+        # Set network mode to 2
+        form = '"formName":"epaoptions"'
+        my_json = '[{"widget": "inp_options_networkmode", "value": "2"}]'
+        extras = f'"fields":{my_json}'
+        body = tools_gw.create_body(form=form, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setconfig', body)
 
         # Manage if task is already running
         if hasattr(self, 'go2iber_task') and self.go2iber_task is not None:
