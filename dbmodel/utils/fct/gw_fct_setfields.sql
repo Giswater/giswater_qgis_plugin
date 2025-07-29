@@ -71,7 +71,7 @@ v_id_array text[];
 column_type_id_array text[];
 idname text;
 v_pkeyfield text;
-
+v_keys_fields text;
 v_exists boolean;
 
 BEGIN
@@ -324,10 +324,13 @@ BEGIN
 		-- execute query text
 		EXECUTE v_querytext;
 		IF v_fieldsreload IS NOT NULL THEN
+			SELECT string_to_array(string_agg(key, ','), ',') INTO v_keys_fields
+  				FROM json_object_keys(v_fields::json) AS key;
+
 			EXECUTE 'SELECT gw_fct_getcolumnsfromid($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},
 				"form":{},
-				"feature":{"tableName":"'|| v_tablename ||'", "id":"'|| v_id ||'", "fieldsReload":"'|| v_fieldsreload ||'", "parentField":"'||json_object_keys(v_fields)||'"},
+				"feature":{"tableName":"'|| v_tablename ||'", "id":"'|| v_id ||'", "fieldsReload":"'|| v_fieldsreload ||'", "parentField":"'||v_keys_fields||'"},
 				"data":{}}$$)' INTO v_columnfromid;
 		END IF;
 	END IF;
@@ -337,7 +340,6 @@ BEGIN
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
 	v_columnfromid := COALESCE(v_columnfromid, '{}');
-
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
 	      ',"body":{"data":{"fields":' || v_columnfromid || '}'||
