@@ -72,6 +72,8 @@ column_type_id_array text[];
 idname text;
 v_pkeyfield text;
 
+v_exists boolean;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -105,7 +107,7 @@ BEGIN
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
 	-- Get if view has composite primary key
-	IF v_idname ISNULL THEN
+	IF v_idname IS NULL THEN
 
 		-- Manage primary key
 		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
@@ -174,10 +176,47 @@ BEGIN
             USING v_schemaname, v_tablename, v_idname
             INTO column_type_id;
 
+	v_querytext = 'SELECT EXISTS(SELECT 1 FROM ' || quote_ident(v_tablename) ||'';
+	IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 then
+		v_querytext := v_querytext || ' WHERE ';
+		FOREACH idname IN ARRAY v_idname_array loop
+			v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_id_array[i]) || ' AS ' || column_type_id_array[i] || ') AND ';
+			i=i+1;
+		END LOOP;
+		v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+	ELSIF cardinality(v_idname_array) > 1 THEN
+		i = 1;
+		v_querytext := v_querytext || ' WHERE ';
+		FOREACH idname IN ARRAY v_idname_array loop
+			v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_fields->>idname) || ' AS ' || column_type_id_array[i] || ') AND ';
+			i=i+1;
+		END LOOP;
+
+		v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+	ELSE
+		v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';
+	END IF;
+	EXECUTE v_querytext||');' INTO v_exists;
+
 	IF v_text is not NULL THEN
 		i = 1;
-		-- query text, step1
-		v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
+		
+		IF v_exists THEN
+			-- query text for UPDATE, step1
+			v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
+		ELSE
+			-- query text for INSERT, step1
+			v_querytext := 'INSERT INTO ' || quote_ident(v_tablename) ||' (' || quote_ident(v_idname);
+			-- Build column list
+			FOREACH text IN ARRAY v_text LOOP
+				SELECT v_text[i] into v_jsonfield;
+				v_field := (SELECT (v_jsonfield ->> 'key'));
+				v_querytext := concat(v_querytext, ', ', quote_ident(v_field));
+				i := i + 1;
+			END LOOP;
+			v_querytext := v_querytext || ') VALUES (' || quote_literal(v_id)||', ';
+			i := 1;
+		END IF;
 
 		-- query text, step2
 		FOREACH text IN ARRAY v_text
@@ -205,24 +244,32 @@ BEGIN
 			IF v_field ='the_geom' OR v_field ='geom' THEN
 				v_columntype='geometry';
 			END IF;
-			--IF v_value !='null' OR v_value !='NULL' THEN
 
-				IF v_field='state' THEN
-					PERFORM gw_fct_state_control(json_build_object('feature_type_aux', v_featuretype, 'feature_id_aux', v_id, 'state_aux', v_value::integer, 'tg_op_aux', 'UPDATE'));
-				END IF;
+			IF v_field='state' THEN
+				PERFORM gw_fct_state_control(json_build_object('feature_type_aux', v_featuretype, 'feature_id_aux', v_id, 'state_aux', v_value::integer, 'tg_op_aux', 'UPDATE'));
+			END IF;
 
-				IF v_field in ('geom', 'the_geom') THEN
-					v_value := (SELECT ST_SetSRID((v_value)::geometry, SRID_VALUE));
-				END IF;
+			IF v_field in ('geom', 'the_geom') THEN
+				v_value := (SELECT ST_SetSRID((v_value)::geometry, SRID_VALUE));
+			END IF;
 
-				--building the query text
+			--building the query text
+			IF v_exists THEN
+				-- For UPDATE
 				IF n=1 THEN
 					v_querytext := concat (v_querytext, quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
 				ELSIF i>1 THEN
 					v_querytext := concat (v_querytext, ' , ',  quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
 				END IF;
-				n=n+1;
-			--END IF;
+			ELSE
+				-- For INSERT
+				IF i=1 THEN
+					v_querytext := concat(v_querytext, 'CAST(', quote_nullable(v_value), ' AS ', v_columntype, ')');
+				ELSE
+					v_querytext := concat(v_querytext, ', CAST(', quote_nullable(v_value), ' AS ', v_columntype, ')');
+				END IF;
+			END IF;
+			n=n+1;
 			i=i+1;
 
 		END LOOP;
@@ -233,25 +280,29 @@ BEGIN
 			v_id_array := string_to_array(v_id, ', ');
 		end if;
 
-        IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 then
-            i = 1;
-			v_querytext := v_querytext || ' WHERE ';
-			FOREACH idname IN ARRAY v_idname_array loop
-				v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_id_array[i]) || ' AS ' || column_type_id_array[i] || ') AND ';
-				i=i+1;
-			END LOOP;
-			v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
-		ELSIF cardinality(v_idname_array) > 1 THEN
-			i = 1;
-			v_querytext := v_querytext || ' WHERE ';
-			FOREACH idname IN ARRAY v_idname_array loop
-				v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_fields->>idname) || ' AS ' || column_type_id_array[i] || ') AND ';
-				i=i+1;
-			END LOOP;
+		IF v_exists THEN
+			IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 then
+				i = 1;
+				v_querytext := v_querytext || ' WHERE ';
+				FOREACH idname IN ARRAY v_idname_array loop
+					v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_id_array[i]) || ' AS ' || column_type_id_array[i] || ') AND ';
+					i=i+1;
+				END LOOP;
+				v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+			ELSIF cardinality(v_idname_array) > 1 THEN
+				i = 1;
+				v_querytext := v_querytext || ' WHERE ';
+				FOREACH idname IN ARRAY v_idname_array loop
+					v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_fields->>idname) || ' AS ' || column_type_id_array[i] || ') AND ';
+					i=i+1;
+				END LOOP;
 
-			v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+				v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+			ELSE
+				v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';
+			END IF;
 		ELSE
-			v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';
+			v_querytext := v_querytext || ')';
 		END IF;
 
 		-- execute query text
