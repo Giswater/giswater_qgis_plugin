@@ -37,6 +37,7 @@ BEGIN
 	    SELECT json_build_object(
 	        'status', 'Accepted',
 	        'body', json_build_object(
+                'organization_name', v_orgname,
 	        	'data', json_agg(
 		            json_build_object('id', ct.team_id, 'idval', ct.teamname)
 		        )
@@ -50,6 +51,7 @@ BEGIN
 	    SELECT json_build_object(
 	        'status', 'Accepted',
 	        'body', json_build_object(
+                'organization_name', v_orgname,
 	        	'data', json_agg(
 		            json_build_object('id', ct.team_id, 'idval', ct.teamname)
 		        )
