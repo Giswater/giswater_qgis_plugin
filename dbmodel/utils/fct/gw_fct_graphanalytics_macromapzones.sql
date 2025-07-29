@@ -19,7 +19,7 @@ DECLARE
 	v_srid INTEGER;
 	v_project_type TEXT;
 
-	v_fid integer;
+	v_fid integer = 3482;
 
 	-- dialog variables
 	v_class text;
@@ -29,19 +29,13 @@ DECLARE
 	v_geomparamupdate float;
 	v_commitchanges boolean;
 
-	v_audit_result text;
 	v_visible_layer text;
 
 	v_level integer;
 	v_status text;
 	v_message text;
 
-	v_query_text text;
-		v_result text;
-
 	v_result_info json;
-	v_result_point json;
-	v_result_line json;
 	v_result_polygon json;
 	v_response JSON;
 
@@ -49,10 +43,8 @@ DECLARE
 	v_macro_table text;
 	v_child_table text;
 	v_macro_id_field text;
-	v_child_id_field text;
-	v_child_expl_field text;
-
 	v_data json;
+	v_query_geom TEXT;
 
 BEGIN
 
@@ -72,15 +64,13 @@ BEGIN
 	-- Dynamic mapping for macro/child tables and fields
 	IF v_class NOT IN ('MACROSECTOR', 'MACROOMZONE','MACRODMA','MACRODQA') THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3090", "function":"3482","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
+		"data":{"message":"3090", "function":"3482","parameters":null, "is_process":true}}$$)';
 		RETURN NULL;
 	END IF;
 
 	v_macro_table := lower(v_class);
 	v_child_table := replace(v_macro_table, 'macro', '');
 	v_macro_id_field := v_macro_table || '_id';
-	v_child_id_field := v_macro_id_field;
-	v_child_expl_field := 'expl_id';
 	v_visible_layer := 'v_edit_' || v_macro_table;
 
 	-- Parse expl_id array
@@ -122,75 +112,43 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
 
-	IF v_commitchanges THEN
-		v_query_text := '
-			WITH macro_geom AS (
-				SELECT
-					' || v_child_id_field || ' AS macro_id,
-					ST_Union(the_geom) AS the_geom
-				FROM ' || v_child_table || '
-				WHERE the_geom IS NOT NULL
-				AND (
-					' || CASE
-						WHEN v_expl_id_array IS NULL OR array_length(v_expl_id_array,1) = 0 THEN 'TRUE'
-						ELSE v_child_expl_field || '::text = ANY(' ||
-							'ARRAY[' ||
-								(SELECT string_agg(quote_literal(x), ',') FROM unnest(v_expl_id_array) x) ||
-							']::text[])'
-					END || '
-				)
-				GROUP BY ' || v_child_id_field || '
-			)
-			UPDATE ' || v_macro_table || ' m
-			SET the_geom = g.the_geom
-			FROM macro_geom g
-			WHERE m.' || v_macro_id_field || ' = g.macro_id
-			AND g.the_geom IS NOT NULL;
-		';
-		EXECUTE v_query_text;
-	ELSE
-		-- temporal layer
-		EXECUTE '
-			SELECT COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
-			FROM (
-				SELECT jsonb_build_object(
-					''type'',       ''Feature'',
-					''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-					''properties'', to_jsonb(row) - ''the_geom''
-				) AS feature
-				FROM (
-				SELECT
-					' || v_child_id_field || ' AS macro_id,
-					ST_Union(the_geom) AS the_geom
-				FROM ' || v_child_table || '
-				WHERE the_geom IS NOT NULL
-				AND (
-					' || CASE
-						WHEN v_expl_id_array IS NULL OR array_length(v_expl_id_array,1) = 0 THEN 'TRUE'
-						ELSE v_child_expl_field || '::text = ANY(' ||
-							'ARRAY[' ||
-								(SELECT string_agg(quote_literal(x), ',') FROM unnest(v_expl_id_array) x) ||
-							']::text[])'
-					END || '
-				)
-				GROUP BY ' || v_child_id_field || '
-				) AS row
-			) AS features
-		' INTO v_result;
+	-- prepare query
+	v_query_geom = '
+	SELECT '||v_macro_id_field||', st_union(the_geom) as the_geom FROM '|| v_child_table ||' 
+	WHERE '||v_macro_id_field||' IS NOT NULL AND '||quote_literal(v_expl_id_array)||'::integer[] && ARRAY[expl_id]
+	GROUP BY '||v_macro_id_field||'';
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_line := concat('{"geometryType":"LineString", "features":', v_result, '}');
+	IF v_commitchanges THEN -- update macromapzone table
+		
+		EXECUTE '
+		UPDATE '|| v_macro_table ||' t SET the_geom = a.the_geom FROM ('||v_query_geom||')a 
+		WHERE t.'||v_macro_id_field||' = a.'||v_macro_id_field||'
+		';
+	ELSE -- temporal layer
+	
+		EXECUTE '
+		SELECT COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+		FROM (
+			SELECT jsonb_build_object(
+				''type'',       ''Feature'',
+				''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+				''properties'', to_jsonb(row) - ''the_geom''
+			) AS feature
+			FROM ('||v_query_geom||') AS row
+		) AS features
+		' INTO v_result_polygon;
+		
 	END IF;
 
 
 
-	v_result_info := COALESCE(v_result_info, '{}');
-	v_result_point := COALESCE(v_result_point, '{}');
-	v_result_line := COALESCE(v_result_line, '{}');
-	v_result_polygon := COALESCE(v_result_polygon, '{}');
+	-- return
+	v_status := coalesce(v_status, 'Accepted');
 	v_level := COALESCE(v_level, 0);
-	v_message := COALESCE(v_message, '');
-	v_version := COALESCE(v_version, '');
+	v_message := COALESCE(v_message, '{}');
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
 
 	RETURN gw_fct_json_create_return(('{
 		"status":"'||v_status||'", 
@@ -204,12 +162,10 @@ BEGIN
 			"data":{
 				"graphClass": "'||v_class||'", 
 				"info":'||v_result_info||',
-				"point":'||v_result_point||',
-				"line":'||v_result_line||',
 				"polygon":'||v_result_polygon||'
 			}
 		}
-	}')::json, 2710, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
+	}')::json, 3482, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
 
 END;
 $BODY$
