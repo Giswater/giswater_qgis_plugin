@@ -425,7 +425,8 @@ class GwInfo(QObject):
                     msg_params = (field['columnname'],)
                     tools_qgis.show_message(msg, dialog=dialog, msg_params=msg_params)
             if str(value) not in ('', None, -1, "None", "-1") and widget.property('columnname'):
-                self.my_json[str(widget.property('columnname'))] = str(value)
+                if widget.property('saveValue') is None:
+                    self.my_json[str(widget.property('columnname'))] = str(value)
 
         tools_log.log_info(str(self.my_json))
 
@@ -1791,19 +1792,14 @@ class GwInfo(QObject):
                 if new_feature is False:
                     new_feature = tools_qt.get_feature_by_id(self.layer, self.new_feature_id)
                 new_feature.setAttribute(id_name, newfeature_id)
-                after_insert = True
-                for k, v in list(_json.items()):
-                    if k in parent_fields:
-                        new_feature.setAttribute(k, v)
-                        _json.pop(k, None)
+
+                # Get the geometry from the feature
+                if new_feature and new_feature.hasGeometry():
+                    _json['the_geom'] = new_feature.geometry().asWkt()
 
                 epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
                 if epa_type != 'null':
                     _json['epa_type'] = epa_type
-
-                if not self.layer_new_feature.isEditable():
-                    self.layer_new_feature.startEditing()
-                self.layer_new_feature.updateFeature(new_feature)
 
                 self.new_feature_id = None
                 self._enable_action(dialog, "actionCentered", True)
@@ -1811,21 +1807,6 @@ class GwInfo(QObject):
                 self._enable_action(dialog, "actionSetToArc", True)
                 global is_inserting  # noqa: F824
                 is_inserting = False
-                my_json = json.dumps(_json)
-                if my_json == '' or str(my_json) == '{}':
-                    if new_feature is not None:
-                        self.layer_new_feature.commitChanges()
-                    # Force a map refresh
-                    tools_qgis.refresh_map_canvas()  # First refresh all the layers
-                    global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
-                    # Refresh psector's relations tables
-                    tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
-                    if close_dlg:
-                        if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
-                            tools_gw.close_docker()
-                            return True
-                        tools_gw.close_dialog(dialog)
-                    return True
 
                 if self.new_feature.attribute(id_name) is not None:
                     feature = f'"id":"{self.new_feature.attribute(id_name)}", '
@@ -1834,12 +1815,15 @@ class GwInfo(QObject):
 
             # If we make an info
             else:
-                my_json = json.dumps(_json)
                 feature = f'"id":"{self.feature_id}", '
+                # Get geometry from existing feature
+                existing_feature = tools_qt.get_feature_by_id(self.layer, int(self.feature_id))
+                if existing_feature and existing_feature.hasGeometry():
+                    _json['the_geom'] = existing_feature.geometry().asWkt()
 
             feature += f'"tableName":"{p_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
-            extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
+            extras = f'"fields":{json.dumps(_json)}, "reload":"{fields_reload}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Get utils_graphanalytics_automatic_trigger param
@@ -1860,11 +1844,18 @@ class GwInfo(QObject):
 
             if clear_json:
                 _json.clear()
+            
+            if "Failed" in json_result['status']:
+                msg = json_result['message']['text']
+                if msg is None:
+                    msg = 'Feature not upserted'
+                msg_level = json_result['message']['level']
+                if msg_level is None:
+                    msg_level = 2
+                tools_qgis.show_message(msg, message_level=msg_level, dialog=dialog)
+                return False
 
             if "Accepted" in json_result['status']:
-                # If we create a new feature
-                if new_feature is not None:
-                    self.layer_new_feature.commitChanges()
                 msg = json_result['message']['text']
                 if msg is None:
                     msg = 'Feature upserted'
@@ -1896,12 +1887,6 @@ class GwInfo(QObject):
                         self.valve_thread = GwToggleValveTask("Update mapzones", params)
                         QgsApplication.taskManager().addTask(self.valve_thread)
                         QgsApplication.taskManager().triggerTask(self.valve_thread)
-            elif "Failed" in json_result['status']:
-                # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
-                # If we create a new feature
-                if self.new_feature_id is not None:
-                    self.layer_new_feature.rollBack()
-                return False
 
         # Tab EPA
         if not generic and self.my_json_epa != '' and str(self.my_json_epa) != '{}':

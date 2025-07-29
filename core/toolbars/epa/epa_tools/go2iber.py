@@ -19,6 +19,7 @@ from qgis.PyQt.QtWidgets import (
 from sip import isdeleted
 from qgis.core import QgsProject
 from pathlib import Path
+import json
 
 from ....ui.ui_manager import GwGo2IberUi
 from ....threads.go2iber_task import GwGo2IberTask
