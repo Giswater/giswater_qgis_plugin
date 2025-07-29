@@ -1947,7 +1947,7 @@ class GwInfo(QObject):
 
         try:
             actions_list = dialog.findChildren(QAction)
-            static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp'
+            static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
                               'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
 
             for action in actions_list:
