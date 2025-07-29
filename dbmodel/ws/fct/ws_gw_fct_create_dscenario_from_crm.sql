@@ -161,8 +161,18 @@ BEGIN
 		v_proposed_enddate = quote_literal(v_proposed_enddate)::date - INTERVAL '1 day';
 		v_proposed_enddate = v_proposed_enddate::date;
 
- 		UPDATE temp_config_toolbox c SET inputparams = REPLACE(inputparams::TEXT, inputparams->6->>'value', v_proposed_enddate)::JSON WHERE id = 3110; --enddate
-
+		UPDATE temp_config_toolbox 
+ 		SET inputparams = (
+ 		    SELECT jsonb_agg(
+ 		        CASE 
+ 		            WHEN elem->>'widgetname' = 'endDate' 
+ 		            THEN jsonb_set(elem, '{value}', to_jsonb(v_proposed_enddate::text))
+ 		            ELSE elem
+ 		        END
+ 		    )
+ 		    FROM jsonb_array_elements(inputparams::jsonb) elem
+ 		)
+ 		WHERE id = 3110;
    		RETURN '{"status":"Accepted"}';
 
 	END IF;
