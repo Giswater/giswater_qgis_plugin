@@ -35,6 +35,7 @@ DECLARE
 	v_status text;
 	v_message text;
 
+	v_result JSON;
 	v_result_info json;
 	v_result_polygon json;
 	v_response JSON;
@@ -114,9 +115,10 @@ BEGIN
 
 	-- prepare query
 	v_query_geom = '
-	SELECT '||v_macro_id_field||', st_union(the_geom) as the_geom FROM '|| v_child_table ||' 
+	SELECT '||v_macro_id_field||' AS mapzone_id, '||v_child_table||'_id, name as '||v_child_table||'_name , 
+	'||v_child_table||'_type, descript, st_union(the_geom) as the_geom  FROM '|| v_child_table ||' 
 	WHERE '||v_macro_id_field||' IS NOT NULL AND '||quote_literal(v_expl_id_array)||'::integer[] && ARRAY[expl_id]
-	GROUP BY '||v_macro_id_field||'';
+	GROUP BY '||v_macro_id_field||', '||v_child_table||'_id,  name, '||v_child_table||'_type, descript';
 
 	IF v_commitchanges THEN -- update macromapzone table
 
@@ -136,10 +138,16 @@ BEGIN
 			) AS feature
 			FROM ('||v_query_geom||') AS row
 		) AS features
-		' INTO v_result_polygon;
+		' INTO v_result;
 
+		v_result_polygon := concat ('{"geometryType":"MultiPolygon", "features":',v_result,'}');
+		
 	END IF;
 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid IN (v_fid) ORDER BY criticity DESC, id ASC) row;
+	v_result := COALESCE(v_result, '{}');
+	v_result_info := concat ('{"geometryType":"", "values":',v_result, '}');
 
 
 	-- return
