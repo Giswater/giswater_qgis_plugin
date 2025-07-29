@@ -127,6 +127,9 @@ INSERT INTO plan_typevalue VALUES ('psector_status', '3', 'CANCELED (Save Trace)
 INSERT INTO plan_typevalue VALUES ('psector_status', '4', 'EXECUTED (Set OPERATIVE and Save Trace)', 'Psector executed. Its elements are set to On Service and also copied to traceability tables', NULL);
 
 
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_pipe_1', 'lyt_pipe_1', 'lytPipe1', '{"lytOrientation": "vertical"}'::json) ON CONFLICT (typevalue, id) DO NOTHING;
+
+
 --
 -- Data for Name: config_csv; Type: TABLE DATA; Schema: ; Owner: -
 --
@@ -6293,6 +6296,3 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_arc_siphon','form_feature','data','pavcat_id','lyt_data_2',30,'string','combo','pavcat_id','pavcat_id',NULL,false,false,true,false,NULL,'SELECT id, id as idval FROM cat_pavement',true,true,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
 	 ('ve_arc_waccel','form_feature','data','pavcat_id','lyt_data_2',30,'string','combo','pavcat_id','pavcat_id',NULL,false,false,true,false,NULL,'SELECT id, id as idval FROM cat_pavement',true,true,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
 	 ('ve_arc_varc','form_feature','data','pavcat_id','lyt_data_2',30,'string','combo','pavcat_id','pavcat_id',NULL,false,false,true,false,NULL,'SELECT id, id as idval FROM cat_pavement',true,true,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL);
-
-
-

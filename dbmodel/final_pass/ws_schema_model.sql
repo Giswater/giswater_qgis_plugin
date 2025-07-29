@@ -556,6 +556,8 @@ INSERT INTO element_type VALUES ('STEP', true, true, 'STEP', NULL);
 INSERT INTO element_type VALUES ('PROTECT_BAND', true, true, 'PROTECT BAND', NULL);
 INSERT INTO element_type VALUES ('HYDRANT_PLATE', true, true, 'HYDRANT_PLATE', NULL);
 
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_additional_1', 'lyt_additional_1', 'layoutFeatures1', NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_pipe_1', 'lyt_pipe_1', 'lytPipe1', '{"lytOrientation": "vertical"}'::json) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,dv_parent_id,dv_querytext_filterc,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder) VALUES
 	 ('cat_feature','form_feature','main','active',NULL,NULL,'boolean','check','active','active',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
@@ -7826,5 +7828,3 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_arc','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43),
 	 ('ve_arc_pipe','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43),
 	 ('ve_arc_varc','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43);
-
-
