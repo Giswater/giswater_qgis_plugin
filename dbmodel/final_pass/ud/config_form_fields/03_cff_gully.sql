@@ -1011,4 +1011,4 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 }',NULL,false,1),
 	 ('visit_gully_insp','form_visit','tab_file','backbutton','lyt_files_2',NULL,NULL,'button','',NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false, "text":"Back"}','{
   "functionName": "set_previous_form_back"
-}',NULL,false,1) ON CONFLICT DO UPDATE SET layoutorder=EXCLUDED.layoutorder;
+}',NULL,false,1) ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder;

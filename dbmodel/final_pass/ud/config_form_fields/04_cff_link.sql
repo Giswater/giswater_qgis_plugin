@@ -508,4 +508,4 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
   "parameters": {
     "columnfind": "element_id"
   }
-}','tbl_element_x_link',false,1) ON CONFLICT DO UPDATE SET layoutorder=EXCLUDED.layoutorder;
+}','tbl_element_x_link',false,1) ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder;
