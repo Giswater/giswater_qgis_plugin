@@ -55,7 +55,7 @@ class GwFeatureEndButton(GwAction):
         self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        self.rel_layers['element'] = [tools_qgis.get_layer_by_tablename('v_ui_element')]
+        self.rel_layers['element'] = [tools_qgis.get_layer_by_tablename('ve_genelem'), tools_qgis.get_layer_by_tablename('ve_frelem')]
         self.rel_layers['link'] = [tools_qgis.get_layer_by_tablename('ve_link')]
 
         self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
