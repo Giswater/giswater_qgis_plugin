@@ -2665,6 +2665,6 @@ WHERE id IS NOT NULL',true,true,NULL,NULL,NULL,'{"setMultiline": false, "valueRe
 	 ('visit_singlevent','form_visit','tab_none','acceptbutton','lyt_data_3',1,NULL,'button','Accept','Accept',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}','{"functionName": "set_visit"}',NULL,false,NULL),
 	 ('visit_singlevent','form_visit','tab_none','backbutton','lyt_data_3',2,NULL,'button','Back','Back',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}','{"functionName": "set_previous_form_back"}',NULL,false,NULL),
 	 ('visit_singlevent','form_visit','tab_none','descript','lyt_data_3',3,'string','text','Descript:','Descript:',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL)
-	 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder;
+	 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder, layoutname=EXCLUDED.layoutname;
 
 ALTER TABLE config_form_fields ENABLE TRIGGER ALL;

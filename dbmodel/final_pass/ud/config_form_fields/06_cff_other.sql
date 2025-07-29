@@ -3669,6 +3669,6 @@ WHERE id IS NOT NULL',true,true,NULL,NULL,NULL,'{"setMultiline":false,"valueRela
   "tabs": [
     "tab_surface"
   ]
-}',NULL,NULL,false,0) ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder;
+}',NULL,NULL,false,0) ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder, layoutname=EXCLUDED.layoutname;
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

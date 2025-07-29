@@ -195,4 +195,4 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_netelement','form_feature','tab_data','presszone_style',NULL,NULL,'text','text','Presszone color','presszone_style',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,NULL),
 	 ('ve_node_netelement','form_feature','tab_data','adescript',NULL,NULL,'text','text','Adescript','adescript',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,NULL),
 	 ('ve_node_netelement','form_feature','tab_data','adate',NULL,NULL,'text','text','Adate','adate',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,NULL)
-	 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder;
+  	 ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder, layoutname=EXCLUDED.layoutname;

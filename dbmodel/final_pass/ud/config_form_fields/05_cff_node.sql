@@ -2448,4 +2448,4 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('visit_node_insp','form_visit','tab_file','tbl_files','lyt_files_1',NULL,NULL,'tableview','',NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}',NULL,'om_visit_event_photo',false,2),
 	 ('visit_node_insp','form_visit','tab_file','backbutton','lyt_files_2',NULL,NULL,'button','',NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false, "text":"Back"}','{
   "functionName": "set_previous_form_back"
-}',NULL,false,1) ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder;
+}',NULL,false,1) ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder, layoutname=EXCLUDED.layoutname;
