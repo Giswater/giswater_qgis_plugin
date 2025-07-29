@@ -35,6 +35,7 @@ DECLARE
 	v_check_management_configs boolean;
 	v_check_data_related boolean;
 	v_fids_to_run integer[];
+    v_count integer;
 
 	-- variables
     v_querytext text;
