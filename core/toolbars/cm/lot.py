@@ -180,64 +180,97 @@ class AddNewLot:
         team_combo = self.dlg_lot.findChild(QComboBox, "tab_data_team_id")
         expl_combo = self.dlg_lot.findChild(QComboBox, "tab_data_expl_id")
         sector_combo = self.dlg_lot.findChild(QComboBox, "tab_data_sector_id")
+        org_assigned_widget = self.dlg_lot.findChild(QLineEdit, "tab_data_organization_assigned")
 
         if not all([campaign_combo, team_combo, expl_combo, sector_combo]):
             return
 
-        # Clear and disable dependent combos initially
-        for combo in [expl_combo, sector_combo]:
-            combo.clear()
-            combo.setEnabled(False)
+        # Clear and disable dependent widgets initially
+        expl_combo.clear()
+        expl_combo.setEnabled(False)
+        sector_combo.clear()
+        sector_combo.setEnabled(False)
+        team_combo.clear()
+        if org_assigned_widget:
+            org_assigned_widget.clear()
+            org_assigned_widget.setEnabled(False)
 
         campaign_id = campaign_combo.currentData()
 
-        # If no campaign is selected, we are done.
         if not campaign_id:
             return
 
-        # Get campaign details: its specific expl_id/sector_id and its organization_id
+        # Fetch all campaign-related data in one go
+        body = {"p_campaign_id": campaign_id}
+        response = tools_gw.execute_procedure("gw_fct_cm_getteam", body, schema_name="cm", check_function=False)
+
+        if isinstance(response, str):
+            response = json.loads(response)
+
+        if not response or response.get("status") != "Accepted":
+            return
+
+        response_body = response.get("body", {})
+        
+        # Populate Organization
+        if org_assigned_widget:
+            org_name = response_body.get("organization_name")
+            if org_name:
+                org_assigned_widget.setText(org_name)
+
+        # Populate Teams
+        teams = response_body.get("data", [])
+        if teams:
+            current_team_id = team_combo.currentData()
+            team_combo.blockSignals(True)
+            for team in teams:
+                team_combo.addItem(str(team['idval']), team['id'])
+            if current_team_id is not None:
+                index = team_combo.findData(current_team_id)
+                if index > -1:
+                    team_combo.setCurrentIndex(index)
+            team_combo.blockSignals(False)
+
+        # Get campaign details for expl and sector
         campaign_details_sql = f"SELECT organization_id, expl_id, sector_id FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
         campaign_data = tools_db.get_row(campaign_details_sql)
 
         if not campaign_data or campaign_data.get('organization_id') is None:
-            return  # No organization found for campaign, leave combos disabled.
+            return
 
         org_id = campaign_data['organization_id']
 
-        # Get the lists of allowed expl_ids and sector_ids for the organization
         allowed_ids_sql = f"SELECT expl_id, sector_id FROM cm.cat_organization WHERE organization_id = {org_id}"
         allowed_ids_data = tools_db.get_row(allowed_ids_sql)
 
         allowed_expl_ids = allowed_ids_data.get('expl_id') if allowed_ids_data else None
         allowed_sector_ids = allowed_ids_data.get('sector_id') if allowed_ids_data else None
 
-        # --- Populate exploitation combo ---
+        # Populate exploitation combo
         sql_expl = f"SELECT expl_id, name FROM {self.schema_parent}.exploitation"
-        if allowed_expl_ids:  # Filter if list is not None and not empty
+        if allowed_expl_ids:
             sql_expl += f" WHERE expl_id = ANY(ARRAY{allowed_expl_ids})"
-        elif isinstance(allowed_expl_ids, list):  # Handle empty list case
+        elif isinstance(allowed_expl_ids, list):
             sql_expl += " WHERE 1=0"
         sql_expl += " ORDER BY name"
-
         rows_expl = tools_db.get_rows(sql_expl)
         if rows_expl:
             tools_qt.fill_combo_values(expl_combo, rows_expl, index_to_show=1, add_empty=False)
             expl_combo.setEnabled(True)
 
-        # --- Populate sector combo ---
+        # Populate sector combo
         sql_sector = f"SELECT sector_id, name FROM {self.schema_parent}.sector"
-        if allowed_sector_ids:  # Filter if list is not None and not empty
+        if allowed_sector_ids:
             sql_sector += f" WHERE sector_id = ANY(ARRAY{allowed_sector_ids})"
-        elif isinstance(allowed_sector_ids, list):  # Handle empty list case
+        elif isinstance(allowed_sector_ids, list):
             sql_sector += " WHERE 1=0"
         sql_sector += " ORDER BY name"
-
         rows_sector = tools_db.get_rows(sql_sector)
         if rows_sector:
             tools_qt.fill_combo_values(sector_combo, rows_sector, index_to_show=1, add_empty=False)
             sector_combo.setEnabled(True)
 
-        # Set pre-selected values from campaign and disable if they exist
+        # Set pre-selected values from campaign
         campaign_expl_id = campaign_data.get('expl_id')
         if campaign_expl_id is not None:
             self.set_widget_value(expl_combo, campaign_expl_id)
@@ -247,36 +280,6 @@ class AddNewLot:
         if campaign_sector_id is not None:
             self.set_widget_value(sector_combo, campaign_sector_id)
             sector_combo.setEnabled(False)
-
-        # UPDATE TEAM COMBO
-        # Preserve the currently selected team ID to restore the selection later.
-        current_team_id = team_combo.currentData()
-        if isinstance(current_team_id, (list, tuple)):
-            current_team_id = current_team_id[0]
-
-        team_combo.blockSignals(True)
-        team_combo.clear()
-
-        if campaign_id:
-            body = {"p_campaign_id": campaign_id}
-            response = tools_gw.execute_procedure("gw_fct_cm_getteam", body, schema_name="cm", check_function=False)
-
-            if isinstance(response, str):
-                response = json.loads(response)
-
-            if response and response.get("status") == "Accepted":
-                teams = response.get("body", {}).get("data", [])
-                if teams:
-                    for team in teams:
-                        # Add item with the name as text and ONLY the ID as data.
-                        team_combo.addItem(str(team['idval']), team['id'])
-
-        # Restore the selection if possible.
-        if current_team_id is not None:
-            index = team_combo.findData(current_team_id)
-            if index > -1:
-                team_combo.setCurrentIndex(index)
-        team_combo.blockSignals(False)
 
     def load_lot_dialog(self, lot_id: Optional[int]):
         """Dynamically load and populate lot dialog using gw_fct_cm_getlot"""
