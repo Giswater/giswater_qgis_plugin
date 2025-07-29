@@ -1,0 +1,35 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+BEGIN;
+
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+SELECT plan(6);
+
+INSERT INTO ve_minsector
+(minsector_id, code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
+VALUES(-901, '-901', ARRAY[0], ARRAY[0], ARRAY[0], ARRAY[0], 0, 0, 0, 0, '', null, null);
+SELECT is((SELECT count(*)::integer FROM ve_minsector WHERE code = '-901'), 1, 'INSERT: ve_minsector -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM minsector WHERE code = '-901'), 1, 'INSERT: minsector -901 was inserted');
+
+
+UPDATE ve_minsector SET descript = 'updated descript' WHERE code = '-901';
+SELECT is((SELECT descript FROM ve_minsector WHERE code = '-901'), 'updated descript', 'UPDATE: ve_minsector -901 was updated');
+SELECT is((SELECT descript FROM minsector WHERE code = '-901'), 'updated descript', 'UPDATE: minsector -901 was updated');
+
+
+DELETE FROM ve_minsector WHERE code = '-901';
+SELECT is((SELECT count(*)::integer FROM ve_minsector WHERE code = '-901'), 0, 'DELETE: ve_minsector -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM minsector WHERE code = '-901'), 0, 'DELETE: minsector -901 was deleted');
+
+
+SELECT * FROM finish();
+
+ROLLBACK;

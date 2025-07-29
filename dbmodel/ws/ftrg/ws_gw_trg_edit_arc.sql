@@ -17,7 +17,7 @@ v_sql varchar;
 v_code_autofill_bool boolean;
 v_count integer;
 v_proximity_buffer double precision;
-v_edit_enable_arc_nodes_update boolean;
+ve_enable_arc_nodes_update boolean;
 v_link_path varchar;
 v_new_arc_type text;
 v_old_arc_type text;
@@ -51,7 +51,7 @@ BEGIN
 	END IF;
 
 	v_proximity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
-	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
+	ve_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
 	v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
 	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_current' AND cur_user=current_user);
 
@@ -420,7 +420,7 @@ BEGIN
 		NEW.tot_headloss_max, NEW.tot_headloss_min, NEW.mincut_connecs, NEW.mincut_hydrometers, NEW.mincut_length, NEW.mincut_watervol, NEW.mincut_criticality, NEW.hydraulic_criticality, NEW.pipe_capacity, NEW.mincut_impact_topo, NEW.mincut_impact_hydro);
 
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
-		IF v_edit_enable_arc_nodes_update IS TRUE THEN
+		IF ve_enable_arc_nodes_update IS TRUE THEN
 			IF NEW.node_1 IS NOT NULL THEN
 				UPDATE arc SET node_1=NEW.node_1 WHERE arc_id=NEW.arc_id;
 			END IF;
@@ -527,7 +527,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
     		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
-		IF v_edit_enable_arc_nodes_update IS TRUE THEN
+		IF ve_enable_arc_nodes_update IS TRUE THEN
 			IF NEW.node_1 IS NOT NULL THEN
 				UPDATE arc SET node_1=NEW.node_1 WHERE arc_id=NEW.arc_id;
 			END IF;

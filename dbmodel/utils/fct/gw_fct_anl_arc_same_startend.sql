@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_same_startend($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_pipe", "id":["1004","1005"]},
+"feature":{"tableName":"ve_man_pipe", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection","parameters":{}}}$$)
 
 -- fid: 104

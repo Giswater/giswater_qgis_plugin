@@ -134,7 +134,7 @@ BEGIN
 
 	FOREACH v_layer IN ARRAY v_visibleLayers::text[]
 	LOOP
-		IF v_layer = 'v_edit_plan_netscenario_valve' THEN v_netscenario_valve = true; END IF;
+		IF v_layer = 've_plan_netscenario_valve' THEN v_netscenario_valve = true; END IF;
 
 	END LOOP;
 
@@ -234,7 +234,7 @@ BEGIN
                                 IF v_netscenario_valve IS TRUE THEN
 									SELECT value::integer INTO v_netscenario_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_netscenario_current';
 
-									v_valve_tablename_netscenario := 'v_edit_plan_netscenario_valve';
+									v_valve_tablename_netscenario := 've_plan_netscenario_valve';
 									v_valve_id_netscenario := v_id;
 									EXECUTE 'SELECT closed FROM '||quote_ident(v_valve_tablename_netscenario)||' WHERE netscenario_id = '||v_netscenario_id||' AND '||v_idname||' = '''||v_id||'''' INTO v_closed_valve_netscenario;
 

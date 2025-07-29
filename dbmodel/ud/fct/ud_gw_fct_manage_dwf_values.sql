@@ -174,7 +174,7 @@ BEGIN
 
 				ELSIF v_action = 'INSERT-ONLY' THEN
 
-					INSERT INTO inp_dwf (node_id, dwfscenario_id) SELECT node_id, v_target FROM v_edit_inp_junction
+					INSERT INTO inp_dwf (node_id, dwfscenario_id) SELECT node_id, v_target FROM ve_inp_junction
 					ON CONFLICT (node_id, dwfscenario_id) DO NOTHING;
 
 					-- get message

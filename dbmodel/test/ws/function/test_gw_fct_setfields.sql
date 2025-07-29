@@ -41,10 +41,10 @@ SELECT is(
 
 SELECT is (
     (gw_fct_setfields($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"id":"PUMP_01", "tableName":"v_edit_inp_curve" }, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"id":"PUMP_01", "tableName":"ve_inp_curve" }, "data":{"filterFields":{}, "pageInfo":{},
     "fields":{"curve_type": "PUMP", "descript": "null", "expl_id": null}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setfields --> "tableName":"v_edit_inp_curve" returns status "Accepted"'
+    'Check if gw_fct_setfields --> "tableName":"ve_inp_curve" returns status "Accepted"'
 );
 
 -- Finish the test

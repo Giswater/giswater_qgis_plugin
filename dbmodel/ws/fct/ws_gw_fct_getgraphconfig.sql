@@ -51,11 +51,11 @@ BEGIN
 	-- definition of mapzone lauyer and pkey
 	IF v_context = 'OPERATIVE' THEN
 		v_mapzone_id = concat(v_mapzone, '_id');
-		v_mapzone = concat('v_edit_',v_mapzone);
+		v_mapzone = concat('ve_',v_mapzone);
 
 	ELSIF v_context = 'NETSCENARIO' THEN
 		v_mapzone_id = concat(v_mapzone, '_id');
-		v_mapzone = concat('v_edit_plan_netscenario_',v_mapzone);
+		v_mapzone = concat('ve_plan_netscenario_',v_mapzone);
 
 	END IF;
 
@@ -98,13 +98,13 @@ BEGIN
 		v_querytext_add = concat ('
 					UNION
 						SELECT concat (''NS-'',v.node_id)::text AS feature_id,''netscenOpenedValve''::text AS graph_type, nd.',v_mapzone_id,'::integer, nd.name, NULL AS rotation, v.the_geom
-						FROM v_edit_plan_netscenario_valve v
+						FROM ve_plan_netscenario_valve v
 						left JOIN arc ON node_1 = node_id
 						left JOIN v_plan_netscenario_arc na USING (arc_id)
 						left JOIN ',v_mapzone,' nd ON nd.',v_mapzone_id,' = na.',v_mapzone_id,' WHERE v.closed IS FALSE
 					UNION
 						SELECT concat (''NS-'',v.node_id)::text AS feature_id,''netscenClosedValve''::text AS graph_type, 0, ''UNDEFINED'', NULL AS rotation, v.the_geom
-						FROM v_edit_plan_netscenario_valve v  WHERE v.closed IS TRUE ');
+						FROM ve_plan_netscenario_valve v  WHERE v.closed IS TRUE ');
 	END IF;
 
 	v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);

@@ -165,13 +165,13 @@ BEGIN
 	AND temp_t_node.node_id=a.node_id::text;
 
 	INSERT INTO temp_t_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id)
-	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id FROM v_edit_inp_inflows;
+	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id FROM ve_inp_inflows;
 
 	INSERT INTO temp_t_node_other (node_id, type, timser_id, poll_id, other, mfactor, sfactor, base, pattern_id)
-	SELECT node_id, 'POLLUTANT', timser_id, poll_id, form_type, mfactor, sfactor, base, pattern_id FROM v_edit_inp_inflows_poll;
+	SELECT node_id, 'POLLUTANT', timser_id, poll_id, form_type, mfactor, sfactor, base, pattern_id FROM ve_inp_inflows_poll;
 
 	INSERT INTO temp_t_node_other (node_id, type, poll_id, other)
-	SELECT node_id, 'TREATMENT', poll_id, function FROM v_edit_inp_treatment;
+	SELECT node_id, 'TREATMENT', poll_id, function FROM ve_inp_treatment;
 
 	-- Insert on arc rpt_inp table
 	EXECUTE 'INSERT INTO temp_t_arc 
@@ -219,7 +219,7 @@ BEGIN
 		case when custom_length is null then total_length else custom_length end,
 		case when custom_depth is null then depth else custom_depth end,
 		gully_method, weir_cd, orifice_cd, custom_a_param, custom_b_param, efficiency, the_geom
-		FROM selector_sector s, v_edit_inp_netgully g 
+		FROM selector_sector s, ve_inp_netgully g 
 		LEFT JOIN value_state_type ON id=g.state_type
 		WHERE g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
 
@@ -235,7 +235,7 @@ BEGIN
 		case when g.custom_length is null then total_length else g.custom_length end,
 		case when custom_depth is null then depth else custom_depth end,
 		gully_method, weir_cd, orifice_cd, custom_a_param, custom_b_param, efficiency, g.the_geom
-		FROM selector_sector s, v_edit_inp_gully g
+		FROM selector_sector s, ve_inp_gully g
 		LEFT JOIN arc a USING (arc_id)
 		LEFT JOIN value_state_type ON id=g.state_type
 		WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
@@ -246,7 +246,7 @@ BEGIN
 		concat(''IN'',node_id), g.node_type, null, null, g.node_id, g.sector_id, g.state, g.state_type,
 		case when custom_top_elev is null then top_elev else custom_top_elev end, 
 		null, null, outlet_type, inlet_width, inlet_length, null, gully_method, cd1, cd2, null, null, efficiency, the_geom
-		FROM selector_sector s, v_edit_inp_inlet g 
+		FROM selector_sector s, ve_inp_inlet g 
 		LEFT JOIN value_state_type ON id=g.state_type
 		WHERE g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
  -- TO FIX: INLET
@@ -255,26 +255,26 @@ BEGIN
 	-- orifice
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
 	SELECT arc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0
-	FROM v_edit_inp_orifice;
+	FROM ve_inp_orifice;
 
 	-- outlet
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
 	SELECT arc_id, 'OUTLET', outlet_type, offsetval, curve_id, cd1, cd2, flap
-	FROM v_edit_inp_outlet;
+	FROM ve_inp_outlet;
 
 
 	-- pump
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
 	SELECT arc_id, 'PUMP', curve_id, status, startup, shutoff
-	FROM v_edit_inp_pump;
+	FROM ve_inp_pump;
 
 	-- weir
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width,
 	road_surf, coef_curve, surcharge)
 	SELECT arc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width,
 	road_surf, coef_curve, surcharge
-	FROM v_edit_inp_weir
-	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = v_edit_inp_weir.weir_type::text
+	FROM ve_inp_weir
+	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = ve_inp_weir.weir_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
 
 	-- filling empty values
@@ -285,7 +285,7 @@ BEGIN
 
 	-- rpt_inp_raingage
 	INSERT INTO t_rpt_inp_raingage
-	SELECT result_id_var, * FROM v_edit_raingage;
+	SELECT result_id_var, * FROM ve_raingage;
 
 	-- setting same rainfall for all raingage
 	IF v_rainfall IS NOT NULL THEN

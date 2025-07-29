@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getwidgetprices(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getwidgetprices($${"client":{}, "form":{}, "feature":{},"data":{"tableName":"v_edit_plan_psector_x_other", "psectorId":8}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_getwidgetprices($${"client":{}, "form":{}, "feature":{},"data":{"tableName":"ve_plan_psector_x_other", "psectorId":8}}$$)::text
 
 */
 

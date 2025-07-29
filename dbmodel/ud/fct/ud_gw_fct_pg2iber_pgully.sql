@@ -77,7 +77,7 @@ BEGIN
 			custom_b_param as b_param,
 			efficiency,
 			g.the_geom
-			FROM selector_sector s, v_edit_inp_pgully g
+			FROM selector_sector s, ve_inp_pgully g
 				LEFT JOIN arc a USING (arc_id)
 				LEFT JOIN value_state_type ON id=g.state_type
 			WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id

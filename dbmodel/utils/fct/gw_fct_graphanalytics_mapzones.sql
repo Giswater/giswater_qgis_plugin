@@ -184,7 +184,7 @@ BEGIN
 		v_table  = 'presszone';
 		v_field = 'presszone_id';
 		v_fieldmp = 'presszone_id';
-		v_visible_layer ='"v_edit_presszone"';
+		v_visible_layer ='"ve_presszone"';
 		IF v_netscenario is not null then
 			v_mapzonename = 'presszone_name';
 		else
@@ -196,7 +196,7 @@ BEGIN
 		v_table = 'dma';
 		v_field = 'dma_id';
 		v_fieldmp = 'dma_id';
-		v_visible_layer ='"v_edit_dma"';
+		v_visible_layer ='"ve_dma"';
 		IF v_netscenario is not null then
 			v_mapzonename = 'dma_name';
 		else
@@ -208,7 +208,7 @@ BEGIN
 		v_table = 'dqa';
 		v_field = 'dqa_id';
 		v_fieldmp = 'dqa_id';
-		v_visible_layer ='"v_edit_dqa"';
+		v_visible_layer ='"ve_dqa"';
 		v_mapzonename = 'name';
 
 	ELSIF v_class = 'SECTOR' THEN
@@ -216,7 +216,7 @@ BEGIN
 		v_table = 'sector';
 		v_field = 'sector_id';
 		v_fieldmp = 'sector_id';
-		v_visible_layer ='"v_edit_sector"';
+		v_visible_layer ='"ve_sector"';
 		v_mapzonename = 'name';
 
 	-- ELSIF v_class = 'DRAINZONE' THEN
@@ -224,7 +224,7 @@ BEGIN
 	--	v_table = 'drainzone';
 	--	v_field = 'drainzone_id';
 	--	v_fieldmp = 'drainzone_id';
-	--	v_visible_layer ='"v_edit_drainzone"';
+	--	v_visible_layer ='"ve_drainzone"';
 	--	v_mapzonename = 'name';
 	ELSE
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done sucessfully"}, "version":"'||v_version||'", 
@@ -1512,11 +1512,11 @@ BEGIN
 
 
 		IF v_class = 'PRESSZONE' THEN
-			v_visible_layer ='"v_edit_plan_netscenario_presszone"';
+			v_visible_layer ='"ve_plan_netscenario_presszone"';
 			UPDATE plan_netscenario_node SET staticpressure = t.staticpressure FROM temp_t_node t WHERE plan_netscenario_node.node_id=t.node_id;
 			UPDATE plan_netscenario_connec SET staticpressure = t.staticpressure FROM temp_t_connec t WHERE plan_netscenario_connec.connec_id=t.connec_id;
 		ELSIF v_class = 'DMA' THEN
-			v_visible_layer ='"v_edit_plan_netscenario_dma"';
+			v_visible_layer ='"ve_plan_netscenario_dma"';
 			UPDATE plan_netscenario_node SET pattern_id = t.pattern_id FROM temp_dma t WHERE plan_netscenario_node.dma_id=t.dma_id;
 			UPDATE plan_netscenario_connec SET pattern_id = t.pattern_id FROM temp_dma t WHERE plan_netscenario_connec.dma_id=t.dma_id;
 		END IF;
@@ -1524,7 +1524,7 @@ BEGIN
 		DELETE FROM selector_inp_dscenario WHERE cur_user = current_user;
 
 		IF v_dscenario_valve IS NOT NULL THEN
-			v_visible_layer = concat(v_visible_layer, ', ', '"v_edit_inp_dscenario_shortpipe"');
+			v_visible_layer = concat(v_visible_layer, ', ', '"ve_inp_dscenario_shortpipe"');
 
 			INSERT INTO selector_inp_dscenario (dscenario_id) VALUES (v_dscenario_valve::integer);
 		END IF;

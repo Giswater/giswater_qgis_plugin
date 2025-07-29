@@ -14,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Plan for 18 test
 SELECT plan(18);
 
--- failed test v_edit_inp_virtual for both geometry and finalnodes.
+-- failed test ve_inp_virtual for both geometry and finalnodes.
 
 -- Create roles for testing
 CREATE USER plan_user;
@@ -91,57 +91,57 @@ SELECT is(
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_conduit", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_conduit", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_conduit and checktype > finalnodes returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_conduit and checktype > finalnodes returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_orifice", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_orifice", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_orifice and checktype > finalnodes returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_orifice and checktype > finalnodes returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_outlet", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_outlet", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_outlet and checktype > finalnodes returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_outlet and checktype > finalnodes returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_pump", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_pump and checktype > finalnodes returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_pump and checktype > finalnodes returns status "Accepted"'
 
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_virtual", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_virtual", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_virtual and checktype > finalnodes returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_virtual and checktype > finalnodes returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_weir", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_weir", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"finalNodes"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_weir and checktype > finalnodes returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_weir and checktype > finalnodes returns status "Accepted"'
 );
 
 SELECT is(
@@ -155,57 +155,57 @@ SELECT is(
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_conduit", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_conduit", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_conduit and checktype > geometry returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_conduit and checktype > geometry returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_orifice", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_orifice", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_orifice and checktype > geometry returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_orifice and checktype > geometry returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_outlet", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_outlet", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_outlet and checktype > geometry returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_outlet and checktype > geometry returns status "Accepted"'
 );
 
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_pump", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_pump and checktype > geometry returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_pump and checktype > geometry returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_virtual", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_virtual", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_virtual and checktype > geometry returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_virtual and checktype > geometry returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_weir", "featureType":"ARC", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_weir", "featureType":"ARC", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"checkType":"geometry"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_duplicated with tablename > v_edit_inp_weir and checktype > geometry returns status "Accepted"'
+    'Check if gw_fct_anl_arc_duplicated with tablename > ve_inp_weir and checktype > geometry returns status "Accepted"'
 );
 
 -- Finish the test

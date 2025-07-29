@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "la
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"name":"test", "type":"CONDUIT"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{},
-"feature":{"tableName":"v_edit_inp_storage", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+"feature":{"tableName":"ve_inp_storage", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
 "selectionMode":"wholeSelection","parameters":{"name":"storage", "type":"STORAGE", "exploitation":"1", "descript":"test"}, "aux_params":null}}$$);
 
 */
@@ -79,8 +79,8 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_sourcetable :=  ((p_data ->>'feature')::json->>'tableName')::text;
 	v_featuretype :=  ((p_data ->>'feature')::json->>'featureType')::text;
-	v_targettable = replace(v_sourcetable,'v_edit_inp','inp_dscenario'); -- for all in exception of v_edit_raingage
-	v_targettable = replace(v_targettable,'v_edit','inp_dscenario'); -- for v_edit_raingage
+	v_targettable = replace(v_sourcetable,'ve_inp','inp_dscenario'); -- for all in exception of ve_raingage
+	v_targettable = replace(v_targettable,'v_edit','inp_dscenario'); -- for ve_raingage
 
 	IF v_selectionmode = 'wholeSelection' THEN v_id= replace(replace(replace(v_id::text,'[','('),']',')'),'"','');END IF;
 

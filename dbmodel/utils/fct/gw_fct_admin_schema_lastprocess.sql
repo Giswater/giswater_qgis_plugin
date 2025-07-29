@@ -167,32 +167,32 @@ BEGIN
 
 			-- drop deprecated views
 			IF v_projecttype = 'WS' THEN
-				DROP VIEW IF EXISTS v_edit_man_varc;
-				DROP VIEW IF EXISTS v_edit_man_pipe;
-				DROP VIEW IF EXISTS v_edit_man_expansiontank;
-				DROP VIEW IF EXISTS v_edit_man_filter;
-				DROP VIEW IF EXISTS v_edit_man_flexunion;
-				DROP VIEW IF EXISTS v_edit_man_hydrant;
-				DROP VIEW IF EXISTS v_edit_man_junction;
-				DROP VIEW IF EXISTS v_edit_man_meter;
-				DROP VIEW IF EXISTS v_edit_man_netsamplepoint;
-				DROP VIEW IF EXISTS v_edit_man_netwjoin;
-				DROP VIEW IF EXISTS v_edit_man_pump;
-				DROP VIEW IF EXISTS v_edit_man_reduction;
-				DROP VIEW IF EXISTS v_edit_man_register;
-				DROP VIEW IF EXISTS v_edit_man_source;
-				DROP VIEW IF EXISTS v_edit_man_tank;
-				DROP VIEW IF EXISTS v_edit_man_valve;
-				DROP VIEW IF EXISTS v_edit_man_waterwell;
-				DROP VIEW IF EXISTS v_edit_man_manhole;
-				DROP VIEW IF EXISTS v_edit_man_wtp;
-				DROP VIEW IF EXISTS v_edit_man_fountain;
-				DROP VIEW IF EXISTS v_edit_man_tap;
-				DROP VIEW IF EXISTS v_edit_man_greentap;
-				DROP VIEW IF EXISTS v_edit_man_wjoin;
-				DROP VIEW IF EXISTS v_edit_man_fountain_pol;
-				DROP VIEW IF EXISTS v_edit_man_register_pol;
-				DROP VIEW IF EXISTS v_edit_man_tank_pol;
+				DROP VIEW IF EXISTS ve_man_varc;
+				DROP VIEW IF EXISTS ve_man_pipe;
+				DROP VIEW IF EXISTS ve_man_expansiontank;
+				DROP VIEW IF EXISTS ve_man_filter;
+				DROP VIEW IF EXISTS ve_man_flexunion;
+				DROP VIEW IF EXISTS ve_man_hydrant;
+				DROP VIEW IF EXISTS ve_man_junction;
+				DROP VIEW IF EXISTS ve_man_meter;
+				DROP VIEW IF EXISTS ve_man_netsamplepoint;
+				DROP VIEW IF EXISTS ve_man_netwjoin;
+				DROP VIEW IF EXISTS ve_man_pump;
+				DROP VIEW IF EXISTS ve_man_reduction;
+				DROP VIEW IF EXISTS ve_man_register;
+				DROP VIEW IF EXISTS ve_man_source;
+				DROP VIEW IF EXISTS ve_man_tank;
+				DROP VIEW IF EXISTS ve_man_valve;
+				DROP VIEW IF EXISTS ve_man_waterwell;
+				DROP VIEW IF EXISTS ve_man_manhole;
+				DROP VIEW IF EXISTS ve_man_wtp;
+				DROP VIEW IF EXISTS ve_man_fountain;
+				DROP VIEW IF EXISTS ve_man_tap;
+				DROP VIEW IF EXISTS ve_man_greentap;
+				DROP VIEW IF EXISTS ve_man_wjoin;
+				DROP VIEW IF EXISTS ve_man_fountain_pol;
+				DROP VIEW IF EXISTS ve_man_register_pol;
+				DROP VIEW IF EXISTS ve_man_tank_pol;
 				DROP VIEW IF EXISTS v_anl_mincut_planified_arc;
 				DROP VIEW IF EXISTS v_anl_mincut_planified_valve;
 				DROP VIEW IF EXISTS v_anl_mincut_result_arc;
@@ -205,27 +205,27 @@ BEGIN
 				DROP VIEW IF EXISTS v_anl_mincut_result_polygon;
 				DROP VIEW IF EXISTS v_anl_mincut_result_valve;
 			ELSIF v_projecttype = 'UD' THEN
-				DROP VIEW IF EXISTS v_edit_man_chamber;
-				DROP VIEW IF EXISTS v_edit_man_chamber_pol;
-				DROP VIEW IF EXISTS v_edit_man_conduit;
-				DROP VIEW IF EXISTS v_edit_man_connec;
-				DROP VIEW IF EXISTS v_edit_man_gully;
-				DROP VIEW IF EXISTS v_edit_man_gully_pol;
-				DROP VIEW IF EXISTS v_edit_man_junction;
-				DROP VIEW IF EXISTS v_edit_man_manhole;
-				DROP VIEW IF EXISTS v_edit_man_netgully;
-				DROP VIEW IF EXISTS v_edit_man_netgully_pol;
-				DROP VIEW IF EXISTS v_edit_man_netinit;
-				DROP VIEW IF EXISTS v_edit_man_outfall;
-				DROP VIEW IF EXISTS v_edit_man_siphon;
-				DROP VIEW IF EXISTS v_edit_man_storage;
-				DROP VIEW IF EXISTS v_edit_man_storage_pol;
-				DROP VIEW IF EXISTS v_edit_man_valve;
-				DROP VIEW IF EXISTS v_edit_man_varc;
-				DROP VIEW IF EXISTS v_edit_man_waccel;
-				DROP VIEW IF EXISTS v_edit_man_wjump;
-				DROP VIEW IF EXISTS v_edit_man_wwtp;
-				DROP VIEW IF EXISTS v_edit_man_wwtp_pol;
+				DROP VIEW IF EXISTS ve_man_chamber;
+				DROP VIEW IF EXISTS ve_man_chamber_pol;
+				DROP VIEW IF EXISTS ve_man_conduit;
+				DROP VIEW IF EXISTS ve_man_connec;
+				DROP VIEW IF EXISTS ve_man_gully;
+				DROP VIEW IF EXISTS ve_man_gully_pol;
+				DROP VIEW IF EXISTS ve_man_junction;
+				DROP VIEW IF EXISTS ve_man_manhole;
+				DROP VIEW IF EXISTS ve_man_netgully;
+				DROP VIEW IF EXISTS ve_man_netgully_pol;
+				DROP VIEW IF EXISTS ve_man_netinit;
+				DROP VIEW IF EXISTS ve_man_outfall;
+				DROP VIEW IF EXISTS ve_man_siphon;
+				DROP VIEW IF EXISTS ve_man_storage;
+				DROP VIEW IF EXISTS ve_man_storage_pol;
+				DROP VIEW IF EXISTS ve_man_valve;
+				DROP VIEW IF EXISTS ve_man_varc;
+				DROP VIEW IF EXISTS ve_man_waccel;
+				DROP VIEW IF EXISTS ve_man_wjump;
+				DROP VIEW IF EXISTS ve_man_wwtp;
+				DROP VIEW IF EXISTS ve_man_wwtp_pol;
 			END IF;
 
 			-- drop deprecated columns
@@ -376,7 +376,7 @@ BEGIN
 			WHERE parameter = 'basic_search_network_connec';
 
 			UPDATE config_param_system SET value =
-			'{"sys_table_id":"v_edit_element","sys_id_field":"element_id","sys_search_field":"element_id","alias":"Elements","cat_field":"elementcat_id","orderby":"5","search_type":"element"}'
+			'{"sys_table_id":"ve_element","sys_id_field":"element_id","sys_search_field":"element_id","alias":"Elements","cat_field":"elementcat_id","orderby":"5","search_type":"element"}'
 			WHERE parameter = 'basic_search_network_element';
 
 			UPDATE config_param_system SET value =

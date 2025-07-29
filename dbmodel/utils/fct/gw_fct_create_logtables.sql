@@ -104,7 +104,7 @@ BEGIN
 		INTO v_options;
 
 		IF v_project_type = 'WS' THEN
-			SELECT count(*) INTO v_doublen2a FROM v_edit_inp_pump WHERE pump_type = 'HEADPUMP';
+			SELECT count(*) INTO v_doublen2a FROM ve_inp_pump WHERE pump_type = 'HEADPUMP';
 		END IF;
 
 		SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;

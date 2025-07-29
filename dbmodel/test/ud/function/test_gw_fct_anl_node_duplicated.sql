@@ -88,41 +88,41 @@ SELECT is (
 
 SELECT is (
     (gw_fct_anl_node_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_junction", "featureType":"NODE", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_junction", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"nodeTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_duplicated with tablename > v_edit_inp_junction returns status "Accepted"'
+    'Check if gw_fct_anl_node_duplicated with tablename > ve_inp_junction returns status "Accepted"'
 );
 
 
 SELECT is (
     (gw_fct_anl_node_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_netgully", "featureType":"NODE", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_netgully", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"nodeTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_duplicated with tablename > v_edit_inp_netgully returns status "Accepted"'
+    'Check if gw_fct_anl_node_duplicated with tablename > ve_inp_netgully returns status "Accepted"'
 );
 
 
 SELECT is (
     (gw_fct_anl_node_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_outfall", "featureType":"NODE", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_outfall", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"nodeTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_duplicated with tablename > v_edit_inp_outfall returns status "Accepted"'
+    'Check if gw_fct_anl_node_duplicated with tablename > ve_inp_outfall returns status "Accepted"'
 );
 
 
 SELECT is (
     (gw_fct_anl_node_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"tableName":"v_edit_inp_storage", "featureType":"NODE", "id":[]},
+    "form":{}, "feature":{"tableName":"ve_inp_storage", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"nodeTolerance":"0.01"},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_duplicated with tablename > v_edit_inp_storage returns status "Accepted"'
+    'Check if gw_fct_anl_node_duplicated with tablename > ve_inp_storage returns status "Accepted"'
 );
 
 

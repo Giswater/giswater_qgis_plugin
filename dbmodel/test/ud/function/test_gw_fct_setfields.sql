@@ -35,18 +35,18 @@ SELECT is(
     (gw_fct_setfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
     "feature":{"id":"100019", "tableName":"ve_node_jump", "featureType":"node" },
     "data":{"filterFields":{}, "pageInfo":{}, "fields":{"nodecat_id": "JUMP-01",
-    "workcat_id": "work2"}, "reload":"", "afterInsert":"False"}}$$)::JSON)->>'status',
+    "workcat_id": "work2", "expl_id": 1, "muni_id": 1}, "reload":"", "afterInsert":"False"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setfields --> "tableName":"ve_node_jump" returns status "Accepted"'
 );
 
 SELECT is (
     (gw_fct_setfields($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"id":"T10-5m", "tableName":"v_edit_inp_timeseries" }, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"id":"T10-5m", "tableName":"ve_inp_timeseries" }, "data":{"filterFields":{}, "pageInfo":{},
     "fields":{"expl_id": 1, "timser_type": "Rainfall", "times_type": "RELATIVE", "descript":
     "null", "fname": "null"}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setfields --> "tableName":"v_edit_inp_timeseries" returns status "Accepted"'
+    'Check if gw_fct_setfields --> "tableName":"ve_inp_timeseries" returns status "Accepted"'
 );
 
 -- Finish the test

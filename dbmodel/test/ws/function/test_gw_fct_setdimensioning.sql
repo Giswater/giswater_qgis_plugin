@@ -33,7 +33,7 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_setdimensioning($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_dimensions", "id":"2"}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_dimensions", "id":"2"}, "data":{"filterFields":{}, "pageInfo":{},
     "fields":{"direction_arrow":"False","state":"1","expl_id":"1","feature_type":""}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setdimensioning returns status "Accepted"'

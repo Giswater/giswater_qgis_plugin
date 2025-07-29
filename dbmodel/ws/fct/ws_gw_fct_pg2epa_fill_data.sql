@@ -125,12 +125,12 @@ BEGIN
 	UPDATE temp_t_node SET addparam=concat('{"valve_type":"',valve_type,'", "setting":"',setting,'", "diameter":"',custom_dint,
 	'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
 	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
-	FROM v_edit_inp_valve v WHERE temp_t_node.node_id=v.node_id::text;
+	FROM ve_inp_valve v WHERE temp_t_node.node_id=v.node_id::text;
 
 	-- update addparam for inp_pump
 	UPDATE temp_t_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',p.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
 	'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"',pump_type,'"}')
-	FROM v_edit_inp_pump p WHERE temp_t_node.node_id=p.node_id::text;
+	FROM ve_inp_pump p WHERE temp_t_node.node_id=p.node_id::text;
 
 	raise notice 'inserting arcs on temp_t_arc table';
 
@@ -212,15 +212,15 @@ BEGIN
 
 	-- update addparam for inp_shortpipe (step 1)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
-	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
-	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id = v_edit_inp_shortpipe.node_id::text
-	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id::text;
+	FROM ve_inp_shortpipe JOIN man_valve USING (node_id)
+	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id = ve_inp_shortpipe.node_id::text
+	WHERE temp_t_node.node_id=ve_inp_shortpipe.node_id::text;
 
 	-- update addparam for inp_shortpipe (step 2)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
-	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
-	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id = v_edit_inp_shortpipe.node_id::text
-	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id::text;
+	FROM ve_inp_shortpipe JOIN man_valve USING (node_id)
+	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id = ve_inp_shortpipe.node_id::text
+	WHERE temp_t_node.node_id=ve_inp_shortpipe.node_id::text;
 
 
 	RETURN 1;

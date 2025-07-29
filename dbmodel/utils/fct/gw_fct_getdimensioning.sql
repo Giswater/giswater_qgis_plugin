@@ -79,7 +79,7 @@ BEGIN
 
 	EXECUTE 'SELECT gw_fct_getformfields($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
 	INTO v_fields_array
-	USING 'v_edit_dimensions', 'form_feature', '', NULL, NULL, NULL, NULL, 'SELECT', null, 4, null::json;
+	USING 've_dimensions', 'form_feature', '', NULL, NULL, NULL, NULL, 'SELECT', null, 4, null::json;
 
 
 	-- USE reduced geometry to intersect with expl mapzone in order to enhance the selectedId expl
@@ -119,7 +119,7 @@ BEGIN
 	
 	v_id = (SELECT nextval('SCHEMA_NAME.dimensions_id_seq'::regclass));
 
-	v_featureinfo = '{"tableName":"v_edit_dimensions", "idName":"id", "id":'||v_id||'}';
+	v_featureinfo = '{"tableName":"ve_dimensions", "idName":"id", "id":'||v_id||'}';
 
 	-- Control NULL's
 	v_status := COALESCE(v_status, '{}');    

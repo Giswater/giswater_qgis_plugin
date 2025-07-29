@@ -131,7 +131,7 @@ BEGIN
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 
-			-- upserting values on a v_edit_review_connec connec table
+			-- upserting values on a ve_review_connec connec table
 			IF EXISTS (SELECT connec_id FROM review_audit_connec WHERE connec_id=NEW.connec_id) THEN
 				UPDATE review_audit_connec SET old_y1=rec_connec.y1, new_y1=NEW.y1, old_y2=rec_connec.y2,
        			new_y2=NEW.y2, old_connec_type=rec_connec.connec_type, new_connec_type=NEW.connec_type, old_matcat_id=rec_connec.matcat_id,

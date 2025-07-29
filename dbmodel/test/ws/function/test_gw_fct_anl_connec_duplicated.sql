@@ -54,10 +54,10 @@ SELECT is (
 
 SELECT is (
     (gw_fct_anl_connec_duplicated($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{"connecTolerance":"0.01"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_connec_duplicated with aux_params and tableName : v_edit_inp_connec returns status "Accepted"'
+    'Check if gw_fct_anl_connec_duplicated with aux_params and tableName : ve_inp_connec returns status "Accepted"'
 );
 
 

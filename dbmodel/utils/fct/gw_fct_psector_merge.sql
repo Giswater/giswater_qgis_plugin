@@ -239,7 +239,7 @@ BEGIN
 			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_id, current_user) ON CONFLICT DO NOTHING;
 		END LOOP;
 
-		--insert copy of the planified feature in the corresponding v_edit_* view and insert it into plan_psector_x_* table
+		--insert copy of the planified feature in the corresponding ve_* view and insert it into plan_psector_x_* table
 		FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel=1 OR classlevel = 2 ORDER BY CASE
 			WHEN id='NODE' THEN 1
 			WHEN id='ARC' THEN 2

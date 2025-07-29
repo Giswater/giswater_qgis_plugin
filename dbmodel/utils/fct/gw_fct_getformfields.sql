@@ -139,7 +139,7 @@ BEGIN
 	END IF;
 
 	-- starting process - get fields
-	IF p_formname ILIKE 'v_edit_inp%' THEN
+	IF p_formname ILIKE 've_inp%' THEN
 	    v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
 
 			WITH typevalue AS (SELECT * FROM config_typevalue)

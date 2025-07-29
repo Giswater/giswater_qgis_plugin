@@ -414,7 +414,7 @@ UPDATE config_form_fields SET iseditable=false WHERE formname='v_edit_drainzone'
 UPDATE config_form_fields SET iseditable=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,widgetcontrols,hidden)
-	VALUES ('v_ui_dwfzone','form_feature','tab_none','drainzone_id','lyt_data_1',11,'text','combo','drainzone_id','drainzone_id',false,false,true,false,false,'SELECT drainzone_id id, name idval FROM v_edit_drainzone','{"setMultiline":false}'::json,false);
+	VALUES ('v_ui_dwfzone','form_feature','tab_none','drainzone_id','lyt_data_1',11,'text','combo','drainzone_id','drainzone_id',false,false,true,false,false,'SELECT drainzone_id id, name idval FROM ve_drainzone','{"setMultiline":false}'::json,false);
 
 -- 10/07/2025
 -- UPDATE config_form_fields SET layoutname = 'lyt_bot_1' WHERE formtype='form_feature' AND tab_name='tab_data' AND columnname in ('sector_id', 'omzone_id', 'state_type', 'state');
@@ -498,12 +498,6 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(3492, 'Omunit analysis', '{"featureType":[]}'::json, '[{"widgetname": "exploitation", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "tooltip": "Choose exploitation to work with", "layoutname": "grl_option_parameters", "layoutorder": 2, "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "selectedId": ""}, {"widgetname": "usePlanPsector", "label": "Use masterplan psectors:", "widgettype": "check", "datatype": "boolean", "layoutname": "grl_option_parameters", "layoutorder": 6, "value": ""}, {"widgetname": "commitChanges", "label": "Commit changes:", "widgettype": "check", "datatype": "boolean", "layoutname": "grl_option_parameters", "layoutorder": 7, "value": ""}, {"widgetname": "updateMapZone", "label": "Update mapzone geometry method:", "widgettype": "combo", "datatype": "integer", "layoutname": "grl_option_parameters", "layoutorder": 8, "comboIds": [0, 1, 2, 3], "comboNames": ["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId": ""}, {"widgetname": "geomParamUpdate", "label": "Geometry parameter:", "widgettype": "text", "datatype": "float", "layoutname": "grl_option_parameters", "layoutorder": 10, "isMandatory": false, "placeholder": "5-30", "value": ""}]'::json, NULL, true, '{4}');
 
 -- 28/07/2025
-UPDATE sys_table SET id='ve_gully' WHERE id='v_edit_gully';
-UPDATE sys_style SET layername = 've_gully' WHERE layername = 'v_edit_gully';
-UPDATE cat_feature SET parent_layer = 've_gully' WHERE parent_layer = 'v_edit_gully';
-UPDATE config_info_layer SET layer_id = 've_gully' WHERE layer_id = 'v_edit_gully';
-UPDATE config_form_tabs SET formname = 've_gully' WHERE formname = 'v_edit_gully';
-
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('arc', 'form_feature', 'tab_data', 'initoverflowpath', 'lyt_data_1',
 (SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname  = 'arc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1' GROUP BY formname, tabname, layoutname),

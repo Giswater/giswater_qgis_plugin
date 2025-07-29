@@ -18,7 +18,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_setfields($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"node", "tableName":"v_edit_man_junction", "id":"1251521"},
+"feature":{"featureType":"node", "tableName":"ve_man_junction", "id":"1251521"},
 "data":{"fields":{"macrosector_id": "1", "sector_id": "2",
 "inventory": "False", "epa_type": "PUMP", "state": "1", "arc_id": "113854", "publish": "False", "verified": "TO REVIEW",
 "expl_id": "1", "builtdate": "2018/11/29", "muni_id": "2", "workcat_id": "22", "buildercat_id": "builder1", "enddate": "2018/11/29",
@@ -176,10 +176,13 @@ BEGIN
             USING v_schemaname, v_tablename, v_idname
             INTO column_type_id;
 
+
+
 	v_querytext = 'SELECT EXISTS(SELECT 1 FROM ' || quote_ident(v_tablename) ||'';
-	IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 then
+	IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 THEN
+		i = 1;
 		v_querytext := v_querytext || ' WHERE ';
-		FOREACH idname IN ARRAY v_idname_array loop
+		FOREACH idname IN ARRAY v_idname_array LOOP
 			v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_id_array[i]) || ' AS ' || column_type_id_array[i] || ') AND ';
 			i=i+1;
 		END LOOP;
@@ -187,7 +190,7 @@ BEGIN
 	ELSIF cardinality(v_idname_array) > 1 THEN
 		i = 1;
 		v_querytext := v_querytext || ' WHERE ';
-		FOREACH idname IN ARRAY v_idname_array loop
+		FOREACH idname IN ARRAY v_idname_array LOOP
 			v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_fields->>idname) || ' AS ' || column_type_id_array[i] || ') AND ';
 			i=i+1;
 		END LOOP;
@@ -198,25 +201,38 @@ BEGIN
 	END IF;
 	EXECUTE v_querytext||');' INTO v_exists;
 
-	IF v_text is not NULL THEN
+
+	-- Remove from v_text any keys that are in v_idname_array
+	IF v_text IS NOT NULL AND v_idname_array IS NOT NULL THEN
+		v_text := ARRAY(
+			SELECT elem
+			FROM unnest(v_text) AS elem
+			WHERE NOT ((elem::json)->>'key') = ANY(v_idname_array)
+		);
+	END IF;
+
+	IF v_text IS NOT NULL THEN
 		i = 1;
-		
+
 		IF v_exists THEN
 			-- query text for UPDATE, step1
 			v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
 		ELSE
 			-- query text for INSERT, step1
-			v_querytext := 'INSERT INTO ' || quote_ident(v_tablename) ||' (' || quote_ident(v_idname);
+			v_querytext := 'INSERT INTO ' || quote_ident(v_tablename) ||' (' || v_idname;
 			-- Build column list
 			FOREACH text IN ARRAY v_text LOOP
-				SELECT v_text[i] into v_jsonfield;
+				SELECT v_text[i] INTO v_jsonfield;
 				v_field := (SELECT (v_jsonfield ->> 'key'));
 				v_querytext := concat(v_querytext, ', ', quote_ident(v_field));
 				i := i + 1;
 			END LOOP;
-			v_querytext := v_querytext || ') VALUES (' || quote_literal(v_id)||', ';
+			v_querytext := v_querytext || ') VALUES (' || v_id || ', ';
 			i := 1;
 		END IF;
+
+		raise notice 'v_querytext: %', v_querytext;
+		raise notice 'v_idname: %', v_idname;
 
 		-- query text, step2
 		FOREACH text IN ARRAY v_text

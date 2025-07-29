@@ -14,8 +14,8 @@ $BODY$
 /*EXAMPLE
 
 -- fid: 403
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_demand($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"name":"1test", "descript":""}}}$$);
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_demand($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"name":"uuuu", "descript":""}}}$$);
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_demand($${"client":{}, "form":{}, "feature":{"tableName":"ve_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"name":"1test", "descript":""}}}$$);
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_demand($${"client":{}, "form":{}, "feature":{"tableName":"ve_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"name":"uuuu", "descript":""}}}$$);
 */
 
 
@@ -125,13 +125,13 @@ BEGIN
 			v_queryfilter = ' WHERE demand is not null';
 		END IF;
 
-		IF v_tablename = 'v_edit_inp_junction' THEN
+		IF v_tablename = 've_inp_junction' THEN
 			v_querytext =  'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, source) 
-					SELECT '|| v_scenarioid||', node_id, ''NODE'', demand, pattern_id, concat(''NODE '',node_id) FROM v_edit_inp_junction '||v_queryfilter;
+					SELECT '|| v_scenarioid||', node_id, ''NODE'', demand, pattern_id, concat(''NODE '',node_id) FROM ve_inp_junction '||v_queryfilter;
 
-		ELSIF v_tablename = 'v_edit_inp_connec' THEN
+		ELSIF v_tablename = 've_inp_connec' THEN
 			v_querytext = 'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, source) 
-					SELECT '|| v_scenarioid||', connec_id, ''CONNEC'', demand, pattern_id, concat(''CONNEC '',connec_id) FROM v_edit_inp_connec '||v_queryfilter;
+					SELECT '|| v_scenarioid||', connec_id, ''CONNEC'', demand, pattern_id, concat(''CONNEC '',connec_id) FROM ve_inp_connec '||v_queryfilter;
 		ELSE
 			v_querytext ='';
 		END IF;

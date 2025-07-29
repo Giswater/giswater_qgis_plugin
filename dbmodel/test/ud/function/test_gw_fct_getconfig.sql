@@ -41,7 +41,7 @@ SELECT is (
 SELECT is (
     (gw_fct_getconfig($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"formName":"config"},
     "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "list_layers_name":"{Node, Connec, Gully, Arc, Link, Node polygon, Gully polygon, Connec polygon, Dimensioning, Element, Municipality, Streetaxis, Plot}",
-    "list_tables_name":"{ve_node, ve_connec, ve_gully, ve_arc, ve_link, ve_pol_node, ve_pol_gully, ve_pol_connec, v_edit_dimensions, v_edit_element, ext_municipality, v_ext_streetaxis, v_ext_plot}"}}$$)::JSON)->>'status',
+    "list_tables_name":"{ve_node, ve_connec, ve_gully, ve_arc, ve_link, ve_pol_node, ve_pol_gully, ve_pol_connec, ve_dimensions, ve_element, ext_municipality, v_ext_streetaxis, v_ext_plot}"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getconfig --> "formName":"config" returns status "Accepted"'
 );

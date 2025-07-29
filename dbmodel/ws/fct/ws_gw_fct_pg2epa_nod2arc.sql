@@ -317,9 +317,9 @@ BEGIN
 	CREATE TEMP TABLE t_arc_endpoint AS
 	WITH query as (SELECT node_id FROM node JOIN
 	(SELECT count(*)as numarcs, node_id FROM node n JOIN
-	(SELECT node_1 as node_id, arc_id, 'n1' as position FROM v_edit_inp_pipe
+	(SELECT node_1 as node_id, arc_id, 'n1' as position FROM ve_inp_pipe
 	UNION
-	ALL SELECT node_2, arc_id , 'n2' FROM v_edit_inp_pipe) a using (node_id) group by n.node_id) a
+	ALL SELECT node_2, arc_id , 'n2' FROM ve_inp_pipe) a using (node_id) group by n.node_id) a
 	USING (node_id) WHERE a.numarcs = 1 AND epa_type ='SHORTPIPE')
 	SELECT arc_id,node_1 AS node_id FROM arc JOIN query ON query.node_id = node_1
 	UNION

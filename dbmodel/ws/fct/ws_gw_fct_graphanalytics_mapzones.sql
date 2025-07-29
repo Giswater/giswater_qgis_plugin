@@ -205,7 +205,7 @@ BEGIN
 	-- SECTION[epic=mapzones]: SET VARIABLES
 	v_mapzone_name = LOWER(v_class);
     v_mapzone_field = v_mapzone_name || '_id';
-	v_visible_layer = 'v_edit_' || v_mapzone_name;
+	v_visible_layer = 've_' || v_mapzone_name;
 	v_mapzone_name = UPPER(v_mapzone_name);
 
 

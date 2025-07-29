@@ -41,7 +41,7 @@ BEGIN
 	DELETE FROM temp_t_table WHERE fid = v_fid;
 
 	-- Dump node coordinates for every polygon
-	FOR row_id IN SELECT subc_id FROM v_edit_inp_subcatchment
+	FOR row_id IN SELECT subc_id FROM ve_inp_subcatchment
 	LOOP
 
 		-- Get the geom and remain fields

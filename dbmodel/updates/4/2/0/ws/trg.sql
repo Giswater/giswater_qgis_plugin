@@ -8,25 +8,25 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
 
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON
-v_edit_link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');
+CREATE TRIGGER gw_trg_edit_link_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
 
-CREATE TRIGGER gw_trg_edit_link_link INSTEAD OF INSERT OR DELETE OR UPDATE ON
-ve_link_link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
-
-CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc
+-- old v_edit parent tables:
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
 
-CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
 
-CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_link
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');
-
+-- ================================
 CREATE TRIGGER gw_trg_edit_ve_epa_frpump INSTEAD OF INSERT OR DELETE OR UPDATE ON
 ve_epa_frpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frpump');
 

@@ -69,7 +69,7 @@ BEGIN
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
 
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
-	IF v_tablename = 'v_edit_dimensions' THEN
+	IF v_tablename = 've_dimensions' THEN
 		v_tablename = 'dimensions';
 	END IF;
 	

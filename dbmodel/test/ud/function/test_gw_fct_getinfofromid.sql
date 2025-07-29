@@ -68,16 +68,16 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_drainzone", "id": "0"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_drainzone", "id": "0"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid tableName --> v_edit_drainzone with id returns status "Accepted"'
+    'Check if gw_fct_getinfofromid tableName --> ve_drainzone with id returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_drainzone"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_drainzone"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid tableName --> v_edit_drainzone returns status "Accepted"'
+    'Check if gw_fct_getinfofromid tableName --> ve_drainzone returns status "Accepted"'
 );
 
 SELECT is(
@@ -90,9 +90,9 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_cat_dscenario", "id":"1"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_cat_dscenario", "id":"1"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid tableName --> v_edit_cat_dscenario returns status "Accepted"'
+    'Check if gw_fct_getinfofromid tableName --> ve_cat_dscenario returns status "Accepted"'
 );
 
 -- Finish the test

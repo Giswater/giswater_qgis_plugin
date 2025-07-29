@@ -36,13 +36,13 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE},
 		"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "activeLayer":"", "featureDialog":["PIPE"],
-		"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "ve_node", "ve_node", "ve_arc", "ve_connec", "ve_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec",
-		"v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_pipe", "v_edit_inp_pump", "v_edit_inp_reservoir", "v_edit_inp_shortpipe", "v_edit_inp_tank", "v_edit_inp_valve", "v_edit_inp_virtualvalve"],
+		"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "ve_dma", "ve_node", "ve_node", "ve_arc", "ve_connec", "ve_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "ve_inp_connec",
+		"ve_inp_inlet", "ve_inp_junction", "ve_inp_pipe", "ve_inp_pump", "ve_inp_reservoir", "ve_inp_shortpipe", "ve_inp_tank", "ve_inp_valve", "ve_inp_virtualvalve"],
 		"mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "epsg":SRID_VALUE, "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.590797402754}}}$$);
 
  SELECT gw_fct_getinfofromcoordinates($${
 		"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "activeLayer":"",
-		"visibleLayer":["ve_arc", "v_edit_dma", "ve_connec", "v_edit_element", "ve_node", "ve_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None",
+		"visibleLayer":["ve_arc", "ve_dma", "ve_connec", "ve_element", "ve_node", "ve_link", "ve_sector", "ve_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None",
 		"featureDialog":["VALVE"],
 		"coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
 
@@ -50,7 +50,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
  SELECT gw_fct_getinfofromcoordinates($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "activeLayer":"",
-		"visibleLayer":["ve_arc", "v_edit_dma", "ve_connec", "v_edit_element", "ve_node", "ve_link", "v_edit_sector", "v_edit_exploitation"],
+		"visibleLayer":["ve_arc", "ve_dma", "ve_connec", "ve_element", "ve_node", "ve_link", "ve_sector", "ve_exploitation"],
 		"addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418894.6048028714,"ycoord":4576612.785781575, "zoomRatio":2105.7904524867854}}}$$);
 */
 

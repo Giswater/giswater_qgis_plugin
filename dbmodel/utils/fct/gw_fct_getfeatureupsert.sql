@@ -115,7 +115,7 @@ v_active_feature text;
 v_proximity_buffer double precision;
 v_sys_raster_dem boolean=false;
 v_connec_autofill_plotcode boolean = false;
-v_edit_insert_elevation_from_dem boolean=false;
+ve_insert_elevation_from_dem boolean=false;
 v_noderecord1 record;
 v_noderecord2 record;
 v_input json;
@@ -234,7 +234,7 @@ BEGIN
  	END IF;
 
 	-- get user parameters
-	SELECT (value)::boolean INTO v_edit_insert_elevation_from_dem FROM config_param_user WHERE parameter='edit_insert_elevation_from_dem' AND cur_user = current_user;
+	SELECT (value)::boolean INTO ve_insert_elevation_from_dem FROM config_param_user WHERE parameter='edit_insert_elevation_from_dem' AND cur_user = current_user;
 	SELECT (value)::boolean INTO v_arc_insert_automatic_endpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
 
 	-- get tablename and formname
@@ -665,7 +665,7 @@ BEGIN
 						order by ST_Distance(v_reduced_geometry, ext_address.the_geom) LIMIT 1);
 
 		-- Dem elevation
-		IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem AND v_idname IN ('node_id', 'connec_id', 'gully_id') THEN
+		IF v_sys_raster_dem AND ve_insert_elevation_from_dem AND v_idname IN ('node_id', 'connec_id', 'gully_id') THEN
 			v_elevation = (SELECT ST_Value(rast,1, v_reduced_geometry, true) FROM ext_raster_dem WHERE id =
 			(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, v_reduced_geometry, 1) LIMIT 1) limit 1);
 		END IF;

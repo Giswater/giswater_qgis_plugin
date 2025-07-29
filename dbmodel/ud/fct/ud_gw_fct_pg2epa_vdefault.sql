@@ -56,8 +56,8 @@ BEGIN
 	v_y0 = (SELECT ((value::json->>'parameters')::json->>'conduit')::json->>'y0' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 
 	RAISE NOTICE '1 - Set system default values';
-	UPDATE v_edit_inp_outfall SET outfall_type = v_outfalltype WHERE outfall_type IS NULL;
-	UPDATE v_edit_raingage SET scf=(SELECT value FROM config_param_user WHERE parameter='epa_rgage_scf_vdefault' AND cur_user=current_user)::float WHERE scf IS NULL;
+	UPDATE ve_inp_outfall SET outfall_type = v_outfalltype WHERE outfall_type IS NULL;
+	UPDATE ve_raingage SET scf=(SELECT value FROM config_param_user WHERE parameter='epa_rgage_scf_vdefault' AND cur_user=current_user)::float WHERE scf IS NULL;
 
 	RAISE NOTICE '2 - Set result default values';
 	UPDATE temp_t_arc SET q0 = v_q0 WHERE q0 IS NULL;

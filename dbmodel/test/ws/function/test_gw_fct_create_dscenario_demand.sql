@@ -32,18 +32,18 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_create_dscenario_demand($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{"name":"test", "descript":null, "exploitation":"0"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_demand --> tableName : v_edit_inp_connec returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_demand --> tableName : ve_inp_connec returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_create_dscenario_demand($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_junction", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_inp_junction", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{"name":"test", "descript":null, "exploitation":"0"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_demand --> tableName : v_edit_inp_junction returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_demand --> tableName : ve_inp_junction returns status "Accepted"'
 );
 
 -- Finish the test

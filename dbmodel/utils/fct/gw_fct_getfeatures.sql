@@ -82,11 +82,11 @@ BEGIN
     IF v_feature_type = 'NODE' THEN
         v_select = 'SELECT node_id as "nodeId", asset_id as "assetId", macrosector_id AS "macroSector", comment AS "aresepId", state, nodecat_id AS "featureClass", '
                   || 'json_build_object(''x'', ST_X(the_geom), ''y'', ST_Y(the_geom), ''epsg'', '||v_epsg||') AS coordinates '
-                  || 'FROM v_edit_node WHERE sys_type = '''||v_systype||''' AND the_geom IS NOT NULL'||v_mapzone_filter||v_order_clause;
+                  || 'FROM ve_node WHERE sys_type = '''||v_systype||''' AND the_geom IS NOT NULL'||v_mapzone_filter||v_order_clause;
     ELSIF v_feature_type = 'ARC' THEN
         v_select = 'SELECT arc_id as "arcId", asset_id as "assetId", macrosector_id AS "macroSector", comment AS "aresepId", state, arccat_id AS "featureClass", '
                   || 'json_build_object(''x'', ST_X(ST_Centroid(the_geom)), ''y'', ST_Y(ST_Centroid(the_geom)), ''epsg'', '||v_epsg||') AS coordinates '
-                  || 'FROM v_edit_arc WHERE sys_type = '''||v_systype||''' AND the_geom IS NOT NULL'||v_mapzone_filter||v_order_clause;
+                  || 'FROM ve_arc WHERE sys_type = '''||v_systype||''' AND the_geom IS NOT NULL'||v_mapzone_filter||v_order_clause;
     ELSE
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"4142", "function":"3484","parameters":{"sysType":"'||v_systype||'", "featureType":"'||v_feature_type||'"}}}$$);';

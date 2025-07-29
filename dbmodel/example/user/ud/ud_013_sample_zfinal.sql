@@ -135,20 +135,6 @@ UPDATE inp_subcatchment SET outlet_id = 95 where subc_id IN ('S91','S92','S94');
 
 UPDATE ext_plot set muni_id = 2 where id::integer < 40;
 
-UPDATE config_form_fields SET iseditable = true where columnname = 'to_arc' and formname not like 'v_edit_flwreg_%';
-
-UPDATE config_form_fields SET iseditable = true where columnname like '%road%';
-
-UPDATE config_form_fields SET iseditable = true where columnname like 'coef_curve';
-
-UPDATE config_form_fields SET hidden = true where columnname in ('geom3', 'geom4') and formname like '%orifice%';
-
-UPDATE config_form_fields SET linkedobject='tbl_event_x_gully' WHERE formname='gully' AND formtype='form_feature' AND tabname='tab_event' AND linkedobject = 'tbl_visit_x_gully';
-
-UPDATE config_form_fields SET dv_querytext = 'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL' WHERE columnname  = 'muni_id' AND widgettype = 'combo';
-
-UPDATE config_form_fields SET hidden = true where columnname in ('apond') and formname like '%storage%';
-
 UPDATE arc SET y1 = 3, y2 = 3, matcat_id = 'Concrete' WHERE arc_id = '100012';
 UPDATE arc SET y1 = 2.2, y2 = 3, matcat_id = 'Concrete' WHERE arc_id = '100014';
 

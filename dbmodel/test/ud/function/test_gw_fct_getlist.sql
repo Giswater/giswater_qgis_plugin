@@ -73,10 +73,10 @@ SELECT is (
 
 SELECT is (
     (gw_fct_getlist($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_cat_hydrology"}, "data":{"filterFields":{"limit": -1, "name":
+    "feature":{"tableName":"ve_cat_hydrology"}, "data":{"filterFields":{"limit": -1, "name":
     {"filterSign":"ILIKE", "value":""}, "active": {"filterSign":"=", "value":"true"}}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getlist --> "tableName":"v_edit_cat_hydrology" returns status "Accepted"'
+    'Check if gw_fct_getlist --> "tableName":"ve_cat_hydrology" returns status "Accepted"'
 );
 
 SELECT is (

@@ -215,9 +215,9 @@ BEGIN
 	end if;
 
 	-- getting source table in order to enhance performance
-	IF v_tablename LIKE 'v_edit_cad%' THEN v_sourcetable = v_tablename;
+	IF v_tablename LIKE 've_cad%' THEN v_sourcetable = v_tablename;
 	ELSIF v_tablename LIKE '%link_connec%' OR v_tablename LIKE '%link_gully%' THEN v_sourcetable = 'link';
-	ELSIF v_tablename LIKE 'v_%edit_%' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
+	ELSIF v_tablename LIKE 'v_%edit_%' THEN v_sourcetable = replace (v_tablename, 've_', '');
 	ELSIF v_tablename LIKE 've_%node%' THEN v_sourcetable = 'node';
 	ELSIF v_tablename LIKE 've_%arc%' THEN v_sourcetable = 'arc';
 	ELSIF v_tablename LIKE 've_%connec%' THEN v_sourcetable = 'connec';

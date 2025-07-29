@@ -210,8 +210,8 @@ BEGIN
 
 		EXECUTE 'SELECT feature_id, featurecat_id  FROM '||v_tablename||' WHERE pol_id = '||quote_literal(v_id)||''
 		INTO v_id, v_tablename;
-		v_tablename = (SELECT concat('v_edit_',lower(feature_type)) FROM cat_feature WHERE id = v_tablename LIMIT 1);
-		IF v_tablename IS NULL THEN v_tablename = 'v_edit_element'; END IF;
+		v_tablename = (SELECT concat('ve_',lower(feature_type)) FROM cat_feature WHERE id = v_tablename LIMIT 1);
+		IF v_tablename IS NULL THEN v_tablename = 've_element'; END IF;
 		v_editable = true;
 	END IF;
 
@@ -337,7 +337,7 @@ BEGIN
 			v_table_parent = 've_connec';
 		else
 			v_table_epa = concat('ve_epa_', lower(v_epatype));
-			v_querystring = concat('SELECT concat(''v_edit_'', lower(feature_type)) FROM sys_feature_epa_type WHERE id =''', v_epatype,'''');
+			v_querystring = concat('SELECT concat(''ve_'', lower(feature_type)) FROM sys_feature_epa_type WHERE id =''', v_epatype,'''');
 			execute v_querystring into v_table_parent;
 		end if;
 
@@ -443,9 +443,9 @@ BEGIN
 	v_vdefault_array := COALESCE(v_vdefault_array, '[]');
 
 	-- getting source table in order to enhance performance
-	IF v_tablename LIKE 'v_edit_cad%' THEN v_sourcetable = v_tablename;
-    ELSIF v_tablename LIKE 'v_edit_flwreg_%' THEN v_sourcetable = replace(v_tablename, 'v_edit_', 'inp_');
-	ELSIF v_tablename LIKE 'v_edit_%' AND v_tablename != 'v_edit_flwreg' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
+	IF v_tablename LIKE 've_cad%' THEN v_sourcetable = v_tablename;
+    ELSIF v_tablename LIKE 've_flwreg_%' THEN v_sourcetable = replace(v_tablename, 've_', 'inp_');
+	ELSIF v_tablename LIKE 've_%' AND v_tablename != 've_flwreg' THEN v_sourcetable = replace (v_tablename, 've_', '');
 	ELSIF v_tablename LIKE 've_node_%' THEN v_sourcetable = 'node';
 	ELSIF v_tablename LIKE 've_link_%' THEN v_sourcetable = 'link';
 	ELSIF v_tablename LIKE 've_arc_%' THEN v_sourcetable = 'arc';

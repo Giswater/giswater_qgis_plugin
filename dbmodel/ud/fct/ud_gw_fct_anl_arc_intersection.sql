@@ -15,7 +15,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_intersection($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_conduit", "id":["138","139"]},
+"feature":{"tableName":"ve_man_conduit", "id":["138","139"]},
 "data":{"selectionMode":"previousSelection", "parameters":{}
 }}$$)
 

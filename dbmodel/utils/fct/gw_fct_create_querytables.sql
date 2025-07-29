@@ -71,14 +71,14 @@ BEGIN
 	DROP TABLE IF EXISTS t_connec;EXECUTE 'CREATE TEMP TABLE t_connec AS SELECT * FROM ve_connec'||v_filter;
 	DROP TABLE IF EXISTS t_element;	EXECUTE 'CREATE TEMP TABLE t_element AS SELECT * FROM element'||v_filter;
 	DROP TABLE IF EXISTS t_link;EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM ve_link';
-	DROP TABLE IF EXISTS t_dma;	CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
+	DROP TABLE IF EXISTS t_dma;	CREATE TEMP TABLE t_dma AS SELECT * FROM ve_dma;
 	IF v_project_type = 'WS' THEN
-		DROP TABLE IF EXISTS t_dqa;	CREATE TEMP TABLE t_dqa AS SELECT * FROM v_edit_dqa;
-		DROP TABLE IF EXISTS t_presszone; CREATE TEMP TABLE t_presszone AS SELECT * FROM v_edit_presszone;
-		DROP TABLE IF EXISTS t_sector; CREATE TEMP TABLE t_sector AS SELECT * FROM v_edit_sector;
+		DROP TABLE IF EXISTS t_dqa;	CREATE TEMP TABLE t_dqa AS SELECT * FROM ve_dqa;
+		DROP TABLE IF EXISTS t_presszone; CREATE TEMP TABLE t_presszone AS SELECT * FROM ve_presszone;
+		DROP TABLE IF EXISTS t_sector; CREATE TEMP TABLE t_sector AS SELECT * FROM ve_sector;
 	ELSIF v_project_type  = 'UD' THEN
 		DROP TABLE IF EXISTS t_gully;EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM ve_gully'||v_filter;
-		DROP TABLE IF EXISTS t_drainzone; CREATE TEMP TABLE t_drainzone AS SELECT * FROM v_edit_drainzone;
+		DROP TABLE IF EXISTS t_drainzone; CREATE TEMP TABLE t_drainzone AS SELECT * FROM ve_drainzone;
 	END IF;
 
 
@@ -86,32 +86,32 @@ BEGIN
 	IF v_epacheck THEN
 		v_filter = concat(v_filter, ' AND sector_id IN (select sector_id from selector_sector where cur_user = current_user)');
 
-		DROP TABLE IF EXISTS t_inp_pump; EXECUTE 'CREATE TEMP TABLE t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
+		DROP TABLE IF EXISTS t_inp_pump; EXECUTE 'CREATE TEMP TABLE t_inp_pump AS SELECT * FROM ve_inp_pump'||v_filter;
 		IF v_project_type = 'WS' THEN
-			DROP TABLE IF EXISTS t_inp_pipe; EXECUTE 'CREATE TEMP TABLE t_inp_pipe AS SELECT * FROM v_edit_inp_pipe'||v_filter;
-			DROP TABLE IF EXISTS t_inp_valve; EXECUTE 'CREATE TEMP TABLE t_inp_valve AS SELECT * FROM v_edit_inp_valve'||v_filter;
-			DROP TABLE IF EXISTS t_inp_junction; EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
-			DROP TABLE IF EXISTS t_inp_reservoir; EXECUTE 'CREATE TEMP TABLE t_inp_reservoir AS SELECT * FROM v_edit_inp_reservoir'||v_filter;
-			DROP TABLE IF EXISTS t_inp_tank; EXECUTE 'CREATE TEMP TABLE t_inp_tank AS SELECT * FROM v_edit_inp_tank'||v_filter;
-			DROP TABLE IF EXISTS t_inp_inlet; EXECUTE 'CREATE TEMP TABLE t_inp_inlet AS SELECT * FROM v_edit_inp_inlet'||v_filter;
-			DROP TABLE IF EXISTS t_inp_virtualvalve; EXECUTE 'CREATE TEMP TABLE t_inp_virtualvalve AS SELECT * FROM v_edit_inp_virtualvalve'||v_filter;
-			DROP TABLE IF EXISTS t_inp_virtualpump; EXECUTE 'CREATE TEMP TABLE t_inp_virtualpump AS SELECT * FROM v_edit_inp_virtualpump'||v_filter;
+			DROP TABLE IF EXISTS t_inp_pipe; EXECUTE 'CREATE TEMP TABLE t_inp_pipe AS SELECT * FROM ve_inp_pipe'||v_filter;
+			DROP TABLE IF EXISTS t_inp_valve; EXECUTE 'CREATE TEMP TABLE t_inp_valve AS SELECT * FROM ve_inp_valve'||v_filter;
+			DROP TABLE IF EXISTS t_inp_junction; EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM ve_inp_junction'||v_filter;
+			DROP TABLE IF EXISTS t_inp_reservoir; EXECUTE 'CREATE TEMP TABLE t_inp_reservoir AS SELECT * FROM ve_inp_reservoir'||v_filter;
+			DROP TABLE IF EXISTS t_inp_tank; EXECUTE 'CREATE TEMP TABLE t_inp_tank AS SELECT * FROM ve_inp_tank'||v_filter;
+			DROP TABLE IF EXISTS t_inp_inlet; EXECUTE 'CREATE TEMP TABLE t_inp_inlet AS SELECT * FROM ve_inp_inlet'||v_filter;
+			DROP TABLE IF EXISTS t_inp_virtualvalve; EXECUTE 'CREATE TEMP TABLE t_inp_virtualvalve AS SELECT * FROM ve_inp_virtualvalve'||v_filter;
+			DROP TABLE IF EXISTS t_inp_virtualpump; EXECUTE 'CREATE TEMP TABLE t_inp_virtualpump AS SELECT * FROM ve_inp_virtualpump'||v_filter;
 
 		ELSIF  v_project_type  = 'UD' THEN
-			DROP TABLE IF EXISTS t_inp_conduit; EXECUTE 'CREATE TEMP TABLE t_inp_conduit AS SELECT * FROM v_edit_inp_conduit'||v_filter;
-			DROP TABLE IF EXISTS t_inp_outlet; EXECUTE 'CREATE TEMP TABLE t_inp_outlet AS SELECT * FROM v_edit_inp_outlet'||v_filter;
-			DROP TABLE IF EXISTS t_inp_orifice; EXECUTE 'CREATE TEMP TABLE t_inp_orifice AS SELECT * FROM v_edit_inp_orifice'||v_filter;
-			DROP TABLE IF EXISTS t_inp_weir; EXECUTE 'CREATE TEMP TABLE t_inp_weir AS SELECT * FROM v_edit_inp_weir'||v_filter;
-			DROP TABLE IF EXISTS t_inp_virtual; EXECUTE 'CREATE TEMP TABLE t_inp_virtual AS SELECT * FROM v_edit_inp_virtual'||v_filter;
-			DROP TABLE IF EXISTS t_inp_storage; EXECUTE 'CREATE TEMP TABLE t_inp_storage AS SELECT * FROM v_edit_inp_storage'||v_filter;
-			DROP TABLE IF EXISTS t_inp_subcatchment; EXECUTE 'CREATE TEMP TABLE t_inp_subcatchment AS SELECT * FROM v_edit_inp_subcatchment';
-			DROP TABLE IF EXISTS t_inp_junction; EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
-			DROP TABLE IF EXISTS t_inp_outfall; EXECUTE 'CREATE TEMP TABLE t_inp_outfall AS SELECT * FROM v_edit_inp_outfall'||v_filter;
-			DROP TABLE IF EXISTS t_inp_divider; EXECUTE 'CREATE TEMP TABLE t_inp_divider AS SELECT * FROM v_edit_inp_divider'||v_filter;
-			DROP TABLE IF EXISTS t_inp_subc2outlet; EXECUTE 'CREATE TEMP TABLE t_inp_subc2outlet AS SELECT * FROM v_edit_inp_subc2outlet';
-			DROP TABLE IF EXISTS t_inp_netgully; EXECUTE 'CREATE TEMP TABLE t_inp_netgully AS SELECT * FROM v_edit_inp_netgully'||v_filter;
-			DROP TABLE IF EXISTS t_inp_gully; EXECUTE 'CREATE TEMP TABLE t_inp_gully AS SELECT * FROM v_edit_inp_gully'||v_filter;
-			DROP TABLE IF EXISTS t_raingage; EXECUTE 'CREATE TEMP TABLE t_raingage AS SELECT * FROM v_edit_raingage';
+			DROP TABLE IF EXISTS t_inp_conduit; EXECUTE 'CREATE TEMP TABLE t_inp_conduit AS SELECT * FROM ve_inp_conduit'||v_filter;
+			DROP TABLE IF EXISTS t_inp_outlet; EXECUTE 'CREATE TEMP TABLE t_inp_outlet AS SELECT * FROM ve_inp_outlet'||v_filter;
+			DROP TABLE IF EXISTS t_inp_orifice; EXECUTE 'CREATE TEMP TABLE t_inp_orifice AS SELECT * FROM ve_inp_orifice'||v_filter;
+			DROP TABLE IF EXISTS t_inp_weir; EXECUTE 'CREATE TEMP TABLE t_inp_weir AS SELECT * FROM ve_inp_weir'||v_filter;
+			DROP TABLE IF EXISTS t_inp_virtual; EXECUTE 'CREATE TEMP TABLE t_inp_virtual AS SELECT * FROM ve_inp_virtual'||v_filter;
+			DROP TABLE IF EXISTS t_inp_storage; EXECUTE 'CREATE TEMP TABLE t_inp_storage AS SELECT * FROM ve_inp_storage'||v_filter;
+			DROP TABLE IF EXISTS t_inp_subcatchment; EXECUTE 'CREATE TEMP TABLE t_inp_subcatchment AS SELECT * FROM ve_inp_subcatchment';
+			DROP TABLE IF EXISTS t_inp_junction; EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM ve_inp_junction'||v_filter;
+			DROP TABLE IF EXISTS t_inp_outfall; EXECUTE 'CREATE TEMP TABLE t_inp_outfall AS SELECT * FROM ve_inp_outfall'||v_filter;
+			DROP TABLE IF EXISTS t_inp_divider; EXECUTE 'CREATE TEMP TABLE t_inp_divider AS SELECT * FROM ve_inp_divider'||v_filter;
+			DROP TABLE IF EXISTS t_inp_subc2outlet; EXECUTE 'CREATE TEMP TABLE t_inp_subc2outlet AS SELECT * FROM ve_inp_subc2outlet';
+			DROP TABLE IF EXISTS t_inp_netgully; EXECUTE 'CREATE TEMP TABLE t_inp_netgully AS SELECT * FROM ve_inp_netgully'||v_filter;
+			DROP TABLE IF EXISTS t_inp_gully; EXECUTE 'CREATE TEMP TABLE t_inp_gully AS SELECT * FROM ve_inp_gully'||v_filter;
+			DROP TABLE IF EXISTS t_raingage; EXECUTE 'CREATE TEMP TABLE t_raingage AS SELECT * FROM ve_raingage';
 		END IF;
 	END IF;
 

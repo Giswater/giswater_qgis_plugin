@@ -33,17 +33,17 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_upsertfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"1",
-    "tableName":"v_edit_cat_hydrology"},"data":{"filterFields":{}, "pageInfo":{}, "fields":{"infiltration": "GREEN_AMPT"}}}$$)::JSON)->>'status',
+    "tableName":"ve_cat_hydrology"},"data":{"filterFields":{}, "pageInfo":{}, "fields":{"infiltration": "GREEN_AMPT"}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_upsertfields --> "tableName":"v_edit_cat_hydrology" returns status "Accepted"'
+    'Check if gw_fct_upsertfields --> "tableName":"ve_cat_hydrology" returns status "Accepted"'
 );
 
 SELECT is (
     (gw_fct_upsertfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"1",
-    "tableName":"v_edit_drainzone"}, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"drainzone_id": "1",
+    "tableName":"ve_drainzone"}, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"drainzone_id": "1",
     "expl_id": "{0}", "name": "2"}, "force_action":"UPDATE"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_upsertfields --> "tableName":"v_edit_drainzone" returns status "Accepted"'
+    'Check if gw_fct_upsertfields --> "tableName":"ve_drainzone" returns status "Accepted"'
 );
 
 -- Finish the test

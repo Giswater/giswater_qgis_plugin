@@ -40,50 +40,50 @@ SELECT is(
 
 SELECT is(
     (gw_fct_anl_node_tcandidate($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_junction", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_inp_junction", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_tcandidate --> tableName : v_edit_inp_junction returns status "Accepted"'
+    'Check if gw_fct_anl_node_tcandidate --> tableName : ve_inp_junction returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_node_tcandidate($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_pump", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "feature":{"tableName":"ve_inp_pump", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_tcandidate --> tableName : v_edit_inp_pump returns status "Accepted"'
+    'Check if gw_fct_anl_node_tcandidate --> tableName : ve_inp_pump returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_node_tcandidate($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"NODE", "id":[]}, "data":{"filterFields":{},
+    "feature":{"tableName":"ve_inp_reservoir", "featureType":"NODE", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_tcandidate --> tableName : v_edit_inp_reservoir returns status "Accepted"'
+    'Check if gw_fct_anl_node_tcandidate --> tableName : ve_inp_reservoir returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_node_tcandidate($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"NODE", "id":[]}, "data":{"filterFields":{},
+    "feature":{"tableName":"ve_inp_shortpipe", "featureType":"NODE", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_tcandidate --> tableName : v_edit_inp_shortpipe returns status "Accepted"'
+    'Check if gw_fct_anl_node_tcandidate --> tableName : ve_inp_shortpipe returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_node_tcandidate($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_tank", "featureType":"NODE", "id":[]}, "data":{"filterFields":{},
+    "feature":{"tableName":"ve_inp_tank", "featureType":"NODE", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_tcandidate --> tableName : v_edit_inp_tank returns status "Accepted"'
+    'Check if gw_fct_anl_node_tcandidate --> tableName : ve_inp_tank returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_anl_node_tcandidate($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_inp_valve", "featureType":"NODE", "id":[]}, "data":{"filterFields":{},
+    "feature":{"tableName":"ve_inp_valve", "featureType":"NODE", "id":[]}, "data":{"filterFields":{},
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_tcandidate --> tableName : v_edit_inp_valve returns status "Accepted"'
+    'Check if gw_fct_anl_node_tcandidate --> tableName : ve_inp_valve returns status "Accepted"'
 );
 -- Finish the test
 SELECT finish();

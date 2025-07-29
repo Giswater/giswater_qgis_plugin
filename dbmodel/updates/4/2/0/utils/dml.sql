@@ -61,31 +61,36 @@ UPDATE sys_table SET alias='Element feature catalog' WHERE id='v_edit_cat_featur
 INSERT INTO sys_fprocess (fid, fprocess_name) VALUES (-1, 'There is');
 INSERT INTO sys_fprocess (fid, fprocess_name) VALUES (-2, 'There are');
 
--- 28/07/2025
-UPDATE sys_table SET id='ve_arc' WHERE id='v_edit_arc';
-UPDATE sys_table SET id='ve_node' WHERE id='v_edit_node';
-UPDATE sys_table SET id='ve_connec' WHERE id='v_edit_connec';
-UPDATE sys_table SET id='ve_link' WHERE id='v_edit_link';
+-- 29/07/2025
+DELETE FROM sys_table WHERE id = 'v_edit_raingage';
 
-UPDATE sys_style SET layername = 've_node' WHERE layername = 'v_edit_node';
-UPDATE sys_style SET layername = 've_arc' WHERE layername = 'v_edit_arc';
-UPDATE sys_style SET layername = 've_connec' WHERE layername = 'v_edit_connec';
-UPDATE sys_style SET layername = 've_link' WHERE layername = 'v_edit_link';
+UPDATE sys_table SET id = REPLACE(id, 'v_edit_', 've_') WHERE id ILIKE '%v_edit_%';
 
-UPDATE cat_feature SET parent_layer = 've_node' WHERE parent_layer = 'v_edit_node';
-UPDATE cat_feature SET parent_layer = 've_arc' WHERE parent_layer = 'v_edit_arc';
-UPDATE cat_feature SET parent_layer = 've_connec' WHERE parent_layer = 'v_edit_connec';
-UPDATE cat_feature SET parent_layer = 've_link' WHERE parent_layer = 'v_edit_link';
+UPDATE sys_style SET layername = REPLACE(layername, 'v_edit_', 've_') WHERE layername ILIKE '%v_edit_%';
 
-UPDATE config_info_layer SET layer_id = 've_node' WHERE layer_id = 'v_edit_node';
-UPDATE config_info_layer SET layer_id = 've_arc' WHERE layer_id = 'v_edit_arc';
-UPDATE config_info_layer SET layer_id = 've_connec' WHERE layer_id = 'v_edit_connec';
-UPDATE config_info_layer SET layer_id = 've_link' WHERE layer_id = 'v_edit_link';
+UPDATE cat_feature SET parent_layer = REPLACE(parent_layer, 'v_edit_', 've_') WHERE parent_layer ILIKE '%v_edit_%';
 
-UPDATE config_form_tabs SET formname = 've_node' WHERE formname = 'v_edit_node';
-UPDATE config_form_tabs SET formname = 've_arc' WHERE formname = 'v_edit_arc';
-UPDATE config_form_tabs SET formname = 've_connec' WHERE formname = 'v_edit_connec';
-UPDATE config_form_tabs SET formname = 've_link' WHERE formname = 'v_edit_link';
+UPDATE config_table SET id= REPLACE(id, 'v_edit_', 've_') WHERE id ILIKE '%v_edit_%';
+
+UPDATE config_info_layer SET layer_id = REPLACE(layer_id, 'v_edit_', 've_') WHERE layer_id ILIKE '%v_edit_%';
+
+UPDATE config_form_tabs SET formname = REPLACE(formname, 'v_edit_', 've_') WHERE formname ILIKE '%v_edit_%';
+
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'v_edit_', 've_') WHERE dv_querytext ILIKE '%v_edit_%';
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+UPDATE config_param_system SET value = REPLACE(value, 'v_edit_', 've_') WHERE value ILIKE '%v_edit_%';
+
+UPDATE sys_param_user SET dv_querytext = REPLACE(dv_querytext, 'v_edit_', 've_') WHERE dv_querytext ILIKE '%v_edit_%';
+
+UPDATE config_function SET layermanager = REPLACE(layermanager::text, 'v_edit_', 've_')::json WHERE layermanager::text ILIKE '%v_edit_%';
+
+UPDATE config_form_list SET query_text = REPLACE(query_text, 'v_edit_', 've_') WHERE query_text ILIKE '%v_edit_%';
+UPDATE config_form_list SET listname = REPLACE(listname, 'v_edit_', 've_') WHERE listname ILIKE '%v_edit_%';
+
+UPDATE config_report SET query_text = REPLACE(query_text, 'v_edit_', 've_') WHERE query_text ILIKE '%v_edit_%';
+
 --23/07/2025
 DELETE FROM config_form_fields WHERE formname='ve_genelem_estep' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';
 DELETE FROM config_form_fields WHERE formname='ve_genelem_ecover' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';

@@ -709,7 +709,7 @@ v_queryhydro =
 		RETURN  gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done succesfully"}, "version":"'||v_version||'"'||
 					',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					'"point":'||v_result_point||','||
-					'"line":'||v_result_line||'}'||'}}')::json, 3142, null, ('{"visible": ["v_edit_dma"]}')::json, null);
+					'"line":'||v_result_line||'}'||'}}')::json, 3142, null, ('{"visible": ["ve_dma"]}')::json, null);
 	END IF;
 
 END;

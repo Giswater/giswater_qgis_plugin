@@ -504,16 +504,6 @@ doc.id,
 om_visit.id
 FROM doc, om_visit;
 
-UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
-AND columnname in ('streetaxis_id','streetaxis2_id', 'postnumber','postnumber2','postcomplement','postcomplement2');
-
-UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
-AND columnname = 'district_id';
-
-UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_node','ve_gully') AND columnname = 'district_id';
-
-UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec') AND columnname = 'district_id';
-
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
 "data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"chamber_param_1", "datatype":"text",
 "widgettype":"combo", "label":"Chamber param_1","ismandatory":"False",
@@ -628,98 +618,6 @@ INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
--- hidden
-UPDATE config_form_fields SET hidden = true WHERE columnname
-IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
-'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1');
-
-UPDATE config_form_fields SET hidden = true WHERE columnname IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
-
--- reorder sample
-UPDATE config_form_fields SET layoutorder =90, layoutname = 'lyt_data_1' WHERE columnname ='link' AND (formname not in ('ve_link'));
-UPDATE config_form_fields SET layoutorder =1 , layoutname ='lyt_bot_2' WHERE columnname ='sector_id' AND (formname not in ('ve_link','v_edit_inp_subcatchment'));
-UPDATE config_form_fields SET layoutorder =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE columnname ='dqa_id' AND (formname not in ('ve_link'));
-UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE columnname ='macrosector_id' AND (formname not in ('ve_link'));
-UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id') AND (formname not in ('ve_link'));
-
-update config_form_fields SET layoutorder = 3 where columnname='state' and formname like '%ve_connec_%';
-update config_form_fields SET layoutorder = 4 where columnname='state_type' and formname like '%ve_connec_%';
-
-UPDATE cat_feature_node set isprofilesurface = true;
-
---refactor of forms
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 11 where columnname ='pjoint_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 12 where columnname ='pjoint_type';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 13 where columnname ='descript' AND (formname not in ('ve_link','v_edit_inp_subcatchment'));
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 14 where columnname = 'annotation';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 15 where columnname = 'observ' AND formname <> 'v_edit_dimensions';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 16 where columnname = 'lastupdate';
-UPDATE config_form_fields SET layoutname ='lyt_data_3' , layoutorder = 17 where columnname = 'lastupdate_user';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 18 where columnname ='link';
-
-UPDATE config_form_fields SET  hidden = true where columnname = 'macrodma_id';
-UPDATE config_form_fields SET  hidden = true where columnname = 'inventory';
-UPDATE config_form_fields SET  hidden = true where columnname = 'feature_id' and formname !='ve_link';
-UPDATE config_form_fields SET  hidden = true where columnname = 'featurecat_id';
-UPDATE config_form_fields SET  hidden = true where columnname = 'connec_length';
-
-UPDATE config_form_fields SET  hidden = true where columnname = 'cmanhole_param_1';
-UPDATE config_form_fields SET  hidden = true where columnname = 'cmanhole_param_2';
-
-UPDATE config_form_fields SET  hidden = true where columnname IN ('accessibility', 'inlet');
-
-UPDATE config_form_fields SET layoutname = 'lyt_data_2',  layoutorder = 50 where columnname ='bottom_channel' AND formname LIKE '%_node_%';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 51 where columnname ='sander_depth' AND formname LIKE '%_node_%';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 52 where columnname ='length' AND formname LIKE '%_node_%';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 53 where columnname ='width' AND formname LIKE '%_node_%';
-
-UPDATE config_form_fields SET layoutname = 'lyt_data_2',  layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_connec_%';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_gully_%';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_arc_%';
-
-UPDATE config_form_fields SET  hidden = true where columnname = 'cat_shape' AND formname LIKE '%_arc_%';
-UPDATE config_form_fields SET  hidden = true where columnname = 'soilcat_id' AND formname LIKE '%_arc_%';
-
-UPDATE config_form_fields SET  hidden = true where columnname = 'depth' AND formname LIKE '%_connec_%';
-UPDATE config_form_fields SET  hidden = true where columnname = 'function_type' AND formname LIKE '%_connec_%';
-UPDATE config_form_fields SET  hidden = true where columnname = 'descript' AND formname LIKE '%_connec_%';
-UPDATE config_form_fields SET  hidden = true where columnname = 'annotation' AND formname LIKE '%_connec_%';
-
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1', layoutorder = 3 where columnname ='state' AND (formname not in ('v_edit_dimensions','ve_link'));
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1', layoutorder = 4 where columnname ='state_type';
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_1',layoutorder = 997 where columnname ='hemisphere';
-UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id' and formname !='ve_link';
-
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 30, hidden = true where columnname ='verified';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 32 where columnname ='dqa_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where columnname ='expl_id' AND (formname not in ('v_edit_dimensions','ve_link','v_edit_inp_subcatchment','v_edit_raingage')) AND formname not like '%ve_frelem%';
-UPDATE config_form_fields SET layoutname = 'lyt_data_1', layoutorder = 998 where columnname ='parent_id';
-
-update config_form_fields SET widgettype = 'text', dv_querytext = null, placeholder  ='Ex.macrosector_id' WHERE columnname  = 'macrosector_id';
-
--- add tooltips for specific fields
-UPDATE config_form_fields SET tooltip = 'accessibility - Para establecer si es accesible o no' WHERE columnname = 'accessibility' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'bottom_channel - Para establecer si tiene canal al fondo o no' WHERE columnname = 'bottom_channel' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'length - Longitud total' WHERE columnname = 'length' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'max_volume - Volumen máximo' WHERE columnname = 'max_volume' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'sander_depth - Profundidad del arenero' WHERE columnname = 'sander_depth' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'util_volume - Volumen útil' WHERE columnname = 'util_volume' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'width - Anchura total' WHERE columnname = 'width' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'prot_surface - Para establecer si existe un protector en superfície' WHERE columnname = 'prot_surface' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'serial_number - Número de serie del elemento' WHERE columnname = 'serial_number' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'siphon - Para establecer si tiene sifón o no' WHERE columnname = 'siphon' AND (tooltip IS NULL OR tooltip='siphon') AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'units - Número de rejas' WHERE columnname = 'units' AND (tooltip IS NULL OR tooltip = 'units') AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'sander_length - Longitud del arenero' WHERE columnname = 'sander_length' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'min_height - Altura mínima' WHERE columnname = 'min_height' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'custom_area - Area útil del depósito' WHERE columnname = 'custom_area' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'groove - Para establecer si hay ranura en el encintado' WHERE columnname = 'groove' AND tooltip = 'groove' AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'inlet - Elemento con aportaciones' WHERE columnname = 'inlet' AND tooltip IS NULL;
-
-UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE columnname = 'width' AND formname ='ve_node_chamber';
-UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE columnname = 'width' AND formname ='ve_node_pump_station';
-UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE columnname = 'width' AND formname ='ve_node_weir';
-
 UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_insert_elevation_from_dem', 'true', current_user)
 ON CONFLICT (parameter, cur_user) DO NOTHING;
@@ -729,67 +627,10 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
--- updates to manage matcat_id separately from catalog
-UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''NODE'' = ANY(feature_type)'
-WHERE columnname='matcat_id' AND formname LIKE 've_node%';
-
-UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type)'
-WHERE columnname='matcat_id' AND formname LIKE 've_connec%';
-
-UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type)'
-WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
-
-UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' arc_type', ' cat_feature_arc') WHERE dv_querytext like'% arc_type%';
-UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
-UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
-UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
-
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' arc_type', ' cat_feature_arc') WHERE dv_querytext like'% arc_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
-
---arc
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%ve_arc_%';
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%ve_arc%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
-UPDATE config_form_fields SET layoutorder = layoutorder +1  where (formname ilike 've_arc%' or formname='ve_arc') AND
-layoutname='lyt_data_2' and layoutorder > 12 and columnname!='fluid_type';
-
---node
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%ve_node_%';
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%ve_node%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_node%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_node%';
-
---connec
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'connec_id' and formname like '%ve_connec_%';
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'connec_id' and formname like '%ve_connec%';
-UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%ve_connec_%';
-UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%ve_connec%';
-update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_connec_%';
-update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_connec%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_connec%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_connec%';
-
---gully
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'gully_id' and formname like '%ve_gully_%';
-UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'gully_id' and formname like '%ve_gully%';
-UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%ve_gully_%';
-UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%ve_gully%';
-update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_gully_%';
-update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_gully_%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_gully%';
-UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_gully%';
-
-UPDATE config_form_fields SET widgettype = 'typeahead',
-dv_querytext = 'SELECT id, id as idval FROM cat_gully WHERE id IS NOT NULL' FROM cat_feature WHERE
-feature_class = 'NETGULLY' AND formname = child_layer and columnname = 'gullycat_id';
-
---placeholder
-UPDATE config_form_fields SET placeholder = 'Only when state is obsolete' where columnname = 'workcat_id_end';
-UPDATE config_form_fields SET placeholder = 'Catalog of the private part of connection' where columnname = 'private_connecat_id' AND formname like '%ve_connec%';
 
 UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_schema';
 
@@ -838,20 +679,7 @@ SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGraphanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
 WHERE parameter = 'admin_checkproject';
 
-UPDATE config_form_fields
-SET widgetcontrols = '{"labelPosition": "top"}'
-WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%') AND widgetcontrols IS NULL;
-
-UPDATE config_form_fields
-SET widgetcontrols = jsonb_set(widgetcontrols::jsonb, '{labelPosition}', '"top"', true)
-WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%');
-
 UPDATE config_param_user SET value='true' WHERE "parameter"='edit_plan_order_control' AND cur_user=current_user;
-
-UPDATE config_form_fields SET web_layoutorder=NULL
-	WHERE columnname='asset_id';
-UPDATE config_form_fields SET web_layoutorder=4
-	WHERE columnname='connec_id';
 
 -- 24/05/2023
 
@@ -860,29 +688,6 @@ UPDATE config_form_tabs SET device = '{5}' where formname like 'visit_%';
 UPDATE config_form_tabs SET device = '{5}' where formname like 'incident_%';
 UPDATE config_form_tabs SET device = '{4}' where formname like 'v_edit_%' and tabname = 'tab_plan';
 
--- 01/08/23
-
-UPDATE config_form_fields
-SET layoutorder = (SELECT attnum FROM pg_attribute WHERE attrelid = formname::regclass AND attname = columnname and attnum > 0 AND NOT attisdropped ORDER BY attnum LIMIT 1)
-WHERE formname IN ('v_edit_inp_frorifice', 'v_edit_inp_dscenario_frorifice', 'v_edit_inp_froutlet', 'v_edit_inp_dscenario_froutlet', 'v_edit_inp_frpump', 'v_edit_inp_dscenario_frpump', 'v_edit_inp_frweir', 'v_edit_inp_dscenario_frweir', 'v_edit_inp_dscenario_demand', 'v_edit_inp_dscenario_pump_additional', 'v_edit_inp_dscenario_pump','v_edit_inp_pump_additional', 'v_edit_inp_dscenario_virtualvalve', 'v_edit_inp_dscenario_virtualpump', 'v_edit_inp_dscenario_valve', 'v_edit_inp_dscenario_tank', 'v_edit_inp_dscenario_shortpipe', 'v_edit_inp_dscenario_rules', 'v_edit_inp_dscenario_reservoir', 'v_edit_inp_dscenario_pipe', 'v_edit_inp_dscenario_junction', 'v_edit_inp_dscenario_inlet', 'v_edit_inp_dscenario_controls', 'v_edit_inp_dscenario_connec', 'inp_dscenario_virtualvalve', 'v_edit_inp_dscenario_conduit', 'v_edit_inp_dscenario_inflows', 'v_edit_inp_dscenario_inflows_poll', 'v_edit_inp_dscenario_lids', 'v_edit_inp_dscenario_outfall', 'v_edit_inp_dscenario_raingage', 'v_edit_inp_dscenario_storage', 'v_edit_inp_dscenario_treatment');
-
--- set hiden and iseditable for dscenario arc_id/node_id/connec_id/feature_id
-UPDATE config_form_fields
-SET iseditable = false, hidden = false
-WHERE formname IN ('v_edit_inp_frorifice', 'v_edit_inp_dscenario_frorifice', 'v_edit_inp_froutlet', 'v_edit_inp_dscenario_froutlet', 'v_edit_inp_frpump', 'v_edit_inp_dscenario_frpump', 'v_edit_inp_frweir', 'v_edit_inp_dscenario_frweir', 'v_edit_inp_dscenario_demand', 'v_edit_inp_dscenario_pump_additional', 'v_edit_inp_dscenario_pump','v_edit_inp_pump_additional', 'v_edit_inp_dscenario_virtualvalve', 'v_edit_inp_dscenario_virtualpump', 'v_edit_inp_dscenario_valve', 'v_edit_inp_dscenario_tank', 'v_edit_inp_dscenario_shortpipe', 'v_edit_inp_dscenario_rules', 'v_edit_inp_dscenario_reservoir', 'v_edit_inp_dscenario_pipe', 'v_edit_inp_dscenario_junction', 'v_edit_inp_dscenario_inlet', 'v_edit_inp_dscenario_controls', 'v_edit_inp_dscenario_connec', 'inp_dscenario_virtualvalve', 'v_edit_inp_dscenario_conduit', 'v_edit_inp_dscenario_inflows', 'v_edit_inp_dscenario_inflows_poll', 'v_edit_inp_dscenario_lids', 'v_edit_inp_dscenario_outfall', 'v_edit_inp_dscenario_raingage', 'v_edit_inp_dscenario_storage', 'v_edit_inp_dscenario_treatment') AND columnname IN ('arc_id', 'node_id', 'connec_id','feature_id');
-UPDATE config_form_fields
-SET hidden=true
-WHERE formname='v_edit_inp_dscenario_junction' AND formtype='form_feature' AND columnname='peak_factor' AND tabname='tab_none';
-
-UPDATE config_form_fields
-SET ismandatory=true
-WHERE columnname='flwreg_length' OR columnname = 'order_id' OR columnname = 'to_arc' AND (tabname='tab_none' AND formname ilike 'v_edit_inp_flwreg%');
-
-UPDATE config_form_fields
-	SET iseditable=true
-	WHERE formname='v_edit_inp_dscenario_inflows' AND columnname='order_id';
-
-UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';
 
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
 
@@ -892,117 +697,7 @@ update config_toolbox set inputparams= '[{"widgetname":"graphClass", "label":"Gr
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 107, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 108, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
 
-UPDATE config_form_fields SET hidden=false WHERE formtype='form_featuretype_change' AND columnname='featurecat_id';
-
-UPDATE config_form_fields SET layoutname='lyt_nvo_curves_1', layoutorder= 2, stylesheet= NULL WHERE formtype='nvo_curves' AND columnname = 'expl_id';
-UPDATE config_form_fields SET layoutname='lyt_nvo_curves_2', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_curves' AND columnname = 'descript';
-UPDATE config_form_fields SET layoutname='lyt_nvo_patterns_1', layoutorder= 2, stylesheet= NULL WHERE formtype='nvo_paprinttterns' AND columnname = 'expl_id';
-UPDATE config_form_fields SET layoutname='lyt_nvo_patterns_1', layoutorder= 1, stylesheet= NULL WHERE formtype='nvo_patterns' AND columnname = 'observ';
-UPDATE config_form_fields SET layoutname='lyt_nvo_controls_1', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_controls' AND columnname = 'sector_id';
-UPDATE config_form_fields SET layoutname='lyt_nvo_timeseries_3', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_timeseries' AND columnname = 'expl_id';
-UPDATE config_form_fields SET layoutname='lyt_nvo_timeseries_4', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_timeseries' AND columnname = 'descript';
-
-
-
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=1, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='drainzone_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=2, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=3, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='drainzone_type' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=4, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=5, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=6, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=7, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=8, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=9, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='link' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=10, hidden=false WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
-
-UPDATE config_form_fields SET layoutname='lyt_workspace_open_1', layoutorder= 1, stylesheet= NULL WHERE formtype='workspace_open' AND columnname = 'descript';
-
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=1, hidden=false WHERE formname='v_ui_macrosector' AND formtype='form_feature' AND columnname='macrosector_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=2, hidden=false WHERE formname='v_ui_macrosector' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=3, hidden=false WHERE formname='v_ui_macrosector' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=4, hidden=false WHERE formname='v_ui_macrosector' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=5, hidden=false WHERE formname='v_ui_macrosector' AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_none';
-
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=1, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=2, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=3, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='sector_type' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=4, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='macrosector' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=5, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=6, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=7, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=8, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=9, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=10, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='parent_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=11, hidden=false WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='link' AND tabname='tab_none';
-
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=1, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='dwfzone_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=2, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=3, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='dwfzone_type' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=4, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=5, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=6, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=7, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=8, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=9, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='link' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=10, hidden=false WHERE formname='v_ui_dwfzone' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
-
 
 -- 04/02/2025
 UPDATE config_toolbox SET alias='Mapzones analysis', functionparams='{"featureType":[]}'::json, inputparams='[{"widgetname":"graphClass", "label":"Graph class:", "widgettype":"combo","datatype":"text","tooltip": "Graphanalytics method used", "layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["DRAINZONE","MACROSECTOR","SECTOR","DWFZONE"],
 "comboNames":["Drainage area (DRAINZONE)","(MACROSECTOR)","(SECTOR)","(DWFZONE)"], "selectedId":""},{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":2, "dvQueryText":"SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "selectedId":""}, {"widgetname":"floodOnlyMapzone", "label":"Flood only one mapzone: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Flood only identified mapzones. The purpose of this is update only network elements affected by this flooding keeping rest of network as is. Recommended to gain performance when mapzones ecosystem is under work", "placeholder":"1001", "layoutname":"grl_option_parameters","layoutorder":3, "value":""}, {"widgetname":"forceOpen", "label":"Force open nodes: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Optative node id(s) to temporary open closed node(s) in order to force algorithm to continue there", "placeholder":"1015,2231,3123", "layoutname":"grl_option_parameters","layoutorder":5, "value":""}, {"widgetname":"forceClosed", "label":"Force closed nodes: (*)","widgettype":"text","datatype":"text", "isMandatory":false, "tooltip":"Optative node id(s) to temporary close open node(s) to force algorithm to stop there","placeholder":"1015,2231,3123", "layoutname":"grl_option_parameters","layoutorder":6,"value":""}, {"widgetname":"usePlanPsector", "label":"Use selected psectors:", "widgettype":"check","datatype":"boolean","tooltip":"If true, use selected psectors. If false ignore selected psectors and only works with on-service network" , "layoutname":"grl_option_parameters","layoutorder":7,"value":""}, {"widgetname":"commitChanges", "label":"Commit changes:", "widgettype":"check","datatype":"boolean","tooltip":"If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables" , "layoutname":"grl_option_parameters","layoutorder":8,"value":""}, {"widgetname":"valueForDisconnected", "label":"Value for disconn. and conflict: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Value to use for disconnected features. Usefull for work in progress with dynamic mpzonesnode" , "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":9, "value":""}, {"widgetname":"updateMapZone", "label":"Mapzone constructor method:","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":10,"comboIds":[0,1,2,6], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "EPA SUBCATCH"], "selectedId":""}, {"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":11, "isMandatory":false, "placeholder":"5-30", "value":""}]'::json, observ=NULL, active=true, device='{4}' WHERE id=2768;
-
-
-UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL
-WHERE (formname='ve_arc' OR formname ILIKE 've_arc_%' OR formname='ve_connec' OR formname ILIKE 've_connec_%' OR formname='ve_node' OR formname ILIKE 've_node_%' OR formname='v_edit_element' OR formname ILIKE 've_element_%' OR formname='ve_gully' OR formname ILIKE 've_gully_%')
-AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_data';
--- 18/02/2025.
-UPDATE config_form_fields SET widgetcontrols= '{"setMultiline": false, "valueRelation": {"layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}' where columnname ='expl_id' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
-
--- 19/02/2025
-UPDATE config_form_fields SET layoutname='lyt_general_6', layoutorder=0, "datatype"='text', widgettype='textarea', "label"='Descript:', tooltip='Descript', placeholder=NULL, ismandatory=false, isparent=false, iseditable=false, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=0 WHERE formname='generic' AND formtype='psector' AND columnname='descript' AND tabname='tab_general';
-UPDATE config_form_fields SET layoutname='lyt_general_6', layoutorder=3, "datatype"='text', widgettype='textarea', "label"='Observation', tooltip='Observation', placeholder=NULL, ismandatory=false, isparent=false, iseditable=false, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=3 WHERE formname='generic' AND formtype='psector' AND columnname='observ' AND tabname='tab_general';
-UPDATE config_form_fields SET layoutname='lyt_general_4', layoutorder=1, "datatype"='string', widgettype='combo', "label"='Exploitation:', tooltip='Exploitation', placeholder=NULL, ismandatory=false, isparent=false, iseditable=false, isautoupdate=false, isfilter=false, dv_querytext='SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id != 0', dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet='{"label":"color:red; font-weight:bold"}'::json, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=0 WHERE formname='generic' AND formtype='psector' AND columnname='expl_id' AND tabname='tab_general';
-
-
--- 27/02/2025
-UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_wwtp_wwtptype''', dv_isnullvalue=True WHERE formname ILIKE 've_node%_wwtp' AND formtype='form_feature' AND columnname='wwtp_type' AND tabname='tab_data';
-
-UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_wwtp_treatmenttype''', dv_isnullvalue=True WHERE formname ILIKE 've_node%_wwtp' AND formtype='form_feature' AND columnname='treatment_type' AND tabname='tab_data';
-
--- arc
-UPDATE config_form_fields SET widgettype='datetime' WHERE (formname ILIKE 've_arc%' OR formname='ve_arc') AND formtype='form_feature' AND columnname='registration_date' AND tabname='tab_data';
-
--- 10/03/2025
-UPDATE config_form_fields SET layoutname='lyt_data_1', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''discharge_medium_typevalue''', dv_isnullvalue=TRUE WHERE columnname='discharge_medium' AND formname ILIKE '%outfall%';
-
--- 26/03/2025
-UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=37, "datatype"='double', widgettype='text', "label"='Custom length', tooltip='Custom length', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=NULL WHERE formname='ve_link' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_none';
-
--- 07/04/2025
-UPDATE config_form_fields SET layoutname='lyt_general_5', layoutorder=2, "datatype"='text', widgettype='text', "label"='Parent id:', tooltip='Parent id', placeholder=NULL, ismandatory=false, isparent=false, iseditable=false, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=1 WHERE formname='generic' AND formtype='psector' AND columnname='parent_id' AND tabname='tab_general';
-
--- 02/07/2025
-UPDATE config_form_fields SET stylesheet='{"label":"color:green; font-weight:bold;"}'::json WHERE columnname='expl_id';
-UPDATE config_form_fields SET stylesheet='{"label":"color:blue; font-weight:bold;"}'::json WHERE columnname='sector_id';
-
--- 16/07/2025
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_overflow_storage' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_chamber' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_change' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_highpoint' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_jump' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_junction' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_netelement' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_netgully' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_netinit' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_outfall' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_pump_station' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_rect_manhole' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_register' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_sandbox' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_sewer_storage' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_valve' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_virtual_node' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_weir' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_wwtp' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=71 WHERE formname='ve_node_circ_manhole' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';

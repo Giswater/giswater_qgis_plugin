@@ -112,7 +112,7 @@ BEGIN
 		v_tradma := (SELECT (value::json->>'DMA')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
 		-- get mapzone values
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector WHERE sector_id > 0) row' INTO v_sector;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM ve_sector WHERE sector_id > 0) row' INTO v_sector;
 
 		IF v_project_type = 'WS' THEN
 
@@ -125,11 +125,11 @@ BEGIN
 			v_trapresszone := (SELECT (value::json->>'PRESSZONE')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 			v_tradqa := (SELECT (value::json->>'DQA')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0) row' INTO v_dma;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'')) row' INTO v_presszone ;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0) row' INTO v_dqa ;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, null as stylesheet FROM v_edit_plan_netscenario_dma WHERE dma_id > 0 ) row' INTO v_netscenario_dma;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, null as stylesheet FROM v_edit_plan_netscenario_presszone WHERE presszone_id NOT IN (''0'', ''-1'') ) row' INTO v_netscenario_presszone ;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM ve_dma WHERE dma_id > 0) row' INTO v_dma;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM ve_presszone WHERE presszone_id NOT IN (''0'', ''-1'')) row' INTO v_presszone ;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM ve_dqa WHERE dqa_id > 0) row' INTO v_dqa ;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, null as stylesheet FROM ve_plan_netscenario_dma WHERE dma_id > 0 ) row' INTO v_netscenario_dma;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, null as stylesheet FROM ve_plan_netscenario_presszone WHERE presszone_id NOT IN (''0'', ''-1'') ) row' INTO v_netscenario_presszone ;
 
 		ELSIF v_project_type = 'UD' THEN
 
@@ -146,8 +146,8 @@ BEGIN
 			v_traddwfzone := (SELECT (value::json->>'DWFZONE')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
 			-- get mapzone values
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldrainzone||' as id, stylesheet::json FROM v_edit_drainzone WHERE drainzone_id > 0) row' INTO v_drainzone;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldwfzone||' as id, stylesheet::json FROM v_edit_dwfzone WHERE dwfzone_id > 0) row' INTO v_dwfzone;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldrainzone||' as id, stylesheet::json FROM ve_drainzone WHERE drainzone_id > 0) row' INTO v_drainzone;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldwfzone||' as id, stylesheet::json FROM ve_dwfzone WHERE dwfzone_id > 0) row' INTO v_dwfzone;
 
 		END IF;
 
@@ -177,14 +177,14 @@ BEGIN
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 					',"body":{"message":{}'||
 				',"data":{"mapzones":
-					[{"name":"sector", "mode": "'||v_modesector||'", "idname": "'||v_colsector||'", "layer":"v_edit_sector", "transparency":'||v_trasector||', "values":' || v_sector ||'}'||
-					',{"name":"presszone", "mode": "'||v_modepresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "transparency":'||v_trapresszone||',  "values":' || v_presszone ||'}'||
-					',{"name":"dma",  "mode": "'||v_modedma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "transparency":'||v_tradma||', "values":' || v_dma ||'}'||
-					',{"name":"dqa",  "mode": "'||v_modedqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "transparency":'||v_tradqa||', "values":' || v_dqa ||'}'||
-					',{"name":"netscenario_dma",  "mode": "'||v_modedma||'", "idname": "'||v_coldma||'", "layer":"v_edit_plan_netscenario_dma", "transparency":'||v_tradma||', "values":' || v_netscenario_dma ||'}'||
-					',{"name":"netscenario_presszone",  "mode": "'||v_modepresszone||'", "idname": "'||v_colpresszone||'", "layer":"v_edit_plan_netscenario_presszone", "transparency":'||v_trapresszone||', "values":' || v_netscenario_presszone ||'}'||
-					',{"name":"drainzone",  "mode": "'||v_modedrainzone||'", "idname": "'||v_coldrainzone||'", "layer":"v_edit_drainzone", "transparency":'||v_tradrainzone||', "values":' || v_drainzone ||'}'||
-					',{"name":"dwfzone",  "mode": "'||v_modedwfzone||'", "idname": "'||v_coldwfzone||'", "layer":"v_edit_dwfzone", "transparency":'||v_traddwfzone||', "values":' || v_dwfzone ||'}'||
+					[{"name":"sector", "mode": "'||v_modesector||'", "idname": "'||v_colsector||'", "layer":"ve_sector", "transparency":'||v_trasector||', "values":' || v_sector ||'}'||
+					',{"name":"presszone", "mode": "'||v_modepresszone||'", "idname":"'||v_colpresszone||'",  "layer":"ve_presszone", "transparency":'||v_trapresszone||',  "values":' || v_presszone ||'}'||
+					',{"name":"dma",  "mode": "'||v_modedma||'", "idname": "'||v_coldma||'", "layer":"ve_dma", "transparency":'||v_tradma||', "values":' || v_dma ||'}'||
+					',{"name":"dqa",  "mode": "'||v_modedqa||'", "idname": "'||v_coldqa||'", "layer":"ve_dqa", "transparency":'||v_tradqa||', "values":' || v_dqa ||'}'||
+					',{"name":"netscenario_dma",  "mode": "'||v_modedma||'", "idname": "'||v_coldma||'", "layer":"ve_plan_netscenario_dma", "transparency":'||v_tradma||', "values":' || v_netscenario_dma ||'}'||
+					',{"name":"netscenario_presszone",  "mode": "'||v_modepresszone||'", "idname": "'||v_colpresszone||'", "layer":"ve_plan_netscenario_presszone", "transparency":'||v_trapresszone||', "values":' || v_netscenario_presszone ||'}'||
+					',{"name":"drainzone",  "mode": "'||v_modedrainzone||'", "idname": "'||v_coldrainzone||'", "layer":"ve_drainzone", "transparency":'||v_tradrainzone||', "values":' || v_drainzone ||'}'||
+					',{"name":"dwfzone",  "mode": "'||v_modedwfzone||'", "idname": "'||v_coldwfzone||'", "layer":"ve_dwfzone", "transparency":'||v_traddwfzone||', "values":' || v_dwfzone ||'}'||
 					']}}'||
 			'}')::json;
 	END IF;

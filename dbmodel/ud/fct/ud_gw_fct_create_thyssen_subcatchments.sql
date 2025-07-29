@@ -42,7 +42,7 @@ BEGIN
 
 	IF v_delete_previous IS TRUE THEN
 
-		DELETE FROM inp_subcatchment WHERE sector_id IN (SELECT distinct sector_id FROM v_edit_sector);
+		DELETE FROM inp_subcatchment WHERE sector_id IN (SELECT distinct sector_id FROM ve_sector);
 
 	END IF;
 

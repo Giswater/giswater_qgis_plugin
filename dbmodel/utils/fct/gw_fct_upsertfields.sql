@@ -17,7 +17,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_upsertfields($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"node", "tableName":"v_edit_man_junction", "id":"1251521"},
+"feature":{"featureType":"node", "tableName":"ve_man_junction", "id":"1251521"},
 "data":{"fields":{"macrosector_id": "1", "sector_id": "2",
 "inventory": "False", "epa_type": "PUMP", "state": "1", "arc_id": "113854", "publish": "False", "verified": "TO REVIEW",
 "expl_id": "1", "builtdate": "2018/11/29", "muni_id": "2", "workcat_id": "22", "buildercat_id": "builder1", "enddate": "2018/11/29",

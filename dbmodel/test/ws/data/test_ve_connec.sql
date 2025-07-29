@@ -11,59 +11,23 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(18);
-
--- IMPORTANT: In this test, we check for existence using the code, not the ID,
--- because we don't allow the user to change the code.
--- In test_connec.sql, we test the `connec` table and can check `connec_id`,
--- but here we are testing the views.
-
--- connec -> ve_connec_fountain
-INSERT INTO ve_connec_fountain
-(connec_id, code, top_elev, "depth", connec_type, sys_type, conneccat_id, cat_matcat_id, cat_pnom, cat_dnom, cat_dint, epa_type, inp_type, state, state_type, expl_id, macroexpl_id, sector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, crmzone_id, crmzone_name, customer_code, connec_length, n_hydrometer, arc_id, annotation, observ, "comment", staticpressure, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, region_id, province_id, descript, svg, rotation, link, verified, "label", label_x, label_y, label_rotation, publish, inventory, num_value, pjoint_id, pjoint_type, adate, adescript, accessibility, asset_id, dma_style, presszone_style, priority, access_type, placement_type, om_state, conserv_state, is_operative, plot_code, brand_id, model_id, serial_number, minsector_id, demand_base, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, created_at, created_by, updated_at, updated_by, the_geom, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank, chlorinator, arq_patrimony, "name", demand_max, demand_min, demand_avg)
-VALUES('-901', '-901', 33.0000, NULL, 'FOUNTAIN', 'FOUNTAIN', 'PVC63-PN16-FOU', 'PVC', '16', '63', 63.00000, 'JUNCTION', 'JUNCTION', 1, 2, 2, 1, 5, '6', NULL, 85.00, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '-901', NULL, NULL, NULL, NULL, NULL, NULL, 52.070, 'soil1', NULL, NULL, NULL, NULL, 'work1', NULL, NULL, '2024-08-22', NULL, 'owner1', 2, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, '', '1', NULL, NULL, NULL, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '204,235,197', '255,255,204', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-08-22 16:38:55.000', 'postgres', '2024-08-22 16:44:08.000', 'postgres', 'SRID=25831;POINT (418470.98314069357 4577984.057125445)'::public.geometry, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL);
-SELECT is((SELECT count(*)::integer FROM ve_connec_fountain WHERE code = '-901'), 1, 'INSERT: ve_connec_fountain "-901" was inserted');
-SELECT is((SELECT count(*)::integer FROM connec WHERE code = '-901'), 1, 'INSERT: connec:fountain "-901" was inserted');
-
-UPDATE ve_connec_fountain SET top_elev = 33.0000 WHERE code = '-901';
-SELECT is((SELECT top_elev FROM ve_connec_fountain WHERE code = '-901'), 33.0000, 'UPDATE: ve_connec_fountain "-901" was updated');
-SELECT is((SELECT top_elev FROM connec WHERE code = '-901'), 33.0000, 'UPDATE: connec:fountain "-901" was updated');
-
-DELETE FROM ve_connec_fountain WHERE code = '-901';
-SELECT is((SELECT count(*)::integer FROM ve_connec_fountain WHERE code = '-901'), 0, 'DELETE: ve_connec_fountain "-901" was deleted');
-SELECT is((SELECT count(*)::integer FROM connec WHERE code = '-901'), 0, 'DELETE: connec:fountain "-901" was deleted');
+SELECT plan(6);
 
 
--- connec -> ve_connec_greentap
-INSERT INTO ve_connec_greentap
-(connec_id, code, top_elev, "depth", connec_type, sys_type, conneccat_id, cat_matcat_id, cat_pnom, cat_dnom, cat_dint, epa_type, inp_type, state, state_type, expl_id, macroexpl_id, sector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, crmzone_id, crmzone_name, customer_code, connec_length, n_hydrometer, arc_id, annotation, observ, "comment", staticpressure, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, region_id, province_id, descript, svg, rotation, link, verified, "label", label_x, label_y, label_rotation, publish, inventory, num_value, pjoint_id, pjoint_type, adate, adescript, accessibility, asset_id, dma_style, presszone_style, priority, access_type, placement_type, om_state, conserv_state, is_operative, plot_code, brand_id, model_id, serial_number, minsector_id, demand_base, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, created_at, created_by, updated_at, updated_by, the_geom, linked_connec, greentap_type, demand_max, demand_min, demand_avg)
-VALUES('-902', '-902', 32.9300, NULL, 'GREENTAP', 'GREENTAP', 'PVC50-PN16-GRE', 'PVC', '16', '50', 50.00000, 'JUNCTION', 'JUNCTION', 1, 2, 2, 1, 5, '6', NULL, 85.00, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '-902', NULL, NULL, NULL, NULL, NULL, NULL, 52.070, 'soil1', NULL, NULL, NULL, NULL, 'work1', NULL, NULL, '2024-08-22', NULL, 'owner1', 2, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, '', '1', NULL, NULL, NULL, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '204,235,197', '255,255,204', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-08-22 16:39:07.000', 'postgres', '2024-08-22 16:39:07.000', 'postgres', 'SRID=25831;POINT (418471.1473305661 4577983.030938743)'::public.geometry, NULL, NULL, NULL, NULL, NULL);
-SELECT is((SELECT count(*)::integer FROM ve_connec_greentap WHERE code = '-902'), 1, 'INSERT: ve_connec_greentap "-902" was inserted');
-SELECT is((SELECT count(*)::integer FROM connec WHERE code = '-902'), 1, 'INSERT: connec:greentap "-902" was inserted');
-
-UPDATE ve_connec_greentap SET top_elev = 33.0000 WHERE code = '-902';
-SELECT is((SELECT top_elev FROM ve_connec_greentap WHERE code = '-902'), 33.0000, 'UPDATE: ve_connec_greentap "-902" was updated');
-SELECT is((SELECT top_elev FROM connec WHERE code = '-902'), 33.0000, 'UPDATE: connec:greentap "-902" was updated');
-
-DELETE FROM ve_connec_greentap WHERE code = '-902';
-SELECT is((SELECT count(*)::integer FROM ve_connec_greentap WHERE code = '-902'), 0, 'DELETE: ve_connec_greentap "-902" was deleted');
-SELECT is((SELECT count(*)::integer FROM connec WHERE code = '-902'), 0, 'DELETE: connec:greentap "-902" was deleted');
+INSERT INTO ve_connec (code, sys_code, top_elev, "depth", connec_type, sys_type, conneccat_id, cat_matcat_id, cat_pnom, cat_dnom, cat_dint, epa_type, inp_type, state, state_type, expl_id, macroexpl_id, sector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, crmzone_id, crmzone_name, customer_code, connec_length, n_hydrometer, arc_id, annotation, observ, "comment", staticpressure, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, region_id, province_id, descript, svg, rotation, link, verified, "label", label_x, label_y, label_rotation, label_quadrant, publish, inventory, num_value, pjoint_id, pjoint_type, adate, adescript, accessibility, asset_id, dma_style, presszone_style, priority, access_type, placement_type, om_state, conserv_state, is_operative, plot_code, brand_id, model_id, serial_number, minsector_id, demand_base, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, created_at, created_by, updated_at, updated_by, the_geom, demand_max, demand_min, demand_avg)
+VALUES('-901','-901', 38.0963, NULL, 'WJOIN', 'WJOIN', 'PVC25-PN16-DOM', 'PVC', '16', '25', 25.00000, 'JUNCTION', 'JUNCTION', 1, 2, 1, 1, 3, '3', NULL, 71.75, 2, NULL, NULL, 1, NULL, NULL, NULL, NULL, 'cc3279', NULL, NULL, '2031', NULL, NULL, NULL, 33.654, 'soil1', 'St. Function', 'St. Category', 'St. Fluid', 'St. Location', 'work2', NULL, NULL, '1993-09-02', NULL, 'owner1', 1, '08830', 1, '1-11011C', 58, '58', NULL, NULL, NULL, 1, 1, NULL, NULL, 2.564, 'https://www.giswater.org', '0', NULL, '5', NULL, 2.564, NULL, true, true, NULL, '2031', 'ARC', NULL, NULL, NULL, NULL, '179,205,227', '204,235,197', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, 113921, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2021-03-28 17:06:35.000', 'postgres', '2024-02-21 12:08:24.000', 'postgres', 'SRID=25831;POINT (414234.94619056734 4576497.812674751)'::public.geometry, NULL, NULL, NULL);
+SELECT is((SELECT count(*)::integer FROM ve_connec WHERE code = '-901'), 1, 'INSERT: ve_connec -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM connec WHERE code = '-901'), 1, 'INSERT: connec -901 was inserted');
 
 
--- connec -> ve_connec_wjoin
-INSERT INTO ve_connec_wjoin
-(connec_id, code, top_elev, "depth", connec_type, sys_type, conneccat_id, cat_matcat_id, cat_pnom, cat_dnom, cat_dint, epa_type, inp_type, state, state_type, expl_id, macroexpl_id, sector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, crmzone_id, crmzone_name, customer_code, connec_length, n_hydrometer, arc_id, annotation, observ, "comment", staticpressure, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, region_id, province_id, descript, svg, rotation, link, verified, "label", label_x, label_y, label_rotation, publish, inventory, num_value, pjoint_id, pjoint_type, adate, adescript, accessibility, asset_id, dma_style, presszone_style, priority, access_type, placement_type, om_state, conserv_state, is_operative, plot_code, brand_id, model_id, serial_number, minsector_id, demand_base, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, created_at, created_by, updated_at, updated_by, the_geom, top_floor, wjoin_type, demand_max, demand_min, demand_avg)
-VALUES('-903', '-903', 33.0300, NULL, 'WJOIN', 'WJOIN', 'PVC32-PN16-DOM', 'PVC', '16', '32', 32.00000, 'JUNCTION', 'JUNCTION', 1, 2, 2, 1, 5, '6', NULL, 85.00, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '-903', NULL, NULL, NULL, NULL, NULL, NULL, 51.970, 'soil1', NULL, NULL, NULL, NULL, 'work1', NULL, NULL, '2024-08-22', NULL, 'owner1', 2, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, '', '1', NULL, NULL, NULL, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '204,235,197', '255,255,204', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-08-22 16:39:19.000', 'postgres', '2024-08-22 16:39:19.000', 'postgres', 'SRID=25831;POINT (418471.2704729705 4577982.127894443)'::public.geometry, NULL, NULL, NULL, NULL, NULL);
-SELECT is((SELECT count(*)::integer FROM ve_connec_wjoin WHERE code = '-903'), 1, 'INSERT: ve_connec_wjoin "-903" was inserted');
-SELECT is((SELECT count(*)::integer FROM connec WHERE code = '-903'), 1, 'INSERT: connec:wjoin "-903" was inserted');
+UPDATE ve_connec SET descript = 'updated descript' WHERE code = '-901';
+SELECT is((SELECT descript FROM ve_connec WHERE code = '-901'), 'updated descript', 'UPDATE: ve_connec -901 was updated');
+SELECT is((SELECT descript FROM connec WHERE code = '-901'), 'updated descript', 'UPDATE: connec -901 was updated');
 
-UPDATE ve_connec_wjoin SET top_elev = 33.0000 WHERE code = '-903';
-SELECT is((SELECT top_elev FROM ve_connec_wjoin WHERE code = '-903'), 33.0000, 'UPDATE: ve_connec_wjoin "-903" was updated');
-SELECT is((SELECT top_elev FROM connec WHERE code = '-903'), 33.0000, 'UPDATE: connec:wjoin "-903" was updated');
 
-DELETE FROM ve_connec_wjoin WHERE code = '-903';
-SELECT is((SELECT count(*)::integer FROM ve_connec_wjoin WHERE code = '-903'), 0, 'DELETE: ve_connec_wjoin "-903" was deleted');
-SELECT is((SELECT count(*)::integer FROM connec WHERE code = '-903'), 0, 'DELETE: connec:wjoin "-903" was deleted');
+DELETE FROM ve_connec WHERE code = '-901';
+SELECT is((SELECT count(*)::integer FROM ve_connec WHERE code = '-901'), 0, 'DELETE: ve_connec -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM connec WHERE code = '-901'), 0, 'DELETE: connec -901 was deleted');
 
 
 SELECT * FROM finish();

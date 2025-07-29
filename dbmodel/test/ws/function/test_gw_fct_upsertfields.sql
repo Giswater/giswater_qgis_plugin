@@ -30,6 +30,8 @@ GRANT role_om to om_user;
 CREATE USER basic_user;
 GRANT role_basic to basic_user;
 
+INSERT INTO plan_netscenario (netscenario_id, "name", descript, parent_id, netscenario_type, active, expl_id, log) VALUES(1, 'Test Netscenario', 'Test Netscenario Descript', NULL, 'DMA', true, 1, NULL);
+
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_upsertfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"1, 2", "tableName":"plan_netscenario_dma"},

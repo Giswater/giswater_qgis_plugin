@@ -12,7 +12,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_connec_duplicated($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_wjoin", "id":["1004","1005"]},
+"feature":{"tableName":"ve_man_wjoin", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection",	"parameters":{"connecTolerance":1},	"parameters":{}}}$$)
 
 -- fid: 105

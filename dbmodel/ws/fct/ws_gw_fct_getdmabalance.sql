@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getdmabalance(p_data json) RETUR
 $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getdmabalance($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_dma", "id":"1"}, 
+"form":{},"feature":{"tableName":"ve_dma", "id":"1"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{},"coordinates":{"xcoord":419254.77166562714,"ycoord":4576827.482150269, "zoomRatio":449.27899973010625}}}$$)::JSON
 

@@ -173,7 +173,7 @@ BEGIN
 
      	-- TO DO: default value for orifice class if null -> default curve_id
      	v_origin_table = TG_TABLE_NAME;
-		v_parent_table = split_part(REGEXP_REPLACE(v_origin_table, '^(man_|v_|v_edit_|ve_)', '', 'gi'), '_', 1);
+		v_parent_table = split_part(REGEXP_REPLACE(v_origin_table, '^(man_|v_|ve_|ve_)', '', 'gi'), '_', 1);
      
      	-- take and clean NEW
     	SELECT row_to_json(NEW) INTO v_json_data;
@@ -201,9 +201,9 @@ BEGIN
 		
 		UPDATE temp_new_vals SET val = quote_literal(ST_astext(NEW.the_geom)) WHERE col = 'the_geom';
 	
-		--UPDATE temp_new_vals SET table_name = split_part(REGEXP_REPLACE(v_origin_table, '^(v_|v_edit_|ve_)', '', 'gi'), '_', 1);
+		--UPDATE temp_new_vals SET table_name = split_part(REGEXP_REPLACE(v_origin_table, '^(v_|ve_|ve_)', '', 'gi'), '_', 1);
 	
-		update temp_new_vals set table_name = 'flwreg' where table_name = 'v_edit_flwreg';
+		update temp_new_vals set table_name = 'flwreg' where table_name = 've_flwreg';
 	
 		DELETE FROM temp_new_vals WHERE col IN ('expl_id', 'muni_id', 'flwreg_type');
 

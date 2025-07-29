@@ -68,52 +68,52 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_plan_netscenario_presszone", "isLayer":true},
+    "feature":{"tableName":"ve_plan_netscenario_presszone", "isLayer":true},
     "data":{"filterFields":{}, "pageInfo":{}, "infoType":"full"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_plan_netscenario_presszone" returns status "Accepted"'
+    'Check if gw_fct_getinfofromid --> "tableName":"ve_plan_netscenario_presszone" returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_sector"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_sector"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_sector" returns status "Accepted"'
+    'Check if gw_fct_getinfofromid --> "tableName":"ve_sector" returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_sector", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_sector", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_sector" with id returns status "Accepted"'
+    'Check if gw_fct_getinfofromid --> "tableName":"ve_sector" with id returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_dma"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_dma"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_dma" returns status "Accepted"'
+    'Check if gw_fct_getinfofromid --> "tableName":"ve_dma" returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_dma", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_dma", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_dma" with id returns status "Accepted"'
+    'Check if gw_fct_getinfofromid --> "tableName":"ve_dma" with id returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_dqa"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_dqa"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_dqa" returns status "Accepted"'
+    'Check if gw_fct_getinfofromid --> "tableName":"ve_dqa" returns status "Accepted"'
 );
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_dqa", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_dqa", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_dqa" with id returns status "Accepted"'
+    'Check if gw_fct_getinfofromid --> "tableName":"ve_dqa" with id returns status "Accepted"'
 );
 
 SELECT is(
@@ -126,9 +126,9 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_cat_dscenario", "id":"1"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"tableName":"ve_cat_dscenario", "id":"1"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_cat_dscenario" with id returns status "Accepted"'
+    'Check if gw_fct_getinfofromid --> "tableName":"ve_cat_dscenario" with id returns status "Accepted"'
 );
 
 -- Finish the test

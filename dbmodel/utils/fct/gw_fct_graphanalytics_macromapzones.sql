@@ -71,7 +71,7 @@ BEGIN
 	v_macro_table := lower(v_class);
 	v_child_table := replace(v_macro_table, 'macro', '');
 	v_macro_id_field := v_macro_table || '_id';
-	v_visible_layer := 'v_edit_' || v_macro_table;
+	v_visible_layer := 've_' || v_macro_table;
 
 	-- Parse expl_id array
 	IF v_expl_id = '-901' THEN
@@ -119,13 +119,13 @@ BEGIN
 	GROUP BY '||v_macro_id_field||'';
 
 	IF v_commitchanges THEN -- update macromapzone table
-		
+
 		EXECUTE '
 		UPDATE '|| v_macro_table ||' t SET the_geom = a.the_geom FROM ('||v_query_geom||')a 
 		WHERE t.'||v_macro_id_field||' = a.'||v_macro_id_field||'
 		';
 	ELSE -- temporal layer
-	
+
 		EXECUTE '
 		SELECT COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
 		FROM (
@@ -137,7 +137,7 @@ BEGIN
 			FROM ('||v_query_geom||') AS row
 		) AS features
 		' INTO v_result_polygon;
-		
+
 	END IF;
 
 

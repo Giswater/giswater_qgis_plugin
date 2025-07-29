@@ -33,7 +33,7 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_getwidgetprices($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "tableName":"v_edit_plan_psector_x_other", "psectorId":5}}$$)::JSON)->>'status',
+    "data":{"filterFields":{}, "pageInfo":{}, "tableName":"ve_plan_psector_x_other", "psectorId":5}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getwidgetprices returns status "Accepted"'
 );

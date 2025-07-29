@@ -11,61 +11,24 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(18);
+SELECT plan(6);
 
--- IMPORTANT: In this test, we check for existence using the code, not the ID,
--- because we don't allow the user to change the code.
--- In test_gully.sql, we test the `gully` table and can check `gully_id`,
--- but here we are testing the views.
+INSERT INTO ve_gully (gully_id, code, sys_code, top_elev, width, length, ymax, sandbox, matcat_id, gully_type, sys_type, gullycat_id, cat_gully_matcat, units, groove, groove_height, groove_length, siphon, connec_arccat_id, connec_length, connec_depth, connec_matcat_id, connec_y1, connec_y2, arc_id, omunit_id, epa_type, state, state_type, expl_id, macroexpl_id, sector_id, sector_type, macrosector_id, muni_id, drainzone_id, drainzone_type, omzone_id, omzone_type, macroomzone_id, dwfzone_id, dwfzone_type, minsector_id, soilcat_id, function_type, category_type, location_type, fluid_type, descript, annotation, observ, "comment", link, num_value, district_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, region_id, province_id, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, placement_type, access_type, asset_id, adate, adescript, verified, uncertain, "label", label_x, label_y, label_rotation, rotation, label_quadrant, svg, inventory, publish, is_operative, inp_type, sector_style, omzone_style, drainzone_style, dwfzone_style, lock_level, expl_visibility, created_at, created_by, updated_at, updated_by, the_geom, pjoint_id, pjoint_type, units_placement, siphon_type, odorflap, dwfzone_outfall, drainzone_outfall)
+VALUES('-901', '-901', '-901', 36.7800, 34.5000, 77.6000, 0.8000, 0.0000, 'Concrete', 'GINLET', 'GULLY', 'SGRT4', 'FD', 1.00, false, NULL, NULL, false, 'PVC-CC025_D', 4.672, 1.200, 'Concrete', 35.9800, NULL, '18893', 0, 'GULLY', 1, 2, 2, 1, 2, NULL, 2, 2, NULL, NULL, 3, NULL, 2, 0, NULL, 0, 'soil1', 'St. Function', 'St. Category', 'St. Location', 0, NULL, NULL, NULL, NULL, 'https://www.giswater.org', NULL, 2, '08830', '1-10320C', NULL, NULL, NULL, NULL, NULL, 1, 1, 'work3', NULL, NULL, '2023-10-15', NULL, 'owner1', NULL, NULL, NULL, NULL, NULL, 0, false, NULL, '3', NULL, -9.377, -9.377, NULL, NULL, true, true, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2021-09-05 15:42:47.000', 'postgres', NULL, NULL, 'SRID=25831;POINT (429089.6348767015 4576325.2010902)'::public.geometry, '18893', 'ARC', NULL, NULL, NULL, NULL, NULL);
 
--- gully -> ve_gully_ginlet
-INSERT INTO ve_gully_ginlet
-(gully_id, code, sys_code, top_elev, ymax, sandbox, matcat_id, gully_type, sys_type, gullycat_id, cat_gully_matcat, units, groove, groove_height, groove_length, siphon, connec_arccat_id, connec_length, connec_depth, connec_matcat_id, connec_y1, connec_y2, width, length, arc_id, epa_type, inp_type, state, state_type, expl_id, macroexpl_id, sector_id, macrosector_id, drainzone_id, omzone_id, macroomzone_id, annotation, observ, "comment", soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, region_id, province_id, descript, svg, rotation, link, verified, "label", label_x, label_y, label_rotation, publish, inventory, uncertain, num_value, pjoint_id, pjoint_type, asset_id, units_placement, is_operative, adate, adescript, siphon_type, odorflap, placement_type, created_at, created_by, updated_at, updated_by, the_geom, dwfzone_outfall, drainzone_outfall)
-VALUES('-901', '-901', '-901', 33.0000, NULL, NULL, 'N/I', 'GINLET', 'GULLY', 'SGRT3', 'FD', 1.00, false, NULL, NULL, false, 'CC020_D', NULL, NULL, NULL, NULL, NULL, 30.0000, 64.0000, NULL, 'GULLY', 'GULLY', 1, 2, 2, 1, 2, 2, NULL, 3, NULL, NULL, NULL, NULL, 'soil1', NULL, NULL, 0, NULL, 'work1', NULL, NULL, '2024-08-23', NULL, 'owner1', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, 350.443, '', '1', NULL, NULL, NULL, NULL, true, true, false, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, '2024-08-23 09:44:56.000', 'postgres', '2024-08-23 09:44:56.000', 'postgres', 'SRID=25831;POINT (418460.4262488815 4577992.6105188895)'::public.geometry, NULL, NULL);
-SELECT is((SELECT count(*)::integer FROM ve_gully_ginlet WHERE code = '-901'), 1, 'INSERT: ve_gully_ginlet "-901" was inserted');
-SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-901'), 1, 'INSERT: gully "-901" was inserted');
+SELECT is((SELECT count(*)::integer FROM ve_gully WHERE code = '-901'), 1, 'INSERT: ve_gully -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-901'), 1, 'INSERT: gully -901 was inserted');
 
-UPDATE ve_gully_ginlet SET top_elev = 33.0000 WHERE code = '-901';
-SELECT is((SELECT top_elev FROM ve_gully_ginlet WHERE code = '-901'), 33.0000, 'UPDATE: ve_gully_ginlet "-901" was updated');
-SELECT is((SELECT top_elev FROM gully WHERE code = '-901'), 33.0000, 'UPDATE: gully "-901" was updated');
+UPDATE ve_gully SET annotation = 'updated annotation' WHERE code = '-901';
+SELECT is((SELECT annotation FROM ve_gully WHERE code = '-901'), 'updated annotation', 'UPDATE: ve_gully -901 was updated');
+SELECT is((SELECT annotation FROM gully WHERE code = '-901'), 'updated annotation', 'UPDATE: gully -901 was updated');
 
-DELETE FROM ve_gully_ginlet WHERE code = '-901';
-SELECT is((SELECT count(*)::integer FROM ve_gully_ginlet WHERE code = '-901'), 0, 'DELETE: ve_gully_ginlet "-901" was deleted');
-SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-901'), 0, 'DELETE: gully "-901" was deleted');
-
-
--- gully -> ve_gully_pgully
-INSERT INTO ve_gully_pgully
-(gully_id, code, sys_code, top_elev, ymax, sandbox, matcat_id, gully_type, sys_type, gullycat_id, cat_gully_matcat, units, groove, groove_height, groove_length, siphon, connec_arccat_id, connec_length, connec_depth, connec_matcat_id, connec_y1, connec_y2, width, length, arc_id, epa_type, inp_type, state, state_type, expl_id, macroexpl_id, sector_id, macrosector_id, drainzone_id, omzone_id, macroomzone_id, annotation, observ, "comment", soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, region_id, province_id, descript, svg, rotation, link, verified, "label", label_x, label_y, label_rotation, publish, inventory, uncertain, num_value, pjoint_id, pjoint_type, asset_id, units_placement, is_operative, adate, adescript, siphon_type, odorflap, placement_type, created_at, created_by, updated_at, updated_by, the_geom, grate_param_1, grate_param_2, dwfzone_outfall, drainzone_outfall)
-VALUES('-902', '-902', '-902', 33.0000, NULL, NULL, 'N/I', 'PGULLY', 'GULLY', 'PGULLY', 'FD', 1.00, false, NULL, NULL, false, 'CC020_D', NULL, NULL, NULL, NULL, NULL, 25.0000, 50.0000, NULL, 'GULLY', 'GULLY', 1, 2, 2, 1, 2, 2, NULL, 3, NULL, NULL, NULL, NULL, 'soil1', NULL, NULL, 0, NULL, 'work1', NULL, NULL, '2024-08-23', NULL, 'owner1', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, 350.443, '', '1', NULL, NULL, NULL, NULL, true, true, false, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, '2024-08-23 09:45:07.000', 'postgres', '2024-08-23 09:45:07.000', 'postgres', 'SRID=25831;POINT (418461.31281972467 4577992.776750923)'::public.geometry, NULL, false, NULL, NULL);
-SELECT is((SELECT count(*)::integer FROM ve_gully_pgully WHERE code = '-902'), 1, 'INSERT: ve_gully_pgully "-902" was inserted');
-SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-902'), 1, 'INSERT: gully "-902" was inserted');
-
-UPDATE ve_gully_pgully SET top_elev = 33.0000 WHERE code = '-902';
-SELECT is((SELECT top_elev FROM ve_gully_pgully WHERE code = '-902'), 33.0000, 'UPDATE: ve_gully_pgully "-902" was updated');
-SELECT is((SELECT top_elev FROM gully WHERE code = '-902'), 33.0000, 'UPDATE: gully "-902" was updated');
-
-DELETE FROM ve_gully_pgully WHERE code = '-902';
-SELECT is((SELECT count(*)::integer FROM ve_gully_pgully WHERE code = '-902'), 0, 'DELETE: ve_gully_pgully "-902" was deleted');
-SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-902'), 0, 'DELETE: gully "-902" was deleted');
-
-
--- gully -> ve_gully_vgully
-INSERT INTO ve_gully_vgully
-(gully_id, code, sys_code, top_elev, ymax, sandbox, matcat_id, gully_type, sys_type, gullycat_id, cat_gully_matcat, units, groove, groove_height, groove_length, siphon, connec_arccat_id, connec_length, connec_depth, connec_matcat_id, connec_y1, connec_y2, width, length, arc_id, epa_type, inp_type, state, state_type, expl_id, macroexpl_id, sector_id, macrosector_id, drainzone_id, omzone_id, macroomzone_id, annotation, observ, "comment", soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, region_id, province_id, descript, svg, rotation, link, verified, "label", label_x, label_y, label_rotation, publish, inventory, uncertain, num_value, pjoint_id, pjoint_type, asset_id, units_placement, is_operative, adate, adescript, siphon_type, odorflap, placement_type, created_at, created_by, updated_at, updated_by, the_geom, dwfzone_outfall, drainzone_outfall)
-VALUES('-903', '-903', '-903', 33.0000, NULL, NULL, 'N/I', 'VGULLY', 'GULLY', 'SGRT6', 'FD', 1.00, false, NULL, NULL, false, 'CC020_D', NULL, NULL, NULL, NULL, NULL, 29.5000, 56.5000, NULL, 'GULLY', 'GULLY', 1, 2, 2, 1, 2, 2, NULL, 3, NULL, NULL, NULL, NULL, 'soil1', NULL, NULL, 0, NULL, 'work1', NULL, NULL, '2024-08-23', NULL, 'owner1', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, 350.443, '', '1', NULL, NULL, NULL, NULL, true, true, false, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, '2024-08-23 09:52:22.000', 'postgres', '2024-08-23 09:52:22.000', 'postgres', 'SRID=25831;POINT (418462.42103327863 4577992.942982956)'::public.geometry, NULL, NULL);
-SELECT is((SELECT count(*)::integer FROM ve_gully_vgully WHERE code = '-903'), 1, 'INSERT: ve_gully_vgully "-903" was inserted');
-SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-903'), 1, 'INSERT: gully "-903" was inserted');
-
-UPDATE ve_gully_vgully SET top_elev = 33.0000 WHERE code = '-903';
-SELECT is((SELECT top_elev FROM ve_gully_vgully WHERE code = '-903'), 33.0000, 'UPDATE: ve_gully_vgully "-903" was updated');
-SELECT is((SELECT top_elev FROM gully WHERE code = '-903'), 33.0000, 'UPDATE: gully "-903" was updated');
-
-DELETE FROM ve_gully_vgully WHERE code = '-903';
-SELECT is((SELECT count(*)::integer FROM ve_gully_vgully WHERE code = '-903'), 0, 'DELETE: ve_gully_vgully "-903" was deleted');
-SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-903'), 0, 'DELETE: gully "-903" was deleted');
+DELETE FROM ve_gully WHERE code = '-901';
+SELECT is((SELECT count(*)::integer FROM ve_gully WHERE code = '-901'), 0, 'DELETE: ve_gully -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM gully WHERE code = '-901'), 0, 'DELETE: gully -901 was deleted');
 
 
 SELECT * FROM finish();
+
 
 ROLLBACK;

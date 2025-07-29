@@ -32,11 +32,11 @@ BEGIN
 	 	IF v_dscenario_type = 'CONDUIT' THEN
 
 			-- default values
-			IF NEW.arccat_id IS NULL OR NEW.arccat_id='' THEN NEW.arccat_id = (SELECT arccat_id FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.matcat_id IS NULL OR NEW.matcat_id='' THEN NEW.matcat_id = (SELECT matcat_id FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.elev1 IS NULL THEN NEW.elev1 = (SELECT sys_elev1 FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.elev2 IS NULL THEN NEW.elev2 = (SELECT sys_elev2 FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.barrels IS NULL THEN NEW.barrels = (SELECT barrels FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.arccat_id IS NULL OR NEW.arccat_id='' THEN NEW.arccat_id = (SELECT arccat_id FROM ve_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.matcat_id IS NULL OR NEW.matcat_id='' THEN NEW.matcat_id = (SELECT matcat_id FROM ve_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.elev1 IS NULL THEN NEW.elev1 = (SELECT sys_elev1 FROM ve_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.elev2 IS NULL THEN NEW.elev2 = (SELECT sys_elev2 FROM ve_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.barrels IS NULL THEN NEW.barrels = (SELECT barrels FROM ve_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
 
 			INSERT INTO inp_dscenario_conduit (dscenario_id, arc_id, arccat_id, matcat_id, elev1, elev2, custom_n, barrels, culvert, kentry, kexit,
 			kavg, flap, q0, qmax, seepage)
@@ -47,13 +47,13 @@ BEGIN
 		ELSIF v_dscenario_type = 'FLWREG-ORIFICE' THEN
 
 			-- default values
-			IF NEW.ori_type IS NULL OR NEW.ori_type='' THEN NEW.ori_type = (SELECT ori_type FROM v_edit_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM v_edit_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.cd IS NULL THEN NEW.cd = (SELECT cd FROM v_edit_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.flap IS NULL OR NEW.flap='' THEN NEW.flap = (SELECT flap FROM v_edit_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.shape IS NULL OR NEW.shape='' THEN NEW.shape = (SELECT shape FROM v_edit_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.geom1 IS NULL THEN NEW.geom1 = (SELECT geom1 FROM v_edit_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.geom2 IS NULL THEN NEW.geom2 = (SELECT geom2 FROM v_edit_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.ori_type IS NULL OR NEW.ori_type='' THEN NEW.ori_type = (SELECT ori_type FROM ve_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM ve_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd IS NULL THEN NEW.cd = (SELECT cd FROM ve_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.flap IS NULL OR NEW.flap='' THEN NEW.flap = (SELECT flap FROM ve_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.shape IS NULL OR NEW.shape='' THEN NEW.shape = (SELECT shape FROM ve_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom1 IS NULL THEN NEW.geom1 = (SELECT geom1 FROM ve_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom2 IS NULL THEN NEW.geom2 = (SELECT geom2 FROM ve_inp_frorifice WHERE nodarc_id = NEW.nodarc_id);END IF;
 
 			INSERT INTO inp_dscenario_frorifice (dscenario_id, nodarc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
 			VALUES (NEW.dscenario_id, NEW.nodarc_id, NEW.ori_type, NEW.offsetval, NEW.cd, NEW.orate, NEW.flap, NEW.shape, NEW.geom1, NEW.geom2, NEW.geom3, NEW.geom4);
@@ -61,11 +61,11 @@ BEGIN
 	 	ELSIF v_dscenario_type = 'FLWREG-OUTLET' THEN
 
 			-- default values
-			IF NEW.outlet_type IS NULL OR NEW.outlet_type='' THEN NEW.outlet_type = (SELECT outlet_type FROM v_edit_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM v_edit_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.cd1 IS NULL THEN NEW.cd1 = (SELECT cd1 FROM v_edit_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM v_edit_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.outlet_type IS NULL OR NEW.outlet_type='' THEN NEW.outlet_type = (SELECT outlet_type FROM ve_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM ve_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM ve_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd1 IS NULL THEN NEW.cd1 = (SELECT cd1 FROM ve_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM ve_inp_froutlet WHERE nodarc_id = NEW.nodarc_id);END IF;
 
 			INSERT INTO inp_dscenario_froutlet (dscenario_id, nodarc_id, outlet_type, offsetval, curve_id, cd1, cd2)
 			VALUES (NEW.dscenario_id, NEW.nodarc_id, NEW.outlet_type, NEW.offsetval, NEW.curve_id, NEW.cd1, NEW.cd2);
@@ -73,10 +73,10 @@ BEGIN
 	 	ELSIF v_dscenario_type = 'FLWREG-PUMP' THEN
 
 			-- default values
-			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_frpump WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_frpump WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.startup IS NULL THEN NEW.startup = (SELECT startup FROM v_edit_inp_frpump WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.shutoff IS NULL THEN NEW.shutoff = (SELECT shutoff FROM v_edit_inp_frpump WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM ve_inp_frpump WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM ve_inp_frpump WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.startup IS NULL THEN NEW.startup = (SELECT startup FROM ve_inp_frpump WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.shutoff IS NULL THEN NEW.shutoff = (SELECT shutoff FROM ve_inp_frpump WHERE nodarc_id = NEW.nodarc_id);END IF;
 
 			INSERT INTO inp_dscenario_frpump (dscenario_id, nodarc_id, curve_id, status, startup, shutoff)
 			VALUES (NEW.dscenario_id, NEW.nodarc_id, NEW.curve_id, NEW.status, NEW.startup, NEW.shutoff);
@@ -84,20 +84,20 @@ BEGIN
 	 	ELSIF v_dscenario_type = 'FLWREG-WEIR' THEN
 
 			-- default values
-			IF NEW.weir_type IS NULL OR NEW.weir_type='' THEN NEW.weir_type = (SELECT weir_type FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.cd IS NULL THEN NEW.cd = (SELECT cd FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.ec IS NULL THEN NEW.ec = (SELECT ec FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.flap IS NULL OR NEW.flap='' THEN NEW.flap = (SELECT flap FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.geom1 IS NULL THEN NEW.geom1 = (SELECT geom1 FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.geom2 IS NULL THEN NEW.geom2 = (SELECT geom2 FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.geom3 IS NULL THEN NEW.geom3 = (SELECT geom3 FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.geom4 IS NULL THEN NEW.geom4 = (SELECT geom4 FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.surcharge IS NULL OR NEW.surcharge='' THEN NEW.surcharge = (SELECT surcharge FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.road_width IS NULL THEN NEW.road_width = (SELECT road_width FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.road_surf IS NULL OR NEW.road_surf='' THEN NEW.road_surf = (SELECT road_surf FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
-			IF NEW.coef_curve IS NULL THEN NEW.coef_curve = (SELECT coef_curve FROM v_edit_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.weir_type IS NULL OR NEW.weir_type='' THEN NEW.weir_type = (SELECT weir_type FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd IS NULL THEN NEW.cd = (SELECT cd FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.ec IS NULL THEN NEW.ec = (SELECT ec FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.flap IS NULL OR NEW.flap='' THEN NEW.flap = (SELECT flap FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom1 IS NULL THEN NEW.geom1 = (SELECT geom1 FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom2 IS NULL THEN NEW.geom2 = (SELECT geom2 FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom3 IS NULL THEN NEW.geom3 = (SELECT geom3 FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom4 IS NULL THEN NEW.geom4 = (SELECT geom4 FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.surcharge IS NULL OR NEW.surcharge='' THEN NEW.surcharge = (SELECT surcharge FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.road_width IS NULL THEN NEW.road_width = (SELECT road_width FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.road_surf IS NULL OR NEW.road_surf='' THEN NEW.road_surf = (SELECT road_surf FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.coef_curve IS NULL THEN NEW.coef_curve = (SELECT coef_curve FROM ve_inp_frweir WHERE nodarc_id = NEW.nodarc_id);END IF;
 
 			INSERT INTO inp_dscenario_frweir (dscenario_id, nodarc_id, weir_type, offsetval, cd, ec,
 			cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve)
@@ -107,9 +107,9 @@ BEGIN
 		ELSIF v_dscenario_type = 'INFLOWS' THEN
 
 			-- default values
-			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM v_edit_inp_inflows WHERE node_id = NEW.node_id AND order_id = NEW.order_id);END IF;
-			IF NEW.base IS NULL THEN NEW.base = (SELECT base FROM v_edit_inp_inflows WHERE node_id = NEW.node_id AND order_id = NEW.order_id);END IF;
-			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_inflows WHERE node_id = NEW.node_id AND order_id = NEW.order_id);END IF;
+			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM ve_inp_inflows WHERE node_id = NEW.node_id AND order_id = NEW.order_id);END IF;
+			IF NEW.base IS NULL THEN NEW.base = (SELECT base FROM ve_inp_inflows WHERE node_id = NEW.node_id AND order_id = NEW.order_id);END IF;
+			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM ve_inp_inflows WHERE node_id = NEW.node_id AND order_id = NEW.order_id);END IF;
 
 			INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, pattern_id)
 			VALUES(NEW.dscenario_id, NEW.node_id, NEW.order_id, NEW.timser_id, NEW.sfactor, NEW.base, NEW.pattern_id);
@@ -117,12 +117,12 @@ BEGIN
 	 	ELSIF v_dscenario_type = 'INFLOWS-POLL' THEN
 
 			-- default values
-			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM v_edit_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
-			IF NEW.form_type IS NULL OR NEW.form_type='' THEN NEW.form_type = (SELECT form_type FROM v_edit_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
-			IF NEW.mfactor IS NULL THEN NEW.mfactor = (SELECT mfactor FROM v_edit_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
-			IF NEW.sfactor IS NULL THEN NEW.sfactor = (SELECT sfactor FROM v_edit_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
-			IF NEW.base IS NULL THEN NEW.base = (SELECT base FROM v_edit_inp_inflows_poll v_edit_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
-			IF NEW.pattern_id IS NULL THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
+			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM ve_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
+			IF NEW.form_type IS NULL OR NEW.form_type='' THEN NEW.form_type = (SELECT form_type FROM ve_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
+			IF NEW.mfactor IS NULL THEN NEW.mfactor = (SELECT mfactor FROM ve_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
+			IF NEW.sfactor IS NULL THEN NEW.sfactor = (SELECT sfactor FROM ve_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
+			IF NEW.base IS NULL THEN NEW.base = (SELECT base FROM ve_inp_inflows_poll ve_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
+			IF NEW.pattern_id IS NULL THEN NEW.pattern_id = (SELECT pattern_id FROM ve_inp_inflows_poll WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
 
 			INSERT INTO inp_dscenario_inflows_poll (dscenario_id, poll_id, node_id, timser_id, form_type, mfactor, sfactor, base, pattern_id)
 			VALUES (NEW.dscenario_id, NEW.poll_id,  NEW.node_id, NEW.timser_id, NEW.form_type, NEW.mfactor, NEW.sfactor, NEW.base, NEW.pattern_id);
@@ -130,11 +130,11 @@ BEGIN
 	 	ELSIF v_dscenario_type = 'JUNCTION' THEN
 
 			-- default values
-			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
-			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
-			IF NEW.apond IS NULL THEN NEW.apond = (SELECT apond FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
+			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM ve_inp_junction WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM ve_inp_junction WHERE node_id = NEW.node_id);END IF;
+			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM ve_inp_junction WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM ve_inp_junction WHERE node_id = NEW.node_id);END IF;
+			IF NEW.apond IS NULL THEN NEW.apond = (SELECT apond FROM ve_inp_junction WHERE node_id = NEW.node_id);END IF;
 
 			INSERT INTO inp_dscenario_junction (dscenario_id, node_id, elev, ymax, y0, ysur, apond, outfallparam)
 	 		VALUES (NEW.dscenario_id, NEW.node_id, NEW.elev, NEW.ymax, NEW.y0, NEW.ysur, NEW.apond, NEW.outfallparam);
@@ -142,21 +142,21 @@ BEGIN
 		ELSIF v_dscenario_type = 'LID-USAGE' THEN
 
 			-- default values
-			IF NEW.numelem IS NULL THEN NEW.numelem = (SELECT elev FROM v_edit_inp_dscenario_lids
+			IF NEW.numelem IS NULL THEN NEW.numelem = (SELECT elev FROM ve_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id);END IF;
-			IF NEW.area IS NULL THEN NEW.area = (SELECT area FROM v_edit_inp_dscenario_lids
+			IF NEW.area IS NULL THEN NEW.area = (SELECT area FROM ve_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.width IS NULL THEN NEW.width = (SELECT width FROM v_edit_inp_dscenario_lids
+			IF NEW.width IS NULL THEN NEW.width = (SELECT width FROM ve_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.initsat IS NULL THEN NEW.initsat = (SELECT initsat FROM v_edit_inp_dscenario_lids
+			IF NEW.initsat IS NULL THEN NEW.initsat = (SELECT initsat FROM ve_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.fromimp IS NULL THEN NEW.fromimp = (SELECT fromimp FROM v_edit_inp_dscenario_lids
+			IF NEW.fromimp IS NULL THEN NEW.fromimp = (SELECT fromimp FROM ve_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.toperv IS NULL THEN NEW.toperv = (SELECT toperv FROM v_edit_inp_dscenario_lids
+			IF NEW.toperv IS NULL THEN NEW.toperv = (SELECT toperv FROM ve_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.rptfile IS NULL THEN NEW.rptfile = (SELECT rptfile FROM v_edit_inp_dscenario_lids
+			IF NEW.rptfile IS NULL THEN NEW.rptfile = (SELECT rptfile FROM ve_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.descript IS NULL THEN NEW.descript = (SELECT descript FROM v_edit_inp_dscenario_lids
+			IF NEW.descript IS NULL THEN NEW.descript = (SELECT descript FROM ve_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
 
 			INSERT INTO inp_dscenario_lids (dscenario_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript)
@@ -166,27 +166,27 @@ BEGIN
  		ELSIF v_dscenario_type = 'OUTFALL' THEN
 
 			-- default values
-			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
-			IF NEW.outfall_type IS NULL OR NEW.outfall_type='' THEN NEW.outfall_type = (SELECT outfall_type FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
-			IF NEW.stage IS NULL THEN NEW.stage = (SELECT stage FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
-			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
-			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
-			IF NEW.gate IS NULL OR NEW.gate='' THEN NEW.gate = (SELECT gate FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
+			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM ve_inp_outfall WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM ve_inp_outfall WHERE node_id = NEW.node_id);END IF;
+			IF NEW.outfall_type IS NULL OR NEW.outfall_type='' THEN NEW.outfall_type = (SELECT outfall_type FROM ve_inp_outfall WHERE node_id = NEW.node_id);END IF;
+			IF NEW.stage IS NULL THEN NEW.stage = (SELECT stage FROM ve_inp_outfall WHERE node_id = NEW.node_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM ve_inp_outfall WHERE node_id = NEW.node_id);END IF;
+			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM ve_inp_outfall WHERE node_id = NEW.node_id);END IF;
+			IF NEW.gate IS NULL OR NEW.gate='' THEN NEW.gate = (SELECT gate FROM ve_inp_outfall WHERE node_id = NEW.node_id);END IF;
 
 			INSERT INTO inp_dscenario_outfall(dscenario_id, node_id, outfall_type, stage, curve_id, timser_id, gate, elev, ymax)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.outfall_type, NEW.stage, NEW.curve_id, NEW.timser_id, NEW.gate, NEW.elev, NEW.ymax);
 
 		ELSIF v_dscenario_type = 'RAINGAGE' THEN
 
-			IF NEW.form_type IS NULL OR NEW.form_type='' THEN NEW.form_type = (SELECT form_type FROM v_edit_raingage WHERE rg_id = NEW.rg_id);END IF;
-			IF NEW.intvl IS NULL THEN NEW.intvl = (SELECT intvl FROM v_edit_raingage WHERE rg_id = NEW.rg_id);END IF;
-			IF NEW.scf IS NULL THEN NEW.scf = (SELECT scf FROM v_edit_raingage WHERE rg_id = NEW.rg_id);END IF;
-			IF NEW.rgage_type IS NULL OR NEW.rgage_type='' THEN NEW.rgage_type = (SELECT rgage_type FROM v_edit_raingage WHERE rg_id = NEW.rg_id);END IF;
-			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM v_edit_raingage WHERE rg_id = NEW.rg_id);END IF;
-			IF NEW.fname IS NULL OR NEW.fname='' THEN NEW.fname = (SELECT fname FROM v_edit_raingage WHERE rg_id = NEW.rg_id);END IF;
-			IF NEW.sta IS NULL OR NEW.sta='' THEN NEW.sta = (SELECT sta FROM v_edit_raingage WHERE rg_id = NEW.rg_id);END IF;
-			IF NEW.units IS NULL OR NEW.units='' THEN NEW.units = (SELECT units FROM v_edit_raingage WHERE rg_id = NEW.rg_id);END IF;
+			IF NEW.form_type IS NULL OR NEW.form_type='' THEN NEW.form_type = (SELECT form_type FROM ve_raingage WHERE rg_id = NEW.rg_id);END IF;
+			IF NEW.intvl IS NULL THEN NEW.intvl = (SELECT intvl FROM ve_raingage WHERE rg_id = NEW.rg_id);END IF;
+			IF NEW.scf IS NULL THEN NEW.scf = (SELECT scf FROM ve_raingage WHERE rg_id = NEW.rg_id);END IF;
+			IF NEW.rgage_type IS NULL OR NEW.rgage_type='' THEN NEW.rgage_type = (SELECT rgage_type FROM ve_raingage WHERE rg_id = NEW.rg_id);END IF;
+			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM ve_raingage WHERE rg_id = NEW.rg_id);END IF;
+			IF NEW.fname IS NULL OR NEW.fname='' THEN NEW.fname = (SELECT fname FROM ve_raingage WHERE rg_id = NEW.rg_id);END IF;
+			IF NEW.sta IS NULL OR NEW.sta='' THEN NEW.sta = (SELECT sta FROM ve_raingage WHERE rg_id = NEW.rg_id);END IF;
+			IF NEW.units IS NULL OR NEW.units='' THEN NEW.units = (SELECT units FROM ve_raingage WHERE rg_id = NEW.rg_id);END IF;
 
 			INSERT INTO inp_dscenario_raingage (dscenario_id, rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units)
 	 		VALUES (NEW.dscenario_id, NEW.rg_id, NEW.form_type, NEW.intvl, NEW.scf, NEW.rgage_type, NEW.timser_id, NEW.fname, NEW.sta, NEW.units);
@@ -194,19 +194,19 @@ BEGIN
 		ELSIF v_dscenario_type = 'STORAGE' THEN
 
 			-- default value
-			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.storage_type IS NULL OR NEW.storage_type='' THEN NEW.storage_type = (SELECT storage_type FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.a1 IS NULL THEN NEW.a1 = (SELECT a1 FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.a2 IS NULL THEN NEW.a2 = (SELECT a2 FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.a0 IS NULL THEN NEW.a0 = (SELECT a0 FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.fevap IS NULL THEN NEW.fevap = (SELECT fevap FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.sh IS NULL THEN NEW.sh = (SELECT sh FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.hc IS NULL THEN NEW.hc = (SELECT hc FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.imd IS NULL THEN NEW.imd = (SELECT imd FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.storage_type IS NULL OR NEW.storage_type='' THEN NEW.storage_type = (SELECT storage_type FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.a1 IS NULL THEN NEW.a1 = (SELECT a1 FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.a2 IS NULL THEN NEW.a2 = (SELECT a2 FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.a0 IS NULL THEN NEW.a0 = (SELECT a0 FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.fevap IS NULL THEN NEW.fevap = (SELECT fevap FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.sh IS NULL THEN NEW.sh = (SELECT sh FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.hc IS NULL THEN NEW.hc = (SELECT hc FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.imd IS NULL THEN NEW.imd = (SELECT imd FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM ve_inp_storage WHERE node_id = NEW.node_id);END IF;
 
 			INSERT INTO inp_dscenario_storage (dscenario_id, node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.elev, NEW.ymax, NEW.storage_type, NEW.curve_id, NEW.a1, NEW.a2, NEW.a0,
@@ -215,7 +215,7 @@ BEGIN
 	 	ELSIF v_dscenario_type = 'TREATMENT' THEN
 
 			-- default value
-			IF NEW.function IS NULL OR NEW.function='' THEN NEW.function = (SELECT function FROM v_edit_inp_treatment WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
+			IF NEW.function IS NULL OR NEW.function='' THEN NEW.function = (SELECT function FROM ve_inp_treatment WHERE node_id = NEW.node_id AND poll_id = NEW.poll_id);END IF;
 
 			INSERT INTO inp_dscenario_treatment (dscenario_id, node_id, poll_id, function)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.poll_id, NEW.function);
@@ -228,21 +228,21 @@ BEGIN
 		ELSIF v_dscenario_type = 'INLET' THEN
 
 			-- default values
-			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.apond IS NULL THEN NEW.apond = (SELECT apond FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.inlet_type IS NULL THEN NEW.inlet_type = (SELECT inlet_type FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.outlet_type IS NULL THEN NEW.outlet_type = (SELECT outlet_type FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.gully_method IS NULL THEN NEW.gully_method = (SELECT gully_method FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.custom_top_elev IS NULL THEN NEW.custom_top_elev = (SELECT custom_top_elev FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.custom_depth IS NULL THEN NEW.custom_depth = (SELECT custom_depth FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.inlet_length IS NULL THEN NEW.inlet_length = (SELECT inlet_length FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.inlet_width IS NULL THEN NEW.inlet_width = (SELECT inlet_width FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.cd1 IS NULL THEN NEW.cd1 = (SELECT cd1 FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.efficiency IS NULL THEN NEW.efficiency = (SELECT efficiency FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.apond IS NULL THEN NEW.apond = (SELECT apond FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.inlet_type IS NULL THEN NEW.inlet_type = (SELECT inlet_type FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.outlet_type IS NULL THEN NEW.outlet_type = (SELECT outlet_type FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.gully_method IS NULL THEN NEW.gully_method = (SELECT gully_method FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.custom_top_elev IS NULL THEN NEW.custom_top_elev = (SELECT custom_top_elev FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.custom_depth IS NULL THEN NEW.custom_depth = (SELECT custom_depth FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.inlet_length IS NULL THEN NEW.inlet_length = (SELECT inlet_length FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.inlet_width IS NULL THEN NEW.inlet_width = (SELECT inlet_width FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.cd1 IS NULL THEN NEW.cd1 = (SELECT cd1 FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.efficiency IS NULL THEN NEW.efficiency = (SELECT efficiency FROM ve_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			
 
 			INSERT INTO inp_dscenario_inlet (dscenario_id, elev, ymax, node_id, y0, ysur, apond, inlet_type, outlet_type, gully_method, custom_top_elev, custom_depth, inlet_length, inlet_width, cd1, cd2, efficiency)

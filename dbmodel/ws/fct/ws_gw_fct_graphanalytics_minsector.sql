@@ -435,7 +435,7 @@ BEGIN
             FROM (
                 SELECT 
                     minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
-                    num_border, num_connec, num_hydro, length, the_geom, ''v_edit_minsector'' AS layer 
+                    num_border, num_connec, num_hydro, length, the_geom, ''ve_minsector'' AS layer 
                 FROM temp_pgr_minsector
             ) row
             UNION
@@ -447,7 +447,7 @@ BEGIN
             FROM (
                 SELECT 
                     minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
-                    num_border, num_connec, num_hydro, length, the_geom, ''v_edit_minsector_mincut'' AS layer 
+                    num_border, num_connec, num_hydro, length, the_geom, ''ve_minsector_mincut'' AS layer 
                 FROM v_temp_minsector_mincut
             ) row
         ) features' INTO v_result;
@@ -586,7 +586,7 @@ BEGIN
         ';
         EXECUTE v_query_text;
 
-        v_visible_layer ='"v_edit_minsector", "v_edit_minsector_mincut"';
+        v_visible_layer ='"ve_minsector", "ve_minsector_mincut"';
 
         -- Message
         EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4022", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001",	 "is_process":true}}$$)';

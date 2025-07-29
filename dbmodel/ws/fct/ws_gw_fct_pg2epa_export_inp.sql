@@ -58,7 +58,7 @@ BEGIN
 		UNION
 		 SELECT d.id,
 		    d.text
-		   FROM selector_sector s, v_edit_inp_dscenario_controls d
+		   FROM selector_sector s, ve_inp_dscenario_controls d
 		  WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
 	  ORDER BY 1) c  ORDER BY c.id;
 
@@ -423,7 +423,7 @@ BEGIN
 	CREATE OR REPLACE TEMP VIEW vi_t_rules AS
 	 SELECT c.text FROM ( SELECT inp_rules.id, inp_rules.text FROM selector_sector s, inp_rules  WHERE s.sector_id = inp_rules.sector_id AND s.cur_user = "current_user"()::text AND inp_rules.active IS NOT FALSE
 	UNION
-	 SELECT d.id, d.text FROM selector_sector s, v_edit_inp_dscenario_rules d WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
+	 SELECT d.id, d.text FROM selector_sector s, ve_inp_dscenario_rules d WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
 	  ORDER BY 1) c
 	  ORDER BY c.id;
 

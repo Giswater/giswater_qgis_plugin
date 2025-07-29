@@ -15,7 +15,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_node_flowregulator($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_manhole", "id":["138","139"]},
+"feature":{"tableName":"ve_man_manhole", "id":["138","139"]},
 "data":{"selectionMode":"previousSelection",  "parameters":{}
 	}}$$)
 

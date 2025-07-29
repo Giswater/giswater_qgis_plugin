@@ -33,7 +33,7 @@ v_role text;
 v_projectype text;
 v_filter text;
 v_om_fields json;
-v_edit_fields json;
+ve_fields json;
 v_epa_fields json;
 v_master_fields json;
 v_admin_fields json;
@@ -128,7 +128,7 @@ BEGIN
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 20);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO v_edit_fields;
+	EXECUTE v_querystring INTO ve_fields;
 
 	-- get epa toolbox parameters
 	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
@@ -237,7 +237,7 @@ BEGIN
 
 --    Control NULL's
 	SELECT json_strip_nulls(json_build_object('om', v_om_fields,
-	'edit', v_edit_fields,
+	'edit', ve_fields,
 	'epa', v_epa_fields,
 	'master', v_master_fields,
 	'admin', v_admin_fields)) INTO v_process;

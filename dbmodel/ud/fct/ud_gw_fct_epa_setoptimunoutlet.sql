@@ -17,7 +17,7 @@ SELECT gw_fct_epa_setoptimumoutlet($${"client":{},"data":{"parameters":{"buffer"
 
 update inp_subcatchment SET outlet_id = null
 
-SELECT * FROM v_edit_inp_subcatchment
+SELECT * FROM ve_inp_subcatchment
 
 select * from cat_hydrology
 
@@ -77,16 +77,16 @@ BEGIN
                        "data":{"function":"3242", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- starting process
-	v_sector = (SELECT replace (replace ((array_agg(sector_id))::text, '{', ''), '}', '') FROM v_edit_sector);
+	v_sector = (SELECT replace (replace ((array_agg(sector_id))::text, '{', ''), '}', '') FROM ve_sector);
 
 	IF v_selectionmode = 'previousSelection' then
 		if v_array is not null then
 			EXECUTE 'INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM ve_node 
-			WHERE epa_type = ''JUNCTION'' AND state > 0 AND sector_id in (select sector_id from v_edit_sector) and node_id in ('||v_array||')';
+			WHERE epa_type = ''JUNCTION'' AND state > 0 AND sector_id in (select sector_id from ve_sector) and node_id in ('||v_array||')';
 		end if;
 	else
 		INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM ve_node
-		WHERE epa_type = 'JUNCTION' AND state > 0 AND sector_id in (select sector_id from v_edit_sector);
+		WHERE epa_type = 'JUNCTION' AND state > 0 AND sector_id in (select sector_id from ve_sector);
 	end if;
 
 	SELECT value::integer INTO v_hydrology FROM config_param_user where parameter = 'inp_options_hydrology_scenario' and cur_user = current_user;
@@ -97,11 +97,11 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"4204", "function":"3242", "parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
-	select count(*) into v_count1 from v_edit_inp_subcatchment where outlet_id is null;
+	select count(*) into v_count1 from ve_inp_subcatchment where outlet_id is null;
 
 	if (select count(*) from temp_node) > 0 then
 
-		FOR rec_subc IN SELECT * FROM inp_subcatchment WHERE hydrology_id = v_hydrology AND sector_id in (select sector_id from v_edit_sector)
+		FOR rec_subc IN SELECT * FROM inp_subcatchment WHERE hydrology_id = v_hydrology AND sector_id in (select sector_id from ve_sector)
 		loop
 
 			raise notice 'loop rec_subc % ', rec_subc.subc_id;
@@ -119,7 +119,7 @@ BEGIN
 
 		END LOOP;
 
-		select count(*) into v_count2 from v_edit_inp_subcatchment where outlet_id is null;
+		select count(*) into v_count2 from ve_inp_subcatchment where outlet_id is null;
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"4206", "function":"3242", "parameters":{"v_count2-v_count1":"'||v_count2-v_count1||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 

@@ -25,7 +25,7 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        v_sql:= 'DELETE FROM v_edit_plan_psector WHERE psector_id = '||quote_literal(OLD.psector_id);
+        v_sql:= 'DELETE FROM ve_plan_psector WHERE psector_id = '||quote_literal(OLD.psector_id);
         EXECUTE v_sql;
         RETURN NULL;
     

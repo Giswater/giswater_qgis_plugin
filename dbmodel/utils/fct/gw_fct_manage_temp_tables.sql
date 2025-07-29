@@ -153,37 +153,37 @@ BEGIN
         IF 'MAPZONES' = ANY(v_group_array) THEN
 
             IF 'SECTOR' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                CREATE TEMP TABLE t_sector AS SELECT * FROM v_edit_sector;
+                CREATE TEMP TABLE t_sector AS SELECT * FROM ve_sector;
             END IF;
 
             IF 'OMZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                CREATE TEMP TABLE t_omzone AS SELECT * FROM v_edit_omzone;
+                CREATE TEMP TABLE t_omzone AS SELECT * FROM ve_omzone;
             END IF;
 
             IF v_project_type = 'WS' THEN
             	IF 'PRESSZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_presszone AS SELECT * FROM v_edit_presszone;
+                    CREATE TEMP TABLE t_presszone AS SELECT * FROM ve_presszone;
             	END IF;
 
 	            IF 'DQA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array)THEN
-	                CREATE TEMP TABLE t_dqa AS SELECT * FROM v_edit_dqa;
+	                CREATE TEMP TABLE t_dqa AS SELECT * FROM ve_dqa;
 	            END IF;
 
                 IF 'DMA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
+                    CREATE TEMP TABLE t_dma AS SELECT * FROM ve_dma;
                 END IF;
 
                 IF 'SUPPLYZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_supplyzone AS SELECT * FROM v_edit_supplyzone;
+                    CREATE TEMP TABLE t_supplyzone AS SELECT * FROM ve_supplyzone;
                 END IF;
 
             ELSIF v_project_type = 'UD' THEN
                 IF 'DRAINZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_drainzone AS SELECT * FROM v_edit_drainzone;
+                    CREATE TEMP TABLE t_drainzone AS SELECT * FROM ve_drainzone;
                 END IF;
 
                 IF 'DWFZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_dwfzone AS SELECT * FROM v_edit_dwfzone;
+                    CREATE TEMP TABLE t_dwfzone AS SELECT * FROM ve_dwfzone;
                 END IF;
             END IF;
         END IF;
@@ -271,33 +271,33 @@ BEGIN
             CREATE TEMP TABLE IF NOT EXISTS temp_t_anlgraph (LIKE temp_anlgraph INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_t_go2epa (LIKE temp_go2epa INCLUDING ALL);
 
-            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_pump AS SELECT * FROM ve_inp_pump'||v_filter;
 
             IF v_project_type = 'WS' THEN
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_pipe AS SELECT * FROM v_edit_inp_pipe'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_valve AS SELECT * FROM v_edit_inp_valve'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_reservoir AS SELECT * FROM v_edit_inp_reservoir'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_tank AS SELECT * FROM v_edit_inp_tank'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_inlet AS SELECT * FROM v_edit_inp_inlet'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtualvalve AS SELECT * FROM v_edit_inp_virtualvalve'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtualpump AS SELECT * FROM v_edit_inp_virtualpump'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_pipe AS SELECT * FROM ve_inp_pipe'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_valve AS SELECT * FROM ve_inp_valve'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_junction AS SELECT * FROM ve_inp_junction'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_reservoir AS SELECT * FROM ve_inp_reservoir'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_tank AS SELECT * FROM ve_inp_tank'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_inlet AS SELECT * FROM ve_inp_inlet'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtualvalve AS SELECT * FROM ve_inp_virtualvalve'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtualpump AS SELECT * FROM ve_inp_virtualpump'||v_filter;
 		    ELSIF v_project_type  = 'UD' THEN
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_conduit AS SELECT * FROM v_edit_inp_conduit'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_outlet AS SELECT * FROM v_edit_inp_outlet'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_orifice AS SELECT * FROM v_edit_inp_orifice'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_weir AS SELECT * FROM v_edit_inp_weir'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtual AS SELECT * FROM v_edit_inp_virtual'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_storage AS SELECT * FROM v_edit_inp_storage'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_outfall AS SELECT * FROM v_edit_inp_outfall'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_divider AS SELECT * FROM v_edit_inp_divider'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_netgully AS SELECT * FROM v_edit_inp_netgully'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_gully AS SELECT * FROM v_edit_inp_gully'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_conduit AS SELECT * FROM ve_inp_conduit'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_outlet AS SELECT * FROM ve_inp_outlet'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_orifice AS SELECT * FROM ve_inp_orifice'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_weir AS SELECT * FROM ve_inp_weir'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtual AS SELECT * FROM ve_inp_virtual'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_storage AS SELECT * FROM ve_inp_storage'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_junction AS SELECT * FROM ve_inp_junction'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_outfall AS SELECT * FROM ve_inp_outfall'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_divider AS SELECT * FROM ve_inp_divider'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_netgully AS SELECT * FROM ve_inp_netgully'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_gully AS SELECT * FROM ve_inp_gully'||v_filter;
                 -- note: don't need filter for these temporal tables
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_subcatchment AS SELECT * FROM v_edit_inp_subcatchment';
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_subc2outlet AS SELECT * FROM v_edit_inp_subc2outlet';
-			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_raingage AS SELECT * FROM v_edit_raingage';
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_subcatchment AS SELECT * FROM ve_inp_subcatchment';
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_subc2outlet AS SELECT * FROM ve_inp_subc2outlet';
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_raingage AS SELECT * FROM ve_raingage';
 		    END IF;
         END IF;
 

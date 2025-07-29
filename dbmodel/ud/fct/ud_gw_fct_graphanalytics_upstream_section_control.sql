@@ -94,7 +94,7 @@ BEGIN
 
 	SELECT gw_fct_json_object_set_key (p_data,'fid'::text, v_fid) INTO p_data;
 
-	IF v_node_id IS NULL AND v_layer in ('v_edit_storage', 'v_edit_inp_outfall') THEN
+	IF v_node_id IS NULL AND v_layer in ('ve_storage', 've_inp_outfall') THEN
 			EXECUTE 'SELECT array_agg(node_id) FROM '||v_layer||''
 			INTO v_node_list;
 
@@ -113,7 +113,7 @@ BEGIN
 
 	END IF;
 
-	IF v_node_id IS NULL AND v_layer !='v_edit_inp_outfall' THEN
+	IF v_node_id IS NULL AND v_layer !='ve_inp_outfall' THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3990", "function":"3176", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 

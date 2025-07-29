@@ -15,7 +15,7 @@ $BODY$
 -- attribute table using custom filters
 SELECT SCHEMA_NAME.gw_fct_getattributetable($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
+"feature":{"tableName":"ve_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
 

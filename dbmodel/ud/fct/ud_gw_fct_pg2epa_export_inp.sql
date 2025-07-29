@@ -173,7 +173,7 @@ BEGIN
 		 SELECT d.id,
 		    d.text
 		   FROM selector_sector s,
-		    v_edit_inp_dscenario_controls d
+		    ve_inp_dscenario_controls d
 		  WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
 	  ORDER BY 1) c
 	  ORDER BY c.id;
@@ -187,11 +187,11 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_coverages AS
-	 SELECT v_edit_inp_subcatchment.subc_id,
+	 SELECT ve_inp_subcatchment.subc_id,
 	    inp_coverage.landus_id,
 	    inp_coverage.percent
 	   FROM inp_coverage
-	     JOIN v_edit_inp_subcatchment ON inp_coverage.subc_id::text = v_edit_inp_subcatchment.subc_id::text
+	     JOIN ve_inp_subcatchment ON inp_coverage.subc_id::text = ve_inp_subcatchment.subc_id::text
 	     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
 		    ve_node.node_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
@@ -228,7 +228,7 @@ BEGIN
 			    inp_subcatchment.descript
 			   FROM inp_subcatchment
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-		     JOIN ve_node ON ve_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
+		     JOIN ve_node ON ve_node.node_id::text = a.node_array) b ON ve_inp_subcatchment.subc_id::text = b.subc_id::text;
 
 
 	 CREATE OR REPLACE TEMP VIEW vi_t_dividers AS
@@ -343,8 +343,8 @@ BEGIN
 	    inp_groundwater.a3,
 	    inp_groundwater.tw,
 	    inp_groundwater.h
-	   FROM v_edit_inp_subcatchment
-	     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text
+	   FROM ve_inp_subcatchment
+	     JOIN inp_groundwater ON inp_groundwater.subc_id::text = ve_inp_subcatchment.subc_id::text
 	     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
 		    ve_node.node_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
@@ -381,7 +381,7 @@ BEGIN
 			    inp_subcatchment.descript
 			   FROM inp_subcatchment
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-		     JOIN ve_node ON ve_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
+		     JOIN ve_node ON ve_node.node_id::text = a.node_array) b ON ve_inp_subcatchment.subc_id::text = b.subc_id::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_gully AS
@@ -408,8 +408,8 @@ BEGIN
 	 SELECT inp_groundwater.subc_id,
 	    ('LATERAL'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_lat,
 	    ('DEEP'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_deep
-	   FROM v_edit_inp_subcatchment
-	     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
+	   FROM ve_inp_subcatchment
+	     JOIN inp_groundwater ON inp_groundwater.subc_id::text = ve_inp_subcatchment.subc_id::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_hydrographs AS
@@ -419,14 +419,14 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_infiltration  AS
-	 SELECT v_edit_inp_subcatchment.subc_id,
-	    v_edit_inp_subcatchment.curveno AS other1,
-	    v_edit_inp_subcatchment.conduct_2 AS other2,
-	    v_edit_inp_subcatchment.drytime_2 AS other3,
+	 SELECT ve_inp_subcatchment.subc_id,
+	    ve_inp_subcatchment.curveno AS other1,
+	    ve_inp_subcatchment.conduct_2 AS other2,
+	    ve_inp_subcatchment.drytime_2 AS other3,
 	    NULL::numeric AS other4,
 	    NULL::double precision AS other5
-	   FROM v_edit_inp_subcatchment
-	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+	   FROM ve_inp_subcatchment
+	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = ve_inp_subcatchment.hydrology_id
 	     JOIN ( SELECT a.subc_id,
 		    a.outlet_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
@@ -441,14 +441,14 @@ BEGIN
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
 	  WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
 	UNION
-	 SELECT v_edit_inp_subcatchment.subc_id,
-	    v_edit_inp_subcatchment.suction AS other1,
-	    v_edit_inp_subcatchment.conduct AS other2,
-	    v_edit_inp_subcatchment.initdef AS other3,
+	 SELECT ve_inp_subcatchment.subc_id,
+	    ve_inp_subcatchment.suction AS other1,
+	    ve_inp_subcatchment.conduct AS other2,
+	    ve_inp_subcatchment.initdef AS other3,
 	    NULL::integer AS other4,
 	    NULL::double precision AS other5
-	   FROM v_edit_inp_subcatchment
-	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+	   FROM ve_inp_subcatchment
+	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = ve_inp_subcatchment.hydrology_id
 	     JOIN ( SELECT a.subc_id,
 		    a.outlet_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
@@ -463,14 +463,14 @@ BEGIN
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
 	  WHERE cat_hydrology.infiltration::text = 'GREEN_AMPT'::text
 	UNION
-	 SELECT v_edit_inp_subcatchment.subc_id,
-	    v_edit_inp_subcatchment.curveno AS other1,
-	    v_edit_inp_subcatchment.conduct_2 AS other2,
-	    v_edit_inp_subcatchment.drytime_2 AS other3,
+	 SELECT ve_inp_subcatchment.subc_id,
+	    ve_inp_subcatchment.curveno AS other1,
+	    ve_inp_subcatchment.conduct_2 AS other2,
+	    ve_inp_subcatchment.drytime_2 AS other3,
 	    NULL::integer AS other4,
 	    NULL::double precision AS other5
-	   FROM v_edit_inp_subcatchment
-	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+	   FROM ve_inp_subcatchment
+	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = ve_inp_subcatchment.hydrology_id
 	     JOIN ( SELECT a.subc_id,
 		    a.outlet_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
@@ -563,7 +563,7 @@ BEGIN
 		    NULL::text AS other6,
 		    NULL::text AS other7
 		   FROM inp_lid
- 		   JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lids)a USING (lidco_id)
+ 		   JOIN (select distinct (lidco_id) from ve_inp_dscenario_lids)a USING (lidco_id)
 		  WHERE inp_lid.active
 		UNION
 		 SELECT inp_lid_value.id,
@@ -578,7 +578,7 @@ BEGIN
 		    CASE WHEN inp_lid_value.value_8::numeric = 0 THEN '0' ELSE inp_lid_value.value_8::text END AS other7
 		   FROM inp_lid_value
 		     JOIN inp_lid USING (lidco_id)
-		     JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lids)a USING (lidco_id)
+		     JOIN (select distinct (lidco_id) from ve_inp_dscenario_lids)a USING (lidco_id)
 		     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
 		  WHERE inp_lid.active AND inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
 	  ORDER BY a.lidco_id, a.id;
@@ -594,15 +594,15 @@ BEGIN
 	    temp_t_lid_usage.fromimp,
 	    temp_t_lid_usage.toperv::integer AS toperv,
 	    temp_t_lid_usage.rptfile
-	   FROM v_edit_inp_subcatchment
-	     JOIN temp_t_lid_usage ON temp_t_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
+	   FROM ve_inp_subcatchment
+	     JOIN temp_t_lid_usage ON temp_t_lid_usage.subc_id::text = ve_inp_subcatchment.subc_id::text;
 
 	CREATE OR REPLACE TEMP VIEW vi_t_loadings  AS
 	 SELECT inp_loadings.subc_id,
 	    inp_loadings.poll_id,
 	    inp_loadings.ibuildup
-	   FROM v_edit_inp_subcatchment
-	     JOIN inp_loadings ON inp_loadings.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
+	   FROM ve_inp_subcatchment
+	     JOIN inp_loadings ON inp_loadings.subc_id::text = ve_inp_subcatchment.subc_id::text;
 
 
 	 CREATE OR REPLACE TEMP VIEW vi_t_losses AS
@@ -690,7 +690,7 @@ BEGIN
 		w.cd,
 		w.flap,
 		w.orate
-		from v_edit_inp_frorifice w
+		from ve_inp_frorifice w
 			JOIN man_frelem m ON m.element_id = w.element_id
 			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
 		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRORIFICE'::text;
@@ -763,7 +763,7 @@ BEGIN
 		END AS other1,
 		w.cd2::text as other2,
 		w.flap::character varying as other3
-		FROM v_edit_inp_froutlet w
+		FROM ve_inp_froutlet w
 			JOIN man_frelem m ON m.element_id = w.element_id
 			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
 		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FROUTLET'::text;
@@ -810,7 +810,7 @@ BEGIN
 		w.status,
 		w.startup,
 		w.shutoff
-		from v_edit_inp_frpump w
+		from ve_inp_frpump w
 			JOIN man_frelem m ON m.element_id = w.element_id
 			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
 		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRPUMP'::text;
@@ -924,15 +924,15 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_subareas AS
-	 SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
-	    v_edit_inp_subcatchment.nimp,
-	    v_edit_inp_subcatchment.nperv,
-	    v_edit_inp_subcatchment.simp,
-	    v_edit_inp_subcatchment.sperv,
-	    v_edit_inp_subcatchment.zero,
-	    v_edit_inp_subcatchment.routeto,
-	    v_edit_inp_subcatchment.rted
-	   FROM v_edit_inp_subcatchment
+	 SELECT DISTINCT ve_inp_subcatchment.subc_id,
+	    ve_inp_subcatchment.nimp,
+	    ve_inp_subcatchment.nperv,
+	    ve_inp_subcatchment.simp,
+	    ve_inp_subcatchment.sperv,
+	    ve_inp_subcatchment.zero,
+	    ve_inp_subcatchment.routeto,
+	    ve_inp_subcatchment.rted
+	   FROM ve_inp_subcatchment
 	     JOIN ( SELECT a.subc_id,
 		    a.outlet_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
@@ -948,16 +948,16 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_subcatchments AS
-	 SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
-	    v_edit_inp_subcatchment.rg_id,
+	 SELECT DISTINCT ve_inp_subcatchment.subc_id,
+	    ve_inp_subcatchment.rg_id,
 	    b.outlet_id,
-	    v_edit_inp_subcatchment.area,
-	    v_edit_inp_subcatchment.imperv,
-	    v_edit_inp_subcatchment.width,
-	    v_edit_inp_subcatchment.slope,
-	    v_edit_inp_subcatchment.clength,
-	    v_edit_inp_subcatchment.snow_id
-	   FROM v_edit_inp_subcatchment
+	    ve_inp_subcatchment.area,
+	    ve_inp_subcatchment.imperv,
+	    ve_inp_subcatchment.width,
+	    ve_inp_subcatchment.slope,
+	    ve_inp_subcatchment.clength,
+	    ve_inp_subcatchment.snow_id
+	   FROM ve_inp_subcatchment
 	     JOIN ( SELECT a.subc_id,
 		    a.outlet_id
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
@@ -973,11 +973,11 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_symbols  AS
-	 SELECT v_edit_raingage.rg_id,
+	 SELECT ve_raingage.rg_id,
 	    NULL::numeric(16,3) AS xcoord,
 	    NULL::numeric(16,3) AS ycoord,
-	    v_edit_raingage.the_geom
-	   FROM v_edit_raingage;
+	    ve_raingage.the_geom
+	   FROM ve_raingage;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_temperature  AS
@@ -1060,7 +1060,7 @@ BEGIN
 		w.road_width,
 		w.road_surf,
 		w.coef_curve
-		from v_edit_inp_frweir w
+		from ve_inp_frweir w
 			JOIN man_frelem m ON m.element_id = w.element_id
 			JOIN temp_t_arc a ON a.node_1 = m.node_id::text
 		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRWEIR'::text;

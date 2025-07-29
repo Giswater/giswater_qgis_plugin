@@ -8,3 +8,9 @@ or (at your option) any later version.
 
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+DROP VIEW IF EXISTS v_edit_arc;
+DROP VIEW IF EXISTS v_edit_node;
+DROP VIEW IF EXISTS v_edit_connec;
+DROP VIEW IF EXISTS v_edit_link;
+DROP VIEW IF EXISTS v_edit_gully;

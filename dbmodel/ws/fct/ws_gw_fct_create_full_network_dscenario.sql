@@ -26,7 +26,7 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 VALUES(3396, 'Create full Network dscenario', '{"featureType":[]}'::json, '[
 {"widgetname":"name", "label":"Name:","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name of the new dscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":1, "value":""},
 {"widgetname":"descript", "label":"descript:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"descript of new scenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
-{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"dwf scenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":3, "value":null}
+{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"dwf scenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM ve_exploitation", "layoutname":"grl_option_parameters","layoutorder":3, "value":null}
 ]'::json, NULL, true, '{4}')
 ON CONFLICT (id) DO  NOTHING;
 
@@ -108,56 +108,56 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'Full Network scenario created succesfully');
 
 		INSERT INTO inp_dscenario_junction SELECT  v_scenarioid, node_id,demand, pattern_id, peak_factor, emitter_coeff, init_quality, source_type,
-		source_quality, source_pattern_id FROM v_edit_inp_junction;
+		source_quality, source_pattern_id FROM ve_inp_junction;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Junction(s)'));
 
 		INSERT INTO inp_dscenario_pipe SELECT v_scenarioid, arc_id, minorloss, status, null, null, bulk_coeff, wall_coeff
-		FROM v_edit_inp_pipe;
+		FROM ve_inp_pipe;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Pipe(s)'));
 
-		INSERT INTO inp_dscenario_shortpipe SELECT v_scenarioid, node_id, minorloss, status, null, null, bulk_coeff, wall_coeff FROM v_edit_inp_shortpipe;
+		INSERT INTO inp_dscenario_shortpipe SELECT v_scenarioid, node_id, minorloss, status, null, null, bulk_coeff, wall_coeff FROM ve_inp_shortpipe;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Shortpipe(s)'));
 
 		INSERT INTO inp_dscenario_tank SELECT v_scenarioid, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow,
-		mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_tank;
+		mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id FROM ve_inp_tank;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Tank(s)'));
 
 		INSERT INTO inp_dscenario_inlet SELECT v_scenarioid, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, head, pattern_id, overflow,
-		mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_inlet;
+		mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id FROM ve_inp_inlet;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Inlet(s)'));
 
 		INSERT INTO inp_dscenario_reservoir SELECT v_scenarioid, node_id, pattern_id, head, init_quality, source_type, source_quality, source_pattern_id
-		FROM v_edit_inp_reservoir;
+		FROM ve_inp_reservoir;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Reservoir(s)'));
 
 		INSERT INTO inp_dscenario_valve SELECT v_scenarioid, node_id, valve_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality
-		FROM v_edit_inp_valve;
+		FROM ve_inp_valve;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Valve(s)'));
 
 		INSERT INTO inp_dscenario_pump SELECT v_scenarioid, node_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id
-		FROM v_edit_inp_pump;
+		FROM ve_inp_pump;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Pump(s)'));
 
 		INSERT INTO inp_dscenario_virtualvalve SELECT v_scenarioid, arc_id, valve_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, init_quality
-		FROM v_edit_inp_virtualvalve;
+		FROM ve_inp_virtualvalve;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Virtualvalve(s)'));
 
 		INSERT INTO inp_dscenario_virtualpump SELECT v_scenarioid, arc_id, power, curve_id, speed, pattern_id, status, null, effic_curve_id, energy_price, energy_pattern_id,
-		pump_type FROM v_edit_inp_virtualpump;
+		pump_type FROM ve_inp_virtualpump;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Virtualpumps(s)'));
 
 		INSERT INTO inp_dscenario_connec SELECT v_scenarioid, connec_id, demand, pattern_id, peak_factor, status, minorloss, custom_roughness, custom_length,
-		custom_dint, emitter_coeff, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_connec;
+		custom_dint, emitter_coeff, init_quality, source_type, source_quality, source_pattern_id FROM ve_inp_connec;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Connec(s)'));
 
