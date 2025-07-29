@@ -107,7 +107,7 @@ BEGIN
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 		SELECT node_id INTO v_node FROM ve_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 		IF v_node IS NULL THEN
-			SELECT node_2 INTO v_node FROM ve_arc WHERE ST_DWithin(the_geom, v_point, 100)  order by st_distance (the_geom, v_point) LIMIT 1;
+			SELECT node_1 INTO v_node FROM ve_arc WHERE ST_DWithin(the_geom, v_point, 100)  order by st_distance (the_geom, v_point) LIMIT 1;
 		END IF;
 	END IF;
 
