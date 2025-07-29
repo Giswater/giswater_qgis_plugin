@@ -90,7 +90,7 @@ BEGIN
         JOIN cat_feature cf ON cf.id = n.id
         JOIN sys_feature_class s ON cf.feature_class = s.id
         JOIN cat_'||v_feature_type||' ON cat_'||v_feature_type||'.id= '||quote_literal(NEW.elementcat_id)||'
-        WHERE n.id = cat_'||v_feature_type||'.'||v_feature_type||'_type AND child_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
+        WHERE n.id = cat_'||v_feature_type||'.'||v_feature_type||'_type LIMIT 1'
         INTO v_man_table;
 
 
@@ -278,6 +278,7 @@ BEGIN
 		NEW.publish, NEW.inventory, NEW.expl_id, upper(v_feature_type), NEW.top_elev, NEW.expl_visibility, NEW.trace_featuregeom, NEW.muni_id, NEW.sector_id, NEW.brand_id, NEW.model_id, /*NEW.asset_id,*/ NEW.datasource,
 		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by, NEW.epa_type, NEW.omzone_id);
 
+		-- MAN TABLE INSERT
 		IF v_man_table='man_frelem' THEN
 			INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length)
 			VALUES(NEW.element_id, NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length);
@@ -286,7 +287,20 @@ BEGIN
 			VALUES(NEW.element_id);
 		END IF;
 
+		-- EPA INSERT
+		IF (NEW.epa_type = 'FRPUMP') THEN
+		    INSERT INTO inp_frpump (element_id) VALUES (NEW.element_id);
 
+		ELSIF (NEW.epa_type = 'FRWEIR') THEN
+		    INSERT INTO inp_frweir (element_id) VALUES (NEW.element_id);
+
+		ELSIF (NEW.epa_type = 'FRORIFICE') THEN
+		    INSERT INTO inp_frorifice (element_id) VALUES (NEW.element_id);
+
+		ELSIF (NEW.epa_type = 'FROUTLET') THEN
+		    INSERT INTO inp_froutlet (element_id) VALUES (NEW.element_id);
+
+		END IF;
 
 
 		-- -- FEATURE INSERT (DYNAMIC TRIGGER)

@@ -71,7 +71,7 @@ CREATE TABLE inp_frweir(
 
 CREATE TABLE inp_frpump (
     element_id int4 NOT NULL,
-    curve_id varchar(16) NOT NULL,
+    curve_id varchar(16) NULL,
     status varchar(3) NULL,
     startup numeric(12, 4) NULL,
     shutoff numeric(12, 4) NULL,

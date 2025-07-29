@@ -170,3 +170,15 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
 
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_frpump INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_epa_frpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frpump');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_frorifice INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_epa_frorifice FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frorifice');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_froutlet INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_epa_froutlet FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('froutlet');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_frweir INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_epa_frweir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frweir');

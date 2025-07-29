@@ -89,6 +89,23 @@ BEGIN
             inlet_length=NEW.inlet_length, inlet_width=NEW.inlet_width, cd1=NEW.cd1, cd2=NEW.cd2, efficiency=NEW.efficiency
             WHERE node_id=OLD.node_id;
 
+        ELSIF v_epatype = 'gully' OR v_epatype = 'pgully' THEN
+            UPDATE inp_gully
+            SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, inlet_type=NEW.inlet_type, outlet_type=NEW.outlet_type, gully_method=NEW.gully_method, custom_top_elev=NEW.custom_top_elev, custom_depth=NEW.custom_depth,
+            inlet_length=NEW.inlet_length, inlet_width=NEW.inlet_width, cd1=NEW.cd1, cd2=NEW.cd2, efficiency=NEW.efficiency
+            WHERE node_id=OLD.node_id;
+
+		ELSIF v_epatype = 'frpump' THEN
+            UPDATE inp_frpump SET curve_id=NEW.curve_id, status=NEW.status, startup=NEW.startup, shutoff=NEW.shutoff WHERE element_id=NEW.element_id;
+        
+        ELSIF v_epatype = 'froutlet' THEN
+            UPDATE inp_froutlet SET outlet_type=NEW.outlet_type, offsetval=NEW.offsetval, curve_id=NEW.curve_id, cd1=NEW.cd1, cd2=NEW.cd2, flap=NEW.flap WHERE element_id=NEW.element_id;
+        
+        ELSIF v_epatype = 'frorifice' THEN
+            UPDATE inp_frorifice SET orifice_type=NEW.orifice_type, offsetval=NEW.offsetval, cd=NEW.cd, orate=NEW.orate, flap=NEW.flap, shape=NEW.shape, geom1=NEW.geom1, geom2=NEW.geom2, geom3=NEW.geom3, geom4=NEW.geom4 WHERE element_id=NEW.element_id;
+        
+        ELSIF v_epatype = 'frweir' THEN
+            UPDATE inp_frweir SET weir_type=NEW.weir_type, offsetval=NEW.offsetval, cd=NEW.cd, ec=NEW.ec, cd2=NEW.cd2, flap=NEW.flap, geom1=NEW.geom1, geom2=NEW.geom2, geom3=NEW.geom3, geom4=NEW.geom4, surcharge=NEW.surcharge, road_width=NEW.road_width, road_surf=NEW.road_surf, coef_curve=NEW.coef_curve WHERE element_id=NEW.element_id;
         END IF;
 
 		RETURN NEW;

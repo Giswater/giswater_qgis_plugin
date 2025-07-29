@@ -86,3 +86,9 @@ UPDATE config_form_tabs SET formname = 've_node' WHERE formname = 'v_edit_node';
 UPDATE config_form_tabs SET formname = 've_arc' WHERE formname = 'v_edit_arc';
 UPDATE config_form_tabs SET formname = 've_connec' WHERE formname = 'v_edit_connec';
 UPDATE config_form_tabs SET formname = 've_link' WHERE formname = 'v_edit_link';
+--23/07/2025
+DELETE FROM config_form_fields WHERE formname='ve_genelem_estep' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';
+DELETE FROM config_form_fields WHERE formname='ve_genelem_ecover' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';
+DELETE FROM config_form_fields WHERE formname='ve_genelem_egate' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';
+DELETE FROM config_form_fields WHERE formname='ve_genelem_eiot_sensor' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';
+DELETE FROM config_form_fields WHERE formname='ve_genelem_eprotector' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';

@@ -26,3 +26,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('parent');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_frpump INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_epa_frpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frpump');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_frvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_epa_frvalve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frvalve');

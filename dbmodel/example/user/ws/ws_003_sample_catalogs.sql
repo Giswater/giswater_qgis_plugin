@@ -62,6 +62,13 @@ INSERT INTO cat_element VALUES ('REGISTER40X40', 'ECOVER', 'CONCRETE', '40x40 cm
 INSERT INTO cat_element VALUES ('REGISTER60X60', 'ECOVER', 'CONCRETE', '60x60 cm', 'Register concrete 60x60', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_60x60.svg', true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('VREGISTER200X200', 'ECOVER', 'BRICK+IRON', '200x200 cm', 'Vertical register concrete/Iron', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'v_register.svg', true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('HYDRANT_PLATE', 'EHYDRANT_PLATE', 'N/I', '50x60 cm', 'Generic hidrant plate', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'hdyrant_plate.svg', true, NULL, NULL, NULL);
+INSERT INTO cat_element (id,element_type,active) VALUES ('EPUMP-01','EPUMP',true);
+INSERT INTO cat_element (id,element_type,active) VALUES ('EVALVE-01','EVALVE',true);
+INSERT INTO cat_element (id,element_type,active) VALUES ('EMANHOLE-01','EMANHOLE',true);
+INSERT INTO cat_element (id,element_type,active) VALUES ('EHYDRANT_PLATE-01','EHYDRANT_PLATE',true);
+INSERT INTO cat_element (id,element_type,active) VALUES ('ERREGISTER-01','EREGISTER',true);
+INSERT INTO cat_element (id,element_type,active) VALUES ('ESTEP-01','ESTEP',true);
+
 
 UPDATE cat_feature SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL_CONTR_VALVE' OR id = 'GEN_PURP_VALVE' OR id = 'PR_SUSTA.VALVE' OR id = 'PR_BREAK.VALVE'
 OR id = 'VALVE_REGISTER' OR id = 'TAP' OR id = 'ADAPTATION' OR id = 'BYPASS_REGISTER' OR id = 'CONTROLREGISTER' OR id = 'THROTTLE_VALVE';
