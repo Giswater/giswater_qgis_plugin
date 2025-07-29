@@ -33,18 +33,6 @@ def main(project_type: str) -> None:
     # Execute the trg_schema_model.sql file after the utils/ftrg and ws/ftrg directories
     execute_sql_file(conn, f"{project_type}/schema_model/07_trg_schema_model.sql")
 
-    i18n_dir = f"i18n/en_US"
-
-    # Check if the i18n directory exists and process schema_model file
-    if os.path.isdir(i18n_dir):
-        logger.info(f"Processing root directory: {i18n_dir}")
-        for root, _, files in os.walk(i18n_dir):
-            file_to_execute = f"{project_type}_schema_model.sql"
-            file_path = os.path.join(root, file_to_execute)
-            execute_sql_file(conn, file_path)
-    else:
-        logger.warning(f"Directory {i18n_dir} does not exist")
-
     # Define the base updates directory
     updates_dir = "updates"
     order = ['utils', f"{project_type}"]
@@ -73,15 +61,6 @@ def main(project_type: str) -> None:
     else:
         logger.warning(f"Directory {updates_dir} does not exist")
 
-    # Check if the i18n directory exists and process the en_US dml
-    if os.path.isdir(i18n_dir):
-        logger.info(f"Processing root directory: {i18n_dir}")
-        for root, _, files in os.walk(i18n_dir):
-            file_to_execute = f"{project_type}_dml.sql"
-            file_path = os.path.join(root, file_to_execute)
-            execute_sql_file(conn, file_path)
-    else:
-        logger.warning(f"Directory {i18n_dir} does not exist")
 
     logger.info(f"PERFORM lastprocess:")
     # Execute last process command
@@ -107,6 +86,32 @@ def main(project_type: str) -> None:
                     execute_sql_file(conn, file_path)
     else:
         logger.warning(f"Directory {example_dir} does not exist")
+
+    # Define the final pass directory
+    final_pass_dir = f"final_pass/{project_type}/config_form_fields"
+    final_pass_i18n_dir = f"final_pass/{project_type}/i18n/en_US"
+
+    # Check if the final pass directory exists and process it
+    if os.path.isdir(final_pass_dir):
+        logger.info(f"Processing root directory: {final_pass_dir}")
+        for root, _, files in os.walk(final_pass_dir):
+            for file in sorted(files):
+                if file.endswith(".sql") and exclude_prefix not in file:
+                    file_path = os.path.join(root, file)
+                    execute_sql_file(conn, file_path)
+    else:
+        logger.warning(f"Directory {final_pass_dir} does not exist")
+
+    # Check if the final pass i18n directory exists and process it
+    if os.path.isdir(final_pass_i18n_dir):
+        logger.info(f"Processing root directory: {final_pass_i18n_dir}")
+        for root, _, files in os.walk(final_pass_i18n_dir):
+            for file in sorted(files):
+                if file.endswith(".sql") and exclude_prefix not in file:
+                    file_path = os.path.join(root, file)
+                    execute_sql_file(conn, file_path)
+    else:
+        logger.warning(f"Directory {final_pass_i18n_dir} does not exist")
 
     # Close the database connection
     conn.close()
