@@ -33,6 +33,7 @@ class GwI18NGenerator:
         self.last_error = None
         self.path_dic = None
         self.dlg_qm = None
+        self.project_type = None
 
     def init_dialog(self):
         """ Constructor """
@@ -139,9 +140,9 @@ class GwI18NGenerator:
                         if self.language not in translated_langs['db']:
                             translated_langs['db'].append(self.language)
                     elif status_all_db_msg is False:
-                        error_langs['db'][self.language].append(text_error)
+                        error_langs['db'].setdefault(self.language, []).append(text_error)
                     elif status_all_db_msg is None:
-                        canceled_langs['db'][self.language].append(text_error)
+                        canceled_langs['db'].setdefault(self.language, []).append(text_error)
                     type_db_file_translated.append(type_db_file)
 
         # Write a message with the results
@@ -179,7 +180,7 @@ class GwI18NGenerator:
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = "{0} ({1}) - Updating python files..."
+        msg = "{0} ({1}) - python - Updating python files..."
         msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}")
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
@@ -376,6 +377,7 @@ class GwI18NGenerator:
         """ Read the values of the database and update the i18n files """
 
         file_name = f"{self.path_dic[file_type]["name"]}"
+        self.project_type = self.path_dic[file_type]["project_type"][0]
         text_error = ""
 
         # Check if file exist
@@ -384,7 +386,7 @@ class GwI18NGenerator:
             title = "Overwrite"
             answer = tools_qt.show_question(msg, title, parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
-                return None, ""
+                return None, "Translation canceled"
         elif not os.path.exists(cfg_path + file_name):
             os.makedirs(cfg_path, exist_ok=True)
 
@@ -419,8 +421,8 @@ class GwI18NGenerator:
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = "{0} ({1}) - Updating {2}..."
-        msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}", table)
+        msg = "{0} ({1}) - {2} - Updating {3}..."
+        msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}", self.project_type, table)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
         colums = []
@@ -772,7 +774,7 @@ class GwI18NGenerator:
                     file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
 
             if closing:
-                file.write("UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n")
+                file.write("UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';\n")
         return ""
     # endregion
     # region Extra functions
@@ -790,7 +792,7 @@ class GwI18NGenerator:
                   'General Public License as published by the Free Software Foundation, either version 3 of the '
                   'License, or (at your option) any later version.\n'
                   '*/\n\n\n')
-        if file_type in ["i18n_ws", "i18n_ud"]:
+        if file_type in ["i18n_ws", "i18n_ud", "i18n_utils"]:
             header += ('SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
                        "UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n")
         elif file_type == "am":
@@ -948,7 +950,7 @@ class GwI18NGenerator:
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "su_feature", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "i18n_ud": {
@@ -959,13 +961,13 @@ class GwI18NGenerator:
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "su_feature", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "i18n_utils": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}utils{os.sep}i18n{os.sep}",
                 "name": f"{self.language}.sql",
-                "project_type": ["ud", "utils", "ws"],
+                "project_type": ["utils", "ud", "ws"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",

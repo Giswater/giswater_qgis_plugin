@@ -2141,7 +2141,6 @@ class GwAdminButton:
 
         # Manage folders 'i18n'
         if 'i18n' in filedir:
-            files_to_execute = []
             files_to_execute = [f"{self.locale}.sql"]
 
             for file in files_to_execute:
