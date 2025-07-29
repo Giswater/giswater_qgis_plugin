@@ -4,6 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 */
 
 
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
+
 UPDATE sys_param_user AS t
 SET label = v.label, descript = v.descript
 FROM (
@@ -11427,4 +11430,4 @@ FROM (
 ) AS v(columnname, formname, formtype, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;
 
-UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
+UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';

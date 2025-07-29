@@ -7872,65 +7872,6 @@ FROM (
 ) AS v(id, name)
 WHERE t.id = v.id;
 
-UPDATE cat_feature AS t
-SET id = v.idval, descript = v.descript
-FROM (
-    VALUES
-    ('STEP', 'GENELEMENT', 'ELEMENT', 'STEP', 'Step'),
-    ('PUMP', 'GENELEMENT', 'ELEMENT', 'PUMP', 'Pump'),
-    ('PROTECTOR', 'GENELEMENT', 'ELEMENT', 'PROTECTOR', 'Protector'),
-    ('FRORIFICE', 'FLWREG', 'ELEMENT', 'FRORIFICE', 'Frorifice'),
-    ('FROUTLET', 'FLWREG', 'ELEMENT', 'FROUTLET', 'Froutlet'),
-    ('EGATE', 'GENELEM', 'ELEMENT', 'EGATE', NULL),
-    ('GULLY', 'GULLY', 'GULLY', 'GULLY', NULL),
-    ('IOT_SENSOR', 'GENELEMENT', 'ELEMENT', 'IOT_SENSOR', 'Iot_sensor'),
-    ('JUNCTION', 'JUNCTION', 'NODE', 'JUNCTION', 'Junction'),
-    ('OUTFALL', 'OUTFALL', 'NODE', 'OUTFALL', NULL),
-    ('SEWER_STORAGE', 'STORAGE', 'NODE', 'SEWER_STORAGE', NULL),
-    ('FRWEIR', 'FLWREG', 'ELEMENT', 'FRWEIR', 'Frweir'),
-    ('GATE', 'GENELEMENT', 'ELEMENT', 'GATE', 'Gate'),
-    ('VIRTUAL_NODE', 'JUNCTION', 'NODE', 'VIRTUAL_NODE', NULL),
-    ('SANDBOX', 'MANHOLE', 'NODE', 'SANDBOX', NULL),
-    ('WWTP', 'WWTP', 'NODE', 'WWTP', NULL),
-    ('CONNEC', 'CONNEC', 'CONNEC', 'CONNEC', NULL),
-    ('PGULLY', 'GULLY', 'GULLY', 'PGULLY', NULL),
-    ('EIOT_SENSOR', 'GENELEM', 'ELEMENT', 'EIOT_SENSOR', NULL),
-    ('VGULLY', 'GULLY', 'GULLY', 'VGULLY', NULL),
-    ('VALVE', 'VALVE', 'NODE', 'VALVE', NULL),
-    ('SIPHON', 'SIPHON', 'ARC', 'SIPHON', NULL),
-    ('EPUMP', 'FRELEM', 'ELEMENT', 'EPUMP', NULL),
-    ('WACCEL', 'WACCEL', 'ARC', 'WACCEL', NULL),
-    ('NETGULLY', 'NETGULLY', 'NODE', 'NETGULLY', NULL),
-    ('CIRC_MANHOLE', 'MANHOLE', 'NODE', 'CIRC_MANHOLE', NULL),
-    ('NETINIT', 'NETINIT', 'NODE', 'NETINIT', NULL),
-    ('EPROTECTOR', 'GENELEM', 'ELEMENT', 'EPROTECTOR', NULL),
-    ('CHAMBER', 'CHAMBER', 'NODE', 'CHAMBER', NULL),
-    ('WEIR', 'CHAMBER', 'NODE', 'WEIR', NULL),
-    ('ECOVER', 'GENELEM', 'ELEMENT', 'ECOVER', NULL),
-    ('EORIFICE', 'FRELEM', 'ELEMENT', 'EORIFICE', NULL),
-    ('EOUTLET', 'FRELEM', 'ELEMENT', 'EOUTLET', NULL),
-    ('ESTEP', 'GENELEM', 'ELEMENT', 'ESTEP', NULL),
-    ('EWEIR', 'FRELEM', 'ELEMENT', 'EWEIR', NULL),
-    ('INLETPIPE', 'INLETPIPE', 'LINK', 'INLETPIPE', 'Inlet pipe link'),
-    ('VARC', 'VARC', 'ARC', 'VARC', 'Varc'),
-    ('FRPUMP', 'FLWREG', 'ELEMENT', 'FRPUMP', 'Frpump'),
-    ('OVERFLOW_STORAGE', 'STORAGE', 'NODE', 'OVERFLOW_STORAGE', 'Overflow_storage'),
-    ('REGISTER', 'JUNCTION', 'NODE', 'REGISTER', NULL),
-    ('JUMP', 'WJUMP', 'NODE', 'JUMP', NULL),
-    ('VCONNEC', 'CONNEC', 'CONNEC', 'VCONNEC', NULL),
-    ('PUMP_PIPE', 'CONDUIT', 'ARC', 'PUMP_PIPE', NULL),
-    ('HIGHPOINT', 'JUNCTION', 'NODE', 'HIGHPOINT', NULL),
-    ('RECT_MANHOLE', 'MANHOLE', 'NODE', 'RECT_MANHOLE', NULL),
-    ('OWERFLOW_STORAGE', 'STORAGE', 'NODE', 'OWERFLOW_STORAGE', NULL),
-    ('PUMP_STATION', 'CHAMBER', 'NODE', 'PUMP_STATION', NULL),
-    ('SERVCONNECTION', 'SERVCONNECTION', 'LINK', 'SERVCONNECTION', 'Servconnection'),
-    ('CHANGE', 'JUNCTION', 'NODE', 'CHANGE', NULL),
-    ('CONDUIT', 'CONDUIT', 'ARC', 'CONDUIT', NULL),
-    ('COVER', 'GENELEMENT', 'ELEMENT', 'COVER', 'Cover'),
-    ('NETELEMENT', 'NETELEMENT', 'NODE', 'NETELEMENT', 'Netelement')
-) AS v(lb_en_us, feature_class, feature_type, idval, descript)
-WHERE t.id = v.lb_en_us AND t.feature_class = v.feature_class AND t.feature_type = v.feature_type;
-
 UPDATE config_report AS t
 SET filterparam = v.text::json
 FROM (
@@ -8113,4 +8054,4 @@ FROM (
 ) AS v(columnname, formname, formtype, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;
 
-UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
+UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';

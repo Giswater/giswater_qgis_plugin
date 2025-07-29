@@ -7338,74 +7338,6 @@ FROM (
 ) AS v(id, name)
 WHERE t.id = v.id;
 
-UPDATE cat_feature AS t
-SET id = v.idval, descript = v.descript
-FROM (
-    VALUES
-    ('ENDLINE', 'JUNCTION', 'NODE', 'ENDLINE', 'End of the line'),
-    ('STEP', 'GENELEMENT', 'ELEMENT', 'STEP', 'Step'),
-    ('VALVE_REGISTER', 'REGISTER', 'NODE', 'VALVE_REGISTER', 'Valve register'),
-    ('GREEN_VALVE', 'VALVE', 'NODE', 'GREEN_VALVE', 'Green valve'),
-    ('SHUTOFF_VALVE', 'VALVE', 'NODE', 'SHUTOFF_VALVE', 'Shutoff valve'),
-    ('CURVE', 'JUNCTION', 'NODE', 'CURVE', 'Curve'),
-    ('CONTROL_REGISTER', 'REGISTER', 'NODE', 'CONTROL_REGISTER', 'Control register'),
-    ('THROTTLE_VALVE', 'VALVE', 'NODE', 'THROTTLE_VALVE', 'Throttle-valve'),
-    ('FL_CONTR_VALVE', 'VALVE', 'NODE', 'FL_CONTR_VALVE', 'Flow control valve'),
-    ('MANHOLE', 'MANHOLE', 'NODE', 'MANHOLE', 'Inspection chamber'),
-    ('GEN_PURP_VALVE', 'VALVE', 'NODE', 'GEN_PURP_VALVE', 'General purpose valve'),
-    ('T', 'JUNCTION', 'NODE', 'T', 'Junction where 3 pipes converge'),
-    ('BYPASS_REGISTER', 'REGISTER', 'NODE', 'BYPASS_REGISTER', 'Bypass-register'),
-    ('X', 'JUNCTION', 'NODE', 'X', 'Junction where 4 pipes converge'),
-    ('SOURCE', 'SOURCE', 'NODE', 'SOURCE', 'Source'),
-    ('AIR_VALVE', 'VALVE', 'NODE', 'AIR_VALVE', 'Air valve'),
-    ('ADAPTATION', 'JUNCTION', 'NODE', 'ADAPTATION', 'Adaptation junction'),
-    ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'NODE', 'NETSAMPLEPOINT', 'Netsamplepoint'),
-    ('TANK', 'TANK', 'NODE', 'TANK', 'Tank'),
-    ('WATER_CONNECTION', 'NETWJOIN', 'NODE', 'WATER_CONNECTION', 'Water connection'),
-    ('FOUNTAIN', 'FOUNTAIN', 'CONNEC', 'FOUNTAIN', 'Ornamental fountain'),
-    ('FLOWMETER', 'METER', 'NODE', 'FLOWMETER', 'Flow meter'),
-    ('REDUCTION', 'REDUCTION', 'NODE', 'REDUCTION', 'Reduction'),
-    ('EXPANTANK', 'EXPANSIONTANK', 'NODE', 'EXPANTANK', 'Expansiontank'),
-    ('PRESSURE_METER', 'METER', 'NODE', 'PRESSURE_METER', 'Pressure meter'),
-    ('FILTER', 'FILTER', 'NODE', 'FILTER', 'Filter'),
-    ('JUNCTION', 'JUNCTION', 'NODE', 'JUNCTION', 'Junction'),
-    ('REGISTER', 'REGISTER', 'NODE', 'REGISTER', 'Register'),
-    ('LINK', 'LINK', 'LINK', 'LINK', 'Link'),
-    ('HYDRANT_PLATE', 'GENELEMENT', 'ELEMENT', 'HYDRANT_PLATE', NULL),
-    ('PROTECT_BAND', 'GENELEMENT', 'ELEMENT', 'PROTECT_BAND', NULL),
-    ('WATERWELL', 'WATERWELL', 'NODE', 'WATERWELL', 'Waterwell'),
-    ('EMANHOLE', 'GENELEM', 'ELEMENT', 'EMANHOLE', NULL),
-    ('EPROTECT_BAND', 'GENELEM', 'ELEMENT', 'EPROTECT_BAND', NULL),
-    ('EHYDRANT_PLATE', 'GENELEM', 'ELEMENT', 'EHYDRANT_PLATE', NULL),
-    ('EPUMP', 'FRELEM', 'ELEMENT', 'EPUMP', NULL),
-    ('ECOVER', 'GENELEM', 'ELEMENT', 'ECOVER', NULL),
-    ('ESTEP', 'GENELEM', 'ELEMENT', 'ESTEP', NULL),
-    ('VARC', 'VARC', 'ARC', 'VARC', 'Varc'),
-    ('FRPUMP', 'FLWREG', 'ELEMENT', 'FRPUMP', 'Frpump'),
-    ('VCONNEC_JOIN', 'WJOIN', 'CONNEC', 'VCONNEC_JOIN', 'Virtual connec'),
-    ('WJOIN', 'WJOIN', 'CONNEC', 'WJOIN', 'Wjoin'),
-    ('VCONNEC', 'WJOIN', 'CONNEC', 'VCONNEC', 'Virtual connec'),
-    ('PR_REDUC_VALVE', 'VALVE', 'NODE', 'PR_REDUC_VALVE', 'Pressure reduction valve'),
-    ('PR_BREAK_VALVE', 'VALVE', 'NODE', 'PR_BREAK_VALVE', 'Pressure break valve'),
-    ('OUTFALL_VALVE', 'VALVE', 'NODE', 'OUTFALL_VALVE', 'Outfall valve'),
-    ('PR_SUSTA_VALVE', 'VALVE', 'NODE', 'PR_SUSTA_VALVE', 'Pressure sustainer valve'),
-    ('TAP', 'TAP', 'CONNEC', 'TAP', 'Water source'),
-    ('GREENTAP', 'GREENTAP', 'CONNEC', 'GREENTAP', 'Greentap'),
-    ('HYDRANT', 'HYDRANT', 'NODE', 'HYDRANT', 'Hydrant'),
-    ('PUMP', 'PUMP', 'NODE', 'PUMP', 'Pump'),
-    ('CLORINATHOR', 'NETELEMENT', 'NODE', 'CLORINATHOR', 'Element to reclorate water'),
-    ('EVALVE', 'FRELEM', 'ELEMENT', 'EVALVE', NULL),
-    ('EREGISTER', 'GENELEM', 'ELEMENT', 'EREGISTER', NULL),
-    ('SERVCONNECTION', 'SERVCONNECTION', 'LINK', 'SERVCONNECTION', 'Servconnection'),
-    ('CHECK_VALVE', 'VALVE', 'NODE', 'CHECK_VALVE', 'Check valve'),
-    ('COVER', 'GENELEMENT', 'ELEMENT', 'COVER', 'Cover'),
-    ('FLEXUNION', 'FLEXUNION', 'NODE', 'FLEXUNION', 'Flex union'),
-    ('NETELEMENT', 'NETELEMENT', 'NODE', 'NETELEMENT', 'Netelement'),
-    ('PIPE', 'PIPE', 'ARC', 'PIPE', 'Water distribution pipe'),
-    ('WTP', 'WTP', 'NODE', 'WTP', 'Water treatment point')
-) AS v(lb_en_us, feature_class, feature_type, idval, descript)
-WHERE t.id = v.lb_en_us AND t.feature_class = v.feature_class AND t.feature_type = v.feature_type;
-
 UPDATE config_report AS t
 SET filterparam = v.text::json
 FROM (
@@ -7588,4 +7520,4 @@ FROM (
 ) AS v(columnname, formname, formtype, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;
 
-UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
+UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';

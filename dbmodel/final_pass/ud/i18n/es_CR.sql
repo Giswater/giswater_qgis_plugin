@@ -7872,65 +7872,6 @@ FROM (
 ) AS v(id, name)
 WHERE t.id = v.id;
 
-UPDATE cat_feature AS t
-SET id = v.idval, descript = v.descript
-FROM (
-    VALUES
-    ('STEP', 'GENELEMENT', 'ELEMENT', 'PATE', 'Pate'),
-    ('PUMP', 'GENELEMENT', 'ELEMENT', 'BOMBA', 'Bomba'),
-    ('PROTECTOR', 'GENELEMENT', 'ELEMENT', 'PROTECTOR', 'Protector'),
-    ('FRORIFICE', 'FLWREG', 'ELEMENT', 'FRORIFICE', 'Frorificio'),
-    ('FROUTLET', 'FLWREG', 'ELEMENT', 'FROUTLET', 'Froutlet'),
-    ('EGATE', 'GENELEM', 'ELEMENT', 'EGATE', NULL),
-    ('GULLY', 'GULLY', 'GULLY', 'GULLY', 'Gully'),
-    ('IOT_SENSOR', 'GENELEMENT', 'ELEMENT', 'IOT_SENSOR', 'Iot_sensor'),
-    ('JUNCTION', 'JUNCTION', 'NODE', 'UNION', 'Unión'),
-    ('OUTFALL', 'OUTFALL', 'NODE', 'OUTFALL', 'Emisario'),
-    ('SEWER_STORAGE', 'STORAGE', 'NODE', 'DEPOSITO_RESIDUAL', 'Alcantarillado_almacenamiento'),
-    ('FRWEIR', 'FLWREG', 'ELEMENT', 'FRWEIR', 'Frweir'),
-    ('GATE', 'GENELEMENT', 'ELEMENT', 'GATE', 'Puerta'),
-    ('VIRTUAL_NODE', 'JUNCTION', 'NODE', 'VIRTUAL_NODE', 'Nodo_virtual'),
-    ('SANDBOX', 'MANHOLE', 'NODE', 'ARENERO', 'Cajón de arena'),
-    ('WWTP', 'WWTP', 'NODE', 'EDAR', 'Wwtp'),
-    ('CONNEC', 'CONNEC', 'CONNEC', 'CONNEC', 'Connec'),
-    ('PGULLY', 'GULLY', 'GULLY', 'PGULLY', 'Pgully'),
-    ('EIOT_SENSOR', 'GENELEM', 'ELEMENT', 'EIOT_SENSOR', NULL),
-    ('VGULLY', 'GULLY', 'GULLY', 'VGULLY', 'Vgully'),
-    ('VALVE', 'VALVE', 'NODE', 'VALVULA', 'Válvula'),
-    ('SIPHON', 'SIPHON', 'ARC', 'SIFON', 'Sifón'),
-    ('EPUMP', 'FRELEM', 'ELEMENT', 'EPUMP', NULL),
-    ('WACCEL', 'WACCEL', 'ARC', 'WACCEL', 'Waccel'),
-    ('NETGULLY', 'NETGULLY', 'NODE', 'NETGULLY', 'Netgully'),
-    ('CIRC_MANHOLE', 'MANHOLE', 'NODE', 'CIRC_MANHOLE', 'Circ_manhole'),
-    ('NETINIT', 'NETINIT', 'NODE', 'NETINIT', 'Netinit'),
-    ('EPROTECTOR', 'GENELEM', 'ELEMENT', 'EPROTECTOR', NULL),
-    ('CHAMBER', 'CHAMBER', 'NODE', 'CAMARA', 'Cámara'),
-    ('WEIR', 'CHAMBER', 'NODE', 'WEIR', 'Presa'),
-    ('ECOVER', 'GENELEM', 'ELEMENT', 'ECOVER', NULL),
-    ('EORIFICE', 'FRELEM', 'ELEMENT', 'EORIFICE', NULL),
-    ('EOUTLET', 'FRELEM', 'ELEMENT', 'EOUTLET', NULL),
-    ('ESTEP', 'GENELEM', 'ELEMENT', 'ESTEP', NULL),
-    ('EWEIR', 'FRELEM', 'ELEMENT', 'EWEIR', NULL),
-    ('INLETPIPE', 'INLETPIPE', 'LINK', 'INLETPIPE', 'Tubo de entrada'),
-    ('VARC', 'VARC', 'ARC', 'VARC', 'Varc'),
-    ('FRPUMP', 'FLWREG', 'ELEMENT', 'FRPUMP', 'Frpump'),
-    ('OVERFLOW_STORAGE', 'STORAGE', 'NODE', 'ALMACENAMIENTO_DESBORDAMIENTO', 'Desbordamiento_almacenamiento'),
-    ('REGISTER', 'JUNCTION', 'NODE', 'REGISTRESE_JUNCTION', 'Regístrese en'),
-    ('JUMP', 'WJUMP', 'NODE', 'SALTO', 'Saltar'),
-    ('VCONNEC', 'CONNEC', 'CONNEC', 'VCONNEC', 'Vconnec'),
-    ('PUMP_PIPE', 'CONDUIT', 'ARC', 'TUBO_BOMBA', 'Tubo_de_bomba'),
-    ('HIGHPOINT', 'JUNCTION', 'NODE', 'HIGHPOINT', 'Highpoint'),
-    ('RECT_MANHOLE', 'MANHOLE', 'NODE', 'RECT_MANHOLE', 'Rect_manhole'),
-    ('OWERFLOW_STORAGE', 'STORAGE', 'NODE', 'OWERFLOW_STORAGE', NULL),
-    ('PUMP_STATION', 'CHAMBER', 'NODE', 'ESTACIÓN_DE_BOMBEO', 'Estación_de_bombeo'),
-    ('SERVCONNECTION', 'SERVCONNECTION', 'LINK', 'SERVOCONEXIÓN', 'Servoconexión'),
-    ('CHANGE', 'JUNCTION', 'NODE', 'CAMBIO', 'Cambio'),
-    ('CONDUIT', 'CONDUIT', 'ARC', 'CONDUCTO', 'Conducto'),
-    ('COVER', 'GENELEMENT', 'ELEMENT', 'TAPA', 'Tapa'),
-    ('NETELEMENT', 'NETELEMENT', 'NODE', 'NETELEMENTO', 'Elemento de red')
-) AS v(lb_en_us, feature_class, feature_type, idval, descript)
-WHERE t.id = v.lb_en_us AND t.feature_class = v.feature_class AND t.feature_type = v.feature_type;
-
 UPDATE config_report AS t
 SET filterparam = v.text::json
 FROM (
@@ -8113,4 +8054,4 @@ FROM (
 ) AS v(columnname, formname, formtype, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;
 
-UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
+UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';

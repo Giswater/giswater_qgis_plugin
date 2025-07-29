@@ -7338,74 +7338,6 @@ FROM (
 ) AS v(id, name)
 WHERE t.id = v.id;
 
-UPDATE cat_feature AS t
-SET id = v.idval, descript = v.descript
-FROM (
-    VALUES
-    ('ENDLINE', 'JUNCTION', 'NODE', 'ENDLINE', 'Final de red'),
-    ('STEP', 'GENELEMENT', 'ELEMENT', 'PATE', 'Pate'),
-    ('VALVE_REGISTER', 'REGISTER', 'NODE', 'VALVULA_REGISTRP', 'Registro de válvulas'),
-    ('GREEN_VALVE', 'VALVE', 'NODE', 'VALVULA_VERDE', 'Válvula verde'),
-    ('SHUTOFF_VALVE', 'VALVE', 'NODE', 'SHUTOFF_VALVE', 'Válvula de cierre'),
-    ('CURVE', 'JUNCTION', 'NODE', 'CURVA', 'Curva'),
-    ('CONTROL_REGISTER', 'REGISTER', 'NODE', 'CONTROL_REGISTER', 'Registro de control'),
-    ('THROTTLE_VALVE', 'VALVE', 'NODE', 'VALVULA_DE_ACELERACIÓN', 'Válvula de mariposa'),
-    ('FL_CONTR_VALVE', 'VALVE', 'NODE', 'FL_CONTR_VALVE', 'Válvula reguladora de caudal'),
-    ('MANHOLE', 'MANHOLE', 'NODE', 'MANHOLE', 'Cámara de inspección'),
-    ('GEN_PURP_VALVE', 'VALVE', 'NODE', 'GEN_PURP_VALVE', 'Válvula de uso general'),
-    ('T', 'JUNCTION', 'NODE', 'T', 'Cruce donde convergen 3 tuberías'),
-    ('BYPASS_REGISTER', 'REGISTER', 'NODE', 'BYPASS_REGISTER', 'Registro de derivación'),
-    ('X', 'JUNCTION', 'NODE', 'X', 'Cruce donde convergen 4 tuberías'),
-    ('SOURCE', 'SOURCE', 'NODE', 'FUENTE', 'Fuente'),
-    ('AIR_VALVE', 'VALVE', 'NODE', 'VALVULA_DE_AIRE', 'Válvula de aire'),
-    ('ADAPTATION', 'JUNCTION', 'NODE', 'ADAPTACION', 'Nudo de adaptación'),
-    ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'NODE', 'NETSAMPLEPOINT', 'Netsamplepoint'),
-    ('TANK', 'TANK', 'NODE', 'TANQUE', 'Depósito'),
-    ('WATER_CONNECTION', 'NETWJOIN', 'NODE', 'CONEXION_AGUA', 'Conexión de agua'),
-    ('FOUNTAIN', 'FOUNTAIN', 'CONNEC', 'FUENTE_ORNAMENTAL', 'Fuente ornamental'),
-    ('FLOWMETER', 'METER', 'NODE', 'CAUDALÍMETRO', 'Caudalímetro'),
-    ('REDUCTION', 'REDUCTION', 'NODE', 'REDUCCIÓN', 'Reducción'),
-    ('EXPANTANK', 'EXPANSIONTANK', 'NODE', 'EXPANTANK', 'Depósito de expansión'),
-    ('PRESSURE_METER', 'METER', 'NODE', 'MEDIDOR_PRESIÓN', 'Medidor de presión'),
-    ('FILTER', 'FILTER', 'NODE', 'FILTRO', 'Filtros'),
-    ('JUNCTION', 'JUNCTION', 'NODE', 'UNION', 'Unión'),
-    ('REGISTER', 'REGISTER', 'NODE', 'REGISTRO', 'Registro'),
-    ('LINK', 'LINK', 'LINK', 'ENLACE', 'Enlace'),
-    ('HYDRANT_PLATE', 'GENELEMENT', 'ELEMENT', 'PLACA_HIDRAULICA', NULL),
-    ('PROTECT_BAND', 'GENELEMENT', 'ELEMENT', 'BANDA_DE_PROTECCION', NULL),
-    ('WATERWELL', 'WATERWELL', 'NODE', 'POZO_DE_AGUA', 'Pozo de agua'),
-    ('EMANHOLE', 'GENELEM', 'ELEMENT', 'EMANHOLE', NULL),
-    ('EPROTECT_BAND', 'GENELEM', 'ELEMENT', 'EPROTECT_BAND', NULL),
-    ('EHYDRANT_PLATE', 'GENELEM', 'ELEMENT', 'EHYDRANT_PLATE', NULL),
-    ('EPUMP', 'FRELEM', 'ELEMENT', 'EPUMP', NULL),
-    ('ECOVER', 'GENELEM', 'ELEMENT', 'ECOVER', NULL),
-    ('ESTEP', 'GENELEM', 'ELEMENT', 'ESTEP', NULL),
-    ('VARC', 'VARC', 'ARC', 'VARC', 'Varc'),
-    ('FRPUMP', 'FLWREG', 'ELEMENT', 'FRPUMP', 'Frpump'),
-    ('VCONNEC_JOIN', 'WJOIN', 'CONNEC', 'CONEXION_VIRTUAL', 'Conexión virtual'),
-    ('WJOIN', 'WJOIN', 'CONNEC', 'WJOIN', 'Wjoin'),
-    ('VCONNEC', 'WJOIN', 'CONNEC', 'VCONNEC', 'Conexión virtual'),
-    ('PR_REDUC_VALVE', 'VALVE', 'NODE', 'PR_REDUC_VALVE', 'Válvula reductora de presión'),
-    ('PR_BREAK_VALVE', 'VALVE', 'NODE', 'PR_BREAK_VALVE', 'Válvula limitadora de presión'),
-    ('OUTFALL_VALVE', 'VALVE', 'NODE', 'VALVULA_SALIDA', 'Válvula de desagüe'),
-    ('PR_SUSTA_VALVE', 'VALVE', 'NODE', 'PR_SUSTA_VALVE', 'Válvula sostenedora de presión'),
-    ('TAP', 'TAP', 'CONNEC', 'TAP', 'Fuente de agua'),
-    ('GREENTAP', 'GREENTAP', 'CONNEC', 'GREENTAP', 'Greentap'),
-    ('HYDRANT', 'HYDRANT', 'NODE', 'HIDRANTE', 'Hidrante'),
-    ('PUMP', 'PUMP', 'NODE', 'BOMBA', 'Bomba'),
-    ('CLORINATHOR', 'NETELEMENT', 'NODE', 'CLORADOR', 'Elemento para reclorar agua'),
-    ('EVALVE', 'FRELEM', 'ELEMENT', 'EVALUAR', NULL),
-    ('EREGISTER', 'GENELEM', 'ELEMENT', 'REGISTROS', NULL),
-    ('SERVCONNECTION', 'SERVCONNECTION', 'LINK', 'SERVOCONEXIÓN', 'Servoconexión'),
-    ('CHECK_VALVE', 'VALVE', 'NODE', 'VALVULA_CHECK', 'Válvula de retención'),
-    ('COVER', 'GENELEMENT', 'ELEMENT', 'TAPA', 'Tapa'),
-    ('FLEXUNION', 'FLEXUNION', 'NODE', 'FLEXUNION', 'Unión flexible'),
-    ('NETELEMENT', 'NETELEMENT', 'NODE', 'NETELEMENTO', 'Elemento de red'),
-    ('PIPE', 'PIPE', 'ARC', 'TUBERIA', 'Tubería de distribución de agua'),
-    ('WTP', 'WTP', 'NODE', 'ETAP', 'Punto de tratamiento del agua')
-) AS v(lb_en_us, feature_class, feature_type, idval, descript)
-WHERE t.id = v.lb_en_us AND t.feature_class = v.feature_class AND t.feature_type = v.feature_type;
-
 UPDATE config_report AS t
 SET filterparam = v.text::json
 FROM (
@@ -7588,4 +7520,4 @@ FROM (
 ) AS v(columnname, formname, formtype, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;
 
-UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
+UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';
