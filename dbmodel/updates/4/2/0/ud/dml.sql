@@ -521,3 +521,5 @@ VALUES('v_edit_arc', 'form_feature', 'tab_data', 'initoverflowpath', 'lyt_data_1
 (SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname  = 'v_edit_arc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1' GROUP BY formname, tabname, layoutname),
 'boolean', 'check', 'Init Over Flow Path', 'initoverflowpath', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, TRUE, NULL)
 ON CONFLICT DO NOTHING;
+
+DELETE FROM sys_param_user WHERE id = 'inp_options_networkmode';
