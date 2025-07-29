@@ -395,7 +395,6 @@ class GwI18NGenerator:
         dbtables = self.path_dic[file_type]["tables"]
         if self.language == 'no_TR':
             if file_type not in ['i18n_ws', 'i18n_ud']:
-                print(f"file_type: {file_type}")
                 return True, f"{file_type}, not translated"
             dbtables = ['dbconfig_form_fields', 'dbconfig_param_system', 'dbconfig_typevalue', 
                               'dbconfig_form_tableview', 'dbconfig_form_fields_feat']

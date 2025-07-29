@@ -190,8 +190,6 @@ class GwAudit:
 
                 # Check if the value has changed
                 if old_value != new_value and old_value != "":
-                    print(f"new_value: {new_value}")
-                    print(f"old_value: {old_value}\n\n")
                     # Create label
                     label = QLabel(str(key))
                     label.setStyleSheet("font-weight: bold;")

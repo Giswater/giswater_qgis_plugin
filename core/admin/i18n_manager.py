@@ -536,7 +536,6 @@ class GwSchemaI18NManager:
 
         # Efficient diff using set of tuples
         diff_rows = self._set_operation_on_dict(rows_org, rows_i18n, op='-', compare='values')
-        print(f"diff_rows: {diff_rows}")
 
         return diff_rows, columns_i18n
 

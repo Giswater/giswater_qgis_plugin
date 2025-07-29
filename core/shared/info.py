@@ -2786,7 +2786,6 @@ class GwInfo(QObject):
             print("widget.dateTime() is None or null")
             widget.displayNull(True)
         else:
-            print(f"widget.dateTime() is {widget.dateTime().toString()}")
             widget.displayNull(False)
 
         # Force clear button to be active
