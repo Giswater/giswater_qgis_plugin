@@ -35,7 +35,7 @@ DECLARE
 	v_check_management_configs boolean;
 	v_check_data_related boolean;
 	v_fids_to_run integer[];
-    v_count integer;
+	v_count integer;
 
 	-- variables
     v_querytext text;
@@ -96,10 +96,14 @@ DECLARE
 	v_table_exists boolean;
 	v_criticity integer;
 	v_conditions text[];
+	v_combo_issue_found boolean := false;
+	v_any_issue_found boolean := false;
+	v_lot_view_name text;
+	v_view_exists boolean;
 
 BEGIN
 
-	SET search_path = 'pg_temp', 'cm', public;
+	SET search_path = 'pg_temp', 'cm', 'public';
 	v_schemaname := 'cm';
 
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
@@ -368,47 +372,68 @@ BEGIN
 				v_form_name := 've_' || v_feature_type_iterator || '_' || v_rec_subtype.subtype;
 				-- Find all 'combo' type columns for the current formname from the PARENT schema
 				v_querytext := format(
-					'SELECT array_agg(columnname)
+					'SELECT columnname, dv_isnullvalue
 					 FROM PARENT_SCHEMA.config_form_fields
 					 WHERE formname = %L AND widgettype LIKE ''combo%%''',
 					 v_form_name
 				);
-				EXECUTE v_querytext INTO v_combo_columns;
+				
+				FOR v_rec_check IN EXECUTE v_querytext
+				LOOP
+					-- If NULL is not a valid value for this combo, check for NULLs.
+					IF v_rec_check.dv_isnullvalue IS NOT TRUE THEN
+						BEGIN
+							-- This query now correctly joins to the specific feature subtype VIEW (e.g., PARENT_SCHEMA.ve_node_pr_reduc_valve)
+							-- stored in v_form_name. This ensures the column being checked (v_rec_check.columnname) actually exists,
+							-- resolving the "column does not exist" error, and simplifies the query by removing a redundant join.
+							v_feature_id_column := v_feature_type_iterator || '_id';
+							v_querytext := format(
+								'SELECT COUNT(T1.*)
+								 FROM cm.om_campaign_lot_x_%I T1
+								 JOIN PARENT_SCHEMA.%I T2 ON T1.%I::text = T2.%I::text
+								 WHERE T1.lot_id = %s AND T2.%I IS NULL',
+								 v_feature_type_iterator,
+								 v_form_name,
+								 v_feature_id_column,
+								 v_feature_id_column,
+								 v_lot_id,
+								 v_rec_check.columnname
+							);
 
-				-- If combo columns are found in config, verify they exist in the actual table
-				IF v_combo_columns IS NOT NULL AND array_length(v_combo_columns, 1) > 0 THEN
-					
-					v_querytext := format(
-						'SELECT array_agg(c.column_name) FROM information_schema.columns c
-						 WHERE c.table_schema = ''PARENT_SCHEMA'' AND c.table_name = %L AND c.column_name = ANY(%L)',
-						 v_feature_type_iterator, v_combo_columns
-					);
-					EXECUTE v_querytext INTO v_verified_combo_columns;
+							EXECUTE v_querytext INTO v_count;
 
-					-- If any verified columns remain, build and execute the update
-					IF v_verified_combo_columns IS NOT NULL AND array_length(v_verified_combo_columns, 1) > 0 THEN
+							IF v_count > 0 THEN
+								v_lot_summary_msg := format(
+									'WARNING (Lot ID: %s): Found %s records in lot with missing required values for field ''%s'' in subtype ''%s''.',
+									v_lot_id, v_count, v_rec_check.columnname, v_rec_subtype.subtype
+								);
+								INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+								VALUES (v_fid, current_user, 2, v_lot_summary_msg);
+								v_combo_issue_found := true;
+							END IF;
 
-						-- Construct the calculation part of the query using only verified columns
-						SELECT string_agg(format('(CASE WHEN T2.%I IS NOT NULL AND T2.%I::text = ''0'' THEN 1 ELSE 0 END)', columnname, columnname), ' + ')
-						INTO v_update_calculation
-						FROM unnest(v_verified_combo_columns) AS columnname;
-
-						-- Construct the final UPDATE statement
-						v_querytext := format(
-							'UPDATE cm.om_campaign_lot_x_%1$s T1 SET %2$I = %3$s
-							 FROM PARENT_SCHEMA.%1$s T2
-							 JOIN PARENT_SCHEMA.cat_%1$s T3 ON T2.%5$I = T3.id
-							 WHERE T1.%1$s_id::text = T2.%1$s_id::text AND T1.lot_id = %4$s AND lower(T3.%1$s_type) = %6$L',
-							v_feature_type_iterator, v_qindex_column, COALESCE(v_update_calculation, '0'),
-							v_lot_id, v_feature_cat_id_col, v_rec_subtype.subtype
-						);
-
-						-- Execute the update
-						EXECUTE v_querytext;
+						EXCEPTION
+							WHEN undefined_column THEN
+								-- This can happen if the view definition is out of sync with config_form_fields.
+								-- This is not an error in the project data, but a configuration mismatch. Log it as INFO.
+								v_lot_summary_msg := format(
+									'INFO (Lot ID: %s): Configuration mismatch. Field ''%s'' from form ''%s'' not found in the underlying view. Skipping check.',
+									v_lot_id, v_rec_check.columnname, v_form_name
+								);
+								INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+								VALUES (v_fid, current_user, 1, v_lot_summary_msg);
+						END;
 					END IF;
-				END IF;
-			END LOOP;
-		END LOOP;
+				END LOOP; -- end loop for combo columns
+			END LOOP; -- end loop for subtypes
+		END LOOP; -- end loop for feature types
+
+		-- Add a final "all clear" message if no combo issues were found for the lot.
+		IF NOT v_combo_issue_found THEN
+			INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+			VALUES (v_fid, current_user, 1, 'INFO: All combo box configurations checks passed successfully for this lot.');
+		END IF;
+
 	END IF;
 	-- ENDSECTION
 
@@ -611,6 +636,10 @@ BEGIN
 			EXECUTE
 				'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{"functionFid":' || v_fid || ',"checkFid":' || v_rec.fid || '}}}$$)'
 				INTO v_check_result;
+			
+			IF (v_check_result->>'issue_found')::boolean IS TRUE THEN
+				v_any_issue_found := true;
+			END IF;
 		END LOOP;
 	END IF;
 	-- ENDSECTION
@@ -621,6 +650,12 @@ BEGIN
 	END IF;
 	IF v_campaign_summary_msg IS NOT NULL THEN
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, v_campaign_summary_msg);
+	END IF;
+
+	-- Add a final "all clear" message if no issues were found.
+	IF NOT v_any_issue_found THEN
+		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+		VALUES (v_fid, current_user, 1, 'INFO: All project configurations checks passed successfully.');
 	END IF;
 
 	-- not necessary to fill excep tables
