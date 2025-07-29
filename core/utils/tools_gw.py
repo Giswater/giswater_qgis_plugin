@@ -663,7 +663,7 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
 
     feature_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
-    viewname = f"v_edit_{feature_type}"
+    viewname = f"ve_{feature_type}"
     field_id = feature_type
     if feature_type == "element":
         viewname = ["ve_frelem", "ve_genelem"]
@@ -3117,7 +3117,7 @@ def load_tableview_feature_end(class_object, dialog, table_object, feature_type,
     if feature_type == 'element':
         table_relation = "v_ui_element"
     else:
-        table_relation = f"v_edit_{feature_type}"
+        table_relation = f"ve_{feature_type}"
     widget_name = f"tbl_{table_object}_x_{feature_type}"
 
     exists = tools_db.check_table(table_relation)
@@ -3580,7 +3580,7 @@ def show_expression_dialog(feature_type, dialog, table_object):
     """ Show expression builder dialog """
 
     # Open a dialog with a QgsExpressionBuilderWidget in it
-    tablename = f"v_edit_{feature_type}"
+    tablename = f"ve_{feature_type}"
     layer = tools_qgis.get_layer_by_tablename(tablename)
     start_text = f"{feature_type}_id"
     dlg = QgsExpressionSelectionDialog(layer, start_text, dialog)

@@ -174,7 +174,7 @@ class GwFeatureDeleteButton(GwAction):
             is_valid, expr = tools_qt.check_expression_filter(expr_filter)
 
             # Get layer from feature
-            layer = tools_qgis.get_layer_by_tablename(f'v_edit_{feature_type}')
+            layer = tools_qgis.get_layer_by_tablename(f've_{feature_type}')
 
             # Check if layer exists and expression is valid
             if layer and is_valid:

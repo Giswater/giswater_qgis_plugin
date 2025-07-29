@@ -964,7 +964,7 @@ class GwVisit(QObject):
 
         # tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_visit_x_{self.rel_feature_type}"
-        viewname = f"v_edit_{self.rel_feature_type}"
+        viewname = f"ve_{self.rel_feature_type}"
         widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
 
         try:
@@ -1027,7 +1027,7 @@ class GwVisit(QObject):
         if feature_type.lower() == 'all':
             return
 
-        viewname = f"v_edit_{feature_type}"
+        viewname = f"ve_{feature_type}"
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(feature_type) + "_id")
 
         # set table model and completer
@@ -1835,7 +1835,7 @@ class GwVisit(QObject):
 
         tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.rel_feature_type}"
-        viewname = f"v_edit_{self.rel_feature_type}"
+        viewname = f"ve_{self.rel_feature_type}"
         widget_table = tools_qt.get_widget(dialog, widget_name)
 
         try:

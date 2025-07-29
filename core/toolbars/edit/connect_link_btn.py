@@ -293,7 +293,7 @@ class GwConnectLinkButton(GwMaptool):
                 layer.selectByIds([selected_ids[0]])
 
         # Get current feature layer (connec/gully)
-        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature_type}')
+        layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
 
         # Check if layer exists
         if layer:
@@ -313,7 +313,7 @@ class GwConnectLinkButton(GwMaptool):
         """ Process selected features """
 
         # Get current feature layer (connec/gully)
-        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature_type}')
+        layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
 
         # Refresh table
         self.fill_tbl_ids(layer)
@@ -342,7 +342,7 @@ def add(**kwargs):
     is_valid, expr = tools_qt.check_expression_filter(expr_filter)
 
     # Get layer from feature
-    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature_type}')
+    layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
 
     # Check if layer exists and expression is valid
     if layer and is_valid:
@@ -374,7 +374,7 @@ def remove(**kwargs):
         return
 
     # Get layer from feature
-    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature_type}')
+    layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
 
     # Check if layer exists
     if layer:
@@ -468,7 +468,7 @@ def filter_expression(**kwargs):
     this = kwargs['class']
 
     # Get current layer and feature type
-    layer_name = f'v_edit_{this.feature_type}'
+    layer_name = f've_{this.feature_type}'
 
     layer = tools_qgis.get_layer_by_tablename(layer_name)
     if not layer:

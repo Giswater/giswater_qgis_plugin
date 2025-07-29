@@ -73,7 +73,7 @@ class AddNewLot:
             self.lot_saved = True
 
         self.rel_list_ids = {ft: [] for ft in ['arc', 'node', 'connec', 'gully', 'link']}
-        self.excluded_layers = [f"v_edit_{ft}" for ft in self.rel_list_ids]
+        self.excluded_layers = [f"ve_{ft}" for ft in self.rel_list_ids]
 
         self.rel_layers = {ft: tools_gw.get_layers_from_feature_type(ft) for ft in ['arc', 'node', 'connec', 'link']}
         if tools_gw.get_project_type() == 'ud':
@@ -766,7 +766,7 @@ class AddNewLot:
 
     def init_filters(self):
         current_date = QDate.currentDate()
-        
+
         where_clause = ""
         username = tools_db.get_current_user()
         sql = f"""

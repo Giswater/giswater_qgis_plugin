@@ -142,7 +142,7 @@ class GwDocument(QObject):
         # Adding auto-completion to a QLineEdit for default feature
         if feature_type is None:
             feature_type = "arc"
-        viewname = f"v_edit_{feature_type}"
+        viewname = f"ve_{feature_type}"
         tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(feature_type) + "_id")
 
         # Config Workcat
@@ -562,7 +562,7 @@ class GwDocument(QObject):
         expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        table_name = f"{self.schema_name}.v_edit_{feature_type}"
+        table_name = f"{self.schema_name}.ve_{feature_type}"
         message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)

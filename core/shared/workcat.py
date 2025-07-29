@@ -305,12 +305,13 @@ class GwWorkcat:
 
         # Select workcat features
         layers = [
-            tools_qgis.get_layer_by_tablename("v_edit_arc"),
-            tools_qgis.get_layer_by_tablename("v_edit_node"),
-            tools_qgis.get_layer_by_tablename("v_edit_connec"),
-            tools_qgis.get_layer_by_tablename("v_edit_link"),
-            # tools_qgis.get_layer_by_tablename("v_edit_element"),  # TODO: select elements too
-            tools_qgis.get_layer_by_tablename("v_edit_gully"),
+            tools_qgis.get_layer_by_tablename("ve_arc"),
+            tools_qgis.get_layer_by_tablename("ve_node"),
+            tools_qgis.get_layer_by_tablename("ve_connec"),
+            tools_qgis.get_layer_by_tablename("ve_link"),
+            tools_qgis.get_layer_by_tablename("ve_frelem"),
+            tools_qgis.get_layer_by_tablename("ve_genelem"),
+            tools_qgis.get_layer_by_tablename("ve_gully"),
         ]
         expr = QgsExpression(expr)
         for lyr in layers:
@@ -525,7 +526,7 @@ class GwWorkcat:
         row = element[0].row()
 
         feature_type = qtable.model().record(row).value('feature_type').lower()
-        table_name = "v_edit_" + feature_type
+        table_name = "ve_" + feature_type
 
         feature_id = qtable.model().record(row).value('feature_id')
 
@@ -639,7 +640,7 @@ class GwWorkcat:
         feature_type = index.sibling(row, column_index).data().lower()
         column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_id')
         feature_id = index.sibling(row, column_index).data()
-        layer = tools_qgis.get_layer_by_tablename(f"v_edit_{feature_type}")
+        layer = tools_qgis.get_layer_by_tablename(f"ve_{feature_type}")
         if not layer:
             return
 

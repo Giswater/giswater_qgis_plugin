@@ -402,7 +402,7 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
-        viewname = "v_edit_" + self.rel_feature_type
+        viewname = "ve_" + self.rel_feature_type
         tools_gw.set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.rel_feature_type) + "_id")
 
         # Set default tab 'arc'

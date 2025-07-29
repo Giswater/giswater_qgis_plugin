@@ -105,7 +105,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename and 'v_edit' in tablename:
+            if tablename and 've' in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def canvasReleaseEvent(self, event):
@@ -242,7 +242,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         layer = self.snapper_manager.get_snapped_layer(result)
         tablename = tools_qgis.get_layer_source_table_name(layer)
-        if tablename and 'v_edit' in tablename:
+        if tablename and 've' in tablename:
             if tablename == 've_node':
                 self.feature_type = 'node'
             elif tablename == 've_connec':
