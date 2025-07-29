@@ -3582,7 +3582,7 @@ def show_expression_dialog(feature_type, dialog, table_object):
     # Open a dialog with a QgsExpressionBuilderWidget in it
     tablename = f"ve_{feature_type}"
     layer = tools_qgis.get_layer_by_tablename(tablename)
-    start_text = f"{feature_type}_id"
+    start_text = None
     dlg = QgsExpressionSelectionDialog(layer, start_text, dialog)
     return dlg.exec_()
 
