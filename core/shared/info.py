@@ -1769,7 +1769,6 @@ class GwInfo(QObject):
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
         newfeature_id = complet_result['body']['feature']['id']
-        parent_fields = complet_result['body']['data']['parentFields']
         list_mandatory = []
         # Manage autoupdate and mandatory widgets
         fields_reload = self._manage_autoupdate_and_mandatory_widgets(dialog, complet_result, p_widget, list_mandatory)
