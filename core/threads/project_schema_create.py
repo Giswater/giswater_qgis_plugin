@@ -23,7 +23,7 @@ class GwCreateSchemaTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, admin, description, params, timer=None):
+    def __init__(self, admin, description, params, project_type, timer=None):
 
         super().__init__(description)
         self.admin: GwAdminButton = admin
@@ -31,6 +31,7 @@ class GwCreateSchemaTask(GwTask):
         self.dict_folders_process = {}
         self.db_exception = (None, None, None)  # error, sql, filepath
         self.timer = timer
+        self.project_type = project_type
 
         # Manage buttons & other dlg-related widgets
         # Disable dlg_readsql_create_project buttons
@@ -71,7 +72,7 @@ class GwCreateSchemaTask(GwTask):
         msg_params = ("Create schema", "custom_execution",)
         tools_log.log_info(msg, msg_params=msg_params)
         self.custom_execution()
-        status = self.final_pass_execution()
+        status = self.final_pass_execution(self.project_type)
         msg_params = ("Create schema", "final_pass_execution",)
         tools_log.log_info(msg, msg_params=msg_params)
         if not tools_os.set_boolean(status, False):
@@ -206,8 +207,8 @@ class GwCreateSchemaTask(GwTask):
         elif self.admin.rdb_empty.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_empty', prefix=False)
 
-    def final_pass_execution(self) -> None:
-        status = self.admin.load_final_pass()
+    def final_pass_execution(self, project_type) -> None:
+        status = self.admin.load_final_pass(project_type)
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False

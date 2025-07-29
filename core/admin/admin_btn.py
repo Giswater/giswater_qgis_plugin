@@ -147,7 +147,7 @@ class GwAdminButton:
         self.descript = project_descript
         self.schema_type = project_type
         self.project_epsg = project_srid
-        self.folder_final_pass = os.path.join(self.sql_dir, 'final_pass', self.project_type)
+        self.folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
         self.folder_locale = os.path.join(self.folder_final_pass, project_type, 'i18n')
         self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
 
@@ -205,11 +205,11 @@ class GwAdminButton:
                   'project_srid': project_srid, 'example_data': example_data}
 
         if hasattr(self, 'task_rename_schema') and not isdeleted(self.task_rename_schema):
-            self.task_rename_schema.task_finished.connect(partial(self.start_create_project_data_schema_task, project_name_schema, params))
+            self.task_rename_schema.task_finished.connect(partial(self.start_create_project_data_schema_task, project_name_schema, params, project_type))
         else:
-            self.start_create_project_data_schema_task(project_name_schema, params)
+            self.start_create_project_data_schema_task(project_name_schema, params, project_type)
 
-    def start_create_project_data_schema_task(self, project_name_schema, params):
+    def start_create_project_data_schema_task(self, project_name_schema, params, project_type):
         self.error_count = 0
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
@@ -222,7 +222,7 @@ class GwAdminButton:
         self.timer.start(1000)
 
         description = "Create schema"
-        self.task_create_schema = GwCreateSchemaTask(self, description, params, timer=self.timer)
+        self.task_create_schema = GwCreateSchemaTask(self, description, params, project_type, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
@@ -607,10 +607,10 @@ class GwAdminButton:
 
         return True
 
-    def load_final_pass(self, lang=None, utils=False):
+    def load_final_pass(self, project_type, lang=None, utils=False):
 
         lang = lang or self.locale
-        project_type = 'utils' if utils else self.project_type
+        project_type = 'utils' if utils else project_type
         folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
         folders = sorted(os.listdir(folder_final_pass))
         
