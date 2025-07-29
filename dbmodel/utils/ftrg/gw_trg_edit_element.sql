@@ -80,11 +80,6 @@ BEGIN
 	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		v_length_arc := (SELECT ST_Length(the_geom) FROM arc WHERE arc_id = NEW.to_arc);
-		IF v_length_arc < NEW.flwreg_length THEN
-			RAISE EXCEPTION 'Element is longer than to_arc length';
-		END IF;
-
         -- get feature_type and man_table dynamically
         EXECUTE '
         SELECT lower(feature_type) FROM cat_feature WHERE child_layer = '||quote_literal(v_tg_table_name)||' OR parent_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
@@ -110,6 +105,12 @@ BEGIN
             v_unitsfactor = 1;
         END IF;
 
+		IF v_man_table='man_frelem' THEN
+			v_length_arc := (SELECT ST_Length(the_geom) FROM arc WHERE arc_id = NEW.to_arc);
+			IF v_length_arc < NEW.flwreg_length THEN
+				RAISE EXCEPTION 'Element is longer than to_arc length';
+			END IF;
+		END IF;
 
         -- get element_type and associated feature
         SELECT element_type INTO v_element_type FROM cat_element WHERE id=NEW.elementcat_id;
