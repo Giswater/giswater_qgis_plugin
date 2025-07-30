@@ -261,6 +261,7 @@ class GwMapzoneManager:
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'graphClass'), f"{mapzone_type.upper()}", 0)
+        tools_qt.set_widget_enabled(dlg_functions, 'graphClass', False)
 
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
