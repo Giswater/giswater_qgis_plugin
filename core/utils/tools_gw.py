@@ -4913,6 +4913,7 @@ def refresh_all_styles(dialog=None):
         param = str(e)
         tools_qgis.show_warning(msg, dialog=dialog, parameter=param)
 
+
 # region compatibility QGIS version functions
 
 def set_snapping_type(layer_settings, value):
