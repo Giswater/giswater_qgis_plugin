@@ -46,3 +46,6 @@ ALTER TABLE macroomzone ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
 
 -- 24/07/2025
 ALTER TABLE om_waterbalance_dma_graph ALTER COLUMN node_id TYPE int4 USING node_id::int4;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"meter_type", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"name", "dataType":"text"}}$$);

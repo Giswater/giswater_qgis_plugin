@@ -319,3 +319,10 @@ DELETE FROM config_form_fields  WHERE formname = 've_node';
 ALTER TABLE config_form_fields DISABLE TRIGGER ALL;
 UPDATE config_form_fields SET formname = REPLACE(formname, 'v_edit_', 've_') WHERE formname LIKE 'v_edit_%';
 ALTER TABLE config_form_fields ENABLE TRIGGER ALL;
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_meter_metertype', '0', 'UNKNOWN', NULL, NULL) 
+ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) 
+VALUES('edit_typevalue', 'man_meter_metertype', 'man_meter', 'meter_type', NULL, true)
+ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
