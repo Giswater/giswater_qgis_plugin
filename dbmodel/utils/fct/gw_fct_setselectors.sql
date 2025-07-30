@@ -318,6 +318,7 @@ BEGIN
 		IF v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
 
 			IF v_tabname = 'tab_exploitation' THEN
+				DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 				INSERT INTO selector_macroexpl
 				SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 				ON CONFLICT (macroexpl_id, cur_user) DO NOTHING;
