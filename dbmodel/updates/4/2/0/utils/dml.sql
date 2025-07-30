@@ -100,3 +100,99 @@ DELETE FROM config_form_fields WHERE formname='ve_genelem_eprotector' AND formty
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4322, '%v_count_feature% link(s) have been downgraded', NULL, 0, true, 'utils', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4324, '%v_count_feature% element(s) have been downgraded', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE config_toolbox SET inputparams='[
+  {
+    "label": "Direct insert into node table:",
+    "value": null,
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "insertIntoNode",
+    "widgettype": "check",
+    "layoutorder": 1
+  },
+  {
+    "label": "Node tolerance:",
+    "value": null,
+    "datatype": "float",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "nodeTolerance",
+    "widgettype": "spinbox",
+    "layoutorder": 2
+  },
+  {
+    "label": "Exploitation ids:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "exploitation",
+    "widgettype": "combo",
+    "dvQueryText": "select expl_id as id, name as idval from exploitation where active is not False order by name",
+    "layoutorder": 3
+  },
+  {
+    "label": "State:",
+    "value": null,
+    "datatype": "integer",
+    "isparent": "True",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "stateType",
+    "widgettype": "combo",
+    "dvQueryText": "select value_state_type.id as id, concat(''state: '',value_state.name,'' state type: '', value_state_type.name) as idval from value_state_type join value_state on value_state.id = state where value_state_type.id is not null order by  CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, id",
+    "layoutorder": 4
+  },
+  {
+    "label": "Workcat:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "workcatId",
+    "widgettype": "combo",
+    "dvQueryText": "select id as id, id as idval from cat_work where id is not null",
+    "isNullValue": true,
+    "layoutorder": 5
+  },
+  {
+    "label": "Builtdate:",
+    "value": null,
+    "datatype": "date",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "builtdate",
+    "widgettype": "datetime",
+    "layoutorder": 6
+  },
+  {
+    "label": "Node type:",
+    "isparent": true,
+    "value": null,
+    "datatype": "text",
+    "iseditable": true,
+    "layoutname": "grl_option_parameters",
+    "selectedId": "$userNodetype",
+    "widgetname": "nodeType",
+    "widgettype": "combo",
+    "dvQueryText": "select distinct cfn.id as id, cfn.id as idval from cat_feature_node cfn JOIN cat_node cn ON cn.node_type=cfn.id where cfn.id is not null",
+    "layoutorder": 7
+  },
+  {
+    "label": "Node catalog:",
+    "dvparentid": "node_type",
+    "dvquerytext_filterc": " AND value_state_type.state",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": "$userNodecat",
+    "widgetname": "nodeCat",
+    "widgettype": "combo",
+    "dvQueryText": "select distinct id as id, id as idval from cat_node order by id",
+    "parentname": "nodeType",
+    "filterquery": "select distinct id as id, id as idval from cat_node where node_type = ''{parent_value}'' order by id",
+    "layoutorder": 8
+  }
+]'::json WHERE id=2118;
