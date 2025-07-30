@@ -97,3 +97,6 @@ DELETE FROM config_form_fields WHERE formname='ve_genelem_ecover' AND formtype='
 DELETE FROM config_form_fields WHERE formname='ve_genelem_egate' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';
 DELETE FROM config_form_fields WHERE formname='ve_genelem_eiot_sensor' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';
 DELETE FROM config_form_fields WHERE formname='ve_genelem_eprotector' AND formtype='form_feature' AND columnname='epa_type' AND tabname='tab_data';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4322, '%v_count_feature% link(s) have been downgraded', NULL, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4324, '%v_count_feature% element(s) have been downgraded', NULL, 0, true, 'utils', 'core', 'AUDIT');
