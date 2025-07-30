@@ -1414,7 +1414,7 @@ BEGIN
 			JOIN value_state_type sa ON sa.state =a.state AND sa.id=a.state_type
 			WHERE sn.is_operative =true AND sa.is_operative =true AND 
 			n.node_id IN
-			(SELECT json_array_elements(graphconfig->''use'')->>''nodeParent'' as nodeparent
+			(SELECT (json_array_elements(graphconfig->''use'')->>''nodeParent'')::integer as nodeparent
 			FROM '||quote_ident(v_table)||' WHERE active=true)
 			AND a.'||quote_ident(v_field)||' IN
 			(SELECT '||quote_ident(v_field)||'
