@@ -517,3 +517,5 @@ VALUES('v_edit_arc', 'form_feature', 'tab_data', 'initoverflowpath', 'lyt_data_1
 ON CONFLICT DO NOTHING;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_networkmode';
+
+UPDATE config_form_fields SET formname = REPLACE(formname, 'v_edit_', 've_') WHERE formname LIKE 'v_edit_%';
