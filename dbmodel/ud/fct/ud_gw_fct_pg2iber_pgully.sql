@@ -83,11 +83,11 @@ BEGIN
 			WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id
 		),
 		vi_t_pgully AS (
-			SELECT temp_t_pgully.gully_id as code,
+			SELECT temp_t_pgully.gully_id::text as code,
 		    temp_t_pgully.outlet_type,
 		    COALESCE(temp_t_pgully.node_id::text, ''-9999''::text) AS outlet_node,
 		    temp_t_pgully.the_geom as the_geom,
-		    COALESCE(temp_t_pgully.top_elev::numeric(12,3), ''-9999''::integer::numeric) AS zcoord,
+		    COALESCE(temp_t_pgully.top_elev::numeric(12,3), ''-9999''::integer::numeric) AS top_elev,
 		    temp_t_pgully.width::numeric(12,3) AS width,
 		    temp_t_pgully.length::numeric(12,3) AS length,
 		    COALESCE(temp_t_pgully.depth::numeric(12,3), ''-9999''::integer::numeric) AS depth,

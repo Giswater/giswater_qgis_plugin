@@ -8912,3 +8912,68 @@ AS SELECT raingage.rg_id,
     raingage
      LEFT JOIN selector_municipality m USING (muni_id)
   WHERE raingage.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND (m.cur_user = CURRENT_USER OR raingage.muni_id IS NULL);
+
+CREATE OR REPLACE VIEW ve_inp_pgully
+AS SELECT g.gully_id,
+    g.code,
+    g.top_elev,
+    g.gully_type,
+    g.gullycat_id,
+    (g.width / 100::numeric)::numeric(12,2) AS grate_width,
+    (g.length / 100::numeric)::numeric(12,2) AS grate_length,
+    g.arc_id,
+    g.sector_id,
+    g.expl_id,
+    g.state,
+    g.state_type,
+    polygon.the_geom,
+    g.units,
+    g.units_placement,
+    g.groove,
+    g.groove_height,
+    g.groove_length,
+    g.pjoint_id,
+    g.pjoint_type,
+        CASE
+            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.width / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_gully.width / 100::numeric)::numeric(12,3)
+        END AS total_width,
+        CASE
+            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.width / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_gully.length / 100::numeric)::numeric(12,3)
+        END AS total_length,
+    g.ymax - COALESCE(g.sandbox, 0::numeric) AS depth,
+    g.annotation,
+    i.outlet_type,
+    i.custom_top_elev,
+    i.custom_width,
+    i.custom_length,
+    i.custom_depth,
+    i.gully_method,
+    i.weir_cd,
+    i.orifice_cd,
+    i.custom_a_param,
+    i.custom_b_param,
+    i.efficiency
+   FROM ve_gully g
+     JOIN inp_gully i ON i.gully_id = g.gully_id
+     JOIN cat_gully ON g.gullycat_id::text = cat_gully.id::text
+     JOIN polygon ON polygon.feature_id = g.gully_id
+  WHERE g.is_operative IS TRUE AND g.epa_type = 'PGULLY';
+
+CREATE OR REPLACE VIEW ve_epa_pgully
+AS SELECT gully_id,
+    outlet_type,
+    custom_top_elev,
+    custom_width,
+    custom_length,
+    custom_depth,
+    gully_method,
+    weir_cd,
+    orifice_cd,
+    custom_a_param,
+    custom_b_param,
+    efficiency
+   FROM inp_gully;
