@@ -313,4 +313,9 @@ You must select a period already created or manually select the date of the inte
 2) DMA graph need to be executed.  
 >End Date proposal for 1% of hydrometers which consum is out of the period: 2015-07-31 00:00:00' WHERE id=3142;
 
+DELETE FROM config_form_fields  WHERE formname = 've_arc';
+DELETE FROM config_form_fields  WHERE formname = 've_connec';
+DELETE FROM config_form_fields  WHERE formname = 've_node';
+ALTER TABLE config_form_fields DISABLE TRIGGER ALL;
 UPDATE config_form_fields SET formname = REPLACE(formname, 'v_edit_', 've_') WHERE formname LIKE 'v_edit_%';
+ALTER TABLE config_form_fields ENABLE TRIGGER ALL;

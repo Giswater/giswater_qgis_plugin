@@ -516,6 +516,14 @@ VALUES('v_edit_arc', 'form_feature', 'tab_data', 'initoverflowpath', 'lyt_data_1
 'boolean', 'check', 'Init Over Flow Path', 'initoverflowpath', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, TRUE, NULL)
 ON CONFLICT DO NOTHING;
 
-UPDATE config_form_fields SET formname = REPLACE(formname, 'v_edit_', 've_') WHERE formname LIKE 'v_edit_%';
 
+DELETE FROM config_form_fields  WHERE formname = 've_arc';
+DELETE FROM config_form_fields  WHERE formname = 've_connec';
+DELETE FROM config_form_fields  WHERE formname = 've_node';
+DELETE FROM config_form_fields  WHERE formname = 've_gully';
+ALTER TABLE config_form_fields DISABLE TRIGGER ALL;
+UPDATE config_form_fields SET formname = REPLACE(formname, 'v_edit_', 've_') WHERE formname LIKE 'v_edit_%';
+ALTER TABLE config_form_fields ENABLE TRIGGER ALL;
+
+DELETE FROM sys_param_user WHERE id = 'inp_options_networkmode';
 UPDATE sys_param_user SET formname = 'hidden' WHERE id = 'inp_options_networkmode';
