@@ -357,6 +357,8 @@ BEGIN
 		update node set label_y = st_y(v_label_point) where node_id = new.node_id;
 	
 	end if;
+	
+	UPDATE node SET rotation = NEW.rotation WHERE node_id = NEW.node_id;
 
 	RETURN NEW;
 END;
