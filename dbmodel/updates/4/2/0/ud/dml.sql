@@ -516,6 +516,6 @@ VALUES('v_edit_arc', 'form_feature', 'tab_data', 'initoverflowpath', 'lyt_data_1
 'boolean', 'check', 'Init Over Flow Path', 'initoverflowpath', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, TRUE, NULL)
 ON CONFLICT DO NOTHING;
 
-DELETE FROM sys_param_user WHERE id = 'inp_options_networkmode';
-
 UPDATE config_form_fields SET formname = REPLACE(formname, 'v_edit_', 've_') WHERE formname LIKE 'v_edit_%';
+
+UPDATE sys_param_user SET formname = 'hidden' WHERE id = 'inp_options_networkmode';
