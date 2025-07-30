@@ -304,6 +304,8 @@ class GwPsector:
                            "ve_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_plan_psector.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
+        kwargs = {"class": self}
+        self.dlg_plan_psector.rejected.connect(partial(close_dlg, **kwargs))
         self.dlg_plan_psector.tabwidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.tabwidget.currentChanged.connect(partial(self._reset_snapping))
 
@@ -2942,7 +2944,7 @@ def close_dlg(**kwargs):
         dialog.reload_states_selector()
         if dialog.iface.activeLayer():
             dialog.iface.setActiveLayer(dialog.iface.activeLayer())
-        dialog.layers = tools_gw.remove_selection(True, layers=dialog.layers)
+        dialog.rel_layers = tools_gw.remove_selection(True, layers=dialog.rel_layers)
         dialog.reset_model_psector("arc")
         dialog.reset_model_psector("node")
         dialog.reset_model_psector("connec")
