@@ -859,8 +859,13 @@ BEGIN
 		END IF;
 
 		-- rotation
-		IF NEW.rotation::text != OLD.rotation::text OR OLD.rotation IS NULL THEN
+		IF NEW.rotation IS DISTINCT FROM OLD.rotation THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
+		END IF;
+		
+		-- hemisphere
+		IF NEW.hemisphere IS DISTINCT FROM OLD.hemisphere THEN
+			UPDATE node SET hemisphere=NEW.hemisphere WHERE node_id = OLD.node_id;
 		END IF;
 
 		-- The geom
@@ -896,11 +901,6 @@ BEGIN
 				AND element_id IN (SELECT element_id FROM element_x_node WHERE node_id = NEW.node_id);
 			END IF;
 
-		END IF;
-
-		--Hemisphere
-		IF (NEW.hemisphere != OLD.hemisphere) THEN
-			   UPDATE node SET hemisphere=NEW.hemisphere WHERE node_id = OLD.node_id;
 		END IF;
 
 		--link_path

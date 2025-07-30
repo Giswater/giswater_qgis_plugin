@@ -830,8 +830,13 @@ BEGIN
 		END IF;
 
 		-- rotation
-		IF NEW.rotation::text != OLD.rotation::text OR OLD.rotation IS NULL THEN
+		IF NEW.rotation IS DISTINCT FROM OLD.rotation THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
+		END IF;
+		
+		-- hemisphere
+		IF NEW.hemisphere IS DISTINCT FROM OLD.hemisphere THEN
+			UPDATE node SET hemisphere=NEW.hemisphere WHERE node_id = OLD.node_id;
 		END IF;
 
 		-- The geom
@@ -895,7 +900,7 @@ BEGIN
 			asset_id=NEW.asset_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant,
 			access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap,
-			pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, omunit_id=NEW.omunit_id
+			pavcat_id=NEW.pavcat_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, omunit_id=NEW.omunit_id
 			WHERE node_id = OLD.node_id;
 		ELSE
 			UPDATE node
@@ -909,7 +914,7 @@ BEGIN
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, updated_at=now(), updated_by=current_user, matcat_id = NEW.matcat_id,
 			asset_id=NEW.asset_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
-			lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, pavcat_id=NEW.pavcat_id, hemisphere=NEW.hemisphere, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, omunit_id=NEW.omunit_id
+			lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, pavcat_id=NEW.pavcat_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, omunit_id=NEW.omunit_id
 			WHERE node_id = OLD.node_id;
 		END IF;
 
