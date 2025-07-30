@@ -15,7 +15,6 @@ from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                   QComboBox, QCompleter, QDateEdit, QDialog,
                                   QHBoxLayout, QLabel, QLineEdit, QTableView,
                                   QTextEdit, QToolBar, QWidget, QPushButton)
-from qgis.core import QgsRectangle
 
 from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi
 
@@ -1065,9 +1064,6 @@ class AddNewLot:
                 lot_ids.append(int(lot_id))
             except (ValueError, TypeError):
                 continue
-
-        for lot_id in lot_ids:
-            geometries = self._get_feature_geometries_from_lot(lot_id, select_features=True)
 
         self.iface.mapCanvas().refresh()
 

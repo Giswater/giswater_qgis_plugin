@@ -5043,6 +5043,10 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
                 f"JOIN {cat_table} c ON p.{cat_id_col} = c.id"
             )
 
+    if feature_type == 'arc':
+        extra_cols.extend(['node_1', 'node_2'])
+        select_extras.extend(['p.node_1', 'p.node_2'])
+
     # Base columns for the INSERT statement
     base_insert_cols = ['campaign_id', f'{feature_type}_id', 'status', 'the_geom']
 
@@ -5148,15 +5152,28 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
         tools_qgis.show_warning(msg)
         return
 
-    for feature_id in ids or []:
-        sql = f"""
-            INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
-            SELECT {lot_id}, {feature_id}, 1, code
-            FROM {lib_vars.schema_name}.{feature_type}
-            WHERE {feature_type}_id = {feature_id}
-            ON CONFLICT DO NOTHING;
-        """
-        tools_db.execute_sql(sql)
+    # Special handling for arcs to include node_1 and node_2
+    if feature_type == 'arc':
+        for feature_id in ids or []:
+            sql = f"""
+                INSERT INTO {tablename} (lot_id, arc_id, status, code, node_1, node_2)
+                SELECT {lot_id}, {feature_id}, 1, code, node_1, node_2
+                FROM {lib_vars.schema_name}.arc
+                WHERE arc_id = {feature_id}
+                ON CONFLICT DO NOTHING;
+            """
+            tools_db.execute_sql(sql)
+    else:
+        # Standard insertion for other feature types
+        for feature_id in ids or []:
+            sql = f"""
+                INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
+                SELECT {lot_id}, {feature_id}, 1, code
+                FROM {lib_vars.schema_name}.{feature_type}
+                WHERE {feature_type}_id = {feature_id}
+                ON CONFLICT DO NOTHING;
+            """
+            tools_db.execute_sql(sql)
 
 
 def load_tableview_lot(dialog, feature_type, lot_id, layers, ids=None):
