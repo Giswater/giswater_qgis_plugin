@@ -61,6 +61,7 @@ from ..shared import audit  # noqa: F401
 from ..toolbars.utilities import snapshot_view  # noqa: F401
 from ..toolbars.edit import connect_link_btn  # noqa: F401
 from ..toolbars.cm import lot, campaign  # noqa: F401
+from ..toolbars.toc.layerstyle_change_btn import apply_styles_to_layers
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -4875,6 +4876,42 @@ def export_layers_to_gpkg(layers, path):
             options.layerName = vlayer.name()
             QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
 
+
+def refresh_all_styles(dialog=None):
+    """Refresh all styles in the database based on the current QGIS layer styles."""
+    try:
+        # Get all loaded layers in the project
+        loaded_layers = global_vars.iface.mapCanvas().layers()
+        set_styles = set()
+
+        for layer in loaded_layers:
+            style_manager = layer.styleManager()
+            # Get all loaded styles in the layer
+            available_styles = style_manager.styles()
+            for style_name in available_styles:
+                set_styles.add(style_name)
+
+        for style in set_styles:
+            sql_get_id = (
+                f"SELECT id FROM {lib_vars.schema_name}.config_style "
+                f"WHERE idval = '{style}';"
+            )
+            styleconfig_id = tools_db.get_row(sql_get_id)
+
+            if styleconfig_id:
+                # Apply the style with force_refresh=True
+                apply_styles_to_layers(styleconfig_id[0], style, force_refresh=True)
+            # TODO: show message of all refreshed styles
+            # msg = f"Style '{style}' not found in database."
+            # tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
+    
+        msg = "All layers have been successfully refreshed."
+        tools_qgis.show_success(msg, dialog=dialog)
+
+    except Exception as e:
+        msg = "Database Error"
+        param = str(e)
+        tools_qgis.show_warning(msg, dialog=dialog, parameter=param)
 
 # region compatibility QGIS version functions
 

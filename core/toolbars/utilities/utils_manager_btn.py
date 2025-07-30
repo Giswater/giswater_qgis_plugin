@@ -17,7 +17,8 @@ from ..dialog import GwAction
 from .utilities_manager.mapzone_manager import GwMapzoneManager
 from ...shared.info import GwInfo
 from ...shared.workcat import GwWorkcat
-from ....libs import tools_qt
+from ....libs import tools_qt, lib_vars
+from ...utils import tools_gw
 
 
 class GwUtilsManagerButton(GwAction):
@@ -68,8 +69,10 @@ class GwUtilsManagerButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [['Mapzones manager', '_mapzones_manager'], ['Workcat manager', '_workcat_manager'], ['Style manager', '_style_manager']]
-
+        buttons = [['Mapzones manager', '_mapzones_manager'], ['Workcat manager', '_workcat_manager']]
+        role = tools_gw.get_role_permissions(lib_vars.project_vars.get('project_role'))
+        if role in ('role_master', 'role_admin', 'role_system'):
+            buttons.append(['Style manager', '_style_manager'])
         for button in buttons:
             button_name = button[0]
             button_function = button[1]

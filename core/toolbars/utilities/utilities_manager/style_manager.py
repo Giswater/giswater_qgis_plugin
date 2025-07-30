@@ -9,7 +9,6 @@ from functools import partial
 import json
 import tempfile
 
-from ...toc.layerstyle_change_btn import apply_styles_to_layers
 from ....ui.ui_manager import GwStyleManagerUi, GwStyleUi, GwUpdateStyleGroupUi
 from ....utils import tools_gw
 from .....libs import lib_vars, tools_db, tools_qgis, tools_qt
@@ -62,7 +61,7 @@ class GwStyleManager:
         # Connect signals to the style buttons
         self.style_mng_dlg.btn_delete_style.clicked.connect(self._delete_selected_styles)
         self.style_mng_dlg.btn_update_style.clicked.connect(self._update_selected_style)
-        self.style_mng_dlg.btn_refresh_all.clicked.connect(partial(self._refresh_all_styles, self.style_mng_dlg))
+        self.style_mng_dlg.btn_refresh_all.clicked.connect(partial(self._refresh_all_styles_mng, self.style_mng_dlg))
 
         self.style_mng_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.style_mng_dlg, True, 'core'))
 
@@ -645,40 +644,10 @@ class GwStyleManager:
             param = str(e)
             tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
-    def _refresh_all_styles(self, dialog):
-        """Refresh all styles in the database based on the current QGIS layer styles."""
-        try:
-            # Get all loaded layers in the project
-            loaded_layers = self.iface.mapCanvas().layers()
-            set_styles = set()
+    def _refresh_all_styles_mng(self, dialog):
+        """ Refreshes all styles in the database and reloads the style table. """
+        # Refresh all styles in the database
+        tools_gw.refresh_all_styles(dialog)
 
-            for layer in loaded_layers:
-                style_manager = layer.styleManager()
-                # Get all loaded styles in the layer
-                available_styles = style_manager.styles()
-                for style_name in available_styles:
-                    set_styles.add(style_name)
-
-            for style in set_styles:
-                sql_get_id = (
-                    f"SELECT id FROM {lib_vars.schema_name}.config_style "
-                    f"WHERE idval = '{style}';"
-                )
-                styleconfig_id = tools_db.get_row(sql_get_id)
-
-                if styleconfig_id:
-                    # Apply the style with force_refresh=True
-                    apply_styles_to_layers(styleconfig_id[0], style, force_refresh=True)
-                # TODO: show message of all refreshed styles
-                # msg = f"Style '{style}' not found in database."
-                # tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
-
-            msg = "All layers have been successfully refreshed."
-            tools_qgis.show_success(msg, dialog=dialog)
-            self._load_styles()
-
-        except Exception as e:
-            msg = "Database Error"
-            param = str(e)
-            tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
-
+        # Reload the style table to show updated data
+        self._load_styles()
