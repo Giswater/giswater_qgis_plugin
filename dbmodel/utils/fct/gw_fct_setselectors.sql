@@ -702,6 +702,22 @@ BEGIN
 	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
 
+ 	-- exit psector mode if current psector is outside the selected expl
+	
+	IF EXISTS (
+	    SELECT 1
+	    FROM config_param_user a
+	    LEFT JOIN plan_psector b ON a.value::integer = b.psector_id
+	    JOIN selector_expl c ON b.expl_id = c.expl_id
+	    WHERE a."parameter" = 'plan_psector_mode'
+	    AND c.cur_user = current_user
+		) THEN
+	
+		UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_mode' AND cur_user = current_user;
+	
+	END IF;
+
+
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_mode', 'utils_workspace_vdefault')
