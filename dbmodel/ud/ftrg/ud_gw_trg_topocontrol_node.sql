@@ -124,6 +124,17 @@ BEGIN
 						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (106, NEW.node_id, v_message);
 					END IF;
 				END IF;
+
+				-- stop insert/update if plan_psector.active of the current_psector is true
+				IF (SELECT active FROM plan_psector WHERE psector_id = v_psector_id) IS TRUE THEN 
+				
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"4326", "function":"1136","parameters":{"node_id":"'||NEW.node_id||'"}}}$$);';
+
+					RETURN NULL;
+
+				END IF;
+
 			END IF;
 
 		END IF;

@@ -212,3 +212,6 @@ AND CASE
   WHEN (SELECT psector_value FROM check_value) IS NULL THEN id != 2 
   ELSE id=2 
 END' where columnname = 'state';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4326, 'It is not allowed to insert/update one node of the current active psector over another node with state (1). The node is: %node_id%', 'Review your data. It''s not possible to have more than one node with the same state at the same position.', 2, true, 'utils', 'core', 'UI');
