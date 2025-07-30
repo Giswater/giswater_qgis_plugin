@@ -357,9 +357,7 @@ BEGIN
             ELSIF v_project_type = 'UD' THEN
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
-                WITH sel_expl AS (
-                    SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
-                ), sel_ps AS (
+                WITH sel_ps AS (
                     SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
                 ), arc_psector AS (
                     SELECT
