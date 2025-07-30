@@ -138,7 +138,7 @@ BEGIN
 				END IF;
 
 				-- Values to insert into arc table
-				rec_new_arc.arc_id := concat(rec_node.node_id,rec_flowreg.flw_type,rec_flowreg.order_id);
+				rec_new_arc.arc_id := rec_flowreg.element_id;
 				rec_new_arc.node_1:= rec_node.node_id;
 				rec_new_arc.arc_type:= 'NODE2ARC';
 				rec_new_arc.arccat_id := 'MAINSTREAM';
