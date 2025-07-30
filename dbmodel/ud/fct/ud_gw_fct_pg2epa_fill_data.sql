@@ -160,9 +160,17 @@ BEGIN
 	UPDATE temp_t_node SET addparam=concat('{"outfall_type":"',outfall_type,'", "state":"',state,'", "curve_id":"',curve_id,'", "timser_id":"',timser_id,'", "gate":"',gate,'"}')
 	FROM inp_outfall WHERE temp_t_node.node_id=inp_outfall.node_id::text;
 
-	UPDATE temp_t_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction ON a.node_id = inp_junction.node_id::text
+	-- update child param for outfall from node sink
+	UPDATE temp_t_node SET epa_type='OUTFALL' FROM temp_anl_node a JOIN inp_junction USING (node_id) 
 	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user
 	AND temp_t_node.node_id=a.node_id::text;
+
+	-- update child param for outfall from node when is the last (border of sector)
+	UPDATE temp_t_node SET epa_type='OUTFALL', addparam=outfallparam
+	FROM inp_junction JOIN  
+	(select * from (SELECT node_2 as node_id from arc group by node_2 having count(*) = 1)a except 
+	select * from (SELECT node_1 from arc group by node_1 having count(*) > 0)b) c USING (node_id)
+	WHERE outfallparam is not null and temp_t_node.node_id = c.node_id;
 
 	INSERT INTO temp_t_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id)
 	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id FROM ve_inp_inflows;
