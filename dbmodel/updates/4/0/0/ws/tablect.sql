@@ -473,7 +473,7 @@ CREATE RULE insert_plan_psector_x_arc AS
    WHERE (new.state = 2) DO  INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
   VALUES (new.arc_id, ( SELECT (config_param_user.value)::integer AS value
            FROM config_param_user
-          WHERE (((config_param_user.parameter)::text = 'plan_psector_current'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
+          WHERE (((config_param_user.parameter)::text = 'plan_psector_mode'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
          LIMIT 1), 1, true);
 
 CREATE RULE insert_plan_psector_x_node AS
@@ -481,7 +481,7 @@ CREATE RULE insert_plan_psector_x_node AS
    WHERE (new.state = 2) DO  INSERT INTO plan_psector_x_node (node_id, psector_id, state, doable)
   VALUES (new.node_id, ( SELECT (config_param_user.value)::integer AS value
            FROM config_param_user
-          WHERE (((config_param_user.parameter)::text = 'plan_psector_current'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
+          WHERE (((config_param_user.parameter)::text = 'plan_psector_mode'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
          LIMIT 1), 1, true);
 
 ALTER TABLE polygon ALTER COLUMN feature_id TYPE int4 USING feature_id::int4;

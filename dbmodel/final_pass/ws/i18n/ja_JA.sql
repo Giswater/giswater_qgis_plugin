@@ -15,7 +15,7 @@ FROM (
     ('feat_eregister_vdefault', 'Default catalog for eregister', 'Value default catalog for eregister cat_feature'),
     ('feat_emanhole_vdefault', 'Default catalog for emanhole', 'Value default catalog for emanhole cat_feature'),
     ('inp_options_demand_model', '需要モデル', '需要モデル：'),
-    ('plan_psector_current', 'Psector (Alternative):', 'Default value of psector parameter'),
+    ('plan_psector_mode', 'Psector (Alternative):', 'Default value of psector parameter'),
     ('feat_ehydrant_plate_vdefault', 'Default catalog for ehydrant_plate', 'Value default catalog for ehydrant_plate cat_feature'),
     ('feat_gen_purp_valve_vdefault', 'gen_purp_valve のデフォルトカタログ：', 'gen_purp_valve cat_feature のデフォルト・カタログ値'),
     ('edit_node_interpolate', 'Values to manage node interpolate tool:', 'Values to use with tool node interpolate'),

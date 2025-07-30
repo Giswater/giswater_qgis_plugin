@@ -416,7 +416,7 @@ WHERE typevalue = ''price_units''',true,false,NULL,NULL,NULL,'{"setMultiline":fa
 	 ('ve_arc_pipe','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','state - Domain value of arc''s state (on service, planified, obsolete)',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -531,7 +531,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_arc_varc','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','state - Domain value of arc''s state (on service, planified, obsolete)',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 

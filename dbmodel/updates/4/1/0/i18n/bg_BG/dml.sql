@@ -113,7 +113,7 @@ UPDATE sys_param_user SET label = 'Свързваща течност:', descript
 UPDATE sys_param_user SET label = 'Функция Connec:', descript = 'Стойност по подразбиране на типа на функцията за connec' WHERE id = 'edit_connec_function_vdefault';
 UPDATE sys_param_user SET label = 'Вмъкване на височина от DEM:', descript = 'Ако е вярно, надморската височина ще бъде вмъкната автоматично от растерния DEM' WHERE id = 'edit_insert_elevation_from_dem';
 UPDATE sys_param_user SET label = 'Модел на търсенето', descript = 'Модел на търсенето:' WHERE id = 'inp_options_demand_model';
-UPDATE sys_param_user SET label = 'Psector (Alternative):', descript = 'Default value of psector parameter' WHERE id = 'plan_psector_current';
+UPDATE sys_param_user SET label = 'Psector (Alternative):', descript = 'Default value of psector parameter' WHERE id = 'plan_psector_mode';
 UPDATE sys_param_user SET label = 'Value for psector_strategy', descript = 'Psector strategy' WHERE id = 'utils_psector_strategy';
 UPDATE sys_param_user SET label = 'Дължина:', descript = 'Ако е вярно, ще се отчете стойността на дължината на дъгата' WHERE id = 'inp_report_length';
 UPDATE sys_param_user SET label = 'Каталог по подразбиране за check_valve:', descript = 'Стойност по подразбиране на каталога за check_valve cat_feature' WHERE id = 'feat_check_valve_vdefault';

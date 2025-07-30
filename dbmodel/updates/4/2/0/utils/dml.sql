@@ -196,3 +196,6 @@ UPDATE config_toolbox SET inputparams='[
     "layoutorder": 8
   }
 ]'::json WHERE id=2118;
+
+
+update config_param_system set parameter = 'plan_psector_mode' where parameter = 'plan_psector_current';

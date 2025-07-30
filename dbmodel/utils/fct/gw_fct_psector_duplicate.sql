@@ -103,12 +103,12 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, error_message)
 	VALUES (153, v_result_id, concat('Copy psector ',v_old_psector_id,' as ',v_new_psector_name,'.' ));
 
-	SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_current' and cur_user=current_user;
+	SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_mode' and cur_user=current_user;
 
 	IF v_psector_vdefault IS NULL THEN
-		INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_current', v_new_psector_id, current_user);
+		INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_mode', v_new_psector_id, current_user);
 	ELSE
-		UPDATE config_param_user SET value=v_new_psector_id WHERE parameter='plan_psector_current' and cur_user=current_user;
+		UPDATE config_param_user SET value=v_new_psector_id WHERE parameter='plan_psector_mode' and cur_user=current_user;
 	END IF;
 
 	INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -331,5 +331,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-

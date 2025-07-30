@@ -16,7 +16,7 @@ FROM (
     ('feat_eregister_vdefault', 'Catálogo por defecto para eregister', 'Valor catálogo por defecto para eregister cat_feature'),
     ('feat_emanhole_vdefault', 'Catálogo por defecto para emanhole', 'Valor catálogo por defecto para emanhole cat_feature'),
     ('inp_options_demand_model', 'Modelo de demanda', 'Modelo de demanda'),
-    ('plan_psector_current', 'Psector (Alternativa):', 'Valor por defecto del parámetro psector'),
+    ('plan_psector_mode', 'Psector (Alternativa):', 'Valor por defecto del parámetro psector'),
     ('feat_ehydrant_plate_vdefault', 'Catálogo por defecto para ehydrant_plate', 'Valor por defecto del catálogo para ehydrant_plate cat_feature'),
     ('feat_owerflow_storage_vdefault', 'Catálogo por defecto para owerflow_storage', 'Valor catálogo por defecto para owerflow_storage cat_feature'),
     ('feat_egate_vdefault', 'Catálogo por defecto para egate', 'Valor catálogo por defecto para egate cat_feature'),

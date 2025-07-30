@@ -79,7 +79,7 @@ UPDATE sys_param_user SET label = '', descript = 'Nombre predeterminado de la ca
 UPDATE sys_param_user SET label = 'Fluido de connec:', descript = 'Valor predeterminado del tipo de fluido para connec' WHERE id = 'edit_connec_fluid_vdefault';
 UPDATE sys_param_user SET label = 'Función de connec:', descript = 'Valor predeterminado del tipo de función para connec' WHERE id = 'edit_connec_function_vdefault';
 UPDATE sys_param_user SET label = 'Insertar elevación desde DEM:', descript = 'Si es verdadero, la elevación se insertará automáticamente desde el ráster DEM' WHERE id = 'edit_insert_elevation_from_dem';
-UPDATE sys_param_user SET label = 'Psector (Alternativa):', descript = 'Valor por defecto del parámetro psector' WHERE id = 'plan_psector_current';
+UPDATE sys_param_user SET label = 'Psector (Alternativa):', descript = 'Valor por defecto del parámetro psector' WHERE id = 'plan_psector_mode';
 UPDATE sys_param_user SET label = 'Valor de psector_strategy', descript = 'Estrategia sectorial' WHERE id = 'utils_psector_strategy';
 UPDATE sys_param_user SET label = 'Municipio', descript = 'Default value of municipality parameter' WHERE id = 'edit_municipality_vdefault';
 UPDATE sys_param_user SET label = 'Función de nodo:', descript = 'Valor predeterminado del tipo de función para el nodo' WHERE id = 'edit_node_function_vdefault';

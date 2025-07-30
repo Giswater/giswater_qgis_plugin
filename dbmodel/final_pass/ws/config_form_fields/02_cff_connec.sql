@@ -333,7 +333,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_connec_fountain','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','state - Domain value of connect''s state.',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -465,7 +465,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_connec_greentap','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','state - Domain value of connect''s state.',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -591,7 +591,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_connec_tap','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','state - Domain value of connect''s state.',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -720,7 +720,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_connec_vconnec','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','state - Domain value of connect''s state.',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -846,7 +846,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_connec_wjoin','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','state - Domain value of connect''s state.',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1041,7 +1041,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_water_connection','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 

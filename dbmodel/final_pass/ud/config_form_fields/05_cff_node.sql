@@ -397,7 +397,7 @@ AND feature_type = ''NODE''',NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',N
 	 ('ve_node_chamber','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -502,7 +502,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_change','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -593,7 +593,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_circ_manhole','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -700,7 +700,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_highpoint','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -791,7 +791,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_jump','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -889,7 +889,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_junction','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -980,7 +980,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_netelement','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1071,7 +1071,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_netgully','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - State of the element. To choose between the 3 types of states available',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1171,7 +1171,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_netinit','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1269,7 +1269,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_outfall','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1362,7 +1362,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_overflow_storage','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1453,7 +1453,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_pump_station','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1556,7 +1556,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_rect_manhole','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1663,7 +1663,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_register','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1756,7 +1756,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_sandbox','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1861,7 +1861,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_sewer_storage','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -1962,7 +1962,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_valve','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -2054,7 +2054,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_virtual_node','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -2145,7 +2145,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_weir','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -2250,7 +2250,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_wwtp','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 

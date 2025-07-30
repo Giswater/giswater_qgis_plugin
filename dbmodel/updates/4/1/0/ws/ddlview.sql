@@ -4034,7 +4034,7 @@ AS SELECT plan_psector.psector_id,
                      JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_other.psector_id
                   ORDER BY plan_psector_x_other.psector_id) v_plan_psector_x_other
           GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
-  WHERE config_param_user.cur_user::text = CURRENT_USER AND config_param_user.parameter::text = 'plan_psector_current'::text AND config_param_user.value::integer = plan_psector.psector_id;
+  WHERE config_param_user.cur_user::text = CURRENT_USER AND config_param_user.parameter::text = 'plan_psector_mode'::text AND config_param_user.value::integer = plan_psector.psector_id;
 
 CREATE OR REPLACE VIEW v_plan_psector_all
 AS SELECT plan_psector.psector_id,

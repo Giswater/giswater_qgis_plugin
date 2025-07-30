@@ -130,12 +130,12 @@ BEGIN
                        "data":{"message":"3782", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "parameters":{"v_new_psector_id":"'||v_new_psector_id||'", "v_new_psector_name":"'||v_new_psector_name||'"}, "is_process":true}}$$)';
 
 
-		SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_current' and cur_user=current_user;
+		SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_mode' and cur_user=current_user;
 
 		IF v_psector_vdefault IS NULL THEN
-			INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_current', v_new_psector_id, current_user);
+			INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_mode', v_new_psector_id, current_user);
 		ELSE
-			UPDATE config_param_user SET value=v_new_psector_id WHERE parameter='plan_psector_current' and cur_user=current_user;
+			UPDATE config_param_user SET value=v_new_psector_id WHERE parameter='plan_psector_mode' and cur_user=current_user;
 		END IF;
 
 		--copy arcs with state 0 inside plan_psector tables
@@ -365,5 +365,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-

@@ -879,7 +879,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 ALTER TABLE IF EXISTS config_style ADD CONSTRAINT idval_chk UNIQUE (idval);
 
 -- 20/12/2024
-UPDATE sys_param_user SET id='plan_psector_current' WHERE id='plan_psector_vdefault';
+UPDATE sys_param_user SET id='plan_psector_mode' WHERE id='plan_psector_vdefault';
 
 -- 26/12/2024
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
@@ -2291,7 +2291,7 @@ INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES
 UPDATE config_form_fields SET dv_querytext='WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 

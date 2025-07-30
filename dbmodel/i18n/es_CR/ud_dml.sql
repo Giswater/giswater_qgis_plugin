@@ -12,7 +12,7 @@ SET label = v.label, descript = v.descript
 FROM (
     VALUES
     ('feat_eiot_sensor_vdefault', 'Catálogo por defecto para eiot_sensor', 'Catálogo de valores por defecto para eiot_sensor cat_feature'),
-    ('plan_psector_current', 'Psector (Alternativa):', 'Valor por defecto del parámetro psector'),
+    ('plan_psector_mode', 'Psector (Alternativa):', 'Valor por defecto del parámetro psector'),
     ('feat_owerflow_storage_vdefault', 'Catálogo por defecto para owerflow_storage', 'Valor catálogo por defecto para owerflow_storage cat_feature'),
     ('feat_egate_vdefault', 'Catálogo por defecto para egate', 'Valor catálogo por defecto para egate cat_feature'),
     ('feat_eprotector_vdefault', 'Catálogo por defecto para eprotector', 'Valor catálogo por defecto para eprotector cat_feature'),

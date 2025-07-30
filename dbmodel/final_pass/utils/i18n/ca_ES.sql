@@ -16,7 +16,7 @@ FROM (
     ('feat_eregister_vdefault', 'Default catalog for eregister', 'Value default catalog for eregister cat_feature'),
     ('feat_emanhole_vdefault', 'Default catalog for emanhole', 'Value default catalog for emanhole cat_feature'),
     ('inp_options_demand_model', 'Model de demanda', 'Model de demanda'),
-    ('plan_psector_current', 'Psector (Alternative):', 'Default value of psector parameter'),
+    ('plan_psector_mode', 'Psector (Alternative):', 'Default value of psector parameter'),
     ('feat_ehydrant_plate_vdefault', 'Default catalog for ehydrant_plate', 'Value default catalog for ehydrant_plate cat_feature'),
     ('feat_owerflow_storage_vdefault', 'Default catalog for owerflow_storage', 'Value default catalog for owerflow_storage cat_feature'),
     ('feat_egate_vdefault', 'Default catalog for egate', 'Value default catalog for egate cat_feature'),

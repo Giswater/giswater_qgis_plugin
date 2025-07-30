@@ -391,7 +391,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_gully_ginlet','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - State of the element. To choose between the 3 types of states available',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -498,7 +498,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_gully_gully','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - State of the element. To choose between the 3 types of states available',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -597,7 +597,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_gully_pgully','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - State of the element. To choose between the 3 types of states available',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -700,7 +700,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_gully_vgully','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - State of the element. To choose between the 3 types of states available',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -801,7 +801,7 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_node_netgully','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - State of the element. To choose between the 3 types of states available',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 

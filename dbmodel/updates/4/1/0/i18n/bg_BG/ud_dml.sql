@@ -79,7 +79,7 @@ UPDATE sys_param_user SET label = '', descript = 'Име по подразбир
 UPDATE sys_param_user SET label = 'Свързваща течност:', descript = 'Стойност по подразбиране на типа течност за свързване' WHERE id = 'edit_connec_fluid_vdefault';
 UPDATE sys_param_user SET label = 'Функция Connec:', descript = 'Стойност по подразбиране на типа на функцията за connec' WHERE id = 'edit_connec_function_vdefault';
 UPDATE sys_param_user SET label = 'Вмъкване на височина от DEM:', descript = 'Ако е вярно, надморската височина ще бъде вмъкната автоматично от растерния DEM' WHERE id = 'edit_insert_elevation_from_dem';
-UPDATE sys_param_user SET label = 'Psector (Alternative):', descript = 'Default value of psector parameter' WHERE id = 'plan_psector_current';
+UPDATE sys_param_user SET label = 'Psector (Alternative):', descript = 'Default value of psector parameter' WHERE id = 'plan_psector_mode';
 UPDATE sys_param_user SET label = 'Value for psector_strategy', descript = 'Psector strategy' WHERE id = 'utils_psector_strategy';
 UPDATE sys_param_user SET label = 'Община:', descript = 'Стойност по подразбиране на параметъра на общината' WHERE id = 'edit_municipality_vdefault';
 UPDATE sys_param_user SET label = 'Функция на възел:', descript = 'Стойност по подразбиране на типа функция за възел' WHERE id = 'edit_node_function_vdefault';

@@ -259,7 +259,7 @@ BEGIN
 			END IF;
 
 			-- check user's variable
-			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='plan_psector_current' AND cur_user="current_user"();
+			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='plan_psector_mode' AND cur_user="current_user"();
 			IF v_psector_vdefault IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1083", "function":"2130","parameters":null, "is_process":true}}$$);';
@@ -288,7 +288,7 @@ BEGIN
 			END IF;
 
 			-- check user's variable
-			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='plan_psector_current' AND cur_user="current_user"();
+			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='plan_psector_mode' AND cur_user="current_user"();
 			IF v_psector_vdefault IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1083", "function":"2130","parameters":null, "is_process":true}}$$);';
@@ -349,5 +349,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-

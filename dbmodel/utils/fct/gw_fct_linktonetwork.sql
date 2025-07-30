@@ -125,7 +125,7 @@ BEGIN
 	v_check_status:= (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_link2network');
 
 	-- get user variables
-	v_psector_current = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current' AND cur_user = current_user);
+	v_psector_current = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_mode' AND cur_user = current_user);
 
 	-- get parameters from input json
 	v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);

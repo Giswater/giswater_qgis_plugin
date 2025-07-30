@@ -442,7 +442,7 @@ AND feature_type = ''ARC''',NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NU
 	 ('ve_arc_conduit','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - Domain value of arc''s state (on service, planified, obsolete)',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -552,7 +552,7 @@ AND feature_type = ''ARC''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "
 	 ('ve_arc_pump_pipe','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - Domain value of arc''s state (on service, planified, obsolete)',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -664,7 +664,7 @@ AND feature_type = ''ARC''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "
 	 ('ve_arc_siphon','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - Domain value of arc''s state (on service, planified, obsolete)',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -773,7 +773,7 @@ AND feature_type = ''ARC''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "
 	 ('ve_arc_varc','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - Domain value of arc''s state (on service, planified, obsolete)',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
@@ -880,7 +880,7 @@ AND feature_type = ''ARC''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "
 	 ('ve_arc_waccel','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','State:','state - Domain value of arc''s state (on service, planified, obsolete)',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
+  WHERE parameter = ''plan_psector_mode''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
