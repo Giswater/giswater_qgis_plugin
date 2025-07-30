@@ -9,12 +9,13 @@ from functools import partial
 import json
 from typing import Any, Dict, List, Optional
 
-from qgis.PyQt.QtCore import QDate, Qt, QModelIndex
+from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QItemSelectionModel
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                   QComboBox, QCompleter, QDateEdit, QDialog,
-                                  QLabel, QLineEdit, QTableView, QTextEdit,
-                                  QToolBar, QWidget)
+                                  QHBoxLayout, QLabel, QLineEdit, QTableView,
+                                  QTextEdit, QToolBar, QWidget, QPushButton)
+from qgis.core import QgsRectangle
 
 from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi
 
@@ -22,6 +23,7 @@ from .... import global_vars
 from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
+from ....global_vars import GwFeatureTypes
 
 
 class AddNewLot:
@@ -126,6 +128,25 @@ class AddNewLot:
         tools_gw.add_icon(self.dlg_lot.btn_snapping, '137')
         tools_gw.add_icon(self.dlg_lot.btn_expr_select, '178')
 
+        # Create a widget and layout to hold the buttons
+        self.corner_widget = QWidget()
+        layout = QHBoxLayout(self.corner_widget)
+        layout.setContentsMargins(0, 1, 0, 0)
+
+        self.btn_show_on_top_relations = QPushButton()
+        tools_gw.add_icon(self.btn_show_on_top_relations, '175')
+        self.btn_show_on_top_relations.setToolTip("Show selection on top")
+        self.btn_show_on_top_relations.clicked.connect(self._show_selection_on_top_relations)
+        layout.addWidget(self.btn_show_on_top_relations)
+
+        self.btn_zoom_to_selection_relations = QPushButton()
+        tools_gw.add_icon(self.btn_zoom_to_selection_relations, '176')
+        self.btn_zoom_to_selection_relations.setToolTip("Zoom to selection")
+        self.btn_zoom_to_selection_relations.clicked.connect(self._zoom_to_selection_relations)
+        layout.addWidget(self.btn_zoom_to_selection_relations)
+
+        self.dlg_lot.tab_feature.setCornerWidget(self.corner_widget)
+
         # Cancel / Accept
         self.dlg_lot.btn_cancel.clicked.connect(self.dlg_lot.reject)
         self.dlg_lot.rejected.connect(self.manage_rejected)
@@ -168,6 +189,9 @@ class AddNewLot:
             view = getattr(self.dlg_lot, table_name, None)
             if view:
                 tools_qt.set_tableview_config(view)
+
+        # Connect selectionChanged signal to select features in relations tables when selecting them on the canvas
+        global_vars.canvas.selectionChanged.connect(partial(self._manage_selection_changed))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
@@ -779,6 +803,98 @@ class AddNewLot:
 
         tools_gw.open_dialog(self.dlg_lot_man, dlg_name="lot_management")
 
+    def _show_selection_on_top(self, qtable):
+        """
+        Moves the selected rows in a QTableView to the top.
+        """
+        model = qtable.model()
+        selection_model = qtable.selectionModel()
+        if not selection_model or not selection_model.hasSelection():
+            return
+
+        selected_rows = [index.row() for index in selection_model.selectedRows()]
+        selected_rows.sort()
+
+        # Extract items from selected rows
+        rows_data = []
+        for row in selected_rows:
+            row_items = [model.item(row, col) for col in range(model.columnCount())]
+            rows_data.append([QStandardItem(item.text()) if item else QStandardItem() for item in row_items])
+
+        # Remove selected rows from the bottom up to avoid index shifting issues
+        for row in reversed(selected_rows):
+            model.removeRow(row)
+
+        # Insert rows at the top
+        for i, row_data in enumerate(rows_data):
+            model.insertRow(i, row_data)
+
+        # Restore selection on the moved rows
+        for i in range(len(rows_data)):
+            qtable.selectRow(i)
+
+    def _get_feature_geometries_from_lot(self, lot_id, select_features=False):
+        """
+        Get all feature geometries associated with a given lot_id.
+        If select_features is True, it will also select the features on the map.
+        """
+        geometries = []
+        feature_types = ['arc', 'node', 'connec', 'link']
+        if tools_gw.get_project_type() == 'ud':
+            feature_types.append('gully')
+
+        for ft in feature_types:
+            table_name = f"om_campaign_lot_x_{ft}"
+            id_name = f"{ft}_id"
+            sql = f"SELECT {id_name} FROM cm.{table_name} WHERE lot_id = {lot_id}"
+            rows = tools_db.get_rows(sql)
+            if not rows:
+                continue
+
+            feature_ids = [row[0] for row in rows]
+            layers = tools_gw.get_layers_from_feature_type(ft)
+            for layer in layers:
+                if layer.isValid():
+                    if select_features:
+                        layer.selectByIds(feature_ids)
+                    else:
+                        for feat in layer.getFeatures(f"{id_name} IN ({','.join(map(str, feature_ids))})"):
+                            geometries.append(feat.geometry())
+        return geometries
+
+    def _zoom_to_selection(self):
+        """
+        Zoom to the combined extent of all features related to the selected lots.
+        """
+        selected_rows = self.dlg_lot_man.tbl_lots.selectionModel().selectedRows()
+        if not selected_rows:
+            tools_qgis.show_warning("Please select a lot to zoom to.", dialog=self.dlg_lot_man)
+            return
+
+        model = self.dlg_lot_man.tbl_lots.model()
+        lot_ids = [model.data(model.index(row.row(), 0)) for row in selected_rows]
+
+        all_geometries = []
+        for lot_id in lot_ids:
+            try:
+                lot_id = int(lot_id)
+                geometries = self._get_feature_geometries_from_lot(lot_id)
+                all_geometries.extend(geometries)
+            except (ValueError, TypeError):
+                continue
+
+        if not all_geometries:
+            return
+
+        # Combine all bounding boxes
+        bounding_box = all_geometries[0].boundingBox()
+        for geom in all_geometries[1:]:
+            bounding_box.combineExtentWith(geom.boundingBox())
+
+        # Zoom the map canvas
+        canvas = self.iface.mapCanvas()
+        canvas.zoomToFeatureExtent(bounding_box)
+
     def load_lots_into_manager(self):
         """Load campaign data into the campaign management table"""
         if not hasattr(self.dlg_lot_man, "tbl_lots"):
@@ -927,6 +1043,129 @@ class AddNewLot:
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.dlg_lot_man)
         self.filter_lot()
 
+    def _on_lot_selection_changed(self, selected, deselected):
+        """
+        Selects features on the map when a lot is selected in the table.
+        """
+        # Clear previous selections
+        for layer_group in self.rel_layers.values():
+            for layer in layer_group:
+                layer.removeSelection()
+
+        model = self.dlg_lot_man.tbl_lots.model()
+        selection_model = self.dlg_lot_man.tbl_lots.selectionModel()
+
+        if not selection_model.hasSelection():
+            return
+
+        lot_ids = []
+        for index in selection_model.selectedRows():
+            lot_id = model.data(model.index(index.row(), 0))
+            try:
+                lot_ids.append(int(lot_id))
+            except (ValueError, TypeError):
+                continue
+
+        for lot_id in lot_ids:
+            geometries = self._get_feature_geometries_from_lot(lot_id, select_features=True)
+
+        self.iface.mapCanvas().refresh()
+
+    def _get_current_relations_table(self):
+        """Gets the current visible table view in the relations tab."""
+        current_tab_widget = self.dlg_lot.tab_feature.currentWidget()
+        if not current_tab_widget:
+            return None, None
+
+        feature = current_tab_widget.objectName().replace('tab_', '')
+        if not feature:
+            return None, None
+
+        table_widget_name = f"tbl_campaign_lot_x_{feature}"
+        table_view = self.dlg_lot.findChild(QTableView, table_widget_name)
+        return table_view, feature
+
+    def _show_selection_on_top_relations(self):
+        """Moves selected rows to the top for the current relations table."""
+        table_view, _ = self._get_current_relations_table()
+        if table_view:
+            self._show_selection_on_top(table_view)
+
+    def _zoom_to_selection_relations(self):
+        """Zooms to the selected features in the current relations table."""
+        table_view, feature_type = self._get_current_relations_table()
+        if not table_view or not feature_type:
+            return
+
+        selection_model = table_view.selectionModel()
+        if not selection_model or not selection_model.hasSelection():
+            tools_qgis.show_warning("Please select an element to zoom to.", dialog=self.dlg_lot)
+            return
+
+        model = table_view.model()
+        id_column_index = -1
+        id_col_name = f'{feature_type}_id'
+
+        for i in range(model.columnCount()):
+            if model.headerData(i, Qt.Horizontal) == id_col_name:
+                id_column_index = i
+                break
+
+        if id_column_index == -1:
+            tools_qgis.show_warning(f"Could not find ID column '{id_col_name}'.", dialog=self.dlg_lot)
+            return
+
+        selected_rows = selection_model.selectedRows()
+        feature_ids = [model.data(model.index(row.row(), id_column_index)) for row in selected_rows]
+
+        if not feature_ids:
+            return
+
+        # Use the generic zoom function to match psector's behavior
+        tools_gw.zoom_to_feature_by_id(f"ve_{feature_type}", id_col_name, feature_ids)
+
+    def _manage_selection_changed(self, layer):
+        if layer is None:
+            return
+
+        if layer.providerType() != 'postgres':
+            return
+
+        tablename = tools_qgis.get_layer_source_table_name(layer)
+        if not tablename:
+            return
+
+        mapping_dict = {
+            "ve_node": ("node_id", self.dlg_lot.tbl_campaign_lot_x_node),
+            "ve_arc": ("arc_id", self.dlg_lot.tbl_campaign_lot_x_arc),
+            "ve_connec": ("connec_id", self.dlg_lot.tbl_campaign_lot_x_connec),
+            "ve_gully": ("gully_id", self.dlg_lot.tbl_campaign_lot_x_gully),
+        }
+        if tablename not in mapping_dict:
+            return
+        
+        idname, tableview = mapping_dict[tablename]
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            feature_ids = [f"{feature.attribute(idname)}" for feature in features]
+
+            # Select in table
+            selection_model = tableview.selectionModel()
+
+            # Clear previous selection
+            selection_model.clearSelection()
+
+            model = tableview.model()
+
+            # Loop through the model rows to find matching feature_ids
+            for row in range(model.rowCount()):
+                index = model.index(row, 0)
+                feature_id = model.data(index)
+
+                if f"{feature_id}" in feature_ids:
+                    selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
+
     def _update_feature_completer_lot(self, dlg: QDialog):
         # Identify the current tab and derive feature info
         tab_widget = dlg.tab_feature.currentWidget()
@@ -950,6 +1189,31 @@ class AddNewLot:
             completer = QCompleter([str(x) for x in allowed_ids])
             completer.setCaseSensitivity(False)
             feature_id_lineedit.setCompleter(completer)
+
+    def _manage_selection_changed_signals(self, feature_type: GwFeatureTypes, connect=True, disconnect=True):
+        """
+        Manage the selection changed signals for the tableview based on the feature type
+        """
+        tableview_map = {
+            GwFeatureTypes.ARC: (self.dlg_lot.tbl_campaign_lot_x_arc, "ve_arc", "arc_id", self.rb_red, 5),
+            GwFeatureTypes.NODE: (self.dlg_lot.tbl_campaign_lot_x_node, "ve_node", "node_id", self.rb_red, 10),
+            GwFeatureTypes.CONNEC: (self.dlg_lot.tbl_campaign_lot_x_connec, "ve_connec", "connec_id", self.rb_red, 10),
+            GwFeatureTypes.GULLY: (self.dlg_lot.tbl_campaign_lot_x_gully, "ve_gully", "gully_id", self.rb_red, 10),
+        }
+        tableview, tablename, feat_id, rb, width = tableview_map.get(feature_type, (None, None, None, None, None))
+        if tableview is None:
+            return
+
+        if disconnect:
+            tools_gw.disconnect_signal('lot', f"highlight_features_by_id_{tablename}")
+
+        if not connect:
+            return
+
+        # Highlight features by id using the generic helper
+        tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
+            tools_qgis.highlight_features_by_id, tableview, tablename, feat_id, rb, width
+        ), 'lot', f"highlight_features_by_id_{tablename}")
 
     def resources_management(self):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
