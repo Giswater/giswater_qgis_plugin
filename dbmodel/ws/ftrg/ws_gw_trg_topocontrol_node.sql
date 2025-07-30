@@ -42,7 +42,7 @@ v_manquerytext2 text;
 v_epaquerytext1 text;
 v_epaquerytext2 text;
 v_schemaname text;
-v_connec_id varchar;
+v_connec_id INTEGER;
 v_linkrec record;
 v_message text;
 v_nodetype text;
@@ -85,7 +85,7 @@ BEGIN
 	-- For state=1,2
 	ELSE
 
-		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
+		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
 			-- Checking conflict state=1 nodes (exiting vs new one)
 			IF (NEW.state=1) AND (v_node_proximity_control IS TRUE) THEN
@@ -147,7 +147,7 @@ BEGIN
 						END IF;
 					ELSE
 						-- getting values to create new 'ficticius' arc
-						SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id::text;
+						SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id;
 
 						-- refactoring values fo new one
 						v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
@@ -191,7 +191,7 @@ BEGIN
 							v_querytext='';
 						END IF;
 						v_manquerytext1 =  'INSERT INTO '||v_mantable||' SELECT ';
-						v_manquerytext2 =  v_querytext||' FROM '||v_mantable||' WHERE arc_id= '||v_arc.arc_id||'::text';
+						v_manquerytext2 =  v_querytext||' FROM '||v_mantable||' WHERE arc_id= '||v_arc.arc_id||'';
 
 						-- building querytext for epa_table
 						v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','')
@@ -200,13 +200,13 @@ BEGIN
 							v_querytext='';
 						END IF;
 						v_epaquerytext1 =  'INSERT INTO '||v_epatable||' (arc_id' ||v_querytext||') SELECT ';
-						v_epaquerytext2 =  v_querytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc.arc_id||'::text';
+						v_epaquerytext2 =  v_querytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc.arc_id||'';
 
 						-- insert new records into man_table
-						EXECUTE v_manquerytext1||v_arcrecordtb.arc_id::text||v_manquerytext2;
+						EXECUTE v_manquerytext1||v_arcrecordtb.arc_id||v_manquerytext2;
 
 						-- insert new records into epa_table
-						EXECUTE v_epaquerytext1||v_arcrecordtb.arc_id::text||v_epaquerytext2;
+						EXECUTE v_epaquerytext1||v_arcrecordtb.arc_id||v_epaquerytext2;
 
 						--Copy addfields from old arc to new arcs
 						v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
@@ -278,7 +278,9 @@ BEGIN
 				END LOOP;
 			END IF;
 
-		ELSIF TG_OP ='UPDATE' THEN
+		END IF;
+
+		IF TG_OP ='UPDATE' THEN
 
 			-- Updating expl / dma
 			IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN

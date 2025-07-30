@@ -36,8 +36,8 @@ v_manquerytext2 text;
 v_epaquerytext1 text;
 v_epaquerytext2 text;
 v_schemaname text;
-v_gully_id varchar;
-v_connec_id varchar;
+v_gully_id integer;
+v_connec_id integer;
 v_linkrec record;
 v_message text;
 v_trace_featuregeom boolean;
@@ -89,8 +89,7 @@ BEGIN
 		-- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
 		PERFORM gw_fct_state_control(json_build_object('feature_type_aux', 'NODE', 'feature_id_aux', NEW.node_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP));
 
-		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
-
+		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
 			-- Checking conflict state=1 nodes (exiting vs new one)
 			IF (NEW.state=1) AND (v_node_proximity_control IS TRUE) THEN
@@ -127,6 +126,9 @@ BEGIN
 				END IF;
 			END IF;
 
+		END IF;
+	
+	IF TG_OP = 'INSERT' then
 			-- check for existing node (1)
 			SELECT * INTO v_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
 
@@ -151,7 +153,7 @@ BEGIN
 						END IF;
 					ELSE
 						-- getting values to create new 'fictius' arc
-						SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id::text;
+						SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id;
 
 						-- refactoring values for new one
 						v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
@@ -183,7 +185,7 @@ BEGIN
 						UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
 						-- getting table child information (man_table)
-						v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN ve_arc ON c.id=arc_type WHERE arc_id=v_arc.arc_id);
+						v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN ve_arc ON c.id=arc_type WHERE arc_id=v_arc.arc_id);
 						v_epatable = (SELECT epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON epa_default = s.id JOIN ve_arc ON c.id=arc_type
 						WHERE arc_id=v_arc.arc_id);
 
@@ -194,7 +196,7 @@ BEGIN
 							v_querytext='';
 						END IF;
 						v_manquerytext1 =  'INSERT INTO '||v_mantable||' SELECT ';
-						v_manquerytext2 =  v_querytext||' FROM '||v_mantable||' WHERE arc_id= '||v_arc.arc_id||'::text';
+						v_manquerytext2 =  v_querytext||' FROM '||v_mantable||' WHERE arc_id= '||v_arc.arc_id||'';
 
 						-- building querytext for epa_table
 						v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','')
@@ -203,13 +205,13 @@ BEGIN
 							v_querytext='';
 						END IF;
 						v_epaquerytext1 =  'INSERT INTO '||v_epatable||' (arc_id' ||v_querytext||') SELECT ';
-						v_epaquerytext2 =  v_querytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc.arc_id||'::text';
+						v_epaquerytext2 =  v_querytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc.arc_id||'';
 
 						-- insert new records into man_table
-						EXECUTE v_manquerytext1||v_arcrecordtb.arc_id::text||v_manquerytext2;
+						EXECUTE v_manquerytext1||v_arcrecordtb.arc_id||v_manquerytext2;
 
 						-- insert new records into epa_table
-						EXECUTE v_epaquerytext1||v_arcrecordtb.arc_id::text||v_epaquerytext2;
+						EXECUTE v_epaquerytext1||v_arcrecordtb.arc_id||v_epaquerytext2;
 
 						--Copy addfields from old arc to new arcs
 						v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
