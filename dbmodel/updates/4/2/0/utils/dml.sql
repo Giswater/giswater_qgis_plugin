@@ -199,3 +199,16 @@ UPDATE config_toolbox SET inputparams='[
 
 
 update config_param_system set parameter = 'plan_psector_mode' where parameter = 'plan_psector_current';
+update config_form_fields set dv_querytext = 'WITH check_value AS (
+  SELECT value::integer AS psector_value 
+  FROM config_param_user 
+  WHERE parameter = ''plan_psector_mode''
+  AND cur_user = current_user
+)
+SELECT id, name AS idval 
+FROM value_state 
+WHERE id IS NOT NULL 
+AND CASE 
+  WHEN (SELECT psector_value FROM check_value) IS NULL THEN id != 2 
+  ELSE id=2 
+END' where columnname = 'state';
