@@ -2694,7 +2694,7 @@ class GwPsector:
                 continue
             column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
             _id = index.sibling(row, column_index).data()
-            ids.append(_id)
+            ids.append(str(_id))
 
         if not ids:
             return
