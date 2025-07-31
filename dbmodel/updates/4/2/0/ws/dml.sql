@@ -326,3 +326,79 @@ ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
 VALUES('edit_typevalue', 'man_meter_metertype', 'man_meter', 'meter_type', NULL, true)
 ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+DELETE FROM config_toolbox WHERE id=2712;
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(2706, 'Minsector analysis', '{"featureType":[]}'::json, '[
+  {
+    "widgetname": "exploitation",
+    "label": "Exploitation:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Choose exploitation to work with",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
+    "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC",
+    "selectedId": ""
+  },
+  {
+    "widgetname": "usePlanPsector",
+    "label": "Use masterplan psectors:",
+    "widgettype": "check",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "value": ""
+  },
+  {
+    "widgetname": "commitChanges",
+    "label": "Commit changes:",
+    "widgettype": "check",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 3,
+    "value": ""
+  },
+  {
+    "widgetname": "updateMapZone",
+    "label": "Update mapzone geometry method:",
+    "widgettype": "combo",
+    "datatype": "integer",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 4,
+    "comboIds": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "comboNames": [
+      "NONE",
+      "CONCAVE POLYGON",
+      "PIPE BUFFER",
+      "PLOT & PIPE BUFFER"
+    ],
+    "selectedId": ""
+  },
+  {
+    "widgetname": "geomParamUpdate",
+    "label": "Geometry parameter:",
+    "widgettype": "text",
+    "datatype": "float",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 5,
+    "isMandatory": false,
+    "placeholder": "5-30",
+    "value": ""
+  },
+  {
+    "widgetname": "executeMassiveMincut",
+    "label": "Execute Massive Mincut:",
+    "widgettype": "check",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 6,
+    "value": ""
+  }
+]'::json, NULL, true, '{4}')
+ON CONFLICT (id) DO UPDATE SET inputparams=EXCLUDED.inputparams;

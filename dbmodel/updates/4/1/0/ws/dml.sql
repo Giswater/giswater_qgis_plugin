@@ -569,18 +569,6 @@ INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_n
 INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_none', 'active', 'lyt_data_1', 4, 'boolean', 'check', 'active', 'active', NULL, false, false, true, false, false, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_none', 'lock_level', 'lyt_data_1', 5, 'integer', 'combo', 'lock_level', 'lock_level', NULL, false, false, true, false, NULL, 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level'' AND id IS NOT NULL', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
--- 05/06/2025
--- WIP new algorithm to recalculate massive mincut with minsector
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3424, 'gw_fct_massivemincut_v1', 'ws', 'function', 'json', 'json', 'Function of graphanalytics for massive mincutzones identification.', 'role_plan', NULL, 'core', NULL);
-
-INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(3424, 'Mincut massive v1', '{"featureType":[]}'::json, '[
-{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":1, 
-"dvQueryText":"SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "selectedId":"$userExploitation"},
-{"widgetname":"usePlanPsector", "label":"Use selected psectors:", "widgettype":"check","datatype":"boolean","tooltip":"If true, use selected psectors. If false ignore selected psectors and only works with on-service network" , "layoutname":"grl_option_parameters","layoutorder":2,"value":""},
-{"widgetname":"recalculateMinsectors", "label":"Recalculate minsectors:", "widgettype":"check","datatype":"boolean","tooltip":"If true, recalculate minsectors. If false, use existing minsectors" , "layoutname":"grl_option_parameters","layoutorder":3,"value":""},
-{"widgetname":"commitChanges", "label":"Commit changes:", "widgettype":"check","datatype":"boolean","tooltip":"If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables" , "layoutname":"grl_option_parameters","layoutorder":4,"value":""}
-]'::json, NULL, true, '{4}');
-
 --03/06/2025
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
