@@ -247,7 +247,7 @@ class GwInfo(QObject):
                         sub_tag = 'node'
 
                 # Comes from QPushButtons node1 or node2
-                if feature_id:
+                if feature_id and self.complet_result['body']['feature']['geometry']:
                     x1 = self.complet_result['body']['feature']['geometry']['x']
                     y1 = self.complet_result['body']['feature']['geometry']['y']
                     if x1 and y1:
