@@ -1849,7 +1849,7 @@ def add_widget(dialog, field, lbl, widget):
         layout.setColumnStretch(col, 1)
 
 
-def add_widget_combined(dialog, field, label, widget, old_widget_pos):
+def add_widget_combined(dialog, field, label, widget, pos_offset):
     """ Insert widget into layout based on orientation and label position """
 
     layout = dialog.findChild(QGridLayout, field['layoutname'])
@@ -1857,7 +1857,7 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
         return
     orientation = layout.property('lytOrientation')
     widget_pos = int(field.get('layoutorder', 0))
-    row, col = (0, widget_pos + old_widget_pos) if orientation == "horizontal" else (widget_pos + old_widget_pos, 0)
+    row, col = (0, widget_pos + pos_offset) if orientation == "horizontal" else (widget_pos + pos_offset, 0)
 
     label_pos = field['widgetcontrols']['labelPosition'] if (
                             'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
@@ -1878,6 +1878,7 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
                 layout.addWidget(label, row, col)
                 col += 1
             layout.setColumnStretch(col, 1)
+        pos_offset += 1
 
     if isinstance(widget, QSpacerItem):
         layout.addItem(widget, row, col)
@@ -1888,7 +1889,7 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
     if label and orientation == "horizontal":
         layout.setColumnStretch(col, 1)
 
-    return col if orientation == "horizontal" else row
+    return pos_offset
 
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
@@ -5587,7 +5588,7 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
     """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
 
     layout_orientations = {}
-    old_widget_pos = 0
+    pos_offset = 0
 
     # Retrieve layout orientations from the JSON response if provided
     for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
@@ -5622,12 +5623,10 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
 
         if current_layout != field['layoutname']:
             current_layout = field['layoutname']
-            old_widget_pos = 0
+            pos_offset = 0
 
-        if field['columnname'] in ('scale', 'rotation', 'atlas_id'):
-            print(f"field: {field}")
         # Add widget into layout
-        old_widget_pos = add_widget_combined(dialog, field, label, widget, old_widget_pos)
+        pos_offset = add_widget_combined(dialog, field, label, widget, pos_offset)
 
 
 def set_widgets(dialog, complet_result, field, tablename, class_info):
