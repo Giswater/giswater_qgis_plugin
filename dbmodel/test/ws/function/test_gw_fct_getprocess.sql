@@ -11,8 +11,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 5 test
-SELECT plan(5);
+-- Plan for 6 test
+SELECT plan(6);
 
 -- Create roles for testing
 CREATE USER plan_user;
