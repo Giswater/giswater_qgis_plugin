@@ -1621,9 +1621,9 @@ class GwInfo(QObject):
                 self._reset_my_json()
             if from_apply:
                 action_edit.setChecked(True)
-                tools_gw.enable_all(dialog, self.complet_result['body']['data'])
+                tools_gw.enable_all(dialog, self.complet_result['body']['data'], from_apply=True)
                 if self.epa_complet_result:
-                    tools_gw.enable_all(dialog, self.epa_complet_result['body']['data'])
+                    tools_gw.enable_all(dialog, self.epa_complet_result['body']['data'], from_apply=True)
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])

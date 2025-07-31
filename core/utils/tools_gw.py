@@ -1351,7 +1351,7 @@ def enable_widgets(dialog, result, enable):
         pass
 
 
-def enable_all(dialog, result):
+def enable_all(dialog, result, from_apply=False):
 
     try:
         widget_list = dialog.findChildren(QWidget)
@@ -1369,10 +1369,12 @@ def enable_all(dialog, result):
                                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet(None)
+                            if not from_apply:
+                                widget.setStyleSheet(None)
                     elif isinstance(widget, (QComboBox, QgsDateTimeEdit)):
                         widget.setEnabled(field['iseditable'])
-                        widget.setStyleSheet(None)
+                        if not from_apply:
+                            widget.setStyleSheet(None)
                         widget.setFocusPolicy(Qt.StrongFocus if field['iseditable'] else Qt.NoFocus)
 
                     elif type(widget) in (QCheckBox, QPushButton):
