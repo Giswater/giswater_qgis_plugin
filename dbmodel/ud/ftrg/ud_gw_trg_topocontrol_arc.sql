@@ -41,12 +41,12 @@ v_node_proximity_control boolean;
 v_node_proximity double precision;
 v_arc_searchnodes_control boolean;
 v_arc_searchnodes double precision;
-v_user_dis_statetopocontrol boolean;
 v_node2 text;
 v_nodecat text;
 v_keepdepthvalues boolean;
 v_message text;
-ve_disable_arctopocontrol boolean;
+v_user_disable_statetopocontrol boolean;
+v_user_disable_arctopocontrol boolean;
 
 BEGIN
 
@@ -62,10 +62,10 @@ BEGIN
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 
 	-- Get user variables
-	SELECT value::boolean INTO v_user_dis_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol' AND cur_user = current_user;
+	SELECT value::boolean INTO v_user_disable_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol' AND cur_user = current_user;
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
 	SELECT value::boolean INTO v_keepdepthvalues FROM config_param_user WHERE parameter='edit_arc_keepdepthval_when_reverse_geom' AND cur_user = current_user;
-	SELECT value::boolean INTO ve_disable_arctopocontrol FROM config_param_user WHERE parameter='edit_disable_arctopocontrol' AND cur_user = current_user;
+	SELECT value::boolean INTO v_user_disable_arctopocontrol FROM config_param_user WHERE parameter='edit_disable_arctopocontrol' AND cur_user = current_user;
 
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
@@ -74,11 +74,11 @@ BEGIN
   	END IF;
 
 	-- disable trigger
-	IF ve_disable_arctopocontrol THEN
+	IF v_user_disable_arctopocontrol THEN
 		RETURN NEW;
 	END IF;
 
-	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
+	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_disable_statetopocontrol IS TRUE THEN
 
 		SELECT * INTO nodeRecord1 FROM node
 		JOIN cat_feature_node ON cat_feature_node.id = node_type
@@ -198,7 +198,7 @@ BEGIN
 	END IF;
 
     -- only if user variable is not disabled
-    IF v_user_dis_statetopocontrol IS FALSE THEN
+    IF v_user_disable_statetopocontrol IS FALSE THEN
 
         --  Control of start/end node and depth variables
         IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN

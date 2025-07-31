@@ -22,14 +22,15 @@ v_samenode_init_end_control boolean;
 v_nodeinsert_arcendpoint boolean;
 v_arc_searchnodes_control boolean;
 v_arc_searchnodes double precision;
-v_user_statetopocontrol boolean;
 v_node2 text;
 v_nodecat text;
 v_message text;
 v_msg boolean = false;
 v_check_conflictmapzones boolean = false;
 v_zone text;
-ve_disable_arctopocontrol boolean;
+v_user_disable_statetopocontrol boolean;
+v_user_disable_arctopocontrol boolean;
+
 
 BEGIN
 
@@ -44,8 +45,8 @@ BEGIN
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 
 	-- get user variables
-	SELECT value::boolean INTO v_user_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol' AND cur_user = current_user;
-	SELECT value::boolean INTO ve_disable_arctopocontrol FROM config_param_user WHERE parameter='edit_disable_arctopocontrol' AND cur_user = current_user;
+	SELECT value::boolean INTO v_user_disable_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol' AND cur_user = current_user;
+	SELECT value::boolean INTO v_user_disable_arctopocontrol FROM config_param_user WHERE parameter='edit_disable_arctopocontrol' AND cur_user = current_user;
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
 
 
@@ -56,11 +57,11 @@ BEGIN
 	END IF;
 
 	-- disable trigger
-	IF v_arc_searchnodes_control IS FALSE OR ve_disable_arctopocontrol THEN
+	IF v_arc_searchnodes_control IS FALSE OR v_user_disable_arctopocontrol THEN
 		RETURN NEW;
 	END IF;
 
-	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_statetopocontrol IS TRUE THEN
+	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_disable_statetopocontrol IS TRUE THEN
 
 		-- working without statetopocontrol
 		SELECT node.*,node_type INTO nodeRecord1 FROM node
@@ -220,7 +221,7 @@ BEGIN
 
 
     -- only if user variable is not disabled
-    IF v_user_statetopocontrol IS FALSE THEN
+    IF v_user_disable_statetopocontrol IS FALSE THEN
 
         --  Control of start/end node
         IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
