@@ -58,7 +58,7 @@ BEGIN
 	delete from t_anl_node WHERE fid = 124;
 
 	-- check number of times each node appears in terms of identify nodearcs <> 2
-	v_query_number = 'SELECT count(*)as numarcs, node_id FROM node n JOIN 
+	v_query_number = 'SELECT count(*)as numarcs, n.node_id FROM node n JOIN 
 						      (SELECT node_1 as node_id FROM ve_arc 
 							UNION ALL SELECT node_2 FROM ve_arc) a ON n.node_id=a.node_id group by n.node_id';
 
