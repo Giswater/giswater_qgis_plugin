@@ -60,7 +60,7 @@ BEGIN
 	-- check number of times each node appears in terms of identify nodearcs <> 2
 	v_query_number = 'SELECT count(*)as numarcs, node_id FROM node n JOIN 
 						      (SELECT node_1 as node_id FROM ve_arc 
-							UNION ALL SELECT node_2 FROM ve_arc) a using (node_id) group by n.node_id';
+							UNION ALL SELECT node_2 FROM ve_arc) a ON n.node_id=a.node_id group by n.node_id';
 
 	-- query text for mandatory node2arcs
 	v_querytext = 'SELECT a.*, v.to_arc FROM temp_t_node a JOIN man_valve v ON a.node_id=v.node_id::text WHERE to_arc is not null
@@ -77,7 +77,7 @@ BEGIN
 
 	-- query text for non-mandatory node2arcs
 	IF p_only_mandatory_nodarc IS FALSE THEN
-		v_querytext = 'SELECT a.*, s.to_arc FROM temp_t_node a JOIN inp_shortpipe i ON i.node_id = a.node_id 
+		v_querytext = 'SELECT a.*, s.to_arc FROM temp_t_node a JOIN inp_shortpipe i ON i.node_id::text = a.node_id 
 					   LEFT JOIN man_valve s ON i.node_id = s.node_id WHERE s.to_arc IS NULL';
 		
 		v_querytext = concat (' INSERT INTO t_anl_node (num_arcs, arc_id, node_id, top_elev, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, 
