@@ -53,6 +53,7 @@ v_json_new_data JSON;
 v_sql TEXT;
 v_rec_sentence record;
 v_tg_table_name TEXT;
+v_epa_type text;
 v_result text;
 v_input_json JSON;
 v_result_rec record;
@@ -275,6 +276,10 @@ BEGIN
 			END IF;
 		END IF;
 
+		v_epa_type := NEW.epa_type;
+		IF lower(v_epa_type) = 'undefined' THEN
+		    v_epa_type := NULL;
+		END IF;
 
 		INSERT INTO "element" (element_id, code, sys_code, elementcat_id, serial_number, num_elements, state, state_type, observ, "comment", function_type, category_type,
 		location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified, label_x, label_y, label_rotation,

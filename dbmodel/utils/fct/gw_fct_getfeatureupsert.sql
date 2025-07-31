@@ -310,7 +310,7 @@ BEGIN
 		END IF;
 
 		IF v_catfeature.code_autofill IS TRUE THEN
-			v_code=v_id;
+			v_code=concat(v_catfeature.addparam::json->>'code_prefix',v_id);
 		END IF;
 
 		-- check if v_table_id is defined on cat_feature
