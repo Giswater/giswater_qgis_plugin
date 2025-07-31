@@ -1292,3 +1292,23 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET ismandatory=true
 	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='flwreg_length' AND tabname='tab_data';
+
+
+-- 22/07/2025
+INSERT INTO edit_typevalue (typevalue,id,idval) VALUES ('dma_type','TRANSMISSION','TRANSMISSION');
+INSERT INTO edit_typevalue (typevalue,id,idval) VALUES ('dma_type','DISTRIBUTION','DISTRIBUTION');
+INSERT INTO edit_typevalue (typevalue,id,idval) VALUES ('dma_type','HYBRID','HYBRID');
+
+INSERT INTO inp_typevalue (typevalue,id,idval) VALUES ('inp_options_networkmode','1','TRANSMISSION NETWORK');
+INSERT INTO inp_typevalue (typevalue,id,idval) VALUES ('inp_options_networkmode','5','NETWORK DMA');
+
+--23/07/2025
+INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc,
+feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue,
+stylesheet, placeholder, "source")
+VALUES('inp_options_selecteddma', 'epaoptions', 'Wich DMA will be exportad if networkmode is NETWORK DMA', 'role_epa', NULL, 'Dma (NETWORK DMA):',
+'SELECT dma_id as id, name as idval FROM dma WHERE dma_id is not null and dma_id > 0', NULL, true, 2, 'ws', false, NULL, NULL, NULL, false, 'integer', 'combo', true, NULL, NULL,
+'lyt_general_1', true, true, NULL, NULL, NULL, 'core');
+
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('inp_options_selecteddma', '3', 'postgres') ON CONFLICT DO NOTHING;
+
