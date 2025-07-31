@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_gettoolbox(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
-	
+
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -45,7 +45,7 @@ v_querytext_mod text;
 v_queryresult text;
 v_expl text;
 v_state text;
-v_inp_result text; 
+v_inp_result text;
 v_rpt_result text;
 v_return json;
 v_return2 text;
@@ -159,14 +159,17 @@ BEGIN
 	EXECUTE v_querystring INTO v_master_fields;
 
 	-- get admin toolbox parameters
-	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+	v_querystring = concat('
+		SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			 SELECT config_toolbox.id, alias, function_name as functionname
 			 FROM sys_function
 			 JOIN config_toolbox USING (id)
 			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_admin'' AND config_toolbox.active IS TRUE
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')
-			 AND ',v_device,' = ANY(device)) a');
+			 AND ',v_device,' = ANY(device)
+			 AND 3426 <> id -- 3426 is the id of the function gw_fct_cm_integrate_production, TODO: Remove this where and add a if to check if the cm schema is created.
+		) a');
 
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 50);
