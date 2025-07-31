@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_import_swmm_flwreg($${"data": {
     },
     "weir": {
         "featureClass": "EWEIR",
-        "catalog": "EWEIR-01"
+        "catalog": "WEIR-01"
     },
     "outlet": {
         "featureClass": "OUTLET",

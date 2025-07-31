@@ -189,7 +189,7 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_la
 
 INSERT INTO cat_element (id, element_type, active) VALUES ('ORIFICE-01', 'EORIFICE', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('OUTLET-01', 'EOUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_element (id, element_type, active) VALUES ('EWEIR-01', 'EWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_element (id, element_type, active) VALUES ('WEIR-01', 'EWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('PUMP-01', 'EPUMP', TRUE) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
