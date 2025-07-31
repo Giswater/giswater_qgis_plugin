@@ -20,7 +20,7 @@ SELECT has_table('ext_cat_hydrometer'::name, 'Table ext_cat_hydrometer should ex
 SELECT columns_are(
     'ext_cat_hydrometer',
     ARRAY[
-        'id', 'hydrometer_type', 'madeby', 'class', 'ulmc', 'voltman_flow', 'multi_jet_flow', 'dnom', 'link', 'url', 'picture', 'svg', 'code', 'observ'
+        'id', 'hydrometer_type', 'madeby', 'class', 'ulmc', 'type', 'flownom', 'dnom', 'link', 'url', 'picture', 'svg', 'code', 'observ'
     ],
     'Table ext_cat_hydrometer should have the correct columns'
 );
@@ -34,8 +34,8 @@ SELECT col_type_is('ext_cat_hydrometer', 'hydrometer_type', 'varchar(100)', 'Col
 SELECT col_type_is('ext_cat_hydrometer', 'madeby', 'varchar(100)', 'Column madeby should be varchar(100)');
 SELECT col_type_is('ext_cat_hydrometer', 'class', 'varchar(100)', 'Column class should be varchar(100)');
 SELECT col_type_is('ext_cat_hydrometer', 'ulmc', 'varchar(100)', 'Column ulmc should be varchar(100)');
-SELECT col_type_is('ext_cat_hydrometer', 'voltman_flow', 'varchar(100)', 'Column voltman_flow should be varchar(100)');
-SELECT col_type_is('ext_cat_hydrometer', 'multi_jet_flow', 'varchar(100)', 'Column multi_jet_flow should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'type', 'varchar(100)', 'Column type should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'flownom', 'varchar(100)', 'Column flownom should be varchar(100)');
 SELECT col_type_is('ext_cat_hydrometer', 'dnom', 'varchar(100)', 'Column dnom should be varchar(100)');
 SELECT col_type_is('ext_cat_hydrometer', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('ext_cat_hydrometer', 'url', 'varchar(512)', 'Column url should be varchar(512)');

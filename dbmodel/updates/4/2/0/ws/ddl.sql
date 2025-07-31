@@ -63,3 +63,5 @@ CREATE TABLE IF NOT EXISTS minsector_mincut_valve (
 CREATE INDEX IF NOT EXISTS idx_minsector_mincut_valve_minsector_id ON minsector_mincut_valve (minsector_id);
 CREATE INDEX IF NOT EXISTS idx_minsector_mincut_valve_node_id ON minsector_mincut_valve (node_id);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_cat_hydrometer", "column":"voltman_flow", "newName":"type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_cat_hydrometer", "column":"multi_jet_flow", "newName":"flownom"}}$$);
