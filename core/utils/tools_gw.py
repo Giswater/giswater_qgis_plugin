@@ -1856,7 +1856,6 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
     if layout in (None, 'null', 'NULL', 'Null'):
         return
     orientation = layout.property('lytOrientation')
-    old_widget_pos = int(old_widget_pos) if old_widget_pos is not None else 0
     widget_pos = int(field.get('layoutorder', 0))
     row, col = (0, widget_pos + old_widget_pos) if orientation == "horizontal" else (widget_pos + old_widget_pos, 0)
 
@@ -1888,6 +1887,8 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
 
     if label and orientation == "horizontal":
         layout.setColumnStretch(col, 1)
+
+    return col if orientation == "horizontal" else row
 
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
@@ -4906,7 +4907,7 @@ def refresh_all_styles(dialog=None):
             # TODO: show message of all refreshed styles
             # msg = f"Style '{style}' not found in database."
             # tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
-    
+
         msg = "All layers have been successfully refreshed."
         tools_qgis.show_success(msg, dialog=dialog)
 
@@ -5622,11 +5623,11 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
         if current_layout != field['layoutname']:
             current_layout = field['layoutname']
             old_widget_pos = 0
-        else:
-            old_widget_pos = 1
 
+        if field['columnname'] in ('scale', 'rotation', 'atlas_id'):
+            print(f"field: {field}")
         # Add widget into layout
-        add_widget_combined(dialog, field, label, widget, old_widget_pos)
+        old_widget_pos = add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
 
 def set_widgets(dialog, complet_result, field, tablename, class_info):
