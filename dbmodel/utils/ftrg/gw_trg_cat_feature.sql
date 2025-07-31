@@ -49,7 +49,44 @@ BEGIN
 	SELECT json_extract_path_text (value::json,'rename_view_x_id')::boolean INTO v_isrenameview FROM config_param_system
 	WHERE parameter='admin_manage_cat_feature';
 
+	IF TG_OP = 'INSERT' THEN
+		IF v_projecttype = 'WS' THEN
+			IF NEW.feature_class = 'FRELEM' AND NEW.id NOT IN ('EPUMP', 'EVALVE') THEN
+				-- ERROR: FRELEM CANNOT BE CREATED
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"4332", "function":"2758","parameters":{}, "is_process":true}}$$);';
+				RETURN NULL;
+			END IF;
+		ELSEIF v_projecttype = 'UD' THEN
+			IF NEW.feature_class = 'FRELEM' AND NEW.id NOT IN ('EPUMP', 'EWEIR', 'EORIFICE', 'EOUTLET') THEN
+				-- ERROR: FRELEM CANNOT BE CREATED
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"4332", "function":"2758","parameters":{}, "is_process":true}}$$);';
+				RETURN NULL;
+			END IF;
+		END IF;
+	ELSEIF TG_OP = 'UPDATE' THEN
+		IF OLD.feature_class = 'FRELEM' OR NEW.feature_class = 'FRELEM' THEN
+			IF OLD.id <> NEW.id OR OLD.feature_class <> NEW.feature_class OR OLD.feature_type <> NEW.feature_type OR OLD.parent_layer <> NEW.parent_layer OR OLD.child_layer <> NEW.child_layer THEN
+				-- ERROR: CANNOT UPDATE SOME FIELDS OF A FRELEM
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"4330", "function":"2758","parameters":{}, "is_process":true}}$$);';
+				RETURN NULL;
+			END IF;
+		END IF;
+	ELSIF TG_OP = 'DELETE' THEN
+		IF OLD.feature_class = 'FRELEM' THEN
+			-- ERROR: FRELEM CANNOT BE DELETED
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4328", "function":"2758","parameters":{}, "is_process":true}}$$);';
+			RETURN NULL;
+		END IF;
+	END IF;
+
 	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') THEN
+		IF v_table = 'DELETE' THEN
+			RETURN NEW;
+		END IF;
 		--Controls on update or insert of cat_feature.id check if the new id or child layer has accents, dots or dashes. If so, give an error.
 		v_id = array_to_string(ts_lexize('unaccent',NEW.id),',','*');
 

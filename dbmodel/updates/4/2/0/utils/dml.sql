@@ -225,3 +225,7 @@ UPDATE config_toolbox SET functionparams = REPLACE(functionparams::text, 'v_edit
 UPDATE config_toolbox SET inputparams = REPLACE(inputparams::text, 'v_edit_', 've_')::json WHERE inputparams::text ILIKE '%v_edit_%';
 
 UPDATE sys_function SET function_name = 'gw_fct_checktopologypsector' where function_name = 'gw_fct_setplan';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4330, 'Cannot update a flowregulator element', NULL, 2, true, 'utils', 'core', 'UI');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4332, 'Cannot insert new flowregulator element', NULL, 2, true, 'utils', 'core', 'UI');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4328, 'Cannot delete a flowregulator element', NULL, 2, true, 'utils', 'core', 'UI');
