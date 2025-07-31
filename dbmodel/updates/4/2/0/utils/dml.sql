@@ -223,3 +223,5 @@ ON CONFLICT (parameter) DO NOTHING;
 
 UPDATE config_toolbox SET functionparams = REPLACE(functionparams::text, 'v_edit_', 've_')::json WHERE functionparams::text ILIKE '%v_edit_%';
 UPDATE config_toolbox SET inputparams = REPLACE(inputparams::text, 'v_edit_', 've_')::json WHERE inputparams::text ILIKE '%v_edit_%';
+
+UPDATE sys_function SET functionname = 'gw_fct_checktopologypsector' where functionname = 'gw_fct_setplan';

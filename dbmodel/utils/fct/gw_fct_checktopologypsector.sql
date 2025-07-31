@@ -8,12 +8,13 @@ or (at your option) any later version.
 --FUNCTION CODE: 3002
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setplan(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setplan(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_checktopologypsector(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_checktopologypsector(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_setplan($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"1"}}$$);
+SELECT SCHEMA_NAME.gw_fct_checktopologypsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"1"}}$$);
 */
 
 DECLARE
