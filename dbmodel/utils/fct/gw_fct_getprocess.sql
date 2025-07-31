@@ -170,7 +170,7 @@ BEGIN
 
 			IF v_selectedid ~ '^[0-9]+$'THEN
 
-				v_selectedid = concat('"selectedId":"',v_arrayresult[v_selectedid::integer],'"');
+				v_selectedid = concat('{"selectedId":"',v_arrayresult[v_selectedid::integer],'"}');
 
 			ELSIF v_selectedid ilike '$user%' then
 

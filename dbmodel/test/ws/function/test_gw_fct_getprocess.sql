@@ -69,6 +69,14 @@ SELECT is (
     'Check if gw_fct_getprocess --> "functionId":"3042" returns status "Accepted"'
 );
 
+-- Create Demand Dscenario from CRM
+SELECT is (
+    (gw_fct_getprocess($${"client":{"device":4, "lang":"es_ES", "version":"4.2.0", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":"3110"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getprocess --> "functionId":"3110" returns status "Accepted"'
+);
+
 
 -- Finish the test
 SELECT finish();
