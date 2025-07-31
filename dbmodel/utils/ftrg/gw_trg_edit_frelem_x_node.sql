@@ -8,7 +8,9 @@ The program is free software: you can redistribute it and/or modify it under the
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_frelem_x_node() RETURNS trigger AS
 $BODY$
 
-DECLARE 
+DECLARE
+	v_version text;
+	v_project_type text;
 	element_type varchar;
 	old_node integer;
 
@@ -17,7 +19,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	-- get element type
 	SELECT cat_feature.feature_class INTO element_type
 	FROM element
@@ -64,11 +66,11 @@ BEGIN
 			UPDATE man_frelem SET node_id = NEW.node_id WHERE element_id = NEW.element_id;
 			RETURN NEW;
 		END IF;
-	
+
 	ELSE
 		RETURN NEW;
 	END IF;
-    
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
