@@ -38,6 +38,7 @@ v_usepsector text;
 v_valuefordisconnected integer;
 v_floodonlymapzone text;
 v_commitchanges text;
+v_mapzones_version integer;
 
 BEGIN
 
@@ -56,6 +57,7 @@ BEGIN
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 
+	SELECT (value::json->>'version')::int2 INTO v_mapzones_version FROM config_param_system WHERE parameter='mapzones_config';
 
 	-- control of null values
 	IF v_paramupdate IS NULL THEN v_paramupdate = 5; END IF;
@@ -72,9 +74,12 @@ BEGIN
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
 	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,'}}}');
 
-	RETURN gw_fct_graphanalytics_mapzones(v_data);
+	IF v_mapzones_version = 1 THEN
+		RETURN gw_fct_graphanalytics_mapzones_v1(v_data);
+	ELSE
+		RETURN gw_fct_graphanalytics_mapzones(v_data);
+	END IF;
 
-	-- TODO: Remove tempory tables when failed
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
