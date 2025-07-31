@@ -144,3 +144,10 @@ UPDATE ext_cat_period b SET period_seconds = a.period_seconds FROM (
 )a WHERE a.id = b.id;
 
 UPDATE connec SET connec_length = st_length(l.the_geom) FROM link l WHERE connec_id = l.feature_id;
+
+INSERT INTO man_genelem (element_id)
+SELECT e.element_id
+FROM element e
+JOIN cat_element ce ON ce.id::text = e.elementcat_id::text
+LEFT JOIN cat_feature cf ON ce.element_type::text = cf.id::text
+WHERE cf.feature_class='GENELEM';
