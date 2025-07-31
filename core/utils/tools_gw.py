@@ -708,7 +708,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
 
 
 def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None,
-                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=True):
+                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=True, force_create_group=False):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -741,8 +741,12 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     if passwd is not None:
         uri.setPassword(passwd)
 
-    create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
-    create_groups = tools_os.set_boolean(create_groups, default=False)
+    if force_create_group:
+        create_groups = True
+    else:
+        create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
+        create_groups = tools_os.set_boolean(create_groups, default=False)
+
     if sub_group:
         sub_group = sub_group.capitalize()
     if sub_sub_group:

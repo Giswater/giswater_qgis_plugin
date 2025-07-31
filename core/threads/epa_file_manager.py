@@ -9,8 +9,10 @@ import os
 import re
 import subprocess
 import psycopg2
+import json
 
 from qgis.PyQt.QtCore import pyqtSignal
+from qgis.core import QgsProject
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -36,6 +38,7 @@ class GwEpaFileManager(GwTask):
         self.network_mode = network_mode
         self.initialize_variables()
         self.set_variables_from_go2epa()
+        self.active_epa_layers = False
 
     def initialize_variables(self):
 
@@ -123,6 +126,25 @@ class GwEpaFileManager(GwTask):
             tools_log.log_warning(msg, msg_params=msg_params)
 
         elif result:
+
+            # If EPA layers are active, load them and make them visible
+            if self.active_epa_layers:
+                # Load EPA layers before making them visible
+                self._load_epa_layers()
+                
+                # Activate EPA layers in TOC
+                project = QgsProject.instance()
+                
+                # Get EPA group from layer tree
+                root = project.layerTreeRoot() 
+                epa_group = root.findGroup('EPA')
+                
+                # Make EPA group and all child layers visible if group exists
+                if epa_group:
+                    epa_group.setItemVisibilityChecked(True)
+                    for layer in epa_group.findLayers():
+                        tools_qgis.set_layer_visible(layer.layer())
+
             msg = "Task 'Go2Epa' execute function '{0}' from '{1}'"
             if self.go2epa_export_inp and self.complet_result:
                 if self.complet_result.get('status') == "Accepted":
@@ -398,6 +420,52 @@ class GwEpaFileManager(GwTask):
 
         return True
 
+    def _load_epa_layers(self):
+        """ Load EPA layers if they are not already loaded """
+        
+        # Get EPA layers from database
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
+        if not json_result or json_result['status'] == 'Failed':
+            return False
+
+        # Get current loaded layers
+        layer_list = []
+        for layer in QgsProject.instance().mapLayers().values():
+            layer_list.append(tools_qgis.get_layer_source_table_name(layer))
+
+        # Load EPA layers that are not already loaded
+        for field in json_result['body']['data']['fields']:
+            if field['context'] is not None:
+                context = json.loads(field['context'])
+                levels = context['levels']
+                
+                # Check if this is an EPA RESULTS layer
+                if len(levels) > 1 and levels[0] == 'EPA' and levels[1] == 'RESULTS':
+                    tablename = field['tableName']
+                    
+                    # Check if layer is not already loaded
+                    if tablename not in layer_list:
+                        layer_name = tablename
+                        the_geom = field['geomField'] if field['geomField'] != "None" else None
+                        geom_field = field['tableId']
+                        
+                        if geom_field:
+                            geom_field = geom_field.replace(" ", "")
+                            group = levels[0]
+                            sub_group = levels[1]
+                            alias = field['layerName'] if field['layerName'] is not None else field['tableName']
+                            
+                            # Add layer to TOC
+                            style_id = "-1"
+                            if lib_vars.project_vars['current_style'] is not None:
+                                style_id = lib_vars.project_vars['current_style']
+                            
+                            tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, 
+                                                      style_id=style_id, alias=alias, force_create_group=True)
+
+        return True
+
     def _import_rpt(self):
         """ Import result file """
 
@@ -419,6 +487,7 @@ class GwEpaFileManager(GwTask):
             msg_params = ("_exec_import_function",)
             tools_log.log_info(msg, msg_params=msg_params)
             status = self._exec_import_function()
+            self.active_epa_layers = True
         except Exception as e:
             self.error_msg = str(e)
         finally:
