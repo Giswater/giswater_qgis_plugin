@@ -220,3 +220,6 @@ VALUES(4326, 'It is not allowed to insert/update one node of the current active 
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('mapzones_config', '{"version" : "1"}', 'Mapzones system config. version - Mapzones version;', 'Mapzones system config', NULL, NULL, true, 17, 'utils', false, false, 'json', 'linetext', true, true, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_admin_other')
 ON CONFLICT (parameter) DO NOTHING;
+
+UPDATE config_toolbox SET functionparams = REPLACE(functionparams::text, 'v_edit_', 've_')::json WHERE functionparams::text ILIKE '%v_edit_%';
+UPDATE config_toolbox SET inputparams = REPLACE(inputparams::text, 'v_edit_', 've_')::json WHERE inputparams::text ILIKE '%v_edit_%';
