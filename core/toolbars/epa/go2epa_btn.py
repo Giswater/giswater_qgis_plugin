@@ -172,11 +172,12 @@ class GwGo2EpaButton(GwAction):
             :param index: tab index (passed by signal)
         """
         # Set network mode to 1
-        form = '"formName":"epaoptions"'
-        my_json = '[{"widget": "inp_options_networkmode", "value": "1"}]'
-        extras = f'"fields":{my_json}'
-        body = tools_gw.create_body(form=form, extras=extras)
-        tools_gw.execute_procedure('gw_fct_setconfig', body)
+        if self.project_type == 'ud':
+            form = '"formName":"epaoptions"'
+            my_json = '[{"widget": "inp_options_networkmode", "value": "1"}]'
+            extras = f'"fields":{my_json}'
+            body = tools_gw.create_body(form=form, extras=extras)
+            tools_gw.execute_procedure('gw_fct_setconfig', body)
 
         if index == 1:
             self.dlg_go2epa.btn_accept.setEnabled(False)
