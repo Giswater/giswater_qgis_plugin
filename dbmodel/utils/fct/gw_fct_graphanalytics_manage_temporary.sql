@@ -146,6 +146,7 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut (LIKE SCHEMA_NAME.minsector_mincut INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut_valve (LIKE SCHEMA_NAME.minsector_mincut_valve INCLUDING ALL);
 
                 -- used for MASSIVE MINCUT
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);

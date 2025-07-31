@@ -49,3 +49,17 @@ ALTER TABLE om_waterbalance_dma_graph ALTER COLUMN node_id TYPE int4 USING node_
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"meter_type", "dataType":"int4"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"name", "dataType":"text"}}$$);
+
+-- 31/07/2025
+CREATE TABLE IF NOT EXISTS minsector_mincut_valve (
+    minsector_id INT4,
+    node_id INT4,
+    proposed BOOLEAN,
+    CONSTRAINT minsector_mincut_valve_pkey PRIMARY KEY (minsector_id, node_id),
+    CONSTRAINT minsector_mincut_valve_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT minsector_mincut_valve_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_minsector_mincut_valve_minsector_id ON minsector_mincut_valve (minsector_id);
+CREATE INDEX IF NOT EXISTS idx_minsector_mincut_valve_node_id ON minsector_mincut_valve (node_id);
+

@@ -663,13 +663,26 @@ BEGIN
             RAISE NOTICE 'v_data: %', v_data;
             v_response := gw_fct_mincut_core(v_data);
 
+            IF v_response->>'status' <> 'Accepted' THEN
+                RETURN v_response;
+            END IF;
+
+
+            -- insert the mincut_minsector_id
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
             SELECT v_record_minsector.minsector_id, n.pgr_node_id
             FROM temp_pgr_node n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
-            RAISE NOTICE 'v_response: %', v_response;
         END LOOP;
+
+
+        DELETE FROM minsector_mincut;
+
+        INSERT INTO minsector_mincut (minsector_id, mincut_minsector_id)
+        SELECT minsector_id, mincut_minsector_id
+        FROM temp_pgr_minsector_mincut;
+
     END IF;
 
     -- Info
