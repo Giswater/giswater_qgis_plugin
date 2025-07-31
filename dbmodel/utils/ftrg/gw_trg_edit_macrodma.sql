@@ -55,7 +55,8 @@ BEGIN
 			END IF;
 		END IF;
 
-	   INSERT INTO macrodma (macrodma_id, name, descript, expl_id, lock_level) VALUES (NEW.macrodma_id, NEW.name, NEW.descript, NEW.expl_id, NEW.lock_level);
+	   INSERT INTO macrodma (macrodma_id, code, name, descript, expl_id, lock_level)
+	   VALUES (NEW.macrodma_id, NEW.macrodma_id, NEW.name, NEW.descript, NEW.expl_id, NEW.lock_level);
 
     	IF v_view_name = 'UI' THEN
 			UPDATE macrodma SET active = NEW.active WHERE macrodma_id = NEW.macrodma_id;

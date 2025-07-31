@@ -39,7 +39,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO macrosector (macrosector_id, name, descript, lock_level) VALUES (NEW.macrosector_id, NEW.name, NEW.descript, NEW.lock_level);
+		INSERT INTO macrosector (macrosector_id, code, name, descript, lock_level)
+		VALUES (NEW.macrosector_id, NEW.macrosector_id, NEW.name, NEW.descript, NEW.lock_level);
 
 		IF v_view_name = 'UI' THEN
 			UPDATE macrosector SET active = NEW.active WHERE macrosector_id = NEW.macrosector_id;

@@ -55,7 +55,8 @@ BEGIN
 			END IF;
 		END IF;
 
-	   INSERT INTO macroomzone (macroomzone_id, name, descript, expl_id, lock_level) VALUES (NEW.macroomzone_id, NEW.name, NEW.descript, NEW.expl_id, NEW.lock_level);
+	   INSERT INTO macroomzone (macroomzone_id, code, name, descript, expl_id, lock_level)
+	   VALUES (NEW.macroomzone_id, NEW.macroomzone_id, NEW.name, NEW.descript, NEW.expl_id, NEW.lock_level);
 
     	IF v_view_name = 'UI' THEN
 			UPDATE macroomzone SET active = NEW.active WHERE macroomzone_id = NEW.macroomzone_id;

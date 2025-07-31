@@ -70,8 +70,8 @@ BEGIN
 			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa;
 		END IF;
 
-		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, pattern_id, dqa_type, link, graphconfig, stylesheet, muni_id, sector_id, lock_level)
-		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, v_mapzone_id, NEW.descript, NEW.pattern_id, NEW.dqa_type,
+		INSERT INTO dqa (dqa_id, code, name, expl_id, macrodqa_id, descript, pattern_id, dqa_type, link, graphconfig, stylesheet, muni_id, sector_id, lock_level)
+		VALUES (NEW.dqa_id, NEW.dqa_id, NEW.name, NEW.expl_id, v_mapzone_id, NEW.descript, NEW.pattern_id, NEW.dqa_type,
 		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.muni_id, NEW.sector_id, NEW.lock_level);
 
 		IF v_view_name = 'UI' THEN

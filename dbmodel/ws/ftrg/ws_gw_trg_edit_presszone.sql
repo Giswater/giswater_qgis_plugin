@@ -65,8 +65,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO presszone (presszone_id, name, expl_id, graphconfig, head, stylesheet, descript, avg_press, presszone_type, link, muni_id, sector_id, lock_level)
-		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.descript,
+		INSERT INTO presszone (presszone_id, code, name, expl_id, graphconfig, head, stylesheet, descript, avg_press, presszone_type, link, muni_id, sector_id, lock_level)
+		VALUES (NEW.presszone_id, NEW.presszone_id, NEW.name, NEW.expl_id, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.descript,
 		NEW.avg_press, NEW.presszone_type, NEW.link, NEW.muni_id, NEW.sector_id, NEW.lock_level);
 
 		IF v_view_name = 'UI' THEN
