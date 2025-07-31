@@ -176,8 +176,6 @@ BEGIN
             USING v_schemaname, v_tablename, v_idname
             INTO column_type_id;
 
-
-
 	v_querytext = 'SELECT EXISTS(SELECT 1 FROM ' || quote_ident(v_tablename) ||'';
 	IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 THEN
 		i = 1;
@@ -324,7 +322,7 @@ BEGIN
 		-- execute query text
 		EXECUTE v_querytext;
 		IF v_fieldsreload IS NOT NULL THEN
-			SELECT string_to_array(string_agg(key, ','), ',') INTO v_keys_fields
+			SELECT array_agg(key) INTO v_keys_fields
   				FROM json_object_keys(v_fields::json) AS key;
 
 			EXECUTE 'SELECT gw_fct_getcolumnsfromid($${
@@ -347,7 +345,7 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM),  'version', v_version, 'SQLSTATE', SQLSTATE)::json;
+	RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 2, 'text', SQLERRM),  'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 
 END;
 $BODY$
