@@ -47,13 +47,13 @@ class GwMincut:
 
         # Get layers of node, arc, connec group
         self.node_group = []
-        self.layers = dict()
+        self.rel_layers = dict()
         self.layers_connec = None
         self.arc_group = []
         self.hydro_list = []
         self.deleted_list = []
         self.ids = []
-        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
+        self.rel_list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
         self.excluded_layers = []
 
         # Serialize data of mincut states
@@ -566,7 +566,7 @@ class GwMincut:
 
     def _init_mincut_canvas(self):
 
-        self.list_ids['connec'] = []
+        self.rel_list_ids['connec'] = []
         self.hydro_list = []
         self.deleted_list = []
 
@@ -574,9 +574,9 @@ class GwMincut:
         self._remove_selection()
 
         # Parametrize list of layers
-        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        self.layers_connec = self.layers['connec']
-        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
+        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.layers_connec = self.rel_layers['connec']
+        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
 
         # Set active and current layer
         self.iface.setActiveLayer(self.layer_arc)
@@ -1115,7 +1115,7 @@ class GwMincut:
         self.dlg_connec = GwMincutConnecUi(self)
         self.dlg_connec.setWindowTitle("Connec management")
         tools_gw.load_settings(self.dlg_connec)
-        self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_connec.tbl_om_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
         tools_gw.add_icon(self.dlg_connec.btn_insert, "111")
         tools_gw.add_icon(self.dlg_connec.btn_delete, "112")
@@ -1127,7 +1127,8 @@ class GwMincut:
         self.dlg_connec.btn_snapping.clicked.connect(self._snapping_init_connec)
         self.dlg_connec.btn_accept.clicked.connect(partial(self._accept_connec, self.dlg_connec, "connec"))
         self.dlg_connec.rejected.connect(partial(tools_gw.close_dialog, self.dlg_connec))
-
+        self.dlg_connec.rejected.connect(partial(tools_qgis.disconnect_signal_selection_changed))
+        
         # Enabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(True)
 
@@ -1169,13 +1170,14 @@ class GwMincut:
 
     def _snapping_init_connec(self):
         """ Snap connec """
-        self.feature_type = 'connec'
-        tools_gw.selection_init(self, self.dlg_connec, self.dlg_connec.tbl_mincut_connec, GwSelectionMode.DEFAULT)
+        self.rel_feature_type = 'connec'
+        
+        tools_gw.selection_init(self, self.dlg_connec, 'connec', GwSelectionMode.MINCUT_CONNEC)
 
     def _snapping_selection_hydro(self):
         """ Snap to connec layers to add its hydrometers """
 
-        self.list_ids['connec'] = []
+        self.rel_list_ids['connec'] = []
 
         for layer in self.layers_connec:
             if layer.selectedFeatureCount() > 0:
@@ -1185,19 +1187,19 @@ class GwMincut:
                 for feature in features:
                     connec_id = feature.attribute("connec_id")
                     # Add element
-                    if connec_id in self.list_ids['connec']:
+                    if connec_id in self.rel_list_ids['connec']:
                         msg = "Feature already in the list"
                         tools_qt.show_info_box(msg, parameter=connec_id)
                         return
                     else:
-                        self.list_ids['connec'].append(connec_id)
+                        self.rel_list_ids['connec'].append(connec_id)
 
         # Set 'expr_filter' with features that are in the list
         expr_filter = "\"connec_id\" IN ("
-        for i in range(len(self.list_ids['connec'])):
-            expr_filter += f"'{self.list_ids['connec'][i]}', "
+        for i in range(len(self.rel_list_ids['connec'])):
+            expr_filter += f"'{self.rel_list_ids['connec'][i]}', "
         expr_filter = expr_filter[:-2] + ")"
-        if len(self.list_ids['connec']) == 0:
+        if len(self.rel_list_ids['connec']) == 0:
             expr_filter = "\"connec_id\" =''"
         # Check expression
         (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
@@ -1209,7 +1211,7 @@ class GwMincut:
     def _snapping_selection_connec(self):
         """ Snap to connec layers """
 
-        self.list_ids['connec'] = []
+        self.rel_list_ids['connec'] = []
 
         for layer in self.layers_connec:
             if layer.selectedFeatureCount() > 0:
@@ -1219,17 +1221,17 @@ class GwMincut:
                 for feature in features:
                     connec_id = feature.attribute("connec_id")
                     # Add element
-                    if connec_id not in self.list_ids['connec']:
-                        self.list_ids['connec'].append(connec_id)
+                    if connec_id not in self.rel_list_ids['connec']:
+                        self.rel_list_ids['connec'].append(connec_id)
 
         expr_filter = None
-        if len(self.list_ids['connec']) > 0:
+        if len(self.rel_list_ids['connec']) > 0:
             # Set 'expr_filter' with features that are in the list
             expr_filter = "\"connec_id\" IN ("
-            for i in range(len(self.list_ids['connec'])):
-                expr_filter += f"'{self.list_ids['connec'][i]}', "
+            for i in range(len(self.rel_list_ids['connec'])):
+                expr_filter += f"'{self.rel_list_ids['connec'][i]}', "
             expr_filter = expr_filter[:-2] + ")"
-            if len(self.list_ids['connec']) == 0:
+            if len(self.rel_list_ids['connec']) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
             (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
@@ -1244,7 +1246,7 @@ class GwMincut:
         self.mincut_class = 3
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
-        self.list_ids['connec'] = []
+        self.rel_list_ids['connec'] = []
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Get hydrometer filter columns
@@ -1392,8 +1394,8 @@ class GwMincut:
                 for feature in features:
                     connec_id = feature.attribute("connec_id")
                     # Check if 'connec_id' is already in 'connec_list'
-                    if connec_id not in self.list_ids['connec']:
-                        self.list_ids['connec'].append(connec_id)
+                    if connec_id not in self.rel_list_ids['connec']:
+                        self.rel_list_ids['connec'].append(connec_id)
 
     def _select_features_connec(self):
         """ Select features of 'connec' of selected mincut """
@@ -1407,14 +1409,14 @@ class GwMincut:
         expr_filter = "\"connec_id\" IN ("
         if rows:
             for row in rows:
-                if row[0] not in self.list_ids['connec'] and row[0] not in self.deleted_list:
-                    self.list_ids['connec'].append(row[0])
+                if row[0] not in self.rel_list_ids['connec'] and row[0] not in self.deleted_list:
+                    self.rel_list_ids['connec'].append(row[0])
 
-        if self.list_ids['connec']:
-            for connec_id in self.list_ids['connec']:
+        if self.rel_list_ids['connec']:
+            for connec_id in self.rel_list_ids['connec']:
                 expr_filter += f"'{connec_id}', "
             expr_filter = expr_filter[:-2] + ")"
-            if len(self.list_ids['connec']) == 0:
+            if len(self.rel_list_ids['connec']) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
             (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
@@ -1429,7 +1431,7 @@ class GwMincut:
 
     def _select_features_hydro(self):
 
-        self.list_ids['connec'] = []
+        self.rel_list_ids['connec'] = []
 
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = tools_qt.get_text(self.dlg_hydro, self.result_mincut_id)
@@ -1443,7 +1445,7 @@ class GwMincut:
             for row in rows:
                 expr_filter += f"'{row[0]}', "
             expr_filter = expr_filter[:-2] + ")"
-            if len(self.list_ids['connec']) == 0:
+            if len(self.rel_list_ids['connec']) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
             (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
@@ -1503,27 +1505,27 @@ class GwMincut:
                 for feature in features:
                     # Append 'connec_id' into 'connec_list'
                     selected_id = feature.attribute("connec_id")
-                    if selected_id not in self.list_ids['connec']:
-                        self.list_ids['connec'].append(selected_id)
+                    if selected_id not in self.rel_list_ids['connec']:
+                        self.rel_list_ids['connec'].append(selected_id)
 
         # Show message if element is already in the list
-        if connec_id in self.list_ids['connec']:
+        if connec_id in self.rel_list_ids['connec']:
             msg = "Selected element already in the list"
             tools_qt.show_info_box(msg, parameter=connec_id)
             return
 
         # If feature id doesn't exist in list -> add
-        self.list_ids['connec'].append(connec_id)
+        self.rel_list_ids['connec'].append(connec_id)
 
         expr_filter = None
-        if len(self.list_ids['connec']) > 0:
+        if len(self.rel_list_ids['connec']) > 0:
 
             # Set expression filter with 'connec_list'
             expr_filter = "\"connec_id\" IN ("
-            for i in range(len(self.list_ids['connec'])):
-                expr_filter += f"'{self.list_ids['connec'][i]}', "
+            for i in range(len(self.rel_list_ids['connec'])):
+                expr_filter += f"'{self.rel_list_ids['connec'][i]}', "
             expr_filter = expr_filter[:-2] + ")"
-            if len(self.list_ids['connec']) == 0:
+            if len(self.rel_list_ids['connec']) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
             (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
@@ -1557,9 +1559,8 @@ class GwMincut:
 
     def _reload_table_connec(self, expr_filter=None):
         """ Reload contents of table 'connec' with selected @expr_filter """
-
-        expr = tools_qt.set_table_model(self.dlg_connec, 'tbl_mincut_connec', "connec", expr_filter)
-        tools_gw.set_tablemodel_config(self.dlg_connec, 'tbl_mincut_connec', 've_connec')
+        expr = tools_qt.set_table_model(self.dlg_connec, 'tbl_om_mincut_connec', "connec", expr_filter)
+        tools_gw.set_tablemodel_config(self.dlg_connec, 'tbl_om_mincut_connec', 've_connec')
         return expr
 
     def _reload_table_hydro(self, expr_filter=None):
@@ -1576,7 +1577,7 @@ class GwMincut:
         tools_gw.disconnect_signal('mincut_selection_changed')
 
         # Get selected rows
-        widget = self.dlg_connec.tbl_mincut_connec
+        widget = self.dlg_connec.tbl_om_mincut_connec
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -1601,15 +1602,15 @@ class GwMincut:
             return
 
         for el in del_id:
-            self.list_ids['connec'].remove(el)
+            self.rel_list_ids['connec'].remove(el)
 
         # Select features which are in the list
         expr_filter = "\"connec_id\" IN ("
-        for i in range(len(self.list_ids['connec'])):
-            expr_filter += f"'{self.list_ids['connec'][i]}', "
+        for i in range(len(self.rel_list_ids['connec'])):
+            expr_filter += f"'{self.rel_list_ids['connec'][i]}', "
         expr_filter = expr_filter[:-2] + ")"
 
-        if len(self.list_ids['connec']) == 0:
+        if len(self.rel_list_ids['connec']) == 0:
             expr_filter = "connec_id=''"
 
         # Update model of the widget with selected expr_filter
@@ -1680,7 +1681,7 @@ class GwMincut:
 
         sql = (f"DELETE FROM om_mincut_{element}"
                f" WHERE result_id = {result_mincut_id};\n")
-        for element_id in self.list_ids['connec']:
+        for element_id in self.rel_list_ids['connec']:
             sql += (f"INSERT INTO om_mincut_{element}"
                     f" (result_id, {element}_id) "
                     f" VALUES ('{result_mincut_id}', '{element_id}');\n")

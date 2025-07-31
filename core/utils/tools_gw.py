@@ -3077,7 +3077,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
 
 def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None,
-                             expr_filter=None):
+                             expr_filter=None, table_separator="_x_"):
     """ Get records of @feature_type associated to selected @table_object """
 
     if feature_id is None:
@@ -3086,7 +3086,7 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
     if feature_idname is None:
         feature_idname = f"{table_object}_id"
 
-    table_relation = table_object + "_x_" + feature_type
+    table_relation = table_object + table_separator + feature_type
     widget_name = "tbl_" + table_relation
 
     exists = tools_db.check_table(table_relation)
@@ -3426,6 +3426,8 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
 
     if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
         expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+        expected_table_name = f"tbl_{table_object}_{class_object.rel_feature_type}"
     else:
         expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
 
@@ -3494,6 +3496,9 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     elif selection_mode == GwSelectionMode.VISIT:
         _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
         load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+        get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
+        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3698,6 +3703,9 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
     elif selection_mode == GwSelectionMode.VISIT:
         _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
         load_tableview_visit(dialog, class_object.visit_id.text(), feature_type)
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+        get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
+        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
         get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
