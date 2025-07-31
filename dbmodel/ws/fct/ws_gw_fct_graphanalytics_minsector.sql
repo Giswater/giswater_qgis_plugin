@@ -667,7 +667,6 @@ BEGIN
                 RETURN v_response;
             END IF;
 
-
             -- insert the mincut_minsector_id
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
             SELECT v_record_minsector.minsector_id, n.pgr_node_id
@@ -676,12 +675,13 @@ BEGIN
             AND n.mapzone_id <> 0;
         END LOOP;
 
+        IF v_commitchanges THEN
+            DELETE FROM minsector_mincut;
 
-        DELETE FROM minsector_mincut;
-
-        INSERT INTO minsector_mincut (minsector_id, mincut_minsector_id)
-        SELECT minsector_id, mincut_minsector_id
-        FROM temp_pgr_minsector_mincut;
+            INSERT INTO minsector_mincut (minsector_id, mincut_minsector_id)
+            SELECT minsector_id, mincut_minsector_id
+            FROM temp_pgr_minsector_mincut;
+        END IF;
 
     END IF;
 
