@@ -1,28 +1,19 @@
-/*
-This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU
-General Public License as published by the Free Software Foundation, either version 3 of the License,
-or (at your option) any later version.
-*/
-
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,dv_parent_id,dv_querytext_filterc,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder) VALUES
-	 ('incident_link','form_visit','tab_data','startdate','lyt_data_1',NULL,'date','datetime','Date:',NULL,NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,4),
-	 ('incident_link','form_visit','tab_data','class_id','lyt_data_1',NULL,'integer','combo','Visit class:',NULL,NULL,false,false,true,NULL,NULL,'SELECT id, idval FROM config_visit_class WHERE feature_type=''LINK'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',NULL,NULL,NULL,NULL,NULL,NULL,'{"functionName": "get_visit"}',NULL,false,1),
-	 ('incident_link','form_visit','tab_data','visit_id','lyt_data_1',NULL,'double','text','Visit id:',NULL,NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,2),
-	 ('incident_link','form_visit','tab_data','status','lyt_data_1',NULL,'integer','combo','Status:',NULL,NULL,false,false,true,NULL,NULL,'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,7),
-	 ('incident_link','form_visit','tab_data','incident_comment','lyt_data_1',NULL,'string','text','Comment:',NULL,NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,6),
-	 ('incident_link','form_visit','tab_data','incident_type','lyt_data_1',NULL,'integer','combo','Incident type:',NULL,NULL,false,false,true,NULL,NULL,'SELECT id, idval FROM om_typevalue WHERE typevalue = ''incident_type''',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,5),
-	 ('incident_link','form_visit','tab_data','link_id','lyt_data_1',NULL,'double','text','Link id:',NULL,NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,3),
-	 ('incident_link','form_visit','tab_data','acceptbutton','lyt_data_2',NULL,NULL,'button','',NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false, "text":"Accept"}','{
+	 ('incident_link','form_visit','tab_data','startdate','lyt_data_1',NULL,'date','datetime','Date:','Date:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,4),
+	 ('incident_link','form_visit','tab_data','link_id','lyt_data_1',NULL,'double','text','Link id:','Link id:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,3),
+	 ('incident_link','form_visit','tab_data','incident_type','lyt_data_1',NULL,'integer','combo','Incident type:','Incident type:',NULL,false,false,true,NULL,NULL,'SELECT id, idval FROM om_typevalue WHERE typevalue = ''incident_type''',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,5),
+	 ('incident_link','form_visit','tab_data','incident_comment','lyt_data_1',NULL,'string','text','Comment:','Comment:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,6),
+	 ('incident_link','form_visit','tab_data','status','lyt_data_1',NULL,'integer','combo','Status:','Status:',NULL,false,false,true,NULL,NULL,'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,7),
+	 ('incident_link','form_visit','tab_data','visit_id','lyt_data_1',NULL,'double','text','Visit id:','Visit id:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,2),
+	 ('incident_link','form_visit','tab_data','class_id','lyt_data_1',NULL,'integer','combo','Visit class:','Visit class:',NULL,false,false,true,NULL,NULL,'SELECT id, idval FROM config_visit_class WHERE feature_type=''LINK'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',NULL,NULL,NULL,NULL,NULL,NULL,'{"functionName": "get_visit"}',NULL,false,1),
+	 ('incident_link','form_visit','tab_data','acceptbutton','lyt_data_2',NULL,NULL,'button',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "text": "Accept"}','{
   "functionName": "set_visit"
 }',NULL,false,1),
-	 ('incident_link','form_visit','tab_file','addfile','lyt_files_1',NULL,NULL,'fileselector','',NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false, "text":"Add File"}','{
+	 ('incident_link','form_visit','tab_file','tbl_files','lyt_files_1',NULL,NULL,'tableview',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}',NULL,'om_visit_event_photo',false,2),
+	 ('incident_link','form_visit','tab_file','addfile','lyt_files_1',NULL,NULL,'fileselector',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "text": "Add File"}','{
   "functionName": "add_file"
 }',NULL,false,1),
-	 ('incident_link','form_visit','tab_file','tbl_files','lyt_files_1',NULL,NULL,'tableview','',NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}',NULL,'om_visit_event_photo',false,2),
-	 ('incident_link','form_visit','tab_file','backbutton','lyt_files_2',NULL,NULL,'button','',NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false, "text":"Back"}','{
+	 ('incident_link','form_visit','tab_file','backbutton','lyt_files_2',NULL,NULL,'button',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "text": "Back"}','{
   "functionName": "set_previous_form_back"
 }',NULL,false,1),
 	 ('ve_link','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID','sector_id  - Sector identifier.',NULL,false,false,false,false,NULL,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
@@ -144,7 +135,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
     "columnfind": "element_id"
   }
 }','tbl_element_x_link',false,1),
-	 ('ve_link','form_feature','tab_none','n_hydrometer','lyt_data_1',1,'integer','text','n_hydrometer','n_hydrometer',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
+	 ('ve_link','form_feature','tab_none','n_hydrometer',NULL,1,'integer','text','n_hydrometer','n_hydrometer',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_conduitlink','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID','sector_id  - Sector identifier.',NULL,false,false,false,false,NULL,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
 	 ('ve_link_conduitlink','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State:',NULL,false,false,true,false,NULL,'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,NULL),
 	 ('ve_link_conduitlink','form_feature','tab_data','state_type','lyt_bot_1',3,'integer','combo','State type','state_type - The state type of the element. It allows to obtain more detail of the state. To select from those available depending on the chosen state',NULL,false,false,true,false,NULL,'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL',true,false,'state',' AND value_state_type.state',NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,NULL),
@@ -179,7 +170,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_link_conduitlink','form_feature','tab_data','top_elev2','lyt_data_2',13,'integer','text','Top elev 2','top_elev2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_conduitlink','form_feature','tab_data','depth2','lyt_data_2',14,'integer','text','Depth2','depth2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_conduitlink','form_feature','tab_data','elevation2','lyt_data_2',15,'integer','text','Elevation2','elevation2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
-	 ('ve_link_conduitlink','form_feature','tab_data','dqa_id','lyt_data_2',16,'integer','text','Dqa','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,true,NULL),
+	 ('ve_link_conduitlink','form_feature','tab_data','dqa_id','lyt_data_2',16,'integer','text','dqa_id','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,true,NULL),
 	 ('ve_link_conduitlink','form_feature','tab_data','expl_id','lyt_data_2',17,'integer','combo','Explotation ID','expl_id - Exploitation to which the element belongs. If the configuration is not changed, the program automatically selects it based on the geometry',NULL,false,false,false,false,NULL,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:green; font-weight:bold;"}','{
   "setMultiline": false,
   "labelPosition": "top",
@@ -304,7 +295,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_link_link','form_feature','tab_data','y2','lyt_data_1',29,'integer','text','Y2','y2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_link','form_feature','tab_data','elevation2','lyt_data_1',30,'integer','text','Elevation2','elevation2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_link','form_feature','tab_data','macrosector_id','lyt_data_1',31,'integer','text','Macrosector id','Macrosector id','Ex.macrosector_id',false,false,false,false,NULL,NULL,true,false,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,NULL),
-	 ('ve_link_link','form_feature','tab_data','dqa_id','lyt_data_2',1,'integer','text','Dqa','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,NULL),
+	 ('ve_link_link','form_feature','tab_data','dqa_id','lyt_data_2',1,'integer','text','dqa_id','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,NULL),
 	 ('ve_link_link','form_feature','tab_data','expl_id','lyt_data_2',2,'integer','combo','Explotation ID','expl_id - Exploitation to which the element belongs. If the configuration is not changed, the program automatically selects it based on the geometry',NULL,false,false,false,false,NULL,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:green; font-weight:bold;"}','{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
 	 ('ve_link_link','form_feature','tab_documents','date_from','lyt_document_1',1,'date','datetime','Date from:','Date from:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":">="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,1),
 	 ('ve_link_link','form_feature','tab_documents','date_to','lyt_document_1',2,'date','datetime','Date to:','Date to:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":"<="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,2),
@@ -383,7 +374,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
     "columnfind": "element_id"
   }
 }','tbl_element_x_link',false,1),
-	 ('ve_link_link','form_feature','tab_none','n_hydrometer','lyt_data_1',1,'integer','text','n_hydrometer','n_hydrometer',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
+	 ('ve_link_link','form_feature','tab_none','n_hydrometer',NULL,1,'integer','text','n_hydrometer','n_hydrometer',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID','sector_id  - Sector identifier.',NULL,false,false,false,false,NULL,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State:',NULL,false,false,true,false,NULL,'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','state_type','lyt_bot_1',3,'integer','combo','State type','state_type - The state type of the element. It allows to obtain more detail of the state. To select from those available depending on the chosen state',NULL,false,false,true,false,NULL,'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL',true,false,'state',' AND value_state_type.state',NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,NULL),
@@ -418,7 +409,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_link_vlink','form_feature','tab_data','top_elev2','lyt_data_2',13,'integer','text','Top elev 2','top_elev2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','depth2','lyt_data_2',14,'integer','text','Depth2','depth2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','elevation2','lyt_data_2',15,'integer','text','Elevation2','elevation2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
-	 ('ve_link_vlink','form_feature','tab_data','dqa_id','lyt_data_2',16,'integer','text','Dqa','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,true,NULL),
+	 ('ve_link_vlink','form_feature','tab_data','dqa_id','lyt_data_2',16,'integer','text','dqa_id','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,true,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','expl_id','lyt_data_2',17,'integer','combo','Explotation ID','expl_id - Exploitation to which the element belongs. If the configuration is not changed, the program automatically selects it based on the geometry',NULL,false,false,false,false,NULL,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:green; font-weight:bold;"}','{
   "setMultiline": false,
   "labelPosition": "top",

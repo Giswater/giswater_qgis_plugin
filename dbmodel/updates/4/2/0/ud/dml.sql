@@ -661,3 +661,53 @@ UPDATE sys_param_user SET formname = 'hidden' WHERE id = 'inp_options_networkmod
 UPDATE config_form_fields SET columnname='gully_method' WHERE formname='ve_epa_pgully' AND formtype='form_feature' AND columnname='method' AND tabname='tab_epa';
 UPDATE config_form_fields SET columnname='gully_method' WHERE formname='ve_epa_gully' AND formtype='form_feature' AND columnname='method' AND tabname='tab_epa';
 UPDATE config_form_fields SET columnname='gully_method' WHERE formname='ve_epa_netgully' AND formtype='form_feature' AND columnname='method' AND tabname='tab_epa';
+
+-- Tabactions
+UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionDemand","actionTooltip": "DWF","disabled": false}]'::json WHERE formname='ve_epa_inlet' AND tabname='tab_epa';
+UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionDemand","actionTooltip": "DWF","disabled": false}]'::json WHERE formname='ve_epa_pgully' AND tabname='tab_epa';
+UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionDemand","actionTooltip": "DWF","disabled": false}]'::json WHERE formname='ve_epa_junction' AND tabname='tab_epa';
+UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false}]'::json WHERE formname='ve_epa_storage' AND tabname='tab_epa';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_epa';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_documents';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_features';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_data';
+
+-- Correct expl_id 
+UPDATE config_form_fields
+	SET widgetcontrols='{"setMultiline": false}'::json
+	WHERE formname='ve_genelem_ehydrant_plate' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE .¡config_form_fields
+	SET widgetcontrols='{"setMultiline": false}'::json
+	WHERE formname='ve_genelem_emanhole' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET widgetcontrols='{"setMultiline": false}'::json
+	WHERE formname='ve_genelem_eprotect_band' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET widgetcontrols='{"setMultiline": false}'::json
+	WHERE formname='ve_genelem_eregister' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET widgetcontrols='{"setMultiline": false}'::json
+	WHERE formname='ve_frelem_evalve' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET widgetcontrols='{"setMultiline": false}'::json
+	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET widgetcontrols='{"setMultiline": false}'::json
+	WHERE formname='ve_genelem_ecover' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET widgetcontrols='{"setMultiline": false}'::json
+	WHERE formname='ve_genelem_estep' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+
+-- Order epump
+UPDATE config_form_fields
+	SET layoutorder=4,layoutname='lyt_data_2'
+	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=2,layoutname='lyt_data_2'
+	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='flwreg_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=3,layoutname='lyt_data_2'
+	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';

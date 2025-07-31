@@ -32,3 +32,7 @@ ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_drainzone_id_fkey;
 ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_drainzone_id_fkey;
 ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_drainzone_id_fkey;
 ALTER TABLE node DROP CONSTRAINT IF EXISTS node_drainzone_id_fkey;
+
+-- 30/07/2025
+ALTER TABLE element DROP CONSTRAINT IF EXISTS element_epa_type_check;
+ALTER TABLE "element" ADD CONSTRAINT element_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['FRPUMP'::text, 'FRVALVE'::text, 'UNDEFINED'::text])))

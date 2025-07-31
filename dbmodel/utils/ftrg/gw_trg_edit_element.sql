@@ -276,27 +276,22 @@ BEGIN
 			END IF;
 		END IF;
 
-		v_epa_type := NEW.epa_type;
-		IF lower(v_epa_type) = 'undefined' THEN
-		    v_epa_type := NULL;
-		END IF;
-
 		INSERT INTO "element" (element_id, code, sys_code, elementcat_id, serial_number, num_elements, state, state_type, observ, "comment", function_type, category_type,
 		location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified, label_x, label_y, label_rotation,
 		publish, inventory, expl_id, feature_type, top_elev, expl_visibility, trace_featuregeom, muni_id, sector_id, brand_id, model_id, /*asset_id,*/ datasource,
-		lock_level, the_geom, created_at, created_by, updated_at, updated_by, epa_type, omzone_id)
+		lock_level, the_geom, created_at, created_by, updated_at, updated_by, omzone_id)
 		VALUES(NEW.element_id, NEW.code, NEW.sys_code, NEW.elementcat_id, NEW.serial_number, NEW.num_elements, NEW.state, NEW.state_type, NEW.observ, NEW."comment", NEW.function_type, NEW.category_type,
 		NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.label_x, NEW.label_y, NEW.label_rotation,
 		NEW.publish, NEW.inventory, NEW.expl_id, upper(v_feature_type), NEW.top_elev, NEW.expl_visibility, NEW.trace_featuregeom, NEW.muni_id, NEW.sector_id, NEW.brand_id, NEW.model_id, /*NEW.asset_id,*/ NEW.datasource,
-		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by, NEW.epa_type, NEW.omzone_id);
+		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by, NEW.omzone_id);
 
 		-- MAN TABLE INSERT
 		IF v_man_table='man_frelem' THEN
-			INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length)
-			VALUES(NEW.element_id, NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length);
+			INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length, epa_type)
+			VALUES(NEW.element_id, NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length, NEW.epa_type);
 		ELSIF v_man_table='man_genelem' THEN
-			INSERT INTO man_genelem (element_id)
-			VALUES(NEW.element_id);
+			INSERT INTO man_genelem (element_id, epa_type)
+			VALUES(NEW.element_id, 'UNDEFINED');
 		END IF;
 
 		-- EPA INSERT
