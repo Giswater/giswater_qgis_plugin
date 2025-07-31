@@ -161,7 +161,7 @@ BEGIN
 	FROM inp_outfall WHERE temp_t_node.node_id=inp_outfall.node_id::text;
 
 	-- update child param for outfall from node sink
-	UPDATE temp_t_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction ON a.node_id = inp_junction.node_id
+	UPDATE temp_t_node SET epa_type='OUTFALL' FROM t_anl_node a JOIN inp_junction ON a.node_id = inp_junction.node_id::text
 	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user
 	AND temp_t_node.node_id=a.node_id::text;
 
