@@ -862,10 +862,10 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('ve_genelem_eregister','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID','Sector ID',false,false,true,false,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false,'{"label":"color:blue; font-weight:bold;"}'::json,'{"setMultiline": false, "labelPosition": "top"}'::json,false) ON CONFLICT DO NOTHING;
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,dv_querytext,dv_orderby_id,dv_isnullvalue,hidden)
 	VALUES ('ve_genelem_eregister','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality id:','muni_id - Identifier of the municipality',false,false,true,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,false) ON CONFLICT DO NOTHING;
-	
-	
-	
-	
+
+
+
+
 -- ECOVER documents
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
 	VALUES ('ve_genelem_ecover','form_feature','tab_documents','date_from','lyt_document_1',1,'date','datetime','Date from:','Date from:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":">="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "date"}}'::json,'tbl_doc_x_element',false,1) ON CONFLICT DO NOTHING;
@@ -1176,7 +1176,7 @@ UPDATE config_form_fields
 	SET widgetcontrols='{"saveValue": false,"setMultiline": false, "labelPosition": "top"}'::json
 	WHERE formname='ve_genelem_estep' AND formtype='form_feature' AND columnname='element_id' AND tabname='tab_data';
 
--- Correct expl_id 
+-- Correct expl_id
 UPDATE config_form_fields
 	SET widgetcontrols='{"setMultiline": false}'::json
 	WHERE formname='ve_genelem_ehydrant_plate' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
@@ -1312,3 +1312,54 @@ VALUES('inp_options_selecteddma', 'epaoptions', 'Wich DMA will be exportad if ne
 
 INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('inp_options_selecteddma', '3', 'postgres') ON CONFLICT DO NOTHING;
 
+-- 01/08/2025
+UPDATE config_toolbox SET inputparams = '[
+  {
+    "label": "Exploitation:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "expl",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT expl_id as id, name as idval FROM ve_exploitation",
+    "layoutorder": 1
+  },
+  {
+    "label": "Material:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "material",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT id, descript as idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL",
+    "layoutorder": 2
+  },
+  {
+    "label": "Price:",
+    "value": null,
+    "tooltip": "Code of removal material price",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "price",
+    "widgettype": "linetext",
+    "isMandatory": true,
+    "layoutorder": 3,
+    "placeholder": ""
+  },
+  {
+    "label": "Observ:",
+    "value": null,
+    "tooltip": "Descriptive text for removal (it apears on psector_x_other observ)",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "observ",
+    "widgettype": "linetext",
+    "isMandatory": true,
+    "layoutorder": 4,
+    "placeholder": ""
+  }
+]'::json WHERE id = 3322;

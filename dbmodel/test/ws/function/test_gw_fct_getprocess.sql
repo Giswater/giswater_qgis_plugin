@@ -11,8 +11,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 6 test
-SELECT plan(6);
+-- Plan for 7 test
+SELECT plan(7);
 
 -- Create roles for testing
 CREATE USER plan_user;
@@ -75,6 +75,14 @@ SELECT is (
     "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":"3110"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getprocess --> "functionId":"3110" returns status "Accepted"'
+);
+
+-- Set cost for removed material on psectors
+SELECT is (
+    (gw_fct_getprocess($${"client":{"device":4, "lang":"es_ES", "version":"4.2.0", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":"3322"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getprocess --> "functionId":"3322" returns status "Accepted"'
 );
 
 
