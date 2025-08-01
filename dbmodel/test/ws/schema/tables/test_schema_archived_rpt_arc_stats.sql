@@ -31,7 +31,7 @@ SELECT columns_are(
 SELECT col_is_pk('archived_rpt_arc_stats', ARRAY['arc_id', 'result_id'], 'Columns arc_id, result_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('archived_rpt_arc_stats', 'arc_id', 'integer', 'Column arc_id should be integer');
+SELECT col_type_is('archived_rpt_arc_stats', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
 SELECT col_type_is('archived_rpt_arc_stats', 'result_id', 'character varying(30)', 'Column result_id should be varchar(30)');
 SELECT col_type_is('archived_rpt_arc_stats', 'arc_type', 'character varying(30)', 'Column arc_type should be varchar(30)');
 SELECT col_type_is('archived_rpt_arc_stats', 'sector_id', 'integer', 'Column sector_id should be integer');

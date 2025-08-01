@@ -32,7 +32,7 @@ SELECT col_is_pk('archived_rpt_arc', 'id', 'Column id should be primary key');
 -- Check column types
 SELECT col_type_is('archived_rpt_arc', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('archived_rpt_arc', 'result_id', 'character varying(30)', 'Column result_id should be varchar(30)');
-SELECT col_type_is('archived_rpt_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
+SELECT col_type_is('archived_rpt_arc', 'arc_id', 'character varying(16)', 'Column arc_id should be character varying(16)');
 SELECT col_type_is('archived_rpt_arc', 'length', 'numeric', 'Column length should be numeric');
 SELECT col_type_is('archived_rpt_arc', 'diameter', 'numeric', 'Column diameter should be numeric');
 SELECT col_type_is('archived_rpt_arc', 'flow', 'numeric', 'Column flow should be numeric');

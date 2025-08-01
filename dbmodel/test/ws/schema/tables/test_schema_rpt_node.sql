@@ -31,7 +31,7 @@ SELECT col_is_pk('rpt_node', ARRAY['id'], 'Column id should be primary key');
 -- Check column types
 SELECT col_type_is('rpt_node', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('rpt_node', 'result_id', 'character varying(30)', 'Column result_id should be character varying(30)');
-SELECT col_type_is('rpt_node', 'node_id', 'integer', 'Column node_id should be integer');
+SELECT col_type_is('rpt_node', 'node_id', 'character varying(16)', 'Column node_id should be character varying(16)');
 SELECT col_type_is('rpt_node', 'top_elev', 'numeric', 'Column top_elev should be numeric');
 SELECT col_type_is('rpt_node', 'demand', 'numeric', 'Column demand should be numeric');
 SELECT col_type_is('rpt_node', 'head', 'numeric', 'Column head should be numeric');
