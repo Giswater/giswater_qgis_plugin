@@ -2266,7 +2266,7 @@ AS SELECT inp_junction.node_id,
     v_rpt_node_stats.quality_min AS qualmin,
     v_rpt_node_stats.quality_avg AS qualavg
    FROM inp_junction
-     LEFT JOIN v_rpt_node_stats USING (node_id);
+     LEFT JOIN v_rpt_node_stats ON inp_junction.node_id::text = v_rpt_node_stats.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_tank
 AS SELECT inp_tank.node_id,
@@ -2298,7 +2298,7 @@ AS SELECT inp_tank.node_id,
     v_rpt_node_stats.quality_min AS qualmin,
     v_rpt_node_stats.quality_avg AS qualavg
    FROM inp_tank
-     LEFT JOIN v_rpt_node_stats USING (node_id);
+     LEFT JOIN v_rpt_node_stats ON inp_tank.node_id::text = v_rpt_node_stats.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_reservoir
 AS SELECT inp_reservoir.node_id,
@@ -2322,7 +2322,7 @@ AS SELECT inp_reservoir.node_id,
     v_rpt_node_stats.quality_min AS qualmin,
     v_rpt_node_stats.quality_avg AS qualavg
    FROM inp_reservoir
-     LEFT JOIN v_rpt_node_stats USING (node_id);
+     LEFT JOIN v_rpt_node_stats ON inp_reservoir.node_id::text = v_rpt_node_stats.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_connec
 AS SELECT inp_connec.connec_id,
@@ -2353,7 +2353,7 @@ AS SELECT inp_connec.connec_id,
     v_rpt_node_stats.quality_min AS qualmin,
     v_rpt_node_stats.quality_avg AS qualavg
    FROM inp_connec
-     LEFT JOIN v_rpt_node_stats ON inp_connec.connec_id = v_rpt_node_stats.node_id;
+     LEFT JOIN v_rpt_node_stats ON inp_connec.connec_id::text = v_rpt_node_stats.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_inlet
 AS SELECT inp_inlet.node_id,
@@ -2390,7 +2390,7 @@ AS SELECT inp_inlet.node_id,
     v_rpt_node_stats.quality_min AS qualmin,
     v_rpt_node_stats.quality_avg AS qualavg
    FROM inp_inlet
-     LEFT JOIN v_rpt_node_stats USING (node_id);
+     LEFT JOIN v_rpt_node_stats ON inp_inlet.node_id::text = v_rpt_node_stats.node_id;
 
 CREATE OR REPLACE VIEW ve_epa_pump
 AS SELECT inp_pump.node_id,
@@ -2692,7 +2692,7 @@ CREATE OR REPLACE VIEW ve_epa_virtualvalve AS
     v_rpt_arc_stats.ffactor_max,
     v_rpt_arc_stats.ffactor_min
     FROM inp_virtualvalve
-    LEFT JOIN v_rpt_arc_stats USING (arc_id);
+    LEFT JOIN v_rpt_arc_stats ON inp_virtualvalve.arc_id::text = v_rpt_arc_stats.arc_id;
 
 CREATE OR REPLACE VIEW ve_epa_virtualpump
 AS SELECT p.arc_id,
@@ -2721,7 +2721,7 @@ AS SELECT p.arc_id,
     v_rpt_arc_stats.ffactor_max,
     v_rpt_arc_stats.ffactor_min
    FROM inp_virtualpump p
-     LEFT JOIN v_rpt_arc_stats USING (arc_id);
+     LEFT JOIN v_rpt_arc_stats ON p.arc_id::text = v_rpt_arc_stats.arc_id;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_pipe
 AS SELECT d.dscenario_id,

@@ -41,7 +41,7 @@ BEGIN
 						JOIN cat_element ON element.elementcat_id = cat_element.id
 						JOIN cat_feature_element ON cat_element.element_type = cat_feature_element.id
 						JOIN cat_feature ON cat_feature_element.id = cat_feature.id
-					WHERE element_id IN (SELECT element_id FROM element_x_node WHERE node_id = NEW.node_id) AND cat_feature.feature_class = 'FRELEM' AND cat_feature.id != 'EPUMP' LIMIT 1
+					WHERE element_id IN (SELECT element_id FROM element_x_node WHERE node_id = NEW.node_id) AND cat_feature.feature_class = 'FRELEM' AND element.epa_type != 'FRPUMP' LIMIT 1
 				) THEN
 					-- ANOTHER FRELEM IS LINKED TO THE NODE
 					SELECT node_id INTO old_node FROM element_x_node WHERE element_id =  NEW.element_id;

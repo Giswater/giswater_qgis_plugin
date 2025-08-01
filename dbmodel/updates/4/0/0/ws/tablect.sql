@@ -486,14 +486,6 @@ CREATE RULE insert_plan_psector_x_node AS
 
 ALTER TABLE polygon ALTER COLUMN feature_id TYPE int4 USING feature_id::int4;
 ALTER TABLE minsector_graph ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE rpt_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE rpt_node_stats ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE archived_rpt_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE archived_rpt_node_stats ALTER COLUMN node_id TYPE int4 USING node_id::int4;
-ALTER TABLE rpt_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-ALTER TABLE rpt_arc_stats ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-ALTER TABLE archived_rpt_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
-ALTER TABLE archived_rpt_arc_stats ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE plan_netscenario_node ALTER COLUMN node_id TYPE int4 USING node_id::int4;
 ALTER TABLE plan_netscenario_arc ALTER COLUMN arc_id TYPE int4 USING arc_id::int4;
 ALTER TABLE plan_netscenario_connec ALTER COLUMN connec_id TYPE int4 USING connec_id::int4;

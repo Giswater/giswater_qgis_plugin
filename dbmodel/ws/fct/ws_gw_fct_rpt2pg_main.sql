@@ -80,7 +80,7 @@ BEGIN
 
 		-- insert into values in table of stats values to enhance performance for big systems
 		INSERT INTO rpt_arc_stats
-		   SELECT arc.arc_id::int4,
+		   SELECT arc.arc_id,
 		    selector_rpt_main.result_id,
 		    arc.arc_type,
 		    arc.sector_id,
@@ -111,7 +111,7 @@ BEGIN
 		   ORDER BY arc.arc_id;
 
 		INSERT INTO rpt_node_stats
-		SELECT node.node_id::int4,
+		SELECT node.node_id,
 		    selector_rpt_main.result_id,
 		    node.node_type,
 		    node.sector_id,
