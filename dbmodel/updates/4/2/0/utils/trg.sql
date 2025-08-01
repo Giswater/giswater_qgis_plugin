@@ -16,8 +16,3 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_municipality();
 
 CREATE TRIGGER gw_trg_ui_rpt_cat_result INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_rpt_cat_result
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_rpt_cat_result();
-
-DROP TRIGGER IF EXISTS gw_trg_cat_feature_delete ON cat_feature;
-
-CREATE TRIGGER gw_trg_cat_feature_delete BEFORE INSERT OR DELETE OR UPDATE ON 
-cat_feature FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_feature('DELETE');
