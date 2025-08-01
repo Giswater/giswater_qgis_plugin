@@ -5676,6 +5676,8 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
             label.setToolTip(field['tooltip'])
         else:
             label.setToolTip(field['label'].capitalize())
+        if 'widgetcontrols' in field and field['widgetcontrols'] is not None and 'labelSize' in field['widgetcontrols']:
+            label.setFixedWidth(field['widgetcontrols']['labelSize'])
 
     if 'widgettype' in field and not field['widgettype']:
         msg = "The field widgettype is not configured for"
