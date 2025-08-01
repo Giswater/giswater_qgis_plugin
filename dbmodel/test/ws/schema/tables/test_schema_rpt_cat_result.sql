@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'result_id', 'exec_date', 'q_timestep', 'q_tolerance', 'cur_user', 'inp_options',
         'rpt_stats', 'export_options', 'network_stats', 'status', 'iscorporate',
-        'addparam', 'expl_id', 'network_type', 'sector_id', 'descript', 'inp_file'
+        'addparam', 'expl_id', 'network_type', 'sector_id', 'descript', 'inp_file', 'dma_id'
     ],
     'Table rpt_cat_result should have the correct columns'
 );
@@ -48,6 +48,7 @@ SELECT col_type_is('rpt_cat_result', 'network_type', 'text', 'Column network_typ
 SELECT col_type_is('rpt_cat_result', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');
 SELECT col_type_is('rpt_cat_result', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('rpt_cat_result', 'inp_file', 'bytea', 'Column inp_file should be bytea');
+SELECT col_type_is('rpt_cat_result', 'dma_id', 'integer[]', 'Column dma_id should be integer[]');
 
 -- Check default values
 SELECT col_has_default('rpt_cat_result', 'exec_date', 'Column exec_date should have a default value');
