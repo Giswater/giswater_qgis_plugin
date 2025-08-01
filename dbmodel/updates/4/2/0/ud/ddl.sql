@@ -196,3 +196,20 @@ ALTER TABLE macroomzone DROP CONSTRAINT IF EXISTS macroomzone_expl_id_fkey;
 ALTER TABLE macroomzone ALTER COLUMN expl_id TYPE INT4[] USING ARRAY[expl_id];
 
 */
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME", "table":"man_outfall", "column":"discharge_medium", "newName":"outfall_medium", "isUtils":"False"}}$$);
+DELETE FROM sys_foreignkey WHERE typevalue_name='discharge_medium_typevalue';
+UPDATE edit_typevalue SET typevalue='outfall_medium_typevalue' WHERE typevalue='discharge_medium_typevalue';
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'outfall_medium_typevalue', 'man_outfall', 'outfall_medium', NULL, true);
+UPDATE config_form_fields SET "label"='outfall_medium', tooltip='outfall_medium', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''outfall_medium_typevalue''' WHERE formname='ve_node_outfall' AND formtype='form_feature' AND columnname='discharge_medium' AND tabname='tab_data';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_netinit", "column":"source_medium", "dataType":"int4", "isUtils":"False"}}$$);
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('source_medium_typevalue', '0', 'Undefined', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'source_medium_typevalue', 'man_netinit', 'source_medium', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+UPDATE config_form_fields SET layoutname='lyt_data_1', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''source_medium_typevalue''', dv_isnullvalue=TRUE WHERE columnname='source_medium' AND formname ILIKE '%netinit%';
+
+
+
+
+
