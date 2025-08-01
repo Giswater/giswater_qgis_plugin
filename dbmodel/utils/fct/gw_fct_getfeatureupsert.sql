@@ -805,6 +805,13 @@ BEGIN
 	v_node1 = COALESCE (v_node1, '');
 	v_node2 = COALESCE (v_node2, '');
 
+	-- force state vdefault in function of psector mode
+	IF (SELECT value FROM config_param_user WHERE "parameter" = 'plan_psector_mode' and value::integer in (select psector_id from plan_psector)) IS NOT NULL THEN
+			UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault';
+		else
+			UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault';			
+	END IF;
+
 	-- gettingf minvalue & maxvalues for widgetcontrols
 	IF v_project_type = 'UD' AND v_catfeature.feature_type IS NOT NULL THEN
 
