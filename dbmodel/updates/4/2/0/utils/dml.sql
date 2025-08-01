@@ -225,3 +225,8 @@ UPDATE config_toolbox SET functionparams = REPLACE(functionparams::text, 'v_edit
 UPDATE config_toolbox SET inputparams = REPLACE(inputparams::text, 'v_edit_', 've_')::json WHERE inputparams::text ILIKE '%v_edit_%';
 
 UPDATE sys_function SET function_name = 'gw_fct_checktopologypsector' where function_name = 'gw_fct_setplan';
+
+-- 01/08/2025
+UPDATE config_form_fields SET widgetcontrols = jsonb_set(COALESCE(widgetcontrols::jsonb, '{}'::jsonb), '{labelSize}', '58')
+WHERE formtype = 'psector' and columnname IN ('name', 'ext_code', 'status','workcat_id') and tabname='tab_general';
+DELETE FROM config_form_fields WHERE formname='generic' AND formtype='psector' AND columnname='spacer_1' AND tabname='tab_general';
