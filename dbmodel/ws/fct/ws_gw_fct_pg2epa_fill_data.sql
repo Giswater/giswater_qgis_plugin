@@ -26,6 +26,7 @@ v_minlength float;
 v_forcereservoirsoninlets boolean;
 v_forcetanksoninlets boolean;
 v_count integer;
+v_querytext text;
 
 BEGIN
 
@@ -56,18 +57,28 @@ BEGIN
 	raise notice 'Inserting nodes on temp_t_node table';
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	EXECUTE ' INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
+	v_querytext = ' INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
 		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
 		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
 		AND ve_arc.sector_id > 0 AND ve_arc.state > 0'
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
-		n.node_id, top_elev, top_elev-depth as elev, node_type, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
+		n.node_id, top_elev, top_elev-depth as elev, node_type, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, n.dma_id, presszone_id, dqa_id, minsector_id,
 		(case when n.builtdate is not null then (now()::date-n.builtdate)/30 else 0 end)
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
+	
+	IF v_networkmode = 1 THEN
+		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = n.dma_id WHERE dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
+	END IF;
+
+	IF v_networkmode = 5 THEN
+		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = n.dma_id WHERE dma.dma_id = (SELECT value::integer FROM config_param_user WHERE parameter = ''inp_options_selecteddma'' AND cur_user = current_user)';
+	END IF;
+	
+	EXECUTE v_querytext;
 
 	-- create link exit
 	IF v_networkmode in (3,4) THEN
@@ -134,7 +145,7 @@ BEGIN
 
 	raise notice 'inserting arcs on temp_t_arc table';
 
-	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
+	v_querytext = 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
 		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		SELECT DISTINCT ON (arc_id)
 		ve_arc.arc_id, node_1, node_2, ve_arc.arc_type, arccat_id, epa_type, ve_arc.sector_id, ve_arc.state, ve_arc.state_type, ve_arc.annotation,
@@ -142,7 +153,7 @@ BEGIN
 		(CASE WHEN ve_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
 		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from ve_arc (dint)...
 		ve_arc.the_geom,
-		ve_arc.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
+		ve_arc.expl_id, ve_arc.dma_id, presszone_id, dqa_id, minsector_id,
 		(case when ve_arc.builtdate is not null then (now()::date-ve_arc.builtdate)/30 else 0 end)
 		FROM selector_sector, ve_arc
 			LEFT JOIN value_state_type ON id=state_type
@@ -151,14 +162,29 @@ BEGIN
 			LEFT JOIN inp_pipe ON ve_arc.arc_id = inp_pipe.arc_id
 			LEFT JOIN inp_virtualpump ON ve_arc.arc_id = inp_virtualpump.arc_id
 			LEFT JOIN inp_virtualvalve ON ve_arc.arc_id = inp_virtualvalve.arc_id
-			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_material.id
-			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
+			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_material.id';
+
+	IF v_networkmode = 1 OR v_networkmode = 5 THEN
+		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = ve_arc.dma_id';
+	END IF;
+
+	v_querytext = v_querytext || ' WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
 			||v_statetype||' AND ve_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND ''ARC'' = ANY(cat_material.feature_type)
 			AND epa_type != ''UNDEFINED''
 			AND ve_arc.sector_id > 0 AND ve_arc.state > 0
 			AND st_length(ve_arc.the_geom) >= '||v_minlength;
+
+	IF v_networkmode = 1 THEN
+		v_querytext = v_querytext || ' AND dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
+	END IF;
+
+	IF v_networkmode = 5 THEN
+		v_querytext = v_querytext || ' AND dma.dma_id = (SELECT value::integer FROM config_param_user WHERE parameter = ''inp_options_selecteddma'' AND cur_user = current_user)';
+	END IF;
+
+	EXECUTE v_querytext;
 
 	IF v_networkmode =  4 THEN
 

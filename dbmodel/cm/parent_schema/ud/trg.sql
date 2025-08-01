@@ -26,12 +26,14 @@ DECLARE
     v_rec record;
     v_view_name text;
     v_trigger_name text;
+    v_feature_id text;
     v_feature_type text;
 BEGIN
     FOR v_rec IN
-        SELECT id FROM PARENT_SCHEMA.cat_feature WHERE feature_type = 'GULLY'
+        SELECT id, feature_type FROM PARENT_SCHEMA.cat_feature WHERE feature_type = 'GULLY'
     LOOP
-        v_feature_type := lower(v_rec.id);
+        v_feature_id := lower(v_rec.id);
+        v_feature_type := lower(v_rec.feature_type);
         -- Construct the view name exactly as in ddl.sql
         v_view_name := 've_' || 'PARENT_SCHEMA' || '_lot_' || v_feature_type;
         v_trigger_name := 'trg_PARENT_SCHEMA_edit_lot_' || v_feature_type;
@@ -39,7 +41,12 @@ BEGIN
         EXECUTE
         'CREATE OR REPLACE TRIGGER ' || v_trigger_name || ' INSTEAD OF
         INSERT OR DELETE OR UPDATE
-        ON cm.' || v_view_name ||' FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_edit_feature()';
+        ON cm.' || v_view_name ||' FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_edit_feature(' || quote_literal(v_feature_type) || ')';
+		
+        EXECUTE
+        'CREATE OR REPLACE TRIGGER ' || v_trigger_name || '_geom INSTEAD OF
+        INSERT OR UPDATE
+        ON cm.' || v_view_name ||' FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_feature_geom(' || quote_literal(v_feature_type) || ')';
     END LOOP;
 END
 $$;

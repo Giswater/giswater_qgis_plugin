@@ -256,6 +256,108 @@ BEGIN
     END LOOP;
     -- ENDSECTION
 
+	-- SECTION[epic=checkproject]: Check for arcs without nodes
+	FOR v_rec IN
+		SELECT 'om_campaign_x_arc' AS table_name, 'campaign_id' AS id_column, v_campaign_id AS id_value
+		UNION ALL
+		SELECT 'om_campaign_lot_x_arc' AS table_name, 'lot_id' AS id_column, v_lot_id AS id_value
+	LOOP
+		IF v_rec.id_value IS NOT NULL THEN
+			v_querytext := format(
+				'SELECT arc_id, the_geom FROM cm.%I WHERE (node_1 IS NULL OR node_2 IS NULL) AND %I = %s',
+				v_rec.table_name, v_rec.id_column, v_rec.id_value
+			);
+
+			FOR v_rec_check IN EXECUTE v_querytext
+			LOOP
+				INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+				VALUES (
+					v_fid,
+					current_user,
+					3, -- Critical Error
+					format('ERROR: Arc ID %s in table %s is missing node_1 or node_2. Please run topocontrol.', v_rec_check.arc_id, v_rec.table_name),
+					1
+				);
+
+				INSERT INTO t_cm_arc(arc_id, descript, the_geom, fid)
+				VALUES (v_rec_check.arc_id, 'Arc missing start/end node', v_rec_check.the_geom, v_fid);
+
+				v_any_issue_found := true;
+			END LOOP;
+		END IF;
+	END LOOP;
+	-- ENDSECTION
+
+	-- SECTION[epic=checkproject]: Find and flag nodes that should divide arcs
+	DECLARE
+		v_arc_divide_tolerance float := 0.05;
+		v_nodes_flagged integer := 0;
+		v_node_to_flag_rec RECORD;
+	BEGIN
+		FOR v_rec IN
+			SELECT 'om_campaign_x_node' AS table_name, 'campaign_id' AS id_column, v_campaign_id AS id_value
+			UNION ALL
+			SELECT 'om_campaign_lot_x_node' AS table_name, 'lot_id' AS id_column, v_lot_id AS id_value
+		LOOP
+			IF v_rec.id_value IS NOT NULL THEN
+				v_querytext := format(
+					'SELECT n.node_id
+					 FROM PARENT_SCHEMA.node n
+					 JOIN cm.%I cx ON n.node_id = cx.node_id
+					 WHERE cx.%I = %s AND (n.isarcdivide IS NULL OR n.isarcdivide = false)
+					   AND EXISTS (
+						 SELECT 1 FROM PARENT_SCHEMA.arc a
+						 WHERE ST_DWithin(n.the_geom, a.the_geom, %s)
+						   AND a.node_1 <> n.node_id AND a.node_2 <> n.node_id
+					   )',
+					v_rec.table_name, v_rec.id_column, v_rec.id_value, v_arc_divide_tolerance
+				);
+
+				FOR v_node_to_flag_rec IN EXECUTE v_querytext
+				LOOP
+					 UPDATE PARENT_SCHEMA.node SET isarcdivide = true WHERE node_id = v_node_to_flag_rec.node_id;
+					 v_nodes_flagged := v_nodes_flagged + 1;
+				END LOOP;
+			END IF;
+		END LOOP;
+
+		IF v_nodes_flagged > 0 THEN
+			INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+			VALUES (v_fid, current_user, 1, format('INFO: Automatically flagged %s nodes for arc division.', v_nodes_flagged), v_nodes_flagged);
+		END IF;
+	END;
+	-- ENDSECTION
+
+	-- SECTION[epic=checkproject]: Perform Arc Division for flagged nodes
+	FOR v_rec IN
+		SELECT 'om_campaign_x_node' AS table_name, 'campaign_id' AS id_column, v_campaign_id AS id_value
+		UNION ALL
+		SELECT 'om_campaign_lot_x_node' AS table_name, 'lot_id' AS id_column, v_lot_id AS id_value
+	LOOP
+		IF v_rec.id_value IS NOT NULL THEN
+			v_querytext := format(
+				'SELECT n.node_id FROM PARENT_SCHEMA.node n
+				 JOIN cm.%I cx ON n.node_id = cx.node_id
+				 WHERE cx.%I = %s AND n.isarcdivide = true',
+				v_rec.table_name, v_rec.id_column, v_rec.id_value
+			);
+
+			FOR v_rec_check IN EXECUTE v_querytext
+			LOOP
+				-- Call the existing arc divide function for each node
+				PERFORM PARENT_SCHEMA.gw_fct_setarcdivide(json_build_object(
+					'feature', json_build_object('id', array[v_rec_check.node_id]),
+					'data', json_build_object('parameters', json_build_object('skipInitEndMessage', true))
+				));
+
+				INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+				VALUES (v_fid, current_user, 1, 'INFO: Performed arc division for node ID ' || v_rec_check.node_id);
+
+			END LOOP;
+		END IF;
+	END LOOP;
+	-- ENDSECTION
+
 	-- SECTION[epic=checkproject]: Get fids to run
 	SELECT array_agg(fid) INTO v_fids_to_run
 	FROM cm.sys_fprocess

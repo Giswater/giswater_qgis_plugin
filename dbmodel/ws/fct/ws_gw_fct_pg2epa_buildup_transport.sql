@@ -47,7 +47,7 @@ BEGIN
 		ELSIF v_count = v_count_diff THEN -- junction
 
 			UPDATE temp_t_node SET epa_type  = 'JUNCTION', pattern_id = addparam::json->>'demand_pattern_id',
-			demand = (addparam::json->>'demand')::numeric
+			demand = CASE WHEN (addparam::json->>'demand')::text != '' THEN (addparam::json->>'demand')::numeric ELSE 0 END
 			WHERE node_id =  rec_node.node_id;
 
 		ELSE -- tank
@@ -55,7 +55,8 @@ BEGIN
 			UPDATE temp_t_node SET epa_type  = 'TANK' WHERE node_id =  rec_node.node_id;
 
 			UPDATE temp_t_node SET epa_type  = 'JUNCTION' WHERE node_id =  rec_node.node_id
-			AND (addparam::json->>'diameter')::numeric=0 AND (addparam::json->>'maxlevel')::numeric=0;
+			AND (addparam::json->>'diameter')::text != '' AND (addparam::json->>'diameter')::numeric=0 
+			AND (addparam::json->>'maxlevel')::text != '' AND (addparam::json->>'maxlevel')::numeric=0;
 		END IF;
 	END LOOP;
 

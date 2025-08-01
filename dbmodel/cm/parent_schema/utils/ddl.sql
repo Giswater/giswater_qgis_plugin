@@ -72,7 +72,7 @@ BEGIN
               SELECT selector_lot.lot_id FROM selector_lot
               WHERE selector_lot.cur_user = current_user
           )
-          SELECT %s b.status, c.the_geom
+          SELECT %s b.status, c.campaign_id, c.the_geom
           FROM %s a
           LEFT JOIN om_campaign_lot ocl ON a.lot_id = ocl.lot_id
           LEFT JOIN om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%s_id = b.%s_id
