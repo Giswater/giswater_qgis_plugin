@@ -9,6 +9,7 @@ or (at your option) any later version.
 --FUNCTION CODE: 3404
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mapzones(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_mapzones(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones(p_data json)
 RETURNS json AS
 $BODY$
