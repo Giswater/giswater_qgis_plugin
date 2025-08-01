@@ -69,6 +69,11 @@ SELECT has_index('rpt_arc_stats', 'rpt_arc_stats_vel_avg', 'Table should have in
 SELECT has_index('rpt_arc_stats', 'rpt_arc_stats_vel_max', 'Table should have index on vel_max');
 SELECT has_index('rpt_arc_stats', 'rpt_arc_stats_vel_min', 'Table should have index on vel_min');
 
+
+-- Check foreign keys
+SELECT has_fk('rpt_arc_stats', 'Table rpt_arc_stats should have foreign keys');
+SELECT fk_ok('rpt_arc_stats', 'result_id', 'rpt_cat_result', 'result_id', 'FK result_id should reference rpt_cat_result.result_id');
+
 SELECT * FROM finish();
 
 ROLLBACK;
