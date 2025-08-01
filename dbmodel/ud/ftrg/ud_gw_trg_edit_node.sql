@@ -629,7 +629,7 @@ BEGIN
 
 		ELSIF v_man_table='man_outfall' THEN
 
-			INSERT INTO man_outfall (node_id, name, discharge_medium) VALUES (NEW.node_id,NEW.name, NEW.discharge_medium);
+			INSERT INTO man_outfall (node_id, name, outfall_medium) VALUES (NEW.node_id,NEW.name, NEW.outfall_medium);
 
 		ELSIF v_man_table='man_valve' THEN
 
@@ -660,8 +660,8 @@ BEGIN
 
 		ELSIF v_man_table='man_netinit' THEN
 
-			INSERT INTO man_netinit (node_id,length, width, inlet, bottom_channel, accessibility, name)
-			VALUES (NEW.node_id, NEW.length,NEW.width,NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.name);
+			INSERT INTO man_netinit (node_id,length, width, inlet, bottom_channel, accessibility, name, inlet_medium)
+			VALUES (NEW.node_id, NEW.length,NEW.width,NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.name, NEW.inlet_medium);
 
 		ELSIF v_man_table='man_wjump' THEN
 
@@ -833,7 +833,7 @@ BEGIN
 		IF NEW.rotation IS DISTINCT FROM OLD.rotation THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;
-		
+
 		-- hemisphere
 		IF NEW.hemisphere IS DISTINCT FROM OLD.hemisphere THEN
 			UPDATE node SET hemisphere=NEW.hemisphere WHERE node_id = OLD.node_id;
@@ -938,7 +938,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_outfall' THEN
-			UPDATE man_outfall SET name=NEW.name, discharge_medium=NEW.discharge_medium
+			UPDATE man_outfall SET name=NEW.name, outfall_medium=NEW.outfall_medium
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_storage' THEN
@@ -964,7 +964,8 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_netinit' THEN
-			UPDATE man_netinit SET length=NEW.length, width=NEW.width, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
+			UPDATE man_netinit SET length=NEW.length, width=NEW.width, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name,
+			inlet_medium=NEW.inlet_medium
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_wjump' THEN
@@ -1184,9 +1185,9 @@ BEGIN
 				update node set label_rotation = new.rotation where node_id = new.node_id;
 
 			end if;
-		
+
 			-- CASE: if rotation of the node changes
-			if new.rotation::text != old.rotation::text OR (OLD.rotation IS NULL AND NEW.rotation IS NOT NULL) then	
+			if new.rotation::text != old.rotation::text OR (OLD.rotation IS NULL AND NEW.rotation IS NOT NULL) then
 				-- prev calc: current label position
 				select st_setsrid(st_makepoint(label_x::numeric, label_y::numeric), v_srid) into v_label_point from node where node_id = new.node_id;
 

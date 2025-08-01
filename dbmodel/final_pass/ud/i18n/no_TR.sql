@@ -4991,7 +4991,7 @@ FROM (
 ('custom_elev', '%_node%', 'form_feature', 'custom_elev', 'custom_elev'),
 ('custom_ymax', '%_node%', 'form_feature', 'custom_ymax', 'custom_ymax'),
 ('label_rotation', '%_node%', 'form_feature', 'Label rotation', 'label_rotation - Angle of rotation of the label'),
-('discharge_medium', '%_node%', 'form_feature', 'discharge_medium', 'discharge_medium'),
+('outfall_medium', '%_node%', 'form_feature', 'outfall_medium', 'outfall_medium'),
 ('groove_height', '%_node%', 'form_feature', 'groove_height', 'groove_height'),
 ('bottom_channel', '%_node%', 'form_feature', 'Bottom channel', 'Bottom channel'),
 ('drainzone_id', '%_node%', 'form_feature', 'Drainzone ID', 'Drainzone ID'),

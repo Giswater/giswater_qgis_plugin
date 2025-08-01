@@ -4,6 +4,19 @@
 -- General Public License as published by the Free Software Foundation, either version 3 of the License,
 -- or (at your option) any later version.
 -- */
+BEGIN;
+
+SELECT plan(1);
+
+SELECT ok(1=1, 'Test 1');
+
+SELECT finish();
+
+ROLLBACK;
+
+
+
+
 -- BEGIN;
 
 -- -- Suppress NOTICE messages
