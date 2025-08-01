@@ -559,7 +559,7 @@ BEGIN
 			FROM (SELECT mapzone_id, count(*) AS arcs FROM temp_pgr_arc ta WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) a
 			LEFT JOIN (SELECT mapzone_id, count(*) AS nodes FROM temp_pgr_node tn WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) b USING (mapzone_id)
 			LEFT JOIN (SELECT mapzone_id, count(*) AS connecs FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) c USING (mapzone_id)
-			JOIN plan_netscenario_'||(v_mapzone_name)||' p ON a.mapzone_id = p.'||(v_mapzone_field)||''
+			JOIN plan_netscenario_'||(v_mapzone_name)||' p ON a.mapzone_id = p.'||(v_mapzone_field)||'
 			GROUP BY m.name, arcs, nodes, connecs';
 		ELSE
 			v_query_text = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
