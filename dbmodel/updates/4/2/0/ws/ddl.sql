@@ -65,3 +65,5 @@ CREATE INDEX IF NOT EXISTS idx_minsector_mincut_valve_node_id ON minsector_mincu
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_cat_hydrometer", "column":"voltman_flow", "newName":"type"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_cat_hydrometer", "column":"multi_jet_flow", "newName":"flownom"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"dma_id", "dataType":"integer[]"}}$$);

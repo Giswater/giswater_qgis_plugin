@@ -14,3 +14,5 @@ ALTER TABLE "element" ADD CONSTRAINT element_epa_type_check CHECK (((epa_type)::
 -- 31/07/2025
 ALTER TABLE "element" ADD CONSTRAINT element_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id);
 ALTER TABLE man_frelem ADD CONSTRAINT man_frelem_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id);
+
+ALTER TABLE rpt_arc_stats ADD CONSTRAINT rpt_arc_stats_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON UPDATE CASCADE ON DELETE CASCADE;
