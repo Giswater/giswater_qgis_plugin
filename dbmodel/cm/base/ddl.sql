@@ -235,7 +235,7 @@ CREATE TABLE cat_team (
 	teamname text not NULL,
 	organization_id int4 NOT NULL,
 	descript text NULL,
-	role_id TEXT NULL,
+	role_id TEXT NULL DEFAULT 'role_cm_field',
 	active bool NULL DEFAULT true,
 	CONSTRAINT cat_team_pkey PRIMARY KEY (team_id),
 	CONSTRAINT cat_team_unique UNIQUE (teamname, organization_id),
@@ -245,11 +245,8 @@ CREATE TABLE cat_team (
 
 CREATE TABLE cat_user (
   user_id serial4 PRIMARY KEY,
-  code text NULL,
   loginname text not NULL,
   username text not NULL,
-  fullname varchar(200) not null,
-  descript text,
   team_id int4,
   active boolean DEFAULT TRUE,
   CONSTRAINT cat_user_unique UNIQUE (username),
