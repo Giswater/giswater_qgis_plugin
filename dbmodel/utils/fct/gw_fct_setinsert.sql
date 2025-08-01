@@ -232,6 +232,16 @@ BEGIN
 			v_columntype='geometry';
 		END IF;
 
+		-- Handle array types - format value with curly braces if it's an array
+		IF v_columntype LIKE '%[]' AND v_value IS NOT NULL AND v_value != '' THEN
+			-- Replace [ with { and ] with } for array input
+			IF v_value LIKE '[%' THEN
+				v_value := replace(replace(v_value, '[', '{'), ']', '}');
+			ELSIF v_value NOT LIKE '{%}' THEN
+				v_value := '{' || v_value || '}';
+			END IF;
+		END IF;
+
 		IF v_value !='null' OR v_value !='NULL' THEN
 
 			IF v_field in ('geom', 'the_geom') THEN
