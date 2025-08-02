@@ -114,6 +114,11 @@ BEGIN
 			END IF;
 		END IF;
 	END IF;
+	
+	-- Force network selector in case of null values
+	IF (SELECT count(*) FROM selector_network WHERE cur_user=current_user) < 1 THEN
+	  	INSERT INTO selector_network (network_id, cur_user) VALUES (1, current_user);
+	END IF;
 
 	-- Force state selector in case of null values
 	IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN

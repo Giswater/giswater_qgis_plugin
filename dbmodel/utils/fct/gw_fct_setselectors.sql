@@ -152,6 +152,7 @@ BEGIN
 	DROP TABLE IF EXISTS temp_macrosector;
 	DROP TABLE IF EXISTS temp_municipality;
 	DROP TABLE IF EXISTS temp_t_mincut;
+	DROP TABLE IF EXISTS temp_network;
 
 	IF v_expl_x_user is false THEN
 		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e WHERE active and expl_id > 0 order by 1;
@@ -159,6 +160,8 @@ BEGIN
 		CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
 		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
 		CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
+		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active 
+		FROM om_typevalue WHERE typevalue = 'network_type' order by id;
 
 		IF v_project_type = 'WS' THEN
 			CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
@@ -166,6 +169,9 @@ BEGIN
 	ELSE
 		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e
 		JOIN config_user_x_expl USING (expl_id)	WHERE e.active and expl_id > 0 and username = current_user order by 1;
+
+		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active 
+		FROM om_typevalue WHERE typevalue = 'network_type' order by id;
 
 		CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
 		JOIN temp_exploitation e USING (macroexpl_id)
