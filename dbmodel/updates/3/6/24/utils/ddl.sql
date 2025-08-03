@@ -17,10 +17,3 @@ CREATE TABLE selector_network (
 insert into config_param_system (parameter,value, descript, isenabled, project_type, datatype, widgettype) VALUES
 ('basic_selector_tab_network', '{"table":"temp_network","selector":"selector_network","table_id":"network_id","selector_id":"network_id","label":"network_id, '' - '', name","orderBy":"network_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(network_id, '' - '', name))","selectionMode":"keepPreviousUsingShift", "orderbyCheck":false}',
 'Variable to configura all options related to search for the specificic tab	Selector variables',true,'utils','json','text');
-
-
-insert into config_form_tabs (formname, tabname, label, tooltip, sys_role, orderby, device) VALUES
-('selector_basic','tab_network','Network','Network','role_basic',-1,'{4,5}');
-
-insert into om_typevalue values ('network_type','1','WATER SUPPLY');
-insert into om_typevalue values ('network_type','2','URBAN DRAINAGE');
