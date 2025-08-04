@@ -883,21 +883,6 @@ class GwPsector:
                 elif type(widget) in (QCheckBox, QTableView, QPushButton) or isinstance(widget, QComboBox):
                     widget.setEnabled(False)
 
-    def reload_states_selector(self):
-
-        try:
-            for x in range(0, len(self.all_states)):
-                sql = (f"DELETE FROM selector_state "
-                       f" WHERE state_id = '{self.all_states[x][0]}' AND cur_user = current_user")
-                tools_db.execute_sql(sql)
-
-                sql = (f"INSERT INTO selector_state (state_id, cur_user)"
-                       f" VALUES ('{self.all_states[x][0]}', current_user)")
-                tools_db.execute_sql(sql)
-        except TypeError:
-            # Control if self.all_states is None (object of type 'NoneType' has no len())
-            pass
-
     def reset_model_psector(self, feature_type):
         """ Reset model of the widget """
 
@@ -2941,7 +2926,6 @@ def close_dlg(**kwargs):
         tools_gw.reset_rubberband(dialog.rubber_band_line)
         tools_gw.reset_rubberband(dialog.rubber_band_op)
         dialog.my_json = {}
-        dialog.reload_states_selector()
         if dialog.iface.activeLayer():
             dialog.iface.setActiveLayer(dialog.iface.activeLayer())
         dialog.rel_layers = tools_gw.remove_selection(True, layers=dialog.rel_layers)
@@ -2956,10 +2940,7 @@ def close_dlg(**kwargs):
         tools_gw.disconnect_signal('psector')
         tools_qgis.disconnect_signal_selection_changed()
 
-        json_result = dialog.set_plan()
-        if json_result:
-            if json_result.get('status') == 'Accepted':
-                dialog.reload_states_selector()
+        dialog.set_plan()
 
         # Apply filters on tableview
         if hasattr(dialog, 'dlg_psector_mng'):
