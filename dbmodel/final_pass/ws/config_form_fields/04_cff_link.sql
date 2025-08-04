@@ -1,3 +1,12 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,dv_parent_id,dv_querytext_filterc,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder) VALUES
 	 ('ve_link','form_feature','tab_data','dqa_id','lyt_bot_1',1,'integer','text','dqa_id','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,NULL),
 	 ('ve_link','form_feature','tab_data','link_id','lyt_data_1',1,'integer','text','Link ID','Link ID',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
@@ -41,84 +50,6 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_link','form_feature','tab_data','annotation','lyt_data_3',2,'string','text','Annotation','annotation - Annotations related to link. Additional information',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link','form_feature','tab_data','observ','lyt_data_3',3,'string','text','Observ','Observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link','form_feature','tab_data','link','lyt_data_3',4,'string','hyperlink','Link','Link',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
-	 ('ve_link','form_feature','tab_documents','date_from','lyt_document_1',1,'date','datetime','Date from:','Date from:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":">="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,1),
-	 ('ve_link','form_feature','tab_documents','date_to','lyt_document_1',2,'date','datetime','Date to:','Date to:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":"<="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,2),
-	 ('ve_link','form_feature','tab_documents','doc_type','lyt_document_1',3,'string','combo','Doc type:','Doc type:',NULL,false,false,true,false,true,'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''doc_type''',NULL,true,NULL,NULL,NULL,'{"labelPosition": "top"}','{"functionName": "filter_table", "parameters":{}}','tbl_doc_x_link',false,3),
-	 ('ve_link','form_feature','tab_documents','doc_name','lyt_document_2',1,'string','typeahead','Doc id:','Doc id:',NULL,false,false,true,false,false,'SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL',NULL,NULL,NULL,NULL,NULL,'{"saveValue": false, "filterSign":"ILIKE"}','{"functionName": "filter_table"}',NULL,false,NULL),
-	 ('ve_link','form_feature','tab_documents','btn_doc_insert','lyt_document_2',2,NULL,'button',NULL,'Insert document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"113"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "add_object",
-  "parameters": {
-    "sourcewidget": "tab_documents_doc_name",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link','form_feature','tab_documents','btn_doc_delete','lyt_document_2',3,NULL,'button',NULL,'Delete document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"114"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete document"}','{"functionName": "delete_object", "parameters": {"columnfind": "doc_id", "targetwidget": "tab_documents_tbl_documents", "sourceview": "doc"}}','tbl_doc_x_link',false,NULL),
-	 ('ve_link','form_feature','tab_documents','btn_doc_new','lyt_document_2',4,NULL,'button',NULL,'New document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"143"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "manage_document",
-  "parameters": {
-    "sourcewidget": "tab_documents_doc_name",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link','form_feature','tab_documents','hspacer_document_1','lyt_document_2',5,NULL,'hspacer',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_link','form_feature','tab_documents','open_doc','lyt_document_2',6,NULL,'button',NULL,'Open document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"147"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open document"}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "columnfind": "path",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link','form_feature','tab_documents','tbl_documents','lyt_document_3',1,NULL,'tableview',NULL,NULL,NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "targetwidget": "tab_documents_tbl_documents",
-    "columnfind": "path"
-  }
-}','tbl_doc_x_link',false,4),
-	 ('ve_link','form_feature','tab_elements','element_id','lyt_element_1',1,'string','typeahead','Element id:','Element id',NULL,false,false,true,false,false,'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ',NULL,NULL,NULL,NULL,NULL,'{"saveValue": false, "filterSign":"ILIKE"}','{"functionName": "filter_table", "parameters" : { "columnfind": "id"}}',NULL,false,NULL),
-	 ('ve_link','form_feature','tab_elements','insert_element','lyt_element_1',2,NULL,'button',NULL,'Insert element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"113"}','{"saveValue":false, "filterSign":"="}','{
-	  "functionName": "add_object",
-	  "parameters": {
-	    "sourcewidget": "tab_elements_element_id",
-	    "targetwidget": "tab_elements_tbl_elements",
-	    "sourceview": "element"
-	  }
-	}','ve_link',false,NULL),
-	 ('ve_link','form_feature','tab_elements','delete_element','lyt_element_1',3,NULL,'button',NULL,'Delete element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"114"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete element"}','{ "functionName": "delete_object", "parameters": {"columnfind": "element_id", "targetwidget": "tab_elements_tbl_elements", "sourceview": "element"}}','tbl_element_x_link',false,NULL),
-	 ('ve_link','form_feature','tab_elements','new_element','lyt_element_1',4,NULL,'button',NULL,'New element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"143"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "manage_element_menu",
-  "parameters": {
-    "sourcetable": "v_ui_element_x_arc",
-    "targetwidget": "tab_elements_tbl_elements",
-    "field_object_id": "element_id",
-    "sourceview": "element"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link','form_feature','tab_elements','hspacer_lyt_element','lyt_element_1',5,NULL,'hspacer',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_link','form_feature','tab_elements','open_element','lyt_element_1',6,NULL,'button',NULL,'Open element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"144"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open element"}','{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id",
-    "targetwidget": "tab_elements_tbl_elements"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link','form_feature','tab_elements','btn_link','lyt_element_1',7,NULL,'button',NULL,'Open link',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"173"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open link"}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "targetwidget": "tab_elements_tbl_elements",
-    "columnfind": "link_id"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link','form_feature','tab_elements','tbl_elements','lyt_element_3',1,NULL,'tableview',NULL,NULL,NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}','{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id"
-  }
-}','tbl_element_x_link',false,1),
-	 ('ve_link','form_feature','tab_none','n_hydrometer',NULL,1,'integer','text','n_hydrometer','n_hydrometer',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_link','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID','sector_id  - Sector identifier.',NULL,false,false,false,false,NULL,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
 	 ('ve_link_link','form_feature','tab_data','dqa_id','lyt_bot_1',2,'integer','text','dqa_id','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,true,NULL),
 	 ('ve_link_link','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','State:',NULL,false,false,true,false,NULL,'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,NULL),
@@ -155,84 +86,6 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_link_link','form_feature','tab_data','elevation2','lyt_data_1',30,'integer','text','Elevation2','elevation2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_link','form_feature','tab_data','macrosector_id','lyt_data_1',31,'integer','combo','Macrosector id','Macrosector id',NULL,false,false,false,false,NULL,'SELECT macrosector_id as id, name as idval FROM macrosector WHERE macrosector_id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_link','form_feature','tab_data','expl_id','lyt_data_2',1,'integer','combo','Explotation ID','expl_id - Exploitation to which the element belongs. If the configuration is not changed, the program automatically selects it based on the geometry',NULL,false,false,false,false,NULL,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:green; font-weight:bold;"}','{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
-	 ('ve_link_link','form_feature','tab_documents','date_from','lyt_document_1',1,'date','datetime','Date from:','Date from:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":">="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,1),
-	 ('ve_link_link','form_feature','tab_documents','date_to','lyt_document_1',2,'date','datetime','Date to:','Date to:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":"<="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,2),
-	 ('ve_link_link','form_feature','tab_documents','doc_type','lyt_document_1',3,'string','combo','Doc type:','Doc type:',NULL,false,false,true,false,true,'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''doc_type''',NULL,true,NULL,NULL,NULL,'{"labelPosition": "top"}','{"functionName": "filter_table", "parameters":{}}','tbl_doc_x_link',false,3),
-	 ('ve_link_link','form_feature','tab_documents','doc_name','lyt_document_2',1,'string','typeahead','Doc id:','Doc id:',NULL,false,false,true,false,false,'SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL',NULL,NULL,NULL,NULL,NULL,'{"saveValue": false, "filterSign":"ILIKE"}','{"functionName": "filter_table"}',NULL,false,NULL),
-	 ('ve_link_link','form_feature','tab_documents','btn_doc_insert','lyt_document_2',2,NULL,'button',NULL,'Insert document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"113"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "add_object",
-  "parameters": {
-    "sourcewidget": "tab_documents_doc_name",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_documents','btn_doc_delete','lyt_document_2',3,NULL,'button',NULL,'Delete document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"114"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete document"}','{"functionName": "delete_object", "parameters": {"columnfind": "doc_id", "targetwidget": "tab_documents_tbl_documents", "sourceview": "doc"}}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_documents','btn_doc_new','lyt_document_2',4,NULL,'button',NULL,'New document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"143"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "manage_document",
-  "parameters": {
-    "sourcewidget": "tab_documents_doc_name",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_documents','hspacer_document_1','lyt_document_2',5,NULL,'hspacer',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_link_link','form_feature','tab_documents','open_doc','lyt_document_2',6,NULL,'button',NULL,'Open document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"147"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open document"}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "columnfind": "path",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_documents','tbl_documents','lyt_document_3',1,NULL,'tableview',NULL,NULL,NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "targetwidget": "tab_documents_tbl_documents",
-    "columnfind": "path"
-  }
-}','tbl_doc_x_link',false,4),
-	 ('ve_link_link','form_feature','tab_elements','element_id','lyt_element_1',1,'string','typeahead','Element id:','Element id',NULL,false,false,true,false,false,'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ',NULL,NULL,NULL,NULL,NULL,'{"saveValue": false, "filterSign":"ILIKE"}','{"functionName": "filter_table", "parameters" : { "columnfind": "id"}}',NULL,false,NULL),
-	 ('ve_link_link','form_feature','tab_elements','insert_element','lyt_element_1',2,NULL,'button',NULL,'Insert element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"113"}','{"saveValue":false, "filterSign":"="}','{
-	  "functionName": "add_object",
-	  "parameters": {
-	    "sourcewidget": "tab_elements_element_id",
-	    "targetwidget": "tab_elements_tbl_elements",
-	    "sourceview": "element"
-	  }
-	}','ve_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_elements','delete_element','lyt_element_1',3,NULL,'button',NULL,'Delete element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"114"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete element"}','{ "functionName": "delete_object", "parameters": {"columnfind": "element_id", "targetwidget": "tab_elements_tbl_elements", "sourceview": "element"}}','tbl_element_x_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_elements','new_element','lyt_element_1',4,NULL,'button',NULL,'New element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"143"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "manage_element_menu",
-  "parameters": {
-    "sourcetable": "v_ui_element_x_arc",
-    "targetwidget": "tab_elements_tbl_elements",
-    "field_object_id": "element_id",
-    "sourceview": "element"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_elements','hspacer_lyt_element','lyt_element_1',5,NULL,'hspacer',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_link_link','form_feature','tab_elements','open_element','lyt_element_1',6,NULL,'button',NULL,'Open element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"144"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open element"}','{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id",
-    "targetwidget": "tab_elements_tbl_elements"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_elements','btn_link','lyt_element_1',7,NULL,'button',NULL,'Open link',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"173"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open link"}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "targetwidget": "tab_elements_tbl_elements",
-    "columnfind": "link_id"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_link','form_feature','tab_elements','tbl_elements','lyt_element_3',1,NULL,'tableview',NULL,NULL,NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}','{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id"
-  }
-}','tbl_element_x_link',false,1),
-	 ('ve_link_link','form_feature','tab_none','n_hydrometer',NULL,1,'integer','text','n_hydrometer','n_hydrometer',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_pipelink','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID','sector_id  - Sector identifier.',NULL,false,false,false,false,NULL,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
 	 ('ve_link_pipelink','form_feature','tab_data','dqa_id','lyt_bot_1',2,'integer','text','dqa_id','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,true,NULL),
 	 ('ve_link_pipelink','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','State:',NULL,false,false,true,false,NULL,'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,NULL),
@@ -269,83 +122,6 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_link_pipelink','form_feature','tab_data','depth2','lyt_data_2',14,'integer','text','Depth2','depth2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_pipelink','form_feature','tab_data','elevation2','lyt_data_2',15,'integer','text','Elevation2','elevation2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_pipelink','form_feature','tab_data','expl_id','lyt_data_2',16,'integer','combo','Explotation ID','expl_id - Exploitation to which the element belongs. If the configuration is not changed, the program automatically selects it based on the geometry',NULL,false,false,false,false,NULL,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:green; font-weight:bold;"}','{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_documents','date_from','lyt_document_1',1,'date','datetime','Date from:','Date from:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":">="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,1),
-	 ('ve_link_pipelink','form_feature','tab_documents','date_to','lyt_document_1',2,'date','datetime','Date to:','Date to:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":"<="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,2),
-	 ('ve_link_pipelink','form_feature','tab_documents','doc_type','lyt_document_1',3,'string','combo','Doc type:','Doc type:',NULL,false,false,true,false,true,'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''doc_type''',NULL,true,NULL,NULL,NULL,'{"labelPosition": "top"}','{"functionName": "filter_table", "parameters":{}}','tbl_doc_x_link',false,3),
-	 ('ve_link_pipelink','form_feature','tab_documents','doc_name','lyt_document_2',1,'string','typeahead','Doc id:','Doc id:',NULL,false,false,true,false,false,'SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL',NULL,NULL,NULL,NULL,NULL,'{"saveValue": false, "filterSign":"ILIKE"}','{"functionName": "filter_table"}',NULL,false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_documents','btn_doc_insert','lyt_document_2',2,NULL,'button',NULL,'Insert document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"113"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "add_object",
-  "parameters": {
-    "sourcewidget": "tab_documents_doc_name",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_documents','btn_doc_delete','lyt_document_2',3,NULL,'button',NULL,'Delete document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"114"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete document"}','{"functionName": "delete_object", "parameters": {"columnfind": "doc_id", "targetwidget": "tab_documents_tbl_documents", "sourceview": "doc"}}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_documents','btn_doc_new','lyt_document_2',4,NULL,'button',NULL,'New document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"143"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "manage_document",
-  "parameters": {
-    "sourcewidget": "tab_documents_doc_name",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_documents','hspacer_document_1','lyt_document_2',5,NULL,'hspacer',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_documents','open_doc','lyt_document_2',6,NULL,'button',NULL,'Open document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"147"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open document"}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "columnfind": "path",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_documents','tbl_documents','lyt_document_3',1,NULL,'tableview',NULL,NULL,NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "targetwidget": "tab_documents_tbl_documents",
-    "columnfind": "path"
-  }
-}','tbl_doc_x_link',false,4),
-	 ('ve_link_pipelink','form_feature','tab_elements','element_id','lyt_element_1',1,'string','typeahead','Element id:','Element id',NULL,false,false,true,false,false,'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ',NULL,NULL,NULL,NULL,NULL,'{"saveValue": false, "filterSign":"ILIKE"}','{"functionName": "filter_table", "parameters" : { "columnfind": "id"}}',NULL,false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_elements','insert_element','lyt_element_1',2,NULL,'button',NULL,'Insert element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"113"}','{"saveValue":false, "filterSign":"="}','{
-	  "functionName": "add_object",
-	  "parameters": {
-	    "sourcewidget": "tab_elements_element_id",
-	    "targetwidget": "tab_elements_tbl_elements",
-	    "sourceview": "element"
-	  }
-	}','ve_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_elements','delete_element','lyt_element_1',3,NULL,'button',NULL,'Delete element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"114"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete element"}','{ "functionName": "delete_object", "parameters": {"columnfind": "element_id", "targetwidget": "tab_elements_tbl_elements", "sourceview": "element"}}','tbl_element_x_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_elements','new_element','lyt_element_1',4,NULL,'button',NULL,'New element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"143"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "manage_element_menu",
-  "parameters": {
-    "sourcetable": "v_ui_element_x_arc",
-    "targetwidget": "tab_elements_tbl_elements",
-    "field_object_id": "element_id",
-    "sourceview": "element"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_elements','hspacer_lyt_element','lyt_element_1',5,NULL,'hspacer',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_elements','open_element','lyt_element_1',6,NULL,'button',NULL,'Open element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"144"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open element"}','{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id",
-    "targetwidget": "tab_elements_tbl_elements"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_elements','btn_link','lyt_element_1',7,NULL,'button',NULL,'Open link',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"173"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open link"}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "targetwidget": "tab_elements_tbl_elements",
-    "columnfind": "link_id"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_pipelink','form_feature','tab_elements','tbl_elements','lyt_element_3',1,NULL,'tableview',NULL,NULL,NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}','{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id"
-  }
-}','tbl_element_x_link',false,1),
 	 ('ve_link_vlink','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID','sector_id  - Sector identifier.',NULL,false,false,false,false,NULL,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','dqa_id','lyt_bot_1',2,'integer','text','dqa_id','dqa_id',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,true,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','State:',NULL,false,false,true,false,NULL,'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,NULL),
@@ -381,98 +157,4 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_link_vlink','form_feature','tab_data','top_elev2','lyt_data_2',13,'integer','text','Top elev 2','top_elev2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','depth2','lyt_data_2',14,'integer','text','Depth2','depth2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
 	 ('ve_link_vlink','form_feature','tab_data','elevation2','lyt_data_2',15,'integer','text','Elevation2','elevation2',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,NULL),
-	 ('ve_link_vlink','form_feature','tab_data','expl_id','lyt_data_2',16,'integer','combo','Explotation ID','expl_id - Exploitation to which the element belongs. If the configuration is not changed, the program automatically selects it based on the geometry',NULL,false,false,false,false,NULL,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:green; font-weight:bold;"}','{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL),
-	 ('ve_link_vlink','form_feature','tab_documents','date_from','lyt_document_1',1,'date','datetime','Date from:','Date from:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":">="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,1),
-	 ('ve_link_vlink','form_feature','tab_documents','date_to','lyt_document_1',2,'date','datetime','Date to:','Date to:',NULL,false,false,true,false,true,NULL,NULL,NULL,NULL,NULL,NULL,'{"labelPosition": "top", "filterSign":"<="}','{"functionName": "filter_table", "parameters":{"columnfind": "date"}}','tbl_doc_x_link',false,2),
-	 ('ve_link_vlink','form_feature','tab_documents','doc_type','lyt_document_1',3,'string','combo','Doc type:','Doc type:',NULL,false,false,true,false,true,'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''doc_type''',NULL,true,NULL,NULL,NULL,'{"labelPosition": "top"}','{"functionName": "filter_table", "parameters":{}}','tbl_doc_x_link',false,3),
-	 ('ve_link_vlink','form_feature','tab_documents','doc_name','lyt_document_2',1,'string','typeahead','Doc id:','Doc id:',NULL,false,false,true,false,false,'SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL',NULL,NULL,NULL,NULL,NULL,'{"saveValue": false, "filterSign":"ILIKE"}','{"functionName": "filter_table"}',NULL,false,NULL),
-	 ('ve_link_vlink','form_feature','tab_documents','btn_doc_insert','lyt_document_2',2,NULL,'button',NULL,'Insert document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"113"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "add_object",
-  "parameters": {
-    "sourcewidget": "tab_documents_doc_name",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_documents','btn_doc_delete','lyt_document_2',3,NULL,'button',NULL,'Delete document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"114"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete document"}','{"functionName": "delete_object", "parameters": {"columnfind": "doc_id", "targetwidget": "tab_documents_tbl_documents", "sourceview": "doc"}}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_documents','btn_doc_new','lyt_document_2',4,NULL,'button',NULL,'New document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"143"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "manage_document",
-  "parameters": {
-    "sourcewidget": "tab_documents_doc_name",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_documents','hspacer_document_1','lyt_document_2',5,NULL,'hspacer',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_link_vlink','form_feature','tab_documents','open_doc','lyt_document_2',6,NULL,'button',NULL,'Open document',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"147"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open document"}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "columnfind": "path",
-    "targetwidget": "tab_documents_tbl_documents",
-    "sourceview": "doc"
-  }
-}','tbl_doc_x_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_documents','tbl_documents','lyt_document_3',1,NULL,'tableview',NULL,NULL,NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "targetwidget": "tab_documents_tbl_documents",
-    "columnfind": "path"
-  }
-}','tbl_doc_x_link',false,4),
-	 ('ve_link_vlink','form_feature','tab_elements','element_id','lyt_element_1',1,'string','typeahead','Element id:','Element id',NULL,false,false,true,false,false,'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ',NULL,NULL,NULL,NULL,NULL,'{"saveValue": false, "filterSign":"ILIKE"}','{"functionName": "filter_table", "parameters" : { "columnfind": "id"}}',NULL,false,NULL),
-	 ('ve_link_vlink','form_feature','tab_elements','insert_element','lyt_element_1',2,NULL,'button',NULL,'Insert element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"113"}','{"saveValue":false, "filterSign":"="}','{
-	  "functionName": "add_object",
-	  "parameters": {
-	    "sourcewidget": "tab_elements_element_id",
-	    "targetwidget": "tab_elements_tbl_elements",
-	    "sourceview": "element"
-	  }
-	}','ve_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_elements','delete_element','lyt_element_1',3,NULL,'button',NULL,'Delete element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"114"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete element"}','{ "functionName": "delete_object", "parameters": {"columnfind": "element_id", "targetwidget": "tab_elements_tbl_elements", "sourceview": "element"}}','tbl_element_x_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_elements','new_element','lyt_element_1',4,NULL,'button',NULL,'New element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"143"}','{"saveValue":false, "filterSign":"="}','{
-  "functionName": "manage_element_menu",
-  "parameters": {
-    "sourcetable": "v_ui_element_x_arc",
-    "targetwidget": "tab_elements_tbl_elements",
-    "field_object_id": "element_id",
-    "sourceview": "element"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_elements','hspacer_lyt_element','lyt_element_1',5,NULL,'hspacer',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_link_vlink','form_feature','tab_elements','open_element','lyt_element_1',6,NULL,'button',NULL,'Open element',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"144"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open element"}','{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id",
-    "targetwidget": "tab_elements_tbl_elements"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_elements','btn_link','lyt_element_1',7,NULL,'button',NULL,'Open link',NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{"icon":"173"}','{"saveValue":false, "filterSign":"=", "onContextMenu":"Open link"}','{
-  "functionName": "open_selected_path",
-  "parameters": {
-    "targetwidget": "tab_elements_tbl_elements",
-    "columnfind": "link_id"
-  }
-}','ve_link',false,NULL),
-	 ('ve_link_vlink','form_feature','tab_elements','tbl_elements','lyt_element_3',1,NULL,'tableview',NULL,NULL,NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}','{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id"
-  }
-}','tbl_element_x_link',false,1),
-	 ('visit_link_leak','form_visit','tab_data','visit_id','lyt_data_1',NULL,'double','text','Visit id:','Visit id:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,2),
-	 ('visit_link_leak','form_visit','tab_data','link_id','lyt_data_1',NULL,'double','text','Link id:','Link id:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,3),
-	 ('visit_link_leak','form_visit','tab_data','status','lyt_data_1',NULL,'integer','combo','Status:','Status:',NULL,false,false,true,NULL,NULL,'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,7),
-	 ('visit_link_leak','form_visit','tab_data','insp_observ','lyt_data_1',NULL,'string','text','Observations:','Observations:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,6),
-	 ('visit_link_leak','form_visit','tab_data','leak_link','lyt_data_1',NULL,'string','text','Leak link:','Leak link:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,5),
-	 ('visit_link_leak','form_visit','tab_data','startdate','lyt_data_1',NULL,'date','datetime','Date:','Date:',NULL,false,false,true,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,4),
-	 ('visit_link_leak','form_visit','tab_data','class_id','lyt_data_1',NULL,'integer','combo','Visit class:','Visit class:',NULL,false,false,true,NULL,NULL,'SELECT id, idval FROM config_visit_class WHERE feature_type=''LINK'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',NULL,NULL,NULL,NULL,NULL,NULL,'{"functionName": "get_visit"}',NULL,false,1),
-	 ('visit_link_leak','form_visit','tab_data','acceptbutton','lyt_data_2',NULL,NULL,'button',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "text": "Accept"}','{
-  "functionName": "set_visit"
-}',NULL,false,1),
-	 ('visit_link_leak','form_visit','tab_file','tbl_files','lyt_files_1',NULL,NULL,'tableview',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"saveValue": false}',NULL,'om_visit_event_photo',false,2),
-	 ('visit_link_leak','form_visit','tab_file','addfile','lyt_files_1',NULL,NULL,'fileselector',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "text": "Add File"}','{
-  "functionName": "add_file"
-}',NULL,false,1),
-	 ('visit_link_leak','form_visit','tab_file','backbutton','lyt_files_2',NULL,NULL,'button',NULL,NULL,NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "text": "Back"}','{
-  "functionName": "set_previous_form_back"
-}',NULL,false,1) ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder, layoutname=EXCLUDED.layoutname;
+	 ('ve_link_vlink','form_feature','tab_data','expl_id','lyt_data_2',16,'integer','combo','Explotation ID','expl_id - Exploitation to which the element belongs. If the configuration is not changed, the program automatically selects it based on the geometry',NULL,false,false,false,false,NULL,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,NULL,NULL,'{"label":"color:green; font-weight:bold;"}','{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,NULL) ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutorder=EXCLUDED.layoutorder, layoutname=EXCLUDED.layoutname;

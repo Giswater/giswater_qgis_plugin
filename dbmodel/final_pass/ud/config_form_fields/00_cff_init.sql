@@ -9,4 +9,4 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
-TRUNCATE config_form_fields RESTART IDENTITY;
+DELETE FROM config_form_fields where formtype ='form_feature' and tabname ='tab_data' and (formname like'%arc%' or formname like'%node%' or formname like'%connec%' or formname like'%link%' or formname like'%gully%' or formname like'%elem%');
