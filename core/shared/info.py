@@ -23,7 +23,7 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoub
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, \
     QMenu, QToolButton
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
-    QgsPointXY, QgsProject, QgsFeature
+    QgsPointXY, QgsProject, QgsFeature, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from ..shared.catalog import GwCatalog
@@ -97,7 +97,7 @@ class GwInfo(QObject):
     def get_info_from_id(self, table_name, feature_id, tab_type=None, is_add_schema=None):
         return self.open_form(table_name=table_name, feature_id=feature_id, tab_type=tab_type, is_add_schema=is_add_schema)
 
-    def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
+    def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None, linked_feature=None,
                   layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False, connect_signal=None):
         """
         :param point: point where use clicked
@@ -250,6 +250,7 @@ class GwInfo(QObject):
                 if feature_id and self.complet_result['body']['feature']['geometry']:
                     x1 = self.complet_result['body']['feature']['geometry']['x']
                     y1 = self.complet_result['body']['feature']['geometry']['y']
+
                     if x1 and y1:
                         current_extent = global_vars.canvas.extent()
                         feature_point = QgsPointXY(x1, y1)
@@ -257,11 +258,12 @@ class GwInfo(QObject):
                         if not current_extent.contains(feature_point):
                             global_vars.canvas.setCenter(feature_point)
                             global_vars.canvas.refresh()
-
+                
                 feature_id = self.complet_result['body']['feature']['id']
-
+                if linked_feature:
+                    linked_feature['element_id'] = str(feature_id)
                 result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
-                    new_feature=new_feature, connect_signal=connect_signal)
+                    new_feature=new_feature, connect_signal=connect_signal, linked_feature=linked_feature)
                 if feature_cat is not None:
                     self._manage_new_feature(self.complet_result, dialog)
                 return result, dialog
@@ -300,7 +302,7 @@ class GwInfo(QObject):
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
-    def add_feature(self, feature_cat, action=None, connect_signal=None):
+    def add_feature(self, feature_cat, action=None, connect_signal=None, linked_feature=None):
         """ Button 21, 22: Add 'node', 'arc', 'connec' or 'element' """
 
         global is_inserting  # noqa: F824
@@ -321,8 +323,8 @@ class GwInfo(QObject):
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
 
-        if self.info_layer and feature_cat.parent_layer == 've_genelem':
-
+        # Order liked_feature        
+        if self.info_layer and (feature_cat.parent_layer == 've_genelem' or linked_feature):
             tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
 
             config = self.info_layer.editFormConfig()
@@ -333,12 +335,12 @@ class GwInfo(QObject):
             self.info_layer.startEditing()
 
             # Connect signal with feature_id
-            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal),
+            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal, linked_feature=linked_feature),
                                     'info', 'add_feature_featureAdded_open_new_feature')
             # Create a new feature with the given feature_id
             feature = QgsFeature(self.info_layer.fields())
             self.info_layer.addFeature(feature)
-
+    
         elif self.info_layer:
             # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
             # realizes that he has made a mistake and selects another feature, without this two features would
@@ -352,7 +354,7 @@ class GwInfo(QObject):
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
             self.iface.actionAddFeature().trigger()
-            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal),
+            tools_gw.connect_signal(self.info_layer.featureAdded, partial(self._open_new_feature, connect_signal=connect_signal, linked_feature=linked_feature),
                                     'info', 'add_feature_featureAdded_open_new_feature')
         else:
             msg = "Layer not found"
@@ -391,10 +393,11 @@ class GwInfo(QObject):
 
     # region private functions
 
-    def _get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature, connect_signal=None):
+    def _get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature, connect_signal=None,
+                            linked_feature=None):
         return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id,
                               layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature,
-                              connect_signal=connect_signal)
+                              connect_signal=connect_signal, linked_feature=linked_feature)
 
     def _manage_new_feature(self, complet_result, dialog):
 
@@ -492,7 +495,8 @@ class GwInfo(QObject):
 
         return result, self.dlg_generic
 
-    def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None, connect_signal=None):
+    def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None, connect_signal=None,
+                          linked_feature=None):
         """
         Opens a custom form
             :param feature_id: the id of the node that will populate the form (Integer)
@@ -633,10 +637,12 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(self._manage_prev_action)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
+            self.dlg_cf.btn_apply.clicked.connect(partial(self._apply_from_btn, dlg_cf, self.action_edit, feature_id, new_feature, 
+                                                          False, from_apply=True, linked_feature=linked_feature))
             btn_accept.clicked.connect(
-            partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False))
+            partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False, linked_feature=linked_feature))
             dlg_cf.key_enter.connect(
-            partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False))
+            partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False, linked_feature=linked_feature))
             # Open dialog
             tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
             self.dlg_cf.setWindowTitle(title)
@@ -1590,6 +1596,14 @@ class GwInfo(QObject):
             except RuntimeError:
                 pass
 
+    def _apply_from_btn(self, dialog, action_edit, fid, new_feature=None, generic=False, from_apply=False, linked_feature=None):
+        """ Manage apply button from info dialog """
+
+        self._manage_edition( dialog, action_edit, fid, new_feature, generic, from_apply)
+
+        if linked_feature:
+            self._manage_linked_feature(linked_feature)
+        
     def _manage_edition(self, dialog, action_edit, fid, new_feature=None, generic=False, from_apply=False):
 
         # With the editing QAction we need to collect the last modified value (self.get_last_value()),
@@ -1631,15 +1645,17 @@ class GwInfo(QObject):
                 tools_gw.enable_all(dialog, self.epa_complet_result['body']['data'])
             self._enable_actions(dialog, True)
 
-    def _accept_from_btn(self, dialog, action_edit, new_feature, my_json, last_json, generic=False):
-
+    def _accept_from_btn(self, dialog, action_edit, new_feature, my_json, last_json, generic=False, linked_feature=None):
         if not action_edit.isChecked():
             tools_gw.close_dialog(dialog)
             return
-
+        
         status = self._manage_accept(dialog, action_edit, new_feature, my_json, True, generic)
         if status:
             self._reset_my_json()
+        
+        if linked_feature:
+            self._manage_linked_feature(linked_feature)
 
     def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg, generic=False):
 
@@ -1672,6 +1688,22 @@ class GwInfo(QObject):
                     self._reset_my_json()
 
             return save
+
+    def _manage_linked_feature(self, linked_feature):
+        """ Manage linked feature after accept action """
+        if linked_feature['table_name']:
+            sql = f"SELECT * FROM {linked_feature['table_name']} WHERE {linked_feature['columnname']} = '{linked_feature['element_id']}'"
+            linked = tools_db.get_row(sql)
+            if not linked:
+                element_widget = linked_feature['dialog'].tab_elements.findChild(QWidget, 'tab_elements_element_id')
+                insert_widget = linked_feature['dialog'].tab_elements.findChild(QPushButton, 'tab_elements_insert_element')
+                if element_widget and insert_widget:
+                    element_widget.setText(linked_feature.get('element_id', ''))
+                    insert_widget.click()
+                    element_widget.setText('')
+            else:
+                _reload_table(**linked_feature)
+
 
     def _start_editing(self, dialog, action_edit, result, layer):
 
@@ -3247,14 +3279,19 @@ class GwInfo(QObject):
         if not self.iface.actionAddFeature().isChecked():
             tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
-    def _open_new_feature(self, feature_id, connect_signal=None):
+    def _open_new_feature(self, feature_id, connect_signal=None, linked_feature=None):
         """
         :param feature_id: Parameter sent by the featureAdded method itself
         :return:
-        """
+        """        
+        
 
         tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
+        if linked_feature and linked_feature.get('geometry'):
+            geom = QgsGeometry.fromWkt(linked_feature.get('geometry', {}).get("st_astext"))
+            if geom:
+                feature.setGeometry(geom)
         geom = feature.geometry()
         list_points = None
         try:
@@ -3282,7 +3319,7 @@ class GwInfo(QObject):
         result, dialog = self.info_feature._get_feature_insert(point=list_points, feature_cat=self.feature_cat,
                                                                new_feature_id=feature_id, new_feature=feature,
                                                                layer_new_feature=self.info_layer, tab_type='data',
-                                                               connect_signal=connect_signal)
+                                                               connect_signal=connect_signal, linked_feature=linked_feature)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         config = self.info_layer.editFormConfig()
