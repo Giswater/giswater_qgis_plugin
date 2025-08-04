@@ -238,6 +238,6 @@ UPDATE config_form_fields SET layoutname='lyt_general_7', layoutorder=1, "dataty
   "functionName": "enable",
   "module": "psector"
 }'::json, linkedobject=NULL, hidden=false, web_layoutorder=0 WHERE formname='generic' AND formtype='psector' AND columnname='chk_enable_all' AND tabname='tab_general';
-UPDATE config_form_fields SET layoutname='lyt_general_7', layoutorder=2, "datatype"='boolean', widgettype='check', "label"='Active:', tooltip='Active:', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'active', 'lyt_general_7', 2, 'boolean', 'check', 'Active:', 'Active:', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
   "setMultiline": true
-}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=0 WHERE formname='generic' AND formtype='psector' AND columnname='chk_active' AND tabname='tab_general';
+}'::json, NULL, NULL, false, 0);
