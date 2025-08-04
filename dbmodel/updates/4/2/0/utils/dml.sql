@@ -230,3 +230,14 @@ UPDATE sys_function SET function_name = 'gw_fct_checktopologypsector' where func
 UPDATE config_form_fields SET widgetcontrols = jsonb_set(COALESCE(widgetcontrols::jsonb, '{}'::jsonb), '{labelSize}', '58')
 WHERE formtype = 'psector' and columnname IN ('name', 'ext_code', 'status','workcat_id') and tabname='tab_general';
 DELETE FROM config_form_fields WHERE formname='generic' AND formtype='psector' AND columnname='spacer_1' AND tabname='tab_general';
+
+-- 04/08/2025
+UPDATE config_form_fields SET layoutname='lyt_general_7', layoutorder=1, "datatype"='boolean', widgettype='check', "label"='Show obsolete:', tooltip='Enable all (visualize obsolete state on features related to psector)', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{
+  "setMultiline": true
+}'::json, widgetfunction='{
+  "functionName": "enable",
+  "module": "psector"
+}'::json, linkedobject=NULL, hidden=false, web_layoutorder=0 WHERE formname='generic' AND formtype='psector' AND columnname='chk_enable_all' AND tabname='tab_general';
+UPDATE config_form_fields SET layoutname='lyt_general_7', layoutorder=2, "datatype"='boolean', widgettype='check', "label"='Active:', tooltip='Active:', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{
+  "setMultiline": true
+}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=0 WHERE formname='generic' AND formtype='psector' AND columnname='chk_active' AND tabname='tab_general';
