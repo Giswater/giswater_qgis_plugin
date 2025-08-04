@@ -5118,13 +5118,30 @@ def get_cm_user_role():
     if not tools_db.check_schema('cm'):
         return None
 
-    sql = f"""
-        SELECT t.role_id
-        FROM cm.cat_user AS u
-        JOIN cm.cat_team AS t ON u.team_id = t.team_id
-        WHERE u.username = '{tools_db.get_current_user()}'
-    """
-    return tools_db.get_row(sql)
+    # Try with username first, fallback to loginname if it fails
+    try:
+        sql = f"""
+            SELECT t.role_id
+            FROM cm.cat_user AS u
+            JOIN cm.cat_team AS t ON u.team_id = t.team_id
+            WHERE u.username = '{tools_db.get_current_user()}'
+        """
+        result = tools_db.get_row(sql)
+        return result if result else None
+    except:
+        # If username fails, try with loginname
+        try:
+            sql = f"""
+                SELECT t.role_id
+                FROM cm.cat_user AS u
+                JOIN cm.cat_team AS t ON u.team_id = t.team_id
+                WHERE u.loginname = '{tools_db.get_current_user()}'
+            """
+            result = tools_db.get_row(sql)
+            return result if result else None
+        except:
+            # If both queries fail, return None safely
+            return None
 
 
 def get_ids_from_qtable(qtable, id_column):
