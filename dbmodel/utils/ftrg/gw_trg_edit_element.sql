@@ -298,6 +298,12 @@ BEGIN
 		-- EPA INSERT
 		IF (NEW.epa_type = 'FRPUMP') THEN
 		    INSERT INTO inp_frpump (element_id) VALUES (NEW.element_id);
+			
+		ELSIF (NEW.epa_type = 'FRVALVE') THEN
+		    INSERT INTO inp_frvalve (element_id) VALUES (NEW.element_id);
+
+		ELSIF (NEW.epa_type = 'FRMETER') THEN
+		    INSERT INTO inp_frmeter (element_id) VALUES (NEW.element_id);
 
 		ELSIF (NEW.epa_type = 'FRWEIR') THEN
 		    INSERT INTO inp_frweir (element_id) VALUES (NEW.element_id);
@@ -310,34 +316,7 @@ BEGIN
 
 		END IF;
 
-
-		-- -- FEATURE INSERT (DYNAMIC TRIGGER)
-		-- SELECT row_to_json(NEW) INTO v_json_new_data;
-		-- SELECT row_to_json(OLD) INTO v_json_old_data;
-
-		-- v_input_json := jsonb_build_object(
-        -- 'client', jsonb_build_object(
-        --     'device', 4,
-        --     'infoType', 1,
-        --     'lang', 'ES'
-        -- 	),
-        -- 'feature', '{}'::jsonb,
-        -- 'data', jsonb_build_object(
-        --     'parameters', jsonb_build_object(
-        --         'jsonNewData', v_json_new_data,
-        --         'jsonOldData', v_json_old_data,
-        --         'action', 'INSERT',
-        --         'originTable', v_tg_table_name,
-        --         'pkeyColumn', 'element_id',
-        --         'pkeyValue', NEW.element_id
-        --     	)
-        -- 	)
-    	-- );
-
-		-- PERFORM gw_fct_admin_dynamic_trigger(v_input_json);
-
-
-		-- update element_x_feature table
+		-- insert into element_x_feature table
 		IF v_tablefeature IS NOT NULL AND v_feature IS NOT NULL THEN
 			EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_tablefeature||'_id, element_id) VALUES ('||v_feature||','||NEW.element_id||') ON CONFLICT 
 			('||v_tablefeature||'_id, element_id) DO NOTHING';

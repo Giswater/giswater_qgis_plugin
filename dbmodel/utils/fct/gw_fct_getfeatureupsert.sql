@@ -167,14 +167,14 @@ v_schemaname text;
 
 v_idname_aux text;
 
-v_nodarc_id varchar;
-v_toarc varchar;
-v_order_id integer;
-v_flwreg_type text;
-v_flwreg_length numeric(14,2);
 v_toarc_geom public.geometry;
 
 vdefault_querytext text;
+
+v_featureclass text;
+v_tablefeature text;
+v_toarc	integer;
+
 
 BEGIN
 
@@ -501,29 +501,29 @@ BEGIN
 				IF (v_numnodes >1) AND (v_gully_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('ERROR-1045:',error_message, v_id,'. ',hint_message) FROM sys_message WHERE id=1045);
 					v_status = false;
-				END IF;
-
-			--- get Flowreg Defaults
-			-- TODO: Review if this is correct. Reference 'FLWREG' in this function
-            ELSIF upper(v_catfeature.feature_type) = 'FLWREG' THEN
-                -- Get toarc
-                SELECT arc_id , the_geom into v_toarc, v_toarc_geom FROM ve_arc WHERE ST_DWithin(ST_endpoint(v_reduced_geometry), ve_arc.the_geom, 0.001) LIMIT 1;
-                -- Get flwreg_length
-                SELECT abs(ST_LineLocatePoint(v_toarc_geom, ST_startpoint(v_reduced_geometry)) - ST_LineLocatePoint(v_toarc_geom, ST_endpoint(v_reduced_geometry))) * ST_Length(v_toarc_geom)
-                INTO v_flwreg_length;
-
-                -- WARNING: this code is also in gw_fct_infofromid. If it needs to be changed here, it will most likely have to be changed there too.
-                -- Get node id from initial clicked point
-                SELECT * INTO v_noderecord1 FROM ve_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), ve_node.the_geom, v_arc_searchnodes)
-                ORDER BY ST_Distance(ve_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
-                -- Get flowreg_type
-                v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(v_table_id) ,' LIMIT 1');
-                EXECUTE v_querystring INTO v_flwreg_type;
-				-- Get order_id
-                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM ve_frelem WHERE node_id = v_noderecord1.node_id ::text AND flwreg_type = v_flwreg_type;
-                -- Set nodarc_id
-                v_nodarc_id = concat(v_noderecord1.node_id,upper(substring(v_flwreg_type FROM 1 FOR 2)), v_order_id);
+				END IF;              
 			END IF;
+		END IF;
+		
+		-- get flreg vdefaults (Node ID & to_arc)
+		IF upper(v_catfeature.feature_class) = 'FRELEM' THEN
+			
+			-- get node_id
+			SELECT node_id INTO v_node_id FROM ve_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), ve_node.the_geom, v_arc_searchnodes)
+			ORDER BY ST_Distance(ve_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
+			if v_node_id is NULL THEN
+				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3694", "function":"2560","parameters":null, "is_process":true}}$$);
+			END IF;
+							
+			-- get to_arc
+			SELECT sys_type INTO v_featureclass FROM ve_node WHERE node_id = v_node_id;
+			IF v_featureclass IS NOT NULL AND v_featureclass IN ('PUMP', 'VALVE', 'METER') THEN
+				v_tablefeature = concat('man_',lower(v_featureclass));
+				EXECUTE 'SELECT to_arc FROM '||v_tablefeature||' WHERE node_id = NEW.node_id'
+				INTO v_toarc;
+			END IF;
+			
 		END IF;
 
 		-- get NODE vdefaults user's mapzones only for nodes (for arcs is disabled because values are taken using heritage from nodes. For connect also because they takes from arc)
@@ -553,16 +553,6 @@ BEGIN
 			ELSE
 				v_sector_id =(SELECT sector_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
 				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
-			END IF;
-		END IF;
-
-		-- Node ID
-		IF upper(v_catfeature.feature_type) = 'ELEMENT' AND upper(v_catfeature.feature_class) = 'FRELEM' THEN
-			SELECT node_id INTO v_node_id FROM ve_node WHERE ST_DWithin(ST_startpoint(v_reduced_geometry), ve_node.the_geom, v_arc_searchnodes)
-			ORDER BY ST_Distance(ve_node.the_geom, ST_startpoint(v_reduced_geometry)) LIMIT 1;
-			if v_node_id is NULL THEN
-				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3694", "function":"2560","parameters":null, "is_process":true}}$$);
 			END IF;
 		END IF;
 
@@ -1010,17 +1000,20 @@ BEGIN
 						IF (v_auto_streetvalues_field = 'postnumber') THEN
 							field_value = v_postnumber;
 						ELSE field_value = NULL;
+						END IF;
 					END IF;
-				END IF;
 
 				WHEN 'postcomplement' THEN
 					IF (v_auto_streetvalues_status IS TRUE) THEN
 						IF (v_auto_streetvalues_field = 'postcomplement') THEN
 							field_value = v_postnumber;
 						ELSE field_value = NULL;
+						END IF;
 					END IF;
-				END IF;
-
+				WHEN 'to_arc' THEN
+                        IF v_catfeature.feature_type = 'FLWREG' THEN
+                            field_value = v_toarc;
+                        END IF;
 				WHEN 'ownercat_id' THEN
 					field_value = (SELECT owner_vdefault FROM exploitation WHERE expl_id = v_expl_id LIMIT 1);
 				WHEN 'node_id' THEN
@@ -1052,22 +1045,6 @@ BEGIN
                         IF v_catfeature.feature_type = 'FLWREG' THEN
                             field_value = v_noderecord1.node_id;
                         END IF;
-                     WHEN 'to_arc' THEN
-                        IF v_catfeature.feature_type = 'FLWREG' THEN
-                            field_value = v_toarc;
-                        END IF;
-                    WHEN 'order_id' THEN
-                        IF v_catfeature.feature_type = 'FLWREG' THEN
-                            field_value = v_order_id;
-                        END IF;
-                    WHEN 'nodarc_id' THEN
-                        IF v_catfeature.feature_type = 'FLWREG' THEN
-                            field_value = v_nodarc_id;
-                        END IF;
-                    when 'flwreg_type' then
-                        field_value = v_flwreg_type;
-                    when 'flwreg_length' then
-                        field_value = v_flwreg_length;
 					WHEN 'dwfzone_id' THEN
 						field_value = v_dwfzone_id;
 					WHEN 'drainzone_id' THEN

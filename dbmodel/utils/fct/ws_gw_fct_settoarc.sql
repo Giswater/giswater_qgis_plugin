@@ -48,6 +48,7 @@ v_result_info text;
 v_result text;
 v_version text;
 v_error_context text;
+v_element_id integer;
 
 BEGIN
 
@@ -72,9 +73,10 @@ BEGIN
 
 	DELETE FROM audit_check_data WHERE fid=359 AND cur_user=current_user;
 
-	--If to_arc is not defined take arc to which node is connected
-	IF v_arc_id IS NULL THEN
-		SELECT arc_id INTO v_arc_id FROM arc WHERE node_1 =  v_feature_id;
+	-- get feature id if the objet is a frelement  
+	IF v_feature_class ='FRELEM' THEN
+		v_element_id = v_feature_id;
+		v_feature_id = (SELECT node_id FROM man_frelem WHERE element_id = v_element_id);
 	END IF;
 
 	-- check if to_arc is connected with node
@@ -100,11 +102,16 @@ BEGIN
 
 	ELSIF v_feature_class = 'METER' THEN
 
-		-- nothing to do;
+		UPDATE man_meter SET to_arc = v_arc_id::int4 WHERE node_id = v_feature_id;
+
+	ELSIF v_feature_class = 'FRELEM' THEN
+
+		UPDATE man_frelem SET to_arc = v_arc_id::int4 WHERE element_id = v_element_id;
+
 	END IF;
 
 	-- graphconfig for mapzones
-	IF v_graphdelim && ARRAY['SECTOR','PRESSZONE','DMA','DQA'] THEN
+	IF v_graphdelim && ARRAY['SECTOR','PRESSZONE','DMA','DQA', 'DWFZONE', 'DRAINZONE'] THEN
 
 		--define list of mapzones to be set
 		SELECT array_agg(lower(unnest)) INTO v_mapzone_array FROM unnest(v_graphdelim);
