@@ -143,7 +143,8 @@ class GwI18NGenerator:
                         error_langs['db'].setdefault(self.language, []).append(text_error)
                     elif status_all_db_msg is None:
                         canceled_langs['db'].setdefault(self.language, []).append(text_error)
-                    type_db_file_translated.append(type_db_file)
+                    if type_db_file not in type_db_file_translated:
+                        type_db_file_translated.append(type_db_file)
 
         # Write a message with the results
         if py_msg:
