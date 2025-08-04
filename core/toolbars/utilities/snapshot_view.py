@@ -187,10 +187,10 @@ def close_dlg(**kwargs):
 def run(**kwargs):
     """ Button run clicked """
 
-    dlg = kwargs["class"]
+    class_obj = kwargs["class"]
 
     # Get coordinates
-    txt_coordinates = tools_qt.get_text(dlg.dlg_snapshot_view, "txt_coordinates")
+    txt_coordinates = tools_qt.get_text(class_obj.dlg_snapshot_view, "txt_coordinates")
     polygon = None
 
     if txt_coordinates != "null":
@@ -205,16 +205,16 @@ def run(**kwargs):
         ]])
 
     # Check null values
-    if not polygon or dlg.date.dateTime().isNull() or not any([feature.isChecked() for feature in dlg.features]):
+    if not polygon or class_obj.date.dateTime().isNull() or not any([feature.isChecked() for feature in class_obj.features]):
         msg = "Required fields are missing"
-        tools_qgis.show_warning(msg, dialog=dlg.dlg_snapshot_view)
+        tools_qgis.show_warning(msg, dialog=class_obj.dlg_snapshot_view)
         return
 
     # Create json input data
     form = {
-        "date": dlg.date.dateTime().toString("yyyy-MM-dd"),
+        "date": class_obj.date.dateTime().toString("yyyy-MM-dd"),
         "polygon": f'{polygon.asWkt()}',
-        "features": [feature.objectName().split('_')[-1] for feature in dlg.features if feature.isChecked()]
+        "features": [feature.objectName().split('_')[-1] for feature in class_obj.features if feature.isChecked()]
     }
 
     body = {"client": {"cur_user": tools_db.current_user}, "form": form}
@@ -225,10 +225,10 @@ def run(**kwargs):
     if result.get("status") == "Accepted" and result.get("body").get("data"):
         layers = result['body']['data']
         add_layers_temp(layers, f"Snapshot - {form['date']}")
-        tools_gw.close_dialog(dlg.dlg_snapshot_view)
+        tools_gw.close_dialog(class_obj.dlg_snapshot_view)
     else:
         msg = "No results"
-        tools_qgis.show_warning(msg, dialog=dlg.dlg_snapshot_view)
+        tools_qgis.show_warning(msg, dialog=class_obj.dlg_snapshot_view)
 
 
 def add_layers_temp(layers, group):

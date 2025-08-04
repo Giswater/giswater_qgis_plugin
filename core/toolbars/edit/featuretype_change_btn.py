@@ -271,7 +271,7 @@ def btn_cancel_featuretype_change(**kwargs):
 def btn_accept_featuretype_change(**kwargs):
     """ Update current type of feature and save changes in database """
 
-    this = kwargs["class"]
+    class_obj = kwargs["class"]
     dialog = kwargs["dialog"]
 
     project_type = tools_gw.get_project_type()
@@ -301,8 +301,8 @@ def btn_accept_featuretype_change(**kwargs):
                 project_type == 'ud'):
 
             # Get function input parameters
-            feature = f'"type":"{this.feature_type}"'
-            extras = f'"feature_id":"{this.feature_id}"'
+            feature = f'"type":"{class_obj.feature_type}"'
+            extras = f'"feature_id":"{class_obj.feature_id}"'
             extras += f', "feature_type_new":"{feature_type_new}"'
             extras += f', "featurecat_id":"{featurecat_id}"'
             extras += f', "fluid_type":"{fluid_type}"'
@@ -318,7 +318,7 @@ def btn_accept_featuretype_change(**kwargs):
                 msg = "Error replacing feature"
                 tools_qgis.show_warning(msg)
                 # Check in init config file if user wants to keep map tool active or not
-                this.manage_active_maptool()
+                class_obj.manage_active_maptool()
                 tools_gw.close_dialog(dialog)
                 return
 
@@ -346,23 +346,23 @@ def btn_accept_featuretype_change(**kwargs):
     tools_gw.close_dialog(dialog)
 
     # Refresh map canvas
-    this.refresh_map_canvas()
+    class_obj.refresh_map_canvas()
 
     # Check if the expression is valid
-    expr_filter = f"{this.feature_type}_id = '{this.feature_id}'"
+    expr_filter = f"{class_obj.feature_type}_id = '{class_obj.feature_id}'"
     (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
     if not is_valid:
         return
 
     # Check in init config file if user wants to keep map tool active or not
-    this.manage_active_maptool()
+    class_obj.manage_active_maptool()
 
 
 def btn_catalog_featuretype_change(**kwargs):
     """ Open Catalog form """
 
     dialog = kwargs["dialog"]
-    this = kwargs["class"]
+    class_obj = kwargs["class"]
 
     # Get feature_type
     child_type = tools_qt.get_text(dialog, "tab_none_feature_type_new")
@@ -371,8 +371,8 @@ def btn_catalog_featuretype_change(**kwargs):
         tools_qt.show_info_box(msg, "Info")
         return
 
-    this.catalog = GwCatalog()
-    this.catalog.open_catalog(dialog, 'tab_none_featurecat_id', this.feature_type, child_type)
+    class_obj.catalog = GwCatalog()
+    class_obj.catalog.open_catalog(dialog, 'tab_none_featurecat_id', class_obj.feature_type, child_type)
 
 
 def cmb_new_featuretype_selection_changed(**kwargs):
@@ -380,14 +380,14 @@ def cmb_new_featuretype_selection_changed(**kwargs):
 
     dialog = kwargs["dialog"]
     cmb_new_feature_type = kwargs["widget"]
-    this = kwargs["class"]
+    class_obj = kwargs["class"]
     reload_fields = []
 
     # Fetch the new feature type
     feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
 
     # Create body with only newFeatureCat in extras
-    feature = f'"tableName":"{this.tablename}", "id":"{this.feature_id}"'
+    feature = f'"tableName":"{class_obj.tablename}", "id":"{class_obj.feature_id}"'
     extras = f'"newFeatureCat":"{feature_type_new}"'
     body = tools_gw.create_body(feature=feature, extras=extras)
 

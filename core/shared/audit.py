@@ -279,8 +279,8 @@ def open(**kwargs):
 def open_date(**kwargs):
     """ Open audit in selected date """    
 
-    this = kwargs["class"]
-    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{this.date.dateTime().toString('yyyy-MM-dd')}' ORDER BY tstamp ASC"""
+    class_obj = kwargs["class"]
+    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString('yyyy-MM-dd')}' ORDER BY tstamp ASC"""
     rows = tools_db.get_rows(query)
 
     form = []
@@ -288,7 +288,7 @@ def open_date(**kwargs):
         for row in rows:
             form.append({"logId": row[0]})
 
-    this.fill_dialog(form)
+    class_obj.fill_dialog(form)
 
 
 
