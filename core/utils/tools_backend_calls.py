@@ -996,10 +996,10 @@ def manage_element_menu(**kwargs):
 
     linked_feature_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": geometry, 
                            "self": feature_class, "complet_result": complet_result, 
-                           "columnname":"element_id"}
+                           "columnname": "element_id"}
     linked_feature_no_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": None, 
                               "self": feature_class, "complet_result": complet_result,
-                              "columnname":"element_id"}
+                              "columnname": "element_id"}
     # Create menu for button
     btn_menu = QMenu()
     # Create info feature object for tab_data

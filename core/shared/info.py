@@ -1599,7 +1599,7 @@ class GwInfo(QObject):
     def _apply_from_btn(self, dialog, action_edit, fid, new_feature=None, generic=False, from_apply=False, linked_feature=None):
         """ Manage apply button from info dialog """
 
-        self._manage_edition( dialog, action_edit, fid, new_feature, generic, from_apply)
+        self._manage_edition(dialog, action_edit, fid, new_feature, generic, from_apply)
 
         if linked_feature:
             self._manage_linked_feature(linked_feature)
@@ -1703,7 +1703,6 @@ class GwInfo(QObject):
                     element_widget.setText('')
             else:
                 _reload_table(**linked_feature)
-
 
     def _start_editing(self, dialog, action_edit, result, layer):
 
@@ -3285,7 +3284,6 @@ class GwInfo(QObject):
         :return:
         """        
         
-
         tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
         if linked_feature and linked_feature.get('geometry'):
