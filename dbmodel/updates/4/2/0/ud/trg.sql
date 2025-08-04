@@ -184,3 +184,6 @@ ve_epa_froutlet FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('froutlet');
 
 CREATE TRIGGER gw_trg_edit_ve_epa_frweir INSTEAD OF INSERT OR DELETE OR UPDATE ON
 ve_epa_frweir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frweir');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_inp_dscenario_frpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-PUMP');

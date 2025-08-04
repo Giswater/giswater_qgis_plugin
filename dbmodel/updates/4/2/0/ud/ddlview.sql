@@ -8977,3 +8977,18 @@ AS SELECT gully_id,
     custom_b_param,
     efficiency
    FROM inp_gully;
+
+DROP VIEW IF EXISTS ve_inp_dscenario_frpump;
+CREATE OR REPLACE VIEW ve_inp_dscenario_frpump
+AS SELECT s.dscenario_id,
+    f.element_id,
+    n.node_id,
+    f.curve_id,
+    f.status,
+    f.startup,
+    f.shutoff,
+    n.the_geom
+   FROM selector_inp_dscenario s,
+    inp_dscenario_frpump f
+     JOIN ve_inp_frpump n USING (element_id)
+  WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
