@@ -8,7 +8,7 @@ or (at your option) any later version.
 --FUNCTION CODE: xxxx
 
 CREATE OR REPLACE FUNCTION cm.gw_trg_cm_topocontrol_arc()
-RETURNS json AS
+RETURNS trigger AS
 $BODY$
 
 DECLARE

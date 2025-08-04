@@ -23,8 +23,8 @@ DECLARE
     v_arc_divide_tolerance float = 0.05;
     v_arc_searchnodes float;
     v_schemaname text;
-    rec_aux1 "SCHEMA_NAME".arc;
-    rec_aux2 "SCHEMA_NAME".arc;
+    rec_aux1 "PARENT_SCHEMA".arc;
+    rec_aux2 "PARENT_SCHEMA".arc;
     v_node_id integer;
     v_arc_closest integer;
     v_set_arc_obsolete boolean;
