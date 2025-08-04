@@ -520,7 +520,7 @@ BEGIN
 			SELECT sys_type INTO v_featureclass FROM ve_node WHERE node_id = v_node_id;
 			IF v_featureclass IS NOT NULL AND v_featureclass IN ('PUMP', 'VALVE', 'METER') THEN
 				v_tablefeature = concat('man_',lower(v_featureclass));
-				EXECUTE 'SELECT to_arc FROM '||v_tablefeature||' WHERE node_id = NEW.node_id'
+				EXECUTE 'SELECT to_arc FROM '||v_tablefeature||' WHERE node_id = '||v_node_id
 				INTO v_toarc;
 			END IF;
 			
