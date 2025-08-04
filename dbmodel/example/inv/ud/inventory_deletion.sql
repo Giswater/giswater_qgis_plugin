@@ -49,7 +49,7 @@ DELETE FROM plan_psector;
 DELETE FROM rpt_cat_result;
 
 UPDATE config_param_user SET value = false where parameter = 'plan_psector_force_delete';
-UPDATE inp_gully SET outlet_type =null,  "method"  = null, weir_cd =null , orifice_cd =null , efficiency =null ;
+UPDATE inp_gully SET outlet_type =null,  gully_method = null, weir_cd =null , orifice_cd =null , efficiency =null ;
 
 DELETE FROM raingage;
 DELETE from inp_timeseries;
