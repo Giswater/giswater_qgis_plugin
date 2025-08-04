@@ -302,7 +302,7 @@ BEGIN
 		ELSIF (NEW.epa_type = 'FRVALVE') THEN
 		    INSERT INTO inp_frvalve (element_id) VALUES (NEW.element_id);
 
-		ELSIF (NEW.epa_type = 'FRMETER') THEN
+		ELSIF (NEW.epa_type = 'FRSHORTPIPE') THEN
 		    INSERT INTO inp_frmeter (element_id) VALUES (NEW.element_id);
 
 		ELSIF (NEW.epa_type = 'FRWEIR') THEN
