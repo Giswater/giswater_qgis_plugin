@@ -792,3 +792,21 @@ UPDATE config_form_fields
   }
 }'::json
 	WHERE formname='ve_link_vlink' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+-- 04/08/2025
+DELETE FROM config_form_fields WHERE (formname ILIKE '%frelem%' OR formname ILIKE '%genelem%') AND tabname = 'tab_none';
+DELETE FROM config_form_fields WHERE formname ILIKE '%frelem%' AND columnname = 'nodarc_id';
+
+-- setToArc action
+UPDATE config_form_tabs
+	SET tabactions='[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  }
+]'::json
+	WHERE formname='ve_frelem' AND tabname='tab_data';

@@ -1363,3 +1363,302 @@ UPDATE config_toolbox SET inputparams = '[
     "placeholder": ""
   }
 ]'::json WHERE id = 3322;
+
+
+-- 04/08/2025
+DELETE FROM config_form_fields WHERE (formname ILIKE '%frelem%' OR formname ILIKE '%genelem%') AND tabname = 'tab_none';
+DELETE FROM config_form_fields WHERE formname ILIKE '%frelem%' AND columnname = 'nodarc_id';
+
+-- setToArc action
+UPDATE config_form_tabs
+	SET tabactions='[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  }
+]'::json
+	WHERE formname='ve_frelem' AND tabname='tab_data';
+
+-- Correct sourcetable in widgetfunction
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_connec",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json
+	WHERE formname='connec' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_node",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json
+	WHERE formname='node' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_link",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json
+	WHERE formname='ve_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_link",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json
+	WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_link",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json
+	WHERE formname='ve_link_pipelink' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element_x_link",
+    "targetwidget": "tab_elements_tbl_elements",
+    "field_object_id": "element_id",
+    "sourceview": "element"
+  }
+}'::json
+	WHERE formname='ve_link_vlink' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
+
+-- FRVALVE
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','reaction_min','lyt_epa_data_2',15,'string','text','Min reaction:','Min reaction',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','ffactor_max','lyt_epa_data_2',16,'string','text','Max Ffactor:','Max Ffactor',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','ffactor_min','lyt_epa_data_2',17,'string','text','Min Ffactor:','Min Ffactor',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,linkedobject,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','tbl_inp_valve','lyt_epa_dsc_3',1,'tableview',false,false,false,false,false,'{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_valve"}'::json,'tbl_inp_dscenario_valve',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,linkedobject,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','hspacer_epa_1','lyt_epa_dsc_1',4,'hspacer',false,false,false,false,false,'{"saveValue": false}'::json,'tbl_inp_dscenario_valve',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','cat_dint','lyt_epa_data_1',13,'string','text','Cat dint:','Cat dint',false,false,false,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','custom_dint','lyt_epa_data_1',14,'string','text','Custom dint:','Custom dint',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','status','lyt_epa_data_1',9,'string','text','Status:','Status',false,false,false,false,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','valve_type','lyt_epa_data_1',2,'string','text','Valve type:','Valve type',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','nodarc_id','lyt_epa_data_1',1,'string','text','Nodarc id:','Nodarc id',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','pressure','lyt_epa_data_1',3,'string','text','Pressure:','Pressure',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','flow','lyt_epa_data_1',5,'string','text','Flow:','Flow',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','coef_loss','lyt_epa_data_1',6,'string','text','Coefficient loss:','Coefficient loss',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','minorloss','lyt_epa_data_1',8,'string','text','Minorloss:','Minorloss',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','add_settings','lyt_epa_data_1',11,'string','text','Add settings:','Add settings',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','init_quality','lyt_epa_data_1',12,'string','text','Initial quality:','Initial quality',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','result_id','lyt_epa_data_2',1,'string','text','Result id:','Result id',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','headloss_max','lyt_epa_data_2',8,'string','text','Max headloss:','Max headloss',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','headloss_min','lyt_epa_data_2',9,'string','text','Min headloss:','Min headloss',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','uheadloss_max','lyt_epa_data_2',10,'string','text','Max uheadloss:','Max uheadloss',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','uheadloss_min','lyt_epa_data_2',11,'string','text','Min uheadloss:','Min uheadloss',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','setting_max','lyt_epa_data_2',12,'string','text','Max setting:','Max setting',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','setting_min','lyt_epa_data_2',13,'string','text','Min setting:','Min setting',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','reaction_max','lyt_epa_data_2',14,'string','text','Max reaction:','Max reaction',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','curve_id','lyt_epa_data_1',7,'string','combo','Curve id:','Curve id',false,false,true,false,false,'SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL',true,true,'{"valueRelation":{"nullValue":false, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','flow_max','lyt_epa_data_2',2,'string','text','Max flow:','Max Flow',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','flow_min','lyt_epa_data_2',3,'string','text','Min flow:','Min Flow',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','vel_max','lyt_epa_data_2',5,'string','text','Max velocity:','Max velocity',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','vel_min','lyt_epa_data_2',6,'string','text','Min velocity:','Min velocity',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','add_to_dscenario','lyt_epa_dsc_1',1,'button',false,false,false,false,false,'{"icon":"113"}'::json,'{"saveValue": false}'::json,'{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_valve",
+    "tablename": "v_edit_inp_dscenario_valve",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_valve", "view": "v_edit_inp_dscenario_valve", "add_view": "v_edit_inp_dscenario_valve", "pk": ["dscenario_id", "node_id"]}
+   ]
+, "add_dlg_title":"Valve"   }
+}'::json,'tbl_inp_dscenario_valve',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','edit_dscenario','lyt_epa_dsc_1',3,'button',false,false,true,false,false,'{"icon":"101"}'::json,'{"saveValue":false, "onContextMenu":"Edit dscenario"}'::json,'{
+  "functionName": "edit_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_valve",
+    "tablename": "v_edit_inp_dscenario_valve",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_valve", "view": "v_edit_inp_dscenario_valve", "add_view": "v_edit_inp_dscenario_valve", "pk": ["dscenario_id", "node_id"]}
+   ]
+, "add_dlg_title":"Valve"   }
+}'::json,'tbl_inp_dscenario_valve',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frvalve','form_feature','tab_epa','remove_from_dscenario','lyt_epa_dsc_1',2,'button',false,false,false,false,false,'{"icon":"114"}'::json,'{"saveValue":false, "onContextMenu":"Delete dscenario"}'::json,'{
+  "functionName": "remove_from_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_valve",
+    "tablename": "v_edit_inp_dscenario_valve",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_valve", "view": "v_edit_inp_dscenario_valve", "add_view": "v_edit_inp_dscenario_valve", "pk": ["dscenario_id", "node_id"]}
+   ]
+  }
+}'::json,'tbl_inp_dscenario_valve',false);
+
+-- FRPUMP
+DELETE FROM config_form_fields WHERE formname = 've_epa_frpump';
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','power','lyt_epa_data_1',1,'string','text','Power:','Power',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','speed','lyt_epa_data_1',3,'string','text','Speed:','Speed',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','energy_price','lyt_epa_data_1',9,'string','text','Energy price:','Energy price',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','result_id','lyt_epa_data_2',1,'string','text','Result id:','Result id',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','headloss_max','lyt_epa_data_2',6,'string','text','Max headloss:','Max headloss',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','headloss_min','lyt_epa_data_2',7,'string','text','Min headloss:','Min headloss',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','quality','lyt_epa_data_2',8,'string','text','Quality:','Quality',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','usage_fact','lyt_epa_data_2',9,'string','text','Usage factor:','Usage factor',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','kwhr_mgal','lyt_epa_data_2',11,'string','text','KWh mgal:','KWh mgal',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','avg_kw','lyt_epa_data_2',12,'string','text','Average KW:','Average KW',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','peak_kw','lyt_epa_data_2',13,'string','text','Peak KW:','Peak KW',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','cost_day','lyt_epa_data_2',14,'string','text','Cost day:','Cost day',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','status','lyt_epa_data_1',5,'string','combo','Status:','Status',false,false,true,false,false,'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_pump''',true,true,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','pump_type','lyt_epa_data_1',8,'string','combo','Pump type:','Pump type',false,false,true,false,false,'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_typevalue_pumptype''',true,true,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','avg_effic','lyt_epa_data_2',10,'string','text','Average efficiency:','Average efficiency',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,linkedobject,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','tbl_inp_pump','lyt_epa_dsc_3',1,'tableview',false,false,false,false,false,'{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_pump"}'::json,'tbl_inp_dscenario_pump',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,linkedobject,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','hspacer_epa_1','lyt_epa_dsc_1',4,'hspacer',false,false,false,false,false,'{"saveValue": false}'::json,'tbl_inp_dscenario_pump',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','remove_from_dscenario','lyt_epa_dsc_1',2,'button',false,false,false,false,false,'{"icon":"114"}'::json,'{"saveValue":false, "onContextMenu":"Delete dscenario"}'::json,'{
+  "functionName": "remove_from_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_pump",
+    "tablename": "v_edit_inp_dscenario_pump",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_pump", "view": "v_edit_inp_dscenario_pump", "add_view": "v_edit_inp_dscenario_pump", "pk": ["dscenario_id", "node_id"]}
+   ]
+  }
+}'::json,'tbl_inp_dscenario_pump',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','effic_curve_id','lyt_epa_data_1',11,'string','combo','Eff. curve','Eff. curve',false,false,true,false,false,'SELECT id as id, id as idval FROM ve_inp_curve WHERE curve_type = ''EFFICIENCY''',true,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','energy_pattern_id','lyt_epa_data_1',10,'string','combo','Price pattern:','Price pattern',false,false,true,false,false,'SELECT pattern_id as id, pattern_id as idval FROM ve_inp_pattern WHERE pattern_id is not null','{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','pattern_id','lyt_epa_data_1',4,'string','combo','Pattern:','Pattern',false,false,true,false,false,'SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL',true,true,'{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','flow_max','lyt_epa_data_2',2,'string','text','Max flow:','Max Flow',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','flow_min','lyt_epa_data_2',3,'string','text','Min flow:','Min Flow',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','vel_max','lyt_epa_data_2',4,'string','text','Max velocity:','Max velocity',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','vel_min','lyt_epa_data_2',5,'string','text','Min velocity:','Min velocity',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','add_to_dscenario','lyt_epa_dsc_1',1,'button',false,false,false,false,false,'{"icon":"113"}'::json,'{"saveValue": false}'::json,'{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_pump",
+    "tablename": "v_edit_inp_dscenario_pump",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_pump", "view": "v_edit_inp_dscenario_pump", "add_view": "v_edit_inp_dscenario_pump", "pk": ["dscenario_id", "node_id"]}
+   ]
+ , "add_dlg_title":"Pump" }
+}'::json,'tbl_inp_dscenario_pump',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','edit_dscenario','lyt_epa_dsc_1',3,'button',false,false,true,false,false,'{"icon":"101"}'::json,'{"saveValue":false, "onContextMenu":"Edit dscenario"}'::json,'{
+  "functionName": "edit_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_pump",
+    "tablename": "v_edit_inp_dscenario_pump",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_pump", "view": "v_edit_inp_dscenario_pump", "add_view": "v_edit_inp_dscenario_pump", "pk": ["dscenario_id", "node_id"]}
+   ]
+ , "add_dlg_title":"Pump" }
+}'::json,'tbl_inp_dscenario_pump',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','curve_id','lyt_epa_data_1',2,'string','combo','Curve id:','Curve id',false,false,true,false,false,'SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL AND curve_type IN (''PUMP'', ''PUMP1'', ''PUMP2'', ''PUMP3'', ''PUMP4'')',true,true,'{"valueRelation":{"nullValue":false, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frpump','form_feature','tab_epa','to_arc','lyt_epa_data_1',6,'string','text','To arc:','To arc',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
