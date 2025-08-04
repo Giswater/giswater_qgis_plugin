@@ -286,17 +286,35 @@ BEGIN
 			END IF;
 
 		ELSIF v_feature_type = 'link' THEN
-
-			-- generic log for links
-			FOR v_feature_id_value IN SELECT value FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
-    		LOOP
-				v_count_feature = v_count_feature + 1;
-			END LOOP;
-
-			IF v_count_feature > 0 THEN
+		
+			-- avoid downgrade links in state=2
+			SELECT count(*) INTO v_count FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
+			WHERE value::integer IN (SELECT link_id FROM link WHERE state=2);
+		
+			--RAISE EXCEPTION 'v_sql %', v_sql;
+		
+			IF v_count > 0 THEN
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4322", "function":"3068", "parameters":{"v_count_feature":"'||v_count_feature||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+                "data":{"message":"4328", "function":"3068", "parameters":{}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+               
+			ELSE
+			
+	            -- generic log for links
+				FOR v_feature_id_value IN SELECT value FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
+	    		LOOP
+					v_count_feature = v_count_feature + 1;
+				END LOOP;
+	
+				IF v_count_feature > 0 THEN
+	
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	                       "data":{"message":"4322", "function":"3068", "parameters":{"v_count_feature":"'||v_count_feature||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+	               
+               
+            	END IF;
+
+			
 			END IF;
 		
 		ELSEIF v_feature_type = 'element' THEN
