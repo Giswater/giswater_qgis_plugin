@@ -200,11 +200,11 @@ UPDATE config_toolbox SET inputparams='[
 ]'::json WHERE id=2118;
 
 
-update config_param_system set parameter = 'plan_psector_mode' where parameter = 'plan_psector_current';
+update config_param_system set parameter = 'plan_psector_current' where parameter = 'plan_psector_current';
 update config_form_fields set dv_querytext = 'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_mode''
+  WHERE parameter = ''plan_psector_current''
   AND cur_user = current_user
 )
 SELECT id, name AS idval 
@@ -240,4 +240,4 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 UPDATE config_form_fields SET layoutorder=3, web_layoutorder=3 WHERE formname='generic' AND formtype='psector' AND columnname='creation_date' AND tabname='tab_general';
 =======
 ]'::json WHERE id=2118;
->>>>>>> parent of 700cdf590 (feat(plan_psector): rename variable plan_psector_current to plan_psector_mode)
+>>>>>>> parent of 700cdf590 (feat(plan_psector): rename variable plan_psector_current to plan_psector_current)

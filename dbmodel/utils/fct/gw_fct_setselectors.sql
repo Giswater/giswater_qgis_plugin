@@ -716,11 +716,11 @@ BEGIN
 	    FROM config_param_user a
 	    LEFT JOIN plan_psector b ON a.value::integer = b.psector_id
 	    JOIN selector_expl c ON b.expl_id = c.expl_id
-	    WHERE a."parameter" = 'plan_psector_mode'
+	    WHERE a."parameter" = 'plan_psector_current'
 	    AND c.cur_user = current_user
 		) THEN
 	
-		UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_mode' AND cur_user = current_user;
+		UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
 	
 	END IF;
 

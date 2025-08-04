@@ -868,7 +868,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_node_netelement','form_feature','tab_data','state','lyt_bot_1',3,'smallint','combo','state','state',NULL,false,true,true,false,NULL,'WITH check_value AS (
   SELECT value::integer AS psector_value 
   FROM config_param_user 
-  WHERE parameter = ''plan_psector_mode''
+  WHERE parameter = ''plan_psector_current''
   AND cur_user = ''||CURRENT_USER||''
 )
 SELECT id, name as idval 
