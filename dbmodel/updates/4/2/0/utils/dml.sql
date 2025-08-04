@@ -232,12 +232,8 @@ WHERE formtype = 'psector' and columnname IN ('name', 'ext_code', 'status','work
 DELETE FROM config_form_fields WHERE formname='generic' AND formtype='psector' AND columnname='spacer_1' AND tabname='tab_general';
 
 -- 04/08/2025
-UPDATE config_form_fields SET layoutname='lyt_general_7', layoutorder=1, "datatype"='boolean', widgettype='check', "label"='Show obsolete:', tooltip='Enable all (visualize obsolete state on features related to psector)', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{
-  "setMultiline": true
-}'::json, widgetfunction='{
-  "functionName": "enable",
-  "module": "psector"
-}'::json, linkedobject=NULL, hidden=false, web_layoutorder=0 WHERE formname='generic' AND formtype='psector' AND columnname='chk_enable_all' AND tabname='tab_general';
+UPDATE config_form_fields SET label='Show obsolete:' WHERE formname='generic' AND formtype='psector' AND columnname='chk_enable_all' AND tabname='tab_general';
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'active', 'lyt_general_7', 2, 'boolean', 'check', 'Active:', 'Active:', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
   "setMultiline": true
-}'::json, NULL, NULL, false, 0);
+}'::json, NULL, NULL, false, 2);
+UPDATE config_form_fields SET layoutorder=3, web_layoutorder=3 WHERE formname='generic' AND formtype='psector' AND columnname='creation_date' AND tabname='tab_general';
