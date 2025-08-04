@@ -73,6 +73,9 @@ BEGIN
 
 	-- step 1: pre-process
 	IF v_step = 1 THEN
+	
+		-- drop profilactic temp table of polygon
+		DROP TABLE IF EXISTS temp_anl_polygon;
 
 		-- check consistency for user options
 		SELECT gw_fct_pg2epa_check_options(v_input) INTO v_return;
