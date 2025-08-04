@@ -669,6 +669,12 @@ BEGIN
 
 	END IF;
 
+	-- cross reference schema for state 
+	IF v_addschema IS NOT NULL THEN 
+		EXECUTE 'DELETE FROM '||v_addschema||'.selector_state WHERE cur_user = current_user';
+		EXECUTE 'INSERT INTO '||v_addschema||'.selector_state SELECT state_id, current_user FROM selector_state WHERE cur_user = current_user';
+	END IF;
+	
 	-- get envelope
 	SELECT count(the_geom) INTO v_count_2 FROM ve_node LIMIT 1;
 
