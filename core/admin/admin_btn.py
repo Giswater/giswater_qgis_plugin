@@ -1282,14 +1282,6 @@ class GwAdminButton:
                                                       force_reload=True)
         qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
 
-        list_project_type = tools_db.execute_returning(f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'")
-        try:
-            result = {list_project_type[i]: list_project_type[i + 1] for i in range(0, len(list_project_type), 2)}
-        except Exception:
-            result = {}
-        tools_qt.fill_combo_values(self.dlg_create_gis_project.cmb_project_type, list(result.items()))
-        if len(list(result.items())) <= 1:
-            self.dlg_create_gis_project.cmb_project_type.setEnabled(False)
         self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
         self.dlg_create_gis_project.txt_gis_folder.setEnabled(False)
         if self.is_service:
@@ -1305,6 +1297,18 @@ class GwAdminButton:
 
         # Set shortcut keys
         self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
+
+        # Manage cmb Project Type visibility
+        self.dlg_create_gis_project.lbl_project_type.setVisible(False)
+        self.dlg_create_gis_project.cmb_project_type.setVisible(False)
+        # list_project_type = tools_db.execute_returning(f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'")
+        # try:
+        #     result = {list_project_type[i]: list_project_type[i + 1] for i in range(0, len(list_project_type), 2)}
+        # except Exception:
+        #     result = {}
+        # tools_qt.fill_combo_values(self.dlg_create_gis_project.cmb_project_type, list(result.items()))
+        # if len(list(result.items())) <= 1:
+        #     self.dlg_create_gis_project.cmb_project_type.setEnabled(False)
 
         # Open MainWindow
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
