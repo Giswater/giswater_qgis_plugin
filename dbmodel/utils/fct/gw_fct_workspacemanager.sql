@@ -446,7 +446,7 @@ BEGIN
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	-- get uservalues
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_mode', 'utils_workspace_vdefault')
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
 
 	SELECT row_to_json (a) INTO v_geometry

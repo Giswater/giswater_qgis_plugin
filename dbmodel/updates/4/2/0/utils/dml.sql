@@ -196,6 +196,7 @@ UPDATE config_toolbox SET inputparams='[
     "filterquery": "select distinct id as id, id as idval from cat_node where node_type = ''{parent_value}'' order by id",
     "layoutorder": 8
   }
+<<<<<<< HEAD
 ]'::json WHERE id=2118;
 
 
@@ -237,3 +238,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   "setMultiline": true
 }'::json, NULL, NULL, false, 2);
 UPDATE config_form_fields SET layoutorder=3, web_layoutorder=3 WHERE formname='generic' AND formtype='psector' AND columnname='creation_date' AND tabname='tab_general';
+=======
+]'::json WHERE id=2118;
+>>>>>>> parent of 700cdf590 (feat(plan_psector): rename variable plan_psector_current to plan_psector_mode)

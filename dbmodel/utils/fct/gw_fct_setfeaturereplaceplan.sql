@@ -60,7 +60,7 @@ BEGIN
 	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get user values
-	v_currentpsector  = (SELECT value FROM config_param_user WHERE parameter = 'plan_psector_mode' AND cur_user=current_user);
+	v_currentpsector  = (SELECT value FROM config_param_user WHERE parameter = 'plan_psector_current' AND cur_user=current_user);
 
 	-- manage log (fid: 143)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;

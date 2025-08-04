@@ -58,7 +58,7 @@ BEGIN
 	v_proximity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	ve_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
 	v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
-	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_mode' AND cur_user=current_user);
+	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_current' AND cur_user=current_user);
 
 	SELECT value::boolean into v_auto_sander FROM config_param_system WHERE parameter='edit_node_automatic_sander';
 
@@ -571,7 +571,7 @@ BEGIN
 			IF NEW.state = 2 AND OLD.state=1 THEN
 				INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
 				VALUES (NEW.arc_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'plan_psector_mode'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+				= 'plan_psector_current'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
 			END IF;
 			IF NEW.state = 1 AND OLD.state=2 THEN
 				DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;

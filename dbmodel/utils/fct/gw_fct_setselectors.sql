@@ -383,7 +383,7 @@ BEGIN
 			DELETE FROM selector_psector WHERE psector_id NOT IN
 			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
-			SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_mode'
+			SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current'
 			INTO v_psector_current_value;
 
 			-- Check if current psector is in the selected exploitations
@@ -392,7 +392,7 @@ BEGIN
 					AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN
 					-- Current psector is not in selected exploitations, set to NULL
 					UPDATE config_param_user SET value = NULL
-					WHERE parameter = 'plan_psector_mode' AND cur_user = current_user;
+					WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
 				END IF;
 			END IF;
 
@@ -727,7 +727,7 @@ BEGIN
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_mode', 'utils_workspace_vdefault')
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
 
 

@@ -113,7 +113,7 @@ UPDATE sys_param_user SET label = 'Fluido de connec:', descript = 'Valor predete
 UPDATE sys_param_user SET label = 'Función de connec:', descript = 'Valor predeterminado del tipo de función para connec' WHERE id = 'edit_connec_function_vdefault';
 UPDATE sys_param_user SET label = 'Insertar elevación desde DEM:', descript = 'Si es verdadero, la elevación se insertará automáticamente desde el ráster DEM' WHERE id = 'edit_insert_elevation_from_dem';
 UPDATE sys_param_user SET label = 'Modelo de demanda', descript = 'Modelo de demanda' WHERE id = 'inp_options_demand_model';
-UPDATE sys_param_user SET label = 'Psector (Alternative):', descript = 'Default value of psector parameter' WHERE id = 'plan_psector_mode';
+UPDATE sys_param_user SET label = 'Psector (Alternative):', descript = 'Default value of psector parameter' WHERE id = 'plan_psector_current';
 UPDATE sys_param_user SET label = 'Value for psector_strategy', descript = 'Psector strategy' WHERE id = 'utils_psector_strategy';
 UPDATE sys_param_user SET label = 'Longitud', descript = 'length - Longitud total' WHERE id = 'inp_report_length';
 UPDATE sys_param_user SET label = 'Catálogo predeterminado para check_valve:', descript = 'Catálogo predeterminado de valores para check_valve cat_feature' WHERE id = 'feat_check_valve_vdefault';

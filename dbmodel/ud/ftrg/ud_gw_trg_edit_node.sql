@@ -116,7 +116,7 @@ BEGIN
 	v_gully_weir_cd = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_weir_cd_vdefault' AND cur_user = current_user);
 	v_gully_orifice_cd = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_orifice_cd_vdefault' AND cur_user = current_user);
 	v_gully_efficiency = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_efficiency_vdefault' AND cur_user = current_user);
-	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_mode' AND cur_user=current_user);
+	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_current' AND cur_user=current_user);
 	v_auto_streetvalues_status := (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_buffer := (SELECT (value::json->>'buffer')::integer FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_field := (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
@@ -802,7 +802,7 @@ BEGIN
 			IF NEW.state = 2 AND OLD.state=1 THEN
 				INSERT INTO plan_psector_x_node (node_id, psector_id, state, doable)
 				VALUES (NEW.node_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'plan_psector_mode'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+				= 'plan_psector_current'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
 			END IF;
 			IF NEW.state = 1 AND OLD.state=2 THEN
 				DELETE FROM plan_psector_x_node WHERE node_id=NEW.node_id;
