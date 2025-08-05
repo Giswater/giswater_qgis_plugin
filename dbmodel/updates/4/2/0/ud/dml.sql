@@ -175,11 +175,13 @@ UPDATE config_toolbox SET inputparams='[
     "layoutorder": 1,
     "comboIds": [
       "DWFZONE",
-      "SECTOR"
+      "SECTOR",
+      "DMA"
     ],
     "comboNames": [
       "Drainage area (DRAINZONE + DWFZONE)",
-      "SECTOR"
+      "SECTOR",
+      "DMA"
     ],
     "selectedId": null
   },
@@ -196,11 +198,11 @@ UPDATE config_toolbox SET inputparams='[
   },
   {
     "widgetname": "forceOpen",
-    "label": "Force open nodes: (*)",
+    "label": "Force open arcs: (*)",
     "widgettype": "linetext",
     "datatype": "text",
     "isMandatory": false,
-    "tooltip": "Optative node id(s) to temporary open closed node(s) in order to force algorithm to continue there",
+    "tooltip": "Optative arc id(s) to temporary open closed arc(s) in order to force algorithm to continue there",
     "placeholder": "1015,2231,3123",
     "layoutname": "grl_option_parameters",
     "layoutorder": 5,
@@ -208,11 +210,11 @@ UPDATE config_toolbox SET inputparams='[
   },
   {
     "widgetname": "forceClosed",
-    "label": "Force closed nodes: (*)",
+    "label": "Force closed arcs: (*)",
     "widgettype": "text",
     "datatype": "text",
     "isMandatory": false,
-    "tooltip": "Optative node id(s) to temporary close open node(s) to force algorithm to stop there",
+    "tooltip": "Optative arc id(s) to temporary close open arc(s) to force algorithm to stop there",
     "placeholder": "1015,2231,3123",
     "layoutname": "grl_option_parameters",
     "layoutorder": 6,
@@ -810,3 +812,12 @@ UPDATE config_form_tabs
   }
 ]'::json
 	WHERE formname='ve_frelem' AND tabname='tab_data';
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_ui_dwfzone', 'form_feature', 'tab_none', 'sector_id', 'lyt_data_1', 11, 'text', 'text', 'sector_id', 'sector_id', 'Ex: 1,2', false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_ui_dwfzone', 'form_feature', 'tab_none', 'muni_id', 'lyt_data_1', 12, 'text', 'text', 'muni_id', 'muni_id', 'Ex: 1,2', false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+UPDATE config_form_fields SET layoutorder=13 WHERE formname = 'v_ui_dwfzone' AND formtype = 'form_feature' AND columnname = 'drainzone_id' AND tabname = 'tab_none';
