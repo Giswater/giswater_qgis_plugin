@@ -198,22 +198,6 @@ UPDATE config_toolbox SET inputparams='[
   }
 ]'::json WHERE id=2118;
 
-
-update config_param_system set parameter = 'plan_psector_current' where parameter = 'plan_psector_current';
-update config_form_fields set dv_querytext = 'WITH check_value AS (
-  SELECT value::integer AS psector_value 
-  FROM config_param_user 
-  WHERE parameter = ''plan_psector_current''
-  AND cur_user = current_user
-)
-SELECT id, name AS idval 
-FROM value_state 
-WHERE id IS NOT NULL 
-AND CASE 
-  WHEN (SELECT psector_value FROM check_value) IS NULL THEN id != 2 
-  ELSE id=2 
-END' where columnname = 'state';
-
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4326, 'It is not allowed to insert/update one node of the current active psector over another node with state (1). The node is: %node_id%', 'Review your data. It''s not possible to have more than one node with the same state at the same position.', 2, true, 'utils', 'core', 'UI');
 
