@@ -34,7 +34,7 @@ class GwDscenarioManagerButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = 'node'
-        self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id']
+        self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id', 'element_id']
         self.filter_dict = {"inp_dscenario_controls": {"filter_table": "ve_sector", "feature_type": "sector"},
                             "inp_dscenario_rules": {"filter_table": "ve_sector", "feature_type": "sector"},
                             "inp_dscenario_demand": {"filter_table": ["ve_inp_junction", "ve_inp_connec"], "feature_type": ["node", "connec"]},
