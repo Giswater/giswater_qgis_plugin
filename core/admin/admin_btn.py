@@ -613,7 +613,7 @@ class GwAdminButton:
         project_type = 'utils' if utils else project_type
         folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
         folders = sorted(os.listdir(folder_final_pass))
-        
+
         if self._process_folder(folder_final_pass) is False:
             msg = '{0} folder not found'
             msg_params = ("Final_pass",)
@@ -634,9 +634,9 @@ class GwAdminButton:
                 status = self._execute_files(folder_path, set_progress_bar=True, do_schema_model_i18n=False)
                 if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
                     return False
-                
+
         return True
-                
+
     def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: str | None = None, no_ct: bool = False) -> bool:
         """
         Update the patch folders for a given update directory.
@@ -1222,7 +1222,7 @@ class GwAdminButton:
         export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
 
         if export_passwd and not self.is_service:
-            msg = "Credentials will be stored in GIS project file. Do you want to continue?"
+            msg = "Credentials will be stored in the GIS project file as plain text, and will apply to both existing and future layers. Do you want to proceed?"
             title = "Warning"
             answer = tools_qt.show_question(msg, title)
             if not answer:
@@ -3610,7 +3610,7 @@ class GwAdminButton:
                             return False
 
         return True
-    
+
     def _calculate_elapsed_time(self, dialog):
 
         tf = time()  # Final time
