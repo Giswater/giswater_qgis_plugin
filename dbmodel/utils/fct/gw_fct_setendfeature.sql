@@ -296,7 +296,7 @@ BEGIN
 			IF v_count > 0 THEN
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                "data":{"message":"4328", "function":"3068", "parameters":{}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+                "data":{"message":"4328", "function":"3068", "parameters":{}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)' INTO v_audit_result;
                
 			ELSE
 			
@@ -353,8 +353,21 @@ BEGIN
 				execute v_querytext;
 
 				-- related link to obsolete
-				IF v_feature_type='connec' or v_feature_type='gully' then
-					EXECUTE 'UPDATE link SET state = 0 WHERE feature_id = '|| quote_literal(v_feature_id_value)||';';
+				IF v_feature_type='connec' or v_feature_type='gully' THEN
+				
+					SELECT count(*) INTO v_count FROM link WHERE feature_id = v_feature_id_value AND state=2;
+				
+					IF v_count > 0 THEN
+						RAISE EXCEPTION 'a';
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                		"data":{"message":"4328", "function":"3068", "parameters":{}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)' INTO v_audit_result;
+					
+					else
+				
+						EXECUTE 'UPDATE link SET state = 0 WHERE feature_id = '|| quote_literal(v_feature_id_value)||';';
+					
+					END IF;
+				
 				END IF;
 
 			END LOOP;
@@ -371,6 +384,10 @@ BEGIN
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+	
+		v_status = coalesce(v_status, '{}');
+		v_level = coalesce(v_level, '0')::integer;
+		v_message = coalesce(v_message, '{}');
 
 	END IF;
 
