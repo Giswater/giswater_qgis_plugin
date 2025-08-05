@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                   QHBoxLayout, QLabel, QLineEdit, QTableView,
                                   QTextEdit, QToolBar, QWidget, QPushButton)
 
-from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi
+from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi, TeamCreateUi
 
 from .... import global_vars
 from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
@@ -1240,38 +1240,72 @@ class AddNewLot:
                          " FROM cm.cat_team ct INNER JOIN cm.cat_organization co ON co.organization_id = ct.organization_id",
                 "idname": "team_id",
                 "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_teams")
+            },
+            "cat_user": {
+                "query": "SELECT user_id::text, COALESCE(ct.teamname, 'No team') as teamname, COALESCE(ct.code, '') as code, loginname, username, cu.active::text" +
+                         " FROM cm.cat_user cu LEFT JOIN cm.cat_team ct ON cu.team_id = ct.team_id",
+                "idname": "user_id",
+                "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_users"),
+                "cmbParent": tools_qt.get_widget(self.dlg_resources_man, "cmb_team")
             }
         }
 
         # Init variables
         self.org_id = None
         self.team_id = None
+        self.user_id = None
         self.tab_organizations = 0
+
+        # Populate combos
+        # Create sql query to get all teams
+        sql = "SELECT team_id AS id, teamname AS idval FROM cm.cat_team"
 
         # Check if user is superadmin
         if self.user_data["role"] == "role_cm_admin":
 
             # Create list of tables
-            tables = ["cat_organization", "cat_team"]
+            tables = ["cat_organization", "cat_team", "cat_user"]
 
             # Fill tables
             for table in tables:
                 self._populate_resource_tableview(table)
 
             # Set signals for manage organizations
-            self.dlg_resources_man.txt_orgname.textChanged.connect(self.txt_org_name_changed)
-            self.dlg_resources_man.txt_teams.textChanged.connect(self.filter_teams_table)
-
+            self.dlg_resources_man.txt_orgname.textChanged.connect(partial(self.txt_org_name_changed))
         else:
 
             # Remove tab organizations
             self.dlg_resources_man.tab_main.removeTab(self.tab_organizations)
 
             # Filter teams table by the user organization selected
-            self.filter_teams_table()
+            self.filter_teams_by_name()
 
-            # Connect the team filter text box
-            self.dlg_resources_man.txt_teams.textChanged.connect(self.filter_teams_table)
+            # Filter teams combo
+            sql += f" WHERE organization_id = {self.user_data['org_id']}"
+
+            # Create sql filter and populate table
+            sql_filter = f"WHERE (ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']}) OR cu.team_id IS NULL)"
+            self._populate_resource_tableview("cat_user", sql_filter)
+
+        # Fill teams combo
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows, 1, add_empty=True)
+
+        # Set signals for tables
+        self.dict_tables["cat_team"]["widget"].doubleClicked.connect(partial(self.selected_row, "cat_team"))
+        self.dict_tables["cat_user"]["widget"].doubleClicked.connect(partial(self.selected_row, "cat_user"))
+
+        # Set signals for manage teams
+        self.dlg_resources_man.btn_team_create.clicked.connect(partial(self.open_create_team))
+        self.dlg_resources_man.btn_team_update.clicked.connect(partial(self.open_create_team, True))
+        self.dlg_resources_man.btn_team_delete.clicked.connect(partial(self.delete_registers, "cat_team"))
+        self.dlg_resources_man.txt_teams.textChanged.connect(partial(self.filter_teams_by_name))
+
+        # Set signals for manage users (only team filtering, no user management buttons in UI)
+        self.dlg_resources_man.cmb_team.currentIndexChanged.connect(partial(self.filter_users_table))
+        self.dlg_resources_man.btn_assign_team.clicked.connect(partial(self.assign_team_to_user))
+        self.dlg_resources_man.btn_remove_team.clicked.connect(partial(self.remove_team_from_user))
 
         self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
 
@@ -1285,23 +1319,122 @@ class AddNewLot:
         sql_filter = f"WHERE orgname ILIKE '%{org_name}%'" if org_name != 'null' else None
         self._populate_resource_tableview("cat_organization", sql_filter)
 
-    def filter_teams_table(self):
-        """ Filter table by organization id and team name """
-
-        filters = []
-
-        # If the user is not an admin, filter by their organization ID
-        if self.user_data and self.user_data["role"] != "role_cm_admin":
-            org_id = self.user_data.get('org_id')
-            if org_id is not None:
-                filters.append(f"co.organization_id = {org_id}")
+    def filter_teams_by_name(self):
+        """ Filter teams table by team name """
 
         team_name = tools_qt.get_text(self.dlg_resources_man, "txt_teams")
+        
+        # Build sql filtering by team name and organization
         if team_name != 'null':
-            filters.append(f"teamname ILIKE '%{team_name.strip()}%'")
-
-        sql_filter = f"WHERE {' AND '.join(filters)}" if filters else None
+            # Filter by team name
+            if self.user_data["role"] != "role_cm_admin":
+                # For non-admin users, also filter by organization
+                sql_filter = f"WHERE ct.teamname ILIKE '%{team_name}%' AND co.organization_id = {self.user_data['org_id']}"
+            else:
+                # For admin users, only filter by team name
+                sql_filter = f"WHERE ct.teamname ILIKE '%{team_name}%'"
+        else:
+            # No team name filter - show all teams for admin, or organization teams for non-admin
+            if self.user_data["role"] != "role_cm_admin":
+                sql_filter = f"WHERE co.organization_id = {self.user_data['org_id']}"
+            else:
+                sql_filter = None  # Show all teams for admin
+        
+        # Refresh table
         self._populate_resource_tableview("cat_team", sql_filter)
+
+    def filter_users_table(self):
+        """ Filter table by user name """
+
+        # Get selected team id from combo
+        team_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team")
+
+        # Build sql filtering by the selected team
+        if team_id and team_id != '' and team_id != -1:
+            # When a team is selected, show users from that team AND users with no team
+            # This allows assigning users without teams to the selected team
+            sql_filter = f"WHERE (ct.team_id = {team_id} OR cu.team_id IS NULL)"
+        else:
+            # Show all users (including those without teams) for the current organization
+            if self.user_data["role"] != "role_cm_admin":
+                # For non-admin users, show users from their organization's teams or users without teams
+                sql_filter = f"WHERE (ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']}) OR cu.team_id IS NULL)"
+            else:
+                # For admin users, show all users
+                sql_filter = None
+
+        # Refresh table
+        self._populate_resource_tableview("cat_user", sql_filter)
+
+    def assign_team_to_user(self):
+        """ Assign a team to selected user(s) """
+
+        # Get selected user IDs
+        selected_ids = self.get_selected_ids("cat_user")
+        if not selected_ids:
+            tools_qgis.show_warning("Please select at least one user to assign a team.")
+            return
+
+        # Get selected team from combo
+        team_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team")
+        if not team_id or team_id == -1:
+            tools_qgis.show_warning("Please select a team to assign.")
+            return
+
+        # Get team name for confirmation
+        team_name = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team", 1)  # Get the team name
+        if not team_name or team_name == -1:
+            tools_qgis.show_warning("Please select a valid team to assign.")
+            return
+
+        # Confirm the action
+        user_count = len(selected_ids)
+        msg = f"Are you sure you want to assign team '{team_name}' to {user_count} selected user(s)?"
+        answer = tools_qt.show_question(msg, title="Assign Team")
+        if not answer:
+            return
+
+        # Update users with the selected team
+        ids_str = ",".join(selected_ids)
+        sql = f"UPDATE cm.cat_user SET team_id = {team_id} WHERE user_id IN ({ids_str})"
+        
+        try:
+            tools_db.execute_sql(sql)
+            tools_qgis.show_info(f"Successfully assigned team '{team_name}' to {user_count} user(s).")
+            
+            # Refresh the users table
+            self.filter_users_table()
+        except Exception as e:
+            tools_qgis.show_warning(f"Error assigning team: {str(e)}")
+
+    def remove_team_from_user(self):
+        """ Remove team assignment from selected user(s) """
+
+        # Get selected user IDs
+        selected_ids = self.get_selected_ids("cat_user")
+        if not selected_ids:
+            tools_qgis.show_warning("Please select at least one user to remove team assignment.")
+            return
+
+        # Confirm the action
+        user_count = len(selected_ids)
+        msg = f"Are you sure you want to remove team assignment from {user_count} selected user(s)?"
+        answer = tools_qt.show_question(msg, title="Remove Team Assignment")
+        if not answer:
+            return
+
+        # Update users to remove team assignment
+        ids_str = ",".join(selected_ids)
+        sql = f"UPDATE cm.cat_user SET team_id = NULL WHERE user_id IN ({ids_str})"
+        
+        try:
+            tools_db.execute_sql(sql)
+            tools_qgis.show_info(f"Successfully removed team assignment from {user_count} user(s).")
+            
+            # Refresh the users table
+            self.filter_users_table()
+        except Exception as e:
+            tools_qgis.show_warning(f"Error removing team assignment: {str(e)}")
 
     def _populate_resource_tableview(self, table_name: str, sql_filter: Optional[str] = None):
         """Populate a QTableView with the results of a SQL query."""
@@ -1313,7 +1446,7 @@ class AddNewLot:
         query = self.dict_tables[table_name]["query"]
 
         # Check sql filter
-        if sql_filter:
+        if sql_filter is not None:
             query += f" {sql_filter}"
         elif 'cmbParent' in self.dict_tables[table_name]:
             # Reset combo parent
@@ -1350,11 +1483,11 @@ class AddNewLot:
         # Apply model to table
         table.setModel(model)
 
-    def selected_row(self, table_name: str):
+    def selected_row(self, tablename: str):
         """ Handle double click selected row """
 
         # Call open_create function depending of the table name
-        if table_name == "cat_team":
+        if tablename == "cat_team":
             self.open_create_team(True)
         else:
             self.open_create_user(True)
@@ -1409,41 +1542,38 @@ class AddNewLot:
                 self._populate_resource_tableview(tablename)
             else:
                 if tablename == "cat_team":
-                    self.filter_teams_table()
+                    self.filter_teams_by_name()
                 elif tablename == "cat_user":
                     # Create sql filter and populate table
                     sql_filter = f"WHERE ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']})"
                     self._populate_resource_tableview(tablename, sql_filter)
 
     def open_create_team(self, is_update: Optional[bool] = False):
-        """ Open create team dialog """
+        """ Open dialog to create or update team """
 
-        user = tools_db.current_user
-        form = {"formName": "generic", "formType": "create_team"}
-        body = {"client": {"cur_user": user}, "form": form}
+        # Define the form type and create the body
+        form_type = "team_create"
+        body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
 
-        # DB fct
+        # Get dialog configuration from database
         json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name="cm")
+        
+        if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
+            tools_qgis.show_warning("Failed to load team creation dialog configuration. Please check database configuration.")
+            return
 
         # Create and open dialog
-        self.dlg_create_team = AddLotUi(self)
+        self.dlg_create_team = TeamCreateUi(self)
         tools_gw.load_settings(self.dlg_create_team)
-        tools_gw.manage_dlg_widgets(self, self.dlg_create_team, json_result)
-
-        # Get organization widget combo
-        cmb_org = self.dlg_create_team.findChild(QWidget, "tab_none_org_id")
-
-        # Chek user role
-        if self.user_data["role"] != "role_cm_admin":
-            # Set combo value to the user organization
-            tools_qt.set_combo_value(cmb_org, self.user_data['org_id'], 0, False)
-
-            # Disable combo
-            cmb_org.setEnabled(False)
+        
+        try:
+            tools_gw.manage_dlg_widgets(self, self.dlg_create_team, json_result)
+        except Exception as e:
+            tools_qgis.show_warning(f"Error creating dynamic dialog: {str(e)}")
+            return
 
         if is_update:
             # Get selected id from table
-
             selected_ids = self.get_selected_ids("cat_team")
             if not selected_ids:
                 return
@@ -1451,7 +1581,7 @@ class AddNewLot:
             self.team_id = selected_ids[0]  # Get first selected id
 
             # Get object_id from selected row
-            sql = f"SELECT teamname, descript, active, code, organization_id FROM cm.cat_team WHERE team_id = '{self.team_id}'"
+            sql = f"SELECT teamname, descript, active, code, organization_id, role_id FROM cm.cat_team WHERE team_id = '{self.team_id}'"
 
             rows = tools_db.get_rows(sql)
             if rows:
@@ -1461,59 +1591,20 @@ class AddNewLot:
                 if len(row) > 2:
                     tools_qt.set_checked(self.dlg_create_team, "tab_none_active", row[2])
                     tools_qt.set_widget_text(self.dlg_create_team, "tab_none_code", row[3])
-                    tools_qt.set_combo_value(cmb_org, row[4], 0, False)
+                    # Find and populate organization combo
+                    cmb_org = self.dlg_create_team.findChild(QComboBox, "tab_none_org_id")
+                    if cmb_org:
+                        tools_qt.set_combo_value(cmb_org, row[4], 0, False)
+                    # Find and populate role combo
+                    cmb_role = self.dlg_create_team.findChild(QComboBox, "tab_none_role_id")
+                    if cmb_role and len(row) > 5:
+                        tools_qt.set_combo_value(cmb_role, row[5], 0, False)
 
+        # Connect buttons to functions
+        self.dlg_create_team.btn_accept.clicked.connect(partial(upsert_team, dialog=self.dlg_create_team, class_obj=self))
+        self.dlg_create_team.btn_cancel.clicked.connect(partial(close, dialog=self.dlg_create_team))
+        
         tools_gw.open_dialog(self.dlg_create_team, "create_team")
-
-    def open_create_user(self, is_update: Optional[bool] = False):
-        """ Open create team dialog """
-
-        user = tools_db.current_user
-        form = {"formName": "generic", "formType": "create_user"}
-        body = {"client": {"cur_user": user}, "form": form}
-
-        # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name="cm")
-
-        # Create and open dialog
-        self.dlg_create_team = AddLotUi(self)
-        tools_gw.load_settings(self.dlg_create_team)
-        tools_gw.manage_dlg_widgets(self, self.dlg_create_team, json_result)
-
-        # Get team widget combo
-        cmb_team = self.dlg_create_team.findChild(QWidget, "tab_none_team_id")
-
-        if self.user_data["role"] != "role_cm_admin":
-            # Refresh values for team widget combo
-            sql = f"SELECT team_id AS id, teamname AS idval FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']}"
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_values(cmb_team, rows)
-
-        if is_update:
-            # Get selected id from table
-
-            selected_ids = self.get_selected_ids("cat_user")
-            if not selected_ids:
-                return
-
-            self.user_id = selected_ids[0]  # Get first selected id
-
-            # Get object_id from selected row
-            sql = f"SELECT loginname, descript, active, code, username, fullname, team_id FROM cm.cat_user WHERE user_id = '{self.user_id}'"
-
-            rows = tools_db.get_rows(sql)
-            if rows:
-                row = rows[0]
-                tools_qt.set_widget_text(self.dlg_create_team, "tab_none_loginname", row[0])
-                tools_qt.set_widget_text(self.dlg_create_team, "tab_none_descript", row[1])
-                if len(row) > 2:
-                    tools_qt.set_checked(self.dlg_create_team, "tab_none_active", row[2])
-                    tools_qt.set_widget_text(self.dlg_create_team, "tab_none_code", row[3])
-                    tools_qt.set_widget_text(self.dlg_create_team, "tab_none_username", row[4])
-                    tools_qt.set_widget_text(self.dlg_create_team, "tab_none_fullname", row[5])
-                    tools_qt.set_combo_value(cmb_team, row[6], 0, False)
-
-        tools_gw.open_dialog(self.dlg_create_team, "create_user")
 
     def get_selected_ids(self, tablename: str) -> List[str]:
         """Get selected ids from QTableView."""
@@ -1536,6 +1627,89 @@ class AddNewLot:
             tools_qgis.show_warning(msg)
 
         return values
+
+    def _get_role_from_team_name(self, team_name: str) -> Optional[str]:
+        """Determines the database role based on the team name."""
+        if not team_name:
+            return None
+
+        team_name_lower = team_name.lower()
+
+        if "admin" in team_name_lower:
+            return "role_cm_admin"
+        elif "manager" in team_name_lower:
+            return "role_cm_manager"
+        elif "field" in team_name_lower:
+            return "role_cm_field"
+        else:
+            return "role_basic"
+
+
+def upsert_team(**kwargs: Any):
+    """ Create or update team """
+
+    dlg = kwargs["dialog"]
+    this = kwargs["class_obj"]
+    team_id = this.team_id
+
+    # Get input values from visible fields
+    name = tools_qt.get_text(dlg, "tab_none_name")
+    descript = tools_qt.get_text(dlg, "tab_none_descript")
+    code = tools_qt.get_text(dlg, "tab_none_code")
+    active = tools_qt.get_widget_value(dlg, "tab_none_active")
+    
+    # Set default values automatically
+    org_id = this.user_data['org_id']  # Current user's organization
+    role_id = "role_cm_field"  # Default role
+    
+    # Set default values if empty
+    if not descript or descript == "null":
+        descript = ""
+    if not code or code == "null":
+        code = ""
+
+    # Validate input values
+    if name == "null" or org_id == '':
+        msg = "Missing required fields"
+        tools_qt.show_info_box(msg, "Info")
+        return
+
+    # Validate if name already exists
+    sql_name_exists = f"SELECT * FROM cm.cat_team WHERE teamname = '{str(name)}'"
+
+    if not team_id:
+        sql = f"INSERT INTO cm.cat_team (teamname, descript, active, organization_id, code, role_id) \
+                VALUES ('{name}', '{descript}', {active}, '{org_id}', '{code}', '{role_id}')"
+    else:
+        sql_name_exists += f" AND team_id != {team_id}"
+        sql = f"UPDATE cm.cat_team SET teamname = '{name}', descript = '{descript}', active = {active}, \
+                code = '{code}', role_id = '{role_id}', organization_id = '{org_id}' WHERE team_id = {team_id}"
+        this.team_id = None
+
+    rows = tools_db.get_rows(sql_name_exists)
+    if rows:
+        msg = "The team name already exists"
+        tools_qt.show_info_box(msg, "Info", parameter=str(name))
+        return
+
+    # Execute SQL
+    status = tools_db.execute_sql(sql, commit=True)
+
+    if not status:
+        msg = "Error creating or updating team"
+        tools_qgis.show_warning(msg, parameter=str(name))
+        return
+
+    # Close dialog
+    tools_gw.close_dialog(dlg)
+
+    # Chek user role
+    if this.user_data["role"] == "role_cm_admin":
+        # Reload table without filtering
+        this._populate_resource_tableview("cat_team")
+    else:
+        # Filter teams table by the user organization selected
+        this.filter_teams_by_name()
 
 
 def close(**kwargs: Any):

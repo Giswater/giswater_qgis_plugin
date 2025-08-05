@@ -5128,7 +5128,7 @@ def get_cm_user_role():
         """
         result = tools_db.get_row(sql)
         return result if result else None
-    except Exception as e:
+    except Exception:
         # If username fails, try with loginname
         try:
             sql = f"""
@@ -5139,7 +5139,7 @@ def get_cm_user_role():
             """
             result = tools_db.get_row(sql)
             return result if result else None
-        except Exception as e:
+        except Exception:
             # If both queries fail, return None safely
             return None
 
