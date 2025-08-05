@@ -87,7 +87,7 @@ BEGIN
     ELSE
 
 		-- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
-		PERFORM gw_fct_state_control(json_build_object('feature_type_aux', 'NODE', 'feature_id_aux', NEW.node_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP));
+		PERFORM gw_fct_state_control(json_build_object('parameters', json_build_object('feature_type_aux', 'NODE', 'feature_id_aux', NEW.node_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP)));
 
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
@@ -126,8 +126,8 @@ BEGIN
 				END IF;
 
 				-- stop insert/update if plan_psector.active of the current_psector is true
-				IF (SELECT active FROM plan_psector WHERE psector_id = v_psector_id) IS TRUE THEN 
-				
+				IF (SELECT active FROM plan_psector WHERE psector_id = v_psector_id) IS TRUE THEN
+
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"4326", "function":"1136","parameters":{"node_id":"'||NEW.node_id||'"}}}$$);';
 
@@ -138,7 +138,7 @@ BEGIN
 			END IF;
 
 		END IF;
-	
+
 	IF TG_OP = 'INSERT' then
 			-- check for existing node (1)
 			SELECT * INTO v_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;

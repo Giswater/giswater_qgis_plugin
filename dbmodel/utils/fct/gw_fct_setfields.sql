@@ -260,7 +260,7 @@ BEGIN
 			END IF;
 
 			IF v_field='state' THEN
-				PERFORM gw_fct_state_control(json_build_object('feature_type_aux', v_featuretype, 'feature_id_aux', v_id, 'state_aux', v_value::integer, 'tg_op_aux', 'UPDATE'));
+				PERFORM gw_fct_state_control(json_build_object('parameters', json_build_object('feature_type_aux', v_featuretype, 'feature_id_aux', v_id, 'state_aux', v_value::integer, 'tg_op_aux', 'UPDATE')));
 			END IF;
 
 			IF v_field in ('geom', 'the_geom') THEN

@@ -80,7 +80,7 @@ BEGIN
 
 	ELSE
 		-- Looking for state control
-		PERFORM gw_fct_state_control(json_build_object('feature_type_aux', 'ARC', 'feature_id_aux', NEW.arc_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP));
+		PERFORM gw_fct_state_control(json_build_object('parameters', json_build_object('feature_type_aux', 'ARC', 'feature_id_aux', NEW.arc_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP)));
 
 		-- Lookig for state=0
 		IF NEW.state=0 THEN

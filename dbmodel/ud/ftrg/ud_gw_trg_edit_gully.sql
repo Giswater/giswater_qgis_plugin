@@ -773,7 +773,7 @@ BEGIN
 		-- Looking for state control and insert planified connecs to default psector
 		IF (NEW.state != OLD.state) THEN
 
-			PERFORM gw_fct_state_control(json_build_object('feature_type_aux', 'GULLY', 'feature_id_aux', NEW.gully_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP));
+			PERFORM gw_fct_state_control(json_build_object('parameters', json_build_object('feature_type_aux', 'GULLY', 'feature_id_aux', NEW.gully_id, 'state_aux', NEW.state, 'tg_op_aux', TG_OP)));
 
 			IF NEW.state = 2 AND OLD.state=1 THEN
 
