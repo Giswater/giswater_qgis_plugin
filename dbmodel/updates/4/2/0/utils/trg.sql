@@ -16,3 +16,11 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_municipality();
 
 CREATE TRIGGER gw_trg_ui_rpt_cat_result INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_rpt_cat_result
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_rpt_cat_result();
+
+-- 05/08/2025
+-- PSECTOR
+CREATE TRIGGER gw_trg_edit_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_plan_psector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_psector('plan');
+
+CREATE TRIGGER gw_trg_ui_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_plan_psector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_plan_psector();

@@ -223,3 +223,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 UPDATE config_form_fields SET layoutorder=3, web_layoutorder=3 WHERE formname='generic' AND formtype='psector' AND columnname='creation_date' AND tabname='tab_general';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4328, 'It is not allowed to downgrade planified links (state=2)', 'Review your data.', 2, true, 'utils', 'core', 'AUDIT');
+
+-- 05/08/2025
+UPDATE plan_psector SET workcat_id_plan = workcat_id WHERE workcat_id IS NOT NULL AND status IN (1, 2, 3);

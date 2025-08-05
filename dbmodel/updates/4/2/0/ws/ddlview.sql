@@ -2333,7 +2333,6 @@ ALTER VIEW v_edit_omzone RENAME TO ve_omzone;
 ALTER VIEW v_edit_plan_netscenario_dma RENAME TO ve_plan_netscenario_dma;
 ALTER VIEW v_edit_plan_netscenario_presszone RENAME TO ve_plan_netscenario_presszone;
 ALTER VIEW v_edit_plan_netscenario_valve RENAME TO ve_plan_netscenario_valve;
-ALTER VIEW v_edit_plan_psector RENAME TO ve_plan_psector;
 ALTER VIEW v_edit_plan_psector_x_connec RENAME TO ve_plan_psector_x_connec;
 ALTER VIEW v_edit_plan_psector_x_other RENAME TO ve_plan_psector_x_other;
 ALTER VIEW v_edit_presszone RENAME TO ve_presszone;

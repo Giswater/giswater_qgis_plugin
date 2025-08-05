@@ -9,3 +9,8 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"crm_number", "dataType":"text"}}$$);
+
+-- 05/08/2025
+ALTER TABLE plan_psector ADD COLUMN workcat_id_plan text;
+ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_workcat_id_plan_fkey FOREIGN KEY (workcat_id_plan) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE;
+CREATE INDEX idx_plan_psector_workcat_id_plan ON plan_psector(workcat_id_plan);

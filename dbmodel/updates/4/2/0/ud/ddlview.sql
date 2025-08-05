@@ -8859,7 +8859,6 @@ ALTER VIEW v_edit_macroomzone RENAME TO ve_macroomzone;
 ALTER VIEW v_edit_macrosector RENAME TO ve_macrosector;
 ALTER VIEW v_edit_om_visit RENAME TO ve_om_visit;
 ALTER VIEW v_edit_omzone RENAME TO ve_omzone;
-ALTER VIEW v_edit_plan_psector RENAME TO ve_plan_psector;
 ALTER VIEW v_edit_plan_psector_x_gully RENAME TO ve_plan_psector_x_gully;
 ALTER VIEW v_edit_plan_psector_x_other RENAME TO ve_plan_psector_x_other;
 ALTER VIEW v_edit_review_arc RENAME TO ve_review_arc;
@@ -8992,3 +8991,30 @@ AS SELECT s.dscenario_id,
     inp_dscenario_frpump f
      JOIN ve_inp_frpump n USING (element_id)
   WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+-- 05/08/2025
+-- PSECTOR
+DROP VIEW IF EXISTS v_plan_psector_gully;
+CREATE OR REPLACE VIEW v_plan_psector_gully
+AS WITH sel_psector AS (
+    SELECT selector_psector.psector_id FROM selector_psector WHERE selector_psector.cur_user = CURRENT_USER
+)
+SELECT row_number() OVER () AS rid,
+    gully.gully_id,
+    plan_psector_x_gully.psector_id,
+    gully.code,
+    gully.gullycat_id,
+    gully.gully_type,
+    cat_feature.feature_class,
+    gully.state AS original_state,
+    gully.state_type AS original_state_type,
+    plan_psector_x_gully.state AS plan_state,
+    plan_psector_x_gully.doable,
+    plan_psector.priority AS psector_priority,
+    gully.the_geom
+FROM gully
+JOIN plan_psector_x_gully USING (gully_id)
+JOIN plan_psector USING (psector_id)
+JOIN cat_gully ON cat_gully.id::text = gully.gullycat_id::text
+JOIN cat_feature ON cat_feature.id::text = gully.gully_type::text
+WHERE EXISTS (SELECT 1 FROM sel_psector WHERE sel_psector.psector_id = plan_psector_x_gully.psector_id);
