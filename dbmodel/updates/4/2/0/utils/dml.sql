@@ -198,9 +198,6 @@ UPDATE config_toolbox SET inputparams='[
   }
 ]'::json WHERE id=2118;
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4326, 'It is not allowed to insert/update one node of the current active psector over another node with state (1). The node is: %node_id%', 'Review your data. It''s not possible to have more than one node with the same state at the same position.', 2, true, 'utils', 'core', 'UI');
-
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('mapzones_config', '{"version" : "1"}', 'Mapzones system config. version - Mapzones version;', 'Mapzones system config', NULL, NULL, true, 17, 'utils', false, false, 'json', 'linetext', true, true, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_admin_other')
 ON CONFLICT (parameter) DO NOTHING;
