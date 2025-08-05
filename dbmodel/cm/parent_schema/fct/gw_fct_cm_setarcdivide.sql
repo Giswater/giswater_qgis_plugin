@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 --FUNCTION CODE: xxxx
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cm_setarcdivide(p_data json) RETURNS json AS
+CREATE OR REPLACE FUNCTION cm.gw_fct_cm_setarcdivide(p_data json) RETURNS json AS
 $BODY$
 DECLARE
     -- Simplified declarations
@@ -57,8 +57,8 @@ DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
-    v_schemaname = 'SCHEMA_NAME';
+    SET search_path = "cm", public;
+    v_schemaname = 'cm';
 
     v_node_id := (p_data->'feature'->'id'->>0)::integer;
 
@@ -74,13 +74,17 @@ BEGIN
         RETURN json_build_object('status', 'Failed', 'message', 'Node state is 0');
     END IF;
 
+    -- For CM project type, we need to get node_type from the CM campaign table
     IF v_project_type = 'WS' THEN
         SELECT isarcdivide INTO v_isarcdivide
         FROM PARENT_SCHEMA.cat_feature_node JOIN PARENT_SCHEMA.cat_node ON cat_node.node_type=cat_feature_node.id
         JOIN PARENT_SCHEMA.node ON node.nodecat_id = cat_node.id WHERE node.node_id=v_node_id;
     ELSE
+        -- For CM, get node_type from the campaign table since PARENT_SCHEMA.node doesn't have node_type
         SELECT isarcdivide INTO v_isarcdivide
-        FROM PARENT_SCHEMA.cat_feature_node JOIN PARENT_SCHEMA.node ON node.node_type = cat_feature_node.id WHERE node.node_id=v_node_id;
+        FROM PARENT_SCHEMA.cat_feature_node cfn 
+        JOIN cm.om_campaign_x_node cxn ON cxn.node_type = cfn.id 
+        WHERE cxn.node_id = v_node_id;
     END IF;
     
     IF v_isarcdivide IS NOT TRUE THEN
@@ -127,13 +131,13 @@ BEGIN
     SELECT * INTO rec_aux2 FROM PARENT_SCHEMA.arc WHERE arc_id = v_arc_id;
 
     -- Update values of new arc_id (1)
-    rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
+    rec_aux1.arc_id := nextval('cm.urn_id_seq');
     rec_aux1.code := rec_aux1.arc_id; -- Simplified code generation
     rec_aux1.node_2 := v_node_id;
     rec_aux1.the_geom := v_line1;
 
     -- Update values of new arc_id (2)
-    rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
+    rec_aux2.arc_id := nextval('cm.urn_id_seq');
     rec_aux2.code := rec_aux2.arc_id; -- Simplified code generation
     rec_aux2.node_1 := v_node_id;
     rec_aux2.the_geom := v_line2;

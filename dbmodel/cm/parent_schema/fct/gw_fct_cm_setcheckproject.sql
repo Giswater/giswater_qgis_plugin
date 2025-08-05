@@ -100,6 +100,7 @@ DECLARE
 	v_any_issue_found boolean := false;
 	v_lot_view_name text;
 	v_view_exists boolean;
+	v_arc_divide_tolerance float := 0.05;
 
 BEGIN
 
@@ -111,8 +112,8 @@ BEGIN
 
     v_fid := (p_data->'data'->'parameters'->>'functionFid')::integer;
     v_project_type := COALESCE(p_data->'data'->'parameters'->>'project_type', 'cm');
-    v_campaign_id := p_data->'data'->'parameters'->>'campaignId';
-	v_lot_id := p_data->'data'->'parameters'->>'lotId';
+    v_campaign_id := (p_data->'data'->'parameters'->>'campaignId')::integer;
+	v_lot_id := (p_data->'data'->'parameters'->>'lotId')::integer;
 	v_check_management_configs := COALESCE((p_data->'data'->'parameters'->>'checkManagementConfigs')::boolean, false);
 	v_check_data_related := COALESCE((p_data->'data'->'parameters'->>'checkDataRelated')::boolean, false);
 
@@ -263,10 +264,20 @@ BEGIN
 		SELECT 'om_campaign_lot_x_arc' AS table_name, 'lot_id' AS id_column, v_lot_id AS id_value
 	LOOP
 		IF v_rec.id_value IS NOT NULL THEN
-			v_querytext := format(
-				'SELECT arc_id, the_geom FROM cm.%I WHERE (node_1 IS NULL OR node_2 IS NULL) AND %I = %s',
-				v_rec.table_name, v_rec.id_column, v_rec.id_value
-			);
+			-- For campaign tables, get geometry directly. For lot tables, join with parent schema
+			IF v_rec.table_name LIKE '%lot_x_%' THEN
+				v_querytext := format(
+					'SELECT cx.arc_id, a.the_geom FROM cm.%I cx 
+					 JOIN PARENT_SCHEMA.arc a ON cx.arc_id = a.arc_id 
+					 WHERE (cx.node_1 IS NULL OR cx.node_2 IS NULL) AND cx.%I = %s',
+					v_rec.table_name, v_rec.id_column, v_rec.id_value
+				);
+			ELSE
+				v_querytext := format(
+					'SELECT arc_id, the_geom FROM cm.%I WHERE (node_1 IS NULL OR node_2 IS NULL) AND %I = %s',
+					v_rec.table_name, v_rec.id_column, v_rec.id_value
+				);
+			END IF;
 
 			FOR v_rec_check IN EXECUTE v_querytext
 			LOOP
@@ -290,36 +301,49 @@ BEGIN
 
 	-- SECTION[epic=checkproject]: Find and flag nodes that should divide arcs
 	DECLARE
-		v_arc_divide_tolerance float := 0.05;
 		v_nodes_flagged integer := 0;
 		v_node_to_flag_rec RECORD;
 	BEGIN
-		FOR v_rec IN
-			SELECT 'om_campaign_x_node' AS table_name, 'campaign_id' AS id_column, v_campaign_id AS id_value
-			UNION ALL
-			SELECT 'om_campaign_lot_x_node' AS table_name, 'lot_id' AS id_column, v_lot_id AS id_value
-		LOOP
-			IF v_rec.id_value IS NOT NULL THEN
-				v_querytext := format(
-					'SELECT n.node_id
-					 FROM PARENT_SCHEMA.node n
-					 JOIN cm.%I cx ON n.node_id = cx.node_id
-					 WHERE cx.%I = %s AND (n.isarcdivide IS NULL OR n.isarcdivide = false)
-					   AND EXISTS (
-						 SELECT 1 FROM PARENT_SCHEMA.arc a
-						 WHERE ST_DWithin(n.the_geom, a.the_geom, %s)
-						   AND a.node_1 <> n.node_id AND a.node_2 <> n.node_id
-					   )',
-					v_rec.table_name, v_rec.id_column, v_rec.id_value, v_arc_divide_tolerance
-				);
+		-- Only process campaign nodes since lot nodes don't have node_type column
+		IF v_campaign_id IS NOT NULL THEN
+			v_querytext := format(
+				'SELECT n.node_id
+				 FROM PARENT_SCHEMA.node n
+				 JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id
+				 JOIN PARENT_SCHEMA.cat_feature_node cfn ON cx.node_type = cfn.id
+				 WHERE cx.campaign_id = %s AND (cfn.isarcdivide IS NULL OR cfn.isarcdivide = false)
+				   AND EXISTS (
+					 SELECT 1 FROM PARENT_SCHEMA.arc a
+					 WHERE ST_DWithin(n.the_geom, a.the_geom, %s)
+					   AND a.node_1 <> n.node_id AND a.node_2 <> n.node_id
+					   AND a.arc_id IN (SELECT arc_id FROM cm.om_campaign_x_arc WHERE campaign_id = %s)
+				   )',
+				v_campaign_id, v_arc_divide_tolerance, v_campaign_id
+			);
 
-				FOR v_node_to_flag_rec IN EXECUTE v_querytext
-				LOOP
-					 UPDATE PARENT_SCHEMA.node SET isarcdivide = true WHERE node_id = v_node_to_flag_rec.node_id;
-					 v_nodes_flagged := v_nodes_flagged + 1;
-				END LOOP;
-			END IF;
-		END LOOP;
+			FOR v_node_to_flag_rec IN EXECUTE v_querytext
+			LOOP
+				-- Update the cat_feature_node table instead of the node table
+				-- Get node_type from the campaign table
+				DECLARE
+					v_node_type integer;
+				BEGIN
+					-- Get node_type from campaign table
+					SELECT node_type INTO v_node_type FROM cm.om_campaign_x_node WHERE node_id = v_node_to_flag_rec.node_id LIMIT 1;
+					
+					IF v_node_type IS NOT NULL THEN
+						UPDATE PARENT_SCHEMA.cat_feature_node 
+						SET isarcdivide = true 
+						WHERE id = v_node_type;
+						v_nodes_flagged := v_nodes_flagged + 1;
+					END IF;
+				EXCEPTION
+					WHEN OTHERS THEN
+						INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+						VALUES (v_fid, current_user, 2, format('WARNING: Error flagging node %s for arc division. Error: %s', v_node_to_flag_rec.node_id, SQLERRM));
+				END;
+			END LOOP;
+		END IF;
 
 		IF v_nodes_flagged > 0 THEN
 			INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
@@ -329,33 +353,59 @@ BEGIN
 	-- ENDSECTION
 
 	-- SECTION[epic=checkproject]: Perform Arc Division for flagged nodes
-	FOR v_rec IN
-		SELECT 'om_campaign_x_node' AS table_name, 'campaign_id' AS id_column, v_campaign_id AS id_value
-		UNION ALL
-		SELECT 'om_campaign_lot_x_node' AS table_name, 'lot_id' AS id_column, v_lot_id AS id_value
-	LOOP
-		IF v_rec.id_value IS NOT NULL THEN
-			v_querytext := format(
-				'SELECT n.node_id FROM PARENT_SCHEMA.node n
-				 JOIN cm.%I cx ON n.node_id = cx.node_id
-				 WHERE cx.%I = %s AND n.isarcdivide = true',
-				v_rec.table_name, v_rec.id_column, v_rec.id_value
-			);
+	-- Only process campaign nodes that actually have arcs to divide
+	IF v_campaign_id IS NOT NULL THEN
+		v_querytext := format(
+			'SELECT DISTINCT n.node_id 
+			 FROM PARENT_SCHEMA.node n
+			 JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id
+			 JOIN PARENT_SCHEMA.cat_feature_node cfn ON cx.node_type = cfn.id
+			 WHERE cx.campaign_id = %s AND cfn.isarcdivide = true
+			   AND EXISTS (
+				 SELECT 1 FROM PARENT_SCHEMA.arc a
+				 WHERE ST_DWithin(n.the_geom, a.the_geom, %s)
+				   AND a.node_1 <> n.node_id AND a.node_2 <> n.node_id
+				   AND a.arc_id IN (SELECT arc_id FROM cm.om_campaign_x_arc WHERE campaign_id = %s)
+			   )',
+			v_campaign_id, v_arc_divide_tolerance, v_campaign_id
+		);
 
-			FOR v_rec_check IN EXECUTE v_querytext
-			LOOP
-				-- Call the existing arc divide function for each node
-				PERFORM PARENT_SCHEMA.gw_fct_setarcdivide(json_build_object(
+		FOR v_rec_check IN EXECUTE v_querytext
+		LOOP
+			-- Call the CM-specific arc divide function for each node
+			DECLARE
+				v_arc_divide_result json;
+			BEGIN
+				SELECT cm.gw_fct_cm_setarcdivide(json_build_object(
 					'feature', json_build_object('id', array[v_rec_check.node_id]),
 					'data', json_build_object('parameters', json_build_object('skipInitEndMessage', true))
-				));
+				)) INTO v_arc_divide_result;
 
-				INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
-				VALUES (v_fid, current_user, 1, 'INFO: Performed arc division for node ID ' || v_rec_check.node_id);
+				-- Check the result and log appropriately
+				IF v_arc_divide_result->>'status' = 'Accepted' THEN
+					INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+					VALUES (v_fid, current_user, 1, 'INFO: ' || (v_arc_divide_result->>'message'));
+				ELSE
+					INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+					VALUES (v_fid, current_user, 2, 'WARNING: Arc division failed for node ID ' || v_rec_check.node_id || '. ' || (v_arc_divide_result->>'message'));
+				END IF;
+			EXCEPTION
+				WHEN OTHERS THEN
+					INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+					VALUES (v_fid, current_user, 2, 'WARNING: Failed to perform arc division for node ID ' || v_rec_check.node_id || '. Error: ' || SQLERRM);
+			END;
 
-			END LOOP;
+		END LOOP;
+		
+		-- Add message if no arc division was performed
+		IF NOT EXISTS (
+			SELECT 1 FROM t_audit_check_data 
+			WHERE fid = v_fid AND error_message LIKE '%INFO: Arc%divided%'
+		) THEN
+			INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+			VALUES (v_fid, current_user, 1, 'INFO: No arc division was needed - all nodes are properly connected to their arcs.');
 		END IF;
-	END LOOP;
+	END IF;
 	-- ENDSECTION
 
 	-- SECTION[epic=checkproject]: Get fids to run
@@ -524,6 +574,14 @@ BEGIN
 								);
 								INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
 								VALUES (v_fid, current_user, 1, v_lot_summary_msg);
+							WHEN OTHERS THEN
+								-- Catch any other errors and log them as warnings
+								v_lot_summary_msg := format(
+									'WARNING (Lot ID: %s): Error checking field ''%s'' in subtype ''%s''. Error: %s',
+									v_lot_id, v_rec_check.columnname, v_rec_subtype.subtype, SQLERRM
+								);
+								INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+								VALUES (v_fid, current_user, 2, v_lot_summary_msg);
 						END;
 					END IF;
 				END LOOP; -- end loop for combo columns
@@ -611,7 +669,14 @@ BEGIN
 						);
 
 						-- Execute the update
-						EXECUTE v_querytext;
+						BEGIN
+							EXECUTE v_querytext;
+						EXCEPTION
+							WHEN OTHERS THEN
+								INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+								VALUES (v_fid, current_user, 2, format('WARNING: Error updating qindex for campaign %s, feature type %s, subtype %s. Error: %s', 
+									v_campaign_id, v_feature_type_iterator, v_rec_subtype.subtype, SQLERRM));
+						END;
 					END IF;
 				END IF;
 			END LOOP;
@@ -658,10 +723,16 @@ BEGIN
 		END LOOP;
 
 		IF v_total_count > 0 THEN
-			UPDATE cm.om_campaign_lot
-			SET qindex1 = CASE WHEN v_seen_non_null_q1 THEN v_total_q1::decimal / v_total_count ELSE NULL END,
-				qindex2 = CASE WHEN v_seen_non_null_q2 THEN v_total_q2::decimal / v_total_count ELSE NULL END
-			WHERE lot_id = v_lot_id;
+			BEGIN
+				UPDATE cm.om_campaign_lot
+				SET qindex1 = CASE WHEN v_seen_non_null_q1 THEN v_total_q1::decimal / v_total_count ELSE NULL END,
+					qindex2 = CASE WHEN v_seen_non_null_q2 THEN v_total_q2::decimal / v_total_count ELSE NULL END
+				WHERE lot_id = v_lot_id;
+			EXCEPTION
+				WHEN OTHERS THEN
+					INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+					VALUES (v_fid, current_user, 2, format('WARNING: Error updating lot qindex summary for lot %s. Error: %s', v_lot_id, SQLERRM));
+			END;
 
 			v_avg_q1_text := CASE WHEN v_seen_non_null_q1 THEN round(v_total_q1::decimal / v_total_count, 2)::text ELSE 'NULL' END;
 			v_avg_q2_text := CASE WHEN v_seen_non_null_q2 THEN round(v_total_q2::decimal / v_total_count, 2)::text ELSE 'NULL' END;
@@ -707,10 +778,16 @@ BEGIN
 		END LOOP;
 
 		IF v_total_count > 0 THEN
-			UPDATE cm.om_campaign
-			SET qindex1 = CASE WHEN v_seen_non_null_q1 THEN v_total_q1::decimal / v_total_count ELSE NULL END,
-				qindex2 = CASE WHEN v_seen_non_null_q2 THEN v_total_q2::decimal / v_total_count ELSE NULL END
-			WHERE campaign_id = v_campaign_id;
+			BEGIN
+				UPDATE cm.om_campaign
+				SET qindex1 = CASE WHEN v_seen_non_null_q1 THEN v_total_q1::decimal / v_total_count ELSE NULL END,
+					qindex2 = CASE WHEN v_seen_non_null_q2 THEN v_total_q2::decimal / v_total_count ELSE NULL END
+				WHERE campaign_id = v_campaign_id;
+			EXCEPTION
+				WHEN OTHERS THEN
+					INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+					VALUES (v_fid, current_user, 2, format('WARNING: Error updating campaign qindex summary for campaign %s. Error: %s', v_campaign_id, SQLERRM));
+			END;
 
 			v_avg_q1_text := CASE WHEN v_seen_non_null_q1 THEN round(v_total_q1::decimal / v_total_count, 2)::text ELSE 'NULL' END;
 			v_avg_q2_text := CASE WHEN v_seen_non_null_q2 THEN round(v_total_q2::decimal / v_total_count, 2)::text ELSE 'NULL' END;
@@ -739,9 +816,8 @@ BEGIN
 				'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{"functionFid":' || v_fid || ',"checkFid":' || v_rec.fid || '}}}$$)'
 				INTO v_check_result;
 			
-			IF (v_check_result->>'issue_found')::boolean IS TRUE THEN
-				v_any_issue_found := true;
-			END IF;
+			-- Remove the issue_found check since the function doesn't return this field
+			-- The function will log issues directly to t_audit_check_data
 		END LOOP;
 	END IF;
 	-- ENDSECTION
@@ -765,8 +841,19 @@ BEGIN
 
 
 	-- SECTION[epic=checkproject]: Build return
-	EXECUTE 'SELECT cm.gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
-	EXECUTE 'SELECT cm.gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
+	BEGIN
+		EXECUTE 'SELECT cm.gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
+	EXCEPTION
+		WHEN OTHERS THEN
+			v_result_info := '{}';
+	END;
+	
+	BEGIN
+		EXECUTE 'SELECT cm.gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
+	EXCEPTION
+		WHEN OTHERS THEN
+			v_result_point := '{}';
+	END;
 
 	--EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
 	--EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;

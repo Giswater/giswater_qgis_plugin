@@ -1245,7 +1245,7 @@ BEGIN
 					'||v_query_text_aux||'
 					WHERE EXISTS (
 						SELECT 1 FROM v_temp_pgr_mapzone_old tm
-						WHERE c.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+						WHERE g.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
 					)
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc ta WHERE ta.arc_id = g.arc_id
@@ -1259,12 +1259,12 @@ BEGIN
 					'||v_query_text_aux||'
 					WHERE EXISTS (
 						SELECT 1 FROM v_temp_pgr_mapzone_old tm
-						WHERE c.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+						WHERE g.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
 					)
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc ta
 						JOIN gully g USING (arc_id)
-						WHERE c.feature_type = ''GULLY'' AND g.gully_id = l.feature_id
+						WHERE l.feature_type = ''GULLY'' AND g.gully_id = l.feature_id
 					)
 					AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
@@ -1390,18 +1390,16 @@ BEGIN
 				JOIN outfalls o USING (pgr_node_id)
 				WHERE n.node_id = pn.node_id
 				AND n.dwfzone_id > 0
-				AND n.dwfzone_outfall IS DISTINCT FROM o.dwfzone_outfall;
+				AND n.dwfzone_outfall::bigint[] IS DISTINCT FROM o.dwfzone_outfall;
 
 				WITH arc_updates AS (
 					SELECT a.arc_id, n.dwfzone_outfall
 					FROM arc a
+					JOIN temp_pgr_arc ta ON a.arc_id = ta.arc_id
 					JOIN node n ON
-						(n.node_id = a.node_1 AND a.reverse_cost >= 0)
-						OR (n.node_id = a.node_2 AND a.cost >= 0)
+						(n.node_id = a.node_1 AND ta.reverse_cost >= 0)
+						OR (n.node_id = a.node_2 AND ta.cost >= 0)
 					WHERE a.dwfzone_id > 0
-					AND EXISTS (
-						SELECT 1 FROM temp_pgr_arc ta WHERE ta.arc_id = a.arc_id
-					)
 					AND a.dwfzone_outfall IS DISTINCT FROM n.dwfzone_outfall
 				)
 				UPDATE arc a SET dwfzone_outfall = u.dwfzone_outfall

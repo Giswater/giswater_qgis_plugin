@@ -67,6 +67,7 @@ BEGIN
             fluid_type INTEGER DEFAULT 0,
             modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
+            to_arc _int4,
             CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_node_node_id_idx ON temp_pgr_node USING btree (node_id);
@@ -89,6 +90,7 @@ BEGIN
             modif2 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_2
             cost INT DEFAULT 1,
             reverse_cost INT DEFAULT 1,
+            to_arc _int4,
             CONSTRAINT temp_pgr_arc_pkey PRIMARY KEY (pgr_arc_id)
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_arc_id_idx ON temp_pgr_arc USING btree (arc_id);
@@ -128,11 +130,9 @@ BEGIN
         IF v_project_type = 'WS' THEN
             ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
             ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL;
-            ALTER TABLE temp_pgr_node ADD COLUMN to_arc _int4;
 
             ALTER TABLE temp_pgr_arc ADD COLUMN closed BOOL;
             ALTER TABLE temp_pgr_arc ADD COLUMN broken BOOL;
-            ALTER TABLE temp_pgr_arc ADD COLUMN to_arc _int4;
 
             -- for specific functions
             IF v_fct_name = 'MINCUT' OR v_fct_name = 'MINSECTOR' THEN
@@ -531,6 +531,8 @@ BEGIN
                         gully.fluid_type,
                         gully.muni_id,
                         gully.minsector_id,
+                        gully.gullycat_id,
+                        gully.state,
                         gully.the_geom
                     FROM gully_selector
                     JOIN gully ON gully.gully_id::text = gully_selector.gully_id::text
@@ -801,6 +803,8 @@ BEGIN
                     g.fluid_type,
                     g.muni_id,
                     g.minsector_id,
+                    g.gullycat_id,
+                    g.state,
                     g.the_geom
                 FROM gully g
                 JOIN value_state_type vst ON vst.id = g.state_type
