@@ -669,7 +669,14 @@ BEGIN
 		IF v_project_type = 'WS' AND v_presszone_id IS NOT NULL THEN
 			v_staticpressure = (SELECT head from presszone WHERE presszone_id = v_presszone_id) - v_elevation;
 		END IF;
-
+	
+		-- force state vdefault in function of psector mode
+		IF (SELECT value FROM config_param_user WHERE "parameter" = 'plan_psector_current' and value::integer in (select psector_id from plan_psector)) IS NOT NULL THEN
+				UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault';
+			else
+				UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault';			
+		END IF;
+	
 	ELSIF v_tg_op ='UPDATE' OR v_tg_op ='SELECT' then
 
 		-- getting values from feature
@@ -790,14 +797,6 @@ BEGIN
 				EXECUTE v_querystring INTO v_shape, v_geom1, v_geom2, v_matcat_id;
 			END IF;
 		END IF;
-	END IF;
-
-
-	-- force state vdefault in function of psector mode
-	IF (SELECT value FROM config_param_user WHERE "parameter" = 'plan_psector_current' and value::integer in (select psector_id from plan_psector)) IS NOT NULL THEN
-			UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault';
-		else
-			UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault';			
 	END IF;
 
 	-- gettingf minvalue & maxvalues for widgetcontrols
