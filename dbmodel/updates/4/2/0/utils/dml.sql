@@ -234,3 +234,9 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4332, 'Unknown %parameter%', 'You need to pass correct parameters.', 2, true, 'utils', 'core', 'UI');
 
 UPDATE sys_function SET function_name = 'gw_fct_set_toggle_current' WHERE function_name = 'gw_fct_set_current';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4334, 'You can not desactivate the %mapzone_name%, because have objects linked to it', 'First you need to change the objects to another mapzone. EX: Undefined', 2, true, 'utils', 'core', 'UI');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3496, 'gw_fct_check_linked_mapzones', 'utils', 'function', 'json', 'json', 'Check if there are objects linked to the mapzone', NULL, NULL, 'core', NULL);

@@ -82,6 +82,10 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
+		IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
+			PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'sector', 'mapzoneId', OLD.sector_id)));
+		END IF;
+
 		IF v_view_name = 'EDIT' THEN
 			v_mapzone_id = NEW.macrosector_id;
 		ELSIF v_view_name = 'UI' THEN

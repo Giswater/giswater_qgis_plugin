@@ -58,6 +58,10 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
+		IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
+			PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'dwfzone', 'mapzoneId', OLD.dwfzone_id)));
+		END IF;
+
 		UPDATE dwfzone
 		SET dwfzone_id=NEW.dwfzone_id, name=NEW.name, expl_id=NEW.expl_id,
 		sector_id=NEW.sector_id, muni_id=NEW.muni_id, descript=NEW.descript,
