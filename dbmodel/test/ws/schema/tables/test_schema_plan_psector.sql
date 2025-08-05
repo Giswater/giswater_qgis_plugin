@@ -23,7 +23,7 @@ SELECT columns_are(
         'psector_id', 'name', 'psector_type', 'descript', 'expl_id', 'priority', 'text1', 'text2',
         'observ', 'rotation', 'scale', 'atlas_id', 'gexpenses', 'vat', 'other', 'active',
         'the_geom', 'enable_all', 'status', 'ext_code', 'text3', 'text4', 'text5', 'text6',
-        'num_value', 'workcat_id', 'parent_id', 'tstamp', 'insert_user', 'lastupdate', 'lastupdate_user',
+        'num_value', 'workcat_id', 'workcat_id_plan', 'parent_id', 'tstamp', 'insert_user', 'lastupdate', 'lastupdate_user',
         'archived', 'creation_date'
     ],
     'Table plan_psector should have the correct columns'
@@ -59,6 +59,7 @@ SELECT col_type_is('plan_psector', 'text5', 'text', 'Column text5 should be text
 SELECT col_type_is('plan_psector', 'text6', 'text', 'Column text6 should be text');
 SELECT col_type_is('plan_psector', 'num_value', 'numeric', 'Column num_value should be numeric');
 SELECT col_type_is('plan_psector', 'workcat_id', 'text', 'Column workcat_id should be text');
+SELECT col_type_is('plan_psector', 'workcat_id_plan', 'text', 'Column workcat_id_plan should be text');
 SELECT col_type_is('plan_psector', 'parent_id', 'integer', 'Column parent_id should be integer');
 SELECT col_type_is('plan_psector', 'tstamp', 'timestamp without time zone', 'Column tstamp should be timestamp without time zone');
 SELECT col_type_is('plan_psector', 'insert_user', 'character varying(50)', 'Column insert_user should be character varying(50)');
@@ -80,6 +81,7 @@ SELECT has_fk('plan_psector', 'Table plan_psector should have foreign keys');
 SELECT fk_ok('plan_psector', 'expl_id', 'exploitation', 'expl_id', 'FK expl_id should reference exploitation.expl_id');
 SELECT fk_ok('plan_psector', 'parent_id', 'plan_psector', 'psector_id', 'FK parent_id should reference plan_psector.psector_id');
 SELECT fk_ok('plan_psector', 'workcat_id', 'cat_work', 'id', 'FK workcat_id should reference cat_work.id');
+SELECT fk_ok('plan_psector', 'workcat_id_plan', 'cat_work', 'id', 'FK workcat_id_plan should reference cat_work.id');
 
 -- Check constraints
 SELECT col_not_null('plan_psector', 'psector_id', 'Column psector_id should be NOT NULL');
@@ -96,6 +98,7 @@ SELECT has_index('plan_psector', 'idx_plan_psector_expl_id', 'Table should have 
 SELECT has_index('plan_psector', 'idx_plan_psector_name', 'Table should have index on name');
 SELECT has_index('plan_psector', 'idx_plan_psector_status', 'Table should have index on status');
 SELECT has_index('plan_psector', 'idx_plan_psector_workcat_id', 'Table should have index on workcat_id');
+SELECT has_index('plan_psector', 'idx_plan_psector_workcat_id_plan', 'Table should have index on workcat_id_plan');
 SELECT has_index('plan_psector', 'ifx_plan_psector_parent_id', 'Table should have index on parent_id');
 SELECT has_index('plan_psector', 'ifx_plan_psector_the_geom', 'Table should have index on the_geom');
 SELECT has_index('plan_psector', 'plan_psector_expl_id', 'Table should have index on expl_id');
