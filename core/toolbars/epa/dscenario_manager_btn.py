@@ -394,12 +394,12 @@ class GwDscenarioManagerButton(GwAction):
             tools_qgis.show_warning(msg, dialog=dialog, msg_params=msg_params)
             return
 
-        # Prepare the JSON body for gw_fct_set_current
+        # Prepare the JSON body for gw_fct_set_toggle_current
         extras = f'"type": "{scenario_type}", "id": "{scenario_id}"'
         body = tools_gw.create_body(extras=extras)
 
         # Execute the stored procedure
-        result = tools_gw.execute_procedure("gw_fct_set_current", body)
+        result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
         print(result)
         # Check if the stored procedure returned a successful status
         if result.get("status") == "Accepted":
@@ -418,7 +418,7 @@ class GwDscenarioManagerButton(GwAction):
         """
         Sets the label for the current scenario by retrieving its name.
 
-        If `from_open_dialog` is True, the function calls `gw_fct_set_current`
+        If `from_open_dialog` is True, the function calls `gw_fct_set_toggle_current`
         to retrieve the name based on `scenario_type` only. Otherwise, it
         uses the provided `result`.
         """
@@ -429,7 +429,7 @@ class GwDscenarioManagerButton(GwAction):
             body = tools_gw.create_body(extras=extras)
 
             # Execute the stored procedure to retrieve the current scenario information
-            result = tools_gw.execute_procedure("gw_fct_set_current", body)
+            result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
 
             # Check if the stored procedure returned a successful status
             if result.get("status") != "Accepted":

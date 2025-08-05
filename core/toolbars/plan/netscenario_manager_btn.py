@@ -177,10 +177,10 @@ class GwNetscenarioManagerButton(GwAction):
             tools_qgis.show_warning(msg, dialog=dialog)
             return
 
-        # Prepare JSON body for gw_fct_set_current
+        # Prepare JSON body for gw_fct_set_toggle_current
         extras = f'"type": "netscenario", "id": "{netscenario_id}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure("gw_fct_set_current", body)
+        result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
 
         # Check if update was successful and refresh label
         if result.get("status") == "Accepted":
@@ -200,7 +200,7 @@ class GwNetscenarioManagerButton(GwAction):
         if from_open_dialog:
             extras = '"type": "netscenario"'
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure("gw_fct_set_current", body)
+            result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
 
             if not result or result.get("status") != "Accepted":
                 print("Failed to retrieve current netscenario name")

@@ -222,7 +222,7 @@ class GwWorkspaceManagerButton(GwAction):
         body = tools_gw.create_body(extras=extras)
 
         # Execute the stored procedure to retrieve the current workspace information
-        result = tools_gw.execute_procedure("gw_fct_set_current", body)
+        result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
 
         # Check if the stored procedure returned a successful status
         if result.get("status") != "Accepted":
