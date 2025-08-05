@@ -8,17 +8,18 @@ or (at your option) any later version.
 --FUNCTION CODE 3342:
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_current(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_current(p_data JSON)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_toggle_current(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_toggle_current(p_data JSON)
 RETURNS json AS
 $BODY$
 
 /*
 --EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
+SELECT SCHEMA_NAME.gw_fct_set_toggle_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "type":"netscenario", "id": "5"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
+SELECT SCHEMA_NAME.gw_fct_set_toggle_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "type": "psector", "id": "1"}}$$);
 
@@ -44,9 +45,8 @@ BEGIN
     v_type :=  ((p_data->>'data')::json)->>'type'::text;
    	v_id := ((p_data->>'data')::json)->>'id'::text;
 
-    IF v_type IS NULL THEN
-        --TODO ('Harmonize all functions messages with this logic to have the same msg from sys_message ')
-        RAISE EXCEPTION 'Input parameter "type" is required';
+    IF v_type IS NULL OR v_type = '' THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4330", "function":"3342","parameters":{"parameter":"type"}, "is_process":true}}$$);';
     END IF;
 
     -- Get project type and version info
@@ -73,22 +73,31 @@ BEGIN
             parameter_name := 'utils_workspace_vdefault';
 
         ELSE
-            RAISE EXCEPTION 'Unknown type';
+            EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4332", "function":"3342","parameters":{"parameter":"type"}, "is_process":true}}$$);';
     END CASE;
 
     -- Upsert logic for config_param_user: insert if not exists, otherwise update
     IF v_id IS NOT NULL THEN
-    	IF EXISTS (SELECT 1 FROM config_param_user WHERE cur_user = current_user AND parameter = parameter_name) THEN
-	        -- Update if the parameter exists
-	        UPDATE config_param_user
-	        SET value = v_id
-	        WHERE cur_user = current_user AND parameter = parameter_name;
-	    ELSE
-	        -- Insert a new record if it does not exist
-	        INSERT INTO config_param_user (parameter, value, cur_user)
-	        VALUES (parameter_name, v_id, current_user);
-	    END IF;
-	END IF;
+        PERFORM 1 FROM config_param_user WHERE cur_user = current_user AND parameter = parameter_name;
+        IF FOUND THEN
+            -- Check current value
+            IF (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = parameter_name) = v_id THEN
+                -- If same, toggle to NULL
+                UPDATE config_param_user
+                SET value = NULL
+                WHERE cur_user = current_user AND parameter = parameter_name;
+            ELSE
+                -- If different, update to new value
+                UPDATE config_param_user
+                SET value = v_id
+                WHERE cur_user = current_user AND parameter = parameter_name;
+            END IF;
+        ELSE
+            -- Insert new if not exists
+            INSERT INTO config_param_user (parameter, value, cur_user)
+            VALUES (parameter_name, v_id, current_user);
+        END IF;
+    END IF;
 
     -- Determine the query based on the provided type
     CASE p_data->'data'->>'type'

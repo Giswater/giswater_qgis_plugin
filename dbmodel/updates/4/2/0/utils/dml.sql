@@ -226,3 +226,11 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 
 -- 05/08/2025
 UPDATE plan_psector SET workcat_id_plan = workcat_id WHERE workcat_id IS NOT NULL AND status IN (1, 2, 3);
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4330, 'Input parameter: "%parameter%" is required', 'You need to pass correct parameters.', 2, true, 'utils', 'core', 'UI');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4332, 'Unknown %parameter%', 'You need to pass correct parameters.', 2, true, 'utils', 'core', 'UI');
+
+UPDATE sys_function SET function_name = 'gw_fct_set_toggle_current' WHERE function_name = 'gw_fct_set_current';

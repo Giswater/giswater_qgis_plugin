@@ -11,71 +11,34 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(8);
-
--- Create roles for testing
-CREATE USER plan_user;
-GRANT role_plan to plan_user;
-
-CREATE USER epa_user;
-GRANT role_epa to epa_user;
-
-CREATE USER edit_user;
-GRANT role_edit to edit_user;
-
-CREATE USER om_user;
-GRANT role_om to om_user;
-
-CREATE USER basic_user;
-GRANT role_basic to basic_user;
+SELECT plan(16);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "type": "psector", "id": "1"}}$$)::JSON)->>'status',
+    (gw_fct_set_toggle_current($${"data":{"type": "psector", "id": "1"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_set_current psector with id value returns status "Accepted"'
+    'Check if gw_fct_set_toggle_current psector with id value returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "type": "psector"}}$$)::JSON)->>'status',
+    (gw_fct_set_toggle_current($${"data":{"type": "psector"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_set_current psector returns status "Accepted"'
+    'Check if gw_fct_set_toggle_current psector returns status "Accepted"'
+);
+
+INSERT INTO plan_netscenario (netscenario_id, "name", descript, parent_id, netscenario_type, active, expl_id, log)
+VALUES(5, 'test_netscenario', NULL, NULL, 'DMA', true, 0, 'Created in testing');
+
+SELECT is (
+    (gw_fct_set_toggle_current($${"data":{"type": "netscenario", "id": "5"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_set_toggle_current netscenario with id value returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "type": "hydrology", "id": "1"}}$$)::JSON)->>'status',
+    (gw_fct_set_toggle_current($${"data":{"type": "netscenario"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_set_current hydrology with id value returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "type": "hydrology"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_set_current hydrology returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "type": "dwf", "id": "1"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_set_current dwf with id value returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "type": "dwf"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_set_current dwf returns status "Accepted"'
+    'Check if gw_fct_set_toggle_current netscenario returns status "Accepted"'
 );
 
 -- prepare test
@@ -88,19 +51,82 @@ INSERT INTO cat_workspace (id, "name", descript, config, private, active, isedit
 }, "inp_options_advancedsettings" : {"status":false, "parameters":{"junction":{"baseDemand":0},  "reservoir":{"addElevation":1},  "tank":{"addElevation":1}, "valve":{"length":"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}},"pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}}}, "inp_options_vdefault" : {"status":false, "parameters":{"node":{"nullElevBuffer":100, "ceroElevBuffer":100}, "pipe":{"diameter":"160","roughness":"avg"}}}, "inp_options_debug" : {"forceReservoirsOnInlets":false, "forceTanksOnInlets":false, "setDemand":true,"checkResult":true,"onlyIsOperative":true,"delDisconnNetwork":false,"delDryNetwork":false, "removeDemandOnDryNodes":true,"breakPipes":{"status":false, "maxLength":10, "removeVnodeBuffer":1},"graphicLog":"true","steps":0,"autoRepair":true} },"selectors":[{"selector_inp_dscenario": [1]}, {"selector_sector": [1, 2, 3, 4, 5, 0]}, {"selector_state": [1]}, {"selector_rpt_compare": null}, {"selector_rpt_main": null}, {"selector_municipality": [0, 1, 2]}, {"selector_expl": [1, 2, 0]}, {"selector_hydrometer": [1]}, {"selector_psector": [1, 2]}, {"selector_rpt_compare_tstep": null}, {"selector_rpt_main_tstep": null}, {"selector_date": null}]}'::json, false, true, true, 'postgres', now(), 'postgres', now());
 
 SELECT is (
-    (gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "type": "workspace", "id": "1"}}$$)::JSON)->>'status',
+    (gw_fct_set_toggle_current($${"data":{"type": "workspace", "id": "1"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_set_current workspace with id value returns status "Accepted"'
+    'Check if gw_fct_set_toggle_current workspace with id value returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_set_current($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "type": "workspace"}}$$)::JSON)->>'status',
+    (gw_fct_set_toggle_current($${"data":{"type": "workspace"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_set_current workspace returns status "Accepted"'
+    'Check if gw_fct_set_toggle_current workspace returns status "Accepted"'
+);
+
+-- test error messages
+SELECT throws_ok(
+    $$
+        SELECT gw_fct_set_toggle_current($${"data":{"type": "psector_wrong"}}$$)::JSON;
+    $$,
+    'GW002',
+    'Function: [gw_fct_set_toggle_current] - UNKNOWN TYPE. HINT: YOU NEED TO PASS CORRECT PARAMETERS. - <NULL>',
+    'Check if gw_fct_set_toggle_current with wrong type throws expected error'
+);
+
+SELECT throws_ok(
+    $$
+        SELECT gw_fct_set_toggle_current($${"data":{}}$$)::JSON;
+    $$,
+    'GW002',
+    'Function: [gw_fct_set_toggle_current] - INPUT PARAMETER: "TYPE" IS REQUIRED. HINT: YOU NEED TO PASS CORRECT PARAMETERS. - <NULL>',
+    'Check if gw_fct_set_toggle_current without type throws expected error'
+);
+
+-- Toggle psector id=1 ON
+SELECT is(
+    (gw_fct_set_toggle_current($${"data": {"type": "psector", "id": 1}}$$)::json->'status')::text,
+    '"Accepted"',
+    'Toggle psector 1 ON returns status Accepted'
+);
+SELECT is(
+    (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_current'),
+    '1',
+    'plan_psector_current is set to 1 after toggling psector 1 ON'
+);
+
+-- Toggle psector id=1 OFF
+SELECT is(
+    (gw_fct_set_toggle_current($${"data": {"type": "psector", "id": 1}}$$)::json->'status')::text,
+    '"Accepted"',
+    'Toggle psector 1 OFF returns status Accepted'
+);
+SELECT is(
+    (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_current'),
+    NULL,
+    'plan_psector_current is NULL after toggling psector 1 OFF'
+);
+
+-- Toggle psector id=2 ON
+SELECT is(
+    (gw_fct_set_toggle_current($${"data": {"type": "psector", "id": 2}}$$)::json->'status')::text,
+    '"Accepted"',
+    'Toggle psector 2 ON returns status Accepted'
+);
+SELECT is(
+    (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_current'),
+    '2',
+    'plan_psector_current is set to 2 after toggling psector 2 ON'
+);
+
+-- Toggle psector id=1 ON (should switch from 2 to 1)
+SELECT is(
+    (gw_fct_set_toggle_current($${"data": {"type": "psector", "id": 1}}$$)::json->'status')::text,
+    '"Accepted"',
+    'Toggle psector 1 ON (from 2) returns status Accepted'
+);
+SELECT is(
+    (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_current'),
+    '1',
+    'plan_psector_current is set to 1 after toggling psector 1 ON (from 2)'
 );
 
 -- Finish the test
