@@ -211,8 +211,8 @@ BEGIN
 	FROM inp_junction i JOIN  
 	(select * from (SELECT node_2 as node_id from temp_t_arc group by node_2 having count(*) = 1)a 
 	except 
-	select * from (SELECT node_1 from temp_t_arc group by node_1 having count(*) > 0)b) c USING (node_id)
-	WHERE outfallparam is not null and temp_t_node.node_id = i.node_id;
+	select * from (SELECT node_1 from temp_t_arc group by node_1 having count(*) > 0)b) c ON i.node_id::text = c.node_id
+	WHERE outfallparam is not null and temp_t_node.node_id = i.node_id::text;
 
 	-- fill temp_t_gully in order to work with 1D/2D
 	IF v_networkmode = 2 or v_networkmode = 3 THEN
