@@ -65,8 +65,8 @@ class GwMapzoneManager:
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "174")
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
-        tabs = ['sector', 'macrosector', 'omzone', 'macroomzone']
-        project_tabs = {'ws': ['dma', 'dqa', 'macrodma', 'macrodqa', 'supplyzone', 'presszone'],
+        tabs = ['sector', 'dma', 'macrosector', 'omzone', 'macroomzone' ]
+        project_tabs = {'ws': ['dqa', 'macrodma', 'macrodqa', 'supplyzone', 'presszone'],
                         'ud': ['drainzone', 'dwfzone']}
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
