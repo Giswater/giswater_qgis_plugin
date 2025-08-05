@@ -111,6 +111,7 @@ v_check_maxdistance float;
 v_checkeddiam text;
 v_querytext text;
 v_linkcat_id text;
+v_link_type text;
 
 BEGIN
 
@@ -491,6 +492,8 @@ BEGIN
 					-- creation of link
 					v_link.link_id = (SELECT nextval('urn_id_seq'));
 
+					SELECT link_type INTO v_link_type FROM cat_link WHERE id = v_linkcat_id LIMIT 1;
+
 					IF v_projecttype = 'WS' THEN
 						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, omzone_id,
 						presszone_id, dqa_id, minsector_id, fluid_type, muni_id, linkcat_id, state_type)
@@ -500,7 +503,7 @@ BEGIN
 					ELSIF v_projecttype = 'UD' THEN
 						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, omzone_id, fluid_type, muni_id, linkcat_id, link_type, state_type)
 						VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.omzone_id, v_fluidtype_value::INTEGER, v_connect.muni_id, v_linkcat_id, 'LINK', v_connect.state_type);
+						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.omzone_id, v_fluidtype_value::INTEGER, v_connect.muni_id, v_linkcat_id, v_link_type, v_connect.state_type);
 					END IF;
 				ELSE
 					IF v_linkcat_id IS NULL THEN
