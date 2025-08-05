@@ -45,7 +45,7 @@ BEGIN
 		IF v_projecttype = 'WS' THEN 
 			IF psector_type_aux='plan' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
-				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
+				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id AND doable UNION
 				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id 
 				UNION select the_geom from plan_psector_x_other where the_geom IS NOT NULL and psector_id=NEW.psector_id
@@ -55,7 +55,7 @@ BEGIN
 		ELSIF v_projecttype = 'UD' THEN 
 			IF psector_type_aux='plan' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
-				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
+				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id AND doable UNION
 				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
 				select the_geom from gully join plan_psector_x_gully ON plan_psector_x_gully.gully_id=gully.gully_id where psector_id=NEW.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id 
