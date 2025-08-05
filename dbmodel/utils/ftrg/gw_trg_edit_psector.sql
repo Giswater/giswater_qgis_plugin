@@ -74,11 +74,11 @@ BEGIN
 	NEW.psector_id:= (SELECT nextval('plan_psector_id_seq'));
 
 	IF om_aux='plan' THEN
-
+		-- archived is false by default
 		INSERT INTO plan_psector (psector_id, name, psector_type, descript, priority, text1, text2, observ, rotation, scale,
 		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, archived, ext_code, status, text3, text4, text5, text6, num_value, workcat_id, parent_id)
 		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation,
-		NEW.scale, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, true, false,
+		NEW.scale, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active, false,
 		NEW.ext_code, NEW.status, NEW.text3, NEW.text4, NEW.text5, NEW.text6, NEW.num_value, new.workcat_id, new.parent_id);
 	END IF;
 
