@@ -622,7 +622,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('ve_epa_pgully','form_feature','tab_epa','custom_length','lyt_epa_data_1',6,'double','text','Custom length:','Custom length:',false,false,true,false,false,true);
 
 UPDATE config_form_list
-SET query_text='SELECT dscenario_id, node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur FROM v_edit_inp_dscenario_storage WHERE node_id IS NOT NULL'
+SET query_text='SELECT dscenario_id, node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur FROM ve_inp_dscenario_storage WHERE node_id IS NOT NULL'
 WHERE listname='tbl_inp_storage' AND device=4;
 -- 25/07/2025
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3492, 'gw_fct_graphanalytics_omunit', 'ud', 'function', 'json', 'json', 'Dynamic analisys to sectorize network using the flow traceability function and establish omunits.', 'role_plan', NULL, 'core', 'OMUNIT DYNAMIC SECTORITZATION');
