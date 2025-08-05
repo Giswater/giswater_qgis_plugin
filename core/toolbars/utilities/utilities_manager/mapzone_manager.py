@@ -46,9 +46,9 @@ class GwMapzoneManager:
         self.netscenario_id = None
 
         self.mapzone_status = {
-            "enabled": ["sector", "dma", "dqa", "presszone"],
+            "enabled": ["sector", "dma", "dqa", "presszone", "dwfzone"],
             "enabledMacromapzone": ["macrosector", "macrodma", "macrodqa", "macroomzone"],
-            "disabled": ["omzone", "supplyzone"]
+            "disabled": ["omzone", "supplyzone", "drainzone"]
         }
 
         # The -901 is transformed to user selected exploitation in the mapzones analysis
