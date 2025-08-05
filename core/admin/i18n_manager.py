@@ -380,8 +380,7 @@ class GwSchemaI18NManager:
                 # Get the values to insert
                 for col in columns_org:
                     val = row.get(col)
-                    values.append("NULL" if val in [None, ''] else f"'{str(val).replace("'", "''")}'")
-
+                    values.append("NULL" if val in [None, ''] else "'" + str(val).replace("'", "''") + "'")
                 # Get the values to update
                 for col in self.values_en_us:
                     update_values.append(f"{col} = EXCLUDED.{col}")
@@ -794,7 +793,7 @@ class GwSchemaI18NManager:
                 else:
                     values.append(f"{col} = '{row[col]}'")
             values.append(f"project_type = '{project_type}'")
-            value_tuples.append(f"({" AND ".join(values)})")
+            value_tuples.append(f"({' AND '.join(values)})")
 
         where_clause = " OR ".join(value_tuples)
 
@@ -874,7 +873,7 @@ class GwSchemaI18NManager:
                 if val is None:
                     row_values.append('NULL')
                 else:
-                    row_values.append(f"'{str(val).replace("'", "''")}'")
+                    row_values.append("'" + str(val).replace("'", "''") + "'")
             values_sql.append(f"({', '.join(row_values)})")
         values_block = ',\n'.join(values_sql)
 
@@ -956,7 +955,7 @@ class GwSchemaI18NManager:
                 if row[column] is None:
                     text.append(f"{column} IS NULL")
                 else:
-                    text.append(f"{column} = '{str(row[column]).replace("'", "''")}'")
+                    text.append(f"{column} = '" + str(row[column]).replace("'", "''") + "'")
 
             where_clause = " AND ".join(text)
             pk_colums_str = ", ".join(pk_columns)
@@ -983,7 +982,7 @@ class GwSchemaI18NManager:
                 if row[column] is None:
                     text.append(f"{column} IS NULL")
                 else:
-                    text.append(f"{column} = '{str(row[column]).replace("'", "''")}'")
+                    text.append(f"{column} = '" + str(row[column]).replace("'", "''") + "'")
 
             where_clause = " AND ".join(text)
             where_clause += f" AND project_type = 'utils'"
@@ -1095,15 +1094,16 @@ class GwSchemaI18NManager:
 
         if values_list:
             # Single upsert query with all values
-            query = f"""
-                INSERT INTO {self.schema_i18n}.pydialog
-                (source_code, project_type, dialog_name, toolbar_name, source, lb_en_us)
-                VALUES
-                {',\n'.join(values_list)}
-                ON CONFLICT (source_code, project_type, dialog_name, toolbar_name, source)
-                DO UPDATE SET
-                    lb_en_us = EXCLUDED.lb_en_us;
-            """
+            query = (
+                "INSERT INTO {schema}.pydialog "
+                "(source_code, project_type, dialog_name, toolbar_name, source, lb_en_us) "
+                "VALUES {values} "
+                "ON CONFLICT (source_code, project_type, dialog_name, toolbar_name, source) "
+                "DO UPDATE SET lb_en_us = EXCLUDED.lb_en_us;"
+            ).format(
+                schema=self.schema_i18n,
+                values=', '.join(values_list)
+            )
 
             try:
                 self.cursor_i18n.execute(query)
@@ -1172,7 +1172,7 @@ class GwSchemaI18NManager:
             if self.delete_old_keys:
                 for source in old_messages:
                     source = source.replace("'", "''")
-                    query = f"DELETE FROM {self.schema_i18n}.pymessage WHERE source = '{source}';"
+                    query = f"DELETE FROM {self.schema_i18n}.pymessage WHERE source = '" + source + "';"
                     try:
                         self.cursor_i18n.execute(query)
                     except Exception as e:

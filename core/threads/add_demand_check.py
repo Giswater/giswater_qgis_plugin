@@ -25,12 +25,18 @@ WNTR_IMPORT_ERROR = "Couldn't import WNTR Python package. Please check if the Gi
 try:
     import wntr
     from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
+    from wntr.network import WaterNetworkModel
+    from wntr.sim import EpanetSimulator
+    from wntr.metrics.hydraulics import average_expected_demand
 except ImportError:
     wntr = None
-    error_traceback = traceback.format_exc()
-    title = "Epatools Plugin"
-    tools_qgis.show_critical(title=title, text=WNTR_IMPORT_ERROR)
-    tools_qgis.show_critical(title=title, text=error_traceback)
+    WaterNetworkModel = None
+    EpanetSimulator = None
+    average_expected_demand = None
+    # error_traceback = traceback.format_exc()
+    # title = "Epatools Plugin"
+    # tools_qgis.show_critical(title=title, text=WNTR_IMPORT_ERROR)
+    # tools_qgis.show_critical(title=title, text=error_traceback)
 
 
 class GwAddDemandCheck(GwTask):
@@ -208,8 +214,8 @@ class GwAddDemandCheck(GwTask):
             self.cur_step = WNTR_IMPORT_ERROR
             raise ImportError(WNTR_IMPORT_ERROR)
         self.cur_step = "Preparing network model..."
-        wn = wntr.network.read_inpfile(self.input_file)
-        self.adjusted_demands = wntr.metrics.hydraulic.average_expected_demand(wn)
+        wn = WaterNetworkModel.read_inpfile(self.input_file)
+        self.adjusted_demands = average_expected_demand(wn)
 
         # Replace demands with the adjusted demands
         wn.add_pattern("constant_pattern", [1])
@@ -250,7 +256,7 @@ class GwAddDemandCheck(GwTask):
             junction.demand_timeseries_list.append((demand, pat))
 
         prefix = str(Path.home() / ".temp/") + str(uuid.uuid4()).split("-")[0]
-        results = wntr.sim.EpanetSimulator(test_wn).run_sim(file_prefix=prefix).node
+        results = EpanetSimulator(test_wn).run_sim(file_prefix=prefix).node
 
         test_results = {}
         for node in nodes:

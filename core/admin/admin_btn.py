@@ -13,6 +13,7 @@ from functools import partial
 from sip import isdeleted
 from time import time
 from datetime import timedelta
+from typing import Union
 
 from qgis.PyQt.QtCore import QSettings, Qt, QDate, QTimer
 from qgis.PyQt.QtGui import QPixmap
@@ -355,7 +356,7 @@ class GwAdminButton:
 
         return None
 
-    def execute_last_process(self, new_project: bool = False, schema_name: str | None = None, schema_type: str = '', locale: bool = False, srid: str | None = None):
+    def execute_last_process(self, new_project: bool = False, schema_name: Union[str, None] = None, schema_type: str = '', locale: bool = False, srid: Union[str, None] = None):
         """ 
         Execute last process function
         
@@ -464,7 +465,7 @@ class GwAdminButton:
             QgsApplication.taskManager().addTask(self.task_update_schema)
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
-    def load_updates(self, project_type: str | None = None, update_changelog: bool = False, schema_name: str | None = None) -> bool:
+    def load_updates(self, project_type: Union[str, None] = None, update_changelog: bool = False, schema_name: Union[str, None] = None) -> bool:
         """
         Load updates for a given project type.
 
@@ -636,13 +637,13 @@ class GwAdminButton:
                     return False
 
         return True
-
-    def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: str | None = None, no_ct: bool = False) -> bool:
+                
+    def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False) -> bool:
         """
         Update the patch folders for a given update directory.
         :param folder_update (str): Path to the update directory containing patch folders.
         :param new_project (bool): Whether this is a new project (True) or an update to an existing one (False).
-        :param project_type (str | None, optional): The project type to use. If None, uses self.project_type_selected.
+        :param project_type (Union[str, None], optional): The project type to use. If None, uses self.project_type_selected.
         :param no_ct (bool, optional): If True, skips certain processing steps (context-specific).
         :return bool: True if all relevant folders were processed successfully, False otherwise.
         """
@@ -669,7 +670,7 @@ class GwAdminButton:
 
         return True
 
-    def update_dict_folders(self, new_project: bool, project_type: str | None = None, no_ct: bool = False, folder_updates: str = '') -> bool:
+    def update_dict_folders(self, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False, folder_updates: str = '') -> bool:
         """
         Update the dictionary folders for a given update directory.
 
@@ -1313,7 +1314,7 @@ class GwAdminButton:
         # Open MainWindow
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
 
-    def _load_sql(self, path_folder: str, no_ct: bool = False, utils_schema_name: str | None = None, set_progress_bar: bool = False) -> bool:
+    def _load_sql(self, path_folder: str, no_ct: bool = False, utils_schema_name: Union[str, None] = None, set_progress_bar: bool = False) -> bool:
         """
         Load SQL files from a given folder.
 
@@ -3292,7 +3293,7 @@ class GwAdminButton:
             if str(k) == "info":
                 tools_gw.fill_tab_log(dialog, data)
 
-    def _manage_result_message(self, status: bool, msg_ok: str | None = None, msg_error: str | None = None, parameter: str | None = None) -> None:
+    def _manage_result_message(self, status: bool, msg_ok: Union[str, None] = None, msg_error: Union[str, None] = None, parameter: Union[str, None] = None) -> None:
         """ 
         Manage message depending result @status 
 

@@ -377,7 +377,7 @@ class GwI18NGenerator:
     def _create_all_db_files(self, cfg_path, file_type):
         """ Read the values of the database and update the i18n files """
 
-        file_name = f"{self.path_dic[file_type]["name"]}"
+        file_name = f"{self.path_dic[file_type]['name']}"
         self.project_type = self.path_dic[file_type]["project_type"][0]
         text_error = ""
 
@@ -512,11 +512,11 @@ class GwI18NGenerator:
         sql=""
         try:
             if self.lower_lang == 'en_us':
-                sql = (f"SELECT {", ".join(colums)} "
+                sql = (f"SELECT {', '.join(colums)} "
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY context;")
             else:
-                sql = (f"SELECT {", ".join(colums)}, {", ".join(lang_colums)} "
+                sql = (f"SELECT {', '.join(colums)}, {', '.join(lang_colums)} "
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY context;")
         except Exception as e:

@@ -18,8 +18,12 @@ from ...libs import tools_log
 
 try:
     import wntr
+    from wntr.network import WaterNetworkModel
+    from wntr.sim import EpanetSimulator
 except ImportError:
     wntr = None
+    WaterNetworkModel = None
+    EpanetSimulator = None
 
 
 class EmitterCalibrationExecute(QgsTask, QObject):
@@ -189,7 +193,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                     junction.emitter_coefficient = float(junction_coeff) * l_coeff
 
                 # Run simulation
-                self.sim = wntr.sim.EpanetSimulator(network)
+                self.sim = EpanetSimulator(network)
                 self.results = self.sim.run_sim()
 
                 # Get demand by dma
@@ -247,7 +251,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                     junction.emitter_coefficient = float(junction_coeff) * coeff
 
                 # Run simulation
-                self.sim = wntr.sim.EpanetSimulator(network)
+                self.sim = EpanetSimulator(network)
                 self.results = self.sim.run_sim()
 
                 # Get demand by dma
@@ -335,7 +339,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                     float(junction_json["coefficient"]) * coeff
                 )
             # Run simulation
-            self.sim = wntr.sim.EpanetSimulator(network)
+            self.sim = EpanetSimulator(network)
             self.results = self.sim.run_sim()
 
             # Get demand for all network
@@ -413,7 +417,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                     )
 
             # Run simulation
-            self.sim = wntr.sim.EpanetSimulator(network)
+            self.sim = EpanetSimulator(network)
             self.results = self.sim.run_sim()
 
             # Get demand for all network
@@ -489,7 +493,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                 network_junctions["0"].append(v["node_id"])
 
     def _export_network(self):
-        wntr.network.write_inpfile(
+        WaterNetworkModel.write_inpfile(
             self.network, Path(self.output_folder) / f"{self.file_name}.inp"
         )
 

@@ -3,11 +3,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-import wntr
-
 from ....libs import tools_db
 from ...ui.dialog import GwDialog
 from ..task import GwTask
+
+try:
+    import wntr
+    from wntr.network import WaterNetworkModel
+except ImportError:
+    wntr = None
+    WaterNetworkModel = None
 
 
 class GwParseInpTask(GwTask):
@@ -21,7 +26,7 @@ class GwParseInpTask(GwTask):
         super().run()
         try:
             self.log.append("Reading INP file...")
-            self.network = wntr.network.WaterNetworkModel(self.inp_file_path)
+            self.network = WaterNetworkModel(self.inp_file_path)
             flow_units: str = self.network.options.hydraulic.inpfile_units
 
             if flow_units not in ("LPS", "LPM", "MLD", "CMH", "CMD"):
@@ -67,7 +72,7 @@ class Catalogs:
     inp_valves_gpv: Optional[list[str]]
 
     @classmethod
-    def from_network_model(cls, wn: wntr.network.WaterNetworkModel):
+    def from_network_model(cls, wn: WaterNetworkModel):
         # Get node catalog from DB
         rows = tools_db.get_rows("""
                 SELECT n.id, f.epa_default

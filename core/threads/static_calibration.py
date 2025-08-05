@@ -20,13 +20,17 @@ from ..utils import tools_gw
 try:
     import wntr
     from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
+    from wntr.network import WaterNetworkModel, LinkStatus
+    from wntr.sim import EpanetSimulator
 except ImportError:
     wntr = None
     from_si = None
     to_si = None
     FlowUnits = None
     HydParam = None
-
+    WaterNetworkModel = None
+    LinkStatus = None
+    EpanetSimulator = None
 
 class GwStaticCalibration(GwTask):
     ended = pyqtSignal(str)
@@ -64,7 +68,7 @@ class GwStaticCalibration(GwTask):
 
             self.status.emit({"message": "Saving output files...", "step": "last"})
             inp_file = f"{self.output_folder}/{self.file_name}.inp"
-            wntr.network.write_inpfile(static_calibration.calibrated_network, inp_file)
+            WaterNetworkModel.write_inpfile(static_calibration.calibrated_network, inp_file)
             csv_file = f"{self.output_folder}/{self.file_name}.csv"
             report = static_calibration.report()
             static_calibration.write_csv_report(csv_file, report_obj=report)
@@ -140,7 +144,7 @@ def zero_time_value(network, target, attribute, hyd_param):
     duration = network.options.time.duration
     network.options.time.duration = 0
 
-    results = wntr.sim.EpanetSimulator(network).run_sim()
+    results = EpanetSimulator(network).run_sim()
     for ext in ("inp", "bin", "rpt"):
         os.remove(f"temp.{ext}")
 
@@ -295,7 +299,7 @@ class SettingModder:
         units = network.options.hydraulic.inpfile_units
         if feature.link_type != "Valve":
             raise ValueError(f'The link "{feature.name}" is not a valve.')
-        feature.initial_status = wntr.network.LinkStatus.Active
+        feature.initial_status = LinkStatus.Active
         valve_type = feature.valve_type
         if valve_type == "TCV":
             feature.initial_setting = factor
@@ -385,7 +389,7 @@ class Calibrations:
         temp_file = inp_file + ".temp"
         with open(temp_file, "w") as t:
             t.write(fixed_str)
-        self.network = wntr.network.WaterNetworkModel(temp_file)
+        self.network = WaterNetworkModel(temp_file)
         os.remove(temp_file)
 
     def _check_input(self):

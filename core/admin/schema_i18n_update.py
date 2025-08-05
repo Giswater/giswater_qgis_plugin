@@ -330,11 +330,11 @@ class GwSchemaI18NUpdate:
         # Make the query
         sql = ""
         if self.lower_lang == 'en_us':
-            sql = (f"SELECT {", ".join(columns)} "
+            sql = (f"SELECT {', '.join(columns)} "
                f"FROM {table} "
                f"ORDER BY context")
         else:
-            sql = (f"SELECT {", ".join(columns)}, {", ".join(lang_columns)} "
+            sql = (f"SELECT {', '.join(columns)}, {', '.join(lang_columns)} "
                f"FROM {table} "
                f"ORDER BY context")
         rows = self._get_rows(sql, self.cursor_i18n)
@@ -391,8 +391,8 @@ class GwSchemaI18NUpdate:
                         for feature_type in feature_types:
                             if row['feature_type'] == feature_type:
                                 formname = row['feature_type'].lower()
-                                sql_text = (f'UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} '
-                                        f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row['formtype']}\' AND columnname = \'{row['source']}\' ')
+                                sql_text = (f'UPDATE {self.schema}.{row["context"]} SET label = {texts[0]}, tooltip = {texts[1]} '
+                                        f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row["formtype"]}\' AND columnname = \'{row["source"]}\' ')
                                 break
                     else:
                         sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} "
@@ -761,8 +761,8 @@ class GwSchemaI18NUpdate:
             # Create a proper insert query for each row
             values = ", ".join([
                 "NULL" if value is None
-                else f"'{value.replace("'", "''")}'" if isinstance(value, str)  # String values need to be quoted
-                else str(value).replace("'", "''")  # For other types like integers and floats
+                else "'" + value.replace("'", "''") + "'" if isinstance(value, str)
+                else str(value).replace("'", "''")
                 for value in row if not isinstance(value, datetime.datetime)
             ])
             insert_queries += f"INSERT INTO {schema_dest}.{table_dest} ({column_names}) VALUES ({values});\n"

@@ -13,16 +13,21 @@ from statistics import mean
 
 import pandas as pd
 
-try:
-    import wntr
-except ImportError:
-    wntr = None
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ...resources.epatools.utils import anl_quantized_demands
 
+try:
+    import wntr
+    from wntr.network import WaterNetworkModel
+    from wntr.sim import EpanetSimulator
+    from wntr.metrics import expected_demand
+except ImportError:
+    wntr = None
+    WaterNetworkModel = None
+    EpanetSimulator = None
 
 class GwQuantizedDemands(GwTask):
     status = pyqtSignal(str)
@@ -65,7 +70,7 @@ class GwQuantizedDemands(GwTask):
                 self.ended.emit("Task canceled.")
                 return False
             self.status.emit("Saving INP file...")
-            wntr.network.write_inpfile(model.quantized_network, inppath)
+            WaterNetworkModel.write_inpfile(model.quantized_network, inppath)
             msg += f"\n\nINP file created on:\n{inppath}"
 
             csvpath = Path(self.output_folder) / f"{self.file_name}.csv"
@@ -91,7 +96,7 @@ class GwQuantizedDemands(GwTask):
 
     def write_statistics(self, model, file):
         self.status.emit("Running simulation...")
-        sim = wntr.sim.EpanetSimulator(model.quantized_network)
+        sim = EpanetSimulator(model.quantized_network)
         results = {}
         results["input"] = model.input_model.results
         results["output"] = sim.run_sim()
@@ -350,7 +355,7 @@ class InputFlow:
 
 class InputModel:
     def __init__(self, input_file):
-        self._wn = wntr.network.WaterNetworkModel(input_file)
+        self._wn = WaterNetworkModel(input_file)
 
     @property
     @cache
@@ -377,12 +382,12 @@ class InputModel:
     @property
     @cache
     def _expected_demands(self):
-        return wntr.metrics.expected_demand(self.network)
+        return expected_demand(self.network)
 
     @property
     @cache
     def results(self):
-        sim = wntr.sim.EpanetSimulator(self.network)
+        sim = EpanetSimulator(self.network)
         return sim.run_sim()
 
 
