@@ -145,9 +145,24 @@ BEGIN
 		v_message = 'Proces done successfully but with some incosistency';
 	END IF;
 
-	-- activate trigger topocontrol
-	UPDATE arc t SET the_geom = the_geom WHERE arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id = v_psector);
-	UPDATE node SET the_geom = the_geom WHERE node_id IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = v_psector);
+	v_query = '
+		SELECT 354, a.arc_id, a.arccat_id, concat(''Planned arc  '', a.arc_id ,'' with wrong topology''), a.the_geom, a.state
+	 	FROM arc a
+	 	join plan_psector_x_arc px using (arc_id) 
+	 	LEFT JOIN node n ON n.node_id = a.node_1
+	 	LEFT JOIN node m ON m.node_id = a.node_2 
+	 	WHERE psector_id = 1 
+		AND st_distance(st_startpoint(a.the_geom), st_endpoint(a.the_geom)) != st_distance(n.the_geom, m.the_geom)';
+
+
+	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
+
+	IF v_count > 0 THEN
+		
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, state) '||v_query||'';
+		v_level = 1;
+	
+	END IF;
 
 	-- get results
 	--lines
