@@ -431,7 +431,6 @@ class GwSelector:
         # Reload selectors dlg
         self.open_selector(selector_type, reload_dlg=dialog)
 
-
         if tab_name == 'tab_exploitation':
             docker_search = global_vars.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
             if docker_search:

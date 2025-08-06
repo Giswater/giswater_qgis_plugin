@@ -2163,7 +2163,6 @@ class GwPsector:
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure("gw_fct_getselectors", body)
             
-
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @feature_type """
 
@@ -3031,6 +3030,7 @@ class GwPsector:
             tableview.model().flags = lambda index: self.flags(index, tableview.model(), ['arc_id', 'link_id'])
 
     # endregion
+
 
 def close_dlg(**kwargs):
     """ Close dialog and disconnect snapping """

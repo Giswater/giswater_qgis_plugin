@@ -29,7 +29,7 @@ from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, Q
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QVBoxLayout, QHBoxLayout, QTabWidget, \
+from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QHBoxLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
@@ -4585,9 +4585,6 @@ def manage_current_psector_docker(psector_name=None):
     if not dock_widget.isVisible():
         dock_widget.show()
         dock_widget.raise_()
-
-
-
 
 
 def create_sqlite_conn(file_name):
