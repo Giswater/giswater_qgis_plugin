@@ -256,3 +256,6 @@ UPDATE config_form_fields SET widgetcontrols='{"setMultiline":false, "labelPosit
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'workcat_id_plan', 'lyt_general_3', 1, 'string', 'combo', 'Worcat id plan:', 'Worcat id plan', NULL, false, false, false, false, false, 'SELECT id, id as idval  FROM cat_work', NULL, false, NULL, NULL, NULL, '{"setMultiline":false, "labelPosition":"top"}'::json, NULL, NULL, false, 1);
 
 UPDATE sys_param_user SET formname = 'dynamic'  WHERE id = 'edit_state_vdefault';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4336, 'It''s not possible to set this psector to active because it has topological inconsistencies.', 'Fix topological errors first.', 1, true, 'utils', 'core', 'AUDIT');

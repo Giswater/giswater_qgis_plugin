@@ -13,12 +13,32 @@ $BODY$
 
 DECLARE
 v_projectype text;
+v_result JSON;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-   v_projectype := (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
+   	v_projectype := (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
+	
+   
+	IF NEW.active IS TRUE THEN
+   	
+   		EXECUTE 'SELECT gw_fct_checktopologypsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+		"feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"'||NEW.psector_id||'"}}$$)' INTO v_result;
+	
+	
+		IF ((v_result->>'message')::json->>'level')::integer = 1 THEN
+		
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+            "data":{"message":"4336", "function":"2446","parameters":null}}$$);';
+            
+            RETURN OLD;
+		
+		END IF;  	
+   	
+   	END IF;
+   
 
   	-- set active to related layers
 	UPDATE plan_psector_x_arc SET active=NEW.active WHERE psector_id=NEW.psector_id;
