@@ -145,6 +145,10 @@ BEGIN
 		v_message = 'Proces done successfully but with some incosistency';
 	END IF;
 
+	-- activate trigger topocontrol
+	UPDATE arc t SET the_geom = the_geom WHERE arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id = v_psector);
+	UPDATE node SET the_geom = the_geom WHERE node_id IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = v_psector);
+
 	-- get results
 	--lines
 	v_result = null;
