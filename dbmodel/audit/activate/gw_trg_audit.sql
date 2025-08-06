@@ -20,7 +20,6 @@ v_feature_id text;
 v_feature_idname text;
 v_geometry text;
 v_geometry_type text;
-v_the_geom jsonb;
 v_sql text;
 v_columns text;
 v_values text;
@@ -91,27 +90,7 @@ BEGIN
 
         v_new_data := row_to_json(NEW.*);
         v_new_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_new_data);
-        v_the_geom := (v_new_data::jsonb)->'the_geom';
-
-        IF v_geometry_type = 'Point' THEN
-                v_geometry := 'POINT (' ||
-                        array_to_string(
-                            ARRAY[
-                                (v_the_geom->'coordinates'->0)::text,
-                                (v_the_geom->'coordinates'->1)::text
-                            ], ' '
-                        ) || ')';
-        ELSE
-            v_geometry := 'LINESTRING (' ||
-                    array_to_string(
-                        ARRAY[
-                            replace((v_the_geom->'coordinates'->0)::text,',',''),
-                            replace((v_the_geom->'coordinates'->1)::text,',','')
-                        ], ', '
-                    ) || ')';
-            v_geometry = regexp_replace(v_geometry, '[\[\]]', '', 'g');
-        END IF;
-
+        v_geometry := ST_AsText(NEW.the_geom);
         v_new_data := jsonb_set(v_new_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
 
     END IF;
@@ -120,27 +99,7 @@ BEGIN
 
         v_old_data := row_to_json(OLD.*);
         v_old_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_old_data);
-        v_the_geom := (v_old_data::jsonb)->'the_geom';
-
-        IF v_geometry_type = 'Point' THEN
-                v_geometry := 'POINT (' ||
-                        array_to_string(
-                            ARRAY[
-                                (v_the_geom->'coordinates'->0)::text,
-                                (v_the_geom->'coordinates'->1)::text
-                            ], ' '
-                        ) || ')';
-        ELSE
-            v_geometry := 'LINESTRING (' ||
-                    array_to_string(
-                        ARRAY[
-                            replace((v_the_geom->'coordinates'->0)::text,',',''),
-                            replace((v_the_geom->'coordinates'->1)::text,',','')
-                        ], ', '
-                    ) || ')';
-            v_geometry = regexp_replace(v_geometry, '[\[\]]', '', 'g');
-        END IF;
-
+        v_geometry := ST_AsText(OLD.the_geom);
         v_old_data := jsonb_set(v_old_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
 
     END IF;
