@@ -72,12 +72,10 @@ BEGIN
 	
 	IF v_networkmode = 1 THEN
 		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = n.dma_id WHERE dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
-	END IF;
-
-	IF v_networkmode = 5 THEN
+	ELSIF v_networkmode = 5 THEN
 		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = n.dma_id WHERE dma.dma_id = (SELECT value::integer FROM config_param_user WHERE parameter = ''inp_options_selecteddma'' AND cur_user = current_user)';
 	END IF;
-	
+
 	EXECUTE v_querytext;
 
 	-- create link exit

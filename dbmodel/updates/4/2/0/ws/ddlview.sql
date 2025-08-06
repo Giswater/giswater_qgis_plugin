@@ -2299,7 +2299,6 @@ ALTER VIEW v_edit_inp_curve_value RENAME TO ve_inp_curve_value;
 ALTER VIEW v_edit_inp_dscenario_connec RENAME TO ve_inp_dscenario_connec;
 ALTER VIEW v_edit_inp_dscenario_controls RENAME TO ve_inp_dscenario_controls;
 ALTER VIEW v_edit_inp_dscenario_demand RENAME TO ve_inp_dscenario_demand;
-ALTER VIEW v_edit_inp_dscenario_frpump RENAME TO ve_inp_dscenario_frpump;
 ALTER VIEW v_edit_inp_dscenario_frvalve RENAME TO ve_inp_dscenario_frvalve;
 ALTER VIEW v_edit_inp_dscenario_inlet RENAME TO ve_inp_dscenario_inlet;
 ALTER VIEW v_edit_inp_dscenario_junction RENAME TO ve_inp_dscenario_junction;
@@ -2313,7 +2312,6 @@ ALTER VIEW v_edit_inp_dscenario_tank RENAME TO ve_inp_dscenario_tank;
 ALTER VIEW v_edit_inp_dscenario_valve RENAME TO ve_inp_dscenario_valve;
 ALTER VIEW v_edit_inp_dscenario_virtualpump RENAME TO ve_inp_dscenario_virtualpump;
 ALTER VIEW v_edit_inp_dscenario_virtualvalve RENAME TO ve_inp_dscenario_virtualvalve;
-ALTER VIEW v_edit_inp_frpump RENAME TO ve_inp_frpump;
 ALTER VIEW v_edit_inp_frvalve RENAME TO ve_inp_frvalve;
 ALTER VIEW v_edit_inp_inlet RENAME TO ve_inp_inlet;
 ALTER VIEW v_edit_inp_junction RENAME TO ve_inp_junction;
@@ -2354,3 +2352,78 @@ ALTER VIEW v_edit_rtc_hydro_data_x_connec RENAME TO ve_rtc_hydro_data_x_connec;
 ALTER VIEW v_edit_samplepoint RENAME TO ve_samplepoint;
 ALTER VIEW v_edit_sector RENAME TO ve_sector;
 ALTER VIEW v_edit_supplyzone RENAME TO ve_supplyzone;
+
+
+
+CREATE OR REPLACE VIEW ve_inp_frpump
+AS SELECT f.element_id,
+    f.node_id,
+    f.order_id,
+    f.nodarc_id,
+    f.to_arc,
+    f.flwreg_length,
+	p.power,
+    p.curve_id,
+	p.speed,
+	p.pattern_id,
+	p.pump_type,
+	p.effic_curve_id,
+	p.energy_price,
+	p.energy_pattern_id,
+    p.status,
+    f.the_geom
+   FROM ve_frelem f
+     JOIN inp_frpump p ON f.element_id = p.element_id;
+
+
+CREATE OR REPLACE VIEW ve_epa_frpump
+AS SELECT p.element_id,
+    man_frelem.node_id,
+    concat(man_frelem.node_id, '_FR', man_frelem.order_id) AS nodarc_id,
+    man_frelem.to_arc,
+	p.power,
+    p.curve_id,
+	p.speed,
+	p.pattern_id,
+	p.pump_type,
+	p.energyparam,
+	p.energyvalue,
+	p.effic_curve_id,
+	p.energy_price,
+	p.energy_pattern_id,
+    p.status,
+	r.result_id,
+    r.flow_max as flowmax,
+    r.flow_min as flowmin,
+    r.flow_avg as flowavg,
+    r.vel_max as velmax,
+    r.vel_min as velmin,
+    r.vel_avg as velavg,
+    r.headloss_max,
+    r.headloss_min,
+    r.setting_max,
+    r.setting_min,
+    r.reaction_max,
+    r.reaction_min,
+    r.ffactor_max,
+    r.ffactor_min
+   FROM inp_frpump p
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = concat(man_frelem.node_id, '_FR', man_frelem.order_id);
+
+CREATE OR REPLACE VIEW ve_inp_dscenario_frpump
+AS SELECT s.dscenario_id,
+    f.element_id,
+	f.power,
+    f.curve_id,
+	f.speed,
+	f.pattern_id,
+	f.effic_curve_id,
+	f.energy_price,
+	f.energy_pattern_id,
+    f.status,
+    n.the_geom
+   FROM selector_inp_dscenario s,
+    inp_dscenario_frpump f
+     JOIN ve_inp_frpump n USING (element_id)
+  WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;

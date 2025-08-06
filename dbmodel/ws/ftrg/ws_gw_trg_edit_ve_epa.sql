@@ -101,10 +101,13 @@ BEGIN
 			curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality WHERE arc_id=OLD.arc_id;
 
 		ELSIF v_epatype = 'frpump' THEN
-			UPDATE inp_frpump SET curve_id=NEW.curve_id, status=NEW.status, startup=NEW.startup, shutoff=NEW.shutoff WHERE element_id=NEW.element_id;
-
+			UPDATE inp_frpump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern_id=NEW.pattern_id, status=NEW.status,
+			energyparam =NEW.energyparam, energyvalue=NEW.energyvalue, pump_type=NEW.pump_type, effic_curve_id=NEW.effic_curve_id,
+			energy_price=NEW.energy_price, energy_pattern_id=NEW.energy_pattern_id
+			WHERE element_id=NEW.element_id;
+		
 		ELSIF v_epatype = 'frvalve' THEN
-			UPDATE inp_frvalve SET valve_type=NEW.valve_type, custom_dint=NEW.custom_dint, setting=NEW.setting, curve_id=NEW.curve_id, minorloss=NEW.minorloss, add_settings=NEW.add_settings, init_quality=NEW.init_quelity WHERE element_id=NEW.element_id;
+			UPDATE inp_frvalve SET valve_type=NEW.valve_type, custom_dint=NEW.custom_dint, setting=NEW.setting, curve_id=NEW.curve_id, minorloss=NEW.status, add_settings=NEW.add_settings, init_quality=NEW.init_quality WHERE element_id=NEW.element_id;
         END IF;
 
 		RETURN NEW;

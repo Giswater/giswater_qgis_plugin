@@ -36,7 +36,11 @@ odd_var float;
 pump_order float;
 v_old_arc_id varchar(16);
 v_addparam json;
-
+v_roughness float;
+flwreg_rec record;
+arc_todelete text[];
+v_order_id integer;
+valve_rec record;
 
 BEGIN
 
@@ -49,36 +53,45 @@ BEGIN
 	SELECT * INTO record_new_arc FROM temp_t_arc LIMIT 1;
 
 	--  Start process
-    RAISE NOTICE 'Starting additional pumps process.';
+    RAISE NOTICE 'Starting flowreg process.';
 
-	--  Loop for pumping stations
-    FOR node_id_aux IN (SELECT DISTINCT a.node_id FROM inp_pump_additional a JOIN temp_t_arc ON concat(node_id,'_n2a')=arc_id JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'POWERPUMP')
-    LOOP
-		SELECT * INTO arc_rec FROM temp_t_arc WHERE arc_id=concat(node_id_aux,'_n2a');
+	FOR flwreg_rec IN (SELECT element.*, m.node_id FROM element JOIN man_frelem m ON m.element_id = element.element_id LEFT JOIN temp_t_arc t ON t.arc_id = element.element_id::text
+						WHERE element.epa_type IN ('FRPUMP', 'FRVALVE') AND t.arc_id IS NULL)
+	LOOP
+		
+		IF EXISTS (SELECT 1 FROM temp_t_node WHERE node_id = concat(flwreg_rec.node_id, '_n2a_1')) THEN
 
-		-- Loop for additional pumps
-		FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id::text=node_id_aux
-		LOOP
+			SELECT * INTO arc_rec FROM temp_t_arc WHERE arc_id = concat(flwreg_rec.node_id, '_n2a');
 
+			arc_todelete = array_append(arc_todelete, arc_rec.arc_id);
+
+			
 			-- Id creation from pattern arc
-			v_old_arc_id = arc_rec.arc_id;
-			record_new_arc.arc_id=concat(arc_rec.arc_id,pump_rec.order_id);
+			record_new_arc.arc_id=flwreg_rec.element_id::text;
 
-			-- Right or left hand
-			odd_var = pump_rec.order_id %2;
+	-- 		-- Right or left hand
+			SELECT order_id INTO v_order_id
+			FROM (
+    			SELECT element_id, ROW_NUMBER() OVER (ORDER BY element_id) AS order_id
+    			FROM man_frelem
+    			WHERE node_id = flwreg_rec.node_id
+			) sub
+			WHERE element_id = flwreg_rec.element_id;
 
+			
+
+	 		odd_var = v_order_id%2;
 			if (odd_var)=0 then
-				angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))+1.57;
+				angle=(ST_Azimuth(ST_startpoint(ST_makeline(arc_rec.the_geom)), ST_endpoint(arc_rec.the_geom)))+1.57;
 			else
 				angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))-1.57;
 			end if;
 
-			pump_order = (pump_rec.order_id);
 
-			-- Copiyng values from patter arc
+	-- 		-- Copiyng values from patter arc
 			record_new_arc.node_1 = arc_rec.node_1;
 			record_new_arc.node_2 = arc_rec.node_2;
-			record_new_arc.epa_type = arc_rec.epa_type;
+			record_new_arc.epa_type = flwreg_rec.epa_type;
 			record_new_arc.sector_id = arc_rec.sector_id;
 			record_new_arc.sector_id = arc_rec.sector_id;
 			record_new_arc.dma_id = arc_rec.dma_id;
@@ -88,35 +101,48 @@ BEGIN
 			record_new_arc.state = arc_rec.state;
 			record_new_arc.arccat_id = arc_rec.arccat_id;
 
-			-- intermediate variables
+	-- 		-- intermediate variables
 			n1_geom = ST_LineInterpolatePoint(arc_rec.the_geom, 0.500000);
 			dist = (ST_Distance(ST_transform(ST_startpoint(arc_rec.the_geom),rec.epsg), ST_LineInterpolatePoint(arc_rec.the_geom, 0.5000000)));
 
-			--create point1
-			xp1 = ST_x(n1_geom)-(sin(angle))*dist*0.15000*(pump_order::float);
-			yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.15000*(pump_order::float);
+	-- 		--create point1
+			xp1 = ST_x(n1_geom)-(sin(angle))*dist*0.15000*(v_order_id::float);
+			yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.15000*(v_order_id::float);
 
-			p1_geom = ST_SetSRID(ST_MakePoint(xp1, yp1),rec.epsg);
+	 		p1_geom = ST_SetSRID(ST_MakePoint(xp1, yp1),rec.epsg);
 
-			--create arc
-			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, ST_endpoint(arc_rec.the_geom)]);
+	-- 		--create arc
+			IF (SELECT count(node_id) FROM man_frelem where node_id = flwreg_rec.node_id) > 1 THEN
+	 			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, ST_endpoint(arc_rec.the_geom)]);
+			ELSE
+				record_new_arc.the_geom=ST_makeline(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom));
+			END IF;
 
-			--addparam
-			v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern_id":"', pump_rec.pattern_id,'","to_arc":"',
-						 arc_rec.addparam::json->>'to_arc','", "effic_curve_id":"',pump_rec.effic_curve_id,'","energy_price":"',pump_rec.energy_price,'","energy_pattern_id":"',
-						 pump_rec.energy_pattern_id,'","pump_type":"', arc_rec.addparam::json->>'pump_type','"}');
+	-- 		--addparam
+			IF flwreg_rec.epa_type = 'FRPUMP' THEN
+				SELECT * INTO pump_rec FROM ve_inp_frpump WHERE element_id = flwreg_rec.element_id;
+				v_addparam=concat('{"power":"',pump_rec.power,'", "curve_id":"',pump_rec.curve_id,'", "speed":"',pump_rec.speed,'", "pattern":"',pump_rec.pattern_id,'",
+				 "status":"',pump_rec.status,'", "to_arc":"',pump_rec.to_arc,'", "energy_price":"',pump_rec.energy_price,'", "energy_pattern_id":"'
+				 ,pump_rec.energy_pattern_id,'", "pump_type":"',pump_rec.pump_type,'"}');
+			ELSIF flwreg_rec.epa_type = 'FRVALVE' THEN
+				SELECT * INTO valve_rec FROM ve_inp_frvalve WHERE element_id = flwreg_rec.element_id;
+				v_addparam=concat('{"valve_type":"',valve_rec.valve_type,'", "setting":"',valve_rec.setting,'", "curve_id":"',valve_rec.curve_id,'",
+				 "minorloss":"',valve_rec.minorloss,'", "to_arc":"',valve_rec.to_arc,'", "add_settings":"',valve_rec.add_settings,'"}');
+			END IF;
 
-
-			-- Inserting into temp_t_arc
-			INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam,
+	-- 		-- Inserting into temp_t_arc
+			INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, the_geom, expl_id, flw_code, addparam,
 			length, diameter, roughness, dma_id, presszone_id, dqa_id, minsector_id)
 			VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id,
-			record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam,
+			record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam,
 			arc_rec.length,	arc_rec.diameter, arc_rec.roughness, record_new_arc.dma_id, record_new_arc.presszone_id, record_new_arc.dqa_id, record_new_arc.minsector_id);
+		
+		ELSE
+						
+		END IF;
+	END LOOP;
 
-		END LOOP;
-
-    END LOOP;
+	DELETE FROM temp_t_arc WHERE arc_id = ANY (arc_todelete);
 
     RETURN 1;
 

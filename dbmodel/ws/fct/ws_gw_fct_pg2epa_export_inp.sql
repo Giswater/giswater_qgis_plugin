@@ -361,6 +361,29 @@ BEGIN
 	    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) AS other
 	   FROM temp_t_arc
 	  WHERE (epa_type::text = ANY (ARRAY['PUMP'::text, 'VIRTUALPUMP'::text])) AND NOT (arc_id::text IN ( SELECT arc_id FROM vi_t_valves))
+	  UNION
+	  SELECT arc_id, node_1, node_2,
+	  	CASE
+		    WHEN (addparam::json ->> 'power'::text) <> ''::text THEN ('POWER'::text || ' '::text) || (addparam::json ->> 'power'::text)
+		    ELSE NULL::text
+		END AS power,
+		CASE
+		    WHEN (addparam::json ->> 'curve_id'::text) <> ''::text THEN ('HEAD'::text || ' '::text) || (addparam::json ->> 'curve_id'::text)
+		    ELSE NULL::text
+		END AS head,
+		CASE
+		    WHEN (addparam::json ->> 'speed'::text) <> ''::text THEN ('SPEED'::text || ' '::text) || (addparam::json ->> 'speed'::text)
+		    ELSE NULL::text
+		END AS speed,
+		CASE
+		    WHEN (addparam::json ->> 'pattern'::text) <> ''::text THEN ('PATTERN'::text || ' '::text) || (addparam::json ->> 'pattern'::text)
+		    ELSE NULL::text
+		END AS pattern_id,
+	    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) AS other
+	   FROM ve_inp_frpump w
+			JOIN man_frelem m ON m.element_id = w.element_id
+			JOIN temp_t_arc a ON a.arc_id = w.element_id::text
+		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRPUMP'::text
 	  ORDER BY arc_id;
 
 

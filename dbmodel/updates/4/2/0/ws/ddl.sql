@@ -67,3 +67,51 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_cat_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_cat_hydrometer", "column":"multi_jet_flow", "newName":"flownom"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"dma_id", "dataType":"integer[]"}}$$);
+
+
+-- 06/08/2025
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frpump;
+DROP VIEW IF EXISTS ve_epa_frpump;
+DROP VIEW IF EXISTS v_edit_inp_frpump;
+DROP TABLE IF EXISTS inp_frpump;
+CREATE TABLE inp_frpump (
+    element_id int4 NOT NULL,
+	power varchar NULL,
+	curve_id varchar NULL,
+	speed numeric(12, 6) NULL,
+	pattern_id varchar NULL,
+	status varchar(12) NULL,
+	energyparam varchar(30) NULL,
+	energyvalue varchar(30) NULL,
+	pump_type varchar(16) DEFAULT 'POWERPUMP'::character varying NULL,
+	effic_curve_id varchar(18) NULL,
+	energy_price float8 NULL,
+	energy_pattern_id varchar(18) NULL,
+	CONSTRAINT inp_frpump_pk PRIMARY KEY (element_id),
+	CONSTRAINT inp_frpump_status_check CHECK (((status)::text = ANY (ARRAY[('CLOSED'::character varying)::text, ('OPEN'::character varying)::text]))),
+	CONSTRAINT inp_frpump_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT inp_frpump_energy_pattern_id_fkey FOREIGN KEY (energy_pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT inp_frpump_fk_element_id FOREIGN KEY (element_id) REFERENCES element(element_id),
+	CONSTRAINT inp_frpump_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+DROP TABLE IF EXISTS inp_dscenario_frpump;
+CREATE TABLE inp_dscenario_frpump (
+	dscenario_id int4 NOT NULL,
+	element_id int4 NOT NULL,
+	power varchar NULL,
+	curve_id varchar NULL,
+	speed numeric(12, 6) NULL,
+	pattern_id varchar NULL,
+	status varchar(12) NULL,
+	effic_curve_id varchar(18) NULL,
+	energy_price float8 NULL,
+	energy_pattern_id varchar(18) NULL,
+    CONSTRAINT inp_dscenario_frpump_pk PRIMARY KEY (element_id, dscenario_id),
+	CONSTRAINT inp_dscenario_frpump_status_check CHECK (((status)::text = ANY (ARRAY[('CLOSED'::character varying)::text, ('OPEN'::character varying)::text]))),
+	CONSTRAINT inp_dscenario_frpump_fk_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_frpump_dscenario_id_fkey FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_frpump_energy_pattern_id_fkey FOREIGN KEY (energy_pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT inp_dscenario_frpump_element_id_fkey FOREIGN KEY (element_id) REFERENCES inp_frpump(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT inp_dscenario_frpump_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
