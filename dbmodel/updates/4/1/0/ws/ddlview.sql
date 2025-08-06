@@ -714,6 +714,8 @@ AS WITH
         l.workcat_id_end,
         l.builtdate,
         l.enddate,
+        l.brand_id,
+        l.model_id,
         l.verified,
         l.uncertain,
         l.userdefined_geom,

@@ -32,13 +32,13 @@ SELECT columns_are(
         'pjoint_type', 'access_type', 'placement_type', 'accessibility', 'asset_id', 'adate', 'adescript',
         'verified', 'uncertain', 'datasource', 'label_x', 'label_y', 'label_rotation', 'rotation',
         'label_quadrant', 'inventory', 'publish', 'lock_level', 'expl_visibility', 'created_at',
-        'created_by', 'updated_at', 'updated_by', 'the_geom', 'diagonal'
+        'created_by', 'updated_at', 'updated_by', 'the_geom', 'diagonal', 'brand_id', 'model_id'
     ],
     'Table connec should have the correct columns'
 );
 
 -- Check primary key
-SELECT col_is_pk('connec', 'connec_id', 'Column connec_id should be primary key'); 
+SELECT col_is_pk('connec', 'connec_id', 'Column connec_id should be primary key');
 
 -- Check check columns
 SELECT col_has_check('connec', 'pjoint_type', 'Table should have check on pjoint_type');
@@ -128,6 +128,8 @@ SELECT col_type_is('connec', 'updated_at', 'timestamptz', 'Column updated_at sho
 SELECT col_type_is('connec', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('connec', 'the_geom', 'geometry(point, 25831)', 'Column the_geom should be geometry(point, 25831)');
 SELECT col_type_is('connec', 'diagonal', 'varchar(50)', 'Column diagonal should be varchar(50)');
+SELECT col_type_is('connec', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
+SELECT col_type_is('connec', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
 
 -- Check default values
 SELECT col_has_default('connec', 'connec_id', 'Column connec_id should have default value');

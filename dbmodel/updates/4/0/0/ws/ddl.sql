@@ -1795,6 +1795,8 @@ CREATE TABLE link (
 	workcat_id_end varchar(255) NULL,
 	builtdate date NULL,
 	enddate date NULL,
+	brand_id varchar(50) NULL,
+	model_id varchar(50) NULL,
 	verified int2 NULL,
 	uncertain bool NULL,
 	userdefined_geom bool NULL,
