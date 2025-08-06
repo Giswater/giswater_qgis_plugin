@@ -24,7 +24,7 @@ class GwComposerPages(GwTask):
     task_finished = pyqtSignal()
     change_btn_accept = pyqtSignal(bool)
 
-    def __init__(self, description, result, layout, designer, prefix, path, is_single, sleep_time):
+    def __init__(self, description, result, layout, designer, prefix, path, is_single, sleep_time, skip_psectors=0):
 
         super().__init__(description, QgsTask.CanCancel)
         self.result = result
@@ -36,11 +36,14 @@ class GwComposerPages(GwTask):
         self.path = path
         self.is_single = is_single
         self.map_refreshed = 0
+        self.refreshed = False
         self.stop = False
         self.sleep_time = sleep_time
+        self.skip_psectors = skip_psectors
 
         if Qgis.QGIS_VERSION_INT >= 32000:
             self.designer.mapPreviewRefreshed.connect(self._increase_map_refreshed)
+            self.layout.refreshed.connect(self._set_refreshed)
 
     def sort_list(self, json_):
 
@@ -59,20 +62,26 @@ class GwComposerPages(GwTask):
                 if formtabs['tableName'] != 'selector_psector':
                     continue
                 if self.atlas.count() != len(formtabs['fields']):
-                    msg = "The number of pages in your composition does not match the number of psectors"
+                    msg = f"The number of pages in your composition does not match the number of psectors. ({self.atlas.count()} != {len(formtabs['fields'])})"
                     tools_qgis.show_warning(msg)
                     return False
                 psectors_list = formtabs['fields']
 
-            psectors_list.sort(key=self.sort_list)
-            for psector in psectors_list:
+            # psectors_list.sort(key=self.sort_list)
+            for i, psector in enumerate(psectors_list):
+                t0 = time()  # Initial time
+                if i < self.skip_psectors:
+                    _index += 1
+                    self._calculate_remaining_time(t0)
+                    action = self.designer_window.findChild(QAction, 'mActionAtlasNext')
+                    action.trigger()
+                    continue
                 # Get the number of maps in the page
-                maps = self.designer.layout().pageCollection().itemsOnPage(0)
-                maps = [i for i in maps if isinstance(i, QgsLayoutItemMap)]
+                items = self.designer.layout().pageCollection().itemsOnPage(0)
+                maps = [i for i in items if isinstance(i, QgsLayoutItemMap)]
 
                 if self.stop:
                     return False
-                t0 = time()  # Initial time
                 # Wait for the maps to be updated
                 while self.map_refreshed < len(maps):
                     sleep(0.1)
@@ -87,11 +96,26 @@ class GwComposerPages(GwTask):
                 extras += '"isAlone":true, "addSchema":"NULL"'
                 body = tools_gw.create_body(extras=extras)
                 tools_gw.execute_procedure("gw_fct_setselectors", body, is_thread=True)
+
+                self.map_refreshed = 0
+                self.layout.refresh()
+
+                while not self.refreshed:
+                    sleep(0.5)
+                    if self.stop:
+                        return False
+
+                while self.map_refreshed < len(maps):
+                    sleep(0.5)
+                    if self.stop:
+                        return False
+
                 self.export_to_pdf(self.layout, self.path + f"{name}.pdf")
                 self._calculate_remaining_time(t0)
                 action = self.designer_window.findChild(QAction, 'mActionAtlasNext')
                 action.trigger()
                 self.map_refreshed = 0
+                self.refreshed = False
                 _index += 1
         except Exception as e:
             self.exception = e
@@ -185,3 +209,6 @@ class GwComposerPages(GwTask):
     def stop_task(self):
         self.stop = True
         self.time_changed.emit("Cancelling...")
+
+    def _set_refreshed(self):
+        self.refreshed = True
