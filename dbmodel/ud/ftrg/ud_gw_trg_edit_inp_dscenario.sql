@@ -47,7 +47,7 @@ BEGIN
 		ELSIF v_dscenario_type = 'FLWREG-ORIFICE' THEN
 
 			-- default values
-			IF NEW.ori_type IS NULL OR NEW.ori_type='' THEN NEW.ori_type = (SELECT ori_type FROM ve_inp_frorifice WHERE element_id = NEW.element_id);END IF;
+			IF NEW.orifice_type IS NULL OR NEW.orifice_type='' THEN NEW.orifice_type = (SELECT orifice_type FROM ve_inp_frorifice WHERE element_id = NEW.element_id);END IF;
 			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM ve_inp_frorifice WHERE element_id = NEW.element_id);END IF;
 			IF NEW.cd IS NULL THEN NEW.cd = (SELECT cd FROM ve_inp_frorifice WHERE element_id = NEW.element_id);END IF;
 			IF NEW.flap IS NULL OR NEW.flap='' THEN NEW.flap = (SELECT flap FROM ve_inp_frorifice WHERE element_id = NEW.element_id);END IF;
@@ -55,8 +55,8 @@ BEGIN
 			IF NEW.geom1 IS NULL THEN NEW.geom1 = (SELECT geom1 FROM ve_inp_frorifice WHERE element_id = NEW.element_id);END IF;
 			IF NEW.geom2 IS NULL THEN NEW.geom2 = (SELECT geom2 FROM ve_inp_frorifice WHERE element_id = NEW.element_id);END IF;
 
-			INSERT INTO inp_dscenario_frorifice (dscenario_id, element_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
-			VALUES (NEW.dscenario_id, NEW.element_id, NEW.ori_type, NEW.offsetval, NEW.cd, NEW.orate, NEW.flap, NEW.shape, NEW.geom1, NEW.geom2, NEW.geom3, NEW.geom4);
+			INSERT INTO inp_dscenario_frorifice (dscenario_id, element_id, orifice_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
+			VALUES (NEW.dscenario_id, NEW.element_id, NEW.orifice_type, NEW.offsetval, NEW.cd, NEW.orate, NEW.flap, NEW.shape, NEW.geom1, NEW.geom2, NEW.geom3, NEW.geom4);
 
 	 	ELSIF v_dscenario_type = 'FLWREG-OUTLET' THEN
 
@@ -262,7 +262,7 @@ BEGIN
 
 		ELSIF v_dscenario_type = 'FLWREG-ORIFICE' THEN
 			UPDATE inp_dscenario_frorifice SET dscenario_id=NEW.dscenario_id, element_id=NEW.element_id,
-			ori_type=NEW.ori_type, offsetval=NEW.offsetval, cd=NEW.cd, orate=NEW.orate, flap=NEW.flap, shape=NEW.shape,
+			orifice_type=NEW.orifice_type, offsetval=NEW.offsetval, cd=NEW.cd, orate=NEW.orate, flap=NEW.flap, shape=NEW.shape,
 			geom1=NEW.geom1, geom2=NEW.geom2, geom3=NEW.geom3, geom4=NEW.geom4
 			WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
 

@@ -821,3 +821,165 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES('v_ui_dwfzone', 'form_feature', 'tab_none', 'muni_id', 'lyt_data_1', 12, 'text', 'text', 'muni_id', 'muni_id', 'Ex: 1,2', false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
 UPDATE config_form_fields SET layoutorder=13 WHERE formname = 'v_ui_dwfzone' AND formtype = 'form_feature' AND columnname = 'drainzone_id' AND tabname = 'tab_none';
+
+-- new layouts
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_element_dscenario_1', 'lyt_element_dscenario_3', 'layoutElemDscenario1', '{"lytOrientation": "horizontal"}'::json);
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_element_dscenario_2', 'lyt_element_dscenario_3', 'layoutElemDscenario2', '{"lytOrientation": "vertical"}'::json);
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_element_dscenario_3', 'lyt_element_dscenario_3', 'layoutElemDscenario3', '{"lytOrientation": "horizontal"}'::json);
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_elem_dsc_orifice', 'lyt_elem_dsc_orifice', 'layoutElemDscOrifice', '{"lytOrientation": "vertical"}'::json);
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_elem_dsc_outlet', 'lyt_elem_dsc_outlet', 'layoutElemDscOutlet', '{"lytOrientation": "vertical"}'::json);
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_elem_dsc_pump', 'lyt_elem_dsc_pump', 'layoutElemDscPump', '{"lytOrientation": "vertical"}'::json);
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_elem_dsc_weir', 'lyt_elem_dsc_weir', 'layoutElemDscWeir', '{"lytOrientation": "vertical"}'::json);
+
+-- buttons
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'lbl_frelem_dscenario', 'lyt_element_dscenario_1', 1, NULL, 'label', 'Dscenario:', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Dscenario:"}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'hspacer_lyt_dsc_1', 'lyt_element_dscenario_1', 10, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'insert_frelem_dscenario', 'lyt_element_dscenario_1', 11, NULL, 'button', NULL, 'Insert frelem into dscenario', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue":false, "filterSign":"=", "onContextMenu":"Insert into dscenario", "text": "v"}'::json, '{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'delete_from_dscenario', 'lyt_element_dscenario_1', 12, NULL, 'button', NULL, 'Remove frelem from dscenario', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue":false, "filterSign":"=", "onContextMenu":"Remove from dscenario", "text": "^"}'::json, '{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'hspacer2_lyt_dsc_1', 'lyt_element_dscenario_1', 20, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+
+-- frelem dscenario tableviews
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'tbl_frelem_dsc_orifice', 'lyt_elem_dsc_orifice', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, NULL, 'tbl_frelem_dsc_orifice', false, NULL);
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'tbl_frelem_dsc_outlet', 'lyt_elem_dsc_outlet', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, NULL, 'tbl_frelem_dsc_outlet', false, NULL);
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'tbl_frelem_dsc_pump', 'lyt_elem_dsc_pump', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, NULL, 'tbl_frelem_dsc_pump', false, NULL);
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'tbl_frelem_dsc_weir', 'lyt_elem_dsc_weir', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, NULL, 'tbl_frelem_dsc_weir', false, NULL);
+
+
+-- tables
+INSERT INTO config_form_list
+(listname, query_text, device, listtype, listclass, vdefault, addparam)
+VALUES('tbl_frelem_dsc_orifice', 'SELECT * FROM ve_inp_dscenario_frorifice WHERE element_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+
+INSERT INTO config_form_list
+(listname, query_text, device, listtype, listclass, vdefault, addparam)
+VALUES('tbl_frelem_dsc_outlet', 'SELECT * FROM ve_inp_dscenario_froutlet WHERE element_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+
+INSERT INTO config_form_list
+(listname, query_text, device, listtype, listclass, vdefault, addparam)
+VALUES('tbl_frelem_dsc_pump', 'SELECT * FROM ve_inp_dscenario_frpump WHERE element_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+
+INSERT INTO config_form_list
+(listname, query_text, device, listtype, listclass, vdefault, addparam)
+VALUES('tbl_frelem_dsc_weir', 'SELECT * FROM ve_inp_dscenario_frweir WHERE element_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+
+
+-- config_from_tableview
+INSERT INTO config_form_tableview
+(location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'dscenario_id', 1, true, NULL, 'Dscenario id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'element_id', 2, true, NULL, 'Element id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'node_id', 3, true, NULL, 'Node id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'orifice_type', 4, true, NULL, 'Orifice type', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'offsetval', 5, true, NULL, 'Offsetval', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'cd', 6, true, NULL, 'Cd', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'orate', 7, true, NULL, 'Orate', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'flap', 8, true, NULL, 'Flap', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'shape', 9, true, NULL, 'Shape', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'geom1', 10, true, NULL, 'Geom1', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'geom2', 11, true, NULL, 'Geom2', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'geom3', 12, true, NULL, 'Geom3', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'geom4', 13, true, NULL, 'Geom4', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_orifice', 'the_geom', 17, false, NULL, 'the_geom', NULL, NULL);
+
+INSERT INTO config_form_tableview
+(location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'dscenario_id', 1, true, NULL, 'Dscenario id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'element_id', 2, true, NULL, 'Element id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'node_id', 3, true, NULL, 'Node id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'outlet_type', 4, true, NULL, 'Outlet type', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'offsetval', 5, true, NULL, 'Offsetval', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'curve_id', 6, true, NULL, 'Curve id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'cd1', 7, true, NULL, 'Cd1', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'cd2', 8, true, NULL, 'Cd2', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'flap', 9, true, NULL, 'Flap', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_outlet', 'the_geom', 17, false, NULL, 'the_geom', NULL, NULL);
+
+INSERT INTO config_form_tableview
+(location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES
+('feature form', 'ud', 'tbl_frelem_dsc_pump', 'dscenario_id', 1, true, NULL, 'Dscenario id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_pump', 'element_id', 2, true, NULL, 'Element id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_pump', 'node_id', 3, true, NULL, 'Node id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_pump', 'curve_id', 4, true, NULL, 'Curve id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_pump', 'status', 5, true, NULL, 'Status', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_pump', 'startup', 6, true, NULL, 'Startup', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_pump', 'shutoff', 7, true, NULL, 'Shutoff', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_pump', 'the_geom', 17, false, NULL, 'the_geom', NULL, NULL);
+
+-- config_from_tableview
+INSERT INTO config_form_tableview
+(location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'dscenario_id', 1, true, NULL, 'Dscenario id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'element_id', 2, true, NULL, 'Element id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'node_id', 3, true, NULL, 'Node id', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'weir_type', 4, true, NULL, 'Weir type', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'offsetval', 5, true, NULL, 'Offsetval', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'cd', 6, true, NULL, 'Cd', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'ec', 7, true, NULL, 'Ec', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'cd2', 8, true, NULL, 'Cd2', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'flap', 9, true, NULL, 'Flap', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'geom1', 10, true, NULL, 'Geom1', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'geom2', 11, true, NULL, 'Geom2', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'geom3', 12, true, NULL, 'Geom3', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'geom4', 13, true, NULL, 'Geom4', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'surcharge', 14, true, NULL, 'Surcharge', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'road_width', 15, true, NULL, 'Road width', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'road_surf', 16, true, NULL, 'Road surf', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'coef_curve', 17, true, NULL, 'Coef curve', NULL, NULL),
+('feature form', 'ud', 'tbl_frelem_dsc_weir', 'the_geom', 17, false, NULL, 'the_geom', NULL, NULL);
