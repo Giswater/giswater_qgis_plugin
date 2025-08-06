@@ -620,9 +620,12 @@ class GwMapzoneManager:
             partial(self._remove_node_parent, self.config_dlg)
         )
         # Force closed
+        # Set variables based on project type
+        layer = 've_node' if global_vars.project_type == 'ws' else 've_arc'
+
         self.config_dlg.btn_snapping_forceClosed.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_forceClosed,
-                    've_node', 'forceClosed', None,
+                    layer, 'forceClosed', None,
                     self.child_type))
         self.config_dlg.btn_expr_forceClosed.clicked.connect(
             partial(self._select_with_expression_dialog, self.config_dlg, 'forceClosed'))
@@ -633,9 +636,12 @@ class GwMapzoneManager:
             partial(self._remove_force_closed, self.config_dlg)
         )
         # Ignore
+        # Set variables based on project type
+        layer = 've_node' if global_vars.project_type == 'ws' else 've_arc'
+        
         self.config_dlg.btn_snapping_ignore.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_ignore,
-                    've_node', 'ignore', None, self.child_type))
+                    layer, 'ignore', None, self.child_type))
         self.config_dlg.btn_expr_ignore.clicked.connect(
             partial(self._select_with_expression_dialog, self.config_dlg, 'ignore'))
         self.config_dlg.btn_add_ignore.clicked.connect(
@@ -779,8 +785,12 @@ class GwMapzoneManager:
         """ Get selected attribute from snapped feature """
 
         # @options{'key':['att to get from snapped feature', 'function to call']}
+        # Set ID field based on project type for forceClosed and ignore
+        force_closed_id_field = 'node_id' if global_vars.project_type == 'ws' else 'arc_id'
+        ignore_id_field = 'node_id' if global_vars.project_type == 'ws' else 'arc_id'
+        
         options = {'nodeParent': ['node_id', '_set_node_parent'], 'toArc': ['arc_id', '_set_to_arc'],
-                   'forceClosed': ['node_id', '_set_force_closed'], 'ignore': ['node_id', '_set_ignore']}
+                   'forceClosed': [force_closed_id_field, '_set_force_closed'], 'ignore': [ignore_id_field, '_set_ignore']}
 
         if event == Qt.RightButton:
             self._cancel_snapping_tool(dialog, action)
@@ -1198,11 +1208,11 @@ class GwMapzoneManager:
             for arc_id in selected_ids:
                 self._set_to_arc(arc_id)
         elif option == 'forceClosed':
-            for node_id in selected_ids:
-                self._set_force_closed(node_id)
+            for feat_id in selected_ids:
+                self._set_force_closed(feat_id)
         elif option == 'ignore':
-            for node_id in selected_ids:
-                self._set_ignore(node_id)
+            for feat_id in selected_ids:
+                self._set_ignore(feat_id)
 
         # Clean up
         tools_gw.disconnect_signal('mapzone_manager_snapping')
