@@ -5679,7 +5679,7 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
     label = None
 
     # Skip widgets not supported
-    widgettypes_not_supported = ["tabwidget", "divider", "label"]
+    widgettypes_not_supported = ["tabwidget", "divider"]
     if 'widgettype' in field and field['widgettype'] in widgettypes_not_supported:
         return label, widget
 
@@ -5701,6 +5701,9 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
         param = f"formname:{tablename}, columnname:{field['columnname']}"
         tools_qgis.show_message(msg, 2, parameter=param, dialog=dialog)
         return label, widget
+
+    if field['widgettype'] == 'label':
+        return None, label  # Return the label as widget, and no label
 
     try:
         kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field,
