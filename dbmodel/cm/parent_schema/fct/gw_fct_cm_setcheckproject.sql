@@ -101,6 +101,9 @@ DECLARE
 	v_lot_view_name text;
 	v_view_exists boolean;
 	v_arc_divide_tolerance float := 0.05;
+	v_sample_value text;
+	v_is_numeric boolean;
+	v_is_text boolean;
 
 BEGIN
 
@@ -215,20 +218,157 @@ BEGIN
 		FOR v_rec IN SELECT * FROM cm.config_outlayers
 		LOOP
 			v_conditions := ARRAY[]::text[];
-			IF v_rec.min_value IS NOT NULL THEN
-				v_conditions := array_append(v_conditions, format('%I < %s', v_rec.column_name, v_rec.min_value));
+			
+			-- Check column data type and build appropriate conditions
+			v_is_numeric := false;
+			v_is_text := false;
+			
+			-- Get a sample value to determine data type (with campaign/lot filtering)
+			IF v_rec.feature_type = 'arc' THEN
+				IF v_lot_id IS NOT NULL THEN
+					EXECUTE format('SELECT a.%I FROM PARENT_SCHEMA.%I a 
+						JOIN cm.om_campaign_lot_x_arc cx ON a.arc_id = cx.arc_id 
+						WHERE cx.lot_id = %s AND a.%I IS NOT NULL LIMIT 1', 
+						v_rec.column_name, v_rec.feature_type, v_lot_id, v_rec.column_name) INTO v_sample_value;
+				ELSIF v_campaign_id IS NOT NULL THEN
+					EXECUTE format('SELECT a.%I FROM PARENT_SCHEMA.%I a 
+						JOIN cm.om_campaign_x_arc cx ON a.arc_id = cx.arc_id 
+						WHERE cx.campaign_id = %s AND a.%I IS NOT NULL LIMIT 1', 
+						v_rec.column_name, v_rec.feature_type, v_campaign_id, v_rec.column_name) INTO v_sample_value;
+				ELSE
+					EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
+						v_rec.column_name, v_rec.feature_type, v_rec.column_name) INTO v_sample_value;
+				END IF;
+			ELSIF v_rec.feature_type = 'node' THEN
+				IF v_lot_id IS NOT NULL THEN
+					EXECUTE format('SELECT n.%I FROM PARENT_SCHEMA.%I n 
+						JOIN cm.om_campaign_lot_x_node cx ON n.node_id = cx.node_id 
+						WHERE cx.lot_id = %s AND n.%I IS NOT NULL LIMIT 1', 
+						v_rec.column_name, v_rec.feature_type, v_lot_id, v_rec.column_name) INTO v_sample_value;
+				ELSIF v_campaign_id IS NOT NULL THEN
+					EXECUTE format('SELECT n.%I FROM PARENT_SCHEMA.%I n 
+						JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id 
+						WHERE cx.campaign_id = %s AND n.%I IS NOT NULL LIMIT 1', 
+						v_rec.column_name, v_rec.feature_type, v_campaign_id, v_rec.column_name) INTO v_sample_value;
+				ELSE
+					EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
+						v_rec.column_name, v_rec.feature_type, v_rec.column_name) INTO v_sample_value;
+				END IF;
+			ELSE
+				EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
+					v_rec.column_name, v_rec.feature_type, v_rec.column_name) INTO v_sample_value;
 			END IF;
-			IF v_rec.max_value IS NOT NULL THEN
-				v_conditions := array_append(v_conditions, format('%I > %s', v_rec.column_name, v_rec.max_value));
+			
+			-- Skip this rule if no sample value found (no features of this type in campaign/lot)
+			IF v_sample_value IS NULL THEN
+				-- Skip this rule - no features of this type exist in the selected campaign/lot
+				CONTINUE;
+			END IF;
+			
+			-- Test if it's numeric
+			BEGIN
+				PERFORM (v_sample_value::numeric);
+				v_is_numeric := true;
+			EXCEPTION
+				WHEN OTHERS THEN
+					v_is_numeric := false;
+					v_is_text := true;
+			END;
+			
+			-- Build conditions based on data type
+			IF v_is_numeric THEN
+				-- Numeric comparisons - cast min/max values to numeric
+				IF v_rec.min_value IS NOT NULL THEN
+					BEGIN
+						-- Test if min_value can be cast to numeric
+						PERFORM (v_rec.min_value::numeric);
+						v_conditions := array_append(v_conditions, format('CAST(%I AS numeric) < %s', v_rec.column_name, v_rec.min_value));
+					EXCEPTION
+						WHEN OTHERS THEN
+							-- If min_value is not numeric, skip this condition
+							NULL;
+					END;
+				END IF;
+				IF v_rec.max_value IS NOT NULL THEN
+					BEGIN
+						-- Test if max_value can be cast to numeric
+						PERFORM (v_rec.max_value::numeric);
+						v_conditions := array_append(v_conditions, format('CAST(%I AS numeric) > %s', v_rec.column_name, v_rec.max_value));
+					EXCEPTION
+						WHEN OTHERS THEN
+							-- If max_value is not numeric, skip this condition
+							NULL;
+					END;
+				END IF;
+			ELSIF v_is_text THEN
+				-- Text comparisons - use min/max values as text
+				IF v_rec.min_value IS NOT NULL THEN
+					v_conditions := array_append(v_conditions, format('%I < %L', v_rec.column_name, v_rec.min_value));
+				END IF;
+				IF v_rec.max_value IS NOT NULL THEN
+					v_conditions := array_append(v_conditions, format('%I > %L', v_rec.column_name, v_rec.max_value));
+				END IF;
 			END IF;
 
 			IF array_length(v_conditions, 1) > 0 THEN
-				v_querytext := format(
-					'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
-					v_rec.column_name,
-					v_rec.feature_type,
-					array_to_string(v_conditions, ' OR ')
-				);
+				-- Build query with campaign/lot filtering
+				IF v_rec.feature_type = 'arc' THEN
+					-- For arcs, join with campaign/lot tables
+					IF v_lot_id IS NOT NULL THEN
+						-- Filter by lot
+						v_querytext := format(
+							'SELECT a.%I FROM PARENT_SCHEMA.%I a 
+							 JOIN cm.om_campaign_lot_x_arc cx ON a.arc_id = cx.arc_id 
+							 WHERE cx.lot_id = %s AND (%s)',
+							v_rec.column_name, v_rec.feature_type, v_lot_id, array_to_string(v_conditions, ' OR ')
+						);
+					ELSIF v_campaign_id IS NOT NULL THEN
+						-- Filter by campaign
+						v_querytext := format(
+							'SELECT a.%I FROM PARENT_SCHEMA.%I a 
+							 JOIN cm.om_campaign_x_arc cx ON a.arc_id = cx.arc_id 
+							 WHERE cx.campaign_id = %s AND (%s)',
+							v_rec.column_name, v_rec.feature_type, v_campaign_id, array_to_string(v_conditions, ' OR ')
+						);
+					ELSE
+						-- No filtering
+						v_querytext := format(
+							'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
+							v_rec.column_name, v_rec.feature_type, array_to_string(v_conditions, ' OR ')
+						);
+					END IF;
+				ELSIF v_rec.feature_type = 'node' THEN
+					-- For nodes, join with campaign/lot tables
+					IF v_lot_id IS NOT NULL THEN
+						-- Filter by lot
+						v_querytext := format(
+							'SELECT n.%I FROM PARENT_SCHEMA.%I n 
+							 JOIN cm.om_campaign_lot_x_node cx ON n.node_id = cx.node_id 
+							 WHERE cx.lot_id = %s AND (%s)',
+							v_rec.column_name, v_rec.feature_type, v_lot_id, array_to_string(v_conditions, ' OR ')
+						);
+					ELSIF v_campaign_id IS NOT NULL THEN
+						-- Filter by campaign
+						v_querytext := format(
+							'SELECT n.%I FROM PARENT_SCHEMA.%I n 
+							 JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id 
+							 WHERE cx.campaign_id = %s AND (%s)',
+							v_rec.column_name, v_rec.feature_type, v_campaign_id, array_to_string(v_conditions, ' OR ')
+						);
+					ELSE
+						-- No filtering
+						v_querytext := format(
+							'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
+							v_rec.column_name, v_rec.feature_type, array_to_string(v_conditions, ' OR ')
+						);
+					END IF;
+				ELSE
+					-- For other feature types, no filtering
+					v_querytext := format(
+						'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
+						v_rec.column_name, v_rec.feature_type, array_to_string(v_conditions, ' OR ')
+					);
+				END IF;
 
 				EXECUTE 'SELECT count(*) FROM (' || v_querytext || ') AS outliers' INTO v_count;
 			ELSE
@@ -248,8 +388,33 @@ BEGIN
 					v_fid,
 					current_user,
 					v_criticity,
-					-- Use the custom message if provided, otherwise a default one
-					COALESCE(v_rec.except_message, format('Found %s outlier(s) for field %I in table %I.', v_count, v_rec.column_name, v_rec.feature_type)),
+					-- Use the custom message if provided, otherwise a default one with dynamic values
+					COALESCE(
+						-- Replace placeholders in custom message
+						REPLACE(
+							REPLACE(
+								REPLACE(v_rec.except_message, '{min_value}', COALESCE(v_rec.min_value, 'N/A')),
+								'{max_value}', COALESCE(v_rec.max_value, 'N/A')
+							),
+							'{count}', v_count::text
+						),
+						-- Dynamic default message with placeholders replaced
+						REPLACE(
+							REPLACE(
+								REPLACE(
+									REPLACE(
+										REPLACE('Found {count} outlier(s) for field {column_name} in table {feature_type} (range: {min_value} to {max_value}).',
+											'{min_value}', COALESCE(v_rec.min_value, 'N/A')
+										),
+										'{max_value}', COALESCE(v_rec.max_value, 'N/A')
+									),
+									'{count}', v_count::text
+								),
+								'{column_name}', v_rec.column_name
+							),
+							'{feature_type}', v_rec.feature_type
+						)
+					),
 					v_count
 				);
 			ELSE

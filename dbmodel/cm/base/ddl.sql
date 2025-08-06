@@ -606,8 +606,8 @@ CREATE TABLE om_campaign_lot_x_node (
 CREATE TABLE config_outlayers (
 	feature_type text NOT NULL,
 	column_name text NOT NULL,
-	min_value numeric,
-	max_value numeric,
+	min_value text,
+	max_value text,
 	except_error boolean,
 	except_message text,
 	CONSTRAINT config_outlayers_pkey PRIMARY KEY (feature_type, column_name)
