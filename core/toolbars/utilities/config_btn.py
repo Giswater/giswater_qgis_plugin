@@ -190,9 +190,6 @@ class GwConfigButton(GwAction):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        # Update current_workspace label (status bar)
-        tools_gw.manage_current_selections_docker(json_result)
-
         msg = "Values has been updated"
         tools_qgis.show_info(msg)
         # Close dialog

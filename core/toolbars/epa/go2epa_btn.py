@@ -588,7 +588,6 @@ class GwGo2EpaButton(GwAction):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        tools_gw.manage_current_selections_docker(json_result)
         # Refresh epa world view if is active and it has changed
         if any(widget['widget'] == 'inp_options_networkmode' for widget in _json):
             tools_qgis.force_refresh_map_canvas()

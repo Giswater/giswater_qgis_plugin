@@ -182,10 +182,6 @@ class GwProjectCheckCMTask(GwTask):
         # Execute procedure
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
-        if result:
-            open_curselectors = tools_gw.get_config_parser('dialogs_actions', 'curselectors_open_loadproject', "user", "init")
-            open_curselectors = tools_os.set_boolean(open_curselectors, False)
-            tools_gw.manage_current_selections_docker(result, open=open_curselectors)
         try:
             if not result or result['body']['variables'].get('hideForm'):
                 return result

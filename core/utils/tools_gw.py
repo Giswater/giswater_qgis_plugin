@@ -29,7 +29,7 @@ from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, Q
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
+from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QVBoxLayout, QHBoxLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
@@ -3640,7 +3640,6 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
 
     # Temporarily store IDs to be added for this feature type
     selected_ids = []
-    print(class_object.rel_layers[feature_type])
     for layer in class_object.rel_layers[feature_type]:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
@@ -4533,38 +4532,62 @@ def open_dlg_help():
         return True
 
 
-def manage_current_selections_docker(result, open=False):
+def manage_current_psector_docker(psector_name=None):
     """
-    Manage labels for the current_selections docker
-        :param result: looks the data in result['body']['data']['userValues']
-        :param open: if it has to create a new docker or just update it
+    Manage labels for the current_psector docker
     """
-
-    if not result or 'body' not in result or 'data' not in result['body']:
+    if not isinstance(psector_name, (str, type(None))):
         return
+    
+    # Configuration
+    title = "Current psector"
+    icon_size = 12
+    if psector_name is None:
+        psector_name = ""
+    
+    # Determine icon path based on psector_name
+    icon_filename = "140.png" if psector_name else "138.png"
+    icon_path = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}{icon_filename}"
+    
+    # Get or create dock widget
+    dock_widget = lib_vars.session_vars['current_psector']
+    if dock_widget is None:
+        dock_widget = QDockWidget()
+        dock_widget.setWindowTitle(title)
+        lib_vars.session_vars['current_psector'] = dock_widget 
+        global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, dock_widget)
+    
+    # Update dock widget content and title
+    dock_widget.setWindowTitle(title)
+    
+    # Create content widget with horizontal layout
+    content_widget = QWidget()
+    layout = QHBoxLayout()
+    content_widget.setLayout(layout)
+    
+    # Add icon if file exists
+    if os.path.exists(icon_path):
+        icon_label = QLabel()
+        pixmap = QPixmap(icon_path).scaled(icon_size, icon_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        if not pixmap.isNull():
+            icon_label.setPixmap(pixmap)
+        layout.addWidget(icon_label)
+    
+    # Add text label
+    text_label = QLabel(psector_name)
+    layout.addWidget(text_label)
+    layout.addStretch()
+    
+    # Set widget and show
+    dock_widget.setWidget(content_widget)
+    
+    # Show dock widget if not already visible
+    if not dock_widget.isVisible():
+        dock_widget.show()
+        dock_widget.raise_()
 
-    title = "Gw Selectors: "
-    if 'userValues' in result['body']['data']:
-        for user_value in result['body']['data']['userValues']:
-            if user_value['parameter'] == 'plan_psector_current' and user_value['value']:
-                sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
-                row = tools_db.get_row(sql, log_info=False)
-                if row:
-                    title += f"{row[0]} | "
-            elif user_value['parameter'] == 'utils_workspace_vdefault' and user_value['value']:
-                sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
-                row = tools_db.get_row(sql, log_info=False)
-                if row:
-                    title += f"{row[0]} | "
-            elif user_value['value']:
-                title += f"{user_value['value']} | "
 
-        if lib_vars.session_vars['current_selections'] is None:
-            lib_vars.session_vars['current_selections'] = QDockWidget(title[:-3])
-        else:
-            lib_vars.session_vars['current_selections'].setWindowTitle(title[:-3])
-        if open:
-            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, lib_vars.session_vars['current_selections'])
+
 
 
 def create_sqlite_conn(file_name):
@@ -5944,6 +5967,41 @@ def _manage_tablewidget(**kwargs):
     """
 
     return _manage_tableview(**kwargs)
+
+
+def _update_toolbar_button_icon(button_id, toolbar_id, file_name):
+    """
+    Update the icon for a specific toolbar button
+    """
+    try:
+        
+        # Access the button through global_vars
+        if not global_vars.load_project or not hasattr(global_vars.load_project, 'buttons'):
+            return False
+            
+        # Try both string and integer keys
+        button = global_vars.load_project.buttons.get(str(button_id)) or global_vars.load_project.buttons.get(int(button_id))
+        if not button or not hasattr(button, 'action'):
+            return False
+        
+        # Define icon paths
+        icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}{toolbar_id}{os.sep}"
+        icon_path = f"{icon_folder}{file_name}"
+        
+        # Update the button icon
+        if os.path.exists(icon_path):
+            new_icon = QIcon(icon_path)
+            button.action.setIcon(new_icon)
+            return True
+            
+    except Exception as e:
+        # Log the error but don't break the functionality
+        tools_log.log_info(f"Error updating button {button_id} icon: {str(e)}")
+        return False
+    
+    return False
+
+
 # endregion
 
 # region Right Click TableView Menu

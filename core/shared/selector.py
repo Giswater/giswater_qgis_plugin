@@ -431,8 +431,6 @@ class GwSelector:
         # Reload selectors dlg
         self.open_selector(selector_type, reload_dlg=dialog)
 
-        # Update current_workspace label (status bar)
-        tools_gw.manage_current_selections_docker(json_result)
 
         if tab_name == 'tab_exploitation':
             docker_search = global_vars.iface.mainWindow().findChild(QDockWidget, 'dlg_search')

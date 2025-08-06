@@ -50,6 +50,7 @@ signal_manager = None                   # Instance of class GwSignalManager. Fou
 giswater_settings = None                # Instance of class QSettings. QGIS settings related to Giswater variables such as toolbars and checkable actions
 exec_procedure_max_retries = None       # Maximum number of execution retries of a PostgreSQL function
 load_project_menu = None
+load_project = None                     # Instance of class GwLoadProject. Contains all toolbar buttons and project configuration
 # endregion
 
 

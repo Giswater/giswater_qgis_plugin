@@ -367,6 +367,9 @@ class Giswater(QObject):
         # Set action and button as None
         self.action = None
         self.action_info = None
+        
+        # Clear global load_project reference
+        global_vars.load_project = None
 
     def _unset_toc_buttons(self):
         """ Unset Add Child Layer and Toggle EPA World buttons (when plugin is disabled or reloaded) """
@@ -396,6 +399,7 @@ class Giswater(QObject):
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()
+        global_vars.load_project = self.load_project
 
         # If it is not a Giswater project, display admin button
         is_gw_project = self.load_project.project_read(show_warning, self)
@@ -422,11 +426,11 @@ class Giswater(QObject):
         if docker_info:
             self.iface.removeDockWidget(docker_info)
 
-        # Remove 'current_selections' docker
-        if lib_vars.session_vars['current_selections']:
-            self.iface.removeDockWidget(lib_vars.session_vars['current_selections'])
-            lib_vars.session_vars['current_selections'].deleteLater()
-            lib_vars.session_vars['current_selections'] = None
+        # Remove 'current_psector' docker
+        if lib_vars.session_vars.get('current_psector'):
+            self.iface.removeDockWidget(lib_vars.session_vars['current_psector'])
+            lib_vars.session_vars['current_psector'].deleteLater()
+            lib_vars.session_vars['current_psector'] = None
 
         # Manage 'dialog_docker' from lib_vars.session_vars and remove it if exists
         tools_gw.close_docker()
