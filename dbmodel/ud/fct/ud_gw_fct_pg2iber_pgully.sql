@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: 
+--FUNCTION CODE: 3494
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2iber_pgully();
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2iber_pgully()
@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2iber_pgully($${"client":{"device":4, "infoType":1, 
 
 */
 
--- fid: 
+-- fid:
 
 DECLARE
 
