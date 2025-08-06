@@ -1724,3 +1724,15 @@ VALUES('inp_dscenario_virtualvalve', 'form_feature', 'tab_none', 'setting', 'lyt
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('inp_dscenario_valve', 'form_feature', 'tab_none', 'setting', NULL, 5, 'double', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, false, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+
+UPDATE config_form_fields SET ismandatory=true WHERE  formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+
+UPDATE config_param_system SET value='{"status":true, "values":[
+{"sourceTable":"ve_node_tank", "query":"UPDATE inp_inlet t SET maxlevel = hmax, diameter=sqrt(4*area/3.14159) FROM ve_node_tank s "},
+{"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE inp_valve t SET setting = pressure_exit FROM ve_node_pr_reduc_valve s "}]}'
+WHERE parameter = 'epa_automatic_man2inp_values';
+
+UPDATE config_param_system SET value='{"status":true, "values":[
+{"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head=top_elev + pressure_exit FROM ve_node_pr_reduc_valve s "},
+{"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head=top_elev + hmax/2  FROM ve_node_tank s "}]}'
+WHERE parameter = 'epa_automatic_man2graph_values';
