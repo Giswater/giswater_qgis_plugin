@@ -13,9 +13,8 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"arc":[2001,2002], "node":[], "connec":[3001, 3002]},"data":{"type":"feature"}}$$)
-SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"update_tables":["node", "arc", "connec", "link"]},"data":{"type":"time", "lastSeed":"2023-05-05", "extra":"expl_id = '1' AND sector_id = '10007' AND state = '1'"}}$$)
-
--- The user need to have all the selector well configured on database because this function works with ve_ layers...
+SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"update_tables":["node", "arc", "connec", "link"]},"data":{"type":"time_updated", "lastSeed":"2023-05-05", "extra":"expl_id = '1' AND sector_id = '10007' AND state = '1'"}}$$)
+SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg": 25831},"form":{},"feature":{"update_tables":["node", "arc", "connec", "link"]},"data":{"type":"time_deleted", "lastSeed":"2023-05-05", "extra":"expl_id = '1' AND sector_id = '10007' AND state = '1'"}}$$)
 
 */
 
@@ -34,6 +33,9 @@ v_lastseed text;
 v_table text;
 v_updatetables text;
 v_extra text;
+v_key text;
+v_val text;
+v_epsg text;
 
 BEGIN
 
@@ -42,7 +44,7 @@ BEGIN
 
 	v_type = ((p_data ->>'data')::json->>'type');
 
-	IF v_type = 'time' THEN
+	IF v_type = 'time_updated' THEN
 
 	    v_lastseed = ((p_data ->>'data')::json->>'lastSeed');
 	    v_updatetables = ((p_data ->>'feature')::json->>'update_tables');
@@ -53,14 +55,55 @@ BEGIN
 	        v_querytext = concat(
 	            v_querytext,
 	            ' SELECT the_geom FROM ', v_table,
-	            ' WHERE updated_at > ''', v_lastseed, '''::timestamp',
-	            CASE
-	                WHEN v_extra IS NOT NULL AND v_extra <> ''
-	                THEN ' AND ' || v_extra
-	                ELSE ''
-	            END,
-	            ' UNION'
+	            ' WHERE lastupdate > ''', v_lastseed, '''::timestamp'
 	        );
+
+		    IF v_extra IS NOT NULL AND jsonb_typeof(v_extra::jsonb) = 'object' THEN
+		        FOR v_key, v_val IN SELECT * FROM json_each_text(v_extra::json) LOOP
+		            v_querytext := concat(
+		                v_querytext,
+		                ' AND ', quote_ident(v_key), ' = ', quote_literal(v_val)
+		            );
+		        END LOOP;
+		    END IF;
+
+			v_querytext := concat(v_querytext, ' UNION');
+
+	    END LOOP;
+
+		v_querytext = left(v_querytext, length(v_querytext) - 6);
+		v_querytext = CONCAT('SELECT ST_AsGeoJSON(COALESCE(ST_Collect(ST_Buffer(the_geom, 2)), ST_GeomFromText(''POINT EMPTY'')))
+		FROM (', v_querytext, ') AS combined_geometries');
+
+	ELSIF v_type = 'time_deleted' THEN
+
+	    v_lastseed = ((p_data ->>'data')::json->>'lastSeed');
+	    v_updatetables = ((p_data ->>'feature')::json->>'update_tables');
+	    v_extra = ((p_data ->>'data')::json->>'extra');
+		v_epsg =	((p_data ->>'client')::json->>'epsg');
+	    v_querytext = '';
+
+	    FOR v_table IN SELECT json_array_elements_text(v_updatetables::json) LOOP
+
+			v_querytext := concat(
+		        v_querytext,
+		        ' SELECT ST_SetSRID(ST_GeomFromText(olddata->>''the_geom''), ',v_epsg,') AS the_geom FROM audit.log ',
+		        ' WHERE action = ''D''',
+		        ' AND table_name = ', quote_literal(v_table),
+		        ' AND schema = current_schema()',
+		        ' AND tstamp > ''', v_lastseed, '''::timestamp'
+		    );
+		    IF v_extra IS NOT NULL AND jsonb_typeof(v_extra::jsonb) = 'object' THEN
+		        FOR v_key, v_val IN SELECT * FROM json_each_text(v_extra::json) LOOP
+		            v_querytext := concat(
+		                v_querytext,
+		                ' AND olddata->>', quote_literal(v_key), ' = ', quote_literal(v_val)
+		            );
+		        END LOOP;
+		    END IF;
+
+		    v_querytext := concat(v_querytext, ' UNION');
+
 	    END LOOP;
 
 		v_querytext = left(v_querytext, length(v_querytext) - 6);
