@@ -65,7 +65,7 @@ class GwMapzoneManager:
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "174")
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
-        tabs = ['sector', 'dma', 'macrosector', 'omzone', 'macroomzone' ]
+        tabs = ['sector', 'dma', 'macrosector', 'omzone', 'macroomzone']
         project_tabs = {'ws': ['dqa', 'macrodma', 'macrodqa', 'supplyzone', 'presszone'],
                         'ud': ['drainzone', 'dwfzone']}
 
@@ -638,7 +638,7 @@ class GwMapzoneManager:
         # Ignore
         # Set variables based on project type
         layer = 've_node' if global_vars.project_type == 'ws' else 've_arc'
-        
+
         self.config_dlg.btn_snapping_ignore.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_ignore,
                     layer, 'ignore', None, self.child_type))
@@ -788,7 +788,7 @@ class GwMapzoneManager:
         # Set ID field based on project type for forceClosed and ignore
         force_closed_id_field = 'node_id' if global_vars.project_type == 'ws' else 'arc_id'
         ignore_id_field = 'node_id' if global_vars.project_type == 'ws' else 'arc_id'
-        
+
         options = {'nodeParent': ['node_id', '_set_node_parent'], 'toArc': ['arc_id', '_set_to_arc'],
                    'forceClosed': [force_closed_id_field, '_set_force_closed'], 'ignore': [ignore_id_field, '_set_ignore']}
 

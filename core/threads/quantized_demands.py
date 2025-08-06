@@ -29,6 +29,7 @@ except ImportError:
     WaterNetworkModel = None
     EpanetSimulator = None
 
+
 class GwQuantizedDemands(GwTask):
     status = pyqtSignal(str)
     ended = pyqtSignal(str)

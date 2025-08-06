@@ -27,6 +27,7 @@ except ImportError:
     wntr = None
     WaterNetworkModel = None
 
+
 class ValveOperationCheck:
     def __init__(self):
         pass

@@ -32,6 +32,7 @@ except ImportError:
     LinkStatus = None
     EpanetSimulator = None
 
+
 class GwStaticCalibration(GwTask):
     ended = pyqtSignal(str)
     report = pyqtSignal(dict)

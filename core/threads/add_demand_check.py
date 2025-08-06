@@ -11,14 +11,13 @@ import itertools
 import json
 import math
 import uuid
-import traceback
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from qgis.core import QgsTask
 
 from .task import GwTask
-from ...libs import tools_db, tools_qgis
+from ...libs import tools_db
 
 WNTR_IMPORT_ERROR = "Couldn't import WNTR Python package. Please check if the Giswater plugin is installed and it has a 'packages' folder in it with 'wntr'. Also note that WNTR only works with Python 3.12 (QGIS >3.34.5)."
 
