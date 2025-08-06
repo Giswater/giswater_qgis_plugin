@@ -24,8 +24,6 @@ from .epa_tools.anl_quantized_demands import QuantizedDemands
 from .epa_tools.anl_valve_operation_check import ValveOperationCheck
 from .epa_tools.cal_emitter import EmitterCalibration
 from .epa_tools.cal_static import StaticCalibration
-from .epa_tools.import_epanet import GwImportEpanet
-from .epa_tools.import_swmm import GwImportSwmm
 from .epa_tools.go2iber import Go2Iber
 
 
@@ -71,8 +69,7 @@ class GwEpaTools(GwAction):
             (anl_menu, ('ws'), tools_qt.tr('Quantized demands'), None),
             (anl_menu, ('ws'), tools_qt.tr('Valve operation check'), None),
             (cal_menu, ('ws'), tools_qt.tr('Emitter calibration'), None),
-            (cal_menu, ('ws'), tools_qt.tr('Static calibration'), None),
-            (self.menu, ('ud', 'ws'), tools_qt.tr('Import INP file'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png"))
+            (cal_menu, ('ws'), tools_qt.tr('Static calibration'), None)
         ]
         # Add Go2Iber action if ibergis plugin is available
         if tools_qgis.is_plugin_active('ibergis'):
@@ -119,16 +116,6 @@ class GwEpaTools(GwAction):
         elif name == tools_qt.tr('Valve operation check'):
             valve_operation_check = ValveOperationCheck()
             valve_operation_check.clicked_event()
-
-        elif name == tools_qt.tr('Import INP file'):
-            if global_vars.project_type == 'ws':
-                import_inp = GwImportEpanet()
-                import_inp.clicked_event()
-                return
-            if global_vars.project_type == 'ud':
-                import_inp = GwImportSwmm()
-                import_inp.clicked_event()
-                return
 
         elif name == tools_qt.tr('Import IberGIS GPKG project'):
             go2iber = Go2Iber()
