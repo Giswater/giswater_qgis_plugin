@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: xxxx
+--FUNCTION CODE: 3498
 
 CREATE OR REPLACE FUNCTION cm.gw_fct_cm_setarcdivide(p_data json) RETURNS json AS
 $BODY$
@@ -102,9 +102,17 @@ BEGIN
     -- update arc_id null in case the node has related the arc_id
     UPDATE PARENT_SCHEMA.node set arc_id = null where node_id = v_node_id and arc_id is not NULL;
 
-    -- Find closest arc inside tolerance
-    SELECT arc_id, state, the_geom, code INTO v_arc_id, v_state_arc, v_arc_geom, v_code  FROM PARENT_SCHEMA.ve_arc AS a
-    WHERE ST_DWithin(v_node_geom, a.the_geom, v_arc_divide_tolerance) AND node_1 != v_node_id AND node_2 != v_node_id
+    -- Find closest arc inside tolerance (check both campaign and lot arcs)
+    SELECT arc_id, state, the_geom, code INTO v_arc_id, v_state_arc, v_arc_geom, v_code  
+    FROM PARENT_SCHEMA.ve_arc AS a
+    WHERE ST_DWithin(v_node_geom, a.the_geom, v_arc_divide_tolerance) 
+      AND node_1 != v_node_id 
+      AND node_2 != v_node_id
+      AND arc_id IN (
+          SELECT arc_id FROM cm.om_campaign_x_arc
+          UNION
+          SELECT arc_id FROM cm.om_campaign_lot_x_arc
+      )
     ORDER BY ST_Distance(v_node_geom, a.the_geom) LIMIT 1;
 
     IF v_arc_id IS NULL THEN
@@ -131,13 +139,13 @@ BEGIN
     SELECT * INTO rec_aux2 FROM PARENT_SCHEMA.arc WHERE arc_id = v_arc_id;
 
     -- Update values of new arc_id (1)
-    rec_aux1.arc_id := nextval('cm.urn_id_seq');
+    rec_aux1.arc_id := nextval('PARENT_SCHEMA.urn_id_seq');
     rec_aux1.code := rec_aux1.arc_id; -- Simplified code generation
     rec_aux1.node_2 := v_node_id;
     rec_aux1.the_geom := v_line1;
 
     -- Update values of new arc_id (2)
-    rec_aux2.arc_id := nextval('cm.urn_id_seq');
+    rec_aux2.arc_id := nextval('PARENT_SCHEMA.urn_id_seq');
     rec_aux2.code := rec_aux2.arc_id; -- Simplified code generation
     rec_aux2.node_1 := v_node_id;
     rec_aux2.the_geom := v_line2;
