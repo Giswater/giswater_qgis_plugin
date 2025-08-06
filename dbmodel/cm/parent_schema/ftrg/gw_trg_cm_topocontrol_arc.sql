@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: xxxx
+--FUNCTION CODE: 3500
 
 CREATE OR REPLACE FUNCTION cm.gw_trg_cm_topocontrol_arc()
 RETURNS trigger AS
