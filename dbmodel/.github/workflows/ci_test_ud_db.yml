@@ -19,9 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         pg_version: [16, 17]
-    concurrency:
-      group: db-tests-${{ matrix.pg_version }}
-      cancel-in-progress: false
 
     env:
       # PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
