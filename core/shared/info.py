@@ -258,7 +258,7 @@ class GwInfo(QObject):
                         if not current_extent.contains(feature_point):
                             global_vars.canvas.setCenter(feature_point)
                             global_vars.canvas.refresh()
-                
+
                 feature_id = self.complet_result['body']['feature']['id']
                 if linked_feature:
                     linked_feature['element_id'] = str(feature_id)
@@ -323,7 +323,7 @@ class GwInfo(QObject):
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
 
-        # Order liked_feature        
+        # Order liked_feature
         if self.info_layer and (feature_cat.parent_layer == 've_genelem' or linked_feature):
             tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
 
@@ -340,7 +340,7 @@ class GwInfo(QObject):
             # Create a new feature with the given feature_id
             feature = QgsFeature(self.info_layer.fields())
             self.info_layer.addFeature(feature)
-    
+
         elif self.info_layer:
             # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
             # realizes that he has made a mistake and selects another feature, without this two features would
@@ -637,7 +637,7 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(self._manage_prev_action)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
-            self.dlg_cf.btn_apply.clicked.connect(partial(self._apply_from_btn, dlg_cf, self.action_edit, feature_id, new_feature, 
+            self.dlg_cf.btn_apply.clicked.connect(partial(self._apply_from_btn, dlg_cf, self.action_edit, feature_id, new_feature,
                                                           False, from_apply=True, linked_feature=linked_feature))
             btn_accept.clicked.connect(
             partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False, linked_feature=linked_feature))
@@ -769,7 +769,7 @@ class GwInfo(QObject):
                 continue
 
             # Create connections
-            if field['widgettype'] not in ('tableview', 'vspacer', 'list', 'hspacer', 'button'):
+            if field['widgettype'] not in ('tableview', 'vspacer', 'list', 'hspacer', 'button', 'label'):
                 if field['widgettype'] == 'hyperlink':
                     if type(widget) is GwHyperLinkLineEdit:
                         widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
@@ -1603,7 +1603,7 @@ class GwInfo(QObject):
 
         if linked_feature:
             self._manage_linked_feature(linked_feature)
-        
+
     def _manage_edition(self, dialog, action_edit, fid, new_feature=None, generic=False, from_apply=False):
 
         # With the editing QAction we need to collect the last modified value (self.get_last_value()),
@@ -1649,11 +1649,11 @@ class GwInfo(QObject):
         if not action_edit.isChecked():
             tools_gw.close_dialog(dialog)
             return
-        
+
         status = self._manage_accept(dialog, action_edit, new_feature, my_json, True, generic)
         if status:
             self._reset_my_json()
-        
+
         if linked_feature:
             self._manage_linked_feature(linked_feature)
 
@@ -1874,7 +1874,7 @@ class GwInfo(QObject):
 
             if clear_json:
                 _json.clear()
-            
+
             if "Failed" in json_result['status']:
                 msg = json_result['message']['text']
                 if msg is None:
@@ -3282,8 +3282,8 @@ class GwInfo(QObject):
         """
         :param feature_id: Parameter sent by the featureAdded method itself
         :return:
-        """        
-        
+        """
+
         tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
         if linked_feature and linked_feature.get('geometry'):

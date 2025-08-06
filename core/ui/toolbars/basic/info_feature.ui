@@ -95,8 +95,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1151</width>
-             <height>337</height>
+             <width>1159</width>
+             <height>373</height>
             </rect>
            </property>
            <attribute name="label">
@@ -116,8 +116,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1151</width>
-             <height>337</height>
+             <width>1159</width>
+             <height>373</height>
             </rect>
            </property>
            <attribute name="label">
@@ -151,8 +151,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1151</width>
-             <height>328</height>
+             <width>1159</width>
+             <height>365</height>
             </rect>
            </property>
            <attribute name="label">
@@ -190,8 +190,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>83</width>
-             <height>42</height>
+             <width>98</width>
+             <height>36</height>
             </rect>
            </property>
            <attribute name="label">
@@ -218,49 +218,81 @@
         <string>Elements</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
+        <item row="4" column="0">
+         <layout class="QGridLayout" name="lyt_element_dscenario_2">
+          <item row="0" column="0">
+           <widget class="QTabWidget" name="tab_frelem_dscenario">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="tab_orifice">
+             <attribute name="title">
+              <string>Orifice</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_22">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_elem_dsc_orifice"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_outlet">
+             <attribute name="title">
+              <string>Outlet</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_25">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_elem_dsc_outlet"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_pump">
+             <attribute name="title">
+              <string>Pump</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_26">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_elem_dsc_pump"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_weir">
+             <attribute name="title">
+              <string>Weir</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_27">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_elem_dsc_weir"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_valve">
+             <attribute name="title">
+              <string>Valve</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_28">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="lyt_elem_dsc_valve"/>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </item>
         <item row="0" column="0">
-         <widget class="QToolBox" name="elements_toolbox">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="page_elem_main">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>1151</width>
-             <height>343</height>
-            </rect>
-           </property>
-           <attribute name="label">
-            <string>Elements data</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <layout class="QGridLayout" name="lyt_element_1"/>
-            </item>
-            <item>
-             <layout class="QGridLayout" name="lyt_element_2"/>
-            </item>
-            <item>
-             <layout class="QGridLayout" name="lyt_element_3"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="page_elem_dscenario">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>1151</width>
-             <height>343</height>
-            </rect>
-           </property>
-           <attribute name="label">
-            <string>Dscenario</string>
-           </attribute>
-          </widget>
-         </widget>
+         <layout class="QGridLayout" name="lyt_element_1"/>
+        </item>
+        <item row="5" column="0">
+         <layout class="QGridLayout" name="lyt_element_dscenario_3"/>
+        </item>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="lyt_element_2"/>
+        </item>
+        <item row="2" column="0">
+         <layout class="QGridLayout" name="lyt_element_3"/>
+        </item>
+        <item row="3" column="0">
+         <layout class="QGridLayout" name="lyt_element_dscenario_1"/>
         </item>
        </layout>
       </widget>
