@@ -224,9 +224,9 @@ UPDATE config_param_system
 
 UPDATE config_form_fields SET columnname='staticpressure1' WHERE formname ILIKE '%arc%' AND columnname='staticpress1';
 UPDATE config_form_fields SET columnname='staticpressure2' WHERE formname ILIKE '%arc%' AND columnname='staticpress2';
--- UPDATE config_form_fields SET columnname='pressure_exit' WHERE formname ILIKE '%valve%' AND columnname='pression_exit';
--- UPDATE config_form_fields SET columnname='pressure_entry' WHERE formname ILIKE '%valve%' AND columnname='pression_entry';
--- UPDATE config_form_fields SET columnname='pressure_exit' WHERE formname ILIKE '%pump%' AND columnname='pressure';
+UPDATE config_form_fields SET columnname='pressure_exit' WHERE formname ILIKE '%valve%' AND columnname='pression_exit';
+UPDATE config_form_fields SET columnname='pressure_entry' WHERE formname ILIKE '%valve%' AND columnname='pression_entry';
+UPDATE config_form_fields SET columnname='pressure_exit' WHERE formname ILIKE '%pump%' AND columnname='pressure';
 UPDATE config_form_fields SET columnname='staticpressure1' WHERE formname ILIKE '%link%' AND columnname='staticpressure';
 
 
@@ -1662,3 +1662,65 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('ve_epa_frpump','form_feature','tab_epa','curve_id','lyt_epa_data_1',2,'string','combo','Curve id:','Curve id',false,false,true,false,false,'SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL AND curve_type IN (''PUMP'', ''PUMP1'', ''PUMP2'', ''PUMP3'', ''PUMP4'')',true,true,'{"valueRelation":{"nullValue":false, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
 	VALUES ('ve_epa_frpump','form_feature','tab_epa','to_arc','lyt_epa_data_1',6,'string','text','To arc:','To arc',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+
+-- 06/08/2025
+UPDATE config_form_list SET query_text='SELECT dscenario_id, valve_type, diameter, setting, curve_id, minorloss, status, init_quality FROM ve_inp_dscenario_virtualvalve WHERE arc_id IS NOT NULL' WHERE listname='tbl_inp_dscenario_virtualvalve' AND device=4;
+UPDATE config_form_list SET query_text='SELECT dscenario_id AS id, arc_id, valve_type, diameter, setting, curve_id, minorloss, status FROM inp_dscenario_virtualvalve where dscenario_id is not null' WHERE listname='dscenario_virtualvalve' AND device=5;
+UPDATE config_form_list SET query_text='SELECT dscenario_id AS id, node_id, valve_type, setting, curve_id, minorloss, status, add_settings, init_quality FROM inp_dscenario_valve where dscenario_id is not null' WHERE listname='dscenario_valve' AND device=5;
+UPDATE config_form_list SET query_text='SELECT dscenario_id, node_id, nodarc_id, valve_type, setting, curve_id, minorloss, status, add_settings, init_quality FROM ve_inp_dscenario_valve WHERE node_id IS NOT NULL' WHERE listname='tbl_inp_dscenario_valve' AND device=4;
+
+DELETE FROM config_form_fields WHERE formname='inp_dscenario_valve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='inp_dscenario_valve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='inp_dscenario_valve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='inp_dscenario_virtualvalve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='inp_dscenario_virtualvalve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='inp_dscenario_virtualvalve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_epa';
+DELETE FROM config_form_fields WHERE formname='ve_inp_dscenario_valve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_dscenario_valve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_dscenario_valve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_dscenario_virtualvalve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_dscenario_virtualvalve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_dscenario_virtualvalve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_valve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_valve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_valve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_virtualvalve' AND formtype='form_feature' AND columnname='flow' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_virtualvalve' AND formtype='form_feature' AND columnname='coef_loss' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='ve_inp_virtualvalve' AND formtype='form_feature' AND columnname='pressure' AND tabname='tab_none';
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_inp_virtualvalve', 'form_feature', 'tab_none', 'setting', 'lyt_data_1', 16, 'double', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_inp_valve', 'form_feature', 'tab_none', 'setting', 'lyt_data_1', 14, 'double', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_inp_dscenario_virtualvalve', 'form_feature', 'tab_none', 'setting', 'lyt_data_1', 6, 'double', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_inp_dscenario_valve', 'form_feature', 'tab_none', 'setting', NULL, 5, 'double', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, false, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_epa_virtualvalve', 'form_feature', 'tab_epa', 'setting', 'lyt_epa_data_1', 3, 'string', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_epa_valve', 'form_feature', 'tab_epa', 'setting', 'lyt_epa_data_1', 3, 'string', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_epa_frvalve', 'form_feature', 'tab_epa', 'setting', 'lyt_epa_data_1', 3, 'string', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('inp_dscenario_virtualvalve', 'form_feature', 'tab_none', 'setting', 'lyt_data_1', 6, 'double', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('inp_dscenario_valve', 'form_feature', 'tab_none', 'setting', NULL, 5, 'double', 'text', 'Setting:', 'Setting:', NULL, false, false, true, false, false, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
