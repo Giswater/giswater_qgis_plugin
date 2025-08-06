@@ -59,4 +59,5 @@ UPDATE link SET dqa_id=0 ;
 DELETE FROM dqa;
 
 UPDATE man_valve SET to_arc=null WHERE node_id = 1083;
+UPDATE inp_valve SET setting=null WHERE node_id = 1083;
 UPDATE man_pump SET to_arc=null WHERE node_id = 1105;
