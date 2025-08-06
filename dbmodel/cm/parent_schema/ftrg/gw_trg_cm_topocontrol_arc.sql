@@ -13,12 +13,23 @@ $BODY$
 
 DECLARE
     -- Configuration
-    v_search_tolerance double precision := 0.1;
+    v_search_tolerance double precision;
+    v_state_filter boolean := TRUE;
 
     -- State
     v_node_start RECORD;
     v_node_end RECORD;
 BEGIN
+    -- Get configurable tolerance from system parameters
+    SELECT ((value::json)->>'value') INTO v_search_tolerance 
+    FROM PARENT_SCHEMA.config_param_system 
+    WHERE parameter='edit_arc_searchnodes';
+    
+    -- Fallback to default if not configured
+    IF v_search_tolerance IS NULL THEN
+        v_search_tolerance := 0.1;
+    END IF;
+
     -- This trigger runs on the 'om_campaign_x_arc' table.
     -- If the geometry is not being changed, there is nothing to do.
     IF NEW.the_geom IS NULL THEN
@@ -29,14 +40,22 @@ BEGIN
     -- === TOPOLOGY LOGIC - SELF-CONTAINED ===
 
     -- Find the nearest start and end nodes for the new geometry
-    SELECT * INTO v_node_start FROM cm.node
+    SELECT node.*, cfn.isarcdivide INTO v_node_start 
+    FROM PARENT_SCHEMA.node
+    JOIN PARENT_SCHEMA.cat_node ON cat_node.id = node.nodecat_id
+    JOIN PARENT_SCHEMA.cat_feature_node cfn ON cfn.id = cat_node.node_type
     WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), node.the_geom, v_search_tolerance)
-    ORDER BY (CASE WHEN COALESCE(node.isarcdivide, FALSE) IS TRUE THEN 1 ELSE 2 END),
+      AND (node.state = 1 OR v_state_filter = FALSE) -- Only active nodes unless disabled
+    ORDER BY (CASE WHEN COALESCE(cfn.isarcdivide, FALSE) IS TRUE THEN 1 ELSE 2 END),
              ST_Distance(ST_StartPoint(NEW.the_geom), node.the_geom) LIMIT 1;
 
-    SELECT * INTO v_node_end FROM cm.node
+    SELECT node.*, cfn.isarcdivide INTO v_node_end 
+    FROM PARENT_SCHEMA.node
+    JOIN PARENT_SCHEMA.cat_node ON cat_node.id = node.nodecat_id
+    JOIN PARENT_SCHEMA.cat_feature_node cfn ON cfn.id = cat_node.node_type
     WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), node.the_geom, v_search_tolerance)
-    ORDER BY (CASE WHEN COALESCE(node.isarcdivide, FALSE) IS TRUE THEN 1 ELSE 2 END),
+      AND (node.state = 1 OR v_state_filter = FALSE) -- Only active nodes unless disabled
+    ORDER BY (CASE WHEN COALESCE(cfn.isarcdivide, FALSE) IS TRUE THEN 1 ELSE 2 END),
              ST_Distance(ST_EndPoint(NEW.the_geom), node.the_geom) LIMIT 1;
 
     -- Validate the nodes found

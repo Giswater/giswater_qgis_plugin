@@ -204,57 +204,69 @@ BEGIN
 	-- ENDSECTION
 
 	-- SECTION[epic=checkproject]: Perform outlier checks based on config_outlayers
-    FOR v_rec IN SELECT * FROM cm.config_outlayers
-    LOOP
-		v_conditions := ARRAY[]::text[];
-		IF v_rec.min_value IS NOT NULL THEN
-			v_conditions := array_append(v_conditions, format('%I < %s', v_rec.column_name, v_rec.min_value));
-		END IF;
-		IF v_rec.max_value IS NOT NULL THEN
-			v_conditions := array_append(v_conditions, format('%I > %s', v_rec.column_name, v_rec.max_value));
-		END IF;
-
-		IF array_length(v_conditions, 1) > 0 THEN
-			v_querytext := format(
-				'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
-				v_rec.column_name,
-				v_rec.feature_type,
-				array_to_string(v_conditions, ' OR ')
-			);
-
-			EXECUTE 'SELECT count(*) FROM (' || v_querytext || ') AS outliers' INTO v_count;
-		ELSE
-			v_count := 0;
-		END IF;
-
-        IF v_count > 0 THEN
-			-- Determine criticity level
-			IF v_rec.except_error IS TRUE THEN
-				v_criticity := 3; -- ERROR
-			ELSE
-				v_criticity := 2; -- WARNING
+	-- Check if outlier rules are configured
+	IF NOT EXISTS (SELECT 1 FROM cm.config_outlayers) THEN
+		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+		VALUES (v_fid, current_user, 1, 'INFO: No outlier rules configured in config_outlayers table.', 0);
+	ELSE
+		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+		VALUES (v_fid, current_user, 1, format('INFO: Starting outlier validation - checking %s configured rules.', (SELECT count(*) FROM cm.config_outlayers)), 0);
+		
+		FOR v_rec IN SELECT * FROM cm.config_outlayers
+		LOOP
+			v_conditions := ARRAY[]::text[];
+			IF v_rec.min_value IS NOT NULL THEN
+				v_conditions := array_append(v_conditions, format('%I < %s', v_rec.column_name, v_rec.min_value));
+			END IF;
+			IF v_rec.max_value IS NOT NULL THEN
+				v_conditions := array_append(v_conditions, format('%I > %s', v_rec.column_name, v_rec.max_value));
 			END IF;
 
-            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
-            VALUES (
-                v_fid,
-                current_user,
-                v_criticity,
-                -- Use the custom message if provided, otherwise a default one
-                COALESCE(v_rec.except_message, format('Found %s outlier(s) for field %I in table %I.', v_count, v_rec.column_name, v_rec.feature_type)),
-                v_count
-            );
-        ELSE
-            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
-            VALUES (
-                v_fid,
-                current_user,
-                1, -- Info level
-                format('INFO: All values for field %I in table %I are within the defined range.', v_rec.column_name, v_rec.feature_type),
-                0
-            );
-        END IF;
-    END LOOP;
+			IF array_length(v_conditions, 1) > 0 THEN
+				v_querytext := format(
+					'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
+					v_rec.column_name,
+					v_rec.feature_type,
+					array_to_string(v_conditions, ' OR ')
+				);
+
+				EXECUTE 'SELECT count(*) FROM (' || v_querytext || ') AS outliers' INTO v_count;
+			ELSE
+				v_count := 0;
+			END IF;
+
+			IF v_count > 0 THEN
+				-- Determine criticity level
+				IF v_rec.except_error IS TRUE THEN
+					v_criticity := 3; -- ERROR
+				ELSE
+					v_criticity := 2; -- WARNING
+				END IF;
+
+				INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+				VALUES (
+					v_fid,
+					current_user,
+					v_criticity,
+					-- Use the custom message if provided, otherwise a default one
+					COALESCE(v_rec.except_message, format('Found %s outlier(s) for field %I in table %I.', v_count, v_rec.column_name, v_rec.feature_type)),
+					v_count
+				);
+			ELSE
+				INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+				VALUES (
+					v_fid,
+					current_user,
+					1, -- Info level
+					format('INFO: All values for field %I in table %I are within the defined range.', v_rec.column_name, v_rec.feature_type),
+					0
+				);
+			END IF;
+		END LOOP;
+		
+		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+		VALUES (v_fid, current_user, 1, 'INFO: Outlier validation completed successfully.', 0);
+	END IF;
     -- ENDSECTION
 
 	-- SECTION[epic=checkproject]: Check for arcs without nodes
@@ -835,6 +847,56 @@ BEGIN
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
 		VALUES (v_fid, current_user, 1, 'INFO: All project configurations checks passed successfully.');
 	END IF;
+
+	-- SECTION[epic=catalog_check]: Check catalog tables
+	-- Check if there's data to validate
+	IF v_campaign_id IS NULL AND v_lot_id IS NULL THEN
+		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+		VALUES (v_fid, current_user, 1, 'INFO: No campaign or lot selected - skipping catalog validation.');
+	ELSE
+
+	RAISE NOTICE 'Starting catalog check with campaign_id: %, lot_id: %', v_campaign_id, v_lot_id;
+	
+	BEGIN
+		        RAISE NOTICE 'Calling gw_fct_cm_check_catalogs function...';
+        EXECUTE 'SELECT cm.gw_fct_cm_check_catalogs($${"data":{"projectType":"' || v_project_type || '","version":"' || v_version || '","fromProduction":false,"campaign_id":"' || v_campaign_id || '","lot_id":"' || v_lot_id || '"}}$$)' INTO v_check_result;
+		RAISE NOTICE 'Catalog check result status: %', v_check_result->>'status';
+		
+		-- Parse the catalog check result and insert into audit
+		-- Always parse the log messages regardless of status
+		FOR v_rec IN SELECT unnest(string_to_array(v_check_result->'body'->>'log', chr(10))) AS log_line
+		LOOP
+			IF v_rec.log_line != '' THEN
+				IF v_rec.log_line LIKE 'ERROR:%' THEN
+					INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+					VALUES (v_fid, current_user, 3, v_rec.log_line);
+				ELSIF v_rec.log_line LIKE 'WARNING:%' THEN
+					INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+					VALUES (v_fid, current_user, 2, v_rec.log_line);
+				ELSIF v_rec.log_line LIKE 'INFO:%' THEN
+					-- Check if this is a catalog message about new entries being created
+					IF v_rec.log_line LIKE '%new catalog entry will be created%' THEN
+						INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+						VALUES (v_fid, current_user, 2, 'WARNING: ' || substring(v_rec.log_line from 6)); -- Remove 'INFO: ' prefix and add 'WARNING: '
+					ELSIF v_rec.log_line LIKE '%Some features will create new catalog entries%' THEN
+						INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+						VALUES (v_fid, current_user, 2, 'WARNING: ' || substring(v_rec.log_line from 6)); -- Remove 'INFO: ' prefix and add 'WARNING: '
+					ELSE
+						INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+						VALUES (v_fid, current_user, 1, v_rec.log_line);
+					END IF;
+				END IF;
+			END IF;
+		END LOOP;
+		
+
+	EXCEPTION
+		WHEN OTHERS THEN
+			INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+			VALUES (v_fid, current_user, 3, 'ERROR: Catalog check failed: ' || SQLERRM);
+	END;
+	END IF;
+	-- ENDSECTION
 
 	-- not necessary to fill excep tables
 	-- EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"fillExcepTables"}}}$$::json)' INTO v_result_info;
