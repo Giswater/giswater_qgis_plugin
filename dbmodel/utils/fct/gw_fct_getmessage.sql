@@ -194,13 +194,8 @@ BEGIN
 				rec_cat_error.error_message = replace(rec_cat_error.error_message, concat('%', _key, '%'), _value);
 			END LOOP;
 		ELSE
-		
-			IF ((v_parameters -> 'data')::JSON->>'parameters')::text = '{}' OR ((v_parameters -> 'data')::JSON->>'parameters')::TEXT IS NULL THEN 
-			
-			ELSE -- return error parameters aren't the same
-				RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Error in message parameters'))::json;
-			END IF;
-
+			-- return error parameters aren't the same
+			RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Error in message parameters'))::json;
 		END IF;
 	END IF;
 
