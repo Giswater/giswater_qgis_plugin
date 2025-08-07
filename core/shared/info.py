@@ -4224,7 +4224,6 @@ def add_frelem_to_dscenario(**kwargs):
 
 def remove_frelem_from_dscenario(**kwargs):
     """ Remove frelem from dscenario """
-    class_obj = kwargs['class']
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
 
