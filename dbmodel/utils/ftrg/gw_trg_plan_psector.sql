@@ -56,7 +56,7 @@ BEGIN
 		
 			
 		
-			IF ((v_result->>'message')::json->>'level')::integer = 1 THEN
+			IF ((v_result->>'message')::json->>'level')::integer = 1 AND (SELECT count(*) FROM plan_psector_x_node WHERE psector_id = NEW.psector_id) > 0 THEN
 			
 				 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	             "data":{"message":"4336", "function":"2446","parameters":null}}$$)';
