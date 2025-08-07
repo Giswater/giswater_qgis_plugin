@@ -1259,7 +1259,7 @@ BEGIN
 					'||v_query_text_aux||'
 					WHERE EXISTS (
 						SELECT 1 FROM v_temp_pgr_mapzone_old tm
-						WHERE g.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
+						WHERE l.'||quote_ident(v_mapzone_field)||' = tm.old_mapzone_id
 					)
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc ta

@@ -609,7 +609,7 @@ BEGIN
                 ), link_selector AS (
                     SELECT
                         l.link_id,
-                        c.arc_id
+                        g.arc_id
                     FROM link l
                     JOIN gully g ON l.feature_id = g.gully_id
                     WHERE NOT EXISTS (
