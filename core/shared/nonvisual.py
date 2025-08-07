@@ -336,7 +336,6 @@ class GwNonVisual:
         table = dialog.main_tab.currentWidget()
         print(table)
         function_name = table.property('function')
-        print(function_name)
 
         getattr(self, function_name)()
 

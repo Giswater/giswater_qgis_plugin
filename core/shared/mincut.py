@@ -1605,8 +1605,6 @@ class GwMincut:
 
         for el in del_id:
             self.deleted_list.append(el)
-            print(f"el: {el}")
-            print(f"self.rel_list_ids['connec']: {self.rel_list_ids['connec']}")
             self.rel_list_ids['connec'].remove(str(el))
 
         # Select features which are in the list
