@@ -1797,3 +1797,5 @@ WHERE config_param_system."parameter" = sub."parameter"
         LEFT("label", 1) <> UPPER(LEFT("label", 1))
      OR RIGHT(sub.cleaned, 1) <> ':'
   );
+
+UPDATE sys_fprocess SET except_msg='values of roughness out of range acording headloss formula used' WHERE fid=377;

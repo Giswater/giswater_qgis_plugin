@@ -132,7 +132,7 @@ BEGIN
 		WHERE project_type IN (lower('||quote_literal(v_project_type)||'), ''utils'') 
 		AND addparam IS NULL 
 		AND query_text IS NOT NULL 
-		AND function_name ILIKE ''%pg2epa_check%'' 
+		AND function_name ILIKE ''%pg2epa_check%'' AND function_name NOT ILIKE ''%pg2epa_check_data%''
 		AND active ORDER BY fid ASC
 	';
 
