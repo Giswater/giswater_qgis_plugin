@@ -59,7 +59,7 @@ BEGIN
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
 	END LOOP;
 
-
+	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":227}}}$$::json)';
 	-- TODO
 	-------------------- to be replaced
 	RAISE NOTICE 'Check if there are conflicts with dscenarios (396)';
