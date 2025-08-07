@@ -805,13 +805,13 @@ BEGIN
 		    ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
 			v_inp_table:= 'inp_shortpipe';
 		    ELSIF (NEW.epa_type = 'VALVE') THEN
-				IF (SELECT lower(type) FROM cat_feature_node cf JOIN cat_node c ON cf.id=c.node_type WHERE c.id=NEW.nodecat_id)<>'valve' THEN
+				IF (SELECT lower(feature_class) FROM cat_feature_node cfn JOIN cat_node c ON cfn.id=c.node_type JOIN cat_feature cf ON cfn.id=cf.id WHERE c.id=NEW.nodecat_id)<>'valve' THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3266", "function":"1320","parameters":null, "is_process":true}}$$)';
 				END IF;
 			v_inp_table:= 'inp_valve';
 		    ELSIF (NEW.epa_type = 'PUMP') THEN
-				IF (SELECT lower(type) FROM cat_feature_node cf JOIN cat_node c ON cf.id=c.node_type WHERE c.id=NEW.nodecat_id)<>'pump' THEN
+				IF (SELECT lower(feature_class) FROM cat_feature_node cfn JOIN cat_node c ON cfn.id=c.node_type JOIN cat_feature cf ON cfn.id=cf.id WHERE c.id=NEW.nodecat_id)<>'pump' THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3266", "function":"1320","parameters":null, "is_process":true}}$$)';
 				END IF;
