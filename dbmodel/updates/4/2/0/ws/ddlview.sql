@@ -17,7 +17,6 @@ DROP VIEW IF EXISTS vu_element_x_arc;
 DROP VIEW IF EXISTS vu_element_x_node;
 DROP VIEW IF EXISTS vu_element_x_connec;
 DROP VIEW IF EXISTS vu_element_x_link;
-DROP VIEW IF EXISTS vcp_pipes;
 DROP VIEW IF EXISTS vcv_demands;
 DROP VIEW IF EXISTS vcv_patterns;
 DROP VIEW IF EXISTS v_rtc_period_hydrometer;
