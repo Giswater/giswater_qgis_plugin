@@ -445,7 +445,6 @@ BEGIN
 	-- getting source table in order to enhance performance
 	IF v_tablename LIKE 've_cad%' THEN v_sourcetable = v_tablename;
     ELSIF v_tablename LIKE 've_flwreg_%' THEN v_sourcetable = replace(v_tablename, 've_', 'inp_');
-	ELSIF v_tablename LIKE 've_%' AND v_tablename != 've_flwreg' THEN v_sourcetable = replace (v_tablename, 've_', '');
 	ELSIF v_tablename LIKE 've_node_%' THEN v_sourcetable = 'node';
 	ELSIF v_tablename LIKE 've_link_%' THEN v_sourcetable = 'link';
 	ELSIF v_tablename LIKE 've_arc_%' THEN v_sourcetable = 'arc';
@@ -453,6 +452,7 @@ BEGIN
 	ELSIF v_tablename LIKE 've_gully_%' THEN v_sourcetable = 'gully';
 	ELSIF v_tablename LIKE '%hydrometer%' THEN v_sourcetable = 'v_rtc_hydrometer';
 	ELSIF v_tablename LIKE '%elem%' THEN v_sourcetable = 'element';
+	ELSIF v_tablename LIKE 've_%' AND v_tablename != 've_flwreg' THEN v_sourcetable = replace (v_tablename, 've_', '');
 	ELSE v_sourcetable = v_tablename;
 	END IF;
 
