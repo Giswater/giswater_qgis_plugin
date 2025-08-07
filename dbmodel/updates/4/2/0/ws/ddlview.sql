@@ -10,6 +10,18 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP VIEW IF EXISTS ve_link_link;
 DROP VIEW IF EXISTS v_edit_link;
+DROP VIEW IF EXISTS v_inp_pjointpattern;
+DROP VIEW IF EXISTS v_minsector_graph;
+DROP VIEW IF EXISTS v_state_element;
+DROP VIEW IF EXISTS vu_element_x_arc;
+DROP VIEW IF EXISTS vu_element_x_node;
+DROP VIEW IF EXISTS vu_element_x_connec;
+DROP VIEW IF EXISTS vu_element_x_link;
+DROP VIEW IF EXISTS vcp_pipes;
+DROP VIEW IF EXISTS vcv_demands;
+DROP VIEW IF EXISTS vcv_patterns;
+DROP VIEW IF EXISTS v_rtc_period_hydrometer;
+
 
 ALTER VIEW v_edit_arc RENAME COLUMN staticpress1 TO staticpressure1;
 ALTER VIEW v_edit_arc RENAME COLUMN staticpress2 TO staticpressure2;
@@ -2427,3 +2439,114 @@ AS SELECT s.dscenario_id,
     inp_dscenario_frpump f
      JOIN ve_inp_frpump n USING (element_id)
   WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+
+CREATE OR REPLACE VIEW ve_samplepoint
+AS SELECT sm.sample_id,
+    sm.code,
+    sm.lab_code,
+    sm.feature_id,
+    sm.featurecat_id,
+    sm.dma_id,
+    sm.macrodma_id,
+    sm.presszone_id,
+    sm.state,
+    sm.builtdate,
+    sm.enddate,
+    sm.workcat_id,
+    sm.workcat_id_end,
+    sm.rotation,
+    sm.muni_id,
+    sm.streetaxis_id,
+    sm.postnumber,
+    sm.postcode,
+    sm.district_id,
+    sm.streetaxis2_id,
+    sm.postnumber2,
+    sm.postcomplement,
+    sm.postcomplement2,
+    sm.place_name,
+    sm.cabinet,
+    sm.observations,
+    sm.verified,
+    sm.the_geom,
+    sm.expl_id,
+    sm.link,
+    sm.sector_id
+   FROM ( SELECT samplepoint.sample_id,
+            samplepoint.code,
+            samplepoint.lab_code,
+            samplepoint.feature_id,
+            samplepoint.featurecat_id,
+            samplepoint.dma_id,
+            dma.macrodma_id,
+            samplepoint.presszone_id,
+            samplepoint.state,
+            samplepoint.builtdate,
+            samplepoint.enddate,
+            samplepoint.workcat_id,
+            samplepoint.workcat_id_end,
+            samplepoint.rotation,
+            samplepoint.muni_id,
+            samplepoint.streetaxis_id,
+            samplepoint.postnumber,
+            samplepoint.postcode,
+            samplepoint.district_id,
+            samplepoint.streetaxis2_id,
+            samplepoint.postnumber2,
+            samplepoint.postcomplement,
+            samplepoint.postcomplement2,
+            samplepoint.place_name,
+            samplepoint.cabinet,
+            samplepoint.observations,
+            samplepoint.verified,
+            samplepoint.the_geom,
+            samplepoint.expl_id,
+            samplepoint.link,
+            samplepoint.sector_id
+             FROM selector_expl,
+            samplepoint
+             LEFT JOIN dma ON dma.dma_id = samplepoint.dma_id
+          WHERE samplepoint.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) sm
+     JOIN selector_sector s USING (sector_id)
+     LEFT JOIN selector_municipality m USING (muni_id)
+  WHERE s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR sm.muni_id IS NULL);
+
+
+
+  CREATE OR REPLACE VIEW ve_dimensions AS
+WITH v_state_dimensions AS (SELECT dimensions.id
+   FROM selector_state,
+    dimensions
+  WHERE dimensions.state = selector_state.state_id AND selector_state.cur_user = CURRENT_USER)
+SELECT dimensions.id,
+    dimensions.distance,
+    dimensions.depth,
+    dimensions.the_geom,
+    dimensions.x_label,
+    dimensions.y_label,
+    dimensions.rotation_label,
+    dimensions.offset_label,
+    dimensions.direction_arrow,
+    dimensions.x_symbol,
+    dimensions.y_symbol,
+    dimensions.feature_id,
+    dimensions.feature_type,
+    dimensions.state,
+    dimensions.expl_id,
+    dimensions.observ,
+    dimensions.comment,
+    dimensions.sector_id,
+    dimensions.muni_id
+   FROM selector_expl,
+    dimensions
+     JOIN v_state_dimensions ON dimensions.id = v_state_dimensions.id
+     LEFT JOIN selector_municipality m USING (muni_id)
+     JOIN selector_sector s USING (sector_id)
+  WHERE (m.cur_user = CURRENT_USER::text OR dimensions.muni_id IS NULL) AND s.cur_user = CURRENT_USER::text AND dimensions.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+
+
+DROP VIEW IF EXISTS v_state_dimensions;
+DROP VIEW IF EXISTS v_state_samplepoint;

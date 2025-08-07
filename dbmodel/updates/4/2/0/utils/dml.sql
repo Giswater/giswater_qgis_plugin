@@ -278,3 +278,6 @@ UPDATE config_form_fields
   }
 }'::json
 	WHERE formname='element_manager' AND formtype='form_element' AND columnname='delete' AND tabname='tab_none';
+
+
+DELETE FROM sys_table WHERE id ilike 'v_state_%';

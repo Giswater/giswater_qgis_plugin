@@ -11,6 +11,16 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP VIEW IF EXISTS v_edit_dwfzone;
 DROP VIEW IF EXISTS v_ui_dwfzone;
+DROP VIEW IF EXISTS v_state_samplepoint;
+DROP VIEW IF EXISTS v_expl_gully;
+DROP VIEW IF EXISTS v_man_gully;
+DROP VIEW IF EXISTS v_state_link_connec;
+DROP VIEW IF EXISTS v_state_link_gully;
+DROP VIEW IF EXISTS v_state_gully;
+DROP VIEW IF EXISTS vi_pollutants;
+DROP VIEW IF EXISTS v_state_element;
+
+
 
 CREATE OR REPLACE VIEW v_edit_dwfzone
 AS SELECT d.dwfzone_id,
@@ -9070,3 +9080,38 @@ JOIN plan_psector USING (psector_id)
 JOIN cat_gully ON cat_gully.id::text = gully.gullycat_id::text
 JOIN cat_feature ON cat_feature.id::text = gully.gully_type::text
 WHERE EXISTS (SELECT 1 FROM sel_psector WHERE sel_psector.psector_id = plan_psector_x_gully.psector_id);
+
+CREATE OR REPLACE VIEW ve_dimensions
+AS
+WITH v_state_dimensions AS (SELECT dimensions.id
+   FROM selector_state,
+    dimensions
+  WHERE dimensions.state = selector_state.state_id AND selector_state.cur_user = CURRENT_USER)
+SELECT dimensions.id,
+    dimensions.distance,
+    dimensions.depth,
+    dimensions.the_geom,
+    dimensions.x_label,
+    dimensions.y_label,
+    dimensions.rotation_label,
+    dimensions.offset_label,
+    dimensions.direction_arrow,
+    dimensions.x_symbol,
+    dimensions.y_symbol,
+    dimensions.feature_id,
+    dimensions.feature_type,
+    dimensions.state,
+    dimensions.expl_id,
+    dimensions.observ,
+    dimensions.comment,
+    dimensions.sector_id,
+    dimensions.muni_id
+   FROM selector_expl,
+    dimensions
+     JOIN v_state_dimensions ON dimensions.id = v_state_dimensions.id
+     LEFT JOIN selector_municipality m USING (muni_id)
+     JOIN selector_sector s USING (sector_id)
+  WHERE (m.cur_user = CURRENT_USER::text OR dimensions.muni_id IS NULL) AND s.cur_user = CURRENT_USER::text AND dimensions.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+DROP VIEW IF EXISTS v_state_dimensions;
+DROP VIEW IF EXISTS v_state_gully;

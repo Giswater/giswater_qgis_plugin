@@ -1058,3 +1058,8 @@ DELETE FROM config_form_fields WHERE formname ILIKE '%ve_link%' AND formtype='fo
 
 DELETE FROM config_form_fields WHERE formname='ve_gully_ginlet' AND formtype='form_feature' AND columnname='connec_y1' AND tabname='tab_none';
 DELETE FROM config_form_fields WHERE formname='ve_gully_ginlet' AND formtype='form_feature' AND columnname='connec_y2' AND tabname='tab_none';
+
+
+DELETE FROM sys_table WHERE id ilike 'v_state_%';
+
+DELETE FROM sys_table WHERE id in ('v_expl_gully', 'v_man_gully', 'vi_pollutants');

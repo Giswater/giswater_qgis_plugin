@@ -8,6 +8,17 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+DROP VIEW IF EXISTS v_state_arc;
+DROP view IF EXISTS v_state_connec;
+DROP VIEW IF EXISTS v_state_node;
+DROP VIEW IF EXISTS v_state_link;
+DROP VIEW IF EXISTS v_expl_connec;
+DROP VIEW IF EXISTS v_audit_check_project;
+DROP VIEW IF EXISTS vcv_times;
+DROP VIEW IF EXISTS vcv_emitters;
+
+
 CREATE OR REPLACE VIEW ve_frelem
 AS WITH sel_state AS (
     SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
