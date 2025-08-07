@@ -33,6 +33,7 @@ v_error_context text;
 v_result json;
 v_result_info json;
 v_result_line json;
+v_result_point json;
 v_project_type text;
 
 BEGIN
@@ -62,32 +63,55 @@ BEGIN
 	IF v_psector IS NOT NULL THEN
 
 		-- find links for connects state 0 and link null
-		SELECT count(*) INTO v_count FROM plan_psector_x_connec p JOIN link l ON feature_id = connec_id WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = v_psector;
+		v_query = 'SELECT 355, c.connec_id, c.conneccat_id, c.the_geom, ''downgraded connecs without link_id informed in this psector.'', c.state 
+		FROM plan_psector_x_connec p JOIN link l ON feature_id = connec_id 
+		LEFT JOIN connec c USING (connec_id)
+		WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = '||v_psector||'
+		';
+	
+		EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
+	
 		IF v_count > 0 THEN
+		
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded connecs without link_id informed in this psector.'),v_count);
+			VALUES (355, '355', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded connecs without link_id informed in this psector.'),v_count);
+			v_level = 1;
+		
+			EXECUTE 'INSERT INTO anl_connec (fid, connec_id, conneccat_id, descript, the_geom, state) '||v_query||'';
 			v_level = 1;
 
 		END IF;
 
 		IF v_project_type = 'UD' THEN
-			SELECT count(*) INTO v_count FROM plan_psector_x_gully p JOIN link l ON feature_id = gully_id WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = v_psector;
+				
+			v_query = 'SELECT 355, g.gully_id, g.gullycat_id, ''downgraded gully without link_id informed in this psector.'', g.the_geom, g.state FROM plan_psector_x_gully p 
+			JOIN link l ON feature_id = gully_id
+			LEFT JOIN gully g USING (gully_id)
+			WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = '||v_psector||'';
+	
+			EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
+	
 			IF v_count > 0 THEN
+			
 				INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 				VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded gullies without link_id informed in this psector.'),v_count);
 				v_level = 1;
 
+			
+				EXECUTE 'INSERT INTO anl_gully (fid, gully_id, gullycat_id, descript, the_geom, state) '||v_query||'';
+				v_level = 1;
+	
 			END IF;
 		END IF;
 
 		-- control psector topology: find operative/planned arcs without operative nodes in this psector
 		v_query = '
-		select a.arc_id, a.arccat_id, node_id, '|| v_psector ||' as psector_id, concat(''Arc on service '',a.arc_id, '' has not node_1 ('', node_id, '') in this psector'') as descript,  a.the_geom FROM arc a
+		select 355, a.arc_id, a.arccat_id, node_id, '|| v_psector ||' as psector_id, concat(''Arc on service '',a.arc_id, '' has not node_1 ('', node_id, '') in this psector'') as descript,  a.the_geom FROM arc a
 		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0)n on node_1= node_id
 		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
 		where p.arc_id is null and a.state=1
 		union
-		select a.arc_id, a.arccat_id, node_id, '|| v_psector ||' as psector_id, concat(''Arc on service '',a.arc_id, '' has not node_2 ('', node_id, '') in this psector'') as descript, a.the_geom FROM arc a
+		select 355, a.arc_id, a.arccat_id, node_id, '|| v_psector ||' as psector_id, concat(''Arc on service '',a.arc_id, '' has not node_2 ('', node_id, '') in this psector'') as descript, a.the_geom FROM arc a
 		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0 )n on node_2 = node_id
 		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
 		where p.arc_id is null and a.state=1';
@@ -98,10 +122,10 @@ BEGIN
 		IF v_count > 0 THEN
 
 			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
-			SELECT 354, c.arc_id, c.arccat_id, concat(''Arc '', arc_id ,'' without some init/end operative nodes in this psector '',c.psector_id), c.the_geom, 1 FROM (', v_query,')c ');
+			SELECT 355, c.arc_id, c.arccat_id, concat(''Arc '', arc_id ,'' without some init/end operative nodes in this psector '',c.psector_id), c.the_geom, 1 FROM (', v_query,')c ');
 
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (354, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' arcs without some init/end operative nodes in this psector.'),v_count);
+			VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' arcs without some init/end operative nodes in this psector.'),v_count);
 			v_level = 1;
 
 		END IF;
@@ -146,22 +170,68 @@ BEGIN
 	END IF;
 
 	v_query = '
-		SELECT 354, a.arc_id, a.arccat_id, concat(''Planned arc  '', a.arc_id ,'' with wrong topology''), a.the_geom, a.state
+		SELECT 355, a.arc_id, a.arccat_id, concat(''Planned arc  '', a.arc_id ,'' with wrong topology''), a.the_geom, a.state
 	 	FROM arc a
 	 	join plan_psector_x_arc px using (arc_id) 
 	 	LEFT JOIN node n ON n.node_id = a.node_1
 	 	LEFT JOIN node m ON m.node_id = a.node_2 
-	 	WHERE psector_id = 1 
+	 	WHERE psector_id = '||v_psector||' 
 		AND st_distance(st_startpoint(a.the_geom), st_endpoint(a.the_geom)) != st_distance(n.the_geom, m.the_geom)';
 
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
 
 	IF v_count > 0 THEN
+	
+		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+		VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs with wrong topology.'),v_count);
 		
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, state) '||v_query||'';
 		v_level = 1;
+
+	END IF;
+
+
+	v_query = 'SELECT 355, arc_id, arccat_id, concat(''Planned arc  '', arc_id ,'' with wrong topology''), the_geom, a.state 
+	FROM arc a LEFT JOIN plan_psector_x_arc USING (arc_id) 
+	WHERE (node_1 IS NULL OR node_2 IS NULL) AND psector_id = '||v_psector||' AND a.state=2';
+
 	
+	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
+
+	IF v_count > 0 THEN
+	
+		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+		VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs with wrong topology.'),v_count);
+		
+		
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, state) '||v_query||'';
+		v_level = 1;
+
+	END IF;
+
+		
+	-- duplicated nodes
+	v_query = '
+	SELECT 355, node_id, nodecat_id, ''duplicated node'', the_geom, expl_id, state1 FROM (
+	SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, 355, t1.the_geom, t1.expl_id, t2.state AS state2
+	FROM node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(0.01)) 
+	WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a 
+	where (a.state1 > 0 AND a.state2 > 0) AND a.node_id in (select node_id from plan_psector_x_node where psector_id = '||v_psector||')';
+
+	
+	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
+
+
+	IF v_count > 0 THEN
+	
+		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+		VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' duplicated nodes'),v_count);
+		
+		
+		EXECUTE 'INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id, state) '||v_query||'';
+		v_level = 1;
+
 	END IF;
 
 	-- get results
@@ -180,6 +250,25 @@ BEGIN
 	v_result := COALESCE(v_result, '{}');
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
+	v_result = null;
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
+	  	) AS feature
+	  	FROM (
+	  		SELECT node_id, nodecat_id, state, descript, expl_id, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (354,355) UNION
+			SELECT connec_id, conneccat_id, state, descript, expl_id, fid, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (354,355) union
+			SELECT gully_id, gullycat_id, state, descript, expl_id, fid, the_geom FROM anl_gully WHERE cur_user="current_user"() AND fid IN (354,355)
+	  		) row) features;
+
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+
+
+
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (354, 355) order by criticity desc, id asc) row;
@@ -193,7 +282,7 @@ BEGIN
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{"userValues":'||v_uservalues||', "info":'||v_result_info||', "line":'||v_result_line||
+		     ',"data":{"userValues":'||v_uservalues||', "info":'||v_result_info||', "line":'||v_result_line||', "point":'||v_result_point||
 			'}}'||
 	    '}')::json, 3002, null, null, null);
 
