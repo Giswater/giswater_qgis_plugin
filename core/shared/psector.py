@@ -1937,7 +1937,7 @@ class GwPsector:
 
         selected_rows = self.qtbl_psm.selectionModel().selectedRows()
         if len(selected_rows) == 0:
-            msg = "No sector selected. Please select at least one."
+            msg = "No psector selected. Please select at least one."
             tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
