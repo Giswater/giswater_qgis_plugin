@@ -25,7 +25,13 @@ class GwMassiveComposer:
         self.iface = global_vars.iface
 
     def open_massive_composer(self):
-
+        
+        composers_list = tools_qgis.get_composer()
+        if composers_list == '"{}"':
+            msg = "No composers found."
+            tools_qt.show_info_box(msg, "Info")
+            return
+        
         dlg_comp = GwCompPagesUi(self)
         tools_gw.load_settings(dlg_comp)
         self.populate_cmb_composers(dlg_comp.cmb_composers)
