@@ -292,6 +292,7 @@ class Campaign:
 
     def _on_dialog_rejected(self):
         """Clean up resources when the dialog is rejected."""
+        tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
 
@@ -479,6 +480,7 @@ class Campaign:
                 self.filter_campaigns()
 
             if not from_tab_change:
+                tools_qgis.disconnect_signal_selection_changed()
                 self.dialog.accept()
 
         else:

@@ -656,6 +656,7 @@ class AddNewLot:
             tools_gw.reset_rubberband(self.rubber_band)
             tools_qgis.force_refresh_map_canvas()
             if not from_change_tab:
+                tools_qgis.disconnect_signal_selection_changed()
                 self.dlg_lot.accept()
         else:
             msg = "Error saving lot."
@@ -683,6 +684,7 @@ class AddNewLot:
 
     def _on_dialog_rejected(self):
         """Handles cleanup when the dialog is rejected."""
+        tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
 

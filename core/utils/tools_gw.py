@@ -5129,29 +5129,38 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
 
 def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
     """
-    Reload QTableView for campaign_x_<feature_type>
+    Reload QTableView for campaign_x_<feature_type> safely, avoiding recursive selectionChanged loop.
     """
     if not campaign_id:
         msg = "Campaign ID not found."
         tools_qgis.show_warning(msg)
         return
 
-    expr = f"campaign_id = '{campaign_id}'"
-    qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
-    tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
-    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+    class_object = dialog.parent()
+    if getattr(class_object, "signal_selectionChanged", False):
+        return  # Avoid recursion if triggered by selectionChanged
+    class_object.signal_selectionChanged = True
 
-    # Get ids from qtable (that will only mark the ones whanted in snapping)
-    feature_id_column = f"{feature_type}_id"
-    feature_ids = get_ids_from_qtable(qtable, feature_id_column)
+    try:
+        expr = f"campaign_id = '{campaign_id}'"
+        qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
+        tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
+        message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
 
-    if feature_ids:
-        expr = QgsExpression(f"{feature_id_column} IN ({','.join(feature_ids)})")
-        tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+        # Get ids from qtable (that will only mark the ones whanted in snapping)
+        feature_id_column = f"{feature_type}_id"
+        feature_ids = get_ids_from_qtable(qtable, feature_id_column)
 
-    if message:
-        tools_qgis.show_warning(message)
-    set_tablemodel_config(dialog, qtable, tablename)
+        if feature_ids:
+            expr = QgsExpression(f"{feature_id_column} IN ({','.join(feature_ids)})")
+            tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+
+        if message:
+            tools_qgis.show_warning(message)
+        set_tablemodel_config(dialog, qtable, tablename)
+
+    finally:
+        class_object.signal_selectionChanged = False
 
 
 def get_cm_user_role():
