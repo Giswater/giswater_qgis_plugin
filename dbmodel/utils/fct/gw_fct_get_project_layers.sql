@@ -6,8 +6,8 @@ or (at your option) any later version.
 */
 
 --FUNCTION CODE: 3030
--- DROP FUNCTION SCHEMA_NAME.gw_fct_debugsql(json);
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_get_project_layers(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_project_layers(p_data json)
   RETURNS json AS
 $BODY$
@@ -181,7 +181,7 @@ BEGIN
 	END IF;
 
 	v_result_info := v_final;
-	
+
 	RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
    		',"body":{"form":{}'||
        		',"data":{"layers":'||v_result_info||' }}'||

@@ -1736,3 +1736,64 @@ UPDATE config_param_system SET value='{"status":true, "values":[
 {"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head=top_elev + pressure_exit FROM ve_node_pr_reduc_valve s "},
 {"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head=top_elev + hmax/2  FROM ve_node_tank s "}]}'
 WHERE parameter = 'epa_automatic_man2graph_values';
+
+
+
+
+
+
+
+
+-- last update
+-- Normalize "label": replace underscores with spaces, trim, ensure only the first letter is uppercase,
+-- and append a colon if missing. Only updates rows needing changes.
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+UPDATE config_form_fields
+SET "label" =
+    UPPER(LEFT(cleaned, 1)) ||
+    SUBSTRING(cleaned FROM 2) ||
+    CASE WHEN RIGHT(cleaned, 1) = ':' THEN '' ELSE ':' END
+FROM (
+    SELECT
+        formname, formtype, columnname, tabname,
+        TRIM(
+            regexp_replace(
+                regexp_replace(replace("label", '_', ' '), '\s+', ' ', 'g'),
+                '\s+$', '', 'g'
+            )
+        ) AS cleaned
+    FROM config_form_fields
+) AS sub
+WHERE config_form_fields.formname   = sub.formname
+  AND config_form_fields.formtype   = sub.formtype
+  AND config_form_fields.columnname = sub.columnname
+  AND config_form_fields.tabname    = sub.tabname
+  AND "label" IS NOT NULL
+  AND (
+        LEFT("label", 1) <> UPPER(LEFT("label", 1))
+     OR RIGHT(sub.cleaned, 1) <> ':'
+  );
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+UPDATE config_param_system
+SET "label" =
+    UPPER(LEFT(cleaned, 1)) ||
+    SUBSTRING(cleaned FROM 2) ||
+    CASE WHEN RIGHT(cleaned, 1) = ':' THEN '' ELSE ':' END
+FROM (
+    SELECT
+        "parameter",
+        TRIM(
+            regexp_replace(
+                regexp_replace(replace("label", '_', ' '), '\s+', ' ', 'g'),
+                '\s+$', '', 'g'
+            )
+        ) AS cleaned
+    FROM config_param_system
+) AS sub
+WHERE config_param_system."parameter" = sub."parameter"
+  AND "label" IS NOT NULL
+  AND (
+        LEFT("label", 1) <> UPPER(LEFT("label", 1))
+     OR RIGHT(sub.cleaned, 1) <> ':'
+  );
