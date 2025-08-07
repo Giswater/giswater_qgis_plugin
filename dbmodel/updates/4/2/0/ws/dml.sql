@@ -1807,6 +1807,3 @@ DELETE FROM config_form_fields WHERE formname ILIKE '%ve_link%' AND formtype='fo
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4338, 'Water balance is not allowed having surpassed the threshold day limiter (parameter om_waterbalance_threshold_days)', null, 0, true, 'utils', 'core', 'AUDIT');
-
-
-DELETE FROM sys_table WHERE id in ('v_inp_pjointpattern', 'v_minsector_graph');

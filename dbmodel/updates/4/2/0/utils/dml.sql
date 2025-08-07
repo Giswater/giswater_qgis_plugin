@@ -281,3 +281,13 @@ UPDATE config_form_fields
 
 
 DELETE FROM sys_table WHERE id ilike 'v_state_%';
+DELETE FROM sys_table WHERE id ilike 'vu_element_x_%';
+
+DELETE FROM sys_table WHERE id in ('v_expl_gully', 'v_man_gully', 'vi_pollutants');
+DELETE FROM sys_table WHERE id in ('v_inp_pjointpattern', 'v_minsector_graph');
+
+DELETE FROM sys_table WHERE id ='v_audit_check_project';
+
+DELETE FROM sys_table WHERE id = 'vcp_pipes';
+
+DELETE FROM sys_table WHERE id in ('vcv_demands', 'vcv_patterns', 'vcv_times', 'v_rtc_period_hydrometer');
