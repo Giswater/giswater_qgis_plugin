@@ -23,6 +23,7 @@ v_result_info json;
 v_result_point json;
 v_error_context text;
 v_version text;
+v_project_type text;
 v_msgerr json;
 v_catfeature record;
 v_cmschema text;
@@ -38,8 +39,8 @@ BEGIN
 	v_cmschema = 'cm';
    	v_parentschema = 'PARENT_SCHEMA';
 
-  	-- select version
-  	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+  	-- select version and project type
+  	SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
   	-- getting input data
   	v_campaign :=  (((p_data ->>'data')::json->>'parameters')::json->>'campaignId')::integer;
@@ -55,8 +56,6 @@ BEGIN
 	join '||v_cmschema||'.om_campaign_review using (reviewclass_id)
 	join '||v_cmschema||'.om_campaign using (campaign_id) 
 	WHERE campaign_id = '||v_campaign||' ORDER BY orderby';
-
-	raise notice 'v_querytext %', v_querytext;
 
 	FOR v_catfeature IN execute v_querytext
 	LOOP
@@ -76,9 +75,8 @@ BEGIN
         'SELECT ' || v_column_list || ' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
         'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
         'USING (' || v_catfeature.column_id || ') ' ||
-        'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
+        		'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
 
-		raise notice 'v_querytext %', v_querytext;
 		execute v_querytext;
 
 	    -- update (action = 2)
@@ -98,10 +96,8 @@ BEGIN
         'WHERE t.' || v_catfeature.column_id || ' = s.' || v_catfeature.column_id ||
         ' AND l.action = 2 AND l.lot_id IN (' ||
             'SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign ||
-        ');';
+                 ');';
 
-
-		raise notice 'v_querytext %', v_querytext;
 		execute v_querytext;
 
 		-- delete (action = 3)
@@ -111,12 +107,20 @@ BEGIN
 		' FROM ' || v_cmschema || '.' || v_catfeature.source_layer ||' s ' ||
         ' JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
         ' USING (' || v_catfeature.column_id || ') ' ||
-        ' WHERE action = 3 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || '));';
+        	 ' WHERE action = 3 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || '));';
 
-		raise notice 'v_querytext %', v_querytext;
 		execute v_querytext;
 
 	END LOOP;
+
+	        -- Check and create missing catalog entries
+        PERFORM cm.gw_fct_cm_check_catalogs(json_build_object('data', json_build_object(
+            'projectType', v_project_type,
+            'version', v_version,
+            'fromProduction', true,
+            'campaign_id', v_campaign::text,
+            'lot_id', null
+        )));
 
 	-- managing results
   	v_result := COALESCE(v_result, '{}');

@@ -57,7 +57,7 @@ BEGIN
         JOIN pg_auth_members m ON r.oid = m.roleid
         JOIN pg_roles u ON u.oid = m.member 
         WHERE u.rolname = current_user AND r.rolname ILIKE '%cm%';
-        
+    EXCEPTION WHEN OTHERS THEN
         v_current_role := NULL;
     END;
     
@@ -240,79 +240,75 @@ BEGIN
         v_campaign_id
     );
     
-    BEGIN
-        FOR v_rec_subtype IN EXECUTE v_querytext
-        LOOP
-            v_subtype := v_rec_subtype.subtype;
-            v_form_name := 'agosto04_ws_' || v_subtype;
+    FOR v_rec_subtype IN EXECUTE v_querytext
+    LOOP
+        v_subtype := v_rec_subtype.subtype;
+        v_form_name := 'agosto04_ws_' || v_subtype;
+        
+        -- Check combinations of node_type, matcat_id, dnom against cat_node for this subtype
+        BEGIN
+            -- First check if the table exists
+            EXECUTE format('SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = %L)', v_form_name) INTO v_view_exists;
             
-            -- Check combinations of node_type, matcat_id, dnom against cat_node for this subtype
-            BEGIN
-                -- First check if the table exists
-                EXECUTE format('SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = %L)', v_form_name) INTO v_view_exists;
-                
-                IF NOT v_view_exists THEN
-                    v_log := v_log || 'WARNING: Table ' || v_form_name || ' does not exist. Skipping catalog check for subtype ' || v_subtype || chr(10);
-                    CONTINUE;
-                END IF;
-                
-                                v_querytext := format(
+            IF NOT v_view_exists THEN
+                v_log := v_log || 'WARNING: Table ' || v_form_name || ' does not exist. Skipping catalog check for subtype ' || v_subtype || chr(10);
+                CONTINUE;
+            END IF;
+            
+            v_querytext := format(
                 'SELECT DISTINCT T1.node_id, T2.node_type, T2.cat_matcat_id, T2.cat_dnom
                  FROM cm.om_campaign_x_node T1
-                 JOIN %I T2 ON T1.node_id::text = T2.node_id::text
+                 JOIN cm.%I T2 ON T1.node_id::text = T2.node_id::text
                  WHERE T2.node_type IS NOT NULL AND T2.cat_matcat_id IS NOT NULL AND T2.cat_dnom IS NOT NULL AND T1.campaign_id = %L',
                 v_form_name, v_campaign_id
             );
+            
+            FOR v_feature_record IN EXECUTE v_querytext
+            LOOP
+                v_feature_id := v_feature_record.node_id;
+                v_combination_key := v_feature_record.node_type || '|' || v_feature_record.cat_matcat_id || '|' || v_feature_record.cat_dnom;
                 
-                FOR v_feature_record IN EXECUTE v_querytext
-                LOOP
-                    v_feature_id := v_feature_record.node_id;
-                    v_combination_key := v_feature_record.node_type || '|' || v_feature_record.cat_matcat_id || '|' || v_feature_record.cat_dnom;
-                    
-                    -- Skip if already processed
-                    IF v_combination_key = ANY(v_processed_combinations) THEN
-                        CONTINUE;
-                    END IF;
-                    
-                    SELECT COUNT(*) INTO v_count
-                    FROM PARENT_SCHEMA.cat_node 
-                    WHERE node_type = v_feature_record.node_type 
-                      AND matcat_id = v_feature_record.cat_matcat_id 
-                      AND dnom = v_feature_record.cat_dnom;
-                    
-                    IF v_count = 0 THEN
-                        IF v_from_production THEN
-                            -- Create new catalog entry in production
-                            v_new_catalog_id := v_feature_record.cat_matcat_id || '_' || v_feature_record.cat_dnom || '_' || v_feature_record.node_type;
-                            INSERT INTO PARENT_SCHEMA.cat_node (id, node_type, matcat_id, dnom, descript)
-                            VALUES (v_new_catalog_id, v_feature_record.node_type, v_feature_record.cat_matcat_id, v_feature_record.cat_dnom, 
-                                   'Auto-generated catalog entry for ' || v_subtype || ' - ' || v_feature_record.cat_matcat_id || ' ' || v_feature_record.cat_dnom || ' ' || v_feature_record.node_type)
-                            ON CONFLICT (id) DO NOTHING;
-                            
-                            v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
-                                     ') - Created new catalog entry with ID: ' || v_new_catalog_id || chr(10);
-                        ELSE
-                            v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
-                                     ') - A new catalog entry will be created when added to production. ' ||
-                                     'Combination: node_type=' || v_feature_record.node_type || 
-                                     ', matcat_id=' || v_feature_record.cat_matcat_id || 
-                                     ', dnom=' || v_feature_record.cat_dnom || chr(10);
-                        END IF;
+                -- Skip if already processed
+                IF v_combination_key = ANY(v_processed_combinations) THEN
+                    CONTINUE;
+                END IF;
+                
+                SELECT COUNT(*) INTO v_count
+                FROM PARENT_SCHEMA.cat_node 
+                WHERE node_type = v_feature_record.node_type 
+                  AND matcat_id = v_feature_record.cat_matcat_id 
+                  AND dnom = v_feature_record.cat_dnom;
+                
+                IF v_count = 0 THEN
+                    IF v_from_production THEN
+                        -- Create new catalog entry in production
+                        v_new_catalog_id := v_feature_record.cat_matcat_id || '_' || v_feature_record.cat_dnom || '_' || v_feature_record.node_type;
+                        INSERT INTO PARENT_SCHEMA.cat_node (id, node_type, matcat_id, dnom, descript)
+                        VALUES (v_new_catalog_id, v_feature_record.node_type, v_feature_record.cat_matcat_id, v_feature_record.cat_dnom, 
+                               'Auto-generated catalog entry for ' || v_subtype || ' - ' || v_feature_record.cat_matcat_id || ' ' || v_feature_record.cat_dnom || ' ' || v_feature_record.node_type)
+                        ON CONFLICT (id) DO NOTHING;
                         
-                        -- Add to processed combinations
-                        v_processed_combinations := array_append(v_processed_combinations, v_combination_key);
+                        v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
+                                 ') - Created new catalog entry with ID: ' || v_new_catalog_id || chr(10);
                     ELSE
                         v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
-                                 ') - No catalog creation needed. Catalog entry exists.' || chr(10);
+                                 ') - A new catalog entry will be created when added to production. ' ||
+                                 'Combination: node_type=' || v_feature_record.node_type || 
+                                 ', matcat_id=' || v_feature_record.cat_matcat_id || 
+                                 ', dnom=' || v_feature_record.cat_dnom || chr(10);
                     END IF;
-                END LOOP;
-            EXCEPTION WHEN OTHERS THEN
-                v_log := v_log || 'WARNING: Could not process node subtype ' || v_subtype || ' - ' || SQLERRM || chr(10);
-            END;
-        END LOOP;
-    EXCEPTION WHEN OTHERS THEN
-        v_log := v_log || 'ERROR: Failed to execute node query - ' || SQLERRM || chr(10);
-    END;
+                    
+                    -- Add to processed combinations
+                    v_processed_combinations := array_append(v_processed_combinations, v_combination_key);
+                ELSE
+                    v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
+                             ') - No catalog creation needed. Catalog entry exists.' || chr(10);
+                END IF;
+            END LOOP;
+        EXCEPTION WHEN OTHERS THEN
+            v_log := v_log || 'WARNING: Could not process node subtype ' || v_subtype || ' - ' || SQLERRM || chr(10);
+        END;
+    END LOOP;
     
     -- Get distinct node subtypes from lot
     v_querytext := format(
