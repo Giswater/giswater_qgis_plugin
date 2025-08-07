@@ -257,7 +257,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 UPDATE sys_param_user SET formname = 'dynamic'  WHERE id = 'edit_state_vdefault';
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4336, 'It''s not possible to set this psector to active because it has topological inconsistencies.', 'Fix topological errors first.', 2, true, 'utils', 'core', 'UI');
 
 -- 06/08/2025

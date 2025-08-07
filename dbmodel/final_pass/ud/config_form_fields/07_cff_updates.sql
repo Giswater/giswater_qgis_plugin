@@ -77,3 +77,9 @@ WHERE config_param_system."parameter" = sub."parameter"
         LEFT("label", 1) <> UPPER(LEFT("label", 1))
      OR RIGHT(sub.cleaned, 1) <> ':'
   );
+
+UPDATE config_form_fields SET widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}'::json WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+
+UPDATE config_form_fields SET "datatype"='string', widgettype='combo', ismandatory=true, iseditable=true, dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type''', dv_isnullvalue=true WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+
+DELETE FROM config_form_fields WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='n_hydrometer' AND tabname='tab_none';
