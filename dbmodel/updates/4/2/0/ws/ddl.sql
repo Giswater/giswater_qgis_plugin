@@ -115,3 +115,6 @@ CREATE TABLE inp_dscenario_frpump (
 	CONSTRAINT inp_dscenario_frpump_element_id_fkey FOREIGN KEY (element_id) REFERENCES inp_frpump(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT inp_dscenario_frpump_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"flow_units", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"quality_units", "dataType":"text"}}$$);
