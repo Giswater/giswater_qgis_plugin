@@ -265,3 +265,16 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3500, 'gw_trg_cm_topocontrol_arc', 'utils', 'trigger', 'trigger', 'trigger', 'Trigger function that automatically connects campaign arc endpoints to the nearest nodes. Validates topology rules, snaps geometry to node coordinates, and sets proper node_1/node_2 connections while prioritizing division nodes.', NULL, NULL, 'core', NULL);
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3502, 'gw_fct_admin_manage_role_cm', 'utils', 'function', 'json', 'json', 'Synchronizes users with CM roles to the cat_user table. Automatically finds users that have role_cm permissions but are not yet in the cat_user catalog, and inserts them with proper team assignments.', NULL, NULL, 'core', NULL);
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3504, 'gw_fct_cm_check_catalogs', 'utils', 'function', 'json', 'json', 'Validates catalog combinations for campaign and lot features. Checks if arc and node feature combinations exist in cat_arc and cat_node tables, identifies missing catalog entries, and reports which combinations will need new catalog creation when added to production.', NULL, NULL, 'core', NULL);
+
+
+-- 07/08/2025
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "delete_manager_item",
+  "parameters": {
+    "sourcetable": "v_ui_element",
+    "targetwidget": "tab_none_tbl_element",
+    "field_object_id": "element_id"
+  }
+}'::json
+	WHERE formname='element_manager' AND formtype='form_element' AND columnname='delete' AND tabname='tab_none';
