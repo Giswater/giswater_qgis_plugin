@@ -80,6 +80,21 @@ def _get_geom_type(geometry_type: QgsGeometryType = None):
     return geom_type
 
 
+def normalize_label(label: str, add_colon: bool = False) -> str:
+    """ Normalize label: replace underscores with spaces, trim, ensure only the first letter is uppercase,
+    and append a colon if missing. """
+
+    normalized = label.replace('_', ' ').strip()
+
+    if normalized:
+        normalized = normalized[0].upper() + normalized[1:]
+
+    if add_colon and not normalized.endswith(':'):
+        normalized += ':'
+
+    return normalized
+
+
 def load_settings(dialog, plugin='core'):
     """ Load user UI settings related with dialog position and size """
 
@@ -1064,6 +1079,9 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
         # Get column index
         field_index = layer.fields().indexFromName(field['columnname'])
 
+        if field_index == -1:
+            continue
+
         # Hide selected fields according table config_form_fields.hidden
         if 'hidden' in field:
             config = layer.attributeTableConfig()
@@ -1184,6 +1202,11 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
             else:
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+    for field in layer.fields():
+        if field.name() not in [field_json['columnname'] for field_json in json_result['body']['data']['fields']]:
+            field_index = layer.fields().indexFromName(field.name())
+            layer.setFieldAlias(field_index, normalize_label(field.name(), add_colon=True))
 
 
 def load_missing_layers(filter, group="GW Layers", sub_group=None):
@@ -4538,33 +4561,33 @@ def manage_current_psector_docker(psector_name=None):
     """
     if not isinstance(psector_name, (str, type(None))):
         return
-    
+
     # Configuration
     title = "Current psector"
     icon_size = 12
     if psector_name is None:
         psector_name = ""
-    
+
     # Determine icon path based on psector_name
     icon_filename = "140.png" if psector_name else "138.png"
     icon_path = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}{icon_filename}"
-    
+
     # Get or create dock widget
     dock_widget = lib_vars.session_vars['current_psector']
     if dock_widget is None:
         dock_widget = QDockWidget()
         dock_widget.setWindowTitle(title)
-        lib_vars.session_vars['current_psector'] = dock_widget 
+        lib_vars.session_vars['current_psector'] = dock_widget
         global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, dock_widget)
-    
+
     # Update dock widget content and title
     dock_widget.setWindowTitle(title)
-    
+
     # Create content widget with horizontal layout
     content_widget = QWidget()
     layout = QHBoxLayout()
     content_widget.setLayout(layout)
-    
+
     # Add icon if file exists
     if os.path.exists(icon_path):
         icon_label = QLabel()
@@ -4572,15 +4595,15 @@ def manage_current_psector_docker(psector_name=None):
         if not pixmap.isNull():
             icon_label.setPixmap(pixmap)
         layout.addWidget(icon_label)
-    
+
     # Add text label
     text_label = QLabel(psector_name)
     layout.addWidget(text_label)
     layout.addStretch()
-    
+
     # Set widget and show
     dock_widget.setWidget(content_widget)
-    
+
     # Show dock widget if not already visible
     if not dock_widget.isVisible():
         dock_widget.show()
@@ -5971,31 +5994,31 @@ def _update_toolbar_button_icon(button_id, toolbar_id, file_name):
     Update the icon for a specific toolbar button
     """
     try:
-        
+
         # Access the button through global_vars
         if not global_vars.load_project or not hasattr(global_vars.load_project, 'buttons'):
             return False
-            
+
         # Try both string and integer keys
         button = global_vars.load_project.buttons.get(str(button_id)) or global_vars.load_project.buttons.get(int(button_id))
         if not button or not hasattr(button, 'action'):
             return False
-        
+
         # Define icon paths
         icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}{toolbar_id}{os.sep}"
         icon_path = f"{icon_folder}{file_name}"
-        
+
         # Update the button icon
         if os.path.exists(icon_path):
             new_icon = QIcon(icon_path)
             button.action.setIcon(new_icon)
             return True
-            
+
     except Exception as e:
         # Log the error but don't break the functionality
         tools_log.log_info(f"Error updating button {button_id} icon: {str(e)}")
         return False
-    
+
     return False
 
 
