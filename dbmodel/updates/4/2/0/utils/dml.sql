@@ -292,3 +292,33 @@ DELETE FROM sys_table WHERE id = 'vcp_pipes';
 DELETE FROM sys_table WHERE id = 'v_polygon';
 
 DELETE FROM sys_table WHERE id in ('vcv_demands', 'vcv_patterns', 'vcv_times', 'v_rtc_period_hydrometer');
+
+UPDATE sys_fprocess SET query_text='with q_arc as (
+WITH v_state_arc AS (
+SELECT arc_id FROM selector_state, arc
+WHERE arc.state = selector_state.state_id AND selector_state.cur_user = CURRENT_USER
+)
+select * from arc JOIN v_state_arc USING (arc_id))
+SELECT b.* FROM (
+WITH v_state_node AS (SELECT node_id FROM selector_state, node
+WHERE node.state = selector_state.state_id AND selector_state.cur_user = CURRENT_USER)
+SELECT n1.node_id, n1.nodecat_id, n1.sector_id, n1.expl_id, n1.state, n1.the_geom  FROM q_arc, 
+(select * from node JOIN v_state_node USING (node_id)) n1 
+JOIN (SELECT node_1 node_id from q_arc UNION 
+select node_2 FROM q_arc) b USING (node_id) 
+WHERE st_dwithin(q_arc.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN 
+(node_1, node_2)
+)b, selector_expl e 
+where e.expl_id= b.expl_id AND cur_user=current_user' WHERE fid=432; -- t-candidates
+
+
+UPDATE sys_fprocess SET query_text='SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, the_geom FROM (
+	WITH v_state_arc AS (
+         SELECT arc_id FROM selector_state, arc
+          WHERE arc.state = selector_state.state_id AND selector_state.cur_user = CURRENT_USER
+          ), q_arc AS (SELECT * FROM arc JOIN v_state_arc using (arc_id)) 
+ SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux,
+ t2.state as state2, t1.node_1, t1.node_2, t1.expl_id, t1.the_geom 
+ FROM q_arc AS t1 JOIN q_arc AS t2 USING(the_geom) JOIN arc v ON t1.arc_id = v.arc_id
+ WHERE t1.arc_id != t2.arc_id ORDER BY t1.arc_id )a
+ where a.state1 > 0 AND a.state2 > 0' WHERE fid=479; -- arcs dupl
