@@ -4241,16 +4241,30 @@ def remove_frelem_from_dscenario(**kwargs):
         return
 
     columnfind = func_params.get('columnfind')
-    index = selected_list[0]
-    row = index.row()
-    where_clause = ""
-    for column in columnfind:
-        column_index = tools_qt.get_col_index_by_col_name(qtable, column)
-        data = index.sibling(row, column_index).data()
-        where_clause += f"{column} = '{data}' AND "
-    where_clause = where_clause[:-4]
-    sql = f"DELETE FROM ve_inp_dscenario_fr{frelem_name} WHERE {where_clause}"
-    tools_db.execute_sql(sql)
+    where_clauses = []
+    values = []
+    for index in selected_list:
+        row = index.row()
+        where_clause = ""
+        value = {}
+        for column in columnfind:
+            column_index = tools_qt.get_col_index_by_col_name(qtable, column)
+            data = index.sibling(row, column_index).data()
+            where_clause += f"{column} = '{data}' AND "
+            value[column] = data
+        where_clause = where_clause[:-4]
+        where_clauses.append(where_clause)
+        values.append(value)
+
+    msg = "Are you sure you want to delete these records?"
+    title = "Delete records"
+    answer = tools_qt.show_question(msg, title, values, force_action=True)
+    if not answer:
+        return
+
+    for where_clause in where_clauses:
+        sql = f"DELETE FROM ve_inp_dscenario_fr{frelem_name} WHERE {where_clause}"
+        tools_db.execute_sql(sql)
     _reload_table(**kwargs)
 
 
