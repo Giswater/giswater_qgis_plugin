@@ -143,9 +143,12 @@ class GwImportSwmm:
         self.dlg_config.rejected.connect(
             partial(tools_gw.save_settings, self.dlg_config)
         )
+        self.dlg_config.rejected.connect(self._cleanup_signals)
         self.dlg_config.btn_reload.clicked.connect(self._fill_combo_boxes)
         self.dlg_config.btn_cancel.clicked.connect(self.dlg_config.reject)
         self.dlg_config.btn_accept.clicked.connect(self._importinp_accept)
+        self.dlg_config.btn_accept.clicked.connect(self._cleanup_signals)
+        self.dlg_config.chk_psector.stateChanged.connect(self._manage_psector)
 
         # Get catalogs from thread
         self.catalogs: parse_swmm_task.Catalogs = self.parse_inp_task.catalogs
@@ -158,6 +161,62 @@ class GwImportSwmm:
         self._manage_widgets_visibility()
 
         tools_gw.open_dialog(self.dlg_config, dlg_name="inp_config_import")
+
+    def _manage_psector(self):
+        """ Manage the psector checkbox and the workcat and exploitation combo """
+        checked = tools_qt.is_checked(self.dlg_config, "chk_psector")
+        if checked:
+            # Check if there is a current psector
+            result = tools_gw.get_config_value('plan_psector_current')
+            if result is None or result[0] is None:
+                msg = "No psector selected"
+                tools_qgis.show_message(msg, dialog=self.dlg_config)
+                self.dlg_config.chk_psector.click()
+                return
+            # Get psector values
+            psector_id = result[0]
+            sql = "SELECT name, workcat_id, expl_id FROM v_ui_plan_psector WHERE psector_id = %s"
+            row = tools_db.get_row(sql, params=(psector_id,))
+            if row is None:
+                msg = "Error getting current psector"
+                tools_qgis.show_message(msg)
+                return
+            psector_name = row['name']
+            workcat_id = row['workcat_id']
+            exploitation_id = row['expl_id']
+            sql = "SELECT name FROM exploitation WHERE expl_id = %s"
+            row = tools_db.get_row(sql, params=(exploitation_id,))
+            if row is None:
+                msg = "Error getting exploitation"
+                tools_qgis.show_message(msg)
+                return
+            exploitation_name = row['name']
+            # Set text
+            self.dlg_config.chk_psector.setText(psector_name)
+            tools_qt.set_widget_text(self.dlg_config, "txt_workcat", workcat_id)
+            tools_qt.set_combo_value(self.dlg_config.cmb_expl, exploitation_name, 1, add_new=True)
+            # Disable workcat and exploitation combo
+            tools_qt.set_widget_enabled(self.dlg_config, "txt_workcat", False)
+            tools_qt.set_widget_enabled(self.dlg_config, "cmb_expl", False)
+        else:
+            # Enable workcat and exploitation combo
+            tools_qt.set_widget_enabled(self.dlg_config, "txt_workcat", True)
+            tools_qt.set_widget_enabled(self.dlg_config, "cmb_expl", True)
+
+            # Clear workcat and exploitation combo
+            tools_qt.set_widget_text(self.dlg_config, "txt_workcat", "")
+            self.dlg_config.cmb_expl.clear()
+
+            # Populate workcat combo
+            expl_value: str = self.dlg_config.cmb_expl.currentText()
+            rows = tools_db.get_rows("""
+                SELECT expl_id, name
+                FROM exploitation
+                WHERE expl_id > 0
+            """)
+            self.dlg_config.cmb_expl.clear()
+            tools_qt.fill_combo_values(self.dlg_config.cmb_expl, rows, add_empty=False, selected_id=expl_value, index_to_compare=1)
+            self.dlg_config.chk_psector.setText("")
 
     def _manage_widgets_visibility(self):
         # Hide 'Demand dscenario' widget for UD
@@ -198,10 +257,15 @@ class GwImportSwmm:
                 'DELETE FROM inp_dwf CASCADE;',
                 'DELETE FROM connec CASCADE;',
                 'DELETE FROM node CASCADE;',
+                'DELETE FROM element_x_gully CASCADE;',
                 'DELETE FROM gully CASCADE;',
                 'DELETE FROM inp_subcatchment CASCADE;',
                 'DELETE FROM raingage CASCADE;',
                 'DELETE FROM inp_conduit CASCADE;',
+                'DELETE FROM inp_frpump CASCADE;',
+                'DELETE FROM inp_frorifice CASCADE;',
+                'DELETE FROM inp_frweir CASCADE;',
+                'DELETE FROM inp_froutlet CASCADE;',
                 'DELETE FROM inp_pump CASCADE;',
                 'DELETE FROM inp_orifice CASCADE;',
                 'DELETE FROM inp_outlet CASCADE;',
@@ -216,15 +280,17 @@ class GwImportSwmm:
                 'DELETE FROM inp_controls CASCADE;',
                 'DELETE FROM inp_files CASCADE;',
                 'DELETE FROM arc CASCADE;',
-                "DELETE FROM cat_work WHERE id = 'import_inp_test';",
+                # "DELETE FROM cat_work WHERE id = 'import_inp_test';",
                 "DELETE FROM cat_dscenario WHERE expl_id = 1;",
                 "DELETE FROM cat_arc CASCADE;"
                 "DELETE FROM cat_material CASCADE;",
+                "DELETE FROM ext_address CASCADE;",
+                "DELETE FROM ext_streetaxis CASCADE;",
                 # "DELETE FROM sector WHERE sector_id = 1;",
                 # "DELETE FROM ext_municipality WHERE muni_id = 1;",
-                "DELETE FROM exploitation WHERE expl_id = 1;",
+                # "DELETE FROM exploitation WHERE expl_id = 1;",
                 "INSERT INTO cat_material (id, descript, feature_type, n) VALUES ('PVC', 'PVC', '{ARC}', 0.011), ('Brick', 'Brick', '{ARC}', 0.014);",
-                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
                 # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
                 # "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
             ]
@@ -299,6 +365,8 @@ class GwImportSwmm:
                 municipality,
                 raingage,
                 catalogs,
+                2,  # state
+                3,  # state_type
                 manage_flwreg=manage_flwreg,
                 force_commit=force_commit
             )
@@ -320,7 +388,7 @@ class GwImportSwmm:
             return
 
         # Get the configuration values from the dialog
-        workcat, exploitation, sector, municipality, raingage, _ = self._get_config_values()
+        workcat, exploitation, sector, municipality, raingage, _, psector = self._get_config_values()
 
         # Workcat
         if workcat == "":
@@ -330,7 +398,7 @@ class GwImportSwmm:
 
         sql: str = "SELECT id FROM cat_work WHERE id = %s"
         row = tools_db.get_row(sql, params=(workcat,))
-        if row is not None:
+        if row is not None and not psector:
             msg = 'The Workcat_id "{0}" is already in use. Please enter a different ID.'
             msg_params = (workcat,)
             tools_qt.show_info_box(msg, msg_params=msg_params)
@@ -398,10 +466,18 @@ class GwImportSwmm:
                 )
 
         # Save options to the configuration file
-        save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, raingage=raingage, catalogs=catalogs)
+        save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, raingage=raingage, catalogs=catalogs, psector=psector)
 
         # Show tab log
         self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count() - 1)
+
+        # Set state and state_type
+        if psector:
+            state = 2
+            state_type = 3
+        else:
+            state = 1
+            state_type = 2
 
         # Set background task 'Import INP'
         description = "Import INP"
@@ -415,6 +491,8 @@ class GwImportSwmm:
             municipality,
             raingage,
             catalogs,
+            state,
+            state_type,
             manage_flwreg=manage_flwreg,
             force_commit=force_commit
         )
@@ -710,10 +788,10 @@ class GwImportSwmm:
             "dividers": ("NODE", ("MANHOLE",)),
             "storage": ("NODE", ("STORAGE",)),
             "conduits": ("ARC", ("CONDUIT",)),
-            "pumps": (("ARC", "FLWREG"), ("VARC", "FRPUMP")),
-            "orifices": (("ARC", "FLWREG"), ("VARC", "FRORIFICE")),
-            "weirs": (("ARC", "FLWREG"), ("VARC", "FRWEIR")),
-            "outlets": (("ARC", "FLWREG"), ("VARC", "FROUTLET")),
+            "pumps": (("ARC"), ("ELEMENT", "FRELEM")),
+            "orifices": (("ARC"), ("ELEMENT", "FRELEM")),
+            "weirs": (("ARC"), ("ELEMENT", "FRELEM")),
+            "outlets": (("ARC"), ("ELEMENT", "FRELEM")),
         }
         for element_type, (combo,) in self.tbl_elements["features"].items():
             system_catalog = [
@@ -791,7 +869,12 @@ class GwImportSwmm:
         if tag is None:
             return
 
-        # Remove existing row for the element
+        # Remove existing row for the element in the current table
+        for row in range(tbl.rowCount()):
+            if tbl.item(row, 0) and tbl.item(row, 0).text() == tag:
+                tbl.removeRow(row)
+                break
+        # Remove existing row for the element in the other table
         for row in range(other_tbl.rowCount()):
             if other_tbl.item(row, 0) and other_tbl.item(row, 0).text() == tag:
                 other_tbl.removeRow(row)
@@ -837,11 +920,12 @@ class GwImportSwmm:
         self._fill_combo_boxes()
 
     def _get_config_values(self):
-        workcat = tools_qt.get_text(self.dlg_config, "txt_workcat")
+        workcat = tools_qt.get_text(self.dlg_config, "txt_workcat", return_string_null=False)
         exploitation = tools_qt.get_combo_value(self.dlg_config, "cmb_expl")
         sector = tools_qt.get_combo_value(self.dlg_config, "cmb_sector")
         municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
-        raingage = tools_qt.get_text(self.dlg_config, "txt_raingage")
+        raingage = tools_qt.get_text(self.dlg_config, "txt_raingage", return_string_null=False)
+        psector = tools_qt.is_checked(self.dlg_config, "chk_psector")
 
         # Tables (Arcs and Nodes)
         catalogs = {"conduits": {}, "materials": {}, "features": {}}
@@ -861,6 +945,11 @@ class GwImportSwmm:
 
                 if combo_value == "":
                     continue
+                if combo_value == CREATE_NEW:
+                    new_name = _input[element][1].text().strip()
+                    if new_name == "":
+                        continue
+                    combo_value = new_name
 
                 new_catalog = None
 
@@ -868,14 +957,16 @@ class GwImportSwmm:
                     new_catalog_cell = _input[element][1]
                     new_catalog = new_catalog_cell.text().strip()
 
-                    if combo_value == CREATE_NEW and new_catalog == "":
-                        continue
+                    if combo_value == CREATE_NEW:
+                        if new_catalog == "":
+                            continue
+                        combo_value = new_catalog
 
                 result[element] = (
                     new_catalog if combo_value == CREATE_NEW else combo_value
                 )
 
-        return workcat, exploitation, sector, municipality, raingage, catalogs
+        return workcat, exploitation, sector, municipality, raingage, catalogs, psector
 
     def _toggle_enabled_new_catalog_field(
         self, field: QTableWidgetItem, text: str
@@ -955,3 +1046,11 @@ class GwImportSwmm:
         # Scroll to the bottom
         scrollbar = txt_infolog.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
+
+    def _cleanup_signals(self):
+        """Cleanup all import_inp signals when dialog closes"""
+        try:
+            # Disconnect all import_inp section signals
+            tools_gw.disconnect_signal('import_inp')
+        except Exception:
+            pass
