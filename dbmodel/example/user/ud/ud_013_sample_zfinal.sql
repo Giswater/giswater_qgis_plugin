@@ -179,3 +179,5 @@ INSERT INTO inp_frorifice (element_id, orifice_type, offsetval, cd, orate, flap,
 INSERT INTO inp_frpump (element_id, curve_id, status, startup, shutoff) VALUES ('100022', 'PUMP-02', 'ON', 2, 0.4);
 
 INSERT INTO element_x_node SELECT element_id, node_id from man_frelem;
+
+update plan_psector set active=true;

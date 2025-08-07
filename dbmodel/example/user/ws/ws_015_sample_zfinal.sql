@@ -151,3 +151,5 @@ FROM element e
 JOIN cat_element ce ON ce.id::text = e.elementcat_id::text
 LEFT JOIN cat_feature cf ON ce.element_type::text = cf.id::text
 WHERE cf.feature_class='GENELEM';
+
+update plan_psector set active=true;
