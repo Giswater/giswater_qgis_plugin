@@ -16,7 +16,7 @@ SELECT * FROM no_plan();
 --check if table exists
 SELECT has_table('config_form_fields'::name, 'Table config_form_fields should exist');
 
--- check columns names 
+-- check columns names
 
 
 SELECT columns_are(
@@ -24,7 +24,7 @@ SELECT columns_are(
     ARRAY[
       'formname', 'formtype', 'tabname', 'columnname', 'layoutname', 'layoutorder', 'datatype', 'widgettype', 'label', 'tooltip', 'placeholder',
       'ismandatory', 'isparent', 'iseditable', 'isautoupdate', 'isfilter', 'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc',
-      'stylesheet', 'widgetcontrols', 'widgetfunction', 'linkedobject', 'hidden', 'web_layoutorder'
+      'stylesheet', 'widgetcontrols', 'widgetfunction', 'linkedobject', 'hidden', 'web_layoutorder', 'field_layoutorder'
     ],
     'Table config_form_fields should have the correct columns'
 );
@@ -56,6 +56,7 @@ SELECT col_type_is('config_form_fields', 'widgetfunction', 'json', 'Column widge
 SELECT col_type_is('config_form_fields', 'linkedobject', 'text', 'Column linkedobject should be text');
 SELECT col_type_is('config_form_fields', 'hidden', 'bool', 'Column hidden should be bool DEFAULT false');
 SELECT col_type_is('config_form_fields', 'web_layoutorder', 'int4', 'Column web_layoutorder should be int4');
+SELECT col_type_is('config_form_fields', 'field_layoutorder', 'int4', 'Column field_layoutorder should be int4');
 
 --check default values
 
@@ -65,11 +66,11 @@ SELECT col_type_is('config_form_fields', 'web_layoutorder', 'int4', 'Column web_
 -- check indexes
 SELECT has_index('config_form_fields', 'config_form_fields_pkey', ARRAY['formname', 'formtype', 'columnname', 'tabname'], 'Table config_form_fields should have index on formname, formtype, columnname and tabname');
 
---check trigger 
+--check trigger
 SELECT has_trigger('config_form_fields', 'gw_trg_config_control', 'Table config_form_fields should have trigger gw_trg_config_control');
 SELECT has_trigger('config_form_fields', 'gw_trg_typevalue_fk_insert', 'Table config_form_fields should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('config_form_fields', 'gw_trg_typevalue_fk_update', 'Table config_form_fields should have trigger gw_trg_typevalue_fk_update');
---check rule 
+--check rule
 
 SELECT * FROM finish();
 

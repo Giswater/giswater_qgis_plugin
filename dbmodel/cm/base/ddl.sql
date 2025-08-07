@@ -139,6 +139,7 @@ CREATE TABLE config_form_fields (
 	linkedobject text NULL,
 	hidden bool DEFAULT false NOT NULL,
 	web_layoutorder int4 NULL,
+	field_layoutorder int4 NULL,
 	CONSTRAINT config_form_fields_pkey PRIMARY KEY (formname, formtype, columnname, tabname)
 );
 
