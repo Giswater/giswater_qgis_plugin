@@ -17,6 +17,7 @@ DROP VIEW IF EXISTS v_expl_connec;
 DROP VIEW IF EXISTS v_audit_check_project;
 DROP VIEW IF EXISTS vcv_times;
 DROP VIEW IF EXISTS vcv_emitters;
+DROP VIEW IF EXISTS v_polygon;
 
 
 CREATE OR REPLACE VIEW ve_frelem
