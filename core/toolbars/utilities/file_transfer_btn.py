@@ -66,7 +66,7 @@ class GwFileTransferButton(GwAction):
         ag = QActionGroup(self.iface.mainWindow())
 
         import_menu = self.menu.addMenu(tools_qt.tr("Import"))
-        export_menu = self.menu.addMenu(tools_qt.tr("Export")) # noqa: F841
+        export_menu = self.menu.addMenu(tools_qt.tr("Export"))  # noqa: F841
 
         # Define menu actions
         menu_actions = [
