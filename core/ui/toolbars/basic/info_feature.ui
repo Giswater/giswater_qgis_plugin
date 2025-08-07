@@ -30,6 +30,13 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="btn_accept">
+        <property name="text">
+         <string>Accept</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -42,13 +49,6 @@
          </size>
         </property>
        </spacer>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="btn_accept">
-        <property name="text">
-         <string>Accept</string>
-        </property>
-       </widget>
       </item>
       <item row="0" column="3">
        <widget class="QPushButton" name="btn_apply">
@@ -190,7 +190,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
+             <width>83</width>
              <height>36</height>
             </rect>
            </property>
@@ -218,81 +218,90 @@
         <string>Elements</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="4" column="0">
-         <layout class="QGridLayout" name="lyt_element_dscenario_2">
-          <item row="0" column="0">
-           <widget class="QTabWidget" name="tab_frelem_dscenario">
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <widget class="QWidget" name="tab_orifice">
-             <attribute name="title">
-              <string>Orifice</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_22">
-              <item row="0" column="0">
-               <layout class="QGridLayout" name="lyt_elem_dsc_orifice"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="tab_outlet">
-             <attribute name="title">
-              <string>Outlet</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_25">
-              <item row="0" column="0">
-               <layout class="QGridLayout" name="lyt_elem_dsc_outlet"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="tab_pump">
-             <attribute name="title">
-              <string>Pump</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_26">
-              <item row="0" column="0">
-               <layout class="QGridLayout" name="lyt_elem_dsc_pump"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="tab_weir">
-             <attribute name="title">
-              <string>Weir</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_27">
-              <item row="0" column="0">
-               <layout class="QGridLayout" name="lyt_elem_dsc_weir"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="tab_valve">
-             <attribute name="title">
-              <string>Valve</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_28">
-              <item row="0" column="0">
-               <layout class="QGridLayout" name="lyt_elem_dsc_valve"/>
-              </item>
-             </layout>
-            </widget>
-           </widget>
-          </item>
-         </layout>
+        <item row="3" column="0">
+         <widget class="QgsCollapsibleGroupBox" name="grb_frelem_dscenario">
+          <property name="title">
+           <string>Dscenario</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_13">
+           <item row="1" column="0">
+            <layout class="QGridLayout" name="lyt_element_dscenario_2">
+             <item row="0" column="0">
+              <widget class="QTabWidget" name="tab_frelem_dscenario">
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <widget class="QWidget" name="tab_orifice">
+                <attribute name="title">
+                 <string>Orifice</string>
+                </attribute>
+                <layout class="QGridLayout" name="gridLayout_22">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="lyt_elem_dsc_orifice"/>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="tab_outlet">
+                <attribute name="title">
+                 <string>Outlet</string>
+                </attribute>
+                <layout class="QGridLayout" name="gridLayout_25">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="lyt_elem_dsc_outlet"/>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="tab_pump">
+                <attribute name="title">
+                 <string>Pump</string>
+                </attribute>
+                <layout class="QGridLayout" name="gridLayout_26">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="lyt_elem_dsc_pump"/>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="tab_weir">
+                <attribute name="title">
+                 <string>Weir</string>
+                </attribute>
+                <layout class="QGridLayout" name="gridLayout_27">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="lyt_elem_dsc_weir"/>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="tab_valve">
+                <attribute name="title">
+                 <string>Valve</string>
+                </attribute>
+                <layout class="QGridLayout" name="gridLayout_28">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="lyt_elem_dsc_valve"/>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="0">
+            <layout class="QGridLayout" name="lyt_element_dscenario_1"/>
+           </item>
+           <item row="2" column="0">
+            <layout class="QGridLayout" name="lyt_element_dscenario_3"/>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item row="0" column="0">
          <layout class="QGridLayout" name="lyt_element_1"/>
         </item>
-        <item row="5" column="0">
-         <layout class="QGridLayout" name="lyt_element_dscenario_3"/>
-        </item>
-        <item row="1" column="0">
-         <layout class="QGridLayout" name="lyt_element_2"/>
-        </item>
         <item row="2" column="0">
          <layout class="QGridLayout" name="lyt_element_3"/>
         </item>
-        <item row="3" column="0">
-         <layout class="QGridLayout" name="lyt_element_dscenario_1"/>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="lyt_element_2"/>
         </item>
        </layout>
       </widget>
@@ -732,6 +741,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>qgscollapsiblegroupbox.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>tab_main</tabstop>
  </tabstops>

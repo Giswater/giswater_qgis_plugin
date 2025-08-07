@@ -11,6 +11,7 @@ import re
 import urllib.parse as parse
 import webbrowser
 import traceback
+from typing import Union
 from functools import partial
 from qgis.core import QgsEditFormConfig
 
@@ -21,7 +22,7 @@ from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel, QCursor
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, \
-    QMenu, QToolButton
+    QMenu, QToolButton, QTableWidget, QDialog
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
     QgsPointXY, QgsProject, QgsFeature, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
@@ -43,7 +44,7 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
 from ..ui.ui_manager import GwInfoEpaUi  # noqa: F401
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
-from ...libs.tools_qt import GwHyperLinkLineEdit
+from ...libs.tools_qt import GwHyperLinkLineEdit, GwEditDialog
 from .audit import GwAudit
 
 global is_inserting  # noqa: F824
@@ -4154,6 +4155,104 @@ def manage_element(element_id, **kwargs):
     # If we are creating a new element
     else:
         elem.dlg_add_element.btn_accept.clicked.connect(partial(_manage_element_new, elem, **kwargs))
+
+
+def add_frelem_to_dscenario(**kwargs):
+    """ Add frelem to dscenario """
+    class_obj = kwargs['class']
+    dialog = kwargs['dialog']
+    func_params = kwargs['func_params']
+    # Get element_id from tbl_elements
+    qtable: Union[QTableView, QTableWidget, None] = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params['sourcewidget']}")
+    if qtable is None:
+        return
+
+    node_id = class_obj.feature_id
+
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message, dialog=dialog)
+        return
+
+    index = selected_list[0]
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+    element_id = index.sibling(row, column_index).data()
+
+    # Check if is frelem
+    column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_class')
+    feature_class = index.sibling(row, column_index).data()
+    if feature_class != 'FRELEM':
+        message = "Only FRELEM can be added to dscenario"
+        tools_qgis.show_warning(message, dialog=dialog)
+        return
+
+    # Ask user for dscenario_id
+    title = "Choose dscenario"
+    label_text = "Choose dscenario"
+    options = []
+    sql = "SELECT dscenario_id as id, name as idval FROM cat_dscenario"
+    rows = tools_db.get_rows(sql)
+    if not rows:
+        rows = [('', '')]
+    options = rows
+
+    edit_dialog = GwEditDialog(dialog, title=title, label_text=label_text, widget_type="QComboBox", options=options)
+    if edit_dialog.exec() == QDialog.Accepted:
+        dscenario_id = edit_dialog.get_value()
+        if dscenario_id is None:
+            return
+        # Get frelem epa_type
+        sql = f"SELECT epa_type FROM ve_frelem WHERE element_id = '{element_id}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            return
+        epa_type = row[0]
+        if epa_type == 'UNDEFINED':
+            message = "Epa type is not defined"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+        # Add frelem to dscenario
+        sql = (f"INSERT INTO ve_inp_dscenario_{epa_type.lower()} (dscenario_id, element_id, node_id) "
+               f"VALUES ('{dscenario_id}', '{element_id}', '{node_id}')")
+        tools_db.execute_sql(sql)
+        _reload_table(**kwargs)
+        # TODO: switch to tab_{epa_type}
+
+
+def remove_frelem_from_dscenario(**kwargs):
+    """ Remove frelem from dscenario """
+    class_obj = kwargs['class']
+    dialog = kwargs['dialog']
+    func_params = kwargs['func_params']
+
+    index_tab = dialog.tab_frelem_dscenario.currentIndex()
+    tab_name = dialog.tab_frelem_dscenario.widget(index_tab).objectName()  # tab_orifice, tab_outlet, tab_pump, tab_weir
+    frelem_name = tab_name.replace('tab_', '')
+    qtable: Union[QTableView, QTableWidget, None] = dialog.tab_frelem_dscenario.widget(index_tab).findChild(QTableView, f"tab_elements_tbl_frelem_dsc_{frelem_name}")
+    if qtable is None:
+        return
+
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message, dialog=dialog)
+        return
+
+    columnfind = func_params.get('columnfind')
+    index = selected_list[0]
+    row = index.row()
+    where_clause = ""
+    for column in columnfind:
+        column_index = tools_qt.get_col_index_by_col_name(qtable, column)
+        data = index.sibling(row, column_index).data()
+        where_clause += f"{column} = '{data}' AND "
+    where_clause = where_clause[:-4]
+    sql = f"DELETE FROM ve_inp_dscenario_fr{frelem_name} WHERE {where_clause}"
+    tools_db.execute_sql(sql)
+    _reload_table(**kwargs)
 
 
 def _manage_element_new(elem, **kwargs):
