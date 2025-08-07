@@ -14,6 +14,9 @@ $BODY$
 DECLARE
 v_projectype text;
 v_result JSON;
+v_partialquery TEXT;
+v_query TEXT;
+v_count integer;
 
 BEGIN
 
@@ -22,20 +25,47 @@ BEGIN
    	v_projectype := (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 	
    
-	IF NEW.active IS TRUE THEN
+   
+   	IF NEW.active IS TRUE THEN
    	
-   		EXECUTE 'SELECT gw_fct_checktopologypsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-		"feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"'||NEW.psector_id||'"}}$$)' INTO v_result;
+   		
+   		-- check if trg has been executed via dialog or by editing the table plan_psector
+   		IF v_projectype = 'UD' THEN
+   		
+   			v_partialquery = ' union
+			SELECT gully_id, gullycat_id, state, descript, expl_id, fid, the_geom FROM anl_gully WHERE cur_user="current_user"() AND fid IN (354,355)';
 	
-	
-		IF ((v_result->>'message')::json->>'level')::integer = 1 THEN
+		ELSE
 		
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-            "data":{"message":"4336", "function":"2446","parameters":null}}$$);';
-            
-            RETURN OLD;
+			v_partialquery = '';
 		
-		END IF;  	
+		END IF;
+   		
+   		v_query = '
+		SELECT node_id, nodecat_id, state, descript, expl_id, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (354,355) UNION
+		SELECT arc_id, arccat_id, state, descript, expl_id, fid, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid IN (354,355) union
+		SELECT connec_id, conneccat_id, state, descript, expl_id, fid, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (354,355) '||v_partialquery||'';
+   	
+   		EXECUTE 'SELECT count(*) from ('||v_query||')a' INTO v_count;
+   	
+   		IF v_count = 0 THEN 
+   	
+   	
+	   		EXECUTE 'SELECT gw_fct_checktopologypsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+			"feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"'||NEW.psector_id||'"}}$$)' INTO v_result;
+		
+			
+		
+			IF ((v_result->>'message')::json->>'level')::integer = 1 THEN
+			
+				 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	             "data":{"message":"4336", "function":"2446","parameters":null}}$$)';
+	            
+	            RETURN OLD;
+			
+			END IF;  	
+		
+		END IF;
    	
    	END IF;
    
