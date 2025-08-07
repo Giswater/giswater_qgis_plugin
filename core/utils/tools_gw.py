@@ -3100,7 +3100,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
 
 def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None,
-                             expr_filter=None, table_separator="_x_"):
+                             expr_filter=None, table_separator="_x_", columns_to_show=None):
     """ Get records of @feature_type associated to selected @table_object """
 
     if feature_id is None:
@@ -3133,7 +3133,6 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
         expr_filter = get_expression_filter(feature_type, class_object.rel_list_ids, class_object.rel_layers)
 
     table_name = f"{class_object.schema_name}.{feature_type}"
-    columns_to_show = [f"{feature_type}_id", "code", "sys_code", f"{feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
     tools_qt.set_table_model(dialog, widget_name, table_name, expr_filter, columns_to_show)
 
 
@@ -3442,6 +3441,7 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
+
     if selection_mode in (GwSelectionMode.EXPRESSION, GwSelectionMode.EXPRESSION_CAMPAIGN, GwSelectionMode.EXPRESSION_LOT):
         tools_qgis.disconnect_signal_selection_changed()
 
@@ -3523,7 +3523,8 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
-        get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
+        columns_to_show = [f"{class_object.rel_feature_type}_id", "code", "sys_code", f"{class_object.rel_feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
+        get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     table_widget.blockSignals(False)
@@ -3729,7 +3730,8 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
-        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
+        columns_to_show = [f"{feature_type}_id", "code", "sys_code", f"{feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
+        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     enable_feature_type(dialog, table_object, ids=class_object.rel_list_ids[feature_type])
@@ -4440,7 +4442,8 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
         delete_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, list_id=list_id)
         load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
     else:
-        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
+        columns_to_show = [f"{feature_type}_id", "code", "sys_code", f"{feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
+        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
 

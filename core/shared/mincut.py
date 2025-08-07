@@ -1027,6 +1027,8 @@ class GwMincut:
 
         self.dlg_mincut.btn_accept.hide()
         self.dlg_mincut.btn_cancel.setText('Close')
+        self.action_add_connec.setEnabled(False)
+        self.action_add_hydrometer.setEnabled(False)
         self.dlg_mincut.btn_cancel.disconnect()
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, 've_node', self.user_current_layer))
@@ -1172,7 +1174,7 @@ class GwMincut:
         """ Snap connec """
         self.rel_feature_type = 'connec'
         
-        tools_gw.selection_init(self, self.dlg_connec, 'connec', GwSelectionMode.MINCUT_CONNEC)
+        tools_gw.selection_init(self, self.dlg_connec, 'om_mincut', GwSelectionMode.MINCUT_CONNEC)
 
     def _snapping_selection_hydro(self):
         """ Snap to connec layers to add its hydrometers """
@@ -1192,7 +1194,7 @@ class GwMincut:
                         tools_qt.show_info_box(msg, parameter=connec_id)
                         return
                     else:
-                        self.rel_list_ids['connec'].append(connec_id)
+                        self.rel_list_ids['connec'].append(str(connec_id))
 
         # Set 'expr_filter' with features that are in the list
         expr_filter = "\"connec_id\" IN ("
@@ -1222,7 +1224,7 @@ class GwMincut:
                     connec_id = feature.attribute("connec_id")
                     # Add element
                     if connec_id not in self.rel_list_ids['connec']:
-                        self.rel_list_ids['connec'].append(connec_id)
+                        self.rel_list_ids['connec'].append(str(connec_id))
 
         expr_filter = None
         if len(self.rel_list_ids['connec']) > 0:
@@ -1395,7 +1397,7 @@ class GwMincut:
                     connec_id = feature.attribute("connec_id")
                     # Check if 'connec_id' is already in 'connec_list'
                     if connec_id not in self.rel_list_ids['connec']:
-                        self.rel_list_ids['connec'].append(connec_id)
+                        self.rel_list_ids['connec'].append(str(connec_id))
 
     def _select_features_connec(self):
         """ Select features of 'connec' of selected mincut """
@@ -1410,7 +1412,7 @@ class GwMincut:
         if rows:
             for row in rows:
                 if row[0] not in self.rel_list_ids['connec'] and row[0] not in self.deleted_list:
-                    self.rel_list_ids['connec'].append(row[0])
+                    self.rel_list_ids['connec'].append(str(row[0]))
 
         if self.rel_list_ids['connec']:
             for connec_id in self.rel_list_ids['connec']:
@@ -1506,7 +1508,7 @@ class GwMincut:
                     # Append 'connec_id' into 'connec_list'
                     selected_id = feature.attribute("connec_id")
                     if selected_id not in self.rel_list_ids['connec']:
-                        self.rel_list_ids['connec'].append(selected_id)
+                        self.rel_list_ids['connec'].append(str(selected_id))
 
         # Show message if element is already in the list
         if connec_id in self.rel_list_ids['connec']:
@@ -1515,7 +1517,7 @@ class GwMincut:
             return
 
         # If feature id doesn't exist in list -> add
-        self.rel_list_ids['connec'].append(connec_id)
+        self.rel_list_ids['connec'].append(str(connec_id))
 
         expr_filter = None
         if len(self.rel_list_ids['connec']) > 0:
@@ -1602,7 +1604,10 @@ class GwMincut:
             return
 
         for el in del_id:
-            self.rel_list_ids['connec'].remove(el)
+            self.deleted_list.append(el)
+            print(f"el: {el}")
+            print(f"self.rel_list_ids['connec']: {self.rel_list_ids['connec']}")
+            self.rel_list_ids['connec'].remove(str(el))
 
         # Select features which are in the list
         expr_filter = "\"connec_id\" IN ("
@@ -1680,6 +1685,8 @@ class GwMincut:
             return
 
         sql = (f"DELETE FROM om_mincut_{element}"
+               f" WHERE result_id = {result_mincut_id};\n")
+        sql += (f"DELETE FROM om_mincut_hydrometer"
                f" WHERE result_id = {result_mincut_id};\n")
         for element_id in self.rel_list_ids['connec']:
             sql += (f"INSERT INTO om_mincut_{element}"
