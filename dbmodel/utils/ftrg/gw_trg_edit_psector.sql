@@ -71,6 +71,10 @@ BEGIN
 		NEW.psector_type := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_type_vdefault' AND "cur_user"="current_user"())::integer;
 	END IF;
 
+	IF NEW.workcat_id NOT IN (SELECT id FROM cat_work) THEN
+		NEW.workcat_id = NULL;
+	END IF;
+
 	NEW.psector_id:= (SELECT nextval('plan_psector_id_seq'));
 
 	IF om_aux='plan' THEN
