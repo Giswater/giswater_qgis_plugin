@@ -873,10 +873,10 @@ VALUES('node', 'form_feature', 'tab_elements', 'delete_from_dscenario', 'lyt_ele
   "filterSign": "=",
   "onContextMenu": "Remove from dscenario"
 }'::json, '{
-  "functionName": "open_selected_manager_item",
+  "functionName": "remove_frelem_from_dscenario",
+  "module": "info",
   "parameters": {
-    "columnfind": "element_id",
-    "targetwidget": "tab_elements_tbl_elements"
+    "columnfind": ["element_id", "dscenario_id", "node_id"]
   }
 }'::json, NULL, false, NULL);
 INSERT INTO config_form_fields

@@ -211,5 +211,13 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', widgettype='combo', dv_qu
 
 
 
+-- 07/08/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_dscenario_frpump", "column":"pump_type", "isUtils":"False"}}$$);
+ALTER TABLE inp_dscenario_froutlet ALTER COLUMN outlet_type DROP NOT NULL;
+ALTER TABLE inp_dscenario_frorifice ALTER COLUMN orifice_type DROP NOT NULL;
+ALTER TABLE inp_dscenario_frweir ALTER COLUMN weir_type DROP NOT NULL;
+ALTER TABLE inp_froutlet ALTER COLUMN outlet_type DROP NOT NULL;
+ALTER TABLE inp_frorifice ALTER COLUMN orifice_type DROP NOT NULL;
+ALTER TABLE inp_frweir ALTER COLUMN weir_type DROP NOT NULL;
 
 
