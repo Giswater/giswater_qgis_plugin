@@ -854,31 +854,34 @@ VALUES('layout_name_typevalue', 'lyt_elem_dsc_weir', 'lyt_elem_dsc_weir', 'layou
 -- buttons
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('node', 'form_feature', 'tab_elements', 'lbl_frelem_dscenario', 'lyt_element_dscenario_1', 1, NULL, 'label', 'Dscenario:', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Dscenario:"}'::json, NULL, NULL, false, NULL);
+VALUES('node', 'form_feature', 'tab_elements', 'insert_frelem_dscenario', 'lyt_element_dscenario_1', 1, NULL, 'button', NULL, 'Insert frelem into dscenario', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{"icon":"113"}'::json, '{
+  "saveValue": false,
+  "filterSign": "=",
+  "onContextMenu": "Insert into dscenario"
+}'::json, '{
+  "functionName": "add_frelem_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "columnfind": "element_id",
+    "sourcewidget": "tab_elements_tbl_elements"
+  }
+}'::json, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'delete_from_dscenario', 'lyt_element_dscenario_1', 2, NULL, 'button', NULL, 'Remove frelem from dscenario', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{"icon":"114"}'::json, '{
+  "saveValue": false,
+  "filterSign": "=",
+  "onContextMenu": "Remove from dscenario"
+}'::json, '{
+  "functionName": "open_selected_manager_item",
+  "parameters": {
+    "columnfind": "element_id",
+    "targetwidget": "tab_elements_tbl_elements"
+  }
+}'::json, NULL, false, NULL);
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('node', 'form_feature', 'tab_elements', 'hspacer_lyt_dsc_1', 'lyt_element_dscenario_1', 10, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
-INSERT INTO config_form_fields
-(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('node', 'form_feature', 'tab_elements', 'insert_frelem_dscenario', 'lyt_element_dscenario_1', 11, NULL, 'button', NULL, 'Insert frelem into dscenario', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue":false, "filterSign":"=", "onContextMenu":"Insert into dscenario", "text": "v"}'::json, '{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id",
-    "targetwidget": "tab_elements_tbl_elements"
-  }
-}'::json, NULL, false, NULL);
-INSERT INTO config_form_fields
-(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('node', 'form_feature', 'tab_elements', 'delete_from_dscenario', 'lyt_element_dscenario_1', 12, NULL, 'button', NULL, 'Remove frelem from dscenario', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue":false, "filterSign":"=", "onContextMenu":"Remove from dscenario", "text": "^"}'::json, '{
-  "functionName": "open_selected_manager_item",
-  "parameters": {
-    "columnfind": "element_id",
-    "targetwidget": "tab_elements_tbl_elements"
-  }
-}'::json, NULL, false, NULL);
-INSERT INTO config_form_fields
-(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('node', 'form_feature', 'tab_elements', 'hspacer2_lyt_dsc_1', 'lyt_element_dscenario_1', 20, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 
 -- frelem dscenario tableviews
 INSERT INTO config_form_fields
