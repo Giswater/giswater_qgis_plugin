@@ -336,6 +336,12 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
         ("tanks", catalogs.get("tanks")),
         ("pumps", catalogs.get("pumps")),
         ("valves", catalogs.get("valves")),
+        ("prv", catalogs.get("prv")),
+        ("psv", catalogs.get("psv")),
+        ("pbv", catalogs.get("pbv")),
+        ("fcv", catalogs.get("fcv")),
+        ("tcv", catalogs.get("tcv")),
+        ("gpv", catalogs.get("gpv")),
     ]
 
     for element_type, element_catalog in elements:
@@ -347,8 +353,11 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
 
         combo: QComboBox = self_cls.tbl_elements[element_type][0]
         if element_catalog:
+            if combo.findText(element_catalog) == -1:
+                combo.setCurrentText('Create new')
+                self_cls.tbl_elements[element_type][1].setText(element_catalog)
+                continue
             combo.setCurrentText(element_catalog)
-            # TODO: manage CREATE_NEW option (the widget is in self.tbl_elements[element_type][1])
 
     if catalogs.get("pipes") is not None:
         for dint_rough_str, pipe_catalog in catalogs["pipes"].items():
@@ -358,6 +367,10 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
 
             combo: QComboBox = self_cls.tbl_elements["pipes"][dint_rough_tuple][0]
             if pipe_catalog:
+                if combo.findText(pipe_catalog) == -1:
+                    combo.setCurrentText('Create new')
+                    self_cls.tbl_elements["pipes"][dint_rough_tuple][1].setText(pipe_catalog)
+                    continue
                 combo.setCurrentText(pipe_catalog)
 
 

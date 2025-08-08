@@ -63,6 +63,8 @@ class GwImportInpTask(GwTask):
         municipality,
         dscenario,
         catalogs,
+        state,
+        state_type,
         manage_nodarcs: dict[str, bool] = {"pumps": False, "valves": False},
         force_commit: bool = False,
     ) -> None:
@@ -76,6 +78,8 @@ class GwImportInpTask(GwTask):
         self.dscenario: str = dscenario
         self.dscenario_id: int = None
         self.catalogs: dict[str, Any] = catalogs
+        self.state: int = state
+        self.state_type: int = state_type
         self.force_commit: bool = force_commit
         self.update_municipality: bool = False
         self.manage_nodarcs: dict[str, bool] = manage_nodarcs
@@ -91,8 +95,8 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
-            # Disable triggers
-            self._enable_triggers(False)
+            # Disable triggers except plan trigger
+            self._enable_triggers(False, plan_trigger=True)
 
             self.progress_changed.emit("Validate inputs", self.PROGRESS_INIT, "Validating inputs...", False)
             self._validate_inputs()
@@ -120,13 +124,16 @@ class GwImportInpTask(GwTask):
                 self._save_sources()
                 self.progress_changed.emit("Sources", self.PROGRESS_SOURCES, "done!", True)
 
+            # Enable plan and topocontrol triggers
+            self._enable_triggers(False, plan_trigger=True, geometry_trigger=True)
+
             if any(self.manage_nodarcs.values()):
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_SOURCES, "Managing nodarcs (pumps/valves as nodes)...", False)
                 log_str = self._manage_nodarcs()
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_END, "done!", True)
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_END, log_str, True)
 
-            # Enable triggers
+            # Enable ALL triggers
             self._enable_triggers(True)
 
             execute_sql("select 1", commit=True)
@@ -140,7 +147,8 @@ class GwImportInpTask(GwTask):
 
     def _manage_catalogs(self) -> None:
         self.progress_changed.emit("Create catalogs", lerp_progress(0, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating workcat", True)
-        self._create_workcat_id()
+        if self.state != 2:
+            self._create_workcat_id()
         self.progress_changed.emit("Create catalogs", lerp_progress(10, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating demand dscenario", True)
         self._create_demand_dscenario()
         self.progress_changed.emit("Create catalogs", lerp_progress(20, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new node catalogs", True)
@@ -194,12 +202,17 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
             self._save_pipes()
 
-    def _enable_triggers(self, enable: bool) -> None:
+    def _enable_triggers(self, enable: bool, plan_trigger: bool = False, geometry_trigger: bool = False) -> None:
         op = "ENABLE" if enable else "DISABLE"
         queries = [
-            f"ALTER TABLE node {op} TRIGGER ALL;",
-            f"ALTER TABLE arc {op} TRIGGER ALL;",
+            f'ALTER TABLE arc {op} TRIGGER ALL;',
+            f'ALTER TABLE node {op} TRIGGER ALL;',
         ]
+        if plan_trigger:
+            queries.append(f'ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;')
+            queries.append(f'ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;')
+        if geometry_trigger:
+            queries.append(f'ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
         for sql in queries:
             result = tools_db.execute_sql(sql, commit=self.force_commit)
             if not result:
@@ -636,8 +649,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             node_params.append(
                 (
@@ -771,8 +784,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             node_params.append(
                 (
@@ -875,8 +888,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             elevation = t.elevation
             node_params.append(
@@ -1002,8 +1015,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             arc_params.append(
                 (
@@ -1135,8 +1148,8 @@ class GwImportInpTask(GwTask):
                     self.exploitation,
                     self.sector,
                     self.municipality,
-                    1,  # state
-                    2,  # state_type
+                    self.state,
+                    self.state_type,
                     self.workcat,
                 )
             )
@@ -1238,8 +1251,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             arc_params.append(
                 (
@@ -1350,7 +1363,7 @@ class GwImportInpTask(GwTask):
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure(fct_name, body, commit=self.force_commit, is_thread=True)
             if not json_result or json_result.get('status') != 'Accepted':
-                message = f"Error executing {fct_name}"
+                message = f"Error executing {fct_name} - {json_result.get('message')}"
                 raise ValueError(message)
             try:
                 if json_result['body']['data']['info']:
