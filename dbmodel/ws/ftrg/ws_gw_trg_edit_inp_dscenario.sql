@@ -213,20 +213,34 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			INSERT INTO inp_dscenario_virtualvalve (dscenario_id, arc_id, valve_type, setting, curve_id, minorloss, status, init_quality)
 			VALUES (NEW.dscenario_id, NEW.arc_id, NEW.valve_type, NEW.setting, NEW.curve_id, NEW.minorloss, NEW.status, NEW.init_quality);
 
-		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN
+		ELSIF v_dscenario_type = 'FLWREG-PUMP' THEN
 
 			-- default values
-			IF NEW.power IS NULL THEN NEW.power = (SELECT power FROM ve_inp_pump WHERE node_id = NEW.node_id);END IF;
-			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM ve_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM ve_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM ve_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
+			IF NEW.power IS NULL THEN NEW.power = (SELECT power FROM ve_inp_frpump WHERE element_id = NEW.element_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM ve_inp_frpump WHERE element_id = NEW.element_id);END IF;
+			IF NEW.speed IS NULL THEN NEW.speed = (SELECT speed FROM ve_inp_frpump WHERE element_id = NEW.element_id);END IF;
+			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM ve_inp_frpump WHERE element_id = NEW.element_id);END IF;
+			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM ve_inp_frpump WHERE element_id = NEW.element_id);END IF;
+			IF NEW.effic_curve_id IS NULL OR NEW.effic_curve_id='' THEN NEW.effic_curve_id = (SELECT effic_curve_id FROM ve_inp_frpump WHERE element_id = NEW.element_id);END IF;
+			IF NEW.energy_price IS NULL THEN NEW.energy_price = (SELECT energy_price FROM ve_inp_frpump WHERE element_id = NEW.element_id);END IF;
+			IF NEW.energy_pattern_id IS NULL OR NEW.energy_pattern_id='' THEN NEW.energy_pattern_id = (SELECT energy_pattern_id FROM ve_inp_frpump WHERE element_id = NEW.element_id);END IF;
 
-			IF NEW.effic_curve_id IS NULL OR NEW.effic_curve_id='' THEN NEW.effic_curve_id = (SELECT effic_curve_id FROM ve_inp_pump_additional WHERE node_id = NEW.node_id limit 1);END IF;
-			IF NEW.energy_price IS NULL THEN NEW.energy_price = (SELECT energy_price FROM ve_inp_pump_additional WHERE node_id = NEW.node_id limit 1);END IF;
-			IF NEW.energy_pattern_id IS NULL OR NEW.energy_pattern_id='' THEN NEW.energy_pattern_id = (SELECT energy_pattern_id FROM ve_inp_pump_additional WHERE node_id = NEW.node_id limit 1);END IF;
+			INSERT INTO inp_dscenario_frpump(dscenario_id, element_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
+			VALUES (NEW.dscenario_id, NEW.element_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
 
-			INSERT INTO inp_dscenario_pump_additional (dscenario_id, node_id, order_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
+		ELSIF v_dscenario_type = 'FLWREG-VALVE' THEN
+
+			-- default values
+			IF NEW.valve_type IS NULL OR NEW.valve_type='' THEN NEW.valve_type = (SELECT valve_type FROM ve_inp_frvalve WHERE element_id = NEW.element_id);END IF;
+			IF NEW.custom_dint IS NULL THEN NEW.custom_dint = (SELECT custom_dint FROM ve_inp_frvalve WHERE element_id = NEW.element_id);END IF;
+			IF NEW.setting IS NULL THEN NEW.setting = (SELECT setting FROM ve_inp_frvalve WHERE element_id = NEW.element_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM ve_inp_frvalve WHERE element_id = NEW.element_id);END IF;
+			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM ve_inp_frvalve WHERE element_id = NEW.element_id);END IF;
+			IF NEW.add_settings IS NULL THEN NEW.add_settings = (SELECT add_settings FROM ve_inp_frvalve WHERE element_id = NEW.element_id);END IF;
+			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM ve_inp_frvalve WHERE element_id = NEW.element_id);END IF;
+
+			INSERT INTO inp_dscenario_frvalve (dscenario_id, element_id, valve_type, custom_dint, setting, curve_id, minorloss, add_settings, init_quality)
+			VALUES (NEW.dscenario_id, NEW.element_id, NEW.valve_type, NEW.custom_dint, NEW.setting, NEW.curve_id, NEW.minorloss, NEW.add_settings, NEW.init_quality);
 
 		ELSIF v_dscenario_type = 'RULES' THEN
 			INSERT INTO inp_dscenario_rules(dscenario_id, sector_id, text, active)
@@ -306,11 +320,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality
 			WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 
-		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN
-			UPDATE inp_dscenario_pump_additional SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, order_id=NEW.order_id, power=NEW.power, curve_id=NEW.curve_id,
+		ELSIF v_dscenario_type = 'FLWREG-PUMP' THEN
+			UPDATE inp_dscenario_frpump SET dscenario_id=NEW.dscenario_id, element_id=NEW.element_id, power=NEW.power, curve_id=NEW.curve_id,
 			speed=NEW.speed, pattern_id=NEW.pattern_id, status=NEW.status,
 			effic_curve_id = NEW.effic_curve_id, energy_price = NEW.energy_price, energy_pattern_id = NEW.energy_pattern_id
-			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
+			WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
+
+		ELSIF v_dscenario_type = 'FLWREG-VALVE' THEN
+			UPDATE inp_dscenario_frvalve SET dscenario_id=NEW.dscenario_id, element_id=NEW.element_id, valve_type=NEW.valve_type, custom_dint=NEW.custom_dint,
+			setting=NEW.setting, curve_id=NEW.curve_id, minorloss=NEW.minorloss, add_settings=NEW.add_settings, init_quality=NEW.init_quality
+			WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
 
 		ELSIF v_dscenario_type = 'RULES' THEN
 			UPDATE inp_dscenario_rules SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text, active=NEW.active
@@ -358,8 +377,11 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		ELSIF v_dscenario_type = 'VIRTUALVALVE' THEN
 			DELETE FROM inp_dscenario_virtualvalve WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 
-		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN
-			DELETE FROM inp_dscenario_pump_additional WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
+		ELSIF v_dscenario_type = 'FLWREG-PUMP' THEN
+			DELETE FROM inp_dscenario_frpump WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
+
+		ELSIF v_dscenario_type = 'FLWREG-VALVE' THEN
+			DELETE FROM inp_dscenario_frvalve WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
 
 		ELSIF v_dscenario_type = 'RULES' THEN
 			DELETE FROM inp_dscenario_rules WHERE id=OLD.id;

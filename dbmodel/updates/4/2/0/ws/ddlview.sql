@@ -2425,6 +2425,7 @@ AS SELECT p.element_id,
 CREATE OR REPLACE VIEW ve_inp_dscenario_frpump
 AS SELECT s.dscenario_id,
     f.element_id,
+	n.node_id,
 	f.power,
     f.curve_id,
 	f.speed,
@@ -2439,6 +2440,23 @@ AS SELECT s.dscenario_id,
      JOIN ve_inp_frpump n USING (element_id)
   WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
+DROP VIEW IF EXISTS ve_inp_dscenario_frvalve;
+CREATE OR REPLACE VIEW ve_inp_dscenario_frvalve
+AS SELECT s.dscenario_id,
+    v.element_id,
+    n.node_id,
+    v.valve_type,
+    v.custom_dint,
+    v.setting,
+    v.curve_id,
+    v.minorloss,
+    v.add_settings,
+    v.init_quality,
+    n.the_geom
+   FROM selector_inp_dscenario s,
+    inp_dscenario_frvalve v
+     JOIN ve_inp_frvalve n USING (element_id)
+  WHERE s.dscenario_id = v.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 CREATE OR REPLACE VIEW ve_samplepoint
 AS SELECT sm.sample_id,
