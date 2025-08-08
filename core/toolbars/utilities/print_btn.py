@@ -59,7 +59,7 @@ class GwPrintButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [['Fast print', '_fastprint'], ['Massive composer', '_massive_composer']]
+        buttons = [[tools_qt.tr('Print'), '_fastprint'], [tools_qt.tr('Massive composer'), '_massive_composer']]
 
         for button in buttons:
             button_name = button[0]
