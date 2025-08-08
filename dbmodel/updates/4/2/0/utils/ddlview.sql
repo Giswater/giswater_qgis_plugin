@@ -19,6 +19,8 @@ DROP VIEW IF EXISTS vcv_times;
 DROP VIEW IF EXISTS vcv_emitters;
 DROP VIEW IF EXISTS v_polygon;
 
+ALTER VIEW IF EXISTS v_ui_sys_style RENAME TO v_ui_style;
+
 
 CREATE OR REPLACE VIEW ve_frelem
 AS WITH sel_state AS (

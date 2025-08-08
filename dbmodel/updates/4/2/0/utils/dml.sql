@@ -342,3 +342,5 @@ UPDATE sys_table SET id = 'v_hydrometer_x_connec' WHERE id = 'v_rtc_hydrometer_x
 UPDATE sys_param_user SET isenabled = false where id = 'plan_psector_current';
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_node", "column":"active", "dataType":"boolean"}}$$);
+
+UPDATE sys_table SET id = 'v_ui_style' WHERE id = 'v_ui_sys_style';
