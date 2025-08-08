@@ -2990,6 +2990,10 @@
 			<translation>No se ha podido importar el paquete swmm_api. Intente recargar el plugin Giswater. Si el problema persiste reinicie QGIS.</translation>
 		</message>
 		<message>
+			<source>Print</source>
+			<translation>Impresión</translation>
+		</message>
+		<message>
 			<source>Error saving the configuration</source>
 			<translation>Error al guardar la configuración</translation>
 		</message>
