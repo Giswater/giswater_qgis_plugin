@@ -325,3 +325,5 @@ UPDATE sys_fprocess SET query_text='SELECT arc_id, arccat_id, state1, arc_id_aux
  -- 08/08/2025
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3506, 'gw_trg_insert_psector_x_feature', 'utils', 'trigger', NULL, NULL, 'Insert psector_x_feature when a feature is inserted with state=2', NULL, NULL, 'core', NULL);
+
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_edit_', 've_')::json WHERE widgetcontrols::text ilike '%v_edit_%';
