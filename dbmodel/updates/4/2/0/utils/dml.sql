@@ -344,3 +344,5 @@ UPDATE sys_param_user SET isenabled = false where id = 'plan_psector_current';
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_node", "column":"active", "dataType":"boolean"}}$$);
 
 UPDATE sys_table SET id = 'v_ui_style' WHERE id = 'v_ui_sys_style';
+
+DELETE FROM sys_table WHERE id in ('vcp_pipes', 'vcv_dma', 'vcv_dma_log', 'vcv_emitters_log', 'vcv_junction', 'vcv_emitters');

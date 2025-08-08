@@ -2368,6 +2368,13 @@ DROP VIEW IF EXISTS ve_plan_psector_x_connec;
 DROP VIEW IF EXISTS v_value_cat_connec;
 DROP VIEW IF EXISTS v_value_cat_node;
 
+DROP VIEW IF EXISTS vcp_pipes;
+DROP VIEW IF EXISTS vcv_dma;
+DROP VIEW IF EXISTS vcv_dma_log;
+DROP VIEW IF EXISTS vcv_emitters_log;
+DROP VIEW IF EXISTS vcv_junction;
+
+
 
 CREATE OR REPLACE VIEW ve_inp_frpump
 AS SELECT f.element_id,
