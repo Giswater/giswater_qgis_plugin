@@ -290,10 +290,10 @@ class GwImportInpTask(GwTask):
             f'ALTER TABLE element {op} TRIGGER ALL;',
         ]
         if plan_trigger:
-            queries.append(f'ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;')
-            queries.append(f'ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;')
+            queries.append('ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;')
+            queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;')
         if geometry_trigger:
-            queries.append(f'ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
+            queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
         for sql in queries:
             result = tools_db.execute_sql(sql, commit=self.force_commit)
             if not result:
