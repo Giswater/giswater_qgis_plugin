@@ -212,7 +212,7 @@ class GwStyleManager:
 
         # Prepare the SQL query to load data from the view
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
-        model.setTable(f"{lib_vars.schema_name}.v_ui_sys_style")
+        model.setTable(f"{lib_vars.schema_name}.v_ui_style")
 
         if selected_stylegroup_name:
             # Apply filter based on the selected style group
