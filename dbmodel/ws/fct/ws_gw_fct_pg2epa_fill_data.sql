@@ -124,10 +124,10 @@ BEGIN
 	FROM inp_inlet i WHERE temp_t_node.node_id=i.node_id::text;
 
 	-- update child param for inp_junction
-	UPDATE temp_t_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
+	UPDATE temp_t_node SET demand=(inp_junction.demand*COALESCE(peak_factor, 1)), pattern_id=inp_junction.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
 	FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id::text;
 
-	UPDATE temp_t_node SET demand=inp_connec.demand, pattern_id=inp_connec.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
+	UPDATE temp_t_node SET demand=(inp_connec.demand*COALESCE(peak_factor, 1)), pattern_id=inp_connec.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
 	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id::text;
 
 	-- update child param for inp_valve
