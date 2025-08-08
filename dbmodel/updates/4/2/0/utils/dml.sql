@@ -334,3 +334,6 @@ VALUES('ve_link_link', 'form_feature', 'tab_data', 'link_type', 'lyt_top_1', 1, 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_arc", "column":"active", "dataType":"boolean"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_node", "column":"active", "dataType":"boolean"}}$$);
+
+UPDATE sys_table SET id = 've_connec_hydro_data' WHERE id = 've_rtc_hydro_data_x_connec';
+UPDATE sys_table SET id = 'v_hydrometer_x_connec' WHERE id = 'v_rtc_hydrometer_x_connec';

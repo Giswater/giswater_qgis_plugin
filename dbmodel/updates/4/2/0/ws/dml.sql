@@ -1940,3 +1940,5 @@ VALUES('ve_link_pipelink', 'form_feature', 'tab_data', 'link_type', 'lyt_top_1',
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_edit_', 've_')::json WHERE widgetcontrols::text ilike '%v_edit_%';
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_connec", "column":"active", "dataType":"boolean"}}$$);
+
+UPDATE sys_table SET id = 'v_hydrometer_x_node' WHERE id = 'v_rtc_hydrometer_x_node';
