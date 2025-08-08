@@ -74,3 +74,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('connec');
 
 CREATE TRIGGER gw_trg_edit_ve_epa_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_inlet 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('inlet');
+
+CREATE TRIGGER gw_trg_edit_plan_psector_connec INSTEAD OF INSERT OR DELETE OR UPDATE
+ON ve_plan_psector_x_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_psector_x_connect('plan_psector_x_connec');

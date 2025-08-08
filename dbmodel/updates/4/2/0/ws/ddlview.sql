@@ -2364,6 +2364,16 @@ ALTER VIEW v_edit_samplepoint RENAME TO ve_samplepoint;
 ALTER VIEW v_edit_sector RENAME TO ve_sector;
 ALTER VIEW v_edit_supplyzone RENAME TO ve_supplyzone;
 
+DROP VIEW IF EXISTS ve_plan_psector_x_connec;
+DROP VIEW IF EXISTS v_value_cat_connec;
+DROP VIEW IF EXISTS v_value_cat_node;
+
+DROP VIEW IF EXISTS vcp_pipes;
+DROP VIEW IF EXISTS vcv_dma;
+DROP VIEW IF EXISTS vcv_dma_log;
+DROP VIEW IF EXISTS vcv_emitters_log;
+DROP VIEW IF EXISTS vcv_junction;
+
 
 
 CREATE OR REPLACE VIEW ve_inp_frpump
@@ -3531,3 +3541,18 @@ AS SELECT inp_inlet.node_id,
     v_rpt_node_stats.quality_avg AS qualavg
    FROM inp_inlet
      LEFT JOIN v_rpt_node_stats ON inp_inlet.node_id::text = v_rpt_node_stats.node_id::text;
+
+CREATE OR REPLACE VIEW ve_plan_psector_x_connec
+AS SELECT plan_psector_x_connec.id,
+    plan_psector_x_connec.connec_id,
+    plan_psector_x_connec.arc_id,
+    plan_psector_x_connec.psector_id,
+    plan_psector_x_connec.state,
+    plan_psector_x_connec.doable,
+    plan_psector_x_connec.descript,
+    plan_psector_x_connec.link_id,
+    plan_psector_x_connec.insert_tstamp,
+    plan_psector_x_connec.insert_user,
+    link.exit_type
+   FROM plan_psector_x_connec
+     LEFT JOIN link USING (link_id);

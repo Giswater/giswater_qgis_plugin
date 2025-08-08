@@ -193,3 +193,9 @@ CREATE TRIGGER gw_trg_plan_psector_after_gully AFTER INSERT ON gully
 FOR EACH ROW
 WHEN (NEW.state = 2)
 EXECUTE FUNCTION gw_trg_insert_psector_x_feature('gully');
+
+CREATE TRIGGER gw_trg_edit_plan_psector_connec INSTEAD OF INSERT OR DELETE OR UPDATE
+ON ve_plan_psector_x_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_psector_x_connect('plan_psector_x_connec');
+
+CREATE TRIGGER gw_trg_edit_plan_psector_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_plan_psector_x_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_psector_x_connect('plan_psector_x_gully');

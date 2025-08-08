@@ -69,14 +69,6 @@ BEGIN
    	
    	END IF;
    
-
-  	-- set active to related layers
-	UPDATE plan_psector_x_arc SET active=NEW.active WHERE psector_id=NEW.psector_id;
-	UPDATE plan_psector_x_node SET active=NEW.active WHERE psector_id=NEW.psector_id;
-	UPDATE plan_psector_x_connec SET active=NEW.active WHERE psector_id=NEW.psector_id;
-	IF v_projectype = 'UD' THEN
-		UPDATE plan_psector_x_gully SET active=NEW.active WHERE psector_id=NEW.psector_id;
-	END IF;
 	
 RETURN NEW;
 			

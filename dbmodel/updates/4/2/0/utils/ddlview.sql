@@ -19,6 +19,8 @@ DROP VIEW IF EXISTS vcv_times;
 DROP VIEW IF EXISTS vcv_emitters;
 DROP VIEW IF EXISTS v_polygon;
 
+ALTER VIEW IF EXISTS v_ui_sys_style RENAME TO v_ui_style;
+
 -- PSECTOR
 DROP VIEW IF EXISTS v_edit_plan_psector;
 DROP VIEW IF EXISTS v_ui_plan_psector;
@@ -400,3 +402,5 @@ SELECT plan_psector.psector_id,
             GROUP BY v_plan_psector_x_other.psector_id
         ) c ON c.psector_id = plan_psector.psector_id
 WHERE EXISTS (SELECT 1 FROM sel_psector WHERE sel_psector.psector_id = plan_psector.psector_id);
+
+DROP VIEW IF EXISTS vcv_emitters;

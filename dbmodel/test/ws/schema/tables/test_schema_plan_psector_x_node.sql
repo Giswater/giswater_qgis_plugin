@@ -20,7 +20,7 @@ SELECT has_table('plan_psector_x_node'::name, 'Table plan_psector_x_node should 
 SELECT columns_are(
     'plan_psector_x_node',
     ARRAY[
-        'id', 'node_id', 'psector_id', 'state', 'doable', 'descript', 'addparam', 'active',
+        'id', 'node_id', 'psector_id', 'state', 'doable', 'descript', 'addparam',
         'insert_tstamp', 'insert_user'
     ],
     'Table plan_psector_x_node should have the correct columns'
@@ -37,13 +37,11 @@ SELECT col_type_is('plan_psector_x_node', 'state', 'smallint', 'Column state sho
 SELECT col_type_is('plan_psector_x_node', 'doable', 'boolean', 'Column doable should be boolean');
 SELECT col_type_is('plan_psector_x_node', 'descript', 'character varying(254)', 'Column descript should be character varying(254)');
 SELECT col_type_is('plan_psector_x_node', 'addparam', 'json', 'Column addparam should be json');
-SELECT col_type_is('plan_psector_x_node', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('plan_psector_x_node', 'insert_tstamp', 'timestamp without time zone', 'Column insert_tstamp should be timestamp without time zone');
 SELECT col_type_is('plan_psector_x_node', 'insert_user', 'text', 'Column insert_user should be text');
 
 -- Check default values
 SELECT col_has_default('plan_psector_x_node', 'id', 'Column id should have a default value');
-SELECT col_default_is('plan_psector_x_node', 'active', 'true', 'Default value for active should be true');
 SELECT col_has_default('plan_psector_x_node', 'insert_tstamp', 'Column insert_tstamp should have a default value');
 SELECT col_default_is('plan_psector_x_node', 'insert_user', 'CURRENT_USER', 'Default value for insert_user should be CURRENT_USER');
 

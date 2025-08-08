@@ -330,3 +330,19 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES('ve_link_link', 'form_feature', 'tab_data', 'linkcat_id', 'lyt_top_1', 2, 'string', 'typeahead', 'Linkcat ID:', 'linkcat_id - To be selected from the catalog of arcs. It is independent of the type of arch', NULL, true, false, true, false, NULL, 'SELECT id, id as idval FROM cat_link WHERE id IS NOT NULL AND active IS TRUE ', NULL, NULL, 'link_type', ' AND cat_link.link_type IS NULL OR cat_link.link_type', NULL, '{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "cat_link", "activated": true, "keyColumn": "id", "nullValue": false, "valueColumn": "id", "filterExpression": null}}'::json, NULL, NULL, false, 3, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder, field_layoutorder)
 VALUES('ve_link_link', 'form_feature', 'tab_data', 'link_type', 'lyt_top_1', 1, 'string', 'combo', 'Link Type:', 'Type of link. It is auto-populated based on the linkcat_id', NULL, true, true, false, false, NULL, 'SELECT id, id as idval FROM cat_feature_link WHERE id IS NOT NULL', true, false, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_cat_feature_link", "activated": true, "keyColumn": "id", "nullValue": false, "valueColumn": "id", "filterExpression": null}}'::json, NULL, NULL, false, 2, NULL);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_arc", "column":"active", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_node", "column":"active", "dataType":"boolean"}}$$);
+
+UPDATE sys_table SET id = 've_connec_hydro_data' WHERE id = 've_rtc_hydro_data_x_connec';
+UPDATE sys_table SET id = 'v_hydrometer_x_connec' WHERE id = 'v_rtc_hydrometer_x_connec';
+
+
+UPDATE sys_param_user SET isenabled = false where id = 'plan_psector_current';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_node", "column":"active", "dataType":"boolean"}}$$);
+
+UPDATE sys_table SET id = 'v_ui_style' WHERE id = 'v_ui_sys_style';
+
+DELETE FROM sys_table WHERE id in ('vcp_pipes', 'vcv_dma', 'vcv_dma_log', 'vcv_emitters_log', 'vcv_junction', 'vcv_emitters');
