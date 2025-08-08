@@ -2365,6 +2365,9 @@ ALTER VIEW v_edit_sector RENAME TO ve_sector;
 ALTER VIEW v_edit_supplyzone RENAME TO ve_supplyzone;
 
 DROP VIEW IF EXISTS ve_plan_psector_x_connec;
+DROP VIEW IF EXISTS v_value_cat_connec;
+DROP VIEW IF EXISTS v_value_cat_node;
+
 
 CREATE OR REPLACE VIEW ve_inp_frpump
 AS SELECT f.element_id,

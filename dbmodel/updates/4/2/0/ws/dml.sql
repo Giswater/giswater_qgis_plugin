@@ -1940,3 +1940,6 @@ VALUES('ve_link_pipelink', 'form_feature', 'tab_data', 'link_type', 'lyt_top_1',
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_edit_', 've_')::json WHERE widgetcontrols::text ilike '%v_edit_%';
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_connec", "column":"active", "dataType":"boolean"}}$$);
+
+DELETE FROM sys_table WHERE id = 'v_value_cat_connec';
+DELETE FROM sys_table WHERE id = 'v_value_cat_node';
