@@ -260,8 +260,7 @@ BEGIN
 	  	) AS feature
 	  	FROM (
 	  		SELECT node_id, nodecat_id, state, descript, expl_id, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (354,355) UNION
-			SELECT connec_id, conneccat_id, state, descript, expl_id, fid, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (354,355) union
-			SELECT gully_id, gullycat_id, state, descript, expl_id, fid, the_geom FROM anl_gully WHERE cur_user="current_user"() AND fid IN (354,355)
+			SELECT connec_id, conneccat_id, state, descript, expl_id, fid, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (354,355)
 	  		) row) features;
 
 	v_result := COALESCE(v_result, '{}');
