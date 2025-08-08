@@ -1056,5 +1056,4 @@ UPDATE config_form_fields SET "datatype"='string', widgettype='combo', ismandato
 
 DELETE FROM config_form_fields WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='n_hydrometer' AND tabname='tab_none';
 
-DELETE FROM config_form_fields WHERE formname='ve_gully_ginlet' AND formtype='form_feature' AND columnname='connec_y1' AND tabname='tab_none';
-DELETE FROM config_form_fields WHERE formname='ve_gully_ginlet' AND formtype='form_feature' AND columnname='connec_y2' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname ILIKE '%ve_gully%' AND formtype='form_feature' AND columnname IN ('connec_y1', 'connec_y2') AND tabname='tab_none';
