@@ -453,6 +453,7 @@ INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descrip
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (6, '92', 1, 0, false, NULL, true);
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (5, '91', 1, 0, false, NULL, true);
 
+TRUNCATE plan_psector_x_connec;
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3182', '20606', 1, 1, false, 708, true);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3182', '179', 1, 0, false, 314, true);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3183', '20606', 1, 1, false, 707, true);
@@ -466,6 +467,7 @@ INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable,
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3175', '20604', 1, 1, false, 712, true);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3175', '339', 1, 0, false, 444, true);
 
+TRUNCATE plan_psector_x_gully;
 INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30056', '339', 1, 0, false, 526, true);
 INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30057', '178', 1, 0, false, 527, true);
 INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30058', '178', 1, 0, false, 528, true);
