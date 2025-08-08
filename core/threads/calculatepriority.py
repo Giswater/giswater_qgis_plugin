@@ -47,7 +47,6 @@ def optimal_replacement_time(
     )
     cycle_costs = 0
     for t in range(1, round(optimal_replacement_cycle) + 1):
-        # print(cycle_costs)
         cycle_costs += (
             repairing_cost
             * BREAKS_YEAR_0

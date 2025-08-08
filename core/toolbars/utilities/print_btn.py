@@ -75,11 +75,11 @@ class GwPrintButton(GwAction):
         menu.setProperty("last_selection", button_function)
 
     def _fastprint(self):
-        print("fastprint")
+
         self.fastprint = GwFastprint()
         self.fastprint.open_print()
 
     def _massive_composer(self):
-        print("massive composer")
+
         self.massive_composer = GwMassiveComposer()
         self.massive_composer.open_massive_composer()

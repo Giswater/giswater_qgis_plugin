@@ -249,8 +249,7 @@ class GwMapzoneManager:
     def _open_mapzones_analysis(self):
         """ Opens the toolbox 'mapzones_analysis' with the current type of mapzone set """
         mapzone_name = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
-        print(mapzone_name)
-        print(self.mapzone_status["enabledMacromapzone"])
+
         # Execute toolbox function
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         macromapzone_function_id: int = 3482

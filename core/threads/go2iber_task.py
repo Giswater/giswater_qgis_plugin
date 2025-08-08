@@ -27,7 +27,6 @@ class GwGo2IberTask(GwTask):
 
     def __init__(self, description, go2iber, timer=None):
 
-        print("go2iber init 00")
         super().__init__(description)
         self.go2iber = go2iber
         self.json_result = None
@@ -35,13 +34,9 @@ class GwGo2IberTask(GwTask):
         self.fid = 140
         self.function_name = None
         self.timer = timer
-        print("go2iber init 10")
         self.initialize_variables()
-        print("go2iber init 20")
         self.set_variables_from_go2iber()
-        print("go2iber init 30")
         self.ig_execute_model = importlib.import_module('.execute_model', package=f'{self.ibergis_folder}.core.threads')
-        print("go2iber init 40")
         self.ig_feedback_class = importlib.import_module('.feedback', package=f'{self.ibergis_folder}.core.utils')
         self.cur_process = None
         self.cur_text = None
@@ -69,13 +64,10 @@ class GwGo2IberTask(GwTask):
 
         super().run()
 
-        print("go2iber run 00")
         self.step_completed.emit({"message": {"level": 1, "text": "GO2IBER - Work in progress"}}, "\n")
         self.step_completed.emit({"message": {"level": 1, "text": "--------------------------"}}, "\n")
 
-        print("go2iber run 10")
         self.initialize_variables()
-        print("go2iber run 20")
         # TODO:
         # - Generate INP file with Giswater (go2iber)
         self.go2epa_task = GwEpaFileManager("Go2Epa", self.dlg_go2iber, network_mode=2)
@@ -85,11 +77,9 @@ class GwGo2IberTask(GwTask):
         self.go2epa_task.result_name = self.result_name
         self.go2epa_task.file_inp = self.folder_path + os.sep + "Iber_SWMM.inp"
         self.go2epa_task.file_rpt = self.folder_path + os.sep + "Iber_SWMM.rpt"
-        print("go2iber run 30")
         # Create folders path
         os.makedirs(self.folder_path, exist_ok=True)
         self.go2epa_task.main_process()
-        print("go2iber run 40")
 
         pgully_geojson = tools_gw.execute_procedure('gw_fct_pg2iber_pgully')
         geojson_str: str = json.dumps(pgully_geojson['body']['data']['result'])

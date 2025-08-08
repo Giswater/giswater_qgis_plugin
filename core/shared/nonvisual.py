@@ -334,7 +334,6 @@ class GwNonVisual:
         """ Creates a new non-visual object from the manager """
 
         table = dialog.main_tab.currentWidget()
-        print(table)
         function_name = table.property('function')
 
         getattr(self, function_name)()

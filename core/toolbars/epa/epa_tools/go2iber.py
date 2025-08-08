@@ -41,7 +41,6 @@ class Go2Iber:
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
 
-        print("go2iber")
         self.dlg_go2iber = GwGo2IberUi(self)
         tools_gw.load_settings(self.dlg_go2iber)
         if self.ig_options_class is None:

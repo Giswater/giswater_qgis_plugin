@@ -651,7 +651,7 @@ class AddNewLot:
         if result and result.get("status") == "Accepted":
             self.lot_id = result["body"]["feature"]["id"]
             self.is_new_lot = False
-            print("remove selection")
+
             tools_gw.remove_selection(True, layers=self.rel_layers)
             tools_gw.reset_rubberband(self.rubber_band)
             tools_qgis.force_refresh_map_canvas()

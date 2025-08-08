@@ -293,7 +293,6 @@ class GwInfo(QObject):
 
         except Exception as e:
             msg = "Exception in info"
-            print("msg:", msg)
             tools_qgis.show_warning(msg, parameter=e)
             msg = str(traceback.format_exc())
             tools_log.log_error(msg)
@@ -2823,7 +2822,6 @@ class GwInfo(QObject):
             widget.setAllowNull(True)
 
         if widget.dateTime() == QDateTime():
-            print("widget.dateTime() is None or null")
             widget.displayNull(True)
         else:
             widget.displayNull(False)
