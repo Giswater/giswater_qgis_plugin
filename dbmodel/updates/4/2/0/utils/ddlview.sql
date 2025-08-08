@@ -636,6 +636,3 @@ SELECT plan_psector.psector_id,
             GROUP BY v_plan_psector_x_other.psector_id
         ) c ON c.psector_id = plan_psector.psector_id
 WHERE EXISTS (SELECT 1 FROM sel_psector WHERE sel_psector.psector_id = plan_psector.psector_id);
-
-
-ALTER VIEW IF EXISTS v_rtc_hydrometer_x_connec RENAME TO v_hydrometer_x_connec;

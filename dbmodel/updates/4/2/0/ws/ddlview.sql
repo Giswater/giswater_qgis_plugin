@@ -2359,11 +2359,10 @@ ALTER VIEW v_edit_review_audit_connec RENAME TO ve_review_audit_connec;
 ALTER VIEW v_edit_review_audit_node RENAME TO ve_review_audit_node;
 ALTER VIEW v_edit_review_connec RENAME TO ve_review_connec;
 ALTER VIEW v_edit_review_node RENAME TO ve_review_node;
-ALTER VIEW v_edit_rtc_hydro_data_x_connec RENAME TO ve_connec_hydro_data;
+ALTER VIEW v_edit_rtc_hydro_data_x_connec RENAME TO ve_rtc_hydro_data_x_connec;
 ALTER VIEW v_edit_samplepoint RENAME TO ve_samplepoint;
 ALTER VIEW v_edit_sector RENAME TO ve_sector;
 ALTER VIEW v_edit_supplyzone RENAME TO ve_supplyzone;
-ALTER VIEW IF EXISTS v_rtc_hydrometer_x_node RENAME TO v_hydrometer_x_node;
 
 DROP VIEW IF EXISTS ve_plan_psector_x_connec;
 
