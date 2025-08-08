@@ -805,22 +805,36 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                     valueRelation = valueRelation.get('valueRelation')
             if valueRelation:
                 for vr in valueRelation:
-                    vr_layer = tools_qgis.get_layer_by_tablename(vr['targerLayer'])  # Get 'Layer'
-                    field_index = vr_layer.fields().indexFromName(vr['targetColumn'])   # Get 'Column' index
-                    vr_key_column = vr['keyColumn']  # Get 'Key'
-                    vr_value_column = vr['valueColumn']  # Get 'Value'
-                    vr_allow_nullvalue = vr['nullValue']  # Get null values
-                    vr_filter_expression = vr['filterExpression']  # Get 'FilterExpression'
+                    # Get required keys with safe defaults
+                    vr_layer = tools_qgis.get_layer_by_tablename(vr.get('targerLayer', ''))  # Get 'Layer' with default
+                    
+                    # Check if layer exists before proceeding
+                    if vr_layer is None:
+                        continue
+                        
+                    field_index = vr_layer.fields().indexFromName(vr.get('targetColumn', 'id'))   # Get 'Column' index with default
+                    
+                    # Check if field exists before proceeding
+                    if field_index == -1:
+                        continue
+                    # Get required keys with safe defaults
+                    vr_key_column = vr.get('keyColumn', 'id')  # Get 'Key' with default
+                    vr_value_column = vr.get('valueColumn', 'idval')  # Get 'Value' with default
+                    vr_allow_nullvalue = vr.get('nullValue', 'False')  # Get null values with default
+                    vr_filter_expression = vr.get('filterExpression', '')  # Get 'FilterExpression' with default
                     if vr_filter_expression is None:
                         vr_filter_expression = ''
+                    vr_allow_multi = vr.get('allowMulti', 'False')  # Get 'AllowMulti' with default
+                    vr_nof_columns = vr.get('nofColumns', '0')  # Get 'NofColumns' with default
 
                     # Create and apply ValueRelation config
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{layer.id()}',
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
                                                                                  'Key': f'{vr_key_column}',
                                                                                  'Value': f'{vr_value_column}',
                                                                                  'AllowNull': f'{vr_allow_nullvalue}',
-                                                                                 'FilterExpression': f'{vr_filter_expression}'
-                                                                                 })
+                                                                                 'FilterExpression': f'{vr_filter_expression}',
+                                                                                 'AllowMulti': f'{vr_allow_multi}',
+                                                                                 'NofColumns': f'{vr_nof_columns}'})
                     vr_layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
     if visibility is not None:
@@ -1132,25 +1146,34 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
         # Manage ValueRelation configuration
         use_vr = 'widgetcontrols' in field and field['widgetcontrols'] \
                  and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']
+
         if use_vr:
             value_relation = field['widgetcontrols']['valueRelation']
             if value_relation.get('activated'):
                 try:
-                    vr_layer = value_relation['layer']
-                    vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
-                    vr_key_column = value_relation['keyColumn']  # Get 'Key'
-                    vr_value_column = value_relation['valueColumn']  # Get 'Value'
-                    vr_allow_nullvalue = value_relation['nullValue']  # Get null values
-                    vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
+                    vr_layer = value_relation.get('layer', '')
+                    layer_obj = tools_qgis.get_layer_by_tablename(vr_layer)
+                    if layer_obj is None:
+                        raise Exception(f"Layer '{vr_layer}' not found")
+                    vr_layer = layer_obj.id()  # Get layer id
+                    # Get required keys with safe defaults
+                    vr_key_column = value_relation.get('keyColumn', 'id')  # Get 'Key' with default
+                    vr_value_column = value_relation.get('valueColumn', 'idval')  # Get 'Value' with default
+                    vr_allow_nullvalue = value_relation.get('nullValue', 'False')  # Get null values with default
+                    vr_filter_expression = value_relation.get('filterExpression', '')  # Get 'FilterExpression' with default
                     if vr_filter_expression is None:
                         vr_filter_expression = ''
+                    vr_allow_multi = value_relation.get('allowMulti', 'False')  # Get 'AllowMulti' with default
+                    vr_nof_columns = value_relation.get('nofColumns', '0')  # Get 'NofColumns' with default
 
                     # Create and apply ValueRelation config
                     editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
                                                                                  'Key': f'{vr_key_column}',
                                                                                  'Value': f'{vr_value_column}',
                                                                                  'AllowNull': f'{vr_allow_nullvalue}',
-                                                                                 'FilterExpression': f'{vr_filter_expression}'})
+                                                                                 'FilterExpression': f'{vr_filter_expression}',
+                                                                                 'AllowMulti': f'{vr_allow_multi}',
+                                                                                 'NofColumns': f'{vr_nof_columns}'})
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
                 except Exception as e:
