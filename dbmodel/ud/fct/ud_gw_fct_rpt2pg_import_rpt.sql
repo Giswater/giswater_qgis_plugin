@@ -112,7 +112,6 @@ BEGIN
 
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='Washoff';
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='kg';
-	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1=(SELECT poll_id FROM vi_pollutants LIMIT 1);
 
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Depth';
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Average' and csv2='Maximum';
