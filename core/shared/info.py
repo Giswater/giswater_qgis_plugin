@@ -3305,13 +3305,6 @@ class GwInfo(QObject):
 
         tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
-        
-        # Set sys_type with the selected feature_cat.id
-        sys_type_field_index = self.info_layer.fields().indexFromName('sys_type')
-        if sys_type_field_index != -1 and hasattr(self, 'feature_cat') and self.feature_cat:
-            feature.setAttribute(sys_type_field_index, self.feature_cat.feature_class)
-            self.info_layer.updateFeature(feature)
-        
         if linked_feature and linked_feature.get('geometry'):
             geom = QgsGeometry.fromWkt(linked_feature.get('geometry', {}).get("st_astext"))
             if geom:
