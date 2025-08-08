@@ -1943,3 +1943,36 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psect
 
 DELETE FROM sys_table WHERE id = 'v_value_cat_connec';
 DELETE FROM sys_table WHERE id = 'v_value_cat_node';
+
+-- config_form_fields inp_dscenario_frpump
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder, field_layoutorder)
+VALUES
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'dscenario_id', 'lyt_main_1', 1, 'integer', 'text', 'Dscenario id:', 'Dscenario id', NULL, true, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'element_id', 'lyt_main_1', 2, 'integer', 'text', 'Element id:', 'Element id', NULL, true, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'power', 'lyt_main_1', 3, 'string', 'text', 'Power:', 'Power', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'curve_id', 'lyt_main_1', 4, 'string', 'combo', 'Curve id:', 'Curve id', NULL, false, NULL, true, NULL, false, 'SELECT id as id, id as idval FROM inp_curve WHERE id IS NOT NULL AND curve_type IN (''PUMP'', ''PUMP1'', ''PUMP2'', ''PUMP3'', ''PUMP4'')', true, true, NULL, NULL, NULL, '{"valueRelation":{"nullValue":false, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'::json, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'speed', 'lyt_main_1', 5, 'numeric', 'text', 'Speed:', 'Speed', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'pattern_id', 'lyt_main_1', 6, 'string', 'combo', 'Pattern id:', 'Pattern id', NULL, false, NULL, true, NULL, false, 'SELECT pattern_id as id, pattern_id as idval FROM inp_pattern WHERE pattern_id IS NOT NULL', true, true, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'status', 'lyt_main_1', 7, 'string', 'combo', 'Status:', 'Status', NULL, false, NULL, true, NULL, false, 'SELECT DISTINCT id AS id, idval AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue = ''inp_value_status_pump''', true, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'effic_curve_id', 'lyt_main_1', 8, 'string', 'combo', 'Eff. curve:', 'Eff. curve', NULL, false, NULL, true, NULL, false, 'SELECT id as id, id as idval FROM inp_curve WHERE id IS NOT NULL AND curve_type = ''EFFICIENCY''', true, true, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'energy_price', 'lyt_main_1', 9, 'double', 'text', 'Energy price:', 'Energy price', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frpump', 'form_feature', 'tab_none', 'energy_pattern_id', 'lyt_main_1', 10, 'string', 'combo', 'Price pattern:', 'Price pattern', NULL, false, NULL, true, NULL, false, 'SELECT pattern_id as id, pattern_id as idval FROM inp_pattern WHERE pattern_id IS NOT NULL', true, true, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, NULL, NULL);
+
+-- config_form_fields inp_dscenario_frvalve
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder, field_layoutorder)
+VALUES
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'dscenario_id', 'lyt_main_1', 1, 'integer', 'text', 'Dscenario id:', 'Dscenario id', NULL, true, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'element_id', 'lyt_main_1', 2, 'integer', 'text', 'Element id:', 'Element id', NULL, true, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'valve_type', 'lyt_main_1', 3, 'string', 'combo', 'Valve type:', 'Valve type', NULL, false, NULL, true, NULL, false, 'SELECT DISTINCT id AS id, idval AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue = ''inp_typevalue_valve''', true, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'custom_dint', 'lyt_main_1', 4, 'numeric', 'text', 'Custom dint:', 'Custom dint', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'setting', 'lyt_main_1', 5, 'numeric', 'text', 'Setting:', 'Setting', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'curve_id', 'lyt_main_1', 6, 'string', 'combo', 'Curve id:', 'Curve id', NULL, false, NULL, true, NULL, false, 'SELECT id as id, id as idval FROM inp_curve WHERE id IS NOT NULL', true, true, NULL, NULL, NULL, '{"valueRelation":{"nullValue":false, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'::json, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'minorloss', 'lyt_main_1', 7, 'numeric', 'text', 'Minorloss:', 'Minorloss', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'add_settings', 'lyt_main_1', 8, 'double', 'text', 'Add settings:', 'Add settings', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'init_quality', 'lyt_main_1', 9, 'double', 'text', 'Init quality:', 'Init quality', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL);
+
+UPDATE sys_table
+	SET addparam='{"pkey": "dscenario_id, element_id"}'::json
+	WHERE id IN ('inp_dscenario_frpump', 'inp_dscenario_frvalve', 've_inp_dscenario_frpump', 've_inp_dscenario_frvalve');
