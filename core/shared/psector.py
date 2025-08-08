@@ -996,7 +996,7 @@ class GwPsector:
                                 sql += column_name + ", "
 
                 sql = sql[:len(sql) - 2] + ") "
-                values = values[:len(values) - 2] + ")"            
+                values = values[:len(values) - 2] + ")"
                 sql += f"{values} RETURNING psector_id;"
                 new_psector_id = tools_db.execute_returning(sql)
                 if new_psector_id:
@@ -1023,7 +1023,7 @@ class GwPsector:
 
         if psector_id in (None, "null"):
             return False
-        
+
         extras = f'"psectorId":"{psector_id}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_checktopologypsector', body)
@@ -1736,14 +1736,14 @@ class GwPsector:
         if cur_psector and cur_psector[0] is not None:
             sql += f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({scenario_id}, current_user);"
         tools_db.execute_sql(sql)
-                
+
         # Re-open the dialog
         tools_gw.open_dialog(dialog, dlg_name='plan_psector')
 
     def _filter_table(self, dialog, table, widget_txt, chk_active=None, chk_archived=None, tablename=None):
-        
+
         result_select = tools_qt.get_text(dialog, widget_txt)
-        
+
         # Get checkbox states
         active_checked = chk_active.isChecked() if chk_active else False
         archive_checked = chk_archived.isChecked() if chk_archived else False
@@ -1753,7 +1753,7 @@ class GwPsector:
         # Handle active filter
         if not active_checked:
             expr += " active is true"
-        
+
         # Handle archive filter
         if not archive_checked:
             if expr != "":
@@ -1889,14 +1889,17 @@ class GwPsector:
         Handles the dialog close event, ensuring the checkbox is unchecked
         and the filter is disabled if it was still active.
         """
-        if self.dlg_psector_mng.chk_filter_canvas.isChecked():
-            # Uncheck the checkbox and disable the filter
-            self.dlg_psector_mng.chk_filter_canvas.setChecked(False)
-            # Disable filter and restore visibility
-            self._toggle_canvas_filter()
+        try:
+            if self.dlg_psector_mng.chk_filter_canvas.isChecked():
+                # Uncheck the checkbox and disable the filter
+                self.dlg_psector_mng.chk_filter_canvas.setChecked(False)
+                # Disable filter and restore visibility
+                self._toggle_canvas_filter()
 
-        # Accept the close event to allow the dialog to close
-        tools_gw.close_dialog(self.dlg_psector_mng)
+            # Accept the close event to allow the dialog to close
+            tools_gw.close_dialog(self.dlg_psector_mng)
+        except RuntimeError:
+            pass
 
     def charge_psector(self, qtbl_psm):
 
@@ -2162,7 +2165,7 @@ class GwPsector:
                       f'"value":"True"')
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure("gw_fct_getselectors", body)
-            
+
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @feature_type """
 
@@ -3094,6 +3097,6 @@ def enable(**kwargs):
 
 def accept(**kwargs):
     """ Accept button action """
-    
+
     class_obj = kwargs["class"]
     class_obj.insert_or_update_new_psector(True)
