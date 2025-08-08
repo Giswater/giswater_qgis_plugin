@@ -2708,10 +2708,15 @@ class GwInfo(QObject):
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_elements')
+            tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
             if global_vars.project_type == 'ud':
-                tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
                 tab_widget.setTabVisible(4, False)
                 tab_widget.setTabEnabled(4, False)
+            elif global_vars.project_type == 'ws':
+                for i in [0, 1, 3]:
+                    tab_widget.setTabVisible(i, False)
+                    tab_widget.setTabEnabled(i, False)
+
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_element_loaded = True
