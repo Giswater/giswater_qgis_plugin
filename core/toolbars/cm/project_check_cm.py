@@ -48,7 +48,8 @@ class GwProjectCheckCMTask(GwTask):
             campaign_id = self.params.get("campaign_id")
             lot_id = self.params.get("lot_id")
             check_management_configs = self.params.get("check_management_configs", False)
-            check_data_related = self.params.get("check_data_related", False)
+            # Always perform data-related checks
+            check_data_related = self.params.get("check_data_related", True)
 
             # Extract the actual ID values if they are lists [id, name]
             if isinstance(campaign_id, list) and len(campaign_id) > 0:
