@@ -1003,7 +1003,7 @@ class GwPsector:
                     self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").setEnabled(False)
                     tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id[0]))
                     cur_psector = tools_gw.get_config_value('plan_psector_current')
-                    if cur_psector and cur_psector[0] is not None:
+                    if cur_psector is not None:
                         sql = (f"UPDATE config_param_user "
                             f" SET value = $${new_psector_id[0]}$$ "
                             f" WHERE parameter = 'plan_psector_current'"
