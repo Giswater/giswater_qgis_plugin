@@ -337,3 +337,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psect
 
 UPDATE sys_table SET id = 've_connec_hydro_data' WHERE id = 've_rtc_hydro_data_x_connec';
 UPDATE sys_table SET id = 'v_hydrometer_x_connec' WHERE id = 'v_rtc_hydrometer_x_connec';
+
+
+UPDATE sys_param_user SET isenabled = false where id = 'plan_psector_current';
