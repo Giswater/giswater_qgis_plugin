@@ -77,7 +77,7 @@ DECLARE
 	v_form_name text;
 	v_verified_combo_columns text[];
 
-	v_total_q1 integer;
+    v_total_q1 integer;
 	v_total_q2 integer;
 	v_total_count integer;
 	v_temp_q1 integer;
@@ -103,7 +103,21 @@ DECLARE
 	v_arc_divide_tolerance float := 0.05;
 	v_sample_value text;
 	v_is_numeric boolean;
-	v_is_text boolean;
+    v_is_text boolean;
+    -- counters for summary messages
+    v_outlier_rules_checked integer := 0;
+    v_mandatory_checks_count integer := 0;
+    v_fprocess_checks_count integer := 0;
+    v_total_checks_executed integer := 0;
+    v_effective_check_column text;
+    -- feature presence flags for scoped messaging
+    v_has_nodes_in_scope boolean := false;
+    v_has_arcs_in_scope boolean := false;
+    v_has_connecs_in_scope boolean := false;
+    v_has_links_in_scope boolean := false;
+    -- arc missing-node check helpers
+    v_missing_arc_nodes_count integer := 0;
+    v_has_any_arcs boolean := false;
 
 BEGIN
 
@@ -208,15 +222,12 @@ BEGIN
 
 	-- SECTION[epic=checkproject]: Perform outlier checks based on config_outlayers
 	-- Check if outlier rules are configured
-	IF NOT EXISTS (SELECT 1 FROM cm.config_outlayers) THEN
-		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
-		VALUES (v_fid, current_user, 1, 'INFO: No outlier rules configured in config_outlayers table.', 0);
-	ELSE
-		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
-		VALUES (v_fid, current_user, 1, format('INFO: Starting outlier validation - checking %s configured rules.', (SELECT count(*) FROM cm.config_outlayers)), 0);
-		
-		FOR v_rec IN SELECT * FROM cm.config_outlayers
+    IF EXISTS (SELECT 1 FROM cm.config_outlayers) THEN
+        v_outlier_rules_checked := 0;
+
+        FOR v_rec IN SELECT * FROM cm.config_outlayers
 		LOOP
+            v_outlier_rules_checked := v_outlier_rules_checked + 1;
 			v_conditions := ARRAY[]::text[];
 			
 			-- Check column data type and build appropriate conditions
@@ -427,14 +438,29 @@ BEGIN
 					0
 				);
 			END IF;
-		END LOOP;
-		
-		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
-		VALUES (v_fid, current_user, 1, 'INFO: Outlier validation completed successfully.', 0);
-	END IF;
+        END LOOP;
+
+        INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+        VALUES (v_fid, current_user, 1,
+                format('INFO: Outlier validation checked %s configured rules.', v_outlier_rules_checked),
+                v_outlier_rules_checked);
+    END IF;
     -- ENDSECTION
 
-	-- SECTION[epic=checkproject]: Check for arcs without nodes
+    -- SECTION[epic=checkproject]: Check for arcs without nodes
+    -- Detect if there are arcs in scope to emit a positive INFO when no issues are found
+    BEGIN
+        IF v_campaign_id IS NOT NULL THEN
+            PERFORM 1 FROM cm.om_campaign_x_arc WHERE campaign_id = v_campaign_id LIMIT 1;
+            IF FOUND THEN v_has_any_arcs := true; END IF;
+        END IF;
+        IF v_lot_id IS NOT NULL THEN
+            PERFORM 1 FROM cm.om_campaign_lot_x_arc WHERE lot_id = v_lot_id LIMIT 1;
+            IF FOUND THEN v_has_any_arcs := true; END IF;
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        v_has_any_arcs := v_has_arcs_in_scope; -- fallback to previously computed flag
+    END;
 	FOR v_rec IN
 		SELECT 'om_campaign_x_arc' AS table_name, 'campaign_id' AS id_column, v_campaign_id AS id_value
 		UNION ALL
@@ -456,7 +482,7 @@ BEGIN
 				);
 			END IF;
 
-			FOR v_rec_check IN EXECUTE v_querytext
+            FOR v_rec_check IN EXECUTE v_querytext
 			LOOP
 				INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
 				VALUES (
@@ -471,9 +497,15 @@ BEGIN
 				VALUES (v_rec_check.arc_id, 'Arc missing start/end node', v_rec_check.the_geom, v_fid);
 
 				v_any_issue_found := true;
+                v_missing_arc_nodes_count := v_missing_arc_nodes_count + 1;
 			END LOOP;
 		END IF;
 	END LOOP;
+    -- If no missing-node arcs were found but there ARE arcs in scope, add an explicit OK message
+    IF v_has_any_arcs AND v_missing_arc_nodes_count = 0 THEN
+        INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+        VALUES (v_fid, current_user, 1, 'INFO: All arcs are connected to both start and end nodes (node_1 and node_2).', 0);
+    END IF;
 	-- ENDSECTION
 
 	-- SECTION[epic=checkproject]: Find and flag nodes that should divide arcs
@@ -623,10 +655,21 @@ BEGIN
 				GROUP BY feature_type, cf.id
 			';
 
-			FOR v_rec IN EXECUTE v_querytext USING v_lot_id_array LOOP
+            FOR v_rec IN EXECUTE v_querytext USING v_lot_id_array LOOP
 				v_feature_view_name := 'PARENT_SCHEMA_' || v_rec.child_type;
 				v_feature_table_name := 'om_campaign_lot_x_' || v_rec.feature_type;
 				v_feature_id_column := v_rec.feature_type || '_id';
+
+                -- mark presence by feature type when IDs exist
+                IF v_rec.feature_type = 'node' AND array_length(v_rec.feature_ids, 1) > 0 THEN
+                    v_has_nodes_in_scope := true;
+                ELSIF v_rec.feature_type = 'arc' AND array_length(v_rec.feature_ids, 1) > 0 THEN
+                    v_has_arcs_in_scope := true;
+                ELSIF v_rec.feature_type = 'connec' AND array_length(v_rec.feature_ids, 1) > 0 THEN
+                    v_has_connecs_in_scope := true;
+                ELSIF v_rec.feature_type = 'link' AND array_length(v_rec.feature_ids, 1) > 0 THEN
+                    v_has_links_in_scope := true;
+                END IF;
 
 				v_querytext_cfg := '
 					SELECT DISTINCT columnname FROM PARENT_SCHEMA.config_form_fields
@@ -634,22 +677,56 @@ BEGIN
 					AND formname ILIKE ''%ve_'||v_rec.feature_type||'_'||v_rec.child_type||'%''
 				';
 
-				FOR v_rec_check IN EXECUTE v_querytext_cfg
-				LOOP
-					EXECUTE
-						'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{
-							"functionFid":' || v_fid || ',
-							"checkFid":' || v_check_mandatory_fid || ',
-							"replaceParams": ' || 
-								jsonb_build_object(
-									'table_name', v_feature_view_name,
-									'feature_column', v_feature_id_column,
-									'feature_ids', array_to_string(v_rec.feature_ids, ','),
-									'check_column', v_rec_check.columnname
-								)::text || '
-						}}}$$::json)'
-					INTO v_check_result;
-				END LOOP;
+                FOR v_rec_check IN EXECUTE v_querytext_cfg
+                LOOP
+                    -- Count attempted mandatory checks
+                    v_mandatory_checks_count := v_mandatory_checks_count + 1;
+                    -- Adapt generic column names to feature-specific equivalents
+                    v_effective_check_column := v_rec_check.columnname;
+                    IF v_rec.feature_type <> 'node' AND v_effective_check_column = 'tstamp' THEN
+                        v_effective_check_column := 'state';
+                    END IF;
+                    BEGIN
+                        EXECUTE
+                            'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{
+                                "functionFid":' || v_fid || ',
+                                "checkFid":' || v_check_mandatory_fid || ',
+                                "replaceParams": ' || 
+                                    jsonb_build_object(
+                                        'table_name', v_feature_view_name,
+                                        'feature_column', v_feature_id_column,
+                                        'feature_ids', array_to_string(v_rec.feature_ids, ','),
+                                        'check_column', v_effective_check_column
+                                    )::text || '
+                            }}}$$::json)'
+                        INTO v_check_result;
+                    EXCEPTION
+                        WHEN undefined_column THEN
+                            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+                            VALUES (
+                                v_fid,
+                                current_user,
+                                1,
+                                format('INFO: Skipping mandatory check for table %%s, column %%I (column not found).', v_feature_view_name, v_rec_check.columnname)
+                            );
+                        WHEN undefined_table THEN
+                            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+                            VALUES (
+                                v_fid,
+                                current_user,
+                                1,
+                                format('INFO: Skipping mandatory check for table %%s (table not found).', v_feature_view_name)
+                            );
+                        WHEN OTHERS THEN
+                            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+                            VALUES (
+                                v_fid,
+                                current_user,
+                                2,
+                                format('WARNING: Error running mandatory check on table %%s, column %%I. Error: %%s', v_feature_view_name, v_rec_check.columnname, SQLERRM)
+                            );
+                    END;
+                END LOOP;
 			END LOOP;
 		END LOOP;
 	END IF;
@@ -762,6 +839,58 @@ BEGIN
 						END;
 					END IF;
 				END LOOP; -- end loop for combo columns
+
+				-- Build and execute qindex UPDATE for the lot (mirror campaign logic)
+				-- 1) Collect combo columns configured for this form
+				v_querytext := format(
+					'SELECT array_agg(columnname)
+					 FROM PARENT_SCHEMA.config_form_fields
+					 WHERE formname = %L AND widgettype LIKE ''combo%%''',
+					 v_form_name
+				);
+				EXECUTE v_querytext INTO v_combo_columns;
+
+				-- 2) Verify columns exist in the underlying base table
+				IF v_combo_columns IS NOT NULL AND array_length(v_combo_columns, 1) > 0 THEN
+					v_querytext := format(
+						'SELECT array_agg(c.column_name) FROM information_schema.columns c
+						 WHERE c.table_schema = ''PARENT_SCHEMA'' AND c.table_name = %L AND c.column_name = ANY(%L)',
+						 v_feature_type_iterator, v_combo_columns
+					);
+					EXECUTE v_querytext INTO v_verified_combo_columns;
+
+					-- 3) Build calculation only with verified columns
+					IF v_verified_combo_columns IS NOT NULL AND array_length(v_verified_combo_columns, 1) > 0 THEN
+						SELECT string_agg(
+							format('(CASE WHEN T2.%I IS NOT NULL AND T2.%I::text = ''0'' THEN 1 ELSE 0 END)', columnname, columnname),
+							' + '
+						)
+						INTO v_update_calculation
+						FROM unnest(v_verified_combo_columns) AS columnname;
+
+						-- 4) Execute UPDATE on lot_x table for the subtype
+						v_querytext := format(
+							'UPDATE cm.om_campaign_lot_x_%1$s T1 SET %2$I = %3$s
+							 FROM PARENT_SCHEMA.%1$s T2
+							 JOIN PARENT_SCHEMA.cat_%1$s T3 ON T2.%5$I = T3.id
+							 WHERE T1.%1$s_id::text = T2.%1$s_id::text
+							   AND T1.lot_id = %4$s
+							   AND lower(T3.%1$s_type) = %6$L',
+							v_feature_type_iterator, v_qindex_column, COALESCE(v_update_calculation, '0'),
+							v_lot_id, v_feature_cat_id_col, v_rec_subtype.subtype
+						);
+
+						BEGIN
+							EXECUTE v_querytext;
+						EXCEPTION
+							WHEN OTHERS THEN
+								INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+								VALUES (v_fid, current_user, 2,
+									format('WARNING: Error updating qindex for lot %s, feature type %s, subtype %s. Error: %s',
+										v_lot_id, v_feature_type_iterator, v_rec_subtype.subtype, SQLERRM));
+						END;
+					END IF;
+				END IF;
 			END LOOP; -- end loop for subtypes
 		END LOOP; -- end loop for feature types
 
@@ -975,7 +1104,7 @@ BEGIN
 	-- ENDSECTION
 
 	-- SECTION[epic=checkproject]: Get fprocesses
-	IF array_length(v_fids_to_run, 1) > 0 THEN
+    IF array_length(v_fids_to_run, 1) > 0 THEN
 		v_querytext := '
 			SELECT fid, fprocess_name
 			FROM cm.sys_fprocess
@@ -992,6 +1121,7 @@ BEGIN
 			EXECUTE
 				'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{"functionFid":' || v_fid || ',"checkFid":' || v_rec.fid || '}}}$$)'
 				INTO v_check_result;
+            v_fprocess_checks_count := v_fprocess_checks_count + 1;
 			
 			-- Remove the issue_found check since the function doesn't return this field
 			-- The function will log issues directly to t_audit_check_data
@@ -1000,17 +1130,29 @@ BEGIN
 	-- ENDSECTION
 
 	-- Insert summary messages at the end
-	IF v_lot_summary_msg IS NOT NULL THEN
+    v_total_checks_executed := COALESCE(v_outlier_rules_checked, 0) + COALESCE(v_mandatory_checks_count, 0) + COALESCE(v_fprocess_checks_count, 0);
+
+    IF v_total_checks_executed > 0 THEN
+        INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+        VALUES (v_fid, current_user, 1, format('INFO: Total checks executed: %s', v_total_checks_executed));
+    END IF;
+
+    -- If nodes are not in scope for this campaign/lot, remove node-only informational noise
+    IF NOT v_has_nodes_in_scope THEN
+        DELETE FROM t_audit_check_data
+        WHERE fid = v_fid
+          AND criticity = 1
+          AND (
+              error_message ILIKE '%orphan node%'
+              OR error_message ILIKE '%nodes duplicated%'
+          );
+    END IF;
+
+    IF v_lot_summary_msg IS NOT NULL THEN
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, v_lot_summary_msg);
 	END IF;
 	IF v_campaign_summary_msg IS NOT NULL THEN
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, v_campaign_summary_msg);
-	END IF;
-
-	-- Add a final "all clear" message if no issues were found.
-	IF NOT v_any_issue_found THEN
-		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
-		VALUES (v_fid, current_user, 1, 'INFO: All project configurations checks passed successfully.');
 	END IF;
 
 	-- SECTION[epic=catalog_check]: Check catalog tables

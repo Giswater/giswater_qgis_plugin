@@ -31,6 +31,7 @@ DECLARE
     v_missing_catalog text;
     v_catalog_id integer;
     v_count integer;
+    v_new_needed_count integer := 0;
     v_feature_type text;
     v_subtype text;
     v_form_name text;
@@ -130,19 +131,18 @@ BEGIN
                         
                         v_log := v_log || 'INFO: For arc ID ' || v_feature_id || ' (subtype ' || v_subtype || 
                                  ') - Created new catalog entry with ID: ' || v_new_catalog_id || chr(10);
+                        v_new_needed_count := v_new_needed_count + 1;
                     ELSE
                         v_log := v_log || 'INFO: For arc ID ' || v_feature_id || ' (subtype ' || v_subtype || 
                                  ') - A new catalog entry will be created when added to production. ' ||
                                  'Combination: dnom=' || v_feature_record.cat_dnom || 
                                  ', matcat_id=' || v_feature_record.cat_matcat_id || 
                                  ', pnom=' || v_feature_record.cat_pnom || chr(10);
+                        v_new_needed_count := v_new_needed_count + 1;
                     END IF;
                     
                     -- Add to processed combinations
                     v_processed_combinations := array_append(v_processed_combinations, v_combination_key);
-                ELSE
-                    v_log := v_log || 'INFO: For arc ID ' || v_feature_id || ' (subtype ' || v_subtype || 
-                             ') - No catalog creation needed. Catalog entry exists.' || chr(10);
                 END IF;
             END LOOP;
         EXCEPTION WHEN OTHERS THEN
@@ -210,19 +210,18 @@ BEGIN
                         
                         v_log := v_log || 'INFO: For arc ID ' || v_feature_id || ' (subtype ' || v_subtype || 
                                  ') - Created new catalog entry with ID: ' || v_new_catalog_id || chr(10);
+                        v_new_needed_count := v_new_needed_count + 1;
                     ELSE
                         v_log := v_log || 'INFO: For arc ID ' || v_feature_id || ' (subtype ' || v_subtype || 
                                  ') - A new catalog entry will be created when added to production. ' ||
                                  'Combination: dnom=' || v_feature_record.cat_dnom || 
                                  ', matcat_id=' || v_feature_record.cat_matcat_id || 
                                  ', pnom=' || v_feature_record.cat_pnom || chr(10);
+                        v_new_needed_count := v_new_needed_count + 1;
                     END IF;
                     
                     -- Add to processed combinations
                     v_processed_combinations := array_append(v_processed_combinations, v_combination_key);
-                ELSE
-                    v_log := v_log || 'INFO: For arc ID ' || v_feature_id || ' (subtype ' || v_subtype || 
-                             ') - No catalog creation needed. Catalog entry exists.' || chr(10);
                 END IF;
             END LOOP;
         EXCEPTION WHEN OTHERS THEN
@@ -290,19 +289,18 @@ BEGIN
                         
                         v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
                                  ') - Created new catalog entry with ID: ' || v_new_catalog_id || chr(10);
+                        v_new_needed_count := v_new_needed_count + 1;
                     ELSE
                         v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
                                  ') - A new catalog entry will be created when added to production. ' ||
                                  'Combination: node_type=' || v_feature_record.node_type || 
                                  ', matcat_id=' || v_feature_record.cat_matcat_id || 
                                  ', dnom=' || v_feature_record.cat_dnom || chr(10);
+                        v_new_needed_count := v_new_needed_count + 1;
                     END IF;
                     
                     -- Add to processed combinations
                     v_processed_combinations := array_append(v_processed_combinations, v_combination_key);
-                ELSE
-                    v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
-                             ') - No catalog creation needed. Catalog entry exists.' || chr(10);
                 END IF;
             END LOOP;
         EXCEPTION WHEN OTHERS THEN
@@ -371,19 +369,18 @@ BEGIN
                         
                         v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
                                  ') - Created new catalog entry with ID: ' || v_new_catalog_id || chr(10);
+                        v_new_needed_count := v_new_needed_count + 1;
                     ELSE
                         v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
                                  ') - A new catalog entry will be created when added to production. ' ||
                                  'Combination: node_type=' || v_feature_record.node_type || 
                                  ', matcat_id=' || v_feature_record.cat_matcat_id || 
                                  ', dnom=' || v_feature_record.cat_dnom || chr(10);
+                        v_new_needed_count := v_new_needed_count + 1;
                     END IF;
                     
                     -- Add to processed combinations
                     v_processed_combinations := array_append(v_processed_combinations, v_combination_key);
-                ELSE
-                    v_log := v_log || 'INFO: For node ID ' || v_feature_id || ' (subtype ' || v_subtype || 
-                             ') - No catalog creation needed. Catalog entry exists.' || chr(10);
                 END IF;
             END LOOP;
         EXCEPTION WHEN OTHERS THEN
@@ -400,9 +397,11 @@ BEGIN
         );
     ELSE
         -- Add final summary message
-        IF v_log LIKE '%new catalog entry will be created%' THEN
-            v_log := v_log || 'INFO: Some features will create new catalog entries when added to production.' || chr(10);
-        ELSIF v_log LIKE '%No catalog creation needed%' THEN
+        IF v_new_needed_count > 0 THEN
+            v_log := v_log || format('INFO: %s catalog entr%s will be created when added to production.',
+                                      v_new_needed_count,
+                                      CASE WHEN v_new_needed_count = 1 THEN 'y' ELSE 'ies' END) || chr(10);
+        ELSIF v_new_needed_count = 0 THEN
             v_log := v_log || 'INFO: All selected features have existing catalog entries - no new catalogs needed.' || chr(10);
         ELSE
             v_log := v_log || 'INFO: No catalog combinations were found to validate.' || chr(10);
