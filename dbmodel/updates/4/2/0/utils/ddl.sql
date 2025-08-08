@@ -19,4 +19,3 @@ ALTER TABLE config_form_fields ADD COLUMN field_layoutorder int4 NULL;
 
 DROP RULE insert_plan_psector_x_node ON node;
 DROP RULE insert_plan_psector_x_arc ON arc;
-DROP RULE insert_plan_psector_x_connec ON connec;
