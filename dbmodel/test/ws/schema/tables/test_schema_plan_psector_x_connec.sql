@@ -21,7 +21,7 @@ SELECT columns_are(
     'plan_psector_x_connec',
     ARRAY[
         'id', 'connec_id', 'arc_id', 'psector_id', 'state', 'doable', 'descript', '_link_geom_',
-        '_userdefined_geom_', 'link_id', 'active', 'insert_tstamp', 'insert_user'
+        '_userdefined_geom_', 'link_id', 'insert_tstamp', 'insert_user'
     ],
     'Table plan_psector_x_connec should have the correct columns'
 );
@@ -40,13 +40,11 @@ SELECT col_type_is('plan_psector_x_connec', 'descript', 'character varying(254)'
 SELECT col_type_is('plan_psector_x_connec', '_link_geom_', 'geometry(LineString,25831)', 'Column _link_geom_ should be geometry(LineString,25831)');
 SELECT col_type_is('plan_psector_x_connec', '_userdefined_geom_', 'boolean', 'Column _userdefined_geom_ should be boolean');
 SELECT col_type_is('plan_psector_x_connec', 'link_id', 'integer', 'Column link_id should be integer');
-SELECT col_type_is('plan_psector_x_connec', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('plan_psector_x_connec', 'insert_tstamp', 'timestamp without time zone', 'Column insert_tstamp should be timestamp without time zone');
 SELECT col_type_is('plan_psector_x_connec', 'insert_user', 'text', 'Column insert_user should be text');
 
 -- Check default values
 SELECT col_has_default('plan_psector_x_connec', 'id', 'Column id should have a default value');
-SELECT col_default_is('plan_psector_x_connec', 'active', 'true', 'Default value for active should be true');
 SELECT col_has_default('plan_psector_x_connec', 'insert_tstamp', 'Column insert_tstamp should have a default value');
 SELECT col_default_is('plan_psector_x_connec', 'insert_user', 'CURRENT_USER', 'Default value for insert_user should be CURRENT_USER');
 
