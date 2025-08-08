@@ -83,129 +83,228 @@ AS SELECT
 
 
 -- ====================
+CREATE OR REPLACE VIEW ve_element
+AS WITH sel_state AS (
+    SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
+), sel_sector AS (
+    SELECT selector_sector.sector_id FROM selector_sector WHERE selector_sector.cur_user = CURRENT_USER
+), sel_expl AS (
+    SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+), sel_muni AS (
+    SELECT selector_municipality.muni_id FROM selector_municipality WHERE selector_municipality.cur_user = CURRENT_USER
+), element_selector AS (
+    SELECT
+        e.element_id,
+        e.code,
+        e.sys_code,
+        e.top_elev,
+        e.elementcat_id,
+        e.num_elements,
+        e.epa_type,
+        e.state,
+        e.state_type,
+        e.expl_id,
+        e.muni_id,
+        e.sector_id,
+        e.omzone_id,
+        e.function_type,
+        e.category_type,
+        e.location_type,
+        e.observ,
+        e.comment,
+        e.workcat_id,
+        e.workcat_id_end,
+        e.builtdate,
+        e.enddate,
+        e.ownercat_id,
+        e.brand_id,
+        e.model_id,
+        e.serial_number,
+        e.asset_id,
+        e.verified,
+        e.datasource,
+        e.label_x,
+        e.label_y,
+        e.label_rotation,
+        e.rotation,
+        e.inventory,
+        e.publish,
+        e.trace_featuregeom,
+        e.lock_level,
+        e.expl_visibility,
+        e.created_at,
+        e.created_by,
+        e.updated_at,
+        e.updated_by,
+        e.the_geom
+    FROM element e
+    WHERE EXISTS (SELECT 1 FROM sel_sector s WHERE s.sector_id = e.sector_id)
+    AND EXISTS (SELECT 1 FROM sel_expl e WHERE e.expl_id = e.expl_id)
+    AND EXISTS (SELECT 1 FROM sel_state s WHERE s.state_id = e.state)
+    AND EXISTS (SELECT 1 FROM sel_muni m WHERE m.muni_id = e.muni_id)
+), element_selected AS (
+    SELECT
+        e.element_id,
+        e.code,
+        e.sys_code,
+        e.top_elev,
+        cat_element.element_type,
+        e.elementcat_id,
+        e.num_elements,
+        e.epa_type,
+        e.state,
+        e.state_type,
+        e.expl_id,
+        e.muni_id,
+        e.sector_id,
+        e.omzone_id,
+        e.function_type,
+        e.category_type,
+        e.location_type,
+        e.observ,
+        e.comment,
+        cat_element.link,
+        e.workcat_id,
+        e.workcat_id_end,
+        e.builtdate,
+        e.enddate,
+        e.ownercat_id,
+        e.brand_id,
+        e.model_id,
+        e.serial_number,
+        e.asset_id,
+        e.verified,
+        e.datasource,
+        e.label_x,
+        e.label_y,
+        e.label_rotation,
+        e.rotation,
+        e.inventory,
+        e.publish,
+        e.trace_featuregeom,
+        e.lock_level,
+        e.expl_visibility,
+        e.created_at,
+        e.created_by,
+        e.updated_at,
+        e.updated_by,
+        e.the_geom
+    FROM element_selector e
+    JOIN cat_element ON e.elementcat_id::text = cat_element.id::text
+)
+SELECT * FROM element_selected;
 
 CREATE OR REPLACE VIEW ve_frelem AS
-  SELECT element.element_id,
-    element.code,
-    element.sys_code,
-    element.top_elev,
-    cat_element.element_type,
-    element.elementcat_id,
-    element.num_elements,
-    element.epa_type,
-    element.state,
-    element.state_type,
-    element.expl_id,
-    element.muni_id,
-    element.sector_id,
-    element.omzone_id,
-    element.function_type,
-    element.category_type,
-    element.location_type,
-    element.observ,
-    element.comment,
-    cat_element.link,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.asset_id,
-    element.verified,
-    element.datasource,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.rotation,
-    element.inventory,
-    element.publish,
-    element.trace_featuregeom,
-    element.lock_level,
-    element.expl_visibility,
+  SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
     man_frelem.node_id,
     man_frelem.order_id,
     concat (man_frelem.node_id,'_FR', man_frelem.order_id) AS nodarc_id,
     man_frelem.to_arc,
     man_frelem.flwreg_length,
-    st_x(st_endpoint(st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE))) AS symbol_x,
-    st_y(st_endpoint(st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE))) AS symbol_y,
-    element.created_at,
-    element.created_by,
-    element.updated_at,
-    element.updated_by,
-    element.the_geom
-    FROM element
-    JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-    JOIN man_frelem ON element.element_id::text = man_frelem.element_id::text
-    LEFT JOIN selector_sector s USING (sector_id)
-    LEFT JOIN selector_expl e using (expl_id)
-	  JOIN arc a ON arc_id = to_arc
-    WHERE element.expl_id = e.expl_id
-    AND s.cur_user = "current_user"()::text AND e.cur_user = "current_user"()::text;
+    st_x(st_endpoint(st_setsrid(st_makeline(ve_element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE))) AS symbol_x,
+    st_y(st_endpoint(st_setsrid(st_makeline(ve_element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE))) AS symbol_y,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+    ve_element.the_geom
+    FROM ve_element
+    JOIN man_frelem ON ve_element.element_id = man_frelem.element_id
+	  JOIN arc a ON arc_id = to_arc;
 
 
 CREATE OR REPLACE VIEW ve_genelem AS
-SELECT e.* FROM (
-SELECT element.element_id,
-    element.code,
-    element.sys_code,
-    element.top_elev,
-    cat_element.element_type,
-    element.elementcat_id,
-    element.num_elements,
-    element.epa_type,
-    element.state,
-    element.state_type,
-    element.expl_id,
-    element.muni_id,
-    element.sector_id,
-    element.omzone_id,
-    element.function_type,
-    element.category_type,
-    element.location_type,
-    element.observ,
-    element.comment,
-    element.link,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.asset_id,
-    element.verified,
-    element.datasource,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.rotation,
-    element.inventory,
-    element.publish,
-    element.trace_featuregeom,
-    element.lock_level,
-    element.expl_visibility,
-    element.created_at,
-    element.created_by,
-    element.updated_at,
-    element.updated_by,
-    element.the_geom
-   FROM selector_expl, element
-    JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-    LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
-  WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
-  LEFT JOIN selector_sector s USING (sector_id)
-  LEFT JOIN selector_municipality m USING (muni_id)
-  JOIN man_genelem USING (element_id)
-  WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
-  AND (m.cur_user = current_user OR e.muni_id IS NULL);
+SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+    ve_element.the_geom
+   FROM ve_element
+   JOIN man_genelem ON ve_element.element_id = man_genelem.element_id;
 
 CREATE OR REPLACE VIEW v_ext_raster_dem
-AS SELECT DISTINCT ON (r.id) r.id,
+AS
+SELECT DISTINCT ON (r.id)
+    r.id,
     c.code,
     c.alias,
     c.raster_type,
@@ -216,9 +315,9 @@ AS SELECT DISTINCT ON (r.id) r.id,
     r.rast,
     r.rastercat_id,
     r.envelope
-    FROM v_ext_municipality a, ext_raster_dem r
-    JOIN ext_cat_raster c ON c.id = r.rastercat_id
-    WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
+FROM ext_raster_dem r
+JOIN ext_cat_raster c ON c.id = r.rastercat_id
+JOIN v_ext_municipality a ON st_dwithin(r.envelope, a.the_geom, 0::double precision);
 
 
 CREATE OR REPLACE VIEW ve_pol_element
