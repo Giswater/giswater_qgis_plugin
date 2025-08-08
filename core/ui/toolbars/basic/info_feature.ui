@@ -190,7 +190,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>83</width>
+             <width>98</width>
              <height>36</height>
             </rect>
            </property>
@@ -222,6 +222,12 @@
          <widget class="QgsCollapsibleGroupBox" name="grb_frelem_dscenario">
           <property name="title">
            <string>Dscenario</string>
+          </property>
+          <property name="collapsed">
+           <bool>true</bool>
+          </property>
+          <property name="saveCollapsedState">
+           <bool>true</bool>
           </property>
           <layout class="QGridLayout" name="gridLayout_13">
            <item row="1" column="0">

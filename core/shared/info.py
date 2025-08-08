@@ -25,7 +25,7 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoub
     QMenu, QToolButton, QTableWidget, QDialog
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
     QgsPointXY, QgsProject, QgsFeature, QgsGeometry
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsCollapsibleGroupBox
 
 from ..shared.catalog import GwCatalog
 from .dimensioning import GwDimensioning
@@ -2706,7 +2706,15 @@ class GwInfo(QObject):
 
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
+            # Save grb_frelem_dscenario state
+            # FIXME: the intended behavior is to have it be collapsed the first time, but then save the state
+            grb_dscenario = self.dlg_cf.findChild(QgsCollapsibleGroupBox, 'grb_frelem_dscenario')
+            if grb_dscenario is not None:
+                grb_dscenario_state = grb_dscenario.isCollapsed()
+                grb_dscenario.setCollapsed(False)
+            # Populate widgets
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_elements')
+            # Hide dscenario tabs
             tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
             if global_vars.project_type == 'ud':
                 tab_widget.setTabVisible(4, False)
@@ -2715,9 +2723,12 @@ class GwInfo(QObject):
                 for i in [0, 1, 3]:
                     tab_widget.setTabVisible(i, False)
                     tab_widget.setTabEnabled(i, False)
-
+            # Init tab
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
+            # Restore grb_frelem_dscenario state
+            if grb_dscenario is not None:
+                grb_dscenario.setCollapsed(grb_dscenario_state)
             self.tab_element_loaded = True
         # Tab 'EPA'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_epa' and not self.tab_epa_loaded:
