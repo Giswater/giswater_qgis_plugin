@@ -4185,18 +4185,15 @@ def add_frelem_to_dscenario(**kwargs):
         tools_qgis.show_warning(message, dialog=dialog)
         return
 
-    index = selected_list[0]
-    row = index.row()
-    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
-    element_id = index.sibling(row, column_index).data()
-
-    # Check if is frelem
-    column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_class')
-    feature_class = index.sibling(row, column_index).data()
-    if feature_class != 'FRELEM':
-        message = "Only FRELEM can be added to dscenario"
-        tools_qgis.show_warning(message, dialog=dialog)
-        return
+    # Check if all selected rows are frelem
+    for index in selected_list:
+        row = index.row()
+        column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_class')
+        feature_class = index.sibling(row, column_index).data()
+        if feature_class != 'FRELEM':
+            message = "Only FRELEM can be added to dscenario"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
 
     # Ask user for dscenario_id
     title = "Choose dscenario"
@@ -4213,20 +4210,28 @@ def add_frelem_to_dscenario(**kwargs):
         dscenario_id = edit_dialog.get_value()
         if dscenario_id is None:
             return
-        # Get frelem epa_type
-        sql = f"SELECT epa_type FROM ve_frelem WHERE element_id = '{element_id}'"
-        row = tools_db.get_row(sql)
-        if not row:
-            return
-        epa_type = row[0]
-        if epa_type == 'UNDEFINED':
-            message = "Epa type is not defined"
-            tools_qgis.show_warning(message, dialog=dialog)
-            return
-        # Add frelem to dscenario
-        sql = (f"INSERT INTO ve_inp_dscenario_{epa_type.lower()} (dscenario_id, element_id, node_id) "
-               f"VALUES ('{dscenario_id}', '{element_id}', '{node_id}')")
-        tools_db.execute_sql(sql)
+
+        # Process all selected rows
+        for index in selected_list:
+            row = index.row()
+            column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+            element_id = index.sibling(row, column_index).data()
+
+            # Get frelem epa_type
+            sql = f"SELECT epa_type FROM ve_frelem WHERE element_id = '{element_id}'"
+            row_data = tools_db.get_row(sql)
+            if not row_data:
+                continue
+            epa_type = row_data[0]
+            if epa_type == 'UNDEFINED':
+                message = f"Epa type is not defined for element {element_id}"
+                tools_qgis.show_warning(message, dialog=dialog)
+                continue
+            # Add frelem to dscenario
+            sql = (f"INSERT INTO ve_inp_dscenario_{epa_type.lower()} (dscenario_id, element_id, node_id) "
+                   f"VALUES ('{dscenario_id}', '{element_id}', '{node_id}')")
+            tools_db.execute_sql(sql)
+
         _reload_table(**kwargs)
         # TODO: switch to tab_{epa_type}
 
