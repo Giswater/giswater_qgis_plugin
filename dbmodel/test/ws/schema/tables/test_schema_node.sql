@@ -62,6 +62,7 @@ SELECT fk_ok('node', 'soilcat_id', 'cat_soil', 'id', 'FK soilcat_id should refer
 SELECT fk_ok('node', 'state', 'value_state', 'id', 'FK state should reference value_state.id');
 SELECT fk_ok('node', 'state_type', 'value_state_type', 'id', 'FK state_type should reference value_state_type.id');
 SELECT fk_ok('node', 'omzone_id', 'omzone', 'omzone_id', 'FK omzone_id should reference omzone.omzone_id');
+
 -- Check triggers
 SELECT has_trigger('node', 'gw_trg_mantypevalue_fk_insert', 'Table should have gw_trg_mantypevalue_fk_insert trigger');
 SELECT has_trigger('node', 'gw_trg_mantypevalue_fk_update', 'Table should have gw_trg_mantypevalue_fk_update trigger');
@@ -71,9 +72,9 @@ SELECT has_trigger('node', 'gw_trg_node_statecontrol', 'Table should have gw_trg
 SELECT has_trigger('node', 'gw_trg_topocontrol_node', 'Table should have gw_trg_topocontrol_node trigger');
 SELECT has_trigger('node', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('node', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
+SELECT has_trigger('node', 'gw_trg_plan_psector_after_node', 'Table should have gw_trg_plan_psector_after_node trigger');
 
 -- Check rules
-SELECT has_rule('node', 'insert_plan_psector_x_node', 'Table should have insert_plan_psector_x_node rule');
 
 -- Check constraints
 SELECT col_not_null('node', 'node_id', 'Column node_id should be NOT NULL');

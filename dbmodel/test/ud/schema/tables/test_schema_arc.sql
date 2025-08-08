@@ -40,7 +40,7 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('arc', 'arc_id', 'Column arc_id should be primary key'); 
+SELECT col_is_pk('arc', 'arc_id', 'Column arc_id should be primary key');
 
 -- Check check columns
 SELECT col_has_check('arc', 'epa_type', 'Table should have check on epa_type');
@@ -220,9 +220,9 @@ SELECT has_trigger('arc','gw_trg_mantypevalue_fk_update','Table should have trig
 SELECT has_trigger('arc','gw_trg_topocontrol_arc','Table should have trigger gw_trg_topocontrol_arc');
 SELECT has_trigger('arc','gw_trg_typevalue_fk_insert','Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('arc','gw_trg_typevalue_fk_update','Table should have trigger gw_trg_typevalue_fk_update');
+SELECT has_trigger('arc', 'gw_trg_plan_psector_after_arc', 'Table should have trigger gw_trg_plan_psector_after_arc');
 
 -- Check rules
-SELECT has_rule('arc', 'insert_plan_psector_x_arc', 'Table should have rule insert_plan_psector_x_arc');
 
 -- Finish
 SELECT * FROM finish();

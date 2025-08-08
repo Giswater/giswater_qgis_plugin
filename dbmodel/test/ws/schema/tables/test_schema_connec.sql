@@ -144,6 +144,7 @@ SELECT has_trigger('connec', 'gw_trg_mantypevalue_fk_update', 'Table should have
 SELECT has_trigger('connec', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('connec', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
 SELECT has_trigger('connec', 'gw_trg_unique_field', 'Table should have gw_trg_unique_field trigger');
+SELECT has_trigger('connec', 'gw_trg_plan_psector_after_connec', 'Table should have gw_trg_plan_psector_after_connec trigger');
 
 -- Check rules
 

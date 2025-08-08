@@ -187,3 +187,9 @@ ve_epa_frweir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frweir');
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON
 ve_inp_dscenario_frpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-PUMP');
+
+-- 08/08/2025
+CREATE TRIGGER gw_trg_plan_psector_after_gully AFTER INSERT ON gully
+FOR EACH ROW
+WHEN (NEW.state = 2)
+EXECUTE FUNCTION gw_trg_insert_psector_x_feature('gully');

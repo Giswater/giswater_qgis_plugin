@@ -173,9 +173,9 @@ SELECT has_trigger('arc', 'gw_trg_mantypevalue_fk_update', 'Table should have tr
 SELECT has_trigger('arc', 'gw_trg_topocontrol_arc', 'Table should have trigger gw_trg_topocontrol_arc');
 SELECT has_trigger('arc', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('arc', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');
+SELECT has_trigger('arc', 'gw_trg_plan_psector_after_arc', 'Table should have trigger gw_trg_plan_psector_after_arc');
 
 -- Check rules
-SELECT has_rule('arc', 'insert_plan_psector_x_arc', 'Table should have rule insert_plan_psector_x_arc');
 
 -- Check sequences
 

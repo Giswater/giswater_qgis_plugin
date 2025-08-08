@@ -221,3 +221,4 @@ ALTER TABLE inp_frorifice ALTER COLUMN orifice_type DROP NOT NULL;
 ALTER TABLE inp_frweir ALTER COLUMN weir_type DROP NOT NULL;
 
 
+DROP RULE insert_plan_psector_x_gully ON gully;

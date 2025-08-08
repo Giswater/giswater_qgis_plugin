@@ -24,3 +24,19 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_psector('plan');
 
 CREATE TRIGGER gw_trg_ui_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_plan_psector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_plan_psector();
+
+-- 08/08/2025
+CREATE TRIGGER gw_trg_plan_psector_after_node AFTER INSERT ON node
+FOR EACH ROW
+WHEN (NEW.state = 2)
+EXECUTE FUNCTION gw_trg_insert_psector_x_feature('node');
+
+CREATE TRIGGER gw_trg_plan_psector_after_arc AFTER INSERT ON arc
+FOR EACH ROW
+WHEN (NEW.state = 2)
+EXECUTE FUNCTION gw_trg_insert_psector_x_feature('arc');
+
+CREATE TRIGGER gw_trg_plan_psector_after_connec AFTER INSERT ON connec
+FOR EACH ROW
+WHEN (NEW.state = 2)
+EXECUTE FUNCTION gw_trg_insert_psector_x_feature('connec');

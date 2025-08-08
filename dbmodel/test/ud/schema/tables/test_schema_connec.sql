@@ -197,6 +197,7 @@ SELECT has_trigger('connec', 'gw_trg_mantypevalue_fk_update', 'Table should have
 SELECT has_trigger('connec', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('connec', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');
 SELECT has_trigger('connec', 'gw_trg_unique_field', 'Table should have trigger gw_trg_unique_field');
+SELECT has_trigger('connec', 'gw_trg_plan_psector_after_connec', 'Table should have trigger gw_trg_plan_psector_after_connec');
 
 -- Finish
 SELECT * FROM finish();
