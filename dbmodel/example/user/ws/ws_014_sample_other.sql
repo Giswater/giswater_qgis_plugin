@@ -24,18 +24,18 @@ INSERT INTO cat_manager (idval, expl_id, rolename, active) VALUES ('general mana
 INSERT INTO config_graph_mincut VALUES (113766);
 INSERT INTO config_graph_mincut VALUES (113952);
 
-INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL, NULL);
 
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3103', '2087', 1, 0, false, 480, true);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3104', '2078', 1, 0, false, 479, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id) VALUES ('3103', '2087', 1, 0, false, 480);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id) VALUES ('3104', '2078', 1, 0, false, 479);
 
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3014', '2065', 2, 0, false, 473, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id) VALUES ('3014', '2065', 2, 0, false, 473);
 
 UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = '20651';
 
-INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL, NULL);
+INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL, NULL);
+INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL, NULL);
 
 INSERT INTO doc (id, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom) VALUES('Demo document 1', 'Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449', current_user, '2018-03-11 19:40:20.449', NULL);
 INSERT INTO doc (id, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom) VALUES('Demo document 3', 'Demo document 2', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Licensing.txt', NULL, '2018-03-14 17:09:59.762', current_user, '2018-03-14 17:09:59.762', NULL);
@@ -300,10 +300,6 @@ WHERE parameter = 'admin_checkproject';
 
 
 UPDATE ext_rtc_dma_period set avg_press = 30;
-
-UPDATE plan_psector_x_arc SET active = true WHERE arc_id in ('20861', '20851', '20651');
-UPDATE plan_psector_x_node SET active = true WHERE node_id in ('10761');
-UPDATE plan_psector_x_connec SET active = true WHERE connec_id in ('3103', '3104', '3014', '3014');
 
 SELECT setval('SCHEMA_NAME.urn_id_seq', 114465, true);
 

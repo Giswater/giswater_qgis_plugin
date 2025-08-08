@@ -9115,3 +9115,35 @@ SELECT dimensions.id,
 
 DROP VIEW IF EXISTS v_state_dimensions;
 DROP VIEW IF EXISTS v_state_gully;
+
+CREATE OR REPLACE VIEW ve_plan_psector_x_connec
+AS SELECT plan_psector_x_connec.id,
+    plan_psector_x_connec.connec_id,
+    plan_psector_x_connec.arc_id,
+    plan_psector_x_connec.psector_id,
+    plan_psector_x_connec.state,
+    plan_psector_x_connec.doable,
+    plan_psector_x_connec.descript,
+    plan_psector_x_connec.link_id,
+    plan_psector_x_connec.insert_tstamp,
+    plan_psector_x_connec.insert_user,
+    link.exit_type
+   FROM plan_psector_x_connec
+     LEFT JOIN link USING (link_id);
+
+
+DROP VIEW IF EXISTS ve_plan_psector_x_gully;
+CREATE OR REPLACE VIEW ve_plan_psector_x_gully
+AS SELECT plan_psector_x_gully.id,
+    plan_psector_x_gully.gully_id,
+    plan_psector_x_gully.arc_id,
+    plan_psector_x_gully.psector_id,
+    plan_psector_x_gully.state,
+    plan_psector_x_gully.doable,
+    plan_psector_x_gully.descript,
+    plan_psector_x_gully.link_id,
+    plan_psector_x_gully.insert_tstamp,
+    plan_psector_x_gully.insert_user,
+    link.exit_type
+   FROM plan_psector_x_gully
+     LEFT JOIN link USING (link_id);

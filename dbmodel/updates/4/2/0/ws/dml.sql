@@ -1938,3 +1938,5 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES('ve_link_pipelink', 'form_feature', 'tab_data', 'link_type', 'lyt_top_1', 1, 'string', 'combo', 'Link Type:', 'Type of link. It is auto-populated based on the linkcat_id', NULL, true, true, false, false, NULL, 'SELECT id, id as idval FROM cat_feature_link WHERE id IS NOT NULL', true, false, NULL, NULL, NULL, '{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_cat_feature_link", "activated": true, "keyColumn": "id", "nullValue": false, "valueColumn": "id", "filterExpression": null}}'::json, NULL, NULL, false, 2, NULL);
 
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_edit_', 've_')::json WHERE widgetcontrols::text ilike '%v_edit_%';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_connec", "column":"active", "dataType":"boolean"}}$$);

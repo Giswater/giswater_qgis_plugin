@@ -1059,3 +1059,6 @@ DELETE FROM config_form_fields WHERE formname ILIKE '%ve_link%' AND formtype='fo
 DELETE FROM config_form_fields WHERE formname ILIKE '%ve_gully%' AND formtype='form_feature' AND columnname IN ('connec_y1', 'connec_y2') AND tabname='tab_none';
 
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_edit_', 've_')::json WHERE widgetcontrols::text ilike '%v_edit_%';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_connec", "column":"active", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_gully", "column":"active", "dataType":"boolean"}}$$);
