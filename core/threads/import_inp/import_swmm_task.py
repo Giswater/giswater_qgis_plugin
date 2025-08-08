@@ -132,8 +132,8 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
-            # Disable triggers
-            self._enable_triggers(False)
+            # Disable triggers except plan trigger
+            self._enable_triggers(False, plan_trigger=True)
 
             self.progress_changed.emit("Validate inputs", self.PROGRESS_INIT, "Validating inputs...", False)
             self._validate_inputs()
@@ -164,14 +164,17 @@ class GwImportInpTask(GwTask):
 
             self._manage_others()
 
-            # Enable triggers
-            self._enable_triggers(True)
+            # Enable plan and topocontrol triggers
+            self._enable_triggers(False, plan_trigger=True, geometry_trigger=True)
 
             if any(self.manage_flwreg.values()):
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_SOURCES, "Converting to flwreg...", False)
                 log_str = self._manage_flwreg()
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_END, "done!", True)
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_END, log_str, True)
+
+            # Enable ALL triggers
+            self._enable_triggers(True)
 
             execute_sql("select 1", commit=True)
             report_message = '\n'.join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
@@ -279,12 +282,18 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Others", lerp_progress(40, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing subcatchments", True)
             self._save_subcatchments()
 
-    def _enable_triggers(self, enable: bool) -> None:
+    def _enable_triggers(self, enable: bool, plan_trigger: bool = False, geometry_trigger: bool = False) -> None:
         op = "ENABLE" if enable else "DISABLE"
         queries = [
             f'ALTER TABLE arc {op} TRIGGER ALL;',
             f'ALTER TABLE node {op} TRIGGER ALL;',
+            f'ALTER TABLE element {op} TRIGGER ALL;',
         ]
+        if plan_trigger:
+            queries.append(f'ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;')
+            queries.append(f'ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;')
+        if geometry_trigger:
+            queries.append(f'ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
         for sql in queries:
             result = tools_db.execute_sql(sql, commit=self.force_commit)
             if not result:

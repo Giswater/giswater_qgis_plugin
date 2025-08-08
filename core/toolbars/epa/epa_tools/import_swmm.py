@@ -169,7 +169,7 @@ class GwImportSwmm:
             # Check if there is a current psector
             result = tools_gw.get_config_value('plan_psector_current')
             if result is None or result[0] is None:
-                msg = "No psector selected"
+                msg = "No current psector selected"
                 tools_qgis.show_message(msg, dialog=self.dlg_config)
                 self.dlg_config.chk_psector.click()
                 return
