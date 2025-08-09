@@ -570,7 +570,7 @@ BEGIN
 						ON CONFLICT (psector_id, node_id) DO NOTHING;
 					ELSE
 
-							EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3468", "function":"2112", "parameters":{"v_node_id":"'||v_node_id|'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
+						EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3468", "function":"2112", "parameters":{"v_node_id":"'||v_node_id||'::integer"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 						DELETE FROM node WHERE node_id = v_node_id;
 					END IF;
 
