@@ -54,7 +54,6 @@ v_querytext text;
 v_message text = '{"level":1, "text":"Process done successfully"}';
 v_count integer = 0;
 v_count_aux integer = 0;
-v_count_2 integer = 0;
 v_name text;
 v_disableparent boolean;
 v_fid integer = 397;
@@ -688,8 +687,6 @@ BEGIN
 	END IF;
 	
 	-- get envelope
-	SELECT count(the_geom) INTO v_count_2 FROM ve_node LIMIT 1;
-
 	IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
@@ -698,14 +695,16 @@ BEGIN
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc where sector_id IN
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)) b) a;
 
-	ELSIF (v_count_2 > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
+	ELSIF v_tabname IN ('tab_hydro_state', 'tab_network_state', 'tab_dscenario') THEN
+		v_geometry = NULL;
+
+	ELSIF v_tabname IN ('tab_psector') THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
-		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
-
-	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
-		v_geometry = NULL;
+		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1,
+		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM plan_psector where psector_id IN
+		(SELECT psector_id FROM selector_psector WHERE cur_user=current_user)) b) a;		
 
 	ELSIF v_tabname IN ('tab_exploitation') THEN
 		SELECT row_to_json (a)
