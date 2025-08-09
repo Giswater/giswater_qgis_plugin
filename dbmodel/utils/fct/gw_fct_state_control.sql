@@ -51,57 +51,84 @@ BEGIN
 
 	-- control for downgrade features to state(0)
 	IF tg_op_aux = 'UPDATE' THEN
+
 		IF feature_type_aux='NODE' and state_aux=0 THEN
+
 			SELECT state INTO v_old_state FROM node WHERE node_id=feature_id_aux;
 			IF state_aux!=v_old_state AND (v_downgrade_force IS NOT TRUE) THEN
 
-				-- arcs control
+				-- arcs control state 1
 				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 1;
-
-				IF v_num_feature > 0 THEN
-
+				IF v_num_feature > 0 THEN 
 					v_result = 'SELECT array_agg(arc_id) FROM arc WHERE (node_1='|| quote_literal(feature_id_aux)||' OR node_2='|| quote_literal(feature_id_aux)||') AND arc.state = 1;';
-
 					EXECUTE v_result INTO v_result;
-
-					v_result=concat(feature_id_aux,' has associated arcs ',v_result);
-
+					v_result=concat(feature_id_aux,' has associated arcs ',v_result);				
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1072", "function":"2130","parameters":{"node_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
+					"data":{"message":"1072", "function":"2130","debug_msg":"'||v_result||'", "is_process":true}}$$);';
 				END IF;
 
+				-- arcs control state 2
 				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2;
-				IF v_num_feature > 0 THEN
-					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_arc
-					JOIN plan_psector USING (psector_id) where arc_id IN
-					(SELECT arc.arc_id FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2);
-
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3140", "function":"2130","parameters":{"psector_list":"'||v_psector_list||'"}, "is_process":true}}$$);';
-
+				IF v_num_feature > 0 THEN 
+					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_arc 
+					JOIN plan_psector p USING (psector_id) where p.active and arc_id IN 
+					(SELECT arc.arc_id FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2); 
+					IF v_psector_list is not null then			
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'", "is_process":true}}$$);';
+					END IF;
 				END IF;
 
-				--link feature control
-				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux AND link.state > 0;
-				IF v_num_feature > 0 THEN
+				-- connec control state 1
+				SELECT count(connec.connec_id) INTO v_num_feature FROM connec WHERE connec.state = 1 AND arc_id = feature_id_aux;
+				IF v_num_feature > 0 THEN 
+					v_result = 'SELECT array_agg(connec_id) FROM connec WHERE connec.state = 1 AND arc_id = feature_id_aux;';
+					EXECUTE v_result INTO v_result;
+					v_result=concat(feature_id_aux,' has associated arcs ',v_result);				
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1072", "function":"2130","parameters":{"node_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
+					"data":{"message":"1072", "function":"2130","debug_msg":"'||v_result||'", "is_process":true}}$$);';
 				END IF;
 
+				-- connecs control state 2
+				SELECT count(connec.connec_id) INTO v_num_feature FROM connec WHERE connec.state = 2 AND arc_id = feature_id_aux;
+				IF v_num_feature > 0 THEN 
+					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_connec 
+					JOIN plan_psector p USING (psector_id) where p.active AND connec_id = feature_id_aux and connec_id IN 
+					(SELECT connec.connec_id FROM connec WHERE connec.state = 2); 
+
+					IF v_psector_list is not null then
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'", "is_process":true}}$$);';
+					END IF;
+				END IF;
+
+				-- gully to do:
+				IF v_project_type = 'UD' THEN
+					SELECT count(gully.gully_id) INTO v_num_feature FROM gully WHERE gully.state = 2 AND arc_id = feature_id_aux;
+					IF v_num_feature > 0 THEN 
+						SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_gully 
+						JOIN plan_psector p USING (psector_id) where p.active AND gully_id = feature_id_aux and gully_id IN 
+						(SELECT gully.gully_id FROM gully WHERE gully.state = 2); 
+	
+						IF v_psector_list is not null then
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'", "is_process":true}}$$);';
+						END IF;
+					END IF;
+				END IF;
+				
 			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
 
 				-- arcs control
 				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
 				IF v_num_feature > 0 THEN
-
 					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;
 					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (128,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
-
 				END IF;
 
-				--link feature control
+				--link control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN
 					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
@@ -109,27 +136,98 @@ BEGIN
 						USING feature_id_aux;
 					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (128,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
 				END IF;
+				
+				-- node control
+
+				-- connec control
+				
+				-- gully control				
+				
 			END IF;
 
 		ELSIF feature_type_aux='ARC' and state_aux=0 THEN
+
 			SELECT state INTO v_old_state FROM arc WHERE arc_id=feature_id_aux;
+			IF state_aux!=v_old_state AND (v_downgrade_force IS NOT TRUE) THEN
+			
+				--node's control
+				SELECT count(arc_id) INTO v_num_feature FROM node WHERE arc_id=feature_id_aux AND node.state=1;
+				IF v_num_feature > 0 THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"1074", "function":"2130","parameters":{"arc_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
+				END IF;
+				
+				--node's control state = 2
+				SELECT count(node.node_id) INTO v_num_feature FROM node WHERE node.state = 2 AND arc_id = feature_id_aux;
+				IF v_num_feature > 0 THEN 
+					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_node 
+					JOIN plan_psector p USING (psector_id) where p.active AND node_id = feature_id_aux and node_id IN 
+					(SELECT node.node_id FROM node WHERE node.state = 2); 
 
-			IF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
+					IF v_psector_list is not null then
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'", "is_process":true}}$$);';
+					END IF;
+				END IF;
+			
+				--connec's control state = 1
+				SELECT count(arc_id) INTO v_num_feature FROM connec WHERE arc_id=feature_id_aux AND connec.state=1;
+				IF v_num_feature > 0 THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"1074", "function":"2130","parameters":{"arc_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
+				END IF;
+				
+				-- connecs control state 2
+				SELECT count(connec.connec_id) INTO v_num_feature FROM connec WHERE connec.state = 2 AND arc_id = feature_id_aux;
+				IF v_num_feature > 0 THEN 
+					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_connec 
+					JOIN plan_psector p USING (psector_id) where p.active AND connec_id = feature_id_aux and connec_id IN 
+					(SELECT connec.connec_id FROM connec WHERE connec.state = 2); 
 
+					IF v_psector_list is not null then
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'", "is_process":true}}$$);';
+					END IF;
+				END IF;
+				
+				IF v_project_type='UD' THEN
+					
+					--gully's control state = 1
+					SELECT count(arc_id) INTO v_num_feature FROM gully WHERE arc_id=feature_id_aux AND gully.state=1;
+					IF v_num_feature > 0 THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"1074", "function":"2130","parameters":{"arc_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
+					END IF;
+							
+					-- gully's control state 2
+					SELECT count(gully.gully_id) INTO v_num_feature FROM gully WHERE gully.state = 2 AND arc_id = feature_id_aux;
+					IF v_num_feature > 0 THEN 
+						SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_gully 
+						JOIN plan_psector p USING (psector_id) where p.active AND gully_id = feature_id_aux and gully_id IN 
+						(SELECT gully.gully_id FROM gully WHERE gully.state = 2); 
+
+						IF v_psector_list is not null then
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'", "is_process":true}}$$);';
+						END IF;
+					END IF;
+				END IF;
+
+			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
+			
+				--node's control
+				FOR rec_feature IN SELECT * FROM node WHERE arc_id=feature_id_aux AND node.state>0
+				LOOP
+					UPDATE node set arc_id=NULL WHERE node_id=rec_feature.node_id;
+				END LOOP;
+							
 				--connec's control
 				FOR rec_feature IN SELECT * FROM connec WHERE arc_id=feature_id_aux AND connec.state>0
 				LOOP
 					UPDATE connec set arc_id=NULL WHERE connec_id=rec_feature.connec_id;
 				END LOOP;
 
-				--node's control (only WS)
-				IF v_project_type='WS' THEN
-					FOR rec_feature IN SELECT * FROM node WHERE arc_id=feature_id_aux AND node.state>0
-					LOOP
-						UPDATE node set arc_id=NULL WHERE node_id=rec_feature.node_id;
-					END LOOP;
-
-				--gully's control (only UD)
+				--gully's control
 				ELSIF v_project_type='UD' THEN
 					FOR rec_feature IN SELECT * FROM gully WHERE arc_id=feature_id_aux AND gully.state>0
 					LOOP
@@ -138,39 +236,12 @@ BEGIN
 				END IF;
 			END IF;
 
-			IF state_aux!=v_old_state THEN
-
-				--connec's control
-				SELECT count(arc_id) INTO v_num_feature FROM connec WHERE arc_id=feature_id_aux AND connec.state>0;
-				IF v_num_feature > 0 THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1074", "function":"2130","parameters":{"arc_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
-				END IF;
-
-				--node's control (only WS)
-				IF v_project_type='WS' THEN
-					SELECT count(arc_id) INTO v_num_feature FROM node WHERE arc_id=feature_id_aux AND node.state>0;
-					IF v_num_feature > 0 THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"1074", "function":"2130","parameters":{"arc_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
-					END IF;
-
-				--gully's control (only UD)
-				ELSIF v_project_type='UD' THEN
-					SELECT count(arc_id) INTO v_num_feature FROM gully WHERE arc_id=feature_id_aux AND gully.state>0;
-					IF v_num_feature > 0 THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"1074", "function":"2130","parameters":{"arc_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
-					END IF;
-				END IF;
-			END IF;
-
 		ELSIF feature_type_aux='CONNEC' and state_aux=0 THEN
-			SELECT state INTO v_old_state FROM connec WHERE connec_id=feature_id_aux;
 
+			SELECT state INTO v_old_state FROM connec WHERE connec_id=feature_id_aux;
 			IF state_aux!=v_old_state AND (v_connec_downgrade_force IS NOT TRUE) THEN
 
-				--link feature control
+				--link control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -186,10 +257,9 @@ BEGIN
 					"data":{"message":"3194", "function":"2130","parameters":{"feature_id":"'||feature_id_aux||'"}, "is_process":true}}$$);';
 				END IF;
 
-
 			ELSIF state_aux!=v_old_state AND (v_connec_downgrade_force IS TRUE) THEN
 
-				--link feature control
+				--link control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN
 					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1'
@@ -211,11 +281,11 @@ BEGIN
 			END IF;
 
 		ELSIF feature_type_aux='GULLY' and state_aux=0 THEN
-			SELECT state INTO v_old_state FROM gully WHERE gully_id=feature_id_aux;
 
+			SELECT state INTO v_old_state FROM gully WHERE gully_id=feature_id_aux;
 			IF state_aux!=v_old_state AND (v_connec_downgrade_force IS NOT TRUE) THEN
 
-				--link feature control
+				--link control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -224,7 +294,7 @@ BEGIN
 
 			ELSIF state_aux!=v_old_state AND (v_connec_downgrade_force IS TRUE) THEN
 
-				--link feature control
+				--link control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN
 					EXECUTE 'SELECT state_type FROM gully WHERE gully_id=$1'
@@ -234,7 +304,6 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
-	END IF;
 
 	-- control of insert/update nodes with state(2)
 	IF feature_type_aux='NODE' THEN

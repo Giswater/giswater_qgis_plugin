@@ -1064,5 +1064,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psect
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_gully", "column":"active", "dataType":"boolean"}}$$);
 
 update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';					
-delete from sys_param_user where id = 'edit_connec_linkcat_vdefault';
-update sys_param_user set id = 'edit_connec_linkcat_vdefault' where id = 'edit_linkcat_vdefault';
+delete from sys_param_user where id = 'edit_gully_linkcat_vdefault';
+update sys_param_user set id = 'edit_gully_linkcat_vdefault' where id = 'edit_linkcat_vdefault';
