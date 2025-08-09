@@ -50,20 +50,16 @@ BEGIN
 		-- get variable in order to force (or not) delete
 		IF (SELECT lower(value) FROM config_param_user WHERE parameter = 'plan_psector_force_delete' AND cur_user= current_user) !='true' THEN
 
-			IF (SELECT lower(value) FROM config_param_user WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user) ='true' THEN
-				EXECUTE 'DELETE FROM "plan_psector_x_'||v_parent||'" WHERE psector_id::text = '||OLD.psector_id||'::text and '||v_parent||'_id::text = '||v_feature||'::text';
-			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3160", "function":"3022","parameters":{"psector_id":"'||OLD.psector_id||'"}}}$$);';
-			END IF;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3160", "function":"3022","parameters":{"psector_id":"'||OLD.psector_id||'"}}}$$);';
 		ELSE
 			
+			-- setting selectors
  			select string_agg(state_id::text,',') INTO v_cur_selector from selector_state where cur_user=current_user;
- 			
  			DELETE FROM selector_state WHERE cur_user=current_user;
-
  			INSERT INTO selector_state VALUES(2, current_user) ON CONFLICT DO NOTHING;
 
+			-- delete from parent table
 			IF v_parent = 'arc' THEN
 				EXECUTE' SELECT gw_fct_setfeaturedelete($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -89,6 +85,7 @@ BEGIN
 				"data":{"feature_id":"'||OLD.gully_id||'"}}$$);';
 			END IF;
 
+			-- recovering selectors
 			DELETE FROM selector_state WHERE cur_user=current_user;
  			INSERT INTO selector_state SELECT id, current_user FROM value_state WHERE id::text IN (v_cur_selector) 
  			ON CONFLICT DO NOTHING;
