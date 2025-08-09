@@ -346,3 +346,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psect
 UPDATE sys_table SET id = 'v_ui_style' WHERE id = 'v_ui_sys_style';
 
 DELETE FROM sys_table WHERE id in ('vcp_pipes', 'vcv_dma', 'vcv_dma_log', 'vcv_emitters_log', 'vcv_junction', 'vcv_emitters');
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, 
+project_type, datatype, ismandatory, vdefault, source)
+VALUES ('plan_psector_disable_checktopology_trigger', 'dynamic', 'Variable to disable the control for checktopology on trigger plan_psector', 'role_edit', 
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;

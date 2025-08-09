@@ -19,3 +19,56 @@ ALTER TABLE config_form_fields ADD COLUMN field_layoutorder int4 NULL;
 
 DROP RULE insert_plan_psector_x_node ON node;
 DROP RULE insert_plan_psector_x_arc ON arc;
+
+ALTER TABLE archived_psector_connec_traceability RENAME COLUMN tstamp TO created_at;
+ALTER TABLE archived_psector_connec_traceability RENAME COLUMN insert_user TO created_by;
+ALTER TABLE archived_psector_connec_traceability RENAME COLUMN lastupdate TO updated_at;
+ALTER TABLE archived_psector_connec_traceability RENAME COLUMN lastupdate_user TO updated_by;
+
+ALTER TABLE archived_psector_arc_traceability RENAME COLUMN tstamp TO created_at;
+ALTER TABLE archived_psector_arc_traceability RENAME COLUMN insert_user TO created_by;
+ALTER TABLE archived_psector_arc_traceability RENAME COLUMN lastupdate TO updated_at;
+ALTER TABLE archived_psector_arc_traceability RENAME COLUMN lastupdate_user TO updated_by;
+
+ALTER TABLE archived_psector_node_traceability RENAME COLUMN tstamp TO created_at;
+ALTER TABLE archived_psector_node_traceability RENAME column insert_user TO created_by;
+ALTER TABLE archived_psector_node_traceability RENAME COLUMN lastupdate TO updated_at;
+ALTER TABLE archived_psector_node_traceability RENAME COLUMN lastupdate_user TO updated_by;
+
+ALTER TABLE archived_psector_link_traceability RENAME column insert_user TO created_by;
+ALTER TABLE archived_psector_link_traceability RENAME COLUMN lastupdate TO updated_at;
+ALTER TABLE archived_psector_link_traceability RENAME COLUMN lastupdate_user TO updated_by;
+ALTER TABLE archived_psector_link_traceability RENAME COLUMN exit_topelev TO top_elev2;
+ALTER TABLE archived_psector_link_traceability RENAME COLUMN exit_elev TO depth2;
+ALTER TABLE archived_psector_link_traceability RENAME column staticpressure TO staticpressure1;
+ALTER TABLE archived_psector_link_traceability RENAME column conneccat_id TO linkcat_id;
+
+ALTER TABLE archived_psector_link_traceability add column created_at varchar(50);
+ALTER TABLE archived_psector_link_traceability add column staticpressure2 numeric(12,3);
+
+ALTER TABLE archived_psector_node_traceability RENAME to archived_psector_node;
+ALTER TABLE archived_psector_arc_traceability RENAME to archived_psector_arc;
+ALTER TABLE archived_psector_connec_traceability RENAME to archived_psector_connec;
+ALTER TABLE archived_psector_link_traceability RENAME to archived_psector_link;
+
+ALTER TABLE plan_psector RENAME COLUMN tstamp TO created_at;
+ALTER TABLE plan_psector RENAME column insert_user TO created_by;
+ALTER TABLE plan_psector RENAME COLUMN updated_at TO updated_at;
+ALTER TABLE plan_psector RENAME COLUMN update_by TO updated_by;
+
+ALTER SEQUENCE archived_psector_arc_traceability_id_seq RENAME TO archived_psector_arc_id_seq;
+ALTER SEQUENCE archived_psector_node_traceability_id_seq RENAME TO archived_psector_node_id_seq;
+ALTER SEQUENCE archived_psector_connec_traceability_id_seq RENAME TO archived_psector_connec_id_seq;
+ALTER SEQUENCE archived_psector_link_traceability_id_seq RENAME TO archived_psector_link_id_seq;
+
+ALTER TABLE archived_psector_node drop column streetname;
+ALTER TABLE archived_psector_arc drop column streetname;
+ALTER TABLE archived_psector_connec drop column streetname;
+
+ALTER TABLE archived_psector_node drop column streetname2;
+ALTER TABLE archived_psector_arc drop column streetname2;
+ALTER TABLE archived_psector_connec drop column streetname2;
+
+update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';					
+delete from sys_param_user where id = 'edit_connec_linkcat_vdefault';
+update sys_param_user set id = 'edit_connec_linkcat_vdefault' where id = 'edit_linkcat_vdefault';

@@ -220,3 +220,12 @@ ALTER TABLE inp_froutlet ALTER COLUMN outlet_type DROP NOT NULL;
 ALTER TABLE inp_frorifice ALTER COLUMN orifice_type DROP NOT NULL;
 ALTER TABLE inp_frweir ALTER COLUMN weir_type DROP NOT NULL;
 
+ALTER TABLE archived_psector_gully_traceability RENAME COLUMN tstamp TO created_at;
+ALTER TABLE archived_psector_gully_traceability RENAME COLUMN insert_user TO created_by;
+ALTER TABLE archived_psector_gully_traceability RENAME COLUMN lastupdate TO updated_at;
+ALTER TABLE archived_psector_gully_traceability RENAME COLUMN lastupdate_user TO updated_by;
+
+ALTER TABLE archived_psector_gully_traceability RENAME to archived_psector_gully;
+ALTER SEQUENCE archived_psector_gully_traceability_id_seq RENAME TO archived_psector_gully_id_seq;
+ALTER TABLE archived_psector_gully drop column streetname;
+ALTER TABLE archived_psector_gully drop column streetname2;

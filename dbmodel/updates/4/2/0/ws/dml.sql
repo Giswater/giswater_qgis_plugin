@@ -1976,3 +1976,8 @@ VALUES
 UPDATE sys_table
 	SET addparam='{"pkey": "dscenario_id, element_id"}'::json
 	WHERE id IN ('inp_dscenario_frpump', 'inp_dscenario_frvalve', 've_inp_dscenario_frpump', 've_inp_dscenario_frvalve');
+
+
+update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';					
+delete from sys_param_user where id = 'edit_connec_linkcat_vdefault';
+update sys_param_user set id = 'edit_connec_linkcat_vdefault' where id = 'edit_linkcat_vdefault';
