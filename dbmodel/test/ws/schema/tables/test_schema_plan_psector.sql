@@ -105,7 +105,6 @@ SELECT has_index('plan_psector', 'plan_psector_expl_id', 'Table should have inde
 
 -- Check triggers
 SELECT has_trigger('plan_psector', 'gw_trg_plan_psector', 'Table should have trigger gw_trg_plan_psector');
-SELECT has_trigger('plan_psector', 'gw_trg_psector_selector', 'Table should have trigger gw_trg_psector_selector');
 SELECT has_trigger('plan_psector', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('plan_psector', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');
 

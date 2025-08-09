@@ -4193,7 +4193,6 @@ INSERT INTO sys_function VALUES (1130, 'gw_trg_plan_psector_x_arc', 'utils', 'tr
 INSERT INTO sys_function VALUES (2466, 'gw_trg_edit_review_node', 'ud', 'trigger function', NULL, NULL, NULL, 'role_om', NULL, 'core');
 INSERT INTO sys_function VALUES (2420, 'gw_trg_flw_regulator', 'ud', 'trigger function', NULL, NULL, NULL, 'role_epa', NULL, 'core');
 INSERT INTO sys_function VALUES (2458, 'gw_trg_edit_cat_node', 'ws', 'trigger function', NULL, NULL, NULL, 'role_edit', NULL, 'core');
-INSERT INTO sys_function VALUES (2450, 'gw_trg_psector_selector', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master', NULL, 'core');
 INSERT INTO sys_function VALUES (2448, 'gw_trg_edit_psector_x_other', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master', NULL, 'core');
 INSERT INTO sys_function VALUES (2446, 'gw_trg_edit_psector', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master', NULL, 'core');
 INSERT INTO sys_function VALUES (1112, 'gw_trg_edit_dma', 'utils', 'trigger function', NULL, NULL, NULL, 'role_edit', NULL, 'core');

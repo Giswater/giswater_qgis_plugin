@@ -1156,13 +1156,6 @@ CREATE TRIGGER gw_trg_plan_psector_x_node_geom AFTER INSERT OR DELETE OR UPDATE 
 
 
 --
--- Name: plan_psector gw_trg_psector_selector; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_psector_selector AFTER INSERT ON plan_psector FOR EACH ROW EXECUTE FUNCTION gw_trg_psector_selector();
-
-
---
 -- Name: sys_addfields gw_trg_sysaddfields; Type: TRIGGER; Schema: Schema; Owner: -
 --
 

@@ -40,3 +40,8 @@ CREATE TRIGGER gw_trg_plan_psector_after_connec AFTER INSERT ON connec
 FOR EACH ROW
 WHEN (NEW.state = 2)
 EXECUTE FUNCTION gw_trg_insert_psector_x_feature('connec');
+
+drop trigger if exists gw_trg_psector_selector on plan_psector;
+
+DROP FUNCTION IF EXISTS gw_trg_psector_selector();
+DELETE FROM sys_function WHERE function_name = 'gw_trg_psector_selector';
