@@ -948,6 +948,10 @@ class GwPsector:
             msg = "Check fields from table or view"
             tools_qgis.show_warning(msg, parameter=viewname, dialog=self.dlg_plan_psector)
             return
+        sql = (f"UPDATE config_param_user "
+                f"SET value = True "
+                f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+        tools_db.execute_sql(sql)
         columns = []
         for row in rows:
             columns.append(str(row[0]))
@@ -1013,6 +1017,11 @@ class GwPsector:
                             f" VALUES ('plan_psector_current', '{new_psector_id[0]}', current_user);")
                     tools_db.execute_sql(sql)
                     self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
+
+        sql = (f"UPDATE config_param_user "
+                f"SET value = False "
+                f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+        tools_db.execute_sql(sql)
 
         # Refresh selectors UI if it is open and and the form will close
         if close_dlg:
@@ -1644,9 +1653,20 @@ class GwPsector:
                 tools_qgis.show_info(msg, dialog=dialog)
                 selector_updated = True
             else:
-                sql += f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
+                sql = (f"UPDATE config_param_user "
+                        f"SET value = True "
+                        f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+                tools_db.execute_sql(sql)
+
+                sql = f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
+                tools_db.execute_sql(sql)
                 # Check topology
                 self.check_topology_psector(psector_id, psector_name)
+
+                sql = (f"UPDATE config_param_user "
+                        f"SET value = False "
+                        f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+                tools_db.execute_sql(sql)
 
         tools_db.execute_sql(sql)
 
