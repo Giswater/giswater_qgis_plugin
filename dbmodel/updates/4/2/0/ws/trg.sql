@@ -11,9 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
 
-CREATE TRIGGER gw_trg_edit_link_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link_link
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
-
 -- old v_edit parent tables:
 CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
