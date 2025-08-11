@@ -76,3 +76,5 @@ update sys_param_user set id = 'edit_connec_linkcat_vdefault' where id = 'edit_l
 ALTER TABLE link DROP COLUMN IF EXISTS epa_type CASCADE;
 
 DELETE FROM config_form_fields WHERE formname ilike '%link%' AND columnname = 'epa_type';
+
+DROP TABLE IF EXISTS man_link;

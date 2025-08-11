@@ -102,9 +102,6 @@ ve_dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dwfzone('EDIT');
 CREATE TRIGGER gw_trg_v_ui_dwfzone INSTEAD OF INSERT OR DELETE OR UPDATE ON
 v_ui_dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dwfzone('UI');
 
-CREATE TRIGGER gw_trg_edit_link_link INSTEAD OF INSERT OR DELETE OR UPDATE ON
-ve_link_link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
-
 -- 14/07/2025
 -- view
 CREATE TRIGGER gw_trg_edit_dma INSTEAD OF INSERT OR DELETE OR UPDATE ON
