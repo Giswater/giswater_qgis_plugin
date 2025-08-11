@@ -754,8 +754,7 @@ BEGIN
 
 	IF v_count>0 then
 	
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"4340", "function":"2870","parameters":null, "is_process":true}}$$)';
+		SELECT concat('{"level":',log_level, ', "text":"', error_message, '"}') INTO v_message FROM sys_message WHERE id = 4340;
 
 	END IF;
 
@@ -773,8 +772,7 @@ BEGIN
 
 		IF v_count>0 then
 	
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"4340", "function":"2870","parameters":null, "is_process":true}}$$)';
+			SELECT concat('{"level":',log_level, ', "text":"', error_message, '"}') INTO v_message FROM sys_message WHERE id = 4340;
 
 		END IF;
 
@@ -792,6 +790,8 @@ BEGIN
 	v_geometry := COALESCE(v_geometry, '{}');
 	v_uservalues := COALESCE(v_uservalues, '{}');
 	v_action := COALESCE(v_action, 'null');
+	v_message := COALESCE(v_message, '{}');
+
 
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 
