@@ -648,13 +648,14 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 
-		DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
-		DELETE FROM arc WHERE state = 2 AND arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id = OLD.psector_id) ;
-		DELETE FROM node WHERE state = 2 AND node_id IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = OLD.psector_id);
 		DELETE FROM connec WHERE state = 2 AND connec_id IN (SELECT connec_id FROM plan_psector_x_connec WHERE psector_id = OLD.psector_id);
 		IF v_projectype='UD' THEN
 			DELETE FROM gully WHERE state = 2 AND gully_id IN (SELECT gully_id FROM plan_psector_x_gully WHERE psector_id = OLD.psector_id);
 		END IF;
+		DELETE FROM arc WHERE state = 2 AND arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id = OLD.psector_id) ;
+		DELETE FROM node WHERE state = 2 AND node_id IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = OLD.psector_id);
+
+		DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
 
 		RETURN NULL;
 
