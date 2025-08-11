@@ -125,35 +125,60 @@ BEGIN
 		INSERT INTO selector_rpt_main(result_id, cur_user) VALUES (v_result_id, current_user);
 
 		INSERT INTO node_add (node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg, result_id)
-		SELECT node_id, avg(demand_max)::numeric(12,2), avg(demand_min)::numeric(12,2), avg(demand_avg)::numeric(12,2), avg(press_max)::numeric(12,2), avg(press_min)::numeric(12,2), avg(press_avg)::numeric(12,2),
+		SELECT a.node_id::integer, avg(demand_max)::numeric(12,2), avg(demand_min)::numeric(12,2), avg(demand_avg)::numeric(12,2), avg(press_max)::numeric(12,2), avg(press_min)::numeric(12,2), avg(press_avg)::numeric(12,2),
 		avg(head_max)::numeric(12,2), avg(head_min)::numeric(12,2), avg(head_avg)::numeric(12,2), avg(quality_max)::numeric(12,2), avg(quality_min)::numeric(12,2), avg(quality_avg)::numeric(12,2), result_id FROM
 		(SELECT split_part(node_id,'_',1) as node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg, result_id
-		FROM v_rpt_node a WHERE result_id=v_result_id) a
-		JOIN node USING (node_id)
-		GROUP BY node_id, result_id
+		FROM v_rpt_node_stats a WHERE result_id=v_result_id) a
+		JOIN node ON a.node_id=node.node_id::text
+		GROUP BY a.node_id, a.result_id
 		ON CONFLICT (node_id) DO UPDATE SET
 		demand_max = EXCLUDED.demand_max, demand_min = EXCLUDED.demand_min, demand_avg = EXCLUDED.demand_avg,
 		press_max = EXCLUDED.press_max, press_min = EXCLUDED.press_min, press_avg = EXCLUDED.press_avg,
 		head_max = EXCLUDED.head_max, head_min = EXCLUDED.head_min, head_avg = EXCLUDED.head_avg,
 		quality_max = EXCLUDED.quality_max, quality_min = EXCLUDED.quality_min, quality_avg=EXCLUDED.quality_avg, result_id=EXCLUDED.result_id;
+		
 
 		INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id)
-		SELECT arc_id, avg(flow_max)::numeric(12,2), avg(flow_min)::numeric(12,2), avg(flow_avg)::numeric(12,2), avg(vel_max)::numeric(12,2), avg(vel_min)::numeric(12,2), avg(vel_avg)::numeric(12,2), avg(tot_headloss_max)::numeric(12,2), avg(tot_headloss_min)::numeric(12,2), result_id FROM
-		(SELECT split_part(arc_id, 'P',1) as arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id FROM v_rpt_arc a WHERE result_id=v_result_id)a
-		GROUP by arc_id, result_id
+		SELECT a.arc_id::integer, avg(flow_max)::numeric(12,2), avg(flow_min)::numeric(12,2), avg(flow_avg)::numeric(12,2), avg(vel_max)::numeric(12,2), avg(vel_min)::numeric(12,2), avg(vel_avg)::numeric(12,2), avg(tot_headloss_max)::numeric(12,2), avg(tot_headloss_min)::numeric(12,2), result_id FROM
+		(SELECT split_part(arc_id, 'P',1) as arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id FROM v_rpt_arc_stats a WHERE result_id=v_result_id)a
+		JOIN arc ON a.arc_id=arc.arc_id::text
+		GROUP by a.arc_id, a.result_id
 		ON CONFLICT (arc_id) DO UPDATE SET
 		flow_max = EXCLUDED.flow_max, flow_min = EXCLUDED.flow_min, flow_avg = EXCLUDED.flow_avg,
 		vel_max = EXCLUDED.vel_max, vel_min = EXCLUDED.vel_min, vel_avg = EXCLUDED.vel_avg,
 		tot_headloss_max = EXCLUDED.tot_headloss_max, tot_headloss_min = EXCLUDED.tot_headloss_min, result_id=EXCLUDED.result_id;
 
 		INSERT INTO connec_add (connec_id, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, result_id)
-		SELECT node_id, press_max::numeric(12,2), press_min::numeric(12,2), press_avg::numeric(12,2),
+		SELECT node_id::integer, press_max::numeric(12,2), press_min::numeric(12,2), press_avg::numeric(12,2),
 		quality_max::numeric(12,4), quality_min::numeric(12,4), quality_avg::numeric(12,4), result_id
-		FROM v_rpt_node a
-		JOIN connec ON node_id = connec_id
+		FROM v_rpt_node_stats a
+		JOIN connec ON node_id = connec_id::text
 		ON CONFLICT (connec_id) DO UPDATE SET
 		press_max = EXCLUDED.press_max, press_min = EXCLUDED.press_min, press_avg = EXCLUDED.press_avg,
 		quality_max = EXCLUDED.quality_max, quality_min = EXCLUDED.quality_min, quality_avg=EXCLUDED.quality_avg, result_id=EXCLUDED.result_id;
+
+
+		-- update arc values on node when node is nod2arc
+		UPDATE node_add na
+		SET flow_max = t.flow_max, flow_min = t.flow_min, flow_avg = t.flow_avg, vel_max  = t.vel_max, vel_min  = t.vel_min, vel_avg  = t.vel_avg
+		FROM (
+    		SELECT split_part(v.arc_id, '_', 1) AS node_id, v.result_id, AVG(v.flow_max) AS flow_max, AVG(v.flow_min) AS flow_min, AVG(v.flow_avg) AS flow_avg, AVG(v.vel_max)  AS vel_max,
+			AVG(v.vel_min)  AS vel_min, AVG(v.vel_avg)  AS vel_avg
+    		FROM v_rpt_arc_stats v
+			WHERE v.arc_id ILIKE '%_n2a%' AND v.result_id = v_result_id
+			GROUP BY split_part(v.arc_id, '_', 1), v.result_id
+		) t
+		WHERE na.node_id::text = t.node_id;
+
+
+		INSERT INTO element_add (element_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id)
+		SELECT arc_id::integer, avg(flow_max)::numeric(12,2), avg(flow_min)::numeric(12,2), avg(flow_avg)::numeric(12,2), avg(vel_max)::numeric(12,2), avg(vel_min)::numeric(12,2), avg(vel_avg)::numeric(12,2), avg(tot_headloss_max)::numeric(12,2), avg(tot_headloss_min)::numeric(12,2), result_id FROM
+		(SELECT arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id FROM v_rpt_arc_stats a JOIN ve_frelem ON a.arc_id=ve_frelem.element_id::text WHERE result_id=v_result_id)a
+		GROUP by arc_id, result_id
+		ON CONFLICT (element_id) DO UPDATE SET
+		flow_max = EXCLUDED.flow_max, flow_min = EXCLUDED.flow_min, flow_avg = EXCLUDED.flow_avg,
+		vel_max = EXCLUDED.vel_max, vel_min = EXCLUDED.vel_min, vel_avg = EXCLUDED.vel_avg,
+		tot_headloss_max = EXCLUDED.tot_headloss_max, tot_headloss_min = EXCLUDED.tot_headloss_min, result_id=EXCLUDED.result_id;
 
 		--calc avg_press for mapzones
 		FOR v_mapzone IN SELECT unnest(array['dma', 'sector', 'presszone', 'expl'])
@@ -168,7 +193,7 @@ BEGIN
 					) 
 				select round(avg(press_avg),2) as avg_press, '||v_mapzone||'_id::varchar from cn group by '||v_mapzone||'_id
 				)a where a.'||v_mapzone||'_id::varchar = d.'||v_mapzone||'_id::varchar
-				and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id 
+				and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id::text 
 				in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
 
 			ELSE
@@ -180,7 +205,7 @@ BEGIN
 					) 
 				select round(avg(press_avg),2) as avg_press, '||v_mapzone||'_id::varchar from cn group by '||v_mapzone||'_id
 				)a where a.'||v_mapzone||'_id::varchar = d.'||v_mapzone||'_id::varchar
-				and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id 
+				and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id::text 
 				in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
 
 			END IF;

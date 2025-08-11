@@ -118,3 +118,36 @@ CREATE TABLE inp_dscenario_frpump (
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"flow_units", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"quality_units", "dataType":"text"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"flow_max", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"flow_min", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"flow_avg", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"vel_max", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"vel_min", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"vel_avg", "dataType":"numeric(12,2)"}}$$);
+
+
+CREATE TABLE element_add(
+	element_id int4 NOT NULL,
+	result_id text NULL,
+	flow_max numeric(12, 2) NULL,
+	flow_min numeric(12, 2) NULL,
+	flow_avg numeric(12, 2) NULL,
+	vel_max numeric(12, 2) NULL,
+	vel_min numeric(12, 2) NULL,
+	vel_avg numeric(12, 2) NULL,
+	tot_headloss_max numeric(12, 2) NULL,
+	tot_headloss_min numeric(12, 2) NULL,
+	mincut_connecs int4 NULL,
+	mincut_hydrometers int4 NULL,
+	mincut_length numeric(12, 3) NULL,
+	mincut_watervol numeric(12, 3) NULL,
+	mincut_criticality numeric(12, 3) NULL,
+	hydraulic_criticality numeric(12, 3) NULL,
+	pipe_capacity float8 NULL,
+	mincut_impact_topo json NULL,
+	mincut_impact_hydro json NULL,
+	CONSTRAINT element_add_pkey PRIMARY KEY(element_id),
+	CONSTRAINT element_add_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE
+);

@@ -2101,6 +2101,7 @@ CREATE TABLE exploitation (
 	sector_id int4[] NULL,
 	muni_id int4[] NULL,
 	macroexpl_id int4 NOT NULL,
+	avg_press numeric(12,3) NULL,
 	lock_level int4 NULL,
 	active bool DEFAULT true NULL,
 	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
