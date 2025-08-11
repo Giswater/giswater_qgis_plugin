@@ -47,7 +47,7 @@ v_status text;
 v_message text;
 
 v_project_type text;
-v_node integer;
+v_node bigint;
 v_point public.geometry;
 v_sensibility_f float;
 v_sensibility float;
@@ -58,7 +58,6 @@ v_xcoord float;
 v_ycoord float;
 v_epsg integer;
 v_client_epsg integer;
-
 v_query text;
 v_source text;
 v_target text;
@@ -80,7 +79,7 @@ BEGIN
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
-	v_node = json_array_elements_text(json_extract_path_text(p_data,'feature','id')::json)::integer;
+	SELECT (p_data->'feature'->'id'->>0)::bigint INTO v_node;
 
 	v_context = 'Flow trace';
 	v_fid = 220;
@@ -99,8 +98,11 @@ BEGIN
 
 	--Look for closest node using coordinates
 	IF v_node IS NULL THEN
-		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
-		INTO v_sensibility_f;
+		SELECT (value::json->>'web')::float
+		INTO v_sensibility_f
+		FROM config_param_system
+		WHERE parameter = 'basic_info_sensibility_factor';
+
 		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
 
 		-- Make point
@@ -116,76 +118,87 @@ BEGIN
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND (fid = 220 or fid=221);
+	DELETE FROM anl_node WHERE cur_user=current_user AND (fid = 220 or fid=221);
 
-	-- mainstream + diverted flow
-	v_query = '
-		WITH 
+	v_query := $sql$
+		WITH
 			arc_selected AS (
 				SELECT a.arc_id, a.node_1, a.node_2
 				FROM ve_arc a
-				WHERE a.node_1 IS NOT NULL 
-				AND a.node_2 IS NOT NULL 
-				AND a.state > 0 
+				WHERE a.node_1 IS NOT NULL
+				AND a.node_2 IS NOT NULL
+				AND a.state > 0
 				AND a.is_operative = TRUE
 			)
-		SELECT 
-			a.arc_id::int AS id, '||v_source||'::int AS source, '||v_target||'::int AS target,
-			1 as cost, -1 as reverse_cost
+		SELECT
+			a.arc_id::bigint AS id,
+			a.node_2::bigint AS source,
+			a.node_1::bigint AS target,
+			1::float8 AS cost,
+			-1::float8 AS reverse_cost
 			FROM arc_selected a
-	';
+	$sql$;
 
-	EXECUTE 'select count(*)::int from ve_arc'
+	EXECUTE 'SELECT count(*)::int FROM ve_arc'
 	INTO v_distance;
 
-	INSERT INTO anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
-	SELECT n.node_id, v_fid, n.node_type, n.state, n.expl_id, n.drainzone_id, v_diverted_flow, n.the_geom
-	FROM (
+    IF v_node IS NOT NULL THEN
+	  CREATE TEMP TABLE tmp_upstream_nodes ON COMMIT DROP AS
 		SELECT node
-		FROM pgr_drivingdistance(v_query, v_node, v_distance)
-	) p
-	JOIN ve_node n ON n.node_id =p.node;
+		FROM pgr_drivingdistance(v_query, v_node, v_distance);
+
+        INSERT INTO anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
+        SELECT n.node_id, v_fid, n.node_type, n.state, n.expl_id, n.drainzone_id, v_diverted_flow, n.the_geom
+        FROM tmp_upstream_nodes t
+        JOIN ve_node n ON n.node_id = t.node;
+    END IF;
 
 	-- mainstream
-	v_query = '
-		WITH 
+	v_query := format($sql$
+		WITH
 			arc_selected AS (
 				SELECT a.arc_id, a.node_1, a.node_2
 				FROM ve_arc a
-				WHERE a.node_1 IS NOT NULL 
-				AND a.node_2 IS NOT NULL 
-				AND a.state > 0 
+				WHERE a.node_1 IS NOT NULL
+				AND a.node_2 IS NOT NULL
+				AND a.state > 0
 				AND a.is_operative = TRUE
 				AND a.initoverflowpath IS DISTINCT FROM FALSE
 				AND EXISTS (
-					SELECT 1 FROM anl_node an 
-					WHERE an.cur_user = '''||"current_user"()||'''
-					AND an.fid = '''||v_fid||'''
-					AND an.node_id = a.'||v_source||'::text
+					SELECT 1 FROM anl_node an
+					WHERE an.cur_user = %L
+					AND an.fid = %s
+					AND an.node_id = (a.%I)::text
 				)
 			)
-		SELECT 
-			a.arc_id::int AS id, '||v_source||'::int AS source, '||v_target||'::int AS target,
-			1 as cost, -1 as reverse_cost
+		SELECT
+			a.arc_id::bigint AS id,
+			a.node_2::bigint AS source,
+			a.node_1::bigint AS target,
+			1::float8 AS cost,
+			-1::float8 AS reverse_cost
 			FROM arc_selected a
-	';
+	$sql$, current_user, v_fid, v_source);
 
-	UPDATE anl_node n set addparam = v_mainstream
-	FROM (
+    IF v_node IS NOT NULL THEN
+		CREATE TEMP TABLE tmp_mainstream_nodes ON COMMIT DROP AS
 		SELECT node
-		FROM pgr_drivingdistance(v_query, v_node, v_distance)
-	) p
-	WHERE n.cur_user="current_user"() AND n.fid = v_fid
-	AND n.node_id::int4 = p.node;
+		FROM pgr_drivingdistance(v_query, v_node, v_distance);
+
+        UPDATE anl_node n SET addparam = v_mainstream
+        FROM tmp_mainstream_nodes t
+        WHERE n.cur_user = current_user AND n.fid = v_fid
+        AND (n.node_id)::bigint = t.node;
+    END IF;
 
 	INSERT INTO anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
 	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
 	FROM ve_arc a
-	JOIN anl_node n1 ON a.node_1::text = n1.node_id
-	JOIN anl_node n2 ON a.node_2::text = n2.node_id
-	WHERE n1.cur_user="current_user"() AND n1.fid = v_fid
-	AND n2.cur_user="current_user"() AND n2.fid = v_fid;
+	JOIN anl_node n1 ON a.node_1 = n1.node_id::bigint
+	JOIN anl_node n2 ON a.node_2 = n2.node_id::bigint
+	WHERE n1.cur_user=current_user AND n1.fid = v_fid
+	AND n2.cur_user=current_user AND n2.fid = v_fid;
 
 	SELECT jsonb_agg(features.feature) INTO v_result
 	FROM (
@@ -196,7 +209,7 @@ BEGIN
 	'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
 	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, the_geom
-	FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
+	FROM anl_arc WHERE cur_user=current_user AND fid=v_fid) row) features;
 
 	v_result := COALESCE(v_result, '{}');
 	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowtrace arc", "features":',v_result, '}');
@@ -209,18 +222,18 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom',
 		'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
+	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id AS node_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, the_geom
+	FROM  anl_node WHERE cur_user=current_user AND fid=v_fid
 	UNION
 	SELECT v_context as context, c.expl_id, c.connec_id::text, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
 	FROM anl_arc a JOIN ve_connec c ON c.arc_id::text = a.arc_id
-	WHERE cur_user="current_user"() AND fid=v_fid
+	WHERE cur_user=current_user AND fid=v_fid
 	AND c.state > 0
 	AND c.is_operative = TRUE
 	UNION
 	SELECT v_context as context, g.expl_id, g.gully_id::text, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
 	FROM anl_arc a JOIN ve_gully g ON g.arc_id::text = a.arc_id
-	WHERE cur_user="current_user"() AND fid=v_fid
+	WHERE cur_user=current_user AND fid=v_fid
 	AND g.state > 0
 	AND g.is_operative = TRUE) row) features;
 
@@ -244,9 +257,10 @@ BEGIN
 					 '}'
 		'}')::json, v_symbology, null, null, null);
 
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    -- Let the error bubble up so PostgreSQL can properly clean SPI context from extensions
+    RAISE;
 
 END;
 $BODY$
