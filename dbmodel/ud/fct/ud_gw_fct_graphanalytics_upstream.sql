@@ -144,7 +144,8 @@ BEGIN
 	INTO v_distance;
 
     IF v_node IS NOT NULL THEN
-	  CREATE TEMP TABLE tmp_upstream_nodes ON COMMIT DROP AS
+		DROP TABLE IF EXISTS tmp_upstream_nodes;
+	  	CREATE TEMP TABLE tmp_upstream_nodes ON COMMIT DROP AS
 		SELECT node
 		FROM pgr_drivingdistance(v_query, v_node, v_distance);
 
@@ -182,6 +183,7 @@ BEGIN
 	$sql$, current_user, v_fid, v_source);
 
     IF v_node IS NOT NULL THEN
+		DROP TABLE IF EXISTS tmp_mainstream_nodes;
 		CREATE TEMP TABLE tmp_mainstream_nodes ON COMMIT DROP AS
 		SELECT node
 		FROM pgr_drivingdistance(v_query, v_node, v_distance);
