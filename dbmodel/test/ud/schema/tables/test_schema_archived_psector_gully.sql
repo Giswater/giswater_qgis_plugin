@@ -148,7 +148,7 @@ SELECT col_has_default('archived_psector_gully', 'audit_user', 'Column audit_use
 -- Check foreign keys
 
 -- Check indexes
-SELECT has_index('archived_psector_gully', 'audit_psector_gully_traceability_pkey', ARRAY['id'], 'Table should have index on id');
+SELECT has_index('archived_psector_gully', 'archived_psector_gully_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Check triggers
 SELECT has_trigger('archived_psector_gully', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
