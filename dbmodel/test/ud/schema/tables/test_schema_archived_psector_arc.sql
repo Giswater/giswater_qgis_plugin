@@ -16,7 +16,7 @@ SELECT * FROM no_plan();
 --check if table exists
 SELECT has_table('archived_psector_arc'::name, 'Table archived_psector_arc should exist');
 
--- check columns names 
+-- check columns names
 
 
 SELECT columns_are(
@@ -149,12 +149,12 @@ SELECT col_has_default('archived_psector_arc', 'audit_user', 'Column audit_user 
 
 
 -- check index
-SELECT has_index('archived_psector_arc', 'audit_psector_arc_traceability_pkey', ARRAY['id'], 'Table archived_psector_arc should have index on id');
+SELECT has_index('archived_psector_arc', 'archived_psector_arc_pkey', ARRAY['id'], 'Table archived_psector_arc should have index on id');
 
---check trigger 
+--check trigger
 SELECT has_trigger('archived_psector_arc', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('archived_psector_arc', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');
---check rule 
+--check rule
 
 SELECT * FROM finish();
 

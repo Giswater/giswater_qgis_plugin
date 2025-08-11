@@ -227,5 +227,10 @@ ALTER TABLE archived_psector_gully_traceability RENAME COLUMN lastupdate_user TO
 
 ALTER TABLE archived_psector_gully_traceability RENAME to archived_psector_gully;
 ALTER SEQUENCE archived_psector_gully_traceability_id_seq RENAME TO archived_psector_gully_id_seq;
+ALTER TABLE archived_psector_gully RENAME CONSTRAINT audit_psector_gully_traceability_pkey TO archived_psector_gully_pkey;
+
 ALTER TABLE archived_psector_gully drop column streetname;
 ALTER TABLE archived_psector_gully drop column streetname2;
+
+UPDATE sys_foreignkey SET target_table='archived_psector_gully' WHERE typevalue_table='om_typevalue' AND typevalue_name='fluid_type' AND target_table='archived_psector_gully_traceability' AND target_field='fluid_type';
+UPDATE sys_table SET descript='archived_psector_gully', id='archived_psector_gully' WHERE id='archived_psector_gully_traceability';

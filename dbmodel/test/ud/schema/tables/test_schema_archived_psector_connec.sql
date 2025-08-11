@@ -16,14 +16,14 @@ SELECT * FROM no_plan();
 --check if table exists
 SELECT has_table('archived_psector_connec'::name, 'Table archived_psector_connec should exist');
 
--- check columns names 
+-- check columns names
 
 
 SELECT columns_are(
     'archived_psector_connec',
     ARRAY[
         'id', 'psector_id', 'psector_state','doable','psector_arc_id','link_id', 'link_the_geom', 'audit_tstamp',
-         'audit_user', 'action','connec_id', 'code', 'top_elev','y1','y2','connec_type', 'conneccat_id', 
+         'audit_user', 'action','connec_id', 'code', 'top_elev','y1','y2','connec_type', 'conneccat_id',
          'sector_id','customer_code', 'private_conneccat_id', 'demand','state', 'state_type','connec_depth','connec_length', 'arc_id', 'annotation', 'observ',
          'comment','dma_id', 'soilcat_id', 'function_type','category_type', 'fluid_type','location_type','workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
          'ownercat_id','muni_id', 'postcode', 'streetaxis_id', 'postnumber','postcomplement','streetaxis2_id', 'postnumber2', 'postcomplement2', 'descript',
@@ -133,12 +133,12 @@ SELECT col_has_default('archived_psector_connec', 'audit_user', 'Column audit_us
 
 
 -- check index
-SELECT has_index('archived_psector_connec', 'audit_psector_connec_traceability_pkey', ARRAY['id'], 'Table archived_psector_connec should have index on id');
+SELECT has_index('archived_psector_connec', 'archived_psector_connec_pkey', ARRAY['id'], 'Table archived_psector_connec should have index on id');
 
---check trigger 
+--check trigger
 SELECT has_trigger('archived_psector_connec', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('archived_psector_connec', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');
---check rule 
+--check rule
 
 SELECT * FROM finish();
 

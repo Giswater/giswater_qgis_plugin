@@ -61,6 +61,12 @@ ALTER SEQUENCE archived_psector_node_traceability_id_seq RENAME TO archived_psec
 ALTER SEQUENCE archived_psector_connec_traceability_id_seq RENAME TO archived_psector_connec_id_seq;
 ALTER SEQUENCE archived_psector_link_traceability_id_seq RENAME TO archived_psector_link_id_seq;
 
+ALTER TABLE archived_psector_arc RENAME CONSTRAINT audit_psector_arc_traceability_pkey TO archived_psector_arc_pkey;
+ALTER TABLE archived_psector_connec RENAME CONSTRAINT audit_psector_connec_traceability_pkey TO archived_psector_connec_pkey;
+ALTER TABLE archived_psector_node RENAME CONSTRAINT audit_psector_node_traceability_pkey TO archived_psector_node_pkey;
+ALTER TABLE archived_psector_link RENAME CONSTRAINT archived_psector_link_traceability_pkey TO archived_psector_link_pkey;
+
+
 ALTER TABLE archived_psector_node drop column streetname;
 ALTER TABLE archived_psector_arc drop column streetname;
 ALTER TABLE archived_psector_connec drop column streetname;
@@ -69,7 +75,7 @@ ALTER TABLE archived_psector_node drop column streetname2;
 ALTER TABLE archived_psector_arc drop column streetname2;
 ALTER TABLE archived_psector_connec drop column streetname2;
 
-update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';					
+update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';
 delete from sys_param_user where id = 'edit_connec_linkcat_vdefault';
 update sys_param_user set id = 'edit_connec_linkcat_vdefault' where id = 'edit_linkcat_vdefault';
 
@@ -78,3 +84,14 @@ ALTER TABLE link DROP COLUMN IF EXISTS epa_type CASCADE;
 DELETE FROM config_form_fields WHERE formname ilike '%link%' AND columnname = 'epa_type';
 
 DROP TABLE IF EXISTS man_link;
+
+
+UPDATE sys_foreignkey SET target_table='archived_psector_arc' WHERE typevalue_table='om_typevalue' AND typevalue_name='fluid_type' AND target_table='archived_psector_arc_traceability' AND target_field='fluid_type';
+UPDATE sys_foreignkey SET target_table='archived_psector_connec' WHERE typevalue_table='om_typevalue' AND typevalue_name='fluid_type' AND target_table='archived_psector_connec_traceability' AND target_field='fluid_type';
+UPDATE sys_foreignkey SET target_table='archived_psector_link' WHERE typevalue_table='om_typevalue' AND typevalue_name='fluid_type' AND target_table='archived_psector_link_traceability' AND target_field='fluid_type';
+UPDATE sys_foreignkey SET target_table='archived_psector_node' WHERE typevalue_table='om_typevalue' AND typevalue_name='fluid_type' AND target_table='archived_psector_node_traceability' AND target_field='fluid_type';
+
+UPDATE sys_table SET descript='archived_psector_arc', id='archived_psector_arc' WHERE id='archived_psector_arc_traceability';
+UPDATE sys_table SET descript='archived_psector_node', id='archived_psector_node' WHERE id='archived_psector_node_traceability';
+UPDATE sys_table SET descript='archived_psector_connec', id='archived_psector_connec' WHERE id='archived_psector_connec_traceability';
+UPDATE sys_table SET descript='archived_psector_link', id='archived_psector_link' WHERE id='archived_psector_link_traceability';
