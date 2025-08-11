@@ -21,7 +21,8 @@ SELECT columns_are(
     'node_add',
     ARRAY[
         'node_id', 'demand_max', 'demand_min', 'demand_avg', 'press_max', 'press_min', 'press_avg',
-        'head_max', 'head_min', 'head_avg', 'quality_max', 'quality_min', 'quality_avg', 'result_id'
+        'head_max', 'head_min', 'head_avg', 'quality_max', 'quality_min', 'quality_avg', 'result_id',
+        'flow_max', 'flow_min', 'flow_avg', 'vel_max', 'vel_min', 'vel_avg'
     ],
     'Table node_add should have the correct columns'
 );
@@ -44,6 +45,12 @@ SELECT col_type_is('node_add', 'quality_max', 'numeric(12,2)', 'Column quality_m
 SELECT col_type_is('node_add', 'quality_min', 'numeric(12,2)', 'Column quality_min should be numeric(12,2)');
 SELECT col_type_is('node_add', 'quality_avg', 'numeric(12,2)', 'Column quality_avg should be numeric(12,2)');
 SELECT col_type_is('node_add', 'result_id', 'text', 'Column result_id should be text');
+SELECT col_type_is('node_add', 'flow_max', 'numeric(12,2)', 'Column flow_max should be numeric(12,2)');
+SELECT col_type_is('node_add', 'flow_min', 'numeric(12,2)', 'Column flow_min should be numeric(12,2)');
+SELECT col_type_is('node_add', 'flow_avg', 'numeric(12,2)', 'Column flow_avg should be numeric(12,2)');
+SELECT col_type_is('node_add', 'vel_max', 'numeric(12,2)', 'Column vel_max should be numeric(12,2)');
+SELECT col_type_is('node_add', 'vel_min', 'numeric(12,2)', 'Column vel_min should be numeric(12,2)');
+SELECT col_type_is('node_add', 'vel_avg', 'numeric(12,2)', 'Column vel_avg should be numeric(12,2)');
 
 -- Check constraints
 SELECT col_not_null('node_add', 'node_id', 'Column node_id should be NOT NULL');
