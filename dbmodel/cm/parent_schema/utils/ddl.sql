@@ -92,6 +92,7 @@ BEGIN
       lower(rec.feature_type),
       lower(rec.feature_type),
       lower(rec.feature_type),
+      lower(rec.feature_type),
       lower(rec.feature_type)
       );
 
