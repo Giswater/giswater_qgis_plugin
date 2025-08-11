@@ -84,7 +84,7 @@ BEGIN
     FOR v_rec_subtype IN EXECUTE v_querytext
     LOOP
         v_subtype := v_rec_subtype.subtype;
-        v_form_name := 'agosto04_ws_' || v_subtype;
+        v_form_name := 'PARENT_SCHEMA_' || v_subtype;
         
         -- Check combinations of dnom, matcat_id, pnom against cat_arc for this subtype
         BEGIN
@@ -163,7 +163,7 @@ BEGIN
     FOR v_rec_subtype IN EXECUTE v_querytext
     LOOP
         v_subtype := v_rec_subtype.subtype;
-        v_form_name := 'agosto04_ws_' || v_subtype;
+        v_form_name := 'PARENT_SCHEMA_' || v_subtype;
         
         -- Check combinations of dnom, matcat_id, pnom against cat_arc for this subtype
         BEGIN
@@ -242,7 +242,7 @@ BEGIN
     FOR v_rec_subtype IN EXECUTE v_querytext
     LOOP
         v_subtype := v_rec_subtype.subtype;
-        v_form_name := 'agosto04_ws_' || v_subtype;
+        v_form_name := 'PARENT_SCHEMA_' || v_subtype;
         
         -- Check combinations of node_type, matcat_id, dnom against cat_node for this subtype
         BEGIN
@@ -321,7 +321,7 @@ BEGIN
     FOR v_rec_subtype IN EXECUTE v_querytext
     LOOP
         v_subtype := v_rec_subtype.subtype;
-        v_form_name := 'agosto04_ws_' || v_subtype;
+        v_form_name := 'PARENT_SCHEMA_' || v_subtype;
         
         -- For lot tables, we can only check matcat_id and dnom combinations since node_type is not available
         BEGIN

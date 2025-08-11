@@ -25,50 +25,50 @@ INSERT INTO cat_team (team_id, code, teamname, organization_id, descript, role_i
 
 
 -- Team administrator
-INSERT INTO cat_user (user_id, loginname, username, team_id, active) VALUES
-(1,  'agarcia', 'agarcia', 1, true),
-(2,  'ssanchez',    'ssanchez',    1, true);
+INSERT INTO cat_user (user_id, username, team_id, active) VALUES
+(1, 'agarcia', 1, true),
+(2, 'ssanchez', 1, true);
 
 -- Team: Manager o1
-INSERT INTO cat_user (user_id, loginname, username, team_id, active) VALUES
-(3,  'jperis',    'jperis',    2, true),
-(4,  'msierra',   'msierra',   2, true),
-(5,  'o1_manager', 'o1_manager', 2, true);
+INSERT INTO cat_user (user_id, username, team_id, active) VALUES
+(3, 'jperis', 2, true),
+(4, 'msierra', 2, true),
+(5, 'o1_manager', 2, true);
 
 -- Team: Manager o2
-INSERT INTO cat_user (user_id, loginname, username, team_id, active) VALUES
-(6,  'atorres',   'atorres',   3, true),
-(7,  'cfuentes',  'cfuentes',  3, true),
-(8,  'o2_manager', 'o2_manager', 3, true);
+INSERT INTO cat_user (user_id, username, team_id, active) VALUES
+(6, 'atorres', 3, true),
+(7, 'cfuentes', 3, true),
+(8, 'o2_manager', 3, true);
 
 -- Team: o1 field 1
-INSERT INTO cat_user (user_id, loginname, username, team_id, active) VALUES
-(9,  'lblanco',   'lblanco',   4, true),
-(10,  'dferrer',   'dferrer',   4, true),
-(11, 'o1_field1', 'o1_field1', 4, true);
+INSERT INTO cat_user (user_id, username, team_id, active) VALUES
+(9, 'lblanco', 4, true),
+(10, 'dferrer', 4, true),
+(11, 'o1_field1', 4, true);
 
 -- Team: o1 field 2
-INSERT INTO cat_user (user_id, loginname, username, team_id, active) VALUES
-(12,  'ngallart',  'ngallart',  5, true),
-(13, 'omartin',   'omartin',   5, true),
-(14, 'o1_field2', 'o1_field2', 5, true);
+INSERT INTO cat_user (user_id, username, team_id, active) VALUES
+(12, 'ngallart', 5, true),
+(13, 'omartin', 5, true),
+(14, 'o1_field2', 5, true);
 
 -- Team: o2 field 1
-INSERT INTO cat_user (user_id, loginname, username, team_id, active) VALUES
-(15, 'iramos',    'iramos',    6, true),
-(16, 'pablo',     'pablo',     6, true),
-(17, 'o2_field1', 'o2_field1', 6, true);
+INSERT INTO cat_user (user_id, username, team_id, active) VALUES
+(15, 'iramos', 6, true),
+(16, 'pablo', 6, true),
+(17, 'o2_field1', 6, true);
 
 -- Team: o2 field 2
-INSERT INTO cat_user (user_id, loginname, username, team_id, active) VALUES
-(18, 'cgil',      'cgil',      7, true),
-(19, 'rbueno',    'rbueno',    7, true),
-(20, 'o2_field2', 'o2_field2', 7, true);
+INSERT INTO cat_user (user_id, username, team_id, active) VALUES
+(18, 'cgil', 7, true),
+(19, 'rbueno', 7, true),
+(20, 'o2_field2', 7, true);
 
 -- Easy user for test in local
-INSERT INTO cat_user (user_id, loginname, username, team_id, active) VALUES
-(21, 'postgres', 'postgres', 1, true),
-(22, 'bgeoadmin', 'bgeoadmin', 1, true);
+INSERT INTO cat_user (user_id, username, team_id, active) VALUES
+(21, 'postgres', 1, true),
+(22, 'bgeoadmin', 1, true);
 
 -- Reset sequences
 SELECT setval('cat_organization_organization_id_seq', (SELECT MAX(organization_id) FROM cat_organization), true);

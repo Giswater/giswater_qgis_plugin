@@ -40,8 +40,18 @@ BEGIN
     -- SECTION[epic=sync_users]: Sync users with role_cm to cat_user table
     -- Find all users that have role_cm but are not in cat_user table
     v_querytext := '
-        INSERT INTO cm.cat_user (loginname, username, team_id)
-        SELECT DISTINCT r.rolname, r.rolname, NULL::integer
+        INSERT INTO cm.cat_user (username, team_id, roles)
+        SELECT DISTINCT r.rolname AS username,
+               NULL::integer AS team_id,
+               COALESCE(
+                   (
+                       SELECT array_agg(rc.rolname ORDER BY rc.rolname)
+                       FROM pg_auth_members am2
+                       JOIN pg_roles rc ON am2.roleid = rc.oid
+                       WHERE am2.member = r.oid
+                   ),
+                   ARRAY[]::text[]
+               ) AS roles
         FROM pg_roles r
         JOIN pg_auth_members am ON r.oid = am.member
         JOIN pg_roles role_cm ON am.roleid = role_cm.oid

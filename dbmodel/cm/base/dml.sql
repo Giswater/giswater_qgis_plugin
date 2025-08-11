@@ -7,6 +7,14 @@ or (at your option) any later version.
 
 
 SET search_path = cm, public, pg_catalog;
+-- Seed rating config
+INSERT INTO config_qindex_rating(id, minval, maxval, rating) VALUES
+  (1, NULL, 0.999, 'EXCELENTE'),
+  (2, 1.000, 1.999, 'BUENO'),
+  (3, 2.000, 2.999, 'ACEPTABLE'),
+  (4, 3.000, 3.999, 'REGULAR'),
+  (5, 4.000, 999.000, 'INACEPTABLE')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_role VALUES ('role_cm_admin');
 INSERT INTO cat_role VALUES ('role_cm_org');

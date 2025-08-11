@@ -246,9 +246,9 @@ CREATE TABLE cat_team (
 
 CREATE TABLE cat_user (
   user_id serial4 PRIMARY KEY,
-  loginname text not NULL,
   username text not NULL,
   team_id int4,
+  roles text[],
   active boolean DEFAULT TRUE,
   CONSTRAINT cat_user_unique UNIQUE (username),
   CONSTRAINT cat_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cat_team(team_id)
@@ -347,6 +347,7 @@ CREATE TABLE om_campaign (
   sector_id integer,
   qindex1 numeric(12, 3) NULL,
   qindex2 numeric(12, 3) NULL,
+  rating int2 NULL,
   the_geom geometry(MultiPolygon,SRID_VALUE),
   CONSTRAINT om_campaign_pkey PRIMARY KEY (campaign_id),
   CONSTRAINT om_campaign_check_type check (campaign_type in (1,2,3)),
@@ -520,6 +521,7 @@ CREATE TABLE om_campaign_lot (
   sector_id integer,
   qindex1 numeric(12, 3) NULL,
   qindex2 numeric(12, 3) NULL,
+  rating int2 NULL,
   the_geom geometry(MULTIPOLYGON,SRID_VALUE),
   CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (lot_id),
   CONSTRAINT om_campaign_lot_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -612,6 +614,21 @@ CREATE TABLE config_outlayers (
 	except_error boolean,
 	except_message text,
 	CONSTRAINT config_outlayers_pkey PRIMARY KEY (feature_type, column_name)
+);
+
+-- New rating configuration tables
+CREATE TABLE config_qindex_rating (
+  id serial4 PRIMARY KEY,
+  minval numeric(12,3),
+  maxval numeric(12,3),
+  rating text
+);
+
+CREATE TABLE config_qindex_keyparam (
+  layer text NOT NULL,
+  column_name text NOT NULL,
+  active boolean DEFAULT true,
+  CONSTRAINT config_qindex_keyparam_pkey PRIMARY KEY (layer, column_name)
 );
 
 CREATE TABLE selector_campaign (

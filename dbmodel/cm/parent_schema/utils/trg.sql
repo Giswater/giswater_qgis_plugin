@@ -117,10 +117,9 @@ DROP TRIGGER IF EXISTS trg_cm_topocontrol_arc ON cm.om_campaign_x_arc;
 CREATE TRIGGER trg_cm_topocontrol_arc BEFORE INSERT OR UPDATE OF the_geom ON cm.om_campaign_x_arc
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_topocontrol_arc();
 
--- Topocontrol triggers for lot_x_arc (using existing function but monitoring arc_id instead of the_geom)
-DROP TRIGGER IF EXISTS trg_cm_topocontrol_lot_arc ON cm.om_campaign_lot_x_arc;
-CREATE TRIGGER trg_cm_topocontrol_lot_arc BEFORE INSERT OR UPDATE OF arc_id ON cm.om_campaign_lot_x_arc
-FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_topocontrol_arc();
+DROP TRIGGER IF EXISTS trg_cm_topocontrol_node ON cm.om_campaign_x_node;
+CREATE TRIGGER trg_cm_topocontrol_node BEFORE INSERT OR UPDATE OF the_geom ON cm.om_campaign_x_node
+FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_topocontrol_node();
 
 DO $$
 DECLARE

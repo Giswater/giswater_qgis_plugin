@@ -90,6 +90,9 @@ DECLARE
 	v_temp_has_q2 boolean;
 	v_avg_q1_text text;
 	v_avg_q2_text text;
+    v_avg_q1_val numeric;
+    v_avg_q2_val numeric;
+    v_rating_id int2;
 	v_lot_summary_msg text;
 	v_campaign_summary_msg text;
 	v_combo_table text;
@@ -115,6 +118,8 @@ DECLARE
     v_has_arcs_in_scope boolean := false;
     v_has_connecs_in_scope boolean := false;
     v_has_links_in_scope boolean := false;
+    v_column_exists boolean;
+    v_feature_rows integer;
     -- arc missing-node check helpers
     v_missing_arc_nodes_count integer := 0;
     v_has_any_arcs boolean := false;
@@ -1028,7 +1033,7 @@ BEGIN
 			v_seen_non_null_q2 := v_seen_non_null_q2 OR v_temp_has_q2;
 		END LOOP;
 
-		IF v_total_count > 0 THEN
+        IF v_total_count > 0 THEN
 			BEGIN
 				UPDATE cm.om_campaign_lot
 				SET qindex1 = CASE WHEN v_seen_non_null_q1 THEN v_total_q1::decimal / v_total_count ELSE NULL END,
@@ -1040,8 +1045,86 @@ BEGIN
 					VALUES (v_fid, current_user, 2, format('WARNING: Error updating lot qindex summary for lot %s. Error: %s', v_lot_id, SQLERRM));
 			END;
 
-			v_avg_q1_text := CASE WHEN v_seen_non_null_q1 THEN round(v_total_q1::decimal / v_total_count, 2)::text ELSE 'NULL' END;
-			v_avg_q2_text := CASE WHEN v_seen_non_null_q2 THEN round(v_total_q2::decimal / v_total_count, 2)::text ELSE 'NULL' END;
+            v_avg_q1_val := CASE WHEN v_seen_non_null_q1 THEN round(v_total_q1::decimal / v_total_count, 3) ELSE NULL END;
+            v_avg_q2_val := CASE WHEN v_seen_non_null_q2 THEN round(v_total_q2::decimal / v_total_count, 3) ELSE NULL END;
+            v_avg_q1_text := CASE WHEN v_avg_q1_val IS NOT NULL THEN round(v_avg_q1_val, 2)::text ELSE 'NULL' END;
+            v_avg_q2_text := CASE WHEN v_avg_q2_val IS NOT NULL THEN round(v_avg_q2_val, 2)::text ELSE 'NULL' END;
+
+            -- If current user is manager/org, set lot rating from qindex1 using config_qindex_rating
+            IF v_current_role = 'role_cm_org' AND v_avg_q1_val IS NOT NULL THEN
+                SELECT id INTO v_rating_id
+                FROM cm.config_qindex_rating
+                WHERE (minval IS NULL OR v_avg_q1_val >= minval)
+                  AND (maxval IS NULL OR v_avg_q1_val <= maxval)
+                ORDER BY id
+                LIMIT 1;
+                BEGIN
+                    UPDATE cm.om_campaign_lot SET rating = v_rating_id WHERE lot_id = v_lot_id;
+                EXCEPTION WHEN OTHERS THEN
+                    INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+                    VALUES (v_fid, current_user, 2,
+                        format('WARNING: Error updating lot rating for lot %s (qindex1=%s). Error: %s', v_lot_id, v_avg_q1_text, SQLERRM));
+                END;
+            END IF;
+
+            -- Enforce key parameter rules for lot: if any configured key param is NULL/empty/'unknown', force rating to INACEPTABLE
+            IF v_lot_id IS NOT NULL THEN
+                FOR v_rec IN SELECT layer, column_name FROM cm.config_qindex_keyparam WHERE active LOOP
+                    BEGIN
+                        -- Resolve actual lot view name: ve_<parent>_lot_<layer>
+                        SELECT table_name INTO v_lot_view_name
+                        FROM information_schema.views
+                        WHERE table_schema = 'cm'
+                          AND table_name LIKE ('ve_' || '%' || '_lot_' || v_rec.layer)
+                        LIMIT 1;
+                        IF v_lot_view_name IS NULL THEN
+                            CONTINUE;
+                        END IF;
+                        -- Skip if lot has no features of this layer (avoid noise when lot type doesn't include it)
+                        v_querytext := format('SELECT COUNT(*) FROM cm.%I WHERE lot_id = %s', v_lot_view_name, v_lot_id);
+                        EXECUTE v_querytext INTO v_feature_rows;
+                        IF COALESCE(v_feature_rows,0) = 0 THEN
+                            -- no rows for this layer in the lot; skip silently
+                            CONTINUE;
+                        END IF;
+                        -- Skip if the configured column does not exist in the view
+                        SELECT EXISTS (
+                            SELECT 1 FROM information_schema.columns
+                            WHERE table_schema='cm' AND table_name=v_lot_view_name AND column_name=v_rec.column_name
+                        ) INTO v_column_exists;
+                        IF NOT v_column_exists THEN
+                            CONTINUE;
+                        END IF;
+                        v_querytext := format(
+                            'SELECT COUNT(*) FROM cm.%1$I v
+                             WHERE v.lot_id = %2$s
+                               AND (
+                                   v.%3$I IS NULL
+                                   OR trim(v.%3$I::text) = ''''
+                                   OR lower(v.%3$I::text) IN (''unknown'',''desconegut'')
+                               )',
+                            v_lot_view_name, v_lot_id, v_rec.column_name
+                        );
+                        EXECUTE v_querytext INTO v_count;
+                        IF v_count > 0 THEN
+                            SELECT id INTO v_rating_id FROM cm.config_qindex_rating WHERE upper(rating) = 'INACEPTABLE' LIMIT 1;
+                            UPDATE cm.om_campaign_lot SET rating = v_rating_id WHERE lot_id = v_lot_id;
+                            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+                            VALUES (
+                                v_fid,
+                                current_user,
+                                3,
+                                format('ERROR: Found %s invalid value(s) for key param %I.%I. Lot rating set to INACEPTABLE.', v_count, v_rec.layer, v_rec.column_name),
+                                v_count
+                            );
+                        END IF;
+                    EXCEPTION WHEN OTHERS THEN
+                        INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+                        VALUES (v_fid, current_user, 2,
+                                format('WARNING: Key param check failed for %I.%I on lot %s. Error: %s', v_rec.layer, v_rec.column_name, v_lot_id, SQLERRM));
+                    END;
+                END LOOP;
+            END IF;
 
 			v_lot_summary_msg := format('Lot %s summary: Q-Index 1 = %s, Q-Index 2 = %s', v_lot_id, v_avg_q1_text, v_avg_q2_text);
 		END IF;
@@ -1083,7 +1166,7 @@ BEGIN
 			v_seen_non_null_q2 := v_seen_non_null_q2 OR v_temp_has_q2;
 		END LOOP;
 
-		IF v_total_count > 0 THEN
+        IF v_total_count > 0 THEN
 			BEGIN
 				UPDATE cm.om_campaign
 				SET qindex1 = CASE WHEN v_seen_non_null_q1 THEN v_total_q1::decimal / v_total_count ELSE NULL END,
@@ -1095,8 +1178,86 @@ BEGIN
 					VALUES (v_fid, current_user, 2, format('WARNING: Error updating campaign qindex summary for campaign %s. Error: %s', v_campaign_id, SQLERRM));
 			END;
 
-			v_avg_q1_text := CASE WHEN v_seen_non_null_q1 THEN round(v_total_q1::decimal / v_total_count, 2)::text ELSE 'NULL' END;
-			v_avg_q2_text := CASE WHEN v_seen_non_null_q2 THEN round(v_total_q2::decimal / v_total_count, 2)::text ELSE 'NULL' END;
+            v_avg_q1_val := CASE WHEN v_seen_non_null_q1 THEN round(v_total_q1::decimal / v_total_count, 3) ELSE NULL END;
+            v_avg_q2_val := CASE WHEN v_seen_non_null_q2 THEN round(v_total_q2::decimal / v_total_count, 3) ELSE NULL END;
+            v_avg_q1_text := CASE WHEN v_avg_q1_val IS NOT NULL THEN round(v_avg_q1_val, 2)::text ELSE 'NULL' END;
+            v_avg_q2_text := CASE WHEN v_avg_q2_val IS NOT NULL THEN round(v_avg_q2_val, 2)::text ELSE 'NULL' END;
+
+            -- If current user is admin, set campaign rating from qindex2 using config_qindex_rating
+            IF v_current_role = 'role_cm_admin' AND v_avg_q2_val IS NOT NULL THEN
+                SELECT id INTO v_rating_id
+                FROM cm.config_qindex_rating
+                WHERE (minval IS NULL OR v_avg_q2_val >= minval)
+                  AND (maxval IS NULL OR v_avg_q2_val <= maxval)
+                ORDER BY id
+                LIMIT 1;
+                BEGIN
+                    UPDATE cm.om_campaign SET rating = v_rating_id WHERE campaign_id = v_campaign_id;
+                EXCEPTION WHEN OTHERS THEN
+                    INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+                    VALUES (v_fid, current_user, 2,
+                        format('WARNING: Error updating campaign rating for campaign %s (qindex2=%s). Error: %s', v_campaign_id, v_avg_q2_text, SQLERRM));
+                END;
+            END IF;
+
+            -- Enforce key parameter rules for campaign (admin scope)
+            IF v_campaign_id IS NOT NULL THEN
+                FOR v_rec IN SELECT layer, column_name FROM cm.config_qindex_keyparam WHERE active LOOP
+                    BEGIN
+                        -- Resolve view as above
+                        SELECT table_name INTO v_lot_view_name
+                        FROM information_schema.views
+                        WHERE table_schema = 'cm'
+                          AND table_name LIKE ('ve_' || '%' || '_lot_' || v_rec.layer)
+                        LIMIT 1;
+                        IF v_lot_view_name IS NULL THEN
+                            CONTINUE;
+                        END IF;
+                        -- Skip if campaign has no lots with this layer
+                        v_querytext := format('SELECT COUNT(*) FROM cm.%I v JOIN cm.om_campaign_lot o ON o.lot_id=v.lot_id WHERE o.campaign_id=%s', v_lot_view_name, v_campaign_id);
+                        EXECUTE v_querytext INTO v_feature_rows;
+                        IF COALESCE(v_feature_rows,0) = 0 THEN
+                            CONTINUE;
+                        END IF;
+                        -- Skip if the configured column does not exist in the view
+                        SELECT EXISTS (
+                            SELECT 1 FROM information_schema.columns
+                            WHERE table_schema='cm' AND table_name=v_lot_view_name AND column_name=v_rec.column_name
+                        ) INTO v_column_exists;
+                        IF NOT v_column_exists THEN
+                            CONTINUE;
+                        END IF;
+                        v_querytext := format(
+                            'SELECT COUNT(*) FROM cm.%1$I v
+                               JOIN cm.om_campaign_lot ocl ON ocl.lot_id = v.lot_id
+                             WHERE ocl.campaign_id = %2$s
+                               AND (
+                                   v.%3$I IS NULL
+                                   OR trim(v.%3$I::text) = ''''
+                                   OR lower(v.%3$I::text) IN (''unknown'',''desconegut'')
+                               )',
+                            v_lot_view_name, v_campaign_id, v_rec.column_name
+                        );
+                        EXECUTE v_querytext INTO v_count;
+                        IF v_count > 0 THEN
+                            SELECT id INTO v_rating_id FROM cm.config_qindex_rating WHERE upper(rating) = 'INACEPTABLE' LIMIT 1;
+                            UPDATE cm.om_campaign SET rating = v_rating_id WHERE campaign_id = v_campaign_id;
+                            INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+                            VALUES (
+                                v_fid,
+                                current_user,
+                                3,
+                                format('ERROR: Found %s invalid value(s) for key param %I.%I. Campaign rating set to INACEPTABLE.', v_count, v_rec.layer, v_rec.column_name),
+                                v_count
+                            );
+                        END IF;
+                    EXCEPTION WHEN OTHERS THEN
+                        INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+                        VALUES (v_fid, current_user, 2,
+                                format('WARNING: Key param check failed for %I.%I on campaign %s. Error: %s', v_rec.layer, v_rec.column_name, v_campaign_id, SQLERRM));
+                    END;
+                END LOOP;
+            END IF;
 
 			v_campaign_summary_msg := format('Campaign %s summary: Q-Index 1 = %s, Q-Index 2 = %s', v_campaign_id, v_avg_q1_text, v_avg_q2_text);
 		END IF;

@@ -20,6 +20,7 @@ DECLARE
   feature_col text;
   constraint_name text;
   v_cols text;
+  v_cols_no_lot text;
 
 BEGIN
 
@@ -60,11 +61,13 @@ BEGIN
       view_name := format('ve_%s_lot_%s', parent_s, lower(rec.id));
       tbl_name := format('%I_%s', parent_s, lower(rec.id));
 
-      -- Get columns for dynamic view creation
-      SELECT array_to_string(array_agg('a.' || column_name), ', ')
-      INTO v_cols
+      -- Get columns for dynamic view creation (excluding id, lot_id and the_geom)
+      SELECT array_to_string(array_agg('a.' || column_name ORDER BY ordinal_position), ', ')
+      INTO v_cols_no_lot
       FROM information_schema.columns
-      WHERE table_schema = 'cm' AND table_name = lower(tbl_name) AND column_name <> 'the_geom';
+      WHERE table_schema = 'cm'
+        AND table_name = lower(tbl_name)
+        AND column_name NOT IN ('id','lot_id','the_geom');
 
       EXECUTE format(
         'CREATE OR REPLACE VIEW %s AS
@@ -72,7 +75,7 @@ BEGIN
               SELECT selector_lot.lot_id FROM selector_lot
               WHERE selector_lot.cur_user = current_user
           )
-          SELECT %s b.status, c.campaign_id, c.the_geom
+          SELECT a.id, c.campaign_id, a.lot_id, %s b.status, c.the_geom
           FROM %s a
           LEFT JOIN om_campaign_lot ocl ON a.lot_id = ocl.lot_id
           LEFT JOIN om_campaign_lot_x_%s b ON a.lot_id = b.lot_id AND a.%s_id = b.%s_id
@@ -83,9 +86,8 @@ BEGIN
             WHERE sel_lot.lot_id = a.lot_id
         );',
       view_name,
-      CASE WHEN v_cols IS NULL THEN '' ELSE v_cols || ', ' END,
+      CASE WHEN v_cols_no_lot IS NULL THEN '' ELSE v_cols_no_lot || ', ' END,
       tbl_name,
-      lower(rec.feature_type),
       lower(rec.feature_type),
       lower(rec.feature_type),
       lower(rec.feature_type),
