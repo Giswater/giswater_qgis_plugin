@@ -853,7 +853,7 @@ class Campaign:
             SELECT t.role_id, t.organization_id
             FROM cm.cat_user u
             JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.loginname = '{username}'
+            WHERE u.username = '{username}'
         """
         user_info = tools_db.get_row(sql)
 

@@ -118,6 +118,13 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="6">
+            <widget class="QPushButton" name="btn_team_toggle_active">
+             <property name="text">
+              <string>Toggle active</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
          <item row="1" column="0">
@@ -177,6 +184,13 @@
             <widget class="QPushButton" name="btn_remove_team">
              <property name="text">
               <string>Remove Team</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="6">
+            <widget class="QPushButton" name="btn_user_toggle_active">
+             <property name="text">
+              <string>Toggle active</string>
              </property>
             </widget>
            </item>

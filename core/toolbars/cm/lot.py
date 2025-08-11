@@ -19,7 +19,7 @@ from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
 from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi, TeamCreateUi
 
 from .... import global_vars
-from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
+from ....libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_os
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
 from ....global_vars import GwFeatureTypes
@@ -524,10 +524,17 @@ class AddNewLot:
 
     def _on_tab_change(self, index: int):
         tab = self.dlg_lot.tab_widget.widget(index)
-        if tab.objectName() == "RelationsTab" and self.is_new_lot and not self.lot_saved:
-            self.save_lot(from_change_tab=True)
-            self.lot_saved = True  # Only block repeated auto-saves
-            self.enable_feature_tabs_by_campaign(self.lot_id)
+        if tab.objectName() == "RelationsTab":
+            # Ensure lot exists before using relations
+            if self.is_new_lot and not self.lot_saved:
+                self.save_lot(from_change_tab=True)
+                self.lot_saved = True  # Only block repeated auto-saves
+                self.enable_feature_tabs_by_campaign(self.lot_id)
+            # Always prepare the feature ID completer when entering Relations
+            try:
+                self._update_feature_completer_lot(self.dlg_lot)
+            except Exception:
+                pass
 
     def populate_cmb_team(self):
         """ Fill ComboBox cmb_assigned_to """
@@ -757,13 +764,13 @@ class AddNewLot:
         sql = f"""
             SELECT
                 u.user_id,
-                u.loginname,
+                u.username,
                 u.team_id,
                 t.organization_id AS org_id,
                 t.role_id AS role
             FROM cm.cat_user AS u
             JOIN cm.cat_team AS t ON u.team_id = t.team_id
-            WHERE u.loginname = '{username}'
+            WHERE u.username = '{username}'
         """
         return tools_db.get_row(sql)
 
@@ -911,7 +918,7 @@ class AddNewLot:
             SELECT t.role_id, t.organization_id
             FROM cm.cat_user u
             JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.loginname = '{username}'
+            WHERE u.username = '{username}'
         """
         user_info = tools_db.get_row(sql)
 
@@ -942,7 +949,7 @@ class AddNewLot:
             SELECT t.role_id, t.organization_id
             FROM cm.cat_user u
             JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.loginname = '{username}'
+            WHERE u.username = '{username}'
         """
         user_info = tools_db.get_row(sql)
 
@@ -1244,7 +1251,7 @@ class AddNewLot:
                 "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_teams")
             },
             "cat_user": {
-                "query": "SELECT user_id::text, COALESCE(ct.teamname, 'No team') as teamname, COALESCE(ct.code, '') as code, loginname, username, cu.active::text" +
+                "query": "SELECT user_id::text, COALESCE(ct.teamname, 'No team') as teamname, COALESCE(ct.code, '') as code, username, cu.active::text" +
                          " FROM cm.cat_user cu LEFT JOIN cm.cat_team ct ON cu.team_id = ct.team_id",
                 "idname": "user_id",
                 "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_users"),
@@ -1302,12 +1309,18 @@ class AddNewLot:
         self.dlg_resources_man.btn_team_create.clicked.connect(partial(self.open_create_team))
         self.dlg_resources_man.btn_team_update.clicked.connect(partial(self.open_create_team, True))
         self.dlg_resources_man.btn_team_delete.clicked.connect(partial(self.delete_registers, "cat_team"))
+        # Toggle active on teams
+        if hasattr(self.dlg_resources_man, 'btn_team_toggle_active'):
+            self.dlg_resources_man.btn_team_toggle_active.clicked.connect(partial(self.toggle_active_records, "cat_team"))
         self.dlg_resources_man.txt_teams.textChanged.connect(partial(self.filter_teams_by_name))
 
         # Set signals for manage users (only team filtering, no user management buttons in UI)
         self.dlg_resources_man.cmb_team.currentIndexChanged.connect(partial(self.filter_users_table))
         self.dlg_resources_man.btn_assign_team.clicked.connect(partial(self.assign_team_to_user))
         self.dlg_resources_man.btn_remove_team.clicked.connect(partial(self.remove_team_from_user))
+        # Toggle active on users
+        if hasattr(self.dlg_resources_man, 'btn_user_toggle_active'):
+            self.dlg_resources_man.btn_user_toggle_active.clicked.connect(partial(self.toggle_active_records, "cat_user"))
 
         self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
 
@@ -1494,6 +1507,59 @@ class AddNewLot:
         else:
             self.open_create_user(True)
 
+    def toggle_active_records(self, tablename: str):
+        """Toggle active state for selected rows in resources tables (teams/users)."""
+        if tablename not in ("cat_team", "cat_user"):
+            return
+        table = self.dict_tables[tablename]["widget"]
+        idname = self.dict_tables[tablename]["idname"]
+        selected = table.selectionModel().selectedRows()
+        if not selected:
+            tools_qgis.show_warning("No records selected", dialog=self.dlg_resources_man)
+            return
+        # Determine column indexes
+        model = table.model()
+        active_col = tools_qt.get_col_index_by_col_name(table, 'active')
+        if active_col is None or active_col == -1:
+            # Fallback: try to find by header text
+            for i in range(model.columnCount()):
+                if str(model.headerData(i, Qt.Horizontal)).lower() == 'active':
+                    active_col = i
+                    break
+        id_col = 0  # id is first column in our population logic
+
+        ids = []
+        toggles = []
+        for index in selected:
+            row = index.row()
+            row_id = model.index(row, id_col).data()
+            current_active = model.index(row, active_col).data() if active_col is not None and active_col != -1 else None
+            current_active_bool = tools_os.set_boolean(current_active) if current_active is not None else False
+            ids.append(row_id)
+            toggles.append(not current_active_bool)
+
+        # Build SQL: update each selected id
+        sql_statements = []
+        for row_id, new_state in zip(ids, toggles):
+            sql_statements.append(f"UPDATE cm.{tablename} SET active = {str(new_state).lower()} WHERE {idname}::text = '{row_id}'")
+        if not sql_statements:
+            return
+        sql = ";".join(sql_statements)
+        try:
+            tools_db.execute_sql(sql, commit=True)
+        except Exception as e:
+            tools_qgis.show_warning(f"Error toggling state: {str(e)}", dialog=self.dlg_resources_man)
+            return
+
+        # Refresh table according to role and tablename
+        if self.user_data["role"] == "role_cm_admin":
+            self._populate_resource_tableview(tablename)
+        else:
+            if tablename == "cat_team":
+                self.filter_teams_by_name()
+            elif tablename == "cat_user":
+                self.filter_users_table()
+
     def delete_registers(self, tablename: str):
         """ Delete selected registers from the table."""
 
@@ -1511,7 +1577,7 @@ class AddNewLot:
         # If deleting users, get their login names first to also drop the DB user
         login_names_to_drop = []
         if tablename == "cat_user":
-            login_names_rows = tools_db.get_rows(f"SELECT loginname FROM cm.cat_user WHERE {idname} IN ({ids})")
+            login_names_rows = tools_db.get_rows(f"SELECT username FROM cm.cat_user WHERE {idname} IN ({ids})")
             if login_names_rows:
                 login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
 
