@@ -627,14 +627,14 @@ v_queryhydro =
 
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4032", "function":"3142", "parameters":{"v_tsi":"'||round(rec_nrw.tsi::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+                       "data":{"message":"4032", "function":"3142", "parameters":{"v_tsi":"'||coalesce(round(rec_nrw.tsi::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4034", "function":"3142", "parameters":{"v_bmc":"'||round(rec_nrw.bmc::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+                       "data":{"message":"4034", "function":"3142", "parameters":{"v_bmc":"'||coalesce(round(rec_nrw.bmc::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4036", "function":"3142", "parameters":{"v_nrw":"'||round(rec_nrw.nrw::numeric,2)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+                       "data":{"message":"4036", "function":"3142", "parameters":{"v_nrw":"'||coalesce(round(rec_nrw.nrw::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
