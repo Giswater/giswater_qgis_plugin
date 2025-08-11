@@ -1650,6 +1650,11 @@ class GwPsector:
             psector_id = qtbl_psm.model().record(row).value("psector_id")
             psector_name = qtbl_psm.model().record(row).value("name")
             active = qtbl_psm.model().record(row).value("active")
+            archived = qtbl_psm.model().record(row).value("archived")
+            if archived is True:
+                msg = f"Cannot set the active state of archived psector {psector_id}. Please unarchive it first."
+                tools_qgis.show_warning(msg, dialog=dialog)
+                return
             if cur_psector and cur_psector[0] is not None and psector_id == int(cur_psector[0]):
                 msg = "The active state of the current psector cannot be changed. Current psector: {0}"
                 msg_params = (cur_psector[0],)
@@ -1659,7 +1664,7 @@ class GwPsector:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
                 # Remove from selector
                 sql += f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;"
-                msg = "Psector removed from selector"
+                msg = f"Psector {psector_id} removed from selector"
                 tools_qgis.show_info(msg, dialog=dialog)
                 selector_updated = True
             else:
@@ -1704,13 +1709,13 @@ class GwPsector:
                 msg_params = (cur_psector[0],)
                 tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng, msg_params=msg_params)
                 return
-            if archived:
+            if archived is True:
                 sql += f"UPDATE plan_psector SET archived = False WHERE psector_id = {psector_id};"
-                msg = "Psector unarchived"
+                msg = f"Psector {psector_id} unarchived"
                 tools_qgis.show_info(msg, dialog=self.dlg_psector_mng)
             else:
                 sql += f"UPDATE plan_psector SET archived = True, active = False WHERE psector_id = {psector_id};"
-                msg = "Psector archived"
+                msg = f"Psector {psector_id} archived"
                 tools_qgis.show_info(msg, dialog=self.dlg_psector_mng)
 
         tools_db.execute_sql(sql)
@@ -1741,14 +1746,14 @@ class GwPsector:
 
         # Verify that the selected psector is active
         if not active:
-            msg = "Cannot set the current psector of an inactive scenario. Please activate it first."
+            msg = f"Cannot set psector {scenario_id} as current. It is inactive. Please activate it first."
             tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Prepare the JSON body for gw_fct_set_toggle_current
         extras = f'"type": "{scenario_type}", "id": "{scenario_id}"'
         body = tools_gw.create_body(extras=extras)
-
+        
         # Execute the stored procedure
         result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
 
@@ -1758,7 +1763,7 @@ class GwPsector:
             self.set_label_current_psector(dialog, result=result)
         else:
             # If the procedure fails, show a warning
-            msg = "Failed to set psector"
+            msg = f"Failed to set psector {scenario_id} as current"
             tools_qgis.show_warning(msg, dialog=dialog)
 
         cur_psector = tools_gw.get_config_value('plan_psector_current')
@@ -2106,6 +2111,15 @@ class GwPsector:
             tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            archived = self.qtbl_psm.model().record(row).value("archived")
+            id_feature = self.qtbl_psm.model().record(row).value("psector_id")
+            if archived is True:
+                msg = f"Cannot merge archived psector {id_feature}. Please unarchive it first."
+                tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
+                return
+        
         # Get selected dscenario id
         value = ""
         for i in range(0, len(selected_list)):
@@ -2133,6 +2147,11 @@ class GwPsector:
         row = selected_list[0].row()
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
         psector_name = self.qtbl_psm.model().record(row).value("name")
+        archived = self.qtbl_psm.model().record(row).value("archived")
+        if archived is True:
+            msg = f"Cannot duplicate archived psector {psector_id}. Please unarchive it first."
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
+            return
         self.duplicate_psector = GwPsectorDuplicate()
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True))
