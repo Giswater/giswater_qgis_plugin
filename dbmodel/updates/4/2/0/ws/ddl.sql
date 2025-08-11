@@ -16,8 +16,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"staticpress2", "newName":"staticpressure2"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"staticpressure", "newName":"staticpressure1"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"staticpressure2", "dataType":"numeric(12,3)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived_psector_arc_traceability", "column":"staticpress1", "newName":"staticpressure1"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived_psector_arc_traceability", "column":"staticpress2", "newName":"staticpressure2"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived_psector_arc", "column":"staticpress1", "newName":"staticpressure1"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived_psector_arc", "column":"staticpress2", "newName":"staticpressure2"}}$$);
 
 -- 15/07/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc_add", "column":"mincut_impact", "newName":"mincut_impact_topo"}}$$);

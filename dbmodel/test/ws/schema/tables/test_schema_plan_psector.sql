@@ -23,7 +23,7 @@ SELECT columns_are(
         'psector_id', 'name', 'psector_type', 'descript', 'expl_id', 'priority', 'text1', 'text2',
         'observ', 'rotation', 'scale', 'atlas_id', 'gexpenses', 'vat', 'other', 'active',
         'the_geom', 'enable_all', 'status', 'ext_code', 'text3', 'text4', 'text5', 'text6',
-        'num_value', 'workcat_id', 'workcat_id_plan', 'parent_id', 'tstamp', 'insert_user', 'lastupdate', 'lastupdate_user',
+        'num_value', 'workcat_id', 'workcat_id_plan', 'parent_id', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'archived', 'creation_date'
     ],
     'Table plan_psector should have the correct columns'
@@ -61,10 +61,10 @@ SELECT col_type_is('plan_psector', 'num_value', 'numeric', 'Column num_value sho
 SELECT col_type_is('plan_psector', 'workcat_id', 'text', 'Column workcat_id should be text');
 SELECT col_type_is('plan_psector', 'workcat_id_plan', 'text', 'Column workcat_id_plan should be text');
 SELECT col_type_is('plan_psector', 'parent_id', 'integer', 'Column parent_id should be integer');
-SELECT col_type_is('plan_psector', 'tstamp', 'timestamp without time zone', 'Column tstamp should be timestamp without time zone');
-SELECT col_type_is('plan_psector', 'insert_user', 'character varying(50)', 'Column insert_user should be character varying(50)');
-SELECT col_type_is('plan_psector', 'lastupdate', 'timestamp without time zone', 'Column lastupdate should be timestamp without time zone');
-SELECT col_type_is('plan_psector', 'lastupdate_user', 'character varying(50)', 'Column lastupdate_user should be character varying(50)');
+SELECT col_type_is('plan_psector', 'created_at', 'timestamp without time zone', 'Column created_at should be timestamp without time zone');
+SELECT col_type_is('plan_psector', 'created_by', 'character varying(50)', 'Column created_by should be character varying(50)');
+SELECT col_type_is('plan_psector', 'updated_at', 'timestamp without time zone', 'Column updated_at should be timestamp without time zone');
+SELECT col_type_is('plan_psector', 'updated_by', 'character varying(50)', 'Column updated_by should be character varying(50)');
 SELECT col_type_is('plan_psector', 'archived', 'boolean', 'Column archived should be boolean');
 
 -- Check default values
@@ -73,9 +73,8 @@ SELECT col_default_is('plan_psector', 'psector_type', '1', 'Default value for ps
 SELECT col_default_is('plan_psector', 'active', 'true', 'Default value for active should be true');
 SELECT col_default_is('plan_psector', 'enable_all', 'false', 'Default value for enable_all should be false');
 SELECT col_default_is('plan_psector', 'status', '2', 'Default value for status should be 2');
-SELECT col_has_default('plan_psector', 'tstamp', 'Column tstamp should have a default value');
-SELECT col_default_is('plan_psector', 'insert_user', 'CURRENT_USER', 'Default value for insert_user should be CURRENT_USER');
-
+SELECT col_has_default('plan_psector', 'created_at', 'Column created_at should have a default value');
+SELECT col_default_is('plan_psector', 'created_by', 'CURRENT_USER', 'Default value for created_by should be CURRENT_USER');
 -- Check foreign keys
 SELECT has_fk('plan_psector', 'Table plan_psector should have foreign keys');
 SELECT fk_ok('plan_psector', 'expl_id', 'exploitation', 'expl_id', 'FK expl_id should reference exploitation.expl_id');

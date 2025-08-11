@@ -81,6 +81,9 @@ SELECT throws_ok(
     'Check if gw_fct_set_toggle_current without type throws expected error'
 );
 
+-- prepare test
+UPDATE config_param_user SET value = NULL WHERE parameter = 'plan_psector_current';
+
 -- Toggle psector id=1 ON
 SELECT is(
     (gw_fct_set_toggle_current('{"data": {"type": "psector", "id": 1}}')::json->'status')::text,

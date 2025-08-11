@@ -16,7 +16,7 @@ SELECT plan(1);
 
 -- initial data is prepared before proceeding with the test
 INSERT INTO plan_psector (psector_id, "name", psector_type, descript, expl_id, priority, text1, text2, observ, rotation, "scale", atlas_id, gexpenses, vat, other, active,
-the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value, workcat_id, parent_id, tstamp, insert_user, lastupdate, lastupdate_user)
+the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value, workcat_id, parent_id, created_at, created_by, updated_at, updated_by)
 VALUES(-999, 'ACT_09_F1', 1, 'Psector test -999', 1, '2', NULL, NULL, 'Action caused by the hydraulic insufficiency of the conduit.', 90.0000, 1000.00, '02', 19.00, 21.00, 4.50, true,
 'SRID=25831;MULTIPOLYGON (((419057.982 4576702.77, 419057.982 4576647.495195547, 419013.7742227199 4576647.495195547, 419013.7742227199 4576702.77, 419057.982 4576702.77)))'::public.geometry,
 false, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-02-21 12:09:27.095', 'postgres', NULL, NULL);
