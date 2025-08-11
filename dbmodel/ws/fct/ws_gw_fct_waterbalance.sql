@@ -224,7 +224,7 @@ v_queryhydro =
 			v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
 
 			v_data =  concat ('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "',v_expl,'", "updateMapZone":',v_updatemapzone,
-			', "geomParamUpdate":',v_paramupdate,', "updateFeature":true}}}');
+			', "geomParamUpdate":',v_paramupdate,', "updateFeature":true, "commitChanges":true}}}');
 
 			PERFORM gw_fct_graphanalytics_mapzones(v_data);
 
