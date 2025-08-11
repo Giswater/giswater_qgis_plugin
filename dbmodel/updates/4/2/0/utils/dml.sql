@@ -351,3 +351,6 @@ INSERT INTO sys_param_user(id, formname, descript, sys_role,
 project_type, datatype, ismandatory, vdefault, source)
 VALUES ('plan_psector_disable_checktopology_trigger', 'dynamic', 'Variable to disable the control for checktopology on trigger plan_psector', 'role_edit', 
 'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4340, 'You have at least 1 connec in different selected psectors which is connected to different arcs',null, 1, true, 'utils', 'core', 'UI');

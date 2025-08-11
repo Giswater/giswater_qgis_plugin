@@ -741,6 +741,49 @@ BEGIN
 	
 	END IF;
 
+	-- warn the user that in the selected psectors, there is a connec connected to different arcs
+	WITH mec AS ( 
+		SELECT connec_id,
+		row_number() over(PARTITION BY connec_id ORDER BY connec_id) AS rowid_connec,
+		row_number() over(PARTITION BY arc_id ORDER BY arc_id) AS rowid_arc,
+		row_number() over(PARTITION BY psector_id ORDER BY psector_id) AS rowid_psector
+		FROM plan_psector_x_connec 
+		JOIN selector_psector USING (psector_id) WHERE cur_user = current_user
+	)
+	SELECT count(*) INTO v_count FROM mec WHERE rowid_connec>1 AND rowid_arc > 0 AND rowid_psector > 0;
+
+	IF v_count>0 then
+	
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"4340", "function":"2870","parameters":null, "is_process":true}}$$)';
+
+	END IF;
+
+	IF v_project_type = 'UD' THEN
+
+		WITH mec AS ( 
+			SELECT gully_id,
+			row_number() over(PARTITION BY gully_id ORDER BY gully_id) AS rowid_gully,
+			row_number() over(PARTITION BY arc_id ORDER BY arc_id) AS rowid_arc,
+			row_number() over(PARTITION BY psector_id ORDER BY psector_id) AS rowid_psector
+			FROM plan_psector_x_gully
+			JOIN selector_psector USING (psector_id) WHERE cur_user = current_user
+		)
+		SELECT count(*) INTO v_count FROM mec WHERE rowid_gully>1 AND rowid_arc > 0 AND rowid_psector > 0;
+
+		IF v_count>0 then
+	
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"4340", "function":"2870","parameters":null, "is_process":true}}$$)';
+
+		END IF;
+
+	END IF;
+
+
+
+	END IF;
+
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
