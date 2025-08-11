@@ -28,7 +28,7 @@ BEGIN
 	FOR table_record IN SELECT * FROM sys_table
 	LOOP
 
-		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit'||table_record.id||' ON '||v_schemaname||'.'||table_record.id;
+		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit_'||table_record.id||' ON '||v_schemaname||'.'||table_record.id;
 
 		IF table_record.isaudit IS TRUE THEN
 
