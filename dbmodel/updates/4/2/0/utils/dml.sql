@@ -354,3 +354,5 @@ VALUES ('plan_psector_disable_checktopology_trigger', 'dynamic', 'Variable to di
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4340, 'You have at least 1 connec in different selected psectors which is connected to different arcs',null, 1, true, 'utils', 'core', 'UI');
+
+UPDATE plan_typevalue SET idval='PLANIFIED' WHERE typevalue='psector_type' AND id='1';
