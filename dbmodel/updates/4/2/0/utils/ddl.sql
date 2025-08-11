@@ -72,3 +72,7 @@ ALTER TABLE archived_psector_connec drop column streetname2;
 update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';					
 delete from sys_param_user where id = 'edit_connec_linkcat_vdefault';
 update sys_param_user set id = 'edit_connec_linkcat_vdefault' where id = 'edit_linkcat_vdefault';
+
+ALTER TABLE link DROP COLUMN IF EXISTS epa_type CASCADE;
+
+DELETE FROM config_form_fields WHERE formname ilike '%link%' AND columnname = 'epa_type';

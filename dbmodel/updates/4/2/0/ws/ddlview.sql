@@ -128,7 +128,6 @@ AS WITH typevalue AS (
             cat_link.link_type,
             cat_feature.feature_class AS sys_type,
             l_1.linkcat_id,
-            l_1.epa_type,
             l_1.state,
             l_1.state_type,
             l_1.expl_id,
@@ -176,7 +175,7 @@ AS WITH typevalue AS (
             l_1.datasource,
             l_1.is_operative,
                 CASE
-                    WHEN l_1.sector_id > 0 AND l_1.is_operative = true AND l_1.epa_type::text = 'JUNCTION'::text AND inp_network_mode.value = '4'::text THEN l_1.epa_type::text
+                    WHEN l_1.sector_id > 0 AND l_1.is_operative = true AND c.epa_type::text = 'JUNCTION'::text AND inp_network_mode.value = '4'::text THEN c.epa_type::text
                     ELSE NULL::text
                 END AS inp_type,
             l_1.lock_level,
@@ -216,7 +215,6 @@ AS WITH typevalue AS (
     link_type,
     sys_type,
     linkcat_id,
-    epa_type,
     state,
     state_type,
     expl_id,
@@ -298,7 +296,6 @@ AS SELECT ve_link.link_id,
     ve_link.link_type,
     ve_link.sys_type,
     ve_link.linkcat_id,
-    ve_link.epa_type,
     ve_link.state,
     ve_link.state_type,
     ve_link.expl_id,
@@ -925,7 +922,6 @@ AS WITH sel_state AS (
 			cat_link.link_type,
 			cat_feature.feature_class AS sys_type,
 			l.linkcat_id,
-			l.epa_type,
 			l.state,
 			l.state_type,
 			l.expl_id,
@@ -973,8 +969,8 @@ AS WITH sel_state AS (
 			l.datasource,
 			l.is_operative,
 			CASE
-			WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::text AND inp_network_mode.value = '4'::text
-			THEN l.epa_type::text
+			WHEN l.sector_id > 0 AND l.is_operative = true AND c.epa_type = 'JUNCTION'::text AND inp_network_mode.value = '4'::text
+			THEN c.epa_type::text
 			ELSE NULL::text
 			END AS inp_type,
 			l.lock_level,
@@ -1892,7 +1888,6 @@ AS WITH sel_state AS (
 			cat_link.link_type,
 			cat_feature.feature_class AS sys_type,
 			l.linkcat_id,
-			l.epa_type,
 			l.state,
 			l.state_type,
 			l.expl_id,
@@ -1938,8 +1933,8 @@ AS WITH sel_state AS (
 			l.datasource,
 			l.is_operative,
 			CASE
-			WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::text AND inp_network_mode.value = '4'::text
-			THEN l.epa_type::text
+			WHEN l.sector_id > 0 AND l.is_operative = true AND c.epa_type = 'JUNCTION'::text AND inp_network_mode.value = '4'::text
+			THEN c.epa_type::text
 			ELSE NULL::text
 			END AS inp_type,
 			l.lock_level,
