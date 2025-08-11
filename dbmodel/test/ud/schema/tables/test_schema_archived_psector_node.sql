@@ -31,7 +31,7 @@ SELECT columns_are(
         'created_at','arc_id','updated_at','updated_by','created_by','matcat_id','district_id',
         'workcat_id_plan','asset_id','drainzone_id','parent_id','adate','adescript','placement_type',
         'access_type','label_quadrant','minsector_id','brand_id','model_id','serial_number',
-        'streetname','streetname2','dwfzone_id','datasource','omunit_id','lock_level','pavcat_id',
+        'dwfzone_id','datasource','omunit_id','lock_level','pavcat_id',
         'conserv_state','expl_visibility'
     ],
     'Table archived_psector_node should have the correct columns'
@@ -121,8 +121,6 @@ SELECT col_type_is('archived_psector_node','minsector_id','integer','Column mins
 SELECT col_type_is('archived_psector_node','brand_id','varchar(50)','Column brand_id should be varchar(50)');
 SELECT col_type_is('archived_psector_node','model_id','varchar(50)','Column model_id should be varchar(50)');
 SELECT col_type_is('archived_psector_node','serial_number','varchar(100)','Column serial_number should be varchar(100)');
-SELECT col_type_is('archived_psector_node','streetname','varchar(100)','Column streetname should be varchar(100)');
-SELECT col_type_is('archived_psector_node','streetname2','varchar(100)','Column streetname2 should be varchar(100)');
 SELECT col_type_is('archived_psector_node','dwfzone_id','integer','Column dwfzone_id should be integer');
 SELECT col_type_is('archived_psector_node','datasource','integer','Column datasource should be integer');
 SELECT col_type_is('archived_psector_node','omunit_id','integer','Column omunit_id should be integer');

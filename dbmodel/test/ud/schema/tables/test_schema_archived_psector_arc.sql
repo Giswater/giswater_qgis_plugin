@@ -31,7 +31,7 @@ SELECT columns_are(
         'link','verified','the_geom','label_x','label_y','label_rotation','publish','inventory','uncertain','expl_id','num_value','feature_type','created_at',
         'updated_at','updated_by','created_by','district_id','workcat_id_plan','asset_id','pavcat_id','drainzone_id',
         'nodetype_1','node_sys_top_elev_1','node_sys_elev_1','nodetype_2','node_sys_top_elev_2','node_sys_elev_2','parent_id','adate','adescript','visitability',
-        'label_quadrant','minsector_id','brand_id','model_id','serial_number','streetname','streetname2','dwfzone_id','initoverflowpath','omunit_id','registration_date',
+        'label_quadrant','minsector_id','brand_id','model_id','serial_number','dwfzone_id','initoverflowpath','omunit_id','registration_date',
         'meandering','conserv_state','om_state','last_visitdate','negative_offset','expl_visibility'
     ],
     'Table archived_psector_arc should have the correct columns'
@@ -128,8 +128,6 @@ SELECT col_type_is('archived_psector_arc', 'minsector_id', 'int4', 'Column minse
 SELECT col_type_is('archived_psector_arc', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
 SELECT col_type_is('archived_psector_arc', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
 SELECT col_type_is('archived_psector_arc', 'serial_number', 'varchar(100)', 'Column serial_number should be varchar(100)');
-SELECT col_type_is('archived_psector_arc', 'streetname', 'varchar(100)', 'Column streetname should be varchar(100)');
-SELECT col_type_is('archived_psector_arc', 'streetname2', 'varchar(100)', 'Column streetname2 should be varchar(100)');
 SELECT col_type_is('archived_psector_arc', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
 SELECT col_type_is('archived_psector_arc', 'initoverflowpath', 'bool', 'Column initoverflowpath should be bool');
 SELECT col_type_is('archived_psector_arc', 'omunit_id', 'int4', 'Column omunit_id should be int4');

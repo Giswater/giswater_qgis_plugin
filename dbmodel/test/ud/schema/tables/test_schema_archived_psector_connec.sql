@@ -30,7 +30,7 @@ SELECT columns_are(
          'link','verified', 'rotation', 'the_geom', 'label_x','label_y','label_rotation', 'accessibility', 'publish', 'inventory',
           'uncertain','expl_id', 'num_value', 'feature_type', 'pjoint_type','pjoint_id','updated_at', 'updated_by', 'created_by', 'matcat_id',
           'district_id','workcat_id_plan', 'asset_id', 'drainzone_id', 'adate','adescript','plot_code', 'placement_type', 'access_type', 'label_quadrant',
-          'n_hydrometer','minsector_id', 'streetname', 'streetname2', 'dwfzone_id','datasource','omunit_id', 'lock_level', 'expl_visibility', 'label_quadrant', 'diagonal', 'created_at'
+          'n_hydrometer','minsector_id', 'dwfzone_id','datasource','omunit_id', 'lock_level', 'expl_visibility', 'label_quadrant', 'diagonal', 'created_at'
     ],
     'Table archived_psector_connec should have the correct columns'
 );
@@ -118,8 +118,6 @@ SELECT col_type_is('archived_psector_connec', 'access_type', 'text', 'Column acc
 SELECT col_type_is('archived_psector_connec', 'label_quadrant', 'varchar(12)', 'Column label_quadrant should be varchar(12)');
 SELECT col_type_is('archived_psector_connec', 'n_hydrometer', 'int4', 'Column n_hydrometer should be int4');
 SELECT col_type_is('archived_psector_connec', 'minsector_id', 'int4', 'Column minsector_id should be int4');
-SELECT col_type_is('archived_psector_connec', 'streetname', 'varchar(100)', 'Column streetname should be varchar(100)');
-SELECT col_type_is('archived_psector_connec', 'streetname2', 'varchar(100)', 'Column streetname2 should be varchar(100)');
 SELECT col_type_is('archived_psector_connec', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
 SELECT col_type_is('archived_psector_connec', 'datasource', 'int4', 'Column datasource should be int4');
 SELECT col_type_is('archived_psector_connec', 'omunit_id', 'int4', 'Column omunit_id should be int4');

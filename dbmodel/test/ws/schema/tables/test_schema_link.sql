@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'link_id', 'code', 'sys_code', 'feature_id', 'feature_type', 'linkcat_id', 'top_elev1', 'depth1', 'exit_id', 'exit_type',
         'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'sector_id', 'dma_id',
-        'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_visibility', 'epa_type', 'is_operative',
+        'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_visibility', 'is_operative',
         'staticpressure1', 'staticpressure2', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
         'uncertain', 'muni_id', 'verified', 'supplyzone_id', 'custom_length', 'datasource',
         'omzone_id', 'lock_level', 'annotation', 'comment', 'descript', 'link', 'location_type', 'num_value', 'observ',
