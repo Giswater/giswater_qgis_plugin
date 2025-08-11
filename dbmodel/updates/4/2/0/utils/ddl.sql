@@ -53,8 +53,8 @@ ALTER TABLE archived_psector_link_traceability RENAME to archived_psector_link;
 
 ALTER TABLE plan_psector RENAME COLUMN tstamp TO created_at;
 ALTER TABLE plan_psector RENAME column insert_user TO created_by;
-ALTER TABLE plan_psector RENAME COLUMN updated_at TO updated_at;
-ALTER TABLE plan_psector RENAME COLUMN update_by TO updated_by;
+ALTER TABLE plan_psector RENAME COLUMN lastupdate TO updated_at;
+ALTER TABLE plan_psector RENAME COLUMN lastupdate_user TO updated_by;
 
 ALTER SEQUENCE archived_psector_arc_traceability_id_seq RENAME TO archived_psector_arc_id_seq;
 ALTER SEQUENCE archived_psector_node_traceability_id_seq RENAME TO archived_psector_node_id_seq;
