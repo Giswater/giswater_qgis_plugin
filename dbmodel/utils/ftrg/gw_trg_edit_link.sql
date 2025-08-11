@@ -714,11 +714,11 @@ BEGIN
 			END IF;
 
 			INSERT INTO link (link_id, code, sys_code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, omzone_id,
-			linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, verified, custom_length, datasource, top_elev1, y1, top_elev2, y2, link_type, location_type, epa_type,
+			linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, verified, custom_length, datasource, top_elev1, y1, top_elev2, y2, link_type, location_type,
 			annotation, observ, comment, descript, link, num_value, drainzone_outfall, dwfzone_outfall, brand_id, model_id)
 			VALUES (NEW.link_id, NEW.code, NEW.sys_code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype::integer, v_omzone,
 			NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource,
-			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, NEW.link_type, NEW.location_type, NEW.epa_type,
+			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, NEW.link_type, NEW.location_type,
 			NEW.annotation, NEW.observ, NEW.comment, NEW.descript, NEW.link, NEW.num_value, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.brand_id, NEW.model_id);
 		END IF;
 
@@ -901,7 +901,7 @@ BEGIN
 		END IF;
 		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
 		enddate = NEW.enddate, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector, verified = NEW.verified, custom_length = NEW.custom_length,
-		datasource = NEW.datasource, location_type=NEW.location_type, epa_type=NEW.epa_type, annotation=NEW.annotation, observ=NEW.observ, comment=NEW.comment,
+		datasource = NEW.datasource, location_type=NEW.location_type, annotation=NEW.annotation, observ=NEW.observ, comment=NEW.comment,
 		descript=NEW.descript, link=NEW.link, num_value=NEW.num_value, state_type=NEW.state_type
 		WHERE link_id=NEW.link_id;
 
