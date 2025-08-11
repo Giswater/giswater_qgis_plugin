@@ -1566,12 +1566,12 @@ class GwPsector:
 
         self.dlg_psector_mng.btn_cancel.clicked.connect(self._handle_dialog_close)
         self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
-        self.dlg_psector_mng.btn_toggle_archived.clicked.connect(partial(self.set_toggle_archive, self.dlg_psector_mng, self.qtbl_psm))
+        self.dlg_psector_mng.btn_restore.clicked.connect(partial(self.set_toggle_archive, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.rejected.connect(self._handle_dialog_close)
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
-        self.dlg_psector_mng.btn_show_psector.clicked.connect(self._show_psector)
+        self.dlg_psector_mng.btn_open.clicked.connect(self._show_psector)
 
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector",
@@ -1607,7 +1607,7 @@ class GwPsector:
         menu.addAction(action_actual_psector)
 
         action_show = QAction("Show", qtableview)
-        action_show.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_show_psector"))
+        action_show.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_open"))
         menu.addAction(action_show)
 
         action_toggle_active = QAction("Toggle active", qtableview)
@@ -1615,7 +1615,7 @@ class GwPsector:
         menu.addAction(action_toggle_active)
 
         action_toggle_archive = QAction("Toggle archive", qtableview)
-        action_toggle_archive.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_archived"))
+        action_toggle_archive.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_restore"))
         menu.addAction(action_toggle_archive)
 
         action_merge = QAction("Merge", qtableview)

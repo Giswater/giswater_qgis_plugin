@@ -55,66 +55,6 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="1" column="22">
-       <widget class="QPushButton" name="btn_delete">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2">
-       <widget class="QLabel" name="lbl_psector_name">
-        <property name="text">
-         <string>Filter by: Psector name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="17">
-       <widget class="QPushButton" name="btn_toggle_archived">
-        <property name="text">
-         <string>Toggle archive</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="16">
-       <widget class="QPushButton" name="btn_toggle_active">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Toggle active</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="20">
-       <widget class="QPushButton" name="btn_duplicate">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Duplicate</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="19">
-       <widget class="QPushButton" name="btn_merge">
-        <property name="text">
-         <string>Merge</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="15">
        <widget class="QPushButton" name="btn_update_psector">
         <property name="sizePolicy">
@@ -125,26 +65,6 @@
         </property>
         <property name="text">
          <string>Toggle current</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="6" colspan="7">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>80</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="chk_active">
-        <property name="text">
-         <string>Show inactive</string>
         </property>
        </widget>
       </item>
@@ -201,17 +121,60 @@
         </item>
        </layout>
       </item>
+      <item row="1" column="21">
+       <widget class="QPushButton" name="btn_open">
+        <property name="text">
+         <string>Open</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="23">
+       <widget class="QTableView" name="tbl_psm"/>
+      </item>
+      <item row="1" column="22">
+       <widget class="QPushButton" name="btn_delete">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="20">
+       <widget class="QPushButton" name="btn_duplicate">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Duplicate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="19">
+       <widget class="QPushButton" name="btn_merge">
+        <property name="text">
+         <string>Merge</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="chk_active">
+        <property name="text">
+         <string>Show inactive</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="18">
        <widget class="QPushButton" name="btn_create">
         <property name="text">
          <string>Create</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="21">
-       <widget class="QPushButton" name="btn_show_psector">
-        <property name="text">
-         <string>Open</string>
         </property>
        </widget>
       </item>
@@ -228,8 +191,12 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="23">
-       <widget class="QTableView" name="tbl_psm"/>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="lbl_psector_name">
+        <property name="text">
+         <string>Filter by: Psector name</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="2">
        <widget class="QCheckBox" name="chk_archived">
@@ -242,6 +209,39 @@
        <widget class="QCheckBox" name="chk_filter_canvas">
         <property name="text">
          <string>Filter from Canvas</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="16">
+       <widget class="QPushButton" name="btn_toggle_active">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Toggle active</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6" colspan="7">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>80</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="17">
+       <widget class="QPushButton" name="btn_restore">
+        <property name="text">
+         <string>Restore</string>
         </property>
        </widget>
       </item>
