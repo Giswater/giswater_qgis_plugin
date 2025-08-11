@@ -333,6 +333,7 @@ def open_selected_path(**kwargs):
     """
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params['targetwidget']}")
+    path = None
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
@@ -349,18 +350,22 @@ def open_selected_path(**kwargs):
     index = selected_list[0]
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
-    path = index.sibling(row, column_index).data()
-
+    if row and column_index:
+        path = index.sibling(row, column_index).data()
+    
     # Check if file exist
-    if os.path.exists(path):
+    if path is not None and os.path.exists(path):
         # Open the document
         if sys.platform == "win32":
             os.startfile(path)
         else:
             opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, path])
-    else:
+    elif path is not None:
         webbrowser.open(path)
+    else:
+        msg = "File path not found"
+        tools_qgis.show_warning(msg, dialog=kwargs['dialog'])
 
 
 def filter_table(**kwargs):
