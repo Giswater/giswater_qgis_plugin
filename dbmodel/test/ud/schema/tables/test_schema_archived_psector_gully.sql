@@ -29,8 +29,8 @@ SELECT columns_are(
         'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id',
         'postnumber2', 'postcomplement2', 'descript', 'link', 'verified', 'rotation', 'the_geom',
         'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'uncertain', 'expl_id',
-        'num_value', 'feature_type', 'tstamp', 'pjoint_type', 'pjoint_id', 'lastupdate',
-        'lastupdate_user', 'insert_user', 'district_id', 'workcat_id_plan', 'asset_id',
+        'num_value', 'feature_type', 'created_at', 'pjoint_type', 'pjoint_id', 'updated_at',
+        'updated_by', 'created_by', 'district_id', 'workcat_id_plan', 'asset_id',
         'connec_y2', 'gullycat2_id', 'epa_type', 'groove_height', 'groove_length',
         'units_placement', 'drainzone_id', 'adate', 'adescript', 'siphon_type', 'odorflap',
         'placement_type', 'access_type', 'label_quadrant', 'minsector_id', 'dwfzone_id', 'datasource', 'omunit_id', 'lock_level', 'length',
@@ -108,12 +108,12 @@ SELECT col_type_is('archived_psector_gully', 'uncertain', 'bool', 'Column uncert
 SELECT col_type_is('archived_psector_gully', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('archived_psector_gully', 'num_value', 'numeric(12,3)', 'Column num_value should be numeric(12,3)');
 SELECT col_type_is('archived_psector_gully', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
-SELECT col_type_is('archived_psector_gully', 'tstamp', 'timestamp', 'Column tstamp should be timestamp');
+SELECT col_type_is('archived_psector_gully', 'created_at', 'timestamp', 'Column created_at should be timestamp');
 SELECT col_type_is('archived_psector_gully', 'pjoint_type', 'varchar(16)', 'Column pjoint_type should be varchar(16)');
 SELECT col_type_is('archived_psector_gully', 'pjoint_id', 'integer', 'Column pjoint_id should be integer');
-SELECT col_type_is('archived_psector_gully', 'lastupdate', 'timestamp', 'Column lastupdate should be timestamp');
-SELECT col_type_is('archived_psector_gully', 'lastupdate_user', 'varchar(50)', 'Column lastupdate_user should be varchar(50)');
-SELECT col_type_is('archived_psector_gully', 'insert_user', 'varchar(50)', 'Column insert_user should be varchar(50)');
+SELECT col_type_is('archived_psector_gully', 'updated_at', 'timestamp', 'Column updated_at should be timestamp');
+SELECT col_type_is('archived_psector_gully', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
+SELECT col_type_is('archived_psector_gully', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
 SELECT col_type_is('archived_psector_gully', 'district_id', 'integer', 'Column district_id should be integer');
 SELECT col_type_is('archived_psector_gully', 'workcat_id_plan', 'varchar(255)', 'Column workcat_id_plan should be varchar(255)');
 SELECT col_type_is('archived_psector_gully', 'asset_id', 'varchar(50)', 'Column asset_id should be varchar(50)');
