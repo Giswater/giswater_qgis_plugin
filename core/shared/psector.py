@@ -1805,10 +1805,13 @@ class GwPsector:
     def _filter_table(self, dialog, table, widget_txt, chk_active=None, chk_archived=None, tablename=None):
 
         result_select = tools_qt.get_text(dialog, widget_txt)
-
-        # Get checkbox states
-        active_checked = chk_active.isChecked() if chk_active else False
-        archive_checked = chk_archived.isChecked() if chk_archived else False
+        
+        # Get checkbox states safely
+        try:
+            active_checked = chk_active.isChecked()
+            archive_checked = chk_archived.isChecked()
+        except RuntimeError:
+            return
 
         expr = ""
 
