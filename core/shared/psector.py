@@ -231,7 +231,7 @@ class GwPsector:
 
         if psector_id is not None:
             # Load existing psector data and populate form
-            self.load_existing_psector(self.dlg_plan_psector, psector_id, list_coord=None, form_opened=True)
+            self.load_psector(self.dlg_plan_psector, psector_id, list_coord=None, form_opened=True)
 
         if self.dlg_plan_psector.tab_feature.currentIndex() != 1:
             self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
@@ -433,7 +433,7 @@ class GwPsector:
         # Open dialog
         tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
-    def load_existing_psector(self, dialog, psector_id, list_coord=None, form_opened=False):
+    def load_psector(self, dialog, psector_id, list_coord=None, form_opened=False):
         """
         Loads data for an existing psector into the dialog.
         
@@ -1709,7 +1709,7 @@ class GwPsector:
         self._filter_table(dialog, dialog.tbl_psm, dialog.txt_name, dialog.chk_active, dialog.chk_archived, 'v_ui_plan_psector')
 
         # Load existing psector
-        self.load_existing_psector(dialog, psector_id)
+        self.load_psector(dialog, psector_id)
 
         if selector_updated:
             tools_qgis.force_refresh_map_canvas()
@@ -1797,7 +1797,7 @@ class GwPsector:
         tools_db.execute_sql(sql)
 
         # Load existing psector
-        self.load_existing_psector(dialog, scenario_id)
+        self.load_psector(dialog, scenario_id)
 
         # Re-open the dialog
         tools_gw.open_dialog(dialog, dlg_name='plan_psector')
@@ -2005,9 +2005,13 @@ class GwPsector:
             msg = "No psector selected. Please select at least one."
             tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
+        elif len(selected_rows) > 1:
+            msg = "Multiple psectors selected. Please select only one."
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
+            return
 
         # Get selected psector_id from the first column (adjust index if needed)
-        psector_id = [row.data() for row in selected_rows]
+        psector_id = selected_rows[0].data()        
 
         # Call the SQL function to get the sector features
         extras = f'"psector_id":"{psector_id}"'
@@ -2021,7 +2025,7 @@ class GwPsector:
             return
 
         # Load existing psector
-        self.load_existing_psector(self.dlg_psector_mng, psector_id[0])
+        self.load_psector(self.dlg_psector_mng, psector_id)
 
         # The SQL procedure manage creating the temporal layers based on the returned features
         msg = "Psector features loaded successfully on the map."
@@ -2186,7 +2190,7 @@ class GwPsector:
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True))
         self.duplicate_psector.is_duplicated.connect(partial(self.check_topology_psector, psector_id, psector_name))
-        self.duplicate_psector.is_duplicated.connect(partial(self.load_existing_psector, self.duplicate_psectoralog, psector_id))
+        self.duplicate_psector.is_duplicated.connect(partial(self.load_psector, self.duplicate_psectoralog, psector_id))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
     def set_label_current_psector(self, dialog, scenario_type=None, from_open_dialog=False, result=None):
