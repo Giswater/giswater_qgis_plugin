@@ -230,70 +230,8 @@ class GwPsector:
         self.enable_buttons(psector_id is not None)
 
         if psector_id is not None:
-
-            sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
-                   f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status, workcat_id, parent_id"
-                   f" FROM plan_psector "
-                   f"WHERE psector_id = {psector_id}")
-            row = tools_db.get_row(sql)
-
-            if not row:
-                return
-
-            # Check if expl_id already exists in expl_selector
-            sql = ("SELECT DISTINCT(expl_id, cur_user)"
-                   " FROM selector_expl"
-                   f" WHERE expl_id = '{row['expl_id']}' AND cur_user = current_user")
-            exist = tools_db.get_row(sql)
-            if exist is None:
-                sql = ("INSERT INTO selector_expl (expl_id, cur_user) "
-                       f" VALUES ({str(row['expl_id'])}, current_user)"
-                       f" ON CONFLICT DO NOTHING;")
-                tools_db.execute_sql(sql)
-                msg = "Your exploitation selector has been updated"
-                tools_qgis.show_warning(msg, 1, dialog=self.dlg_plan_psector)
-
-            self.fill_widget(self.dlg_plan_psector, "text3", row)
-            self.fill_widget(self.dlg_plan_psector, "text4", row)
-            self.fill_widget(self.dlg_plan_psector, "text5", row)
-            self.fill_widget(self.dlg_plan_psector, "text6", row)
-            self.fill_widget(self.dlg_plan_psector, "num_value", row)
-
-            self.populate_budget(self.dlg_plan_psector, psector_id)
-            self.update = True
-
-            self.dlg_plan_psector.rejected.connect(self.rubber_band_point.reset)
-
-            if not list_coord:
-
-                sql = f"SELECT st_astext(st_envelope(the_geom)) FROM ve_plan_psector WHERE psector_id = {psector_id}"
-                row = tools_db.get_row(sql)
-                if row[0]:
-                    list_coord = re.search('\(\((.*)\)\)', str(row[0]))
-
-            if list_coord:
-                # Get canvas extend in order to create a QgsRectangle
-                ext = self.canvas.extent()
-                start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
-                end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
-                canvas_rec = QgsRectangle(start_point, end_point)
-                canvas_width = ext.xMaximum() - ext.xMinimum()
-                canvas_height = ext.yMaximum() - ext.yMinimum()
-
-                points = tools_qgis.get_geometry_vertex(list_coord)
-                polygon = QgsGeometry.fromPolygonXY([points])
-                psector_rec = polygon.boundingBox()
-                tools_gw.reset_rubberband(self.rubber_band_rectangle)
-                rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
-                if rb_duration == "0":
-                    rb_duration = None
-                tools_qgis.draw_polygon(points, self.rubber_band_rectangle, duration_time=rb_duration)
-
-                # Manage Zoom to rectangle
-                if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
-                    max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-                    tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
-            self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+            # Load existing psector data and populate form
+            self.load_existing_psector(self.dlg_plan_psector, psector_id, list_coord=None, form_opened=True)
 
         if self.dlg_plan_psector.tab_feature.currentIndex() != 1:
             self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
@@ -495,6 +433,88 @@ class GwPsector:
         # Open dialog
         tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
+    def load_existing_psector(self, dialog, psector_id, list_coord=None, form_opened=False):
+        """
+        Loads data for an existing psector into the dialog.
+        
+        Args:
+            dialog (QDialog): Dialog to populate with psector data
+            psector_id (int): ID of psector to load
+            list_coord (list, optional): List of coordinates for psector extent. Defaults to None.
+            form_opened (bool, optional): Whether form is being opened. Defaults to False.
+        """
+        sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
+                   f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status, workcat_id, parent_id"
+                   f" FROM plan_psector "
+                   f"WHERE psector_id = {psector_id}")
+        row = tools_db.get_row(sql)
+
+        if not row:
+            return
+
+        # Check if expl_id already exists in expl_selector
+        sql = ("SELECT DISTINCT(expl_id, cur_user)"
+                " FROM selector_expl"
+                f" WHERE expl_id = '{row['expl_id']}' AND cur_user = current_user")
+        exist = tools_db.get_row(sql)
+        if exist is None:
+            sql = ("INSERT INTO selector_expl (expl_id, cur_user) "
+                    f" VALUES ({str(row['expl_id'])}, current_user)"
+                    f" ON CONFLICT DO NOTHING;")
+            tools_db.execute_sql(sql)
+            msg = "Your exploitation selector has been updated"
+            tools_qgis.show_warning(msg, 1, dialog=dialog)
+
+        if form_opened:
+            self.fill_widget(dialog, "text3", row)
+            self.fill_widget(dialog, "text4", row)
+            self.fill_widget(dialog, "text5", row)
+            self.fill_widget(dialog, "text6", row)
+            self.fill_widget(dialog, "num_value", row)
+
+            self.populate_budget(dialog, psector_id)
+            self.update = True
+
+            dialog.rejected.connect(self.rubber_band_point.reset)
+
+        if not list_coord:
+
+            sql = f"SELECT st_astext(st_envelope(the_geom)) FROM ve_plan_psector WHERE psector_id = {psector_id}"
+            row = tools_db.get_row(sql)
+            if row[0]:
+                list_coord = re.search('\(\((.*)\)\)', str(row[0]))
+
+        if list_coord:
+            # Get canvas extend in order to create a QgsRectangle
+            ext = self.canvas.extent()
+            start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
+            end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
+            canvas_rec = QgsRectangle(start_point, end_point)
+            canvas_width = ext.xMaximum() - ext.xMinimum()
+            canvas_height = ext.yMaximum() - ext.yMinimum()
+
+            points = tools_qgis.get_geometry_vertex(list_coord)
+            polygon = QgsGeometry.fromPolygonXY([points])
+            psector_rec = polygon.boundingBox()
+            tools_gw.reset_rubberband(self.rubber_band_rectangle)
+            rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
+            if rb_duration == "0":
+                rb_duration = None
+            tools_qgis.draw_polygon(points, self.rubber_band_rectangle, duration_time=rb_duration)
+
+            # Manage Zoom to rectangle
+            if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
+                max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+                tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
+            else:
+                tools_qgis.force_refresh_map_canvas()
+        
+        # Force refresh of selector docker to reflect any value changes
+        tools_gw.refresh_selectors()
+        
+        if form_opened:
+            self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+        
     def psector_name_changed(self):
         """ Enable buttons and tabs when name is changed """
 
@@ -1687,6 +1707,10 @@ class GwPsector:
 
         # Refresh table with both filters
         self._filter_table(dialog, dialog.tbl_psm, dialog.txt_name, dialog.chk_active, dialog.chk_archived, 'v_ui_plan_psector')
+
+        # Load existing psector
+        self.load_existing_psector(dialog, psector_id)
+
         if selector_updated:
             tools_qgis.force_refresh_map_canvas()
             tools_gw.refresh_selectors()
@@ -1771,6 +1795,9 @@ class GwPsector:
         if cur_psector and cur_psector[0] is not None:
             sql += f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({scenario_id}, current_user);"
         tools_db.execute_sql(sql)
+
+        # Load existing psector
+        self.load_existing_psector(dialog, scenario_id)
 
         # Re-open the dialog
         tools_gw.open_dialog(dialog, dlg_name='plan_psector')
@@ -1993,6 +2020,9 @@ class GwPsector:
             tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
+        # Load existing psector
+        self.load_existing_psector(self.dlg_psector_mng, psector_id[0])
+
         # The SQL procedure manage creating the temporal layers based on the returned features
         msg = "Psector features loaded successfully on the map."
         tools_qgis.show_success(msg, dialog=self.dlg_psector_mng)
@@ -2156,6 +2186,7 @@ class GwPsector:
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True))
         self.duplicate_psector.is_duplicated.connect(partial(self.check_topology_psector, psector_id, psector_name))
+        self.duplicate_psector.is_duplicated.connect(partial(self.load_existing_psector, self.duplicate_psectoralog, psector_id))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
     def set_label_current_psector(self, dialog, scenario_type=None, from_open_dialog=False, result=None):
