@@ -2193,7 +2193,7 @@ class GwPsector:
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True))
         self.duplicate_psector.is_duplicated.connect(partial(self.check_topology_psector, psector_id, psector_name))
-        self.duplicate_psector.is_duplicated.connect(partial(self.load_psector, self.duplicate_psectoralog, psector_id))
+        self.duplicate_psector.is_duplicated.connect(partial(self.load_psector, self.duplicate_psector, psector_id))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
     def set_label_current_psector(self, dialog, scenario_type=None, from_open_dialog=False, result=None):
