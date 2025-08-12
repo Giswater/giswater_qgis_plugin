@@ -24,7 +24,7 @@ SELECT columns_are(
     ARRAY[
       'formname', 'formtype', 'tabname', 'columnname', 'layoutname', 'layoutorder', 'datatype', 'widgettype', 'label', 'tooltip', 'placeholder',
       'ismandatory', 'isparent', 'iseditable', 'isautoupdate', 'isfilter', 'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc',
-      'stylesheet', 'widgetcontrols', 'widgetfunction', 'linkedobject', 'hidden', 'web_layoutorder', 'field_layoutorder'
+      'stylesheet', 'widgetcontrols', 'widgetfunction', 'linkedobject', 'hidden', 'web_layoutorder'
     ],
     'Table config_form_fields should have the correct columns'
 );
@@ -56,7 +56,6 @@ SELECT col_type_is('config_form_fields', 'widgetfunction', 'json', 'Column widge
 SELECT col_type_is('config_form_fields', 'linkedobject', 'text', 'Column linkedobject should be text');
 SELECT col_type_is('config_form_fields', 'hidden', 'bool', 'Column hidden should be bool DEFAULT false');
 SELECT col_type_is('config_form_fields', 'web_layoutorder', 'int4', 'Column web_layoutorder should be int4');
-SELECT col_type_is('config_form_fields', 'field_layoutorder', 'int4', 'Column field_layoutorder should be int4');
 
 --check default values
 

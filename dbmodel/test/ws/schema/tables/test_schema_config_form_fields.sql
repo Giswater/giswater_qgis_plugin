@@ -23,7 +23,7 @@ SELECT columns_are(
         'formname', 'formtype', 'tabname', 'columnname', 'layoutname', 'layoutorder', 'datatype', 'widgettype', 'label', 'tooltip',
         'placeholder', 'ismandatory', 'isparent', 'iseditable', 'isautoupdate', 'isfilter', 'dv_querytext', 'dv_orderby_id',
         'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'stylesheet', 'widgetcontrols', 'widgetfunction', 'linkedobject',
-        'hidden', 'web_layoutorder', 'field_layoutorder'
+        'hidden', 'web_layoutorder'
     ],
     'Table config_form_fields should have the correct columns'
 );
@@ -59,7 +59,6 @@ SELECT col_type_is('config_form_fields', 'widgetfunction', 'json', 'Column widge
 SELECT col_type_is('config_form_fields', 'linkedobject', 'text', 'Column linkedobject should be text');
 SELECT col_type_is('config_form_fields', 'hidden', 'boolean', 'Column hidden should be boolean');
 SELECT col_type_is('config_form_fields', 'web_layoutorder', 'integer', 'Column web_layoutorder should be integer');
-SELECT col_type_is('config_form_fields', 'field_layoutorder', 'integer', 'Column field_layoutorder should be integer');
 
 -- Check foreign keys
 SELECT hasnt_fk('config_form_fields', 'Table config_form_fields should have no foreign keys');

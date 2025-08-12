@@ -15,8 +15,6 @@ ALTER TABLE plan_psector ADD COLUMN workcat_id_plan text;
 ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_workcat_id_plan_fkey FOREIGN KEY (workcat_id_plan) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 CREATE INDEX idx_plan_psector_workcat_id_plan ON plan_psector(workcat_id_plan);
 
-ALTER TABLE config_form_fields ADD COLUMN field_layoutorder int4 NULL;
-
 DROP RULE insert_plan_psector_x_node ON node;
 DROP RULE insert_plan_psector_x_arc ON arc;
 
