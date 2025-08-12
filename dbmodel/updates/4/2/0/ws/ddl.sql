@@ -196,3 +196,5 @@ END $function$;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"pump_type", "dataType":"int4"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"engine_type", "dataType":"int4"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"flowsetting", "dataType":"numeric(12,3)"}}$$);

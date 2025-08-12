@@ -30,7 +30,7 @@ END' WHERE columnname = 'state';
 -- Add brand and model to ve_node, ve_arc, ve_connec, ve_element, ve_frelem, ve_genelem
   -- Existing ones
     -- Brand_id
-UPDATE config_form_fields SET dv_querytext = NULL, label = 'Brand', isparent = false, isautoupdate = false, widgetcontrols = '{"setMultiline":false}'::json 
+UPDATE config_form_fields SET dv_querytext = NULL, label = 'Brand', isparent = false, isautoupdate = false, widgetcontrols = '{"setMultiline":false}'::json
 WHERE columnname = 'brand_id' AND formtype = 'form_feature' AND tabname = 'tab_data';
 
 DO $$
@@ -48,7 +48,7 @@ BEGIN
 END $$;
 
     -- Model_id
-UPDATE config_form_fields SET dv_querytext = NULL, label = 'Model', isparent = false, isautoupdate = false, widgetcontrols = '{"setMultiline":false}'::json 
+UPDATE config_form_fields SET dv_querytext = NULL, label = 'Model', isparent = false, isautoupdate = false, widgetcontrols = '{"setMultiline":false}'::json
 WHERE columnname = 'model_id' AND formtype = 'form_feature' AND tabname = 'tab_data';
 
 DO $$
@@ -74,13 +74,13 @@ DECLARE
   rec record;
 BEGIN
   FOR rec IN SELECT DISTINCT formname, formtype, tabname FROM config_form_fields cff WHERE formname ILIKE ANY (ARRAY['ve_node_%', 've_arc_%', 've_connec_%', 've_gully_%'])
-      AND tabname = 'tab_data' AND formtype = 'form_feature' AND NOT EXISTS (SELECT 1 FROM config_form_fields cff2 WHERE cff2.formname = cff.formname AND cff2.formtype = cff.formtype 
+      AND tabname = 'tab_data' AND formtype = 'form_feature' AND NOT EXISTS (SELECT 1 FROM config_form_fields cff2 WHERE cff2.formname = cff.formname AND cff2.formtype = cff.formtype
       AND cff2.tabname = cff.tabname AND cff2.columnname = 'brand_id')
   LOOP
     v_dv_querytext := format('SELECT id, id as idval FROM cat_brand WHERE %L = ANY(featurecat_id::text[])', upper(regexp_replace(rec.formname, '^ve_(node|arc|connec|gully)_', '', 'i')));
     v_layoutorder := (SELECT MAX(layoutorder) + 1 FROM config_form_fields WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND layoutname = 'lyt_data_2');
-    
-    INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden) VALUES 
+
+    INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden) VALUES
     (rec.formname, rec.formtype, rec.tabname, 'brand_id', 'lyt_data_2', v_layoutorder, 'text', 'combo', 'Brand id', 'brand_id', false, false, true, false, v_dv_querytext, false);
   END LOOP;
 END $$;
@@ -93,13 +93,13 @@ DECLARE
   rec record;
 BEGIN
   FOR rec IN SELECT DISTINCT formname, formtype, tabname FROM config_form_fields cff WHERE formname ILIKE ANY (ARRAY['ve_node_%', 've_arc_%', 've_connec_%', 've_gully_%'])
-      AND tabname = 'tab_data' AND formtype = 'form_feature' AND NOT EXISTS (SELECT 1 FROM config_form_fields cff2 WHERE cff2.formname = cff.formname AND cff2.formtype = cff.formtype 
+      AND tabname = 'tab_data' AND formtype = 'form_feature' AND NOT EXISTS (SELECT 1 FROM config_form_fields cff2 WHERE cff2.formname = cff.formname AND cff2.formtype = cff.formtype
       AND cff2.tabname = cff.tabname AND cff2.columnname = 'model_id')
   LOOP
     v_dv_querytext := format('SELECT id, id as idval FROM cat_brand_model WHERE %L = ANY(featurecat_id::text[])', upper(regexp_replace(rec.formname, '^ve_(node|arc|connec|gully)_', '', 'i')));
     v_layoutorder := (SELECT MAX(layoutorder) + 1 FROM config_form_fields WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND layoutname = 'lyt_data_2');
-    
-    INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden) VALUES 
+
+    INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden) VALUES
     (rec.formname, rec.formtype, rec.tabname, 'model_id', 'lyt_data_2', v_layoutorder, 'text', 'combo', 'Model id', 'model_id', false, false, true, false, v_dv_querytext, false);
   END LOOP;
 END $$;
@@ -115,7 +115,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('ve_gully','form_feature','tab_data','brand_id','lyt_data_2',23,'text','text','Brand','brand_id',false,true,NULL,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,dv_querytext,hidden)
 	VALUES ('ve_gully','form_feature','tab_data','model_id','lyt_data_2',24,'text','text','Model','model_id',false,true,NULL,false);
-        
+
   -- Elements
     -- ve_frelem
       -- eorifice
@@ -141,7 +141,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('ve_frelem_eweir','form_feature','tab_data','brand_id','lyt_data_1',13,'text','combo','Brand','brand_id',false,false,true,false,'SELECT id, id as idval FROM cat_brand WHERE ''EWEIR'' = ANY(featurecat_id::text[])');
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext)
 	VALUES ('ve_frelem_eweir','form_feature','tab_data','model_id','lyt_data_1',14,'text','combo','Model','model_id',false,false,true,false,'SELECT id, id as idval FROM cat_brand_model WHERE ''EWEIR'' = ANY(featurecat_id::text[])');
-  
+
 UPDATE config_form_fields SET layoutorder=15 WHERE formname ILIKE 've_frelem_%' AND formtype='form_feature' AND columnname='rotation' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutorder=16 WHERE formname ILIKE 've_frelem_%' AND formtype='form_feature' AND columnname='top_elev' AND tabname='tab_data';
 
@@ -175,7 +175,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('ve_genelem_estep','form_feature','tab_data','brand_id','lyt_data_1',12,'text','combo','Brand','brand_id',false,false,true,false,'SELECT id, id as idval FROM cat_brand WHERE ''ESTEP'' = ANY(featurecat_id::text[])');
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext)
 	VALUES ('ve_genelem_estep','form_feature','tab_data','model_id','lyt_data_1',13,'text','combo','Model','model_id',false,false,true,false,'SELECT id, id as idval FROM cat_brand_model WHERE ''ESTEP'' = ANY(featurecat_id::text[])');
-  
+
 UPDATE config_form_fields SET layoutorder=14 WHERE formname ILIKE 've_genelem_%' AND formtype='form_feature' AND columnname='rotation' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutorder=15 WHERE formname ILIKE 've_genelem_%' AND formtype='form_feature' AND columnname='top_elev' AND tabname='tab_data';
 
@@ -412,3 +412,34 @@ DELETE FROM config_form_fields WHERE formname ILIKE '%ve_gully%' AND formtype='f
 
 -- 08/08/2025
 DELETE FROM config_form_fields WHERE formname ILIKE '%elem%' AND formtype='form_feature' AND columnname='element_id' AND tabname='tab_data';
+
+-- 12/08/2025
+
+DO $$
+DECLARE
+  rec record;
+BEGIN
+  FOR rec IN (SELECT child_layer FROM cat_feature WHERE feature_class = 'VALVE')
+  LOOP
+    INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder,
+    "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
+    dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,
+    stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder, field_layoutorder)
+    VALUES(rec.child_layer, 'form_feature', 'tab_data', 'flowsetting', 'lyt_data_2', (SELECT max(layoutorder) + 1 AS layoutorder FROM config_form_fields WHERE formname = rec.child_layer AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+    'numeric', 'text', 'Flow Setting:', 'Flow Setting:', NULL, false, false, true, false, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, true, NULL, NULL)
+    ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
+    layoutorder = EXCLUDED.layoutorder,
+    datatype = EXCLUDED.datatype,
+    widgettype = EXCLUDED.widgettype,
+    label = EXCLUDED.label,
+    dv_querytext = EXCLUDED.dv_querytext,
+    dv_orderby_id = EXCLUDED.dv_orderby_id,
+    dv_isnullvalue = EXCLUDED.dv_isnullvalue,
+    dv_parent_id = EXCLUDED.dv_parent_id,
+    dv_querytext_filterc = EXCLUDED.dv_querytext_filterc,
+    hidden = EXCLUDED.hidden;
+  END LOOP;
+END $$;
+

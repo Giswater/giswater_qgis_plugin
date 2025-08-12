@@ -633,7 +633,7 @@ BEGIN
 
 		ELSIF v_man_table='man_valve' THEN
 
-			INSERT INTO man_valve (node_id, name) VALUES (NEW.node_id,NEW.name);
+			INSERT INTO man_valve (node_id, name, flowsetting) VALUES (NEW.node_id,NEW.name, NEW.flowsetting);
 
 		ELSIF v_man_table='man_storage' THEN
 
@@ -948,7 +948,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_valve' THEN
-			UPDATE man_valve SET name=NEW.name
+			UPDATE man_valve SET name=NEW.name, flowsetting=NEW.flowsetting
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_chamber' THEN

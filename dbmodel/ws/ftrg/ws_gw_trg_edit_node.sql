@@ -587,10 +587,10 @@ BEGIN
 
 		ELSIF v_man_table='man_valve' THEN
 			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pressure_entry, pressure_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
-			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand2, model2, valve_type, to_arc, automated, connection_type)
+			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand2, model2, valve_type, to_arc, automated, connection_type, flowsetting)
 			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pressure_entry, NEW.pressure_exit, NEW.depth_valveshaft, NEW.regulator_situation,
 			NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2, NEW.ordinarystatus,
-			NEW.shutter, NEW.brand2, NEW.model2, NEW.valve_type, NEW.to_arc, NEW.automated, NEW.connection_type);
+			NEW.shutter, NEW.brand2, NEW.model2, NEW.valve_type, NEW.to_arc, NEW.automated, NEW.connection_type, NEW.flowsetting);
 
 		ELSIF v_man_table='man_manhole' THEN
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -1006,7 +1006,8 @@ BEGIN
 			SET closed=NEW.closed, broken=NEW.broken, buried=NEW.buried, irrigation_indicator=NEW.irrigation_indicator, pressure_entry=NEW.pressure_entry, pressure_exit=NEW.pressure_exit,
 			depth_valveshaft=NEW.depth_valveshaft, regulator_situation=NEW.regulator_situation, regulator_location=NEW.regulator_location, regulator_observ=NEW.regulator_observ,
 			lin_meters=NEW.lin_meters, exit_type=NEW.exit_type, exit_code=NEW.exit_code, drive_type=NEW.drive_type, cat_valve2=NEW.cat_valve2, ordinarystatus = NEW.ordinarystatus,
-			shutter=NEW.shutter, brand2=NEW.brand2, model2=NEW.model2, valve_type=NEW.valve_type, to_arc=NEW.to_arc, automated=NEW.automated, connection_type=NEW.connection_type
+			shutter=NEW.shutter, brand2=NEW.brand2, model2=NEW.model2, valve_type=NEW.valve_type, to_arc=NEW.to_arc, automated=NEW.automated, connection_type=NEW.connection_type,
+			flowsetting=NEW.flowsetting
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_register' THEN
