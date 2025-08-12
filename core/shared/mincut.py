@@ -576,7 +576,7 @@ class GwMincut:
         # Parametrize list of layers
         self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers_connec = self.rel_layers['connec']
-        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
 
         # Set active and current layer
         self.iface.setActiveLayer(self.layer_arc)
