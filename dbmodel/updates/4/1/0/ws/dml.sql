@@ -977,7 +977,7 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4034, 'Billed metered consumtion: %v_bmc% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4036, 'Billed metered consumtion: %v_nrw% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4036, 'Non-revenue water: %v_nrw% CMP', null, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4038, 'DMAs updated %v_day% days ago.', null, 0, true, 'utils', 'core', 'AUDIT');
