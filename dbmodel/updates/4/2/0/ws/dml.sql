@@ -2631,3 +2631,16 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
     "columnfind": "path"
   }
 }'::json,'tbl_doc_x_element',false,4);
+
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=1, alias='Node features' WHERE id='ve_cat_feature_node';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=2, alias='Arc features' WHERE id='ve_cat_feature_arc';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=3, alias='Connec features' WHERE id='ve_cat_feature_connec';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=4, alias='Link features' WHERE id='ve_cat_feature_link';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=5, alias='Element features' WHERE id='ve_cat_feature_element';
+
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=6, alias='Node catalog' WHERE id='cat_node';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=7, alias='Arc catalog' WHERE id='cat_arc';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=8, alias='Connec catalog' WHERE id='cat_connec';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=9, alias='Link catalog' WHERE id='cat_link';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=10, alias='Element catalog' WHERE id='cat_element';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=11, alias='Material catalog' WHERE id='cat_material';
