@@ -87,6 +87,10 @@ BEGIN
 	v_selection_mode := (p_data ->>'data')::json->>'selectionMode'::text;
 	v_id := (p_data ->>'feature')::json->>'id'::text;
 
+	IF v_id IS NULL OR v_id = '' THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4330", "function":"2118", "parameters":{"parameter":"id"}, "is_process":true}}$$);';
+	END IF;
+
 	select replace(replace(replace(v_id, '[', ''), ']', ''), '"', '''') into v_id;
 
 	if v_selection_mode = 'previousSelection' then
