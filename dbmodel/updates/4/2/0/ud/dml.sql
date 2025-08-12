@@ -705,10 +705,10 @@ UPDATE config_form_fields
 	SET layoutorder=4,layoutname='lyt_data_2'
 	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_data';
 UPDATE config_form_fields
-	SET layoutorder=2,layoutname='lyt_data_2'
+	SET layoutorder=3,layoutname='lyt_data_2'
 	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='flwreg_length' AND tabname='tab_data';
 UPDATE config_form_fields
-	SET layoutorder=3,layoutname='lyt_data_2'
+	SET layoutorder=2,layoutname='lyt_data_2'
 	WHERE formname='ve_frelem_epump' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
 UPDATE config_form_fields
 	SET layoutorder=5
@@ -724,7 +724,8 @@ UPDATE config_form_fields
     "sourcetable": "v_ui_element_x_node",
     "targetwidget": "tab_elements_tbl_elements",
     "field_object_id": "element_id",
-    "sourceview": "element"
+    "sourceview": "element",
+    "linked_feature": true
   }
 }'::json
 	WHERE formname='node' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
@@ -735,7 +736,8 @@ UPDATE config_form_fields
     "sourcetable": "v_ui_element_x_connec",
     "targetwidget": "tab_elements_tbl_elements",
     "field_object_id": "element_id",
-    "sourceview": "element"
+    "sourceview": "element",
+    "linked_feature": true
   }
 }'::json
 	WHERE formname='connec' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
@@ -746,7 +748,8 @@ UPDATE config_form_fields
     "sourcetable": "v_ui_element_x_gully",
     "targetwidget": "tab_elements_tbl_elements",
     "field_object_id": "element_id",
-    "sourceview": "element"
+    "sourceview": "element",
+    "linked_feature": true
   }
 }'::json
 	WHERE formname='gully' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
@@ -757,7 +760,8 @@ UPDATE config_form_fields
     "sourcetable": "v_ui_element_x_link",
     "targetwidget": "tab_elements_tbl_elements",
     "field_object_id": "element_id",
-    "sourceview": "element"
+    "sourceview": "element",
+    "linked_feature": true
   }
 }'::json
 	WHERE formname='ve_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
@@ -768,7 +772,8 @@ UPDATE config_form_fields
     "sourcetable": "v_ui_element_x_link",
     "targetwidget": "tab_elements_tbl_elements",
     "field_object_id": "element_id",
-    "sourceview": "element"
+    "sourceview": "element",
+    "linked_feature": true
   }
 }'::json
 	WHERE formname='ve_link_conduitlink' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
@@ -779,7 +784,8 @@ UPDATE config_form_fields
     "sourcetable": "v_ui_element_x_link",
     "targetwidget": "tab_elements_tbl_elements",
     "field_object_id": "element_id",
-    "sourceview": "element"
+    "sourceview": "element",
+    "linked_feature": true
   }
 }'::json
 	WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
@@ -790,7 +796,8 @@ UPDATE config_form_fields
     "sourcetable": "v_ui_element_x_link",
     "targetwidget": "tab_elements_tbl_elements",
     "field_object_id": "element_id",
-    "sourceview": "element"
+    "sourceview": "element",
+    "linked_feature": true
   }
 }'::json
 	WHERE formname='ve_link_vlink' AND formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
