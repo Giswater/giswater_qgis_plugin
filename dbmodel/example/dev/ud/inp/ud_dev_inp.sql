@@ -91,31 +91,26 @@ INSERT INTO inp_evaporation (evap_type, value) VALUES ('TIMESERIES', 'T100-5m');
 INSERT INTO inp_evaporation (evap_type, value) VALUES ('FILE', 'fname');
 INSERT INTO inp_evaporation (evap_type, value) VALUES ('RECOVERY', 'patten_01');
 
-INSERT INTO inp_frorifice (id, node_id, to_arc, order_id, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4) 
-VALUES (4, '40', '163', 5, 1.25, 'SIDE', 34.1250, 1.5000, 1.0000, 'YES', 'CIRCULAR', 0.8800, 0.0000, 0.0000, 0.0000);
-INSERT INTO inp_frorifice (id, node_id, to_arc, order_id, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4) 
-VALUES (7, '40', '163', 6, 0.98499999999999999, 'BOTTOM', 34.0080, 1.5000, 1.0000, 'YES', 'RECT_CLOSED', 0.7700, 0.6600, 0.0000, 0.0000);
+INSERT INTO inp_frorifice (id, node_id, to_arc, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4) 
+VALUES (4, '40', '163' 1.25, 'SIDE', 34.1250, 1.5000, 1.0000, 'YES', 'CIRCULAR', 0.8800, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_frorifice (id, node_id, to_arc, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4) 
+VALUES (7, '40', '163', 0.98499999999999999, 'BOTTOM', 34.0080, 1.5000, 1.0000, 'YES', 'RECT_CLOSED', 0.7700, 0.6600, 0.0000, 0.0000);
 
-UPDATE inp_frorifice SET nodarc_id = concat(node_id, 'OR',order_id);
+INSERT INTO inp_froutlet (id, node_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap) 
+VALUES (4, '40', '163', 3.234, 'TABULAR/DEPTH', 33.9250, 'C1_CONTROL', NULL, NULL, NULL);
+INSERT INTO inp_froutlet (id, node_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap) 
+VALUES (6, '40', '163', 1.234, 'TABULAR/HEAD', 33.9954, 'C1_CONTROL', NULL, NULL, NULL);
+INSERT INTO inp_froutlet (id, node_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap) 
+VALUES (1, '40', '163', 1.254, 'FUNCTIONAL/DEPTH', 34.1255, NULL, 0.2500, 0.7481, 'YES');
+INSERT INTO inp_froutlet (id, node_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap) 
+VALUES (3, '40', '163', 2.012, 'FUNCTIONAL/HEAD', 34.0244, NULL, 1.1520, 0.2517, NULL);
 
-INSERT INTO inp_froutlet (id, node_id, to_arc, order_id, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap) 
-VALUES (4, '40', '163', 3, 3.234, 'TABULAR/DEPTH', 33.9250, 'C1_CONTROL', NULL, NULL, NULL);
-INSERT INTO inp_froutlet (id, node_id, to_arc, order_id, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap) 
-VALUES (6, '40', '163', 4, 1.234, 'TABULAR/HEAD', 33.9954, 'C1_CONTROL', NULL, NULL, NULL);
-INSERT INTO inp_froutlet (id, node_id, to_arc, order_id, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap) 
-VALUES (1, '40', '163', 1, 1.254, 'FUNCTIONAL/DEPTH', 34.1255, NULL, 0.2500, 0.7481, 'YES');
-INSERT INTO inp_froutlet (id, node_id, to_arc, order_id, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap) 
-VALUES (3, '40', '163', 2, 2.012, 'FUNCTIONAL/HEAD', 34.0244, NULL, 1.1520, 0.2517, NULL);
-
-UPDATE inp_froutlet SET nodarc_id = concat(node_id, 'OT',order_id);
 
 DELETE FROM inp_frweir;
 INSERT INTO inp_frweir VALUES (1, '237', '242', 1, 0.5, 'TRANSVERSE', 16.3500, 1.5000, NULL, NULL, 'NO', 2.0000, 2.0000, 0.0000, 0.0000, NULL);
 INSERT INTO inp_frweir VALUES (2, '238', '244', 1, 1, 'SIDEFLOW', 29.0000, 1.5000, NULL, NULL, 'NO', 1.0000, 1.0000, 0.0000, 0.0000, NULL);
 INSERT INTO inp_frweir VALUES (3, '18828', '18969', 1, 0.5, 'TRAPEZOIDAL', 17.1500, 1.5000, NULL, NULL, 'NO', 1.0000, 1.0000, 0.0000, 0.0000, NULL);
 INSERT INTO inp_frweir VALUES (11, '40', '163', 1, 2, 'V-NOTCH', 35.1020, 1.5000, NULL, NULL, 'YES', 1.5000, 1.2500, 0.0000, 0.0000, NULL);
-
-UPDATE inp_frweir SET nodarc_id = concat(node_id, 'WE',order_id);
 
 INSERT INTO inp_groundwater VALUES ('S101', 'aquifer01', '101', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, '0', '0', 1);
 INSERT INTO inp_groundwater VALUES ('S102', 'aquifer01', '102', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, '0', '0', 1);
@@ -254,5 +249,3 @@ UPDATE inp_dwf SET pat1='pattern_01', pat2='pattern_02', pat3='pattern_03', pat4
 update inp_subcatchment SET dstore_pattern_id = 'pattern_01';
 update inp_subcatchment SET infil_pattern_id = 'pattern_02';
 update inp_subcatchment SET nperv_pattern_id = 'pattern_03';
-
-UPDATE inp_frpump SET nodarc_id = concat(node_id,'PU',order_id);

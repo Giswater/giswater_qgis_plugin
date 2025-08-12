@@ -443,3 +443,4 @@ BEGIN
   END LOOP;
 END $$;
 
+DELETE FROM config_form_fields WHERE formname ILIKE 've_element%' AND formtype='form_feature' AND columnname='tbl_element_x_gully' AND tabname='tab_features';

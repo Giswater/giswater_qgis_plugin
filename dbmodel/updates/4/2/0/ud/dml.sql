@@ -1377,7 +1377,6 @@ UPDATE config_form_fields
 
 DELETE FROM config_form_fields WHERE formname ILIKE 've_element%' AND formtype='form_feature' AND columnname='tbl_element_x_gully' AND tabname='tab_features';
 
-
 -- last update
 -- Normalize "label": replace underscores with spaces, trim, ensure only the first letter is uppercase,
 -- and append a colon if missing. Only updates rows needing changes.

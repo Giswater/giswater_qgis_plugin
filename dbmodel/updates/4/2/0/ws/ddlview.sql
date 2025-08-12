@@ -27,6 +27,201 @@ ALTER VIEW v_edit_arc RENAME COLUMN staticpress2 TO staticpressure2;
 ALTER VIEW v_edit_arc RENAME COLUMN mincut_impact TO mincut_impact_topo;
 ALTER VIEW v_edit_arc RENAME COLUMN mincut_affectation TO mincut_impact_hydro;
 
+CREATE OR REPLACE VIEW ve_man_frelem AS
+  SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
+    man_frelem.node_id,
+    man_frelem.to_arc,
+    man_frelem.flwreg_length,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+        CASE
+            WHEN man_frelem.node_id = a.node_1 THEN st_setsrid(ST_LineSubstring(a.the_geom, 0, man_frelem.flwreg_length::double precision / st_length(a.the_geom)), 25831)::geometry(LineString,25831)
+            WHEN man_frelem.node_id = a.node_2 THEN st_setsrid(ST_LineSubstring(a.the_geom, 1::double precision - man_frelem.flwreg_length::double precision / st_length(a.the_geom),1), 25831)::geometry(LineString,25831)
+            ELSE NULL::geometry(LineString,25831)
+        END AS the_geom
+   FROM ve_element
+     JOIN man_frelem ON ve_element.element_id = man_frelem.element_id
+     JOIN arc a ON a.arc_id = man_frelem.to_arc
+     JOIN node USING (node_id);
+
+CREATE OR REPLACE VIEW v_edit_inp_frvalve
+as select f.element_id,
+    f.node_id,
+    f.to_arc,
+    f.flwreg_length,
+    v.valve_type,
+    custom_dint,
+    setting,
+    curve_id,
+    minorloss,
+    add_settings,
+    init_quality,
+    f.the_geom
+    FROM ve_man_frelem f
+    JOIN inp_frvalve v ON f.element_id = v.element_id;
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_frvalve
+AS SELECT s.dscenario_id,
+    element_id,
+	  v.valve_type,
+    v.custom_dint,
+    v.setting,
+    v.curve_id,
+    v.minorloss,
+    v.add_settings,
+    v.init_quality,
+    n.the_geom
+    FROM selector_inp_dscenario s, inp_dscenario_frvalve v
+    JOIN v_edit_inp_frvalve n USING (element_id)
+    WHERE s.dscenario_id = v.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+CREATE OR REPLACE VIEW ve_element_epump
+AS SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+    ve_element.the_geom,
+    man_frelem.node_id,
+    man_frelem.to_arc,
+    man_frelem.flwreg_length
+   FROM ve_element
+     JOIN man_frelem USING (element_id)
+  WHERE ve_element.element_type::text = 'EPUMP'::text;
+
+CREATE OR REPLACE VIEW ve_element_evalve
+AS SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+    ve_element.the_geom,
+    man_frelem.node_id,
+    man_frelem.to_arc,
+    man_frelem.flwreg_length
+   FROM ve_element
+     JOIN man_frelem USING (element_id)
+  WHERE ve_element.element_type::text = 'EVALVE'::text;
+
 CREATE OR REPLACE VIEW v_edit_link
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
@@ -2294,13 +2489,9 @@ DROP VIEW IF EXISTS vcv_dma_log;
 DROP VIEW IF EXISTS vcv_emitters_log;
 DROP VIEW IF EXISTS vcv_junction;
 
-
-
 CREATE OR REPLACE VIEW ve_inp_frpump
 AS SELECT f.element_id,
     f.node_id,
-    f.order_id,
-    f.nodarc_id,
     f.to_arc,
     f.flwreg_length,
 	p.power,
@@ -2313,14 +2504,12 @@ AS SELECT f.element_id,
 	p.energy_pattern_id,
     p.status,
     f.the_geom
-   FROM ve_frelem f
+   FROM ve_man_frelem f
      JOIN inp_frpump p ON f.element_id = p.element_id;
 
 CREATE OR REPLACE VIEW ve_inp_frshortpipe
 AS SELECT f.element_id,
     f.node_id,
-    f.order_id,
-    f.nodarc_id,
     f.to_arc,
     f.flwreg_length,
 	p.minorloss,
@@ -2329,14 +2518,13 @@ AS SELECT f.element_id,
 	p.custom_dint,
 	p.status,
     f.the_geom
-   FROM ve_frelem f
+   FROM ve_man_frelem f
      JOIN inp_frshortpipe p ON f.element_id = p.element_id;
 
 
 CREATE OR REPLACE VIEW ve_epa_frpump
 AS SELECT p.element_id,
     man_frelem.node_id,
-    concat(man_frelem.node_id, '_FR', man_frelem.order_id) AS nodarc_id,
     man_frelem.to_arc,
 	p.power,
     p.curve_id,
@@ -2366,7 +2554,7 @@ AS SELECT p.element_id,
     r.ffactor_min
    FROM inp_frpump p
      LEFT JOIN man_frelem USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = concat(man_frelem.node_id, '_FR', man_frelem.order_id);
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = man_frelem.element_id::text;
 
 CREATE OR REPLACE VIEW ve_inp_dscenario_frpump
 AS SELECT s.dscenario_id,
@@ -2538,7 +2726,6 @@ DROP VIEW IF EXISTS ve_epa_shortpipe;
 DROP VIEW IF EXISTS ve_epa_pipe;
 DROP VIEW IF EXISTS ve_epa_virtualvalve;
 DROP VIEW IF EXISTS ve_epa_virtualpump;
-DROP VIEW IF EXISTS ve_epa_frvalve;
 DROP VIEW IF EXISTS ve_epa_frpump;
 DROP VIEW IF EXISTS v_rpt_arc_stats;
 
@@ -3035,7 +3222,6 @@ AS SELECT inp_pump.node_id,
     inp_pump.effic_curve_id,
     inp_pump.energy_price,
     inp_pump.energy_pattern_id,
-    concat(inp_pump.node_id, '_n2a') AS nodarc_id,
     v_rpt_arc_stats.result_id,
     v_rpt_arc_stats.flow_max AS flowmax,
     v_rpt_arc_stats.flow_min AS flowmin,
@@ -3070,7 +3256,6 @@ AS SELECT inp_pump_additional.id,
     inp_pump_additional.effic_curve_id,
     inp_pump_additional.energy_price,
     inp_pump_additional.energy_pattern_id,
-    concat(inp_pump_additional.node_id, '_n2a') AS nodarc_id,
     v_rpt_arc_stats.result_id,
     v_rpt_arc_stats.flow_max AS flowmax,
     v_rpt_arc_stats.flow_min AS flowmin,
@@ -3106,8 +3291,6 @@ AS SELECT inp_valve.node_id,
             ELSE NULL::character varying(12)
         END AS status,
     inp_valve.add_settings,
-    inp_valve.init_quality,
-    concat(inp_valve.node_id, '_n2a') AS nodarc_id,
     v_rpt_arc_stats.result_id,
     v_rpt_arc_stats.flow_max AS flowmax,
     v_rpt_arc_stats.flow_min AS flowmin,
@@ -3129,6 +3312,35 @@ AS SELECT inp_valve.node_id,
      LEFT JOIN v_rpt_arc_stats ON concat(inp_valve.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
      LEFT JOIN man_valve v ON v.node_id = inp_valve.node_id;
 
+CREATE OR REPLACE VIEW ve_epa_frvalve
+AS SELECT v.element_id,
+    man_frelem.node_id,
+    man_frelem.to_arc,
+    v.valve_type,
+    v.custom_dint,
+    v.setting,
+    v.curve_id,
+    v.minorloss AS status,
+    v.add_settings,
+    v.init_quality,
+    r.flow_max,
+    r.flow_min,
+    r.flow_avg,
+    r.vel_max,
+    r.vel_min,
+    r.vel_avg,
+    r.headloss_max,
+    r.headloss_min,
+    r.setting_max,
+    r.setting_min,
+    r.reaction_max,
+    r.reaction_min,
+    r.ffactor_max,
+    r.ffactor_min
+   FROM inp_frvalve v
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = man_frelem.element_id::text;
+
 
 CREATE OR REPLACE VIEW ve_epa_shortpipe
 AS SELECT inp_shortpipe.node_id,
@@ -3144,7 +3356,6 @@ AS SELECT inp_shortpipe.node_id,
         END AS status,
     inp_shortpipe.bulk_coeff,
     inp_shortpipe.wall_coeff,
-    concat(inp_shortpipe.node_id, '_n2a') AS nodarc_id,
     v_rpt_arc_stats.result_id,
     v_rpt_arc_stats.flow_max AS flowmax,
     v_rpt_arc_stats.flow_min AS flowmin,
@@ -3272,42 +3483,10 @@ AS SELECT p.arc_id,
      LEFT JOIN v_rpt_arc_stats ON p.arc_id::text = v_rpt_arc_stats.arc_id::text;
 
 
-CREATE OR REPLACE VIEW ve_epa_frvalve
-AS SELECT v.element_id,
-    man_frelem.node_id,
-    man_frelem.element_id AS nodarc_id,
-    man_frelem.to_arc,
-    v.valve_type,
-    v.custom_dint,
-    v.setting,
-    v.curve_id,
-    v.minorloss AS status,
-    v.add_settings,
-    v.init_quality,
-    r.flow_max,
-    r.flow_min,
-    r.flow_avg,
-    r.vel_max,
-    r.vel_min,
-    r.vel_avg,
-    r.headloss_max,
-    r.headloss_min,
-    r.setting_max,
-    r.setting_min,
-    r.reaction_max,
-    r.reaction_min,
-    r.ffactor_max,
-    r.ffactor_min
-   FROM inp_frvalve v
-     LEFT JOIN man_frelem USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = man_frelem.element_id::text;
-
-
 CREATE OR REPLACE VIEW ve_epa_frshortpipe
 AS SELECT inp_frshortpipe.element_id,
-	ve_frelem.node_id,
-	ve_frelem.to_arc,
-	ve_frelem.element_id AS nodarc_id,
+	ve_man_frelem.node_id,
+	ve_man_frelem.to_arc,
     inp_frshortpipe.minorloss,
     inp_frshortpipe.custom_dint,
     inp_frshortpipe.status,
@@ -3329,14 +3508,13 @@ AS SELECT inp_frshortpipe.element_id,
     v_rpt_arc_stats.ffactor_max,
     v_rpt_arc_stats.ffactor_min
    FROM inp_frshortpipe
-	 JOIN ve_frelem USING (element_id)
+	 JOIN ve_man_frelem USING (element_id)
      LEFT JOIN v_rpt_arc_stats ON inp_frshortpipe.element_id::text = v_rpt_arc_stats.arc_id::text;
 
 
 CREATE OR REPLACE VIEW ve_epa_frpump
 AS SELECT p.element_id,
     man_frelem.node_id,
-    man_frelem.element_id AS nodarc_id,
     man_frelem.to_arc,
     p.power,
     p.curve_id,

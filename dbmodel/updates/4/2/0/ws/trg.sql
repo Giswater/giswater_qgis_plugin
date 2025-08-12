@@ -80,3 +80,13 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('inlet');
 
 CREATE TRIGGER gw_trg_edit_plan_psector_connec INSTEAD OF INSERT OR DELETE OR UPDATE
 ON ve_plan_psector_x_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_psector_x_connect('plan_psector_x_connec');
+
+-- 12/08/2025
+DROP TRIGGER IF EXISTS gw_trg_edit_element_epump ON ve_element_epump;
+DROP TRIGGER IF EXISTS gw_trg_edit_element_evalve ON ve_element_evalve;
+
+CREATE TRIGGER gw_trg_edit_element_epump INSTEAD OF INSERT OR DELETE OR UPDATE 
+ON ve_element_epump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('EPUMP');
+
+CREATE TRIGGER gw_trg_edit_element_evalve INSTEAD OF INSERT OR DELETE OR UPDATE 
+ON ve_element_evalve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('EVALVE');

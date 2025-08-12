@@ -271,3 +271,4 @@ CREATE TABLE man_ginlet (
 
 
 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_frelem", "column":"order_id"}}$$);

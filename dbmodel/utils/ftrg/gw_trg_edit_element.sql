@@ -292,8 +292,8 @@ BEGIN
 
 		-- MAN TABLE INSERT AND EPA_TYPE INSERT
 		IF v_man_table='man_frelem' THEN
-			INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length)
-			VALUES(NEW.element_id, NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length);
+			INSERT INTO man_frelem (element_id, node_id, to_arc, flwreg_length)
+			VALUES(NEW.element_id, NEW.node_id, NEW.to_arc, NEW.flwreg_length);
 			UPDATE "element" SET epa_type = NEW.epa_type WHERE element_id = NEW.element_id;
 		ELSIF v_man_table='man_genelem' THEN
 			INSERT INTO man_genelem (element_id) VALUES (NEW.element_id);
@@ -406,7 +406,7 @@ BEGIN
 
 
 		IF v_man_table='man_frelem' THEN
-			UPDATE man_frelem SET node_id=NEW.node_id, order_id=NEW.order_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
+			UPDATE man_frelem SET node_id=NEW.node_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
 			WHERE element_id=OLD.element_id;
 		ELSIF v_man_table='man_genelem' THEN
 			UPDATE man_genelem SET element_id=NEW.element_id

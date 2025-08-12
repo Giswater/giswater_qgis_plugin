@@ -158,7 +158,7 @@ INSERT INTO element  (element_id, code, elementcat_id, epa_type, state, state_ty
 ('100021', 'E100021', 'ORIFICE-01','FRORIFICE', 1,2,1,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)'),
 ('100022', 'E100022', 'PUMP-01','FRPUMP', 1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)');
 
-INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length) VALUES
+INSERT INTO man_frelem (element_id, node_id, to_arc, flwreg_length) VALUES
 ('100020','18828',1,'18969',0.5),
 ('100021','237',1,'100014',0.5),
 ('100022','18828',1,'18966',1);
