@@ -977,8 +977,8 @@ class GwPsector:
         status_id = tools_qt.get_combo_value(self.dlg_plan_psector, 'tab_general_status')
         # Check if psector status is "Executed" (status_id == 4) and has no workcat_id
         if status_id == 4 and workcat_id in (None, 'null', ''):
-            msg = "Psector {0} has no workcat_id value set. Do you want to continue with the default value?"
-            msg_params = (psector_id,)
+            msg = "Psector '{0}' has no workcat_id value set. Do you want to continue with the default value?"
+            msg_params = (psector_name,)
             answer = tools_qgis.ask_question(msg, parameter='Psector', dialog=self.dlg_plan_psector, msg_params=msg_params)
             if answer is False:
                 return
