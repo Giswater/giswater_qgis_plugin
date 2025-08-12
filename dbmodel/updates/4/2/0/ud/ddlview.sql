@@ -8722,10 +8722,6 @@ ALTER VIEW v_edit_inp_curve_value RENAME TO ve_inp_curve_value;
 ALTER VIEW v_edit_inp_divider RENAME TO ve_inp_divider;
 ALTER VIEW v_edit_inp_dscenario_conduit RENAME TO ve_inp_dscenario_conduit;
 ALTER VIEW v_edit_inp_dscenario_controls RENAME TO ve_inp_dscenario_controls;
-ALTER VIEW v_edit_inp_dscenario_frorifice RENAME TO ve_inp_dscenario_frorifice;
-ALTER VIEW v_edit_inp_dscenario_froutlet RENAME TO ve_inp_dscenario_froutlet;
-ALTER VIEW v_edit_inp_dscenario_frpump RENAME TO ve_inp_dscenario_frpump;
-ALTER VIEW v_edit_inp_dscenario_frweir RENAME TO ve_inp_dscenario_frweir;
 ALTER VIEW v_edit_inp_dscenario_inflows RENAME TO ve_inp_dscenario_inflows;
 ALTER VIEW v_edit_inp_dscenario_inflows_poll RENAME TO ve_inp_dscenario_inflows_poll;
 ALTER VIEW v_edit_inp_dscenario_inlet RENAME TO ve_inp_dscenario_inlet;
@@ -8736,10 +8732,6 @@ ALTER VIEW v_edit_inp_dscenario_raingage RENAME TO ve_inp_dscenario_raingage;
 ALTER VIEW v_edit_inp_dscenario_storage RENAME TO ve_inp_dscenario_storage;
 ALTER VIEW v_edit_inp_dscenario_treatment RENAME TO ve_inp_dscenario_treatment;
 ALTER VIEW v_edit_inp_dwf RENAME TO ve_inp_dwf;
-ALTER VIEW v_edit_inp_frorifice RENAME TO ve_inp_frorifice;
-ALTER VIEW v_edit_inp_froutlet RENAME TO ve_inp_froutlet;
-ALTER VIEW v_edit_inp_frpump RENAME TO ve_inp_frpump;
-ALTER VIEW v_edit_inp_frweir RENAME TO ve_inp_frweir;
 ALTER VIEW v_edit_inp_gully RENAME TO ve_inp_gully;
 ALTER VIEW v_edit_inp_inflows RENAME TO ve_inp_inflows;
 ALTER VIEW v_edit_inp_inflows_poll RENAME TO ve_inp_inflows_poll;
@@ -8883,21 +8875,6 @@ AS SELECT gully_id,
     efficiency
    FROM inp_gully;
 
-DROP VIEW IF EXISTS ve_inp_dscenario_frpump;
-CREATE OR REPLACE VIEW ve_inp_dscenario_frpump
-AS SELECT s.dscenario_id,
-    f.element_id,
-    n.node_id,
-    f.curve_id,
-    f.status,
-    f.startup,
-    f.shutoff,
-    n.the_geom
-   FROM selector_inp_dscenario s,
-    inp_dscenario_frpump f
-     JOIN ve_inp_frpump n USING (element_id)
-  WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
-
 -- 05/08/2025
 -- PSECTOR
 DROP VIEW IF EXISTS v_plan_psector_gully;
@@ -8991,3 +8968,322 @@ AS SELECT plan_psector_x_gully.id,
     link.exit_type
    FROM plan_psector_x_gully
      LEFT JOIN link USING (link_id);
+
+-- remove order_id and nodarc_id from flowregulators
+CREATE OR REPLACE VIEW ve_man_frelem AS
+  SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
+    man_frelem.node_id,
+    man_frelem.to_arc,
+    man_frelem.flwreg_length,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+        CASE
+            WHEN man_frelem.node_id = a.node_1 THEN st_setsrid(st_makeline(node.the_geom, st_lineinterpolatepoint(a.the_geom, man_frelem.flwreg_length::double precision / st_length(a.the_geom))), 25831)::geometry(LineString,25831)
+            WHEN man_frelem.node_id = a.node_2 THEN st_setsrid(st_makeline(node.the_geom, st_lineinterpolatepoint(a.the_geom, 1::double precision - man_frelem.flwreg_length::double precision / st_length(a.the_geom))), 25831)::geometry(LineString,25831)
+            ELSE NULL::geometry(LineString,25831)
+        END AS the_geom
+   FROM ve_element
+     JOIN man_frelem ON ve_element.element_id = man_frelem.element_id
+     JOIN arc a ON a.arc_id = man_frelem.to_arc
+     JOIN node USING (node_id);
+
+CREATE OR REPLACE VIEW ve_epa_frpump
+AS SELECT inp_frpump.element_id,
+	man_frelem.node_id,
+    inp_frpump.curve_id,
+    inp_frpump.status,
+    inp_frpump.startup,
+    inp_frpump.shutoff,
+    v_rpt_pumping_sum.percent,
+    v_rpt_pumping_sum.num_startup,
+    v_rpt_pumping_sum.min_flow,
+    v_rpt_pumping_sum.avg_flow,
+    v_rpt_pumping_sum.max_flow,
+    v_rpt_pumping_sum.vol_ltr,
+    v_rpt_pumping_sum.powus_kwh,
+    v_rpt_pumping_sum.timoff_min,
+    v_rpt_pumping_sum.timoff_max
+   FROM inp_frpump
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN v_rpt_pumping_sum ON v_rpt_pumping_sum.arc_id::text = man_frelem.element_id::text;
+
+CREATE OR REPLACE VIEW ve_epa_frweir
+AS SELECT inp_frweir.element_id,
+	man_frelem.node_id,
+    inp_frweir.weir_type,
+    inp_frweir.offsetval,
+    inp_frweir.cd,
+    inp_frweir.ec,
+    inp_frweir.cd2,
+    inp_frweir.flap,
+    inp_frweir.geom1,
+    inp_frweir.geom2,
+    inp_frweir.geom3,
+    inp_frweir.geom4,
+    inp_frweir.surcharge,
+    inp_frweir.road_width,
+    inp_frweir.road_surf,
+    inp_frweir.coef_curve,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    rpt_arcflow_sum.mfull_flow,
+    rpt_arcflow_sum.mfull_depth AS mfull_dept,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   FROM inp_frweir
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = man_frelem.element_id::text;
+
+CREATE OR REPLACE VIEW ve_epa_frorifice
+AS SELECT inp_frorifice.element_id,
+	man_frelem.node_id,
+    inp_frorifice.orifice_type,
+    inp_frorifice.offsetval,
+    inp_frorifice.cd,
+    inp_frorifice.orate,
+    inp_frorifice.flap,
+    inp_frorifice.shape,
+    inp_frorifice.geom1,
+    inp_frorifice.geom2,
+    inp_frorifice.geom3,
+    inp_frorifice.geom4,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    rpt_arcflow_sum.mfull_flow,
+    rpt_arcflow_sum.mfull_depth,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   FROM inp_frorifice
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = man_frelem.element_id::text;
+
+CREATE OR REPLACE VIEW ve_epa_froutlet
+AS SELECT inp_froutlet.element_id,
+	man_frelem.node_id,
+    inp_froutlet.outlet_type,
+	inp_froutlet.offsetval,
+    inp_froutlet.curve_id,
+    inp_froutlet.cd1,
+    inp_froutlet.cd2,
+    inp_froutlet.flap,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    rpt_arcflow_sum.mfull_flow,
+    rpt_arcflow_sum.mfull_depth AS mfull_dept,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   FROM inp_froutlet
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = man_frelem.element_id::text;
+
+CREATE OR REPLACE VIEW ve_inp_froutlet
+AS SELECT
+    f.element_id,
+    f.node_id,
+    f.to_arc,
+    f.flwreg_length,
+    ou.outlet_type,
+    ou.offsetval,
+    ou.curve_id,
+    ou.cd1,
+    ou.cd2,
+    ou.flap,
+    f.the_geom
+    FROM ve_man_frelem f
+    JOIN inp_froutlet ou USING (element_id);
+
+CREATE OR REPLACE VIEW ve_inp_frweir
+AS SELECT
+    f.element_id,
+    f.node_id,
+    f.to_arc,
+    f.flwreg_length,
+    w.weir_type,
+    w.offsetval,
+    w.cd,
+    w.ec,
+    w.cd2,
+    w.flap,
+    w.geom1,
+    w.geom2,
+    w.geom3,
+    w.geom4,
+    w.surcharge,
+    w.road_width,
+    w.road_surf,
+    w.coef_curve,
+    f.the_geom
+    FROM ve_man_frelem f
+    JOIN inp_frweir w USING (element_id);
+
+
+CREATE OR REPLACE VIEW ve_inp_frpump
+AS SELECT
+    f.element_id,
+    f.node_id,
+    f.to_arc,
+    f.flwreg_length,
+    p.curve_id,
+    p.status,
+    p.startup,
+    p.shutoff,
+    f.the_geom
+    FROM ve_man_frelem f
+    JOIN inp_frpump p USING (element_id);
+
+CREATE OR REPLACE VIEW ve_inp_frorifice
+AS SELECT
+    f.element_id,
+    f.node_id,
+    f.to_arc,
+    f.flwreg_length,
+    ori.orifice_type,
+    ori.offsetval,
+    ori.cd,
+    ori.orate,
+    ori.flap,
+    ori.shape,
+    ori.geom1,
+    ori.geom2,
+    ori.geom3,
+    ori.geom4,
+    f.the_geom
+    FROM ve_man_frelem f
+    JOIN inp_frorifice ori USING (element_id);
+
+CREATE OR REPLACE VIEW ve_inp_dscenario_frpump
+AS SELECT s.dscenario_id,
+    f.element_id,
+    f.curve_id,
+    f.status,
+    f.startup,
+    f.shutoff,
+    n.the_geom
+    FROM selector_inp_dscenario s, inp_dscenario_frpump f
+    JOIN ve_inp_frpump n USING (element_id)
+    WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+CREATE OR REPLACE VIEW ve_inp_dscenario_froutlet
+AS SELECT
+    s.dscenario_id,
+    f.element_id,
+    n.node_id,
+    f.outlet_type,
+    f.offsetval,
+    f.curve_id,
+    f.cd1,
+    f.cd2,
+    f.flap,
+    n.the_geom
+    FROM selector_inp_dscenario s, inp_dscenario_froutlet f
+    JOIN ve_inp_froutlet n USING (element_id)
+	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+CREATE OR REPLACE VIEW ve_inp_dscenario_frweir
+AS SELECT
+    s.dscenario_id,
+    f.element_id,
+    n.node_id,
+    f.weir_type,
+    f.offsetval,
+    f.cd,
+    f.ec,
+    f.cd2,
+    f.flap,
+    f.geom1,
+    f.geom2,
+    f.geom3,
+    f.geom4,
+    f.surcharge,
+    f.road_width,
+    f.road_surf,
+    f.coef_curve,
+    n.the_geom
+    FROM selector_inp_dscenario s, inp_dscenario_frweir f
+    JOIN ve_inp_frweir n USING (element_id)
+	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+CREATE OR REPLACE VIEW ve_inp_dscenario_frorifice
+AS SELECT
+    s.dscenario_id,
+    f.element_id,
+    n.node_id,
+    f.orifice_type,
+    f.offsetval,
+    f.cd,
+    f.orate,
+    f.flap,
+    f.shape,
+    f.geom1,
+    f.geom2,
+    f.geom3,
+    f.geom4,
+    n.the_geom
+    FROM selector_inp_dscenario s, inp_dscenario_frorifice f
+    JOIN ve_inp_frorifice n USING (element_id)
+    WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;

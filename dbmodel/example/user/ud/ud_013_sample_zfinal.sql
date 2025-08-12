@@ -159,9 +159,9 @@ INSERT INTO element  (element_id, code, elementcat_id, epa_type, state, state_ty
 ('100022', 'E100022', 'PUMP-01','FRPUMP', 1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)');
 
 INSERT INTO man_frelem (element_id, node_id, to_arc, flwreg_length) VALUES
-('100020','18828',1,'18969',0.5),
-('100021','237',1,'100014',0.5),
-('100022','18828',1,'18966',1);
+('100020','18828','18969',0.5),
+('100021','237','100014',0.5),
+('100022','18828','18966',1);
 
 INSERT INTO man_genelem (element_id)
 SELECT e.element_id

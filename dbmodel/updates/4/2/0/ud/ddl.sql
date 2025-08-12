@@ -270,5 +270,22 @@ CREATE TABLE man_ginlet (
 );
 
 
-
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frorifice;
+DROP VIEW IF EXISTS v_edit_inp_frorifice;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frpump;
+DROP VIEW IF EXISTS v_edit_inp_frpump;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frweir;
+DROP VIEW IF EXISTS v_edit_inp_frweir;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_froutlet;
+DROP VIEW IF EXISTS v_edit_inp_froutlet;
+DROP VIEW IF EXISTS ve_epa_frorifice;
+DROP VIEW IF EXISTS ve_epa_frweir;
+DROP VIEW IF EXISTS ve_epa_froutlet;
+DROP VIEW IF EXISTS ve_epa_frpump;
+DROP VIEW IF EXISTS ve_element_eorifice;
+DROP VIEW IF EXISTS ve_element_eweir;
+DROP VIEW IF EXISTS ve_element_eoutlet;
+DROP VIEW IF EXISTS ve_element_epump;
+DROP VIEW IF EXISTS ve_man_frelem;
+DROP VIEW IF EXISTS ve_frelem;
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_frelem", "column":"order_id"}}$$);
