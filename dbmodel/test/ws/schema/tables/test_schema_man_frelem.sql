@@ -22,7 +22,6 @@ SELECT columns_are(
     ARRAY[
         'element_id',
         'node_id',
-        'order_id',
         'to_arc',
         'flwreg_length'
     ],
@@ -35,7 +34,6 @@ SELECT col_is_pk('man_frelem', ARRAY['element_id'], 'Column element_id should be
 -- Check column types
 SELECT col_type_is('man_frelem', 'element_id', 'integer', 'Column element_id should be integer');
 SELECT col_type_is('man_frelem', 'node_id', 'integer', 'Column node_id should be integer');
-SELECT col_type_is('man_frelem', 'order_id', 'numeric', 'Column order_id should be numeric');
 SELECT col_type_is('man_frelem', 'to_arc', 'integer', 'Column to_arc should be integer');
 SELECT col_type_is('man_frelem', 'flwreg_length', 'numeric', 'Column flwreg_length should be numeric');
 
