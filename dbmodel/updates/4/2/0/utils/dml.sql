@@ -400,7 +400,7 @@ UPDATE config_form_fields
 -- Update element views names in sys_table
 UPDATE sys_table SET id = 've_man_frelem' WHERE id = 've_frelem';
 UPDATE sys_table SET id = 've_man_genelem' WHERE id = 've_genelem';
-INSERT INTO sys_table (id, sys_role, descript, project_template, context, alias, orderby, source) VALUES 
+INSERT INTO sys_table (id, sys_role, descript, project_template, context, alias, orderby, source) VALUES
 ('ve_element', 'role_edit', 'Shows information about elements', '{"template": [1], "visibility": true, "levels_to_read": 2}', '{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}', 'Elements', 5, 'core');
 
 -- Open correctly the forms
@@ -421,10 +421,10 @@ BEGIN
   FOR rec IN SELECT * FROM config_form_fields WHERE formtype='form_feature' AND columnname='tbl_elements' AND tabname='tab_elements'
   LOOP
     v_widgetfucntion := rec.widgetfunction;
-    IF rec.formname LIKE '%link%' THEN 
-      v_table := 'v_ui_element_x_link'; 
-    ELSE 
-      v_table := 'v_ui_element_x_' || rec.formname; 
+    IF rec.formname LIKE '%link%' THEN
+      v_table := 'v_ui_element_x_link';
+    ELSE
+      v_table := 'v_ui_element_x_' || rec.formname;
     END IF;
     v_widgetfucntion := jsonb_set(v_widgetfucntion, '{parameters, sourcetable}', to_jsonb(v_table));
     UPDATE config_form_fields
@@ -432,3 +432,5 @@ BEGIN
       WHERE formname=rec.formname AND formtype=rec.formtype AND columnname=rec.columnname AND tabname=rec.tabname;
   END LOOP;
 END $$;
+
+UPDATE config_toolbox SET inputparams = replace(inputparams::text, 'v_edit_', 've_')::json WHERE inputparams::text ilike '%v_edit_%';
