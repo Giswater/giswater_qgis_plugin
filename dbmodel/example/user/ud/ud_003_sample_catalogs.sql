@@ -40,16 +40,16 @@ INSERT INTO cat_arc VALUES ('RC200', 'SIPHON', NULL, 'RECT_CLOSED', 2.0000, 2.00
 INSERT INTO cat_arc VALUES ('PP020', 'PUMP_PIPE', NULL, 'FORCE_MAIN', 0.1800, 100.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Pump pipe', NULL, NULL, NULL, NULL, 0.10, 0.10, 0.26, 0.0314, 1.40, 0.03, 'm', 'A_PRE_PE_DN20', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, NULL, 'N_CONNECTION', NULL);
 INSERT INTO cat_arc VALUES ('VIRTUAL', 'VARC', NULL, 'VIRTUAL', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Virtual', NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.0000, 0.00, 0.00, 'm', 'VIRTUAL_M', 'VIRTUAL_M2', 'VIRTUAL_M3', true, NULL, NULL, NULL, NULL, 'N_CONNECTION', NULL);
 
-INSERT INTO cat_brand VALUES ('brand1', NULL, NULL, true, NULL);
-INSERT INTO cat_brand VALUES ('brand2', NULL, NULL, true, NULL);
-INSERT INTO cat_brand VALUES ('brand3', NULL, NULL, true, NULL);
+INSERT INTO cat_brand VALUES ('brand1', NULL, NULL, true, '{SIPHON, JUMP, VALVE, HIGHPOINT}');
+INSERT INTO cat_brand VALUES ('brand2', NULL, NULL, true, '{CJOIN, GINLET, PGULLY, VGULLY}');
+INSERT INTO cat_brand VALUES ('brand3', NULL, NULL, true, '{EPUMP, VALVE, REGISTER, HIGHPOINT, JUNCTION}');
 
-INSERT INTO cat_brand_model VALUES ('model1', 'brand1', NULL, NULL, true, NULL);
-INSERT INTO cat_brand_model VALUES ('model2', 'brand1', NULL, NULL, true, NULL);
-INSERT INTO cat_brand_model VALUES ('model3', 'brand2', NULL, NULL, true, NULL);
-INSERT INTO cat_brand_model VALUES ('model4', 'brand2', NULL, NULL, true, NULL);
-INSERT INTO cat_brand_model VALUES ('model5', 'brand3', NULL, NULL, true, NULL);
-INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, NULL);
+INSERT INTO cat_brand_model VALUES ('model1', 'brand1', NULL, NULL, true, '{SIPHON, JUMP, VALVE}');
+INSERT INTO cat_brand_model VALUES ('model2', 'brand1', NULL, NULL, true, '{CJOIN, GINLET, PGULLY, VGULLY}');
+INSERT INTO cat_brand_model VALUES ('model3', 'brand2', NULL, NULL, true, '{SIPHON, HIGHPOINT}');
+INSERT INTO cat_brand_model VALUES ('model4', 'brand2', NULL, NULL, true, '{REGISTER, HIGHPOINT, JUNCTION}');
+INSERT INTO cat_brand_model VALUES ('model5', 'brand3', NULL, NULL, true, '{CJOIN, GINLET}');
+INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, '{EPUMP, VALVE, REGISTER}');
 
 INSERT INTO cat_connec VALUES ('PVC-CC025_D', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('CON-CC040_I', 'CJOIN', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Concrete connec', NULL, NULL, NULL, NULL, true, NULL);
