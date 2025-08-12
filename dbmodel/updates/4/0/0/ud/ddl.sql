@@ -2119,6 +2119,7 @@ BEGIN
 
 		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_pkey TO _municipality_pkey;
 		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_region_id_fkey TO _municipality_region_id_fkey;
+		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_province_region_fk TO _municipality_province_region_fk;
 		ALTER TABLE utils.municipality RENAME CONSTRAINT municipality_province_id_fkey TO _municipality_province_id_fkey;
 		ALTER TABLE utils.municipality RENAME TO _municipality;
 
@@ -2154,6 +2155,7 @@ BEGIN
 		-- DROP TABLE ext_municipality;
 		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_pkey TO _ext_municipality_pkey;
 		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_region_id_fkey TO _ext_municipality_region_id_fkey;
+		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_province_region_fk TO _ext_municipality_province_region_fk;
 		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_province_id_fkey TO _ext_municipality_province_id_fkey;
 		ALTER TABLE ext_municipality RENAME TO _ext_municipality;
 

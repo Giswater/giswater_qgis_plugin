@@ -1375,6 +1375,8 @@ UPDATE config_form_fields
 	SET layoutorder=2
 	WHERE formname='ve_element_epump' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
 
+DELETE FROM config_form_fields WHERE formname ILIKE 've_element%' AND formtype='form_feature' AND columnname='tbl_element_x_gully' AND tabname='tab_features';
+
 
 -- last update
 -- Normalize "label": replace underscores with spaces, trim, ensure only the first letter is uppercase,

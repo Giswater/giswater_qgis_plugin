@@ -1143,9 +1143,9 @@ UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTool
 UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionDemand","actionTooltip": "DWF","disabled": false}]'::json WHERE formname='ve_epa_pgully' AND tabname='tab_epa';
 UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionDemand","actionTooltip": "DWF","disabled": false}]'::json WHERE formname='ve_epa_junction' AND tabname='tab_epa';
 UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false}]'::json WHERE formname='ve_epa_storage' AND tabname='tab_epa';
-UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_epa';
-UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_documents';
-UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_features';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_epa';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_documents';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_features';
 UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_data';
 
 
@@ -2574,3 +2574,60 @@ BEGIN
     DELETE FROM config_form_fields WHERE formname = rec.child_layer AND columnname = 'chemtreatment';
   END LOOP;
 END $$;
+UPDATE config_info_layer
+	SET orderby=6
+	WHERE layer_id='ve_dimensions';
+UPDATE config_info_layer
+	SET orderby=5
+	WHERE layer_id='ve_arc';
+
+DELETE FROM config_form_fields WHERE formname ILIKE 've_element%' AND formtype='form_feature' AND columnname='tbl_element_x_gully' AND tabname='tab_features';
+
+-- Add tab_documents for emeter
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','btn_doc_delete','lyt_document_2',3,'button','Delete document',false,false,true,false,false,'{"icon":"114"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete document"}'::json,'{"functionName": "delete_object", "parameters": {"columnfind": "doc_id", "targetwidget": "tab_documents_tbl_documents", "sourceview": "doc"}}'::json,'tbl_doc_x_element',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','btn_doc_insert','lyt_document_2',2,'button','Insert document',false,false,true,false,false,'{"icon":"113"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{
+  "functionName": "add_object",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_name",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json,'tbl_doc_x_element',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','btn_doc_new','lyt_document_2',4,'button','New document',false,false,true,false,false,'{"icon":"143"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{
+  "functionName": "manage_document",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_name",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json,'tbl_doc_x_element',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','date_from','lyt_document_1',1,'date','datetime','Date from:','Date from:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":">="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "date"}}'::json,'tbl_doc_x_element',false,1);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','date_to','lyt_document_1',2,'date','datetime','Date to:','Date to:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":"<="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "date"}}'::json,'tbl_doc_x_element',false,2);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,widgetcontrols,widgetfunction,hidden)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','doc_name','lyt_document_2',0,'string','typeahead','Doc id:','Doc id:',false,false,true,false,false,'SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL','{"saveValue": false, "filterSign":"ILIKE"}'::json,'{"functionName": "filter_table"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','doc_type','lyt_document_1',3,'string','combo','Doc type:','Doc type:',false,false,true,false,true,'SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_doc_x_element',false,3);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','hspacer_document_1','lyt_document_2',10,'hspacer',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','open_doc','lyt_document_2',11,'button','Open document',false,false,true,false,false,'{"icon":"147"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open document"}'::json,'{
+  "functionName": "open_selected_path",
+  "parameters": {
+    "columnfind": "path",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json,'tbl_doc_x_element',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+	VALUES ('ve_element_emeter','form_feature','tab_documents','tbl_documents','lyt_document_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{
+  "functionName": "open_selected_path",
+  "parameters": {
+    "targetwidget": "tab_documents_tbl_documents",
+    "columnfind": "path"
+  }
+}'::json,'tbl_doc_x_element',false,4);
