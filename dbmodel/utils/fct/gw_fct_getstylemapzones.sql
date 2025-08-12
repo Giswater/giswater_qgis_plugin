@@ -125,11 +125,11 @@ BEGIN
 			v_trapresszone := (SELECT (value::json->>'PRESSZONE')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 			v_tradqa := (SELECT (value::json->>'DQA')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM ve_dma WHERE dma_id > 0) row' INTO v_dma;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM ve_presszone WHERE presszone_id NOT IN (''0'', ''-1'')) row' INTO v_presszone ;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM ve_dqa WHERE dqa_id > 0) row' INTO v_dqa ;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, null as stylesheet FROM ve_plan_netscenario_dma WHERE dma_id > 0 ) row' INTO v_netscenario_dma;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, null as stylesheet FROM ve_plan_netscenario_presszone WHERE presszone_id NOT IN (''0'', ''-1'') ) row' INTO v_netscenario_presszone ;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM ve_dma WHERE dma_id > 0 AND the_geom IS NOT NULL) row' INTO v_dma;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM ve_presszone WHERE presszone_id NOT IN (''0'', ''-1'') AND the_geom IS NOT NULL) row' INTO v_presszone ;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM ve_dqa WHERE dqa_id > 0 AND the_geom IS NOT NULL) row' INTO v_dqa ;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, null as stylesheet FROM ve_plan_netscenario_dma WHERE dma_id > 0 AND the_geom IS NOT NULL ) row' INTO v_netscenario_dma;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, null as stylesheet FROM ve_plan_netscenario_presszone WHERE presszone_id NOT IN (''0'', ''-1'') AND the_geom IS NOT NULL ) row' INTO v_netscenario_presszone ;
 
 		ELSIF v_project_type = 'UD' THEN
 
@@ -146,8 +146,8 @@ BEGIN
 			v_traddwfzone := (SELECT (value::json->>'DWFZONE')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
 			-- get mapzone values
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldrainzone||' as id, stylesheet::json FROM ve_drainzone WHERE drainzone_id > 0) row' INTO v_drainzone;
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldwfzone||' as id, stylesheet::json FROM ve_dwfzone WHERE dwfzone_id > 0) row' INTO v_dwfzone;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldrainzone||' as id, stylesheet::json FROM ve_drainzone WHERE drainzone_id > 0 AND the_geom IS NOT NULL) row' INTO v_drainzone;
+			EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldwfzone||' as id, stylesheet::json FROM ve_dwfzone WHERE dwfzone_id > 0 AND the_geom IS NOT NULL) row' INTO v_dwfzone;
 
 		END IF;
 
