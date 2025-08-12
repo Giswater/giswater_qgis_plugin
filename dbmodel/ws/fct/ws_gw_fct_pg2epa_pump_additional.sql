@@ -41,7 +41,14 @@ flwreg_rec record;
 arc_todelete text[];
 v_order_id integer;
 valve_rec record;
-
+v_query_text text;
+v_record record;
+v_record_a1	record;
+v_record_a2	record;
+v_curve	text;
+v_arc_id text;
+v_node_1 text;
+v_geom	public.geometry;
 BEGIN
 
 	--  Search path
