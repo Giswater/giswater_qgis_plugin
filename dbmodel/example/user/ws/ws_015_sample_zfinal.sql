@@ -41,6 +41,7 @@ WHERE parameter = 'inp_options_debug';
 UPDATE cat_feature_node SET graph_delimiter = '{MINSECTOR}' WHERE id = 'SHUTOFF_VALVE';
 UPDATE cat_feature_node SET graph_delimiter = '{MINSECTOR}' WHERE id = 'CHECK_VALVE';
 UPDATE cat_feature_node SET graph_delimiter = '{PRESSZONE}' WHERE id IN ('PUMP', 'PR_REDUC_VALVE','PR_BREAK_VALVE','PR_SUSTA_VALVE');
+UPDATE cat_feature_node SET graph_delimiter='{SECTOR,DMA}' WHERE id='TANK';
 
 -- 01/05/2024
 UPDATE config_param_system SET value =

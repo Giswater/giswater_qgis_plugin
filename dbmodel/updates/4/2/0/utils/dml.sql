@@ -347,12 +347,18 @@ UPDATE sys_table SET id = 'v_ui_style' WHERE id = 'v_ui_sys_style';
 
 DELETE FROM sys_table WHERE id in ('vcp_pipes', 'vcv_dma', 'vcv_dma_log', 'vcv_emitters_log', 'vcv_junction', 'vcv_emitters');
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role, 
+INSERT INTO sys_param_user(id, formname, descript, sys_role,
 project_type, datatype, ismandatory, vdefault, source)
-VALUES ('plan_psector_disable_checktopology_trigger', 'dynamic', 'Variable to disable the control for checktopology on trigger plan_psector', 'role_edit', 
+VALUES ('plan_psector_disable_checktopology_trigger', 'dynamic', 'Variable to disable the control for checktopology on trigger plan_psector', 'role_edit',
 'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4340, 'You have at least 1 connec in different selected psectors which is connected to different arcs',null, 1, true, 'utils', 'core', 'UI');
 
 UPDATE plan_typevalue SET idval='PLANIFIED' WHERE typevalue='psector_type' AND id='1';
+
+UPDATE config_form_fields SET layoutorder=4 WHERE formname='new_dma' AND formtype='form_catalog' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=5 WHERE formname='new_dma' AND formtype='form_catalog' AND columnname='macrodma_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='new_dma' AND formtype='form_catalog' AND columnname='descript' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='new_dma' AND formtype='form_catalog' AND columnname='link' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=8 WHERE formname='new_dma' AND formtype='form_catalog' AND columnname='stylesheet' AND tabname='tab_none';
