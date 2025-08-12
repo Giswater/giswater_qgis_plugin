@@ -3469,6 +3469,10 @@ def epa_tbl_doubleClicked(tbl, dlg):
         dlg.findChild(QPushButton, 'tab_epa_edit_dscenario').click()
     elif 'dscenario' in tbl.objectName():
         dlg.findChild(QPushButton, 'btn_edit_dscenario').click()
+    elif 'tbl_dwf' in tbl.objectName():
+        dlg.findChild(QPushButton, 'btn_edit_dwf').click()
+    elif 'tbl_inflows' in tbl.objectName():
+        dlg.findChild(QPushButton, 'btn_edit_inflows').click()
     else:
         dlg.findChild(QPushButton, 'btn_edit_base').click()
 
