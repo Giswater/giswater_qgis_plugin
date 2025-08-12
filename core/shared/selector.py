@@ -56,7 +56,7 @@ class GwSelector:
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab, show_lot_tab=show_lot_tab)
         tools_qt._translate_form('selector', dlg_selector)
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(dlg_selector, dlg_name='selector')
+            tools_gw.docker_dialog(dlg_selector, dlg_name='selector', title='selector')
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
 
             # Set shortcut keys
@@ -397,7 +397,7 @@ class GwSelector:
             tools_qgis.show_message(message, level)
 
         # Apply zoom only to the selected tabs
-        if tab_name in ('tab_exploitation', 'tab_exploitation_add', 'tab_municipality', 'tab_sector'):
+        if tab_name in ('tab_exploitation', 'tab_exploitation_add', 'tab_municipality', 'tab_sector', 'tab_psector'):
             try:
                 # Zoom to feature
                 x1 = json_result['body']['data']['geometry']['x1']
@@ -410,12 +410,12 @@ class GwSelector:
                 pass
 
         # Refresh canvas
-        tools_qgis.set_layer_index('v_edit_arc')
-        tools_qgis.set_layer_index('v_edit_node')
-        tools_qgis.set_layer_index('v_edit_connec')
-        tools_qgis.set_layer_index('v_edit_gully')
-        tools_qgis.set_layer_index('v_edit_link')
-        tools_qgis.set_layer_index('v_edit_plan_psector')
+        tools_qgis.set_layer_index('ve_arc')
+        tools_qgis.set_layer_index('ve_node')
+        tools_qgis.set_layer_index('ve_connec')
+        tools_qgis.set_layer_index('ve_gully')
+        tools_qgis.set_layer_index('ve_link')
+        tools_qgis.set_layer_index('ve_plan_psector')
         tools_qgis.refresh_map_canvas()
 
         # Refresh raster layer
@@ -430,9 +430,6 @@ class GwSelector:
         self.scrolled_amount = dialog.main_tab.currentWidget().verticalScrollBar().value()
         # Reload selectors dlg
         self.open_selector(selector_type, reload_dlg=dialog)
-
-        # Update current_workspace label (status bar)
-        tools_gw.manage_current_selections_docker(json_result)
 
         if tab_name == 'tab_exploitation':
             docker_search = global_vars.iface.mainWindow().findChild(QDockWidget, 'dlg_search')

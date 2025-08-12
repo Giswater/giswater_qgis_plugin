@@ -13,6 +13,7 @@ from functools import partial
 from sip import isdeleted
 from time import time
 from datetime import timedelta
+from typing import Union
 
 from qgis.PyQt.QtCore import QSettings, Qt, QDate, QTimer
 from qgis.PyQt.QtGui import QPixmap
@@ -147,7 +148,8 @@ class GwAdminButton:
         self.descript = project_descript
         self.schema_type = project_type
         self.project_epsg = project_srid
-        self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
+        self.folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
+        self.folder_locale = os.path.join(self.folder_final_pass, project_type, 'i18n')
         self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
 
         # If the locale is no_TR, act as if it was en_US, but disable translation files
@@ -183,7 +185,7 @@ class GwAdminButton:
         tools_log.log_info(msg, msg_params=msg_params)
 
         if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
-            if self.locale not in ('en_US', 'no_TR') or str(self.project_epsg) != '25831':
+            if self.locale not in ('en_US', 'no_TR', 'es_CR') or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
                 title = "Info Message"
@@ -193,7 +195,7 @@ class GwAdminButton:
                     project_srid = '25831'
                     self.locale = 'en_US'
                     project_locale = 'en_US'
-                    self.folder_locale = os.path.join(self.sql_dir, 'i18n', project_locale)
+                    self.folder_locale = os.path.join(self.folder_final_pass, project_type, 'i18n')
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', '25831')
                     tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
                 else:
@@ -204,11 +206,11 @@ class GwAdminButton:
                   'project_srid': project_srid, 'example_data': example_data}
 
         if hasattr(self, 'task_rename_schema') and not isdeleted(self.task_rename_schema):
-            self.task_rename_schema.task_finished.connect(partial(self.start_create_project_data_schema_task, project_name_schema, params))
+            self.task_rename_schema.task_finished.connect(partial(self.start_create_project_data_schema_task, project_name_schema, params, project_type))
         else:
-            self.start_create_project_data_schema_task(project_name_schema, params)
+            self.start_create_project_data_schema_task(project_name_schema, params, project_type)
 
-    def start_create_project_data_schema_task(self, project_name_schema, params):
+    def start_create_project_data_schema_task(self, project_name_schema, params, project_type):
         self.error_count = 0
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
@@ -221,7 +223,7 @@ class GwAdminButton:
         self.timer.start(1000)
 
         description = "Create schema"
-        self.task_create_schema = GwCreateSchemaTask(self, description, params, timer=self.timer)
+        self.task_create_schema = GwCreateSchemaTask(self, description, params, project_type, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
@@ -354,7 +356,7 @@ class GwAdminButton:
 
         return None
 
-    def execute_last_process(self, new_project: bool = False, schema_name: str | None = None, schema_type: str = '', locale: bool = False, srid: str | None = None):
+    def execute_last_process(self, new_project: bool = False, schema_name: Union[str, None] = None, schema_type: str = '', locale: bool = False, srid: Union[str, None] = None):
         """ 
         Execute last process function
         
@@ -463,7 +465,7 @@ class GwAdminButton:
             QgsApplication.taskManager().addTask(self.task_update_schema)
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
-    def load_updates(self, project_type: str | None = None, update_changelog: bool = False, schema_name: str | None = None) -> bool:
+    def load_updates(self, project_type: Union[str, None] = None, update_changelog: bool = False, schema_name: Union[str, None] = None) -> bool:
         """
         Load updates for a given project type.
 
@@ -491,7 +493,7 @@ class GwAdminButton:
             status = self.update_dict_folders(False, project_type=project_type, folder_updates=self.folder_updates)
         self.task1.setProgress(60)
         if status:
-            status = self.execute_last_process(schema_name=schema_name, locale=True)
+            status = self.execute_last_process(schema_name=schema_name, locale=True, schema_type=project_type)
         self.task1.setProgress(100)
 
         if update_changelog is False:
@@ -606,39 +608,42 @@ class GwAdminButton:
 
         return True
 
-    def load_base_locale(self):
-
-        folder_locale = os.path.join(self.sql_dir, 'i18n', 'en_US')
-        if self._process_folder(folder_locale) is False:
-            return False
-        else:
-            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=True)
-            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
-
-        return True
-
-    def load_locale(self, lang=None):
+    def load_final_pass(self, project_type, lang=None, utils=False):
 
         lang = lang or self.locale
-        folder_locale = os.path.join(self.sql_dir, 'i18n', lang)
+        project_type = 'utils' if utils else project_type
+        folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
+        folders = sorted(os.listdir(folder_final_pass))
 
-        if self._process_folder(folder_locale) is False:
-            if lang != 'no_TR':
-                self.load_locale('en_US')
-        else:
-            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
-            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
+        if self._process_folder(folder_final_pass) is False:
+            msg = '{0} folder not found'
+            msg_params = ("Final_pass",)
+            tools_log.log_info(msg, msg_params)
+            return False
+
+        for folder in folders:
+            folder_path = os.path.join(folder_final_pass, folder)
+
+            if folder == 'i18n' and utils:
+                continue
+            if self._process_folder(folder_path) is False:
+                if folder == 'i18n' and lang != 'en_US':
+                    self.load_final_pass(lang='en_US')
+                else:
+                    return False
+            else:
+                status = self._execute_files(folder_path, set_progress_bar=True, do_schema_model_i18n=False)
+                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
+                    return False
 
         return True
-
-    def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: str | None = None, no_ct: bool = False) -> bool:
+                
+    def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False) -> bool:
         """
         Update the patch folders for a given update directory.
         :param folder_update (str): Path to the update directory containing patch folders.
         :param new_project (bool): Whether this is a new project (True) or an update to an existing one (False).
-        :param project_type (str | None, optional): The project type to use. If None, uses self.project_type_selected.
+        :param project_type (Union[str, None], optional): The project type to use. If None, uses self.project_type_selected.
         :param no_ct (bool, optional): If True, skips certain processing steps (context-specific).
         :return bool: True if all relevant folders were processed successfully, False otherwise.
         """
@@ -665,7 +670,7 @@ class GwAdminButton:
 
         return True
 
-    def update_dict_folders(self, new_project: bool, project_type: str | None = None, no_ct: bool = False, folder_updates: str = '') -> bool:
+    def update_dict_folders(self, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False, folder_updates: str = '') -> bool:
         """
         Update the dictionary folders for a given update directory.
 
@@ -1218,7 +1223,7 @@ class GwAdminButton:
         export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
 
         if export_passwd and not self.is_service:
-            msg = "Credentials will be stored in GIS project file. Do you want to continue?"
+            msg = "Credentials will be stored in the GIS project file as plain text, and will apply to both existing and future layers. Do you want to proceed?"
             title = "Warning"
             answer = tools_qt.show_question(msg, title)
             if not answer:
@@ -1278,14 +1283,6 @@ class GwAdminButton:
                                                       force_reload=True)
         qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
 
-        list_project_type = tools_db.execute_returning(f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'")
-        try:
-            result = {list_project_type[i]: list_project_type[i + 1] for i in range(0, len(list_project_type), 2)}
-        except Exception:
-            result = {}
-        tools_qt.fill_combo_values(self.dlg_create_gis_project.cmb_project_type, list(result.items()))
-        if len(list(result.items())) <= 1:
-            self.dlg_create_gis_project.cmb_project_type.setEnabled(False)
         self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
         self.dlg_create_gis_project.txt_gis_folder.setEnabled(False)
         if self.is_service:
@@ -1302,10 +1299,22 @@ class GwAdminButton:
         # Set shortcut keys
         self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
 
+        # Manage cmb Project Type visibility
+        self.dlg_create_gis_project.lbl_project_type.setVisible(False)
+        self.dlg_create_gis_project.cmb_project_type.setVisible(False)
+        list_project_type = tools_db.execute_returning(f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'")
+        try:
+            result = {list_project_type[i]: list_project_type[i + 1] for i in range(0, len(list_project_type), 2)}
+        except Exception:
+            result = {}
+        tools_qt.fill_combo_values(self.dlg_create_gis_project.cmb_project_type, list(result.items()))
+        if len(list(result.items())) <= 1:
+            self.dlg_create_gis_project.cmb_project_type.setEnabled(False)
+
         # Open MainWindow
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
 
-    def _load_sql(self, path_folder: str, no_ct: bool = False, utils_schema_name: str | None = None, set_progress_bar: bool = False) -> bool:
+    def _load_sql(self, path_folder: str, no_ct: bool = False, utils_schema_name: Union[str, None] = None, set_progress_bar: bool = False) -> bool:
         """
         Load SQL files from a given folder.
 
@@ -1699,8 +1708,8 @@ class GwAdminButton:
     def _update_locale(self):
         """"""
         # TODO: Check this!
-        cmb_locale = tools_qt.get_combo_value(self.dlg_readsql, self.cmb_locale, 0)
-        self.folder_locale = os.path.join(self.sql_dir, 'i18n', cmb_locale)
+        self.locale = tools_qt.get_combo_value(self.dlg_readsql, self.cmb_locale, 0)
+        self.folder_locale = os.path.join(self.sql_dir, 'final_pass', 'i18n')
 
     def _populate_data_schema_name(self, widget):
         """"""
@@ -1966,7 +1975,6 @@ class GwAdminButton:
         # checks if we have an existing cm project
         self.cm_schema = self._get_cm_schema_name()
         if self.cm_schema:
-            self.dlg_readsql_create_cm_project.lbl_schema_name.setText(self.cm_schema)
             self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
 
             # checks if we have the parent linked to cm
@@ -2042,7 +2050,6 @@ class GwAdminButton:
         self._run_create_cm_task(['load_base_schema'], 'Create cm base schema')
 
         if self.dlg_readsql_create_cm_project is not None:
-            self.dlg_readsql_create_cm_project.lbl_schema_name.setText(name)
             self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
             self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
             self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
@@ -2110,7 +2117,7 @@ class GwAdminButton:
         self.dlg_readsql_rename.schema_rename_copy.setText(schema)
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
-    def _execute_files(self, filedir, i18n=False, no_ct=False, utils_schema_name=None, set_progress_bar=False, do_schema_model_i18n=True):
+    def _execute_files(self, filedir, no_ct=False, utils_schema_name=None, set_progress_bar=False, do_schema_model_i18n=True):
         """"""
 
         if not os.path.exists(filedir):
@@ -2138,17 +2145,8 @@ class GwAdminButton:
             tools_qgis.show_warning(msg)
 
         # Manage folders 'i18n'
-        manage_i18n = i18n
         if 'i18n' in filedir:
-            manage_i18n = True
-
-        if manage_i18n:
-            files_to_execute = []
-            if do_schema_model_i18n:
-                files_to_execute = [f"{self.project_type_selected}_schema_model.sql"]
-            else:
-                # files_to_execute = [f"dml.sql", f"{self.project_type_selected}_dml.sql"]
-                files_to_execute = [f"{self.project_type_selected}_dml.sql"]
+            files_to_execute = [f"{self.locale}.sql"]
 
             for file in files_to_execute:
                 status = True
@@ -2235,6 +2233,15 @@ class GwAdminButton:
             return True
 
         status = True
+        # Allow passing a single SQL file path to control execution order
+        if os.path.isfile(filedir) and filedir.lower().endswith('.sql'):
+            self.current_sql_file += 1
+            tools_log.log_info(filedir)
+            status = self._read_execute_cm_file(filedir, set_progress_bar, schema_option)
+            if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
+                return False
+            return status
+
         for dirpath, _, files in os.walk(filedir):
             for file in sorted(files):
                 if file.endswith(".sql"):
@@ -3295,7 +3302,7 @@ class GwAdminButton:
             if str(k) == "info":
                 tools_gw.fill_tab_log(dialog, data)
 
-    def _manage_result_message(self, status: bool, msg_ok: str | None = None, msg_error: str | None = None, parameter: str | None = None) -> None:
+    def _manage_result_message(self, status: bool, msg_ok: Union[str, None] = None, msg_error: Union[str, None] = None, parameter: Union[str, None] = None) -> None:
         """ 
         Manage message depending result @status 
 
@@ -3606,7 +3613,7 @@ class GwAdminButton:
                             status = self._load_sql(folder_update, utils_schema_name=schema_name)
                             if tools_os.set_boolean(status, False) is False:
                                 return False
-                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'i18n', self.locale)
+                    folder_update = os.path.join(self.sql_dir, 'final_pass', 'utils', 'i18n', self.locale)
                     if self._process_folder(folder_update) is True:
                         status = self._execute_files(folder_update, True)
                         if tools_os.set_boolean(status, False) is False:

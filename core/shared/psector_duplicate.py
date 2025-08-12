@@ -54,12 +54,23 @@ class GwPsectorDuplicate(QObject):
         id_psector = tools_qt.get_combo_value(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
         new_psector_name = tools_qt.get_text(self.dlg_duplicate_psector, self.dlg_duplicate_psector.new_psector_name)
 
+        sql = ("UPDATE config_param_user "
+                "SET value = True "
+                "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+        tools_db.execute_sql(sql)
+
         # Create body
         feature = '"type":"PSECTOR"'
         extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
         complet_result = tools_gw.execute_procedure('gw_fct_psector_duplicate', body)
+
+        sql = ("UPDATE config_param_user "
+                "SET value = False "
+                "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+        tools_db.execute_sql(sql)
+        
         if not complet_result or complet_result['status'] == 'Failed':
             msg = 'Function gw_fct_psector_duplicate executed with no result'
             tools_qgis.show_message(msg, 3, dialog=self.dlg_duplicate_psector)

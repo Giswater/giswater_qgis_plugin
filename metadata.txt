@@ -19,5 +19,5 @@ icon=icons/dialogs/136.png
 experimental=False
 
 # Compatibility versions
-minorPgVersion=9.5.00
+minorPgVersion=15.00.00
 majorPgVersion=17.99.99

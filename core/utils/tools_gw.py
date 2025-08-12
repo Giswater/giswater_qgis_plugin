@@ -29,7 +29,7 @@ from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, Q
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
+from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QHBoxLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
@@ -61,6 +61,7 @@ from ..shared import audit  # noqa: F401
 from ..toolbars.utilities import snapshot_view  # noqa: F401
 from ..toolbars.edit import connect_link_btn  # noqa: F401
 from ..toolbars.cm import lot, campaign  # noqa: F401
+from ..toolbars.toc.layerstyle_change_btn import apply_styles_to_layers
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -77,6 +78,21 @@ def _get_geom_type(geometry_type: QgsGeometryType = None):
 
     geom_type = geom_types_dict.get(geometry_type, default_geom_type)
     return geom_type
+
+
+def normalize_label(label: str, add_colon: bool = False) -> str:
+    """ Normalize label: replace underscores with spaces, trim, ensure only the first letter is uppercase,
+    and append a colon if missing. """
+
+    normalized = label.replace('_', ' ').strip()
+
+    if normalized:
+        normalized = normalized[0].upper() + normalized[1:]
+
+    if add_colon and not normalized.endswith(':'):
+        normalized += ':'
+
+    return normalized
 
 
 def load_settings(dialog, plugin='core'):
@@ -345,7 +361,7 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
     # Check database connection before opening dialog
     if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not tools_db.check_db_connection():
         return
-    
+
     # Manage translate
     if dlg_name:
         tools_qt._translate_form(dlg_name, dlg)
@@ -526,9 +542,9 @@ def refresh_legend():
     Mysteriously this bug is solved by checking and unchecking the categorization of the tables.
     """
 
-    layers = [tools_qgis.get_layer_by_tablename('v_edit_node'),
-              tools_qgis.get_layer_by_tablename('v_edit_connec'),
-              tools_qgis.get_layer_by_tablename('v_edit_gully')]
+    layers = [tools_qgis.get_layer_by_tablename('ve_node'),
+              tools_qgis.get_layer_by_tablename('ve_connec'),
+              tools_qgis.get_layer_by_tablename('ve_gully')]
 
     for layer in layers:
         if layer:
@@ -558,9 +574,9 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
+    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link"]
     if global_vars.project_type == 'ud':
-        list_layers.append("v_edit_gully")
+        list_layers.append("ve_gully")
 
     for layer_name in list_layers:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -663,10 +679,10 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
 
     feature_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
-    viewname = f"v_edit_{feature_type}"
+    viewname = f"ve_{feature_type}"
     field_id = feature_type
     if feature_type == "element":
-        viewname = ["ve_frelem", "ve_genelem"]
+        viewname = ["ve_man_frelem", "ve_man_genelem"]
         field_id = ["element", "element"]
 
     # Adding auto-completion to a QLineEdit
@@ -707,7 +723,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
 
 
 def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None,
-                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=True):
+                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=True, force_create_group=False):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -727,7 +743,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
 
-    auth_id = tools_db.get_srid('v_edit_node', schema_name) if auth_id is None else auth_id
+    auth_id = tools_db.get_srid('ve_node', schema_name) if auth_id is None else auth_id
     extent = _get_extent_parameters(schema_name) if extent is None else extent
 
     field_id = field_id.replace(" ", "")
@@ -740,8 +756,12 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     if passwd is not None:
         uri.setPassword(passwd)
 
-    create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
-    create_groups = tools_os.set_boolean(create_groups, default=False)
+    if force_create_group:
+        create_groups = True
+    else:
+        create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
+        create_groups = tools_os.set_boolean(create_groups, default=False)
+
     if sub_group:
         sub_group = sub_group.capitalize()
     if sub_sub_group:
@@ -785,22 +805,36 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                     valueRelation = valueRelation.get('valueRelation')
             if valueRelation:
                 for vr in valueRelation:
-                    vr_layer = tools_qgis.get_layer_by_tablename(vr['targerLayer'])  # Get 'Layer'
-                    field_index = vr_layer.fields().indexFromName(vr['targetColumn'])   # Get 'Column' index
-                    vr_key_column = vr['keyColumn']  # Get 'Key'
-                    vr_value_column = vr['valueColumn']  # Get 'Value'
-                    vr_allow_nullvalue = vr['nullValue']  # Get null values
-                    vr_filter_expression = vr['filterExpression']  # Get 'FilterExpression'
+                    # Get required keys with safe defaults
+                    vr_layer = tools_qgis.get_layer_by_tablename(vr.get('targerLayer', ''))  # Get 'Layer' with default
+                    
+                    # Check if layer exists before proceeding
+                    if vr_layer is None:
+                        continue
+                        
+                    field_index = vr_layer.fields().indexFromName(vr.get('targetColumn', 'id'))   # Get 'Column' index with default
+                    
+                    # Check if field exists before proceeding
+                    if field_index == -1:
+                        continue
+                    # Get required keys with safe defaults
+                    vr_key_column = vr.get('keyColumn', 'id')  # Get 'Key' with default
+                    vr_value_column = vr.get('valueColumn', 'idval')  # Get 'Value' with default
+                    vr_allow_nullvalue = vr.get('nullValue', 'False')  # Get null values with default
+                    vr_filter_expression = vr.get('filterExpression', '')  # Get 'FilterExpression' with default
                     if vr_filter_expression is None:
                         vr_filter_expression = ''
+                    vr_allow_multi = vr.get('allowMulti', 'False')  # Get 'AllowMulti' with default
+                    vr_nof_columns = vr.get('nofColumns', '0')  # Get 'NofColumns' with default
 
                     # Create and apply ValueRelation config
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{layer.id()}',
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
                                                                                  'Key': f'{vr_key_column}',
                                                                                  'Value': f'{vr_value_column}',
                                                                                  'AllowNull': f'{vr_allow_nullvalue}',
-                                                                                 'FilterExpression': f'{vr_filter_expression}'
-                                                                                 })
+                                                                                 'FilterExpression': f'{vr_filter_expression}',
+                                                                                 'AllowMulti': f'{vr_allow_multi}',
+                                                                                 'NofColumns': f'{vr_nof_columns}'})
                     vr_layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
     if visibility is not None:
@@ -938,41 +972,41 @@ def configure_layers_from_table_name(table_name):
     # Define table groups dynamically
     table_groups = {
         "curve_id": [
-            "v_edit_inp_pump", "v_edit_inp_pump_additional", "v_edit_inp_virtualpump", "v_edit_inp_virtualvalve",
-            "v_edit_inp_inlet", "v_edit_inp_tank", "v_edit_inp_flgreg_outlet", "v_edit_inp_outlet",
-            "v_edit_inp_flgreg_pump", "v_edit_inp_outfall", "v_edit_inp_storage"
+            "ve_inp_pump", "ve_inp_pump_additional", "ve_inp_virtualpump", "ve_inp_virtualvalve",
+            "ve_inp_inlet", "ve_inp_tank", "ve_inp_flgreg_outlet", "ve_inp_outlet",
+            "ve_inp_flgreg_pump", "ve_inp_outfall", "ve_inp_storage"
         ],
         "curve_id_dscenario": [
-            "v_edit_inp_dscenario_pump", "v_edit_inp_dscenario_pump_additional", "v_edit_inp_dscenario_virtualpump",
-            "v_edit_inp_dscenario_virtualvalve", "v_edit_inp_dscenario_inlet", "v_edit_inp_dscenario_tank",
-            "v_edit_inp_dscenario_flgreg_outlet", "v_edit_inp_dscenario_outlet", "v_edit_inp_dscenario_flgreg_pump",
-            "v_edit_inp_dscenario_outfall", "v_edit_inp_dscenario_storage"
+            "ve_inp_dscenario_pump", "ve_inp_dscenario_pump_additional", "ve_inp_dscenario_virtualpump",
+            "ve_inp_dscenario_virtualvalve", "ve_inp_dscenario_inlet", "ve_inp_dscenario_tank",
+            "ve_inp_dscenario_flgreg_outlet", "ve_inp_dscenario_outlet", "ve_inp_dscenario_flgreg_pump",
+            "ve_inp_dscenario_outfall", "ve_inp_dscenario_storage"
         ],
         "pattern_id": [
-            "v_edit_inp_pump", "v_edit_inp_pump_additional", "v_edit_inp_virtualpump", "v_edit_inp_reservoir",
-            "v_edit_inp_demand", "v_edit_inp_junction", "v_edit_inp_inlet", "v_edit_inp_tank", "v_edit_inp_inflows",
-            "v_edit_inp_inflows_poll", "v_edit_inp_dwf"
+            "ve_inp_pump", "ve_inp_pump_additional", "ve_inp_virtualpump", "ve_inp_reservoir",
+            "ve_inp_demand", "ve_inp_junction", "ve_inp_inlet", "ve_inp_tank", "ve_inp_inflows",
+            "ve_inp_inflows_poll", "ve_inp_dwf"
         ],
         "pattern_id_dscenario": [
-            "v_edit_inp_dscenario_pump", "v_edit_inp_dscenario_pump_additional", "v_edit_inp_dscenario_virtualpump",
-            "v_edit_inp_dscenario_reservoir", "v_edit_inp_dscenario_demand", "v_edit_inp_dscenario_junction",
-            "v_edit_inp_dscenario_inlet", "v_edit_inp_dscenario_tank", "v_edit_inp_dscenario_inflows",
-            "v_edit_inp_dscenario_inflows_poll"
+            "ve_inp_dscenario_pump", "ve_inp_dscenario_pump_additional", "ve_inp_dscenario_virtualpump",
+            "ve_inp_dscenario_reservoir", "ve_inp_dscenario_demand", "ve_inp_dscenario_junction",
+            "ve_inp_dscenario_inlet", "ve_inp_dscenario_tank", "ve_inp_dscenario_inflows",
+            "ve_inp_dscenario_inflows_poll"
         ],
         "timeseries": [
-            "v_edit_inp_inflows", "v_edit_inp_outfall", "v_edit_inp_raingage"
+            "ve_inp_inflows", "ve_inp_outfall", "ve_inp_raingage"
         ],
         "timeseries_dscenario": [
-            "v_edit_inp_dscenario_inflows", "v_edit_inp_dscenario_outfall", "v_edit_inp_dscenario_raingage"
+            "ve_inp_dscenario_inflows", "ve_inp_dscenario_outfall", "ve_inp_dscenario_raingage"
         ],
         "lids_dscenario": [
-            "v_edit_inp_dscenario_lid_usage"
+            "ve_inp_dscenario_lid_usage"
         ],
         "hydrology_id": [
-            "v_edit_inp_subcatchment"
+            "ve_inp_subcatchment"
         ],
         "dwf_id": [
-            "v_edit_inp_dwf"
+            "ve_inp_dwf"
         ]
     }
 
@@ -1059,6 +1093,9 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
         # Get column index
         field_index = layer.fields().indexFromName(field['columnname'])
 
+        if field_index == -1:
+            continue
+
         # Hide selected fields according table config_form_fields.hidden
         if 'hidden' in field:
             config = layer.attributeTableConfig()
@@ -1109,25 +1146,34 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
         # Manage ValueRelation configuration
         use_vr = 'widgetcontrols' in field and field['widgetcontrols'] \
                  and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']
+
         if use_vr:
             value_relation = field['widgetcontrols']['valueRelation']
             if value_relation.get('activated'):
                 try:
-                    vr_layer = value_relation['layer']
-                    vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
-                    vr_key_column = value_relation['keyColumn']  # Get 'Key'
-                    vr_value_column = value_relation['valueColumn']  # Get 'Value'
-                    vr_allow_nullvalue = value_relation['nullValue']  # Get null values
-                    vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
+                    vr_layer = value_relation.get('layer', '')
+                    layer_obj = tools_qgis.get_layer_by_tablename(vr_layer)
+                    if layer_obj is None:
+                        raise Exception(f"Layer '{vr_layer}' not found")
+                    vr_layer = layer_obj.id()  # Get layer id
+                    # Get required keys with safe defaults
+                    vr_key_column = value_relation.get('keyColumn', 'id')  # Get 'Key' with default
+                    vr_value_column = value_relation.get('valueColumn', 'idval')  # Get 'Value' with default
+                    vr_allow_nullvalue = value_relation.get('nullValue', 'False')  # Get null values with default
+                    vr_filter_expression = value_relation.get('filterExpression', '')  # Get 'FilterExpression' with default
                     if vr_filter_expression is None:
                         vr_filter_expression = ''
+                    vr_allow_multi = value_relation.get('allowMulti', 'False')  # Get 'AllowMulti' with default
+                    vr_nof_columns = value_relation.get('nofColumns', '0')  # Get 'NofColumns' with default
 
                     # Create and apply ValueRelation config
                     editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
                                                                                  'Key': f'{vr_key_column}',
                                                                                  'Value': f'{vr_value_column}',
                                                                                  'AllowNull': f'{vr_allow_nullvalue}',
-                                                                                 'FilterExpression': f'{vr_filter_expression}'})
+                                                                                 'FilterExpression': f'{vr_filter_expression}',
+                                                                                 'AllowMulti': f'{vr_allow_multi}',
+                                                                                 'NofColumns': f'{vr_nof_columns}'})
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
                 except Exception as e:
@@ -1179,6 +1225,11 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
             else:
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+    for field in layer.fields():
+        if field.name() not in [field_json['columnname'] for field_json in json_result['body']['data']['fields']]:
+            field_index = layer.fields().indexFromName(field.name())
+            layer.setFieldAlias(field_index, normalize_label(field.name(), add_colon=True))
 
 
 def load_missing_layers(filter, group="GW Layers", sub_group=None):
@@ -1246,11 +1297,11 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
         try:
             if hasattr(dialog, 'btn_cancel'):
                 dialog.btn_cancel.disconnect()
-                dialog.btn_cancel.setText("Close")
+                dialog.btn_cancel.setText(tools_qt.tr("Close"))
                 dialog.btn_cancel.clicked.connect(lambda: dialog.close())
             if hasattr(dialog, 'btn_close'):
                 dialog.btn_close.disconnect()
-                dialog.btn_close.setText("Close")
+                dialog.btn_close.setText(tools_qt.tr("Close"))
                 dialog.btn_close.clicked.connect(lambda: dialog.close())
         except AttributeError:
             # Control if btn_cancel exist
@@ -1350,7 +1401,7 @@ def enable_widgets(dialog, result, enable):
         pass
 
 
-def enable_all(dialog, result):
+def enable_all(dialog, result, from_apply=False):
 
     try:
         widget_list = dialog.findChildren(QWidget)
@@ -1368,10 +1419,12 @@ def enable_all(dialog, result):
                                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet(None)
+                            if not from_apply:
+                                widget.setStyleSheet(None)
                     elif isinstance(widget, (QComboBox, QgsDateTimeEdit)):
                         widget.setEnabled(field['iseditable'])
-                        widget.setStyleSheet(None)
+                        if not from_apply:
+                            widget.setStyleSheet(None)
                         widget.setFocusPolicy(Qt.StrongFocus if field['iseditable'] else Qt.NoFocus)
 
                     elif type(widget) in (QCheckBox, QPushButton):
@@ -1846,16 +1899,15 @@ def add_widget(dialog, field, lbl, widget):
         layout.setColumnStretch(col, 1)
 
 
-def add_widget_combined(dialog, field, label, widget, old_widget_pos):
+def add_widget_combined(dialog, field, label, widget, pos_offset):
     """ Insert widget into layout based on orientation and label position """
 
     layout = dialog.findChild(QGridLayout, field['layoutname'])
     if layout in (None, 'null', 'NULL', 'Null'):
         return
     orientation = layout.property('lytOrientation')
-    old_widget_pos = int(old_widget_pos) if old_widget_pos is not None else 0
     widget_pos = int(field.get('layoutorder', 0))
-    row, col = (0, widget_pos + old_widget_pos) if orientation == "horizontal" else (widget_pos + old_widget_pos, 0)
+    row, col = (0, widget_pos + pos_offset) if orientation == "horizontal" else (widget_pos + pos_offset, 0)
 
     label_pos = field['widgetcontrols']['labelPosition'] if (
                             'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
@@ -1876,6 +1928,7 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
                 layout.addWidget(label, row, col)
                 col += 1
             layout.setColumnStretch(col, 1)
+        pos_offset += 1
 
     if isinstance(widget, QSpacerItem):
         layout.addItem(widget, row, col)
@@ -1885,6 +1938,8 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
 
     if label and orientation == "horizontal":
         layout.setColumnStretch(col, 1)
+
+    return pos_offset
 
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
@@ -3068,7 +3123,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
 
 def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None,
-                             expr_filter=None):
+                             expr_filter=None, table_separator="_x_", columns_to_show=None):
     """ Get records of @feature_type associated to selected @table_object """
 
     if feature_id is None:
@@ -3077,7 +3132,7 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
     if feature_idname is None:
         feature_idname = f"{table_object}_id"
 
-    table_relation = table_object + "_x_" + feature_type
+    table_relation = table_object + table_separator + feature_type
     widget_name = "tbl_" + table_relation
 
     exists = tools_db.check_table(table_relation)
@@ -3101,7 +3156,6 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
         expr_filter = get_expression_filter(feature_type, class_object.rel_list_ids, class_object.rel_layers)
 
     table_name = f"{class_object.schema_name}.{feature_type}"
-    columns_to_show = [f"{feature_type}_id", "code", "sys_code", f"{feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
     tools_qt.set_table_model(dialog, widget_name, table_name, expr_filter, columns_to_show)
 
 
@@ -3114,7 +3168,10 @@ def load_tableview_feature_end(class_object, dialog, table_object, feature_type,
     if feature_idname is None:
         feature_idname = f"{feature_type}_id"
 
-    table_relation = f"v_edit_{feature_type}"
+    if feature_type == 'element':
+        table_relation = "v_ui_element"
+    else:
+        table_relation = f"ve_{feature_type}"
     widget_name = f"tbl_{table_object}_x_{feature_type}"
 
     exists = tools_db.check_table(table_relation)
@@ -3125,14 +3182,6 @@ def load_tableview_feature_end(class_object, dialog, table_object, feature_type,
         return
 
     if expr_filter is None:
-        sql = (f"SELECT {feature_type}_id "
-            f"FROM {table_relation} "
-            f"WHERE {feature_idname} = '{feature_id}'")
-        rows = tools_db.get_rows(sql, log_info=False)
-        if rows:
-            for row in rows:
-                class_object.rel_list_ids[feature_type].append(str(row[0]))
-                class_object.rel_ids.append(str(row[0]))
         expr_filter = get_expression_filter(feature_type, class_object.rel_list_ids, class_object.rel_layers)
 
     table_name = f"{class_object.schema_name}.{feature_type}"
@@ -3257,7 +3306,7 @@ def get_role_permissions(qgis_project_role):
 
 
 def get_config_value(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True, schema_name=None):
-    
+
     if schema_name is None:
         schema_name = lib_vars.schema_name
 
@@ -3415,13 +3464,16 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
-    if selection_mode not in (GwSelectionMode.EXPRESSION, GwSelectionMode.EXPRESSION_CAMPAIGN, GwSelectionMode.EXPRESSION_LOT):
+
+    if selection_mode in (GwSelectionMode.EXPRESSION, GwSelectionMode.EXPRESSION_CAMPAIGN, GwSelectionMode.EXPRESSION_LOT):
         tools_qgis.disconnect_signal_selection_changed()
 
     field_id = f"{class_object.rel_feature_type}_id"
 
     if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
         expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+        expected_table_name = f"tbl_{table_object}_{class_object.rel_feature_type}"
     else:
         expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
 
@@ -3490,8 +3542,12 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     elif selection_mode == GwSelectionMode.VISIT:
         _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
         load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+        get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
+        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
-        get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
+        columns_to_show = [f"{class_object.rel_feature_type}_id", "code", "sys_code", f"{class_object.rel_feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
+        get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     table_widget.blockSignals(False)
@@ -3546,21 +3602,21 @@ def set_model_signals(class_object):
 
     # Set selectionModel signals
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "v_edit_arc", "arc_id", class_object.rubber_band_point, 5
+        tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "ve_arc", "arc_id", class_object.rubber_band_point, 5
     ))
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
         class_object._highlight_features_by_id, class_object.qtbl_arc, "arc", "arc_id", class_object.rubber_band_op, 5
     ))
 
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_node, "v_edit_node", "node_id", class_object.rubber_band_point, 10
+        tools_qgis.highlight_features_by_id, class_object.qtbl_node, "ve_node", "node_id", class_object.rubber_band_point, 10
     ))
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
         class_object._highlight_features_by_id, class_object.qtbl_node, "node", "node_id", class_object.rubber_band_op, 5
     ))
 
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "v_edit_connec", "connec_id", class_object.rubber_band_point, 10
+        tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "ve_connec", "connec_id", class_object.rubber_band_point, 10
     ))
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
         class_object._highlight_features_by_id, class_object.qtbl_connec, "connec", "connec_id", class_object.rubber_band_op, 5
@@ -3571,7 +3627,7 @@ def set_model_signals(class_object):
 
     if class_object.project_type.upper() == 'UD':
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "v_edit_gully", "gully_id", class_object.rubber_band_point, 10
+            tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "ve_gully", "gully_id", class_object.rubber_band_point, 10
         ))
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
             class_object._highlight_features_by_id, class_object.qtbl_gully, "gully", "gully_id", class_object.rubber_band_op, 5
@@ -3585,9 +3641,9 @@ def show_expression_dialog(feature_type, dialog, table_object):
     """ Show expression builder dialog """
 
     # Open a dialog with a QgsExpressionBuilderWidget in it
-    tablename = f"v_edit_{feature_type}"
+    tablename = f"ve_{feature_type}"
     layer = tools_qgis.get_layer_by_tablename(tablename)
-    start_text = f"{feature_type}_id"
+    start_text = None
     dlg = QgsExpressionSelectionDialog(layer, start_text, dialog)
     return dlg.exec_()
 
@@ -3631,7 +3687,6 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
 
     # Temporarily store IDs to be added for this feature type
     selected_ids = []
-    print(class_object.rel_layers[feature_type])
     for layer in class_object.rel_layers[feature_type]:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
@@ -3694,8 +3749,12 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
     elif selection_mode == GwSelectionMode.VISIT:
         _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
         load_tableview_visit(dialog, class_object.visit_id.text(), feature_type)
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+        get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
+        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
-        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
+        columns_to_show = [f"{feature_type}_id", "code", "sys_code", f"{feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
+        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     enable_feature_type(dialog, table_object, ids=class_object.rel_list_ids[feature_type])
@@ -3714,9 +3773,9 @@ def remove_selection(remove_groups=True, layers=None):
     :return: Dictionary of layers with removed selection
     """
 
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
+    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link"]
     if global_vars.project_type == 'ud':
-        list_layers.append("v_edit_gully")
+        list_layers.append("ve_gully")
 
     for layer_name in list_layers:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -3760,10 +3819,11 @@ def docker_dialog(dialog, dlg_name=None, title=None):
         global_vars.iface.addDockWidget(positions[lib_vars.session_vars['dialog_docker'].position],
                                         lib_vars.session_vars['dialog_docker'])
 
-        if title:
-            lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
         if dlg_name:
             tools_qt._translate_form(dlg_name, dialog)
+        if title:
+            lib_vars.session_vars['dialog_docker'].setWindowTitle(tools_qt.tr(f'dlg_{title}', context_name=dlg_name))
+
     except RuntimeError as e:
         msg = "{0}: {1}"
         msg_params = (type(e).__name__, e,)
@@ -4091,7 +4151,7 @@ def set_completer_object(dialog, tablename, field_id="id"):
     """
 
     widget_name = tablename + "_id"
-    if tablename == "v_edit_element":  # TODO: remove this when refactored
+    if tablename == "ve_element":  # TODO: remove this when refactored
         widget_name = "element_id"
 
     widget = tools_qt.get_widget(dialog, widget_name)
@@ -4405,7 +4465,8 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
         delete_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, list_id=list_id)
         load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
     else:
-        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
+        columns_to_show = [f"{feature_type}_id", "code", "sys_code", f"{feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
+        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
 
@@ -4416,7 +4477,7 @@ def get_parent_layers_visibility():
     """
 
     layers_visibility = {}
-    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]:
+    for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_gully", "ve_link"]:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer:
             layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
@@ -4520,38 +4581,59 @@ def open_dlg_help():
         return True
 
 
-def manage_current_selections_docker(result, open=False):
+def manage_current_psector_docker(psector_name=None):
     """
-    Manage labels for the current_selections docker
-        :param result: looks the data in result['body']['data']['userValues']
-        :param open: if it has to create a new docker or just update it
+    Manage labels for the current_psector docker
     """
-
-    if not result or 'body' not in result or 'data' not in result['body']:
+    if not isinstance(psector_name, (str, type(None))):
         return
 
-    title = "Gw Selectors: "
-    if 'userValues' in result['body']['data']:
-        for user_value in result['body']['data']['userValues']:
-            if user_value['parameter'] == 'plan_psector_current' and user_value['value']:
-                sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
-                row = tools_db.get_row(sql, log_info=False)
-                if row:
-                    title += f"{row[0]} | "
-            elif user_value['parameter'] == 'utils_workspace_vdefault' and user_value['value']:
-                sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
-                row = tools_db.get_row(sql, log_info=False)
-                if row:
-                    title += f"{row[0]} | "
-            elif user_value['value']:
-                title += f"{user_value['value']} | "
+    # Configuration
+    title = "Current psector"
+    icon_size = 12
+    if psector_name is None:
+        psector_name = ""
 
-        if lib_vars.session_vars['current_selections'] is None:
-            lib_vars.session_vars['current_selections'] = QDockWidget(title[:-3])
-        else:
-            lib_vars.session_vars['current_selections'].setWindowTitle(title[:-3])
-        if open:
-            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, lib_vars.session_vars['current_selections'])
+    # Determine icon path based on psector_name
+    icon_filename = "140.png" if psector_name else "138.png"
+    icon_path = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}{icon_filename}"
+
+    # Get or create dock widget
+    dock_widget = lib_vars.session_vars['current_psector']
+    if dock_widget is None:
+        dock_widget = QDockWidget()
+        dock_widget.setWindowTitle(title)
+        lib_vars.session_vars['current_psector'] = dock_widget
+        global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, dock_widget)
+
+    # Update dock widget content and title
+    dock_widget.setWindowTitle(title)
+
+    # Create content widget with horizontal layout
+    content_widget = QWidget()
+    layout = QHBoxLayout()
+    content_widget.setLayout(layout)
+
+    # Add icon if file exists
+    if os.path.exists(icon_path):
+        icon_label = QLabel()
+        pixmap = QPixmap(icon_path).scaled(icon_size, icon_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        if not pixmap.isNull():
+            icon_label.setPixmap(pixmap)
+        layout.addWidget(icon_label)
+
+    # Add text label
+    text_label = QLabel(psector_name)
+    layout.addWidget(text_label)
+    layout.addStretch()
+
+    # Set widget and show
+    dock_widget.setWidget(content_widget)
+
+    # Show dock widget if not already visible
+    if not dock_widget.isVisible():
+        dock_widget.show()
+        dock_widget.raise_()
 
 
 def create_sqlite_conn(file_name):
@@ -4880,6 +4962,43 @@ def export_layers_to_gpkg(layers, path):
             QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
 
 
+def refresh_all_styles(dialog=None):
+    """Refresh all styles in the database based on the current QGIS layer styles."""
+    try:
+        # Get all loaded layers in the project
+        loaded_layers = global_vars.iface.mapCanvas().layers()
+        set_styles = set()
+
+        for layer in loaded_layers:
+            style_manager = layer.styleManager()
+            # Get all loaded styles in the layer
+            available_styles = style_manager.styles()
+            for style_name in available_styles:
+                set_styles.add(style_name)
+
+        for style in set_styles:
+            sql_get_id = (
+                f"SELECT id FROM {lib_vars.schema_name}.config_style "
+                f"WHERE idval = '{style}';"
+            )
+            styleconfig_id = tools_db.get_row(sql_get_id)
+
+            if styleconfig_id:
+                # Apply the style with force_refresh=True
+                apply_styles_to_layers(styleconfig_id[0], style, force_refresh=True)
+            # TODO: show message of all refreshed styles
+            # msg = f"Style '{style}' not found in database."
+            # tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
+
+        msg = "All layers have been successfully refreshed."
+        tools_qgis.show_success(msg, dialog=dialog)
+
+    except Exception as e:
+        msg = "Database Error"
+        param = str(e)
+        tools_qgis.show_warning(msg, dialog=dialog, parameter=param)
+
+
 # region compatibility QGIS version functions
 
 def set_snapping_type(layer_settings, value):
@@ -4989,16 +5108,16 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
 
     extra_cols = []
     select_extras = []
-    
+
     config = feature_configs.get(feature_type)
     if config:
         cat_id_col = config['cat_id_col']
         type_col = config['type_col']
-        
+
         # All configured features have at least a catalog ID
         extra_cols.append(cat_id_col)
         select_extras.append(f"p.{cat_id_col}")
-        
+
         if type_col:
             # This feature type requires a JOIN to get its type from the catalog table
             cat_table = f"{lib_vars.schema_name}.cat_{feature_type}"
@@ -5009,9 +5128,13 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
                 f"JOIN {cat_table} c ON p.{cat_id_col} = c.id"
             )
 
+    if feature_type == 'arc':
+        extra_cols.extend(['node_1', 'node_2'])
+        select_extras.extend(['p.node_1', 'p.node_2'])
+
     # Base columns for the INSERT statement
     base_insert_cols = ['campaign_id', f'{feature_type}_id', 'status', 'the_geom']
-    
+
     # Corresponding values/columns for the SELECT statement
     base_select_cols = [f"{campaign_id}", f'p.{feature_type}_id', "1", 'p.the_geom']
 
@@ -5019,41 +5142,73 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
     insert_cols = ", ".join(base_insert_cols + extra_cols)
     select_cols = ", ".join(base_select_cols + select_extras)
 
-    for feature_id in ids or []:
-        sql = f"""
-            INSERT INTO {tablename} ({insert_cols})
-            SELECT {select_cols}
-            {from_clause}
-            WHERE p.{feature_type}_id = {feature_id}
-            ON CONFLICT DO NOTHING;
-        """
-        tools_db.execute_sql(sql)
+    # Temporarily disable CM topocontrol strictly for Campaign > Relations inserts
+    toggled = False
+    try:
+        if tools_db.check_schema('cm') and feature_type in ('arc', 'node'):
+            tools_db.execute_sql(
+                """
+                INSERT INTO cm.config_param_user(parameter, value, cur_user)
+                VALUES ('edit_disable_topocontrol','true', current_user)
+                ON CONFLICT (parameter, cur_user) DO UPDATE SET value='true';
+                """
+            )
+            toggled = True
+
+        for feature_id in ids or []:
+            sql = f"""
+                INSERT INTO {tablename} ({insert_cols})
+                SELECT {select_cols}
+                {from_clause}
+                WHERE p.{feature_type}_id = {feature_id}
+                ON CONFLICT DO NOTHING;
+            """
+            tools_db.execute_sql(sql)
+    finally:
+        if toggled:
+            tools_db.execute_sql(
+                """
+                UPDATE cm.config_param_user
+                SET value='false'
+                WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user;
+                """
+            )
 
 
 def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
-    """ Reload QTableView for campaign_x_<feature_type> """
-
+    """
+    Reload QTableView for campaign_x_<feature_type> safely, avoiding recursive selectionChanged loop.
+    """
     if not campaign_id:
         msg = "Campaign ID not found."
         tools_qgis.show_warning(msg)
         return
 
-    expr = f"campaign_id = '{campaign_id}'"
-    qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
-    tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
-    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+    class_object = dialog.parent()
+    if getattr(class_object, "signal_selectionChanged", False):
+        return  # Avoid recursion if triggered by selectionChanged
+    class_object.signal_selectionChanged = True
 
-    # Get ids from qtable (that will only mark the ones whanted in snapping)
-    feature_id_column = f"{feature_type}_id"
-    feature_ids = get_ids_from_qtable(qtable, feature_id_column)
+    try:
+        expr = f"campaign_id = '{campaign_id}'"
+        qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
+        tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
+        message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
 
-    if feature_ids:
-        expr = QgsExpression(f"{feature_id_column} IN ({','.join(feature_ids)})")
-        tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+        # Get ids from qtable (that will only mark the ones whanted in snapping)
+        feature_id_column = f"{feature_type}_id"
+        feature_ids = get_ids_from_qtable(qtable, feature_id_column)
 
-    if message:
-        tools_qgis.show_warning(message)
-    set_tablemodel_config(dialog, qtable, tablename)
+        if feature_ids:
+            expr = QgsExpression(f"{feature_id_column} IN ({','.join(feature_ids)})")
+            tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+
+        if message:
+            tools_qgis.show_warning(message)
+        set_tablemodel_config(dialog, qtable, tablename)
+
+    finally:
+        class_object.signal_selectionChanged = False
 
 
 def get_cm_user_role():
@@ -5063,13 +5218,30 @@ def get_cm_user_role():
     if not tools_db.check_schema('cm'):
         return None
 
-    sql = f"""
-        SELECT t.role_id
-        FROM cm.cat_user AS u
-        JOIN cm.cat_team AS t ON u.team_id = t.team_id
-        WHERE u.username = '{tools_db.get_current_user()}'
-    """
-    return tools_db.get_row(sql)
+    # Try with username first, fallback to loginname if it fails
+    try:
+        sql = f"""
+            SELECT t.role_id
+            FROM cm.cat_user AS u
+            JOIN cm.cat_team AS t ON u.team_id = t.team_id
+            WHERE u.username = '{tools_db.get_current_user()}'
+        """
+        result = tools_db.get_row(sql)
+        return result if result else None
+    except Exception:
+        # If username fails, try with loginname
+        try:
+            sql = f"""
+                SELECT t.role_id
+                FROM cm.cat_user AS u
+                JOIN cm.cat_team AS t ON u.team_id = t.team_id
+                WHERE u.loginname = '{tools_db.get_current_user()}'
+            """
+            result = tools_db.get_row(sql)
+            return result if result else None
+        except Exception:
+            # If both queries fail, return None safely
+            return None
 
 
 def get_ids_from_qtable(qtable, id_column):
@@ -5113,15 +5285,28 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
         tools_qgis.show_warning(msg)
         return
 
-    for feature_id in ids or []:
-        sql = f"""
-            INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
-            SELECT {lot_id}, {feature_id}, 1, code
-            FROM {lib_vars.schema_name}.{feature_type}
-            WHERE {feature_type}_id = {feature_id}
-            ON CONFLICT DO NOTHING;
-        """
-        tools_db.execute_sql(sql)
+    # Special handling for arcs to include node_1 and node_2
+    if feature_type == 'arc':
+        for feature_id in ids or []:
+            sql = f"""
+                INSERT INTO {tablename} (lot_id, arc_id, status, code, node_1, node_2)
+                SELECT {lot_id}, {feature_id}, 1, code, node_1, node_2
+                FROM {lib_vars.schema_name}.arc
+                WHERE arc_id = {feature_id}
+                ON CONFLICT DO NOTHING;
+            """
+            tools_db.execute_sql(sql)
+    else:
+        # Standard insertion for other feature types
+        for feature_id in ids or []:
+            sql = f"""
+                INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
+                SELECT {lot_id}, {feature_id}, 1, code
+                FROM {lib_vars.schema_name}.{feature_type}
+                WHERE {feature_type}_id = {feature_id}
+                ON CONFLICT DO NOTHING;
+            """
+            tools_db.execute_sql(sql)
 
 
 def load_tableview_lot(dialog, feature_type, lot_id, layers, ids=None):
@@ -5532,7 +5717,7 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
     """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
 
     layout_orientations = {}
-    old_widget_pos = 0
+    pos_offset = 0
 
     # Retrieve layout orientations from the JSON response if provided
     for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
@@ -5567,12 +5752,10 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
 
         if current_layout != field['layoutname']:
             current_layout = field['layoutname']
-            old_widget_pos = 0
-        else:
-            old_widget_pos = 1
+            pos_offset = 0
 
         # Add widget into layout
-        add_widget_combined(dialog, field, label, widget, old_widget_pos)
+        pos_offset = add_widget_combined(dialog, field, label, widget, pos_offset)
 
 
 def set_widgets(dialog, complet_result, field, tablename, class_info):
@@ -5596,7 +5779,7 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
     label = None
 
     # Skip widgets not supported
-    widgettypes_not_supported = ["tabwidget", "divider", "label"]
+    widgettypes_not_supported = ["tabwidget", "divider"]
     if 'widgettype' in field and field['widgettype'] in widgettypes_not_supported:
         return label, widget
 
@@ -5610,12 +5793,17 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
             label.setToolTip(field['tooltip'])
         else:
             label.setToolTip(field['label'].capitalize())
+        if 'widgetcontrols' in field and field['widgetcontrols'] is not None and 'labelSize' in field['widgetcontrols']:
+            label.setFixedWidth(field['widgetcontrols']['labelSize'])
 
     if 'widgettype' in field and not field['widgettype']:
         msg = "The field widgettype is not configured for"
         param = f"formname:{tablename}, columnname:{field['columnname']}"
         tools_qgis.show_message(msg, 2, parameter=param, dialog=dialog)
         return label, widget
+
+    if field['widgettype'] == 'label':
+        return None, label  # Return the label as widget, and no label
 
     try:
         kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field,
@@ -5856,6 +6044,41 @@ def _manage_tablewidget(**kwargs):
     """
 
     return _manage_tableview(**kwargs)
+
+
+def _update_toolbar_button_icon(button_id, toolbar_id, file_name):
+    """
+    Update the icon for a specific toolbar button
+    """
+    try:
+
+        # Access the button through global_vars
+        if not global_vars.load_project or not hasattr(global_vars.load_project, 'buttons'):
+            return False
+
+        # Try both string and integer keys
+        button = global_vars.load_project.buttons.get(str(button_id)) or global_vars.load_project.buttons.get(int(button_id))
+        if not button or not hasattr(button, 'action'):
+            return False
+
+        # Define icon paths
+        icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}{toolbar_id}{os.sep}"
+        icon_path = f"{icon_folder}{file_name}"
+
+        # Update the button icon
+        if os.path.exists(icon_path):
+            new_icon = QIcon(icon_path)
+            button.action.setIcon(new_icon)
+            return True
+
+    except Exception as e:
+        # Log the error but don't break the functionality
+        tools_log.log_info(f"Error updating button {button_id} icon: {str(e)}")
+        return False
+
+    return False
+
+
 # endregion
 
 # region Right Click TableView Menu

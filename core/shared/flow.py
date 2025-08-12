@@ -43,7 +43,7 @@ class GwFlow(GwMaptool):
 
     def activate(self):
         # set active and current layer
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer_node)
         self.current_layer = self.layer_node
 
@@ -66,7 +66,7 @@ class GwFlow(GwMaptool):
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
-            layer = tools_qgis.get_layer_by_tablename('v_edit_node')
+            layer = tools_qgis.get_layer_by_tablename('ve_node')
             if layer:
                 self.iface.setActiveLayer(layer)
 

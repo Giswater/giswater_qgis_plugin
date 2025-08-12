@@ -11,12 +11,15 @@ import os
 from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QIcon
-from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from qgis.PyQt.QtCore import QPoint
 from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_qt, tools_log, tools_db, tools_qgis, tools_os
+from .... import global_vars
+from ..epa.epa_tools.import_epanet import GwImportEpanet
+from ..epa.epa_tools.import_swmm import GwImportSwmm
 
 
 class GwFileTransferButton(GwAction):
@@ -60,38 +63,46 @@ class GwFileTransferButton(GwAction):
             action.disconnect()
             self.menu.removeAction(action)
             del action
-            
-        action_group = self.action.property('action_group')
+        ag = QActionGroup(self.iface.mainWindow())
+
+        import_menu = self.menu.addMenu(tools_qt.tr("Import"))
+        export_menu = self.menu.addMenu(tools_qt.tr("Export"))  # noqa: F841
 
         # Define menu actions
         menu_actions = [
             # Import section
-            {'name': tools_qt.tr('Import CSV'), 'function': '_open_csv', 'icon': f'{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}66_1.png'},
+            (import_menu, ('ud', 'ws'), tools_qt.tr('Import CSV'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}66_1.png")),
+            (import_menu, ('ud', 'ws'), tools_qt.tr('Import INP file'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png"))
         ]
         # Add actions to menu
-        for item in menu_actions:
-            if item.get('separator'):
-                self.menu.addSeparator()
-                continue
-                
-            action_name = item['name']
-            action_function = item['function']
-            
-            # Create and configure action
-            if 'icon' in item:
-                action_icon = item['icon']
-                obj_action = QAction(QIcon(action_icon), str(tools_qt.tr(action_name)), action_group)
+        for menu, types, action, icon in menu_actions:
+            if global_vars.project_type in types:
+                if icon:
+                    obj_action = QAction(icon, f"{action}", ag)
+                else:
+                    obj_action = QAction(f"{action}", ag)
+                menu.addAction(obj_action)
+                obj_action.triggered.connect(partial(self._get_selected_action, action))
 
-            else:
-                obj_action = QAction(str(tools_qt.tr(action_name)), action_group)
-                
-            obj_action.setObjectName(action_name)
-            obj_action.setProperty('action_group', action_group)
-            
-            # Add action to menu and connect signals
-            self.menu.addAction(obj_action)
-            obj_action.triggered.connect(partial(getattr(self, action_function)))
-            obj_action.triggered.connect(partial(self._save_last_selection, self.menu, action_function))
+        # Remove menu if it is empty
+        # for menu in self.menu.findChildren(QMenu):
+        #     if not len(menu.actions()):
+        #         menu.menuAction().setParent(None)
+
+    def _get_selected_action(self, name):
+        """ Gets selected action """
+
+        if name == tools_qt.tr('Import CSV'):
+            self._open_csv()
+        elif name == tools_qt.tr('Import INP file'):
+            if global_vars.project_type == 'ws':
+                import_inp = GwImportEpanet()
+                import_inp.clicked_event()
+                return
+            if global_vars.project_type == 'ud':
+                import_inp = GwImportSwmm()
+                import_inp.clicked_event()
+                return
 
     def _save_last_selection(self, menu, button_function):
         menu.setProperty("last_selection", button_function)
@@ -232,7 +243,7 @@ class GwFileTransferButton(GwAction):
         else:
             if result['status'] == "Accepted":
                 tools_gw.fill_tab_log(dialog, result['body']['data'], close=False)
-                self.dlg_csv.btn_cancel.setText("Close")
+                self.dlg_csv.btn_cancel.setText(tools_qt.tr("Close"))
             message = result.get('message')
             if message:
                 msg = message.get('text')

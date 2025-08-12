@@ -48,7 +48,8 @@ class GwProjectCheckCMTask(GwTask):
             campaign_id = self.params.get("campaign_id")
             lot_id = self.params.get("lot_id")
             check_management_configs = self.params.get("check_management_configs", False)
-            check_data_related = self.params.get("check_data_related", False)
+            # Always perform data-related checks
+            check_data_related = self.params.get("check_data_related", True)
 
             # Extract the actual ID values if they are lists [id, name]
             if isinstance(campaign_id, list) and len(campaign_id) > 0:
@@ -182,12 +183,8 @@ class GwProjectCheckCMTask(GwTask):
         # Execute procedure
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
-        if result:
-            open_curselectors = tools_gw.get_config_parser('dialogs_actions', 'curselectors_open_loadproject', "user", "init")
-            open_curselectors = tools_os.set_boolean(open_curselectors, False)
-            tools_gw.manage_current_selections_docker(result, open=open_curselectors)
         try:
-            if not result or (result['body']['variables']['hideForm'] is True):
+            if not result or result['body']['variables'].get('hideForm'):
                 return result
         except KeyError as e:
             msg = "EXCEPTION: {0}, {1}"

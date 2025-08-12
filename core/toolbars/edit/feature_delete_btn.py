@@ -47,7 +47,7 @@ class GwFeatureDeleteButton(GwAction):
         tools_qt.fill_combo_values(self.dlg_feature_delete.feature_type, rows)
 
         # Set active layer
-        layer_name = 'v_edit_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = 've_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)
@@ -174,7 +174,7 @@ class GwFeatureDeleteButton(GwAction):
             is_valid, expr = tools_qt.check_expression_filter(expr_filter)
 
             # Get layer from feature
-            layer = tools_qgis.get_layer_by_tablename(f'v_edit_{feature_type}')
+            layer = tools_qgis.get_layer_by_tablename(f've_{feature_type}')
 
             # Check if layer exists and expression is valid
             if layer and is_valid:
@@ -245,7 +245,7 @@ class GwFeatureDeleteButton(GwAction):
 
         # Get feature_type and feature_id
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
-        layer_name = 'v_edit_' + feature_type
+        layer_name = 've_' + feature_type
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         field_id = feature_type + "_id"
 
@@ -273,7 +273,7 @@ class GwFeatureDeleteButton(GwAction):
         current_layer.removeSelection()
 
         # Set active layer
-        layer_name = 'v_edit_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = 've_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)

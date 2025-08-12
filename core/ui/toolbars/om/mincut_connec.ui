@@ -76,7 +76,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QTableView" name="tbl_mincut_connec">
+       <widget class="QTableView" name="tbl_om_mincut_connec">
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>
@@ -119,7 +119,7 @@
   <tabstop>btn_insert</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>btn_snapping</tabstop>
-  <tabstop>tbl_mincut_connec</tabstop>
+  <tabstop>tbl_om_mincut_connec</tabstop>
   <tabstop>btn_accept</tabstop>
  </tabstops>
  <resources/>

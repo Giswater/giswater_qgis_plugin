@@ -74,35 +74,31 @@
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="1" column="5">
-            <widget class="QPushButton" name="btn_team_delete">
-             <property name="text">
-              <string>Delete</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
+           <item row="0" column="3">
             <widget class="QPushButton" name="btn_team_create">
              <property name="text">
               <string>Create</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item row="0" column="0">
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Filter by organization:</string>
+              <string>Filter by team name:</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="4">
+           <item row="0" column="4">
             <widget class="QPushButton" name="btn_team_update">
              <property name="text">
               <string>Update</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="txt_teams"/>
+           </item>
+           <item row="0" column="2">
             <spacer name="horizontalSpacer_3">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -115,8 +111,19 @@
              </property>
             </spacer>
            </item>
-           <item row="1" column="1">
-            <widget class="QComboBox" name="cmb_orga"/>
+           <item row="0" column="5">
+            <widget class="QPushButton" name="btn_team_delete">
+             <property name="text">
+              <string>Delete</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="6">
+            <widget class="QPushButton" name="btn_team_toggle_active">
+             <property name="text">
+              <string>Toggle active</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -136,24 +143,17 @@
         <attribute name="title">
          <string>Users</string>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_7">
+        <layout class="QGridLayout" name="gridLayout_5">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout_5">
-           <item row="0" column="4">
-            <widget class="QPushButton" name="btn_user_update">
-             <property name="text">
-              <string>Modify</string>
-             </property>
-            </widget>
-           </item>
+          <layout class="QGridLayout" name="gridLayout_7">
            <item row="0" column="0">
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Filter by teams:</string>
+              <string>Filter by team:</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
+           <item row="0" column="3">
             <spacer name="horizontalSpacer_4">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -166,27 +166,45 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="3">
-            <widget class="QPushButton" name="btn_user_create">
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cmb_team">
+             <property name="placeholderText">
+              <string>Select team</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <widget class="QPushButton" name="btn_assign_team">
              <property name="text">
-              <string>Create</string>
+              <string>Assign Team</string>
              </property>
             </widget>
            </item>
            <item row="0" column="5">
-            <widget class="QPushButton" name="btn_user_delete">
+            <widget class="QPushButton" name="btn_remove_team">
              <property name="text">
-              <string>Delete</string>
+              <string>Remove Team</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="cmb_team"/>
+           <item row="0" column="6">
+            <widget class="QPushButton" name="btn_user_toggle_active">
+             <property name="text">
+              <string>Toggle active</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
          <item row="1" column="0">
-          <widget class="QTableView" name="tbl_users"/>
+          <widget class="QTableView" name="tbl_users">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -196,7 +214,14 @@
    </item>
    <item>
     <layout class="QGridLayout" name="lyt_buttons">
-     <item row="0" column="0">
+     <item row="0" column="4">
+      <widget class="QPushButton" name="btn_close">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -208,13 +233,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="btn_close">
-       <property name="text">
-        <string>Close</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>

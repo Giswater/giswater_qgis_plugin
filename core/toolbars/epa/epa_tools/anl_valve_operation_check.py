@@ -11,7 +11,6 @@ from functools import partial
 from pathlib import Path
 from time import time
 
-import wntr
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget
@@ -20,6 +19,13 @@ from ....threads.valve_operation_check import GwValveOperationCheck
 from ....ui.ui_manager import ValveOperationCheckUi
 from .....libs import tools_qt, tools_db
 from ....utils import tools_gw
+
+try:
+    import wntr
+    from wntr.network import WaterNetworkModel
+except ImportError:
+    wntr = None
+    WaterNetworkModel = None
 
 
 class ValveOperationCheck:
@@ -246,7 +252,7 @@ class ValveOperationCheck:
             return False
 
         try:
-            network = wntr.network.WaterNetworkModel(input_file)
+            network = WaterNetworkModel(input_file)
         except Exception as e:
             msg = "INP file couldn't be imported:\n{0}"
             msg_params = (str(e),)

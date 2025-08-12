@@ -9,20 +9,20 @@ from functools import partial
 import json
 from typing import Any, Dict, List, Optional
 
-from qgis.PyQt.QtCore import QDate, Qt, QModelIndex
+from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QItemSelectionModel
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                   QComboBox, QCompleter, QDateEdit, QDialog,
-                                  QLabel, QLineEdit, QTableView, QTextEdit,
-                                  QToolBar, QWidget)
+                                  QHBoxLayout, QLabel, QLineEdit, QTableView,
+                                  QTextEdit, QToolBar, QWidget, QPushButton)
 
-from ...ui.ui_manager import TeamCreateUi, UserCreateUi, AddLotUi, LotManagementUi, \
-    ResourcesManagementUi
+from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi, TeamCreateUi
 
 from .... import global_vars
-from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
+from ....libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_os
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
+from ....global_vars import GwFeatureTypes
 
 
 class AddNewLot:
@@ -61,7 +61,7 @@ class AddNewLot:
         self.lot_id_value = None
         self.ids = []
         self.rb_list = []
-        self.feature_type = 'arc'
+        self.rel_feature_type = 'arc'
         self.signal_selectionChanged = False
         self.cmb_position = 17
         self.srid = lib_vars.data_epsg
@@ -74,7 +74,7 @@ class AddNewLot:
             self.lot_saved = True
 
         self.rel_list_ids = {ft: [] for ft in ['arc', 'node', 'connec', 'gully', 'link']}
-        self.excluded_layers = [f"v_edit_{ft}" for ft in self.rel_list_ids]
+        self.excluded_layers = [f"ve_{ft}" for ft in self.rel_list_ids]
 
         self.rel_layers = {ft: tools_gw.get_layers_from_feature_type(ft) for ft in ['arc', 'node', 'connec', 'link']}
         if tools_gw.get_project_type() == 'ud':
@@ -98,6 +98,8 @@ class AddNewLot:
             campaign_combo.currentIndexChanged.connect(self._on_campaign_changed)
             # Initial population when the dialog opens
             self._on_campaign_changed()
+            # Clear initial data cache after first run
+            self.initial_lot_data = {}
         else:
             print("[DEBUG] Critical: Could not find 'tab_data_campaign_id' widget to connect signal.")
 
@@ -124,6 +126,25 @@ class AddNewLot:
         tools_gw.add_icon(self.dlg_lot.btn_delete, '112')
         tools_gw.add_icon(self.dlg_lot.btn_snapping, '137')
         tools_gw.add_icon(self.dlg_lot.btn_expr_select, '178')
+
+        # Create a widget and layout to hold the buttons
+        self.corner_widget = QWidget()
+        layout = QHBoxLayout(self.corner_widget)
+        layout.setContentsMargins(0, 1, 0, 0)
+
+        self.btn_show_on_top_relations = QPushButton()
+        tools_gw.add_icon(self.btn_show_on_top_relations, '175')
+        self.btn_show_on_top_relations.setToolTip("Show selection on top")
+        self.btn_show_on_top_relations.clicked.connect(self._show_selection_on_top_relations)
+        layout.addWidget(self.btn_show_on_top_relations)
+
+        self.btn_zoom_to_selection_relations = QPushButton()
+        tools_gw.add_icon(self.btn_zoom_to_selection_relations, '176')
+        self.btn_zoom_to_selection_relations.setToolTip("Zoom to selection")
+        self.btn_zoom_to_selection_relations.clicked.connect(self._zoom_to_selection_relations)
+        layout.addWidget(self.btn_zoom_to_selection_relations)
+
+        self.dlg_lot.tab_feature.setCornerWidget(self.corner_widget)
 
         # Cancel / Accept
         self.dlg_lot.btn_cancel.clicked.connect(self.dlg_lot.reject)
@@ -168,6 +189,9 @@ class AddNewLot:
             if view:
                 tools_qt.set_tableview_config(view)
 
+        # Connect selectionChanged signal to select features in relations tables when selecting them on the canvas
+        global_vars.canvas.selectionChanged.connect(partial(self._manage_selection_changed))
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
@@ -181,64 +205,101 @@ class AddNewLot:
         team_combo = self.dlg_lot.findChild(QComboBox, "tab_data_team_id")
         expl_combo = self.dlg_lot.findChild(QComboBox, "tab_data_expl_id")
         sector_combo = self.dlg_lot.findChild(QComboBox, "tab_data_sector_id")
+        org_assigned_widget = self.dlg_lot.findChild(QLineEdit, "tab_data_organization_assigned")
 
         if not all([campaign_combo, team_combo, expl_combo, sector_combo]):
             return
 
-        # Clear and disable dependent combos initially
-        for combo in [expl_combo, sector_combo]:
-            combo.clear()
-            combo.setEnabled(False)
+        # Clear and disable dependent widgets initially
+        expl_combo.clear()
+        expl_combo.setEnabled(False)
+        sector_combo.clear()
+        sector_combo.setEnabled(False)
+        team_combo.clear()
+        if org_assigned_widget:
+            org_assigned_widget.clear()
+            org_assigned_widget.setEnabled(False)
 
         campaign_id = campaign_combo.currentData()
 
-        # If no campaign is selected, we are done.
         if not campaign_id:
             return
 
-        # Get campaign details: its specific expl_id/sector_id and its organization_id
+        # Fetch all campaign-related data in one go
+        body = {"p_campaign_id": campaign_id}
+        response = tools_gw.execute_procedure("gw_fct_cm_getteam", body, schema_name="cm", check_function=False)
+
+        if isinstance(response, str):
+            response = json.loads(response)
+
+        if not response or response.get("status") != "Accepted":
+            return
+
+        response_body = response.get("body", {})
+        
+        # Populate Organization
+        if org_assigned_widget:
+            org_name = response_body.get("organization_name")
+            if org_name:
+                org_assigned_widget.setText(org_name)
+
+        # Populate Teams
+        teams = response_body.get("data", [])
+        if teams:
+            team_combo.blockSignals(True)
+            for team in teams:
+                team_combo.addItem(str(team['idval']), team['id'])
+            # Restore the lot's original team_id if it exists
+            if self.initial_lot_data.get("team_id"):
+                self.set_widget_value(team_combo, self.initial_lot_data["team_id"])
+            team_combo.blockSignals(False)
+
+        # Get campaign details for expl and sector
         campaign_details_sql = f"SELECT organization_id, expl_id, sector_id FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
         campaign_data = tools_db.get_row(campaign_details_sql)
 
         if not campaign_data or campaign_data.get('organization_id') is None:
-            return  # No organization found for campaign, leave combos disabled.
+            return
 
         org_id = campaign_data['organization_id']
 
-        # Get the lists of allowed expl_ids and sector_ids for the organization
         allowed_ids_sql = f"SELECT expl_id, sector_id FROM cm.cat_organization WHERE organization_id = {org_id}"
         allowed_ids_data = tools_db.get_row(allowed_ids_sql)
 
         allowed_expl_ids = allowed_ids_data.get('expl_id') if allowed_ids_data else None
         allowed_sector_ids = allowed_ids_data.get('sector_id') if allowed_ids_data else None
 
-        # --- Populate exploitation combo ---
+        # Populate exploitation combo
         sql_expl = f"SELECT expl_id, name FROM {self.schema_parent}.exploitation"
-        if allowed_expl_ids:  # Filter if list is not None and not empty
+        if allowed_expl_ids:
             sql_expl += f" WHERE expl_id = ANY(ARRAY{allowed_expl_ids})"
-        elif isinstance(allowed_expl_ids, list):  # Handle empty list case
+        elif isinstance(allowed_expl_ids, list):
             sql_expl += " WHERE 1=0"
         sql_expl += " ORDER BY name"
-
         rows_expl = tools_db.get_rows(sql_expl)
         if rows_expl:
             tools_qt.fill_combo_values(expl_combo, rows_expl, index_to_show=1, add_empty=False)
             expl_combo.setEnabled(True)
+            # Restore the lot's original expl_id if it exists
+            if self.initial_lot_data.get("expl_id"):
+                self.set_widget_value(expl_combo, self.initial_lot_data["expl_id"])
 
-        # --- Populate sector combo ---
+        # Populate sector combo
         sql_sector = f"SELECT sector_id, name FROM {self.schema_parent}.sector"
-        if allowed_sector_ids:  # Filter if list is not None and not empty
+        if allowed_sector_ids:
             sql_sector += f" WHERE sector_id = ANY(ARRAY{allowed_sector_ids})"
-        elif isinstance(allowed_sector_ids, list):  # Handle empty list case
+        elif isinstance(allowed_sector_ids, list):
             sql_sector += " WHERE 1=0"
         sql_sector += " ORDER BY name"
-
         rows_sector = tools_db.get_rows(sql_sector)
         if rows_sector:
             tools_qt.fill_combo_values(sector_combo, rows_sector, index_to_show=1, add_empty=False)
             sector_combo.setEnabled(True)
+            # Restore the lot's original sector_id if it exists
+            if self.initial_lot_data.get("sector_id"):
+                self.set_widget_value(sector_combo, self.initial_lot_data["sector_id"])
 
-        # Set pre-selected values from campaign and disable if they exist
+        # Set pre-selected values from campaign
         campaign_expl_id = campaign_data.get('expl_id')
         if campaign_expl_id is not None:
             self.set_widget_value(expl_combo, campaign_expl_id)
@@ -248,36 +309,6 @@ class AddNewLot:
         if campaign_sector_id is not None:
             self.set_widget_value(sector_combo, campaign_sector_id)
             sector_combo.setEnabled(False)
-
-        # UPDATE TEAM COMBO
-        # Preserve the currently selected team ID to restore the selection later.
-        current_team_id = team_combo.currentData()
-        if isinstance(current_team_id, (list, tuple)):
-            current_team_id = current_team_id[0]
-
-        team_combo.blockSignals(True)
-        team_combo.clear()
-
-        if campaign_id:
-            body = {"p_campaign_id": campaign_id}
-            response = tools_gw.execute_procedure("gw_fct_cm_getteam", body, schema_name="cm", check_function=False)
-
-            if isinstance(response, str):
-                response = json.loads(response)
-
-            if response and response.get("status") == "Accepted":
-                teams = response.get("body", {}).get("data", [])
-                if teams:
-                    for team in teams:
-                        # Add item with the name as text and ONLY the ID as data.
-                        team_combo.addItem(str(team['idval']), team['id'])
-
-        # Restore the selection if possible.
-        if current_team_id is not None:
-            index = team_combo.findData(current_team_id)
-            if index > -1:
-                team_combo.setCurrentIndex(index)
-        team_combo.blockSignals(False)
 
     def load_lot_dialog(self, lot_id: Optional[int]):
         """Dynamically load and populate lot dialog using gw_fct_cm_getlot"""
@@ -298,6 +329,13 @@ class AddNewLot:
         form_fields = response["body"]["data"].get("fields", [])
         self.fields_form = form_fields
         self.lot_id_value = response["body"].get("feature", {}).get("id")
+
+        # Cache original selected IDs from the server response for the initial load
+        self.initial_lot_data = {}
+        if not self.is_new_lot:
+            for field in form_fields:
+                if field.get("columnname") in ["team_id", "expl_id", "sector_id"]:
+                    self.initial_lot_data[field.get("columnname")] = field.get("selectedId")
 
         for field in form_fields:
             widget = self.create_widget_from_field(field)
@@ -373,8 +411,8 @@ class AddNewLot:
         return creation_func() if creation_func else None
 
     def _on_tab_feature_changed(self):
-        # Update self.feature_type just like in Campaign
-        self.feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
+        # Update self.rel_feature_type just like in Campaign
+        self.rel_feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
 
     def get_allowed_features_for_lot(self, lot_id: int, feature: str) -> List[Any]:
         """Only be able to make the relations to the features id that come from campaign """
@@ -451,8 +489,8 @@ class AddNewLot:
         elif isinstance(widget, QComboBox):
             target_id_to_find = None
             try:
-                # Ensure we are searching for an integer ID
-                target_id_to_find = int(value)
+                # Ensure we are searching for an integer or string ID
+                target_id_to_find = value
             except (ValueError, TypeError):
                 pass  # If it's not a number, we can't match it to the list's ID
 
@@ -461,9 +499,14 @@ class AddNewLot:
                     item_data = widget.itemData(i)
                     # Handle cases where itemData is a list like [2, 'expl_02']
                     if isinstance(item_data, (list, tuple)) and item_data:
-                        if item_data[0] == target_id_to_find:
+                        # Compare as strings for safety
+                        if str(item_data[0]) == str(target_id_to_find):
                             widget.setCurrentIndex(i)
                             return  # Exit after finding the correct item
+                    # Also handle simple data types
+                    elif str(item_data) == str(target_id_to_find):
+                        widget.setCurrentIndex(i)
+                        return
 
             # If we couldn't find it by data, fall back to a simple text search as a last resort.
             # This handles cases where the data might not be a list.
@@ -481,10 +524,17 @@ class AddNewLot:
 
     def _on_tab_change(self, index: int):
         tab = self.dlg_lot.tab_widget.widget(index)
-        if tab.objectName() == "RelationsTab" and self.is_new_lot and not self.lot_saved:
-            self.save_lot(from_change_tab=True)
-            self.lot_saved = True  # Only block repeated auto-saves
-            self.enable_feature_tabs_by_campaign(self.lot_id)
+        if tab.objectName() == "RelationsTab":
+            # Ensure lot exists before using relations
+            if self.is_new_lot and not self.lot_saved:
+                self.save_lot(from_change_tab=True)
+                self.lot_saved = True  # Only block repeated auto-saves
+                self.enable_feature_tabs_by_campaign(self.lot_id)
+            # Always prepare the feature ID completer when entering Relations
+            try:
+                self._update_feature_completer_lot(self.dlg_lot)
+            except Exception:
+                pass
 
     def populate_cmb_team(self):
         """ Fill ComboBox cmb_assigned_to """
@@ -608,11 +658,12 @@ class AddNewLot:
         if result and result.get("status") == "Accepted":
             self.lot_id = result["body"]["feature"]["id"]
             self.is_new_lot = False
-            print("remove selection")
+
             tools_gw.remove_selection(True, layers=self.rel_layers)
             tools_gw.reset_rubberband(self.rubber_band)
             tools_qgis.force_refresh_map_canvas()
             if not from_change_tab:
+                tools_qgis.disconnect_signal_selection_changed()
                 self.dlg_lot.accept()
         else:
             msg = "Error saving lot."
@@ -640,6 +691,7 @@ class AddNewLot:
 
     def _on_dialog_rejected(self):
         """Handles cleanup when the dialog is rejected."""
+        tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
 
@@ -712,13 +764,13 @@ class AddNewLot:
         sql = f"""
             SELECT
                 u.user_id,
-                u.loginname,
+                u.username,
                 u.team_id,
                 t.organization_id AS org_id,
                 t.role_id AS role
             FROM cm.cat_user AS u
             JOIN cm.cat_team AS t ON u.team_id = t.team_id
-            WHERE u.loginname = '{username}'
+            WHERE u.username = '{username}'
         """
         return tools_db.get_row(sql)
 
@@ -743,8 +795,8 @@ class AddNewLot:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_lot_man.cmb_estat, rows, index_to_show=1, add_empty=True)
 
-        self.load_lots_into_manager()
         self.init_filters()
+        self.load_lots_into_manager()
 
         self.dlg_lot_man.btn_cancel.clicked.connect(self.dlg_lot_man.reject)
         self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
@@ -759,22 +811,130 @@ class AddNewLot:
 
         tools_gw.open_dialog(self.dlg_lot_man, dlg_name="lot_management")
 
+    def _show_selection_on_top(self, qtable):
+        """
+        Moves the selected rows in a QTableView to the top.
+        """
+        model = qtable.model()
+        selection_model = qtable.selectionModel()
+        if not selection_model or not selection_model.hasSelection():
+            return
+
+        selected_rows = [index.row() for index in selection_model.selectedRows()]
+        selected_rows.sort()
+
+        # Extract items from selected rows
+        rows_data = []
+        for row in selected_rows:
+            row_items = [model.item(row, col) for col in range(model.columnCount())]
+            rows_data.append([QStandardItem(item.text()) if item else QStandardItem() for item in row_items])
+
+        # Remove selected rows from the bottom up to avoid index shifting issues
+        for row in reversed(selected_rows):
+            model.removeRow(row)
+
+        # Insert rows at the top
+        for i, row_data in enumerate(rows_data):
+            model.insertRow(i, row_data)
+
+        # Restore selection on the moved rows
+        for i in range(len(rows_data)):
+            qtable.selectRow(i)
+
+    def _get_feature_geometries_from_lot(self, lot_id, select_features=False):
+        """
+        Get all feature geometries associated with a given lot_id.
+        If select_features is True, it will also select the features on the map.
+        """
+        geometries = []
+        feature_types = ['arc', 'node', 'connec', 'link']
+        if tools_gw.get_project_type() == 'ud':
+            feature_types.append('gully')
+
+        for ft in feature_types:
+            table_name = f"om_campaign_lot_x_{ft}"
+            id_name = f"{ft}_id"
+            sql = f"SELECT {id_name} FROM cm.{table_name} WHERE lot_id = {lot_id}"
+            rows = tools_db.get_rows(sql)
+            if not rows:
+                continue
+
+            feature_ids = [row[0] for row in rows]
+            layers = tools_gw.get_layers_from_feature_type(ft)
+            for layer in layers:
+                if layer.isValid():
+                    if select_features:
+                        layer.selectByIds(feature_ids)
+                    else:
+                        for feat in layer.getFeatures(f"{id_name} IN ({','.join(map(str, feature_ids))})"):
+                            geometries.append(feat.geometry())
+        return geometries
+
+    def _zoom_to_selection(self):
+        """
+        Zoom to the combined extent of all features related to the selected lots.
+        """
+        selected_rows = self.dlg_lot_man.tbl_lots.selectionModel().selectedRows()
+        if not selected_rows:
+            tools_qgis.show_warning("Please select a lot to zoom to.", dialog=self.dlg_lot_man)
+            return
+
+        model = self.dlg_lot_man.tbl_lots.model()
+        lot_ids = [model.data(model.index(row.row(), 0)) for row in selected_rows]
+
+        all_geometries = []
+        for lot_id in lot_ids:
+            try:
+                lot_id = int(lot_id)
+                geometries = self._get_feature_geometries_from_lot(lot_id)
+                all_geometries.extend(geometries)
+            except (ValueError, TypeError):
+                continue
+
+        if not all_geometries:
+            return
+
+        # Combine all bounding boxes
+        bounding_box = all_geometries[0].boundingBox()
+        for geom in all_geometries[1:]:
+            bounding_box.combineExtentWith(geom.boundingBox())
+
+        # Zoom the map canvas
+        canvas = self.iface.mapCanvas()
+        canvas.zoomToFeatureExtent(bounding_box)
+
     def load_lots_into_manager(self):
         """Load campaign data into the campaign management table"""
-
         if not hasattr(self.dlg_lot_man, "tbl_lots"):
             return
-        query = "SELECT * FROM cm.v_ui_campaign_lot ORDER BY lot_id DESC"
-        self.populate_tableview(self.dlg_lot_man.tbl_lots, query)
+        self.filter_lot()
 
     def init_filters(self):
         current_date = QDate.currentDate()
-        sql = 'SELECT MIN(startdate), MAX(startdate) FROM cm.om_campaign_lot'
+
+        where_clause = ""
+        username = tools_db.get_current_user()
+        sql = f"""
+            SELECT t.role_id, t.organization_id
+            FROM cm.cat_user u
+            JOIN cm.cat_team t ON u.team_id = t.team_id
+            WHERE u.username = '{username}'
+        """
+        user_info = tools_db.get_row(sql)
+
+        if user_info:
+            role = user_info[0]
+            org_id = user_info[1]
+            if role not in ('role_cm_admin'):
+                if org_id is not None:
+                    where_clause = f" WHERE campaign_name IN (SELECT name FROM cm.om_campaign WHERE organization_id = {org_id})"
+
+        sql = f'SELECT MIN(startdate), MAX(startdate) FROM cm.v_ui_campaign_lot{where_clause}'
         row = tools_db.get_rows(sql)
 
-        if row and row[0]:
-            self.dlg_lot_man.date_event_from.setDate(row[0][0] or current_date)
-            self.dlg_lot_man.date_event_to.setDate(row[0][1] or current_date)
+        if row and row[0] and row[0][0] is not None:
+            self.dlg_lot_man.date_event_from.setDate(row[0][0])
+            self.dlg_lot_man.date_event_to.setDate(row[0][1])
         else:
             self.dlg_lot_man.date_event_from.setDate(current_date)
             self.dlg_lot_man.date_event_to.setDate(current_date)
@@ -783,30 +943,45 @@ class AddNewLot:
         """Filter lot records based on date range and date type."""
         filters = []
 
+        # Directly query the cm schema to get user's role and organization
+        username = tools_db.get_current_user()
+        sql = f"""
+            SELECT t.role_id, t.organization_id
+            FROM cm.cat_user u
+            JOIN cm.cat_team t ON u.team_id = t.team_id
+            WHERE u.username = '{username}'
+        """
+        user_info = tools_db.get_row(sql)
+
+        if user_info:
+            role = user_info[0]
+            org_id = user_info[1]
+            if role not in ('role_cm_admin'):
+                if org_id is not None:
+                    filters.append(f"campaign_name IN (SELECT name FROM cm.om_campaign WHERE organization_id = {org_id})")
+
         # get value to now column filter (startdate, enddate, real_startdate, real_enddate)
         date_type = tools_qt.get_combo_value(self.dlg_lot_man, self.dlg_lot_man.cmb_date_filter_type, 0)
-        if not date_type:
-            return
+        if date_type and date_type != -1:
+            # get dates
+            date_from = self.dlg_lot_man.date_event_from.date()
+            date_to = self.dlg_lot_man.date_event_to.date()
 
-        # get dates
-        date_from = self.dlg_lot_man.date_event_from.date()
-        date_to = self.dlg_lot_man.date_event_to.date()
+            # start date end date logic
+            if date_from > date_to:
+                self.dlg_lot_man.date_event_to.setDate(date_from)
+                date_to = date_from
 
-        # start date end date logic
-        if date_from > date_to:
-            self.dlg_lot_man.date_event_to.setDate(date_from)
-            date_to = date_from
+            interval = f"'{date_from.toString('yyyy-MM-dd')} 00:00:00' AND '{date_to.toString('yyyy-MM-dd')} 23:59:59'"
+            date_filter = f"({date_type} BETWEEN {interval}"
 
-        interval = f"'{date_from.toString('yyyy-MM-dd')} 00:00:00' AND '{date_to.toString('yyyy-MM-dd')} 23:59:59'"
-        date_filter = f"({date_type} BETWEEN {interval}"
+            # show nulls if checked
+            if hasattr(self.dlg_lot_man, "chk_show_nulls") and self.dlg_lot_man.chk_show_nulls.isChecked():
+                date_filter += f" OR {date_type} IS NULL)"
+            else:
+                date_filter += ")"
 
-        # show nulls if checked
-        if hasattr(self.dlg_lot_man, "chk_show_nulls") and self.dlg_lot_man.chk_show_nulls.isChecked():
-            date_filter += f" OR {date_type} IS NULL)"
-        else:
-            date_filter += ")"
-
-        filters.append(date_filter)
+            filters.append(date_filter)
 
         # filter by name logic
         name_value = self.dlg_lot_man.txt_lot_name.text().strip()
@@ -820,7 +995,7 @@ class AddNewLot:
 
         # build and execute full query
         where_clause = " AND ".join(filters)
-        query = "SELECT * FROM cm.om_campaign_lot"
+        query = "SELECT * FROM cm.v_ui_campaign_lot"
         if where_clause:
             query += f" WHERE {where_clause}"
         query += " ORDER BY lot_id DESC"
@@ -876,6 +1051,126 @@ class AddNewLot:
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.dlg_lot_man)
         self.filter_lot()
 
+    def _on_lot_selection_changed(self, selected, deselected):
+        """
+        Selects features on the map when a lot is selected in the table.
+        """
+        # Clear previous selections
+        for layer_group in self.rel_layers.values():
+            for layer in layer_group:
+                layer.removeSelection()
+
+        model = self.dlg_lot_man.tbl_lots.model()
+        selection_model = self.dlg_lot_man.tbl_lots.selectionModel()
+
+        if not selection_model.hasSelection():
+            return
+
+        lot_ids = []
+        for index in selection_model.selectedRows():
+            lot_id = model.data(model.index(index.row(), 0))
+            try:
+                lot_ids.append(int(lot_id))
+            except (ValueError, TypeError):
+                continue
+
+        self.iface.mapCanvas().refresh()
+
+    def _get_current_relations_table(self):
+        """Gets the current visible table view in the relations tab."""
+        current_tab_widget = self.dlg_lot.tab_feature.currentWidget()
+        if not current_tab_widget:
+            return None, None
+
+        feature = current_tab_widget.objectName().replace('tab_', '')
+        if not feature:
+            return None, None
+
+        table_widget_name = f"tbl_campaign_lot_x_{feature}"
+        table_view = self.dlg_lot.findChild(QTableView, table_widget_name)
+        return table_view, feature
+
+    def _show_selection_on_top_relations(self):
+        """Moves selected rows to the top for the current relations table."""
+        table_view, _ = self._get_current_relations_table()
+        if table_view:
+            self._show_selection_on_top(table_view)
+
+    def _zoom_to_selection_relations(self):
+        """Zooms to the selected features in the current relations table."""
+        table_view, feature_type = self._get_current_relations_table()
+        if not table_view or not feature_type:
+            return
+
+        selection_model = table_view.selectionModel()
+        if not selection_model or not selection_model.hasSelection():
+            tools_qgis.show_warning("Please select an element to zoom to.", dialog=self.dlg_lot)
+            return
+
+        model = table_view.model()
+        id_column_index = -1
+        id_col_name = f'{feature_type}_id'
+
+        for i in range(model.columnCount()):
+            if model.headerData(i, Qt.Horizontal) == id_col_name:
+                id_column_index = i
+                break
+
+        if id_column_index == -1:
+            tools_qgis.show_warning(f"Could not find ID column '{id_col_name}'.", dialog=self.dlg_lot)
+            return
+
+        selected_rows = selection_model.selectedRows()
+        feature_ids = [model.data(model.index(row.row(), id_column_index)) for row in selected_rows]
+
+        if not feature_ids:
+            return
+
+        # Use the generic zoom function to match psector's behavior
+        tools_gw.zoom_to_feature_by_id(f"ve_{feature_type}", id_col_name, feature_ids)
+
+    def _manage_selection_changed(self, layer):
+        if layer is None:
+            return
+
+        if layer.providerType() != 'postgres':
+            return
+
+        tablename = tools_qgis.get_layer_source_table_name(layer)
+        if not tablename:
+            return
+
+        mapping_dict = {
+            "ve_node": ("node_id", self.dlg_lot.tbl_campaign_lot_x_node),
+            "ve_arc": ("arc_id", self.dlg_lot.tbl_campaign_lot_x_arc),
+            "ve_connec": ("connec_id", self.dlg_lot.tbl_campaign_lot_x_connec),
+            "ve_gully": ("gully_id", self.dlg_lot.tbl_campaign_lot_x_gully),
+        }
+        if tablename not in mapping_dict:
+            return
+        
+        idname, tableview = mapping_dict[tablename]
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            feature_ids = [f"{feature.attribute(idname)}" for feature in features]
+
+            # Select in table
+            selection_model = tableview.selectionModel()
+
+            # Clear previous selection
+            selection_model.clearSelection()
+
+            model = tableview.model()
+
+            # Loop through the model rows to find matching feature_ids
+            for row in range(model.rowCount()):
+                index = model.index(row, 0)
+                feature_id = model.data(index)
+
+                if f"{feature_id}" in feature_ids:
+                    selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
+
     def _update_feature_completer_lot(self, dlg: QDialog):
         # Identify the current tab and derive feature info
         tab_widget = dlg.tab_feature.currentWidget()
@@ -900,21 +1195,30 @@ class AddNewLot:
             completer.setCaseSensitivity(False)
             feature_id_lineedit.setCompleter(completer)
 
-    def _get_role_from_team_name(self, team_name: str) -> Optional[str]:
-        """Determines the database role based on the team name."""
-        if not team_name:
-            return None
+    def _manage_selection_changed_signals(self, feature_type: GwFeatureTypes, connect=True, disconnect=True):
+        """
+        Manage the selection changed signals for the tableview based on the feature type
+        """
+        tableview_map = {
+            GwFeatureTypes.ARC: (self.dlg_lot.tbl_campaign_lot_x_arc, "ve_arc", "arc_id", self.rb_red, 5),
+            GwFeatureTypes.NODE: (self.dlg_lot.tbl_campaign_lot_x_node, "ve_node", "node_id", self.rb_red, 10),
+            GwFeatureTypes.CONNEC: (self.dlg_lot.tbl_campaign_lot_x_connec, "ve_connec", "connec_id", self.rb_red, 10),
+            GwFeatureTypes.GULLY: (self.dlg_lot.tbl_campaign_lot_x_gully, "ve_gully", "gully_id", self.rb_red, 10),
+        }
+        tableview, tablename, feat_id, rb, width = tableview_map.get(feature_type, (None, None, None, None, None))
+        if tableview is None:
+            return
 
-        team_name_lower = team_name.lower()
+        if disconnect:
+            tools_gw.disconnect_signal('lot', f"highlight_features_by_id_{tablename}")
 
-        if "admin" in team_name_lower:
-            return "role_cm_admin"
-        elif "manager" in team_name_lower:
-            return "role_cm_manager"
-        elif "field" in team_name_lower:
-            return "role_cm_field"
+        if not connect:
+            return
 
-        return None
+        # Highlight features by id using the generic helper
+        tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
+            tools_qgis.highlight_features_by_id, tableview, tablename, feat_id, rb, width
+        ), 'lot', f"highlight_features_by_id_{tablename}")
 
     def resources_management(self):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
@@ -947,8 +1251,8 @@ class AddNewLot:
                 "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_teams")
             },
             "cat_user": {
-                "query": "SELECT user_id::text, teamname, cu.code, loginname, username, fullname, cu.descript, cu.active::text" +
-                         " FROM cm.cat_user cu INNER JOIN cm.cat_team ct ON cu.team_id = ct.team_id",
+                "query": "SELECT user_id::text, COALESCE(ct.teamname, 'No team') as teamname, COALESCE(ct.code, '') as code, username, cu.active::text" +
+                         " FROM cm.cat_user cu LEFT JOIN cm.cat_team ct ON cu.team_id = ct.team_id",
                 "idname": "user_id",
                 "widget": tools_qt.get_widget(self.dlg_resources_man, "tbl_users"),
                 "cmbParent": tools_qt.get_widget(self.dlg_resources_man, "cmb_team")
@@ -962,13 +1266,6 @@ class AddNewLot:
         self.tab_organizations = 0
 
         # Populate combos
-        sql = "SELECT organization_id AS id, orgname AS idval FROM cm.cat_organization"
-        rows = tools_db.get_rows(sql)
-
-        # Chek rows
-        if rows:
-            tools_qt.fill_combo_values(self.dlg_resources_man.cmb_orga, rows, 1, add_empty=True)
-
         # Create sql query to get all teams
         sql = "SELECT team_id AS id, teamname AS idval FROM cm.cat_team"
 
@@ -984,26 +1281,19 @@ class AddNewLot:
 
             # Set signals for manage organizations
             self.dlg_resources_man.txt_orgname.textChanged.connect(partial(self.txt_org_name_changed))
-            self.dlg_resources_man.cmb_orga.currentIndexChanged.connect(partial(self.filter_teams_table))
         else:
 
             # Remove tab organizations
             self.dlg_resources_man.tab_main.removeTab(self.tab_organizations)
 
-            # Set combo value to the user organization
-            tools_qt.set_combo_value(self.dlg_resources_man.cmb_orga, self.user_data['org_id'], 0, False)
-
             # Filter teams table by the user organization selected
-            self.filter_teams_table()
-
-            # Set disabled combo
-            self.dlg_resources_man.cmb_orga.setEnabled(False)
+            self.filter_teams_by_name()
 
             # Filter teams combo
             sql += f" WHERE organization_id = {self.user_data['org_id']}"
 
             # Create sql filter and populate table
-            sql_filter = f"WHERE ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']})"
+            sql_filter = f"WHERE (ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']}) OR cu.team_id IS NULL)"
             self._populate_resource_tableview("cat_user", sql_filter)
 
         # Fill teams combo
@@ -1019,12 +1309,18 @@ class AddNewLot:
         self.dlg_resources_man.btn_team_create.clicked.connect(partial(self.open_create_team))
         self.dlg_resources_man.btn_team_update.clicked.connect(partial(self.open_create_team, True))
         self.dlg_resources_man.btn_team_delete.clicked.connect(partial(self.delete_registers, "cat_team"))
+        # Toggle active on teams
+        if hasattr(self.dlg_resources_man, 'btn_team_toggle_active'):
+            self.dlg_resources_man.btn_team_toggle_active.clicked.connect(partial(self.toggle_active_records, "cat_team"))
+        self.dlg_resources_man.txt_teams.textChanged.connect(partial(self.filter_teams_by_name))
 
-        # Set signals for manage users
-        self.dlg_resources_man.btn_user_create.clicked.connect(partial(self.open_create_user))
-        self.dlg_resources_man.btn_user_update.clicked.connect(partial(self.open_create_user, True))
-        self.dlg_resources_man.btn_user_delete.clicked.connect(partial(self.delete_registers, "cat_user"))
+        # Set signals for manage users (only team filtering, no user management buttons in UI)
         self.dlg_resources_man.cmb_team.currentIndexChanged.connect(partial(self.filter_users_table))
+        self.dlg_resources_man.btn_assign_team.clicked.connect(partial(self.assign_team_to_user))
+        self.dlg_resources_man.btn_remove_team.clicked.connect(partial(self.remove_team_from_user))
+        # Toggle active on users
+        if hasattr(self.dlg_resources_man, 'btn_user_toggle_active'):
+            self.dlg_resources_man.btn_user_toggle_active.clicked.connect(partial(self.toggle_active_records, "cat_user"))
 
         self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
 
@@ -1038,11 +1334,28 @@ class AddNewLot:
         sql_filter = f"WHERE orgname ILIKE '%{org_name}%'" if org_name != 'null' else None
         self._populate_resource_tableview("cat_organization", sql_filter)
 
-    def filter_teams_table(self):
-        """ Filter table by organization id """
+    def filter_teams_by_name(self):
+        """ Filter teams table by team name """
 
-        org_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_orga")
-        sql_filter = f"WHERE co.organization_id = {org_id}" if org_id != '' else None
+        team_name = tools_qt.get_text(self.dlg_resources_man, "txt_teams")
+        
+        # Build sql filtering by team name and organization
+        if team_name != 'null':
+            # Filter by team name
+            if self.user_data["role"] != "role_cm_admin":
+                # For non-admin users, also filter by organization
+                sql_filter = f"WHERE ct.teamname ILIKE '%{team_name}%' AND co.organization_id = {self.user_data['org_id']}"
+            else:
+                # For admin users, only filter by team name
+                sql_filter = f"WHERE ct.teamname ILIKE '%{team_name}%'"
+        else:
+            # No team name filter - show all teams for admin, or organization teams for non-admin
+            if self.user_data["role"] != "role_cm_admin":
+                sql_filter = f"WHERE co.organization_id = {self.user_data['org_id']}"
+            else:
+                sql_filter = None  # Show all teams for admin
+        
+        # Refresh table
         self._populate_resource_tableview("cat_team", sql_filter)
 
     def filter_users_table(self):
@@ -1052,15 +1365,91 @@ class AddNewLot:
         team_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team")
 
         # Build sql filtering by the selected team
-        sql_filter = f"WHERE ct.team_id = {team_id}" if team_id != '' else None
-
-        # Check if user select all teams in combo and the role is not admin
-        if not sql_filter and self.user_data["role"] != "role_cm_admin":
-            # Build sql filtering by the user organization
-            sql_filter = f"WHERE ct.organization_id = {self.user_data['org_id']}"
+        if team_id and team_id != '' and team_id != -1:
+            # When a team is selected, show users from that team AND users with no team
+            # This allows assigning users without teams to the selected team
+            sql_filter = f"WHERE (ct.team_id = {team_id} OR cu.team_id IS NULL)"
+        else:
+            # Show all users (including those without teams) for the current organization
+            if self.user_data["role"] != "role_cm_admin":
+                # For non-admin users, show users from their organization's teams or users without teams
+                sql_filter = f"WHERE (ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']}) OR cu.team_id IS NULL)"
+            else:
+                # For admin users, show all users
+                sql_filter = None
 
         # Refresh table
         self._populate_resource_tableview("cat_user", sql_filter)
+
+    def assign_team_to_user(self):
+        """ Assign a team to selected user(s) """
+
+        # Get selected user IDs
+        selected_ids = self.get_selected_ids("cat_user")
+        if not selected_ids:
+            tools_qgis.show_warning("Please select at least one user to assign a team.")
+            return
+
+        # Get selected team from combo
+        team_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team")
+        if not team_id or team_id == -1:
+            tools_qgis.show_warning("Please select a team to assign.")
+            return
+
+        # Get team name for confirmation
+        team_name = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team", 1)  # Get the team name
+        if not team_name or team_name == -1:
+            tools_qgis.show_warning("Please select a valid team to assign.")
+            return
+
+        # Confirm the action
+        user_count = len(selected_ids)
+        msg = f"Are you sure you want to assign team '{team_name}' to {user_count} selected user(s)?"
+        answer = tools_qt.show_question(msg, title="Assign Team")
+        if not answer:
+            return
+
+        # Update users with the selected team
+        ids_str = ",".join(selected_ids)
+        sql = f"UPDATE cm.cat_user SET team_id = {team_id} WHERE user_id IN ({ids_str})"
+        
+        try:
+            tools_db.execute_sql(sql)
+            tools_qgis.show_info(f"Successfully assigned team '{team_name}' to {user_count} user(s).")
+            
+            # Refresh the users table
+            self.filter_users_table()
+        except Exception as e:
+            tools_qgis.show_warning(f"Error assigning team: {str(e)}")
+
+    def remove_team_from_user(self):
+        """ Remove team assignment from selected user(s) """
+
+        # Get selected user IDs
+        selected_ids = self.get_selected_ids("cat_user")
+        if not selected_ids:
+            tools_qgis.show_warning("Please select at least one user to remove team assignment.")
+            return
+
+        # Confirm the action
+        user_count = len(selected_ids)
+        msg = f"Are you sure you want to remove team assignment from {user_count} selected user(s)?"
+        answer = tools_qt.show_question(msg, title="Remove Team Assignment")
+        if not answer:
+            return
+
+        # Update users to remove team assignment
+        ids_str = ",".join(selected_ids)
+        sql = f"UPDATE cm.cat_user SET team_id = NULL WHERE user_id IN ({ids_str})"
+        
+        try:
+            tools_db.execute_sql(sql)
+            tools_qgis.show_info(f"Successfully removed team assignment from {user_count} user(s).")
+            
+            # Refresh the users table
+            self.filter_users_table()
+        except Exception as e:
+            tools_qgis.show_warning(f"Error removing team assignment: {str(e)}")
 
     def _populate_resource_tableview(self, table_name: str, sql_filter: Optional[str] = None):
         """Populate a QTableView with the results of a SQL query."""
@@ -1072,7 +1461,7 @@ class AddNewLot:
         query = self.dict_tables[table_name]["query"]
 
         # Check sql filter
-        if sql_filter:
+        if sql_filter is not None:
             query += f" {sql_filter}"
         elif 'cmbParent' in self.dict_tables[table_name]:
             # Reset combo parent
@@ -1109,14 +1498,67 @@ class AddNewLot:
         # Apply model to table
         table.setModel(model)
 
-    def selected_row(self, table_name: str):
+    def selected_row(self, tablename: str):
         """ Handle double click selected row """
 
         # Call open_create function depending of the table name
-        if table_name == "cat_team":
+        if tablename == "cat_team":
             self.open_create_team(True)
         else:
             self.open_create_user(True)
+
+    def toggle_active_records(self, tablename: str):
+        """Toggle active state for selected rows in resources tables (teams/users)."""
+        if tablename not in ("cat_team", "cat_user"):
+            return
+        table = self.dict_tables[tablename]["widget"]
+        idname = self.dict_tables[tablename]["idname"]
+        selected = table.selectionModel().selectedRows()
+        if not selected:
+            tools_qgis.show_warning("No records selected", dialog=self.dlg_resources_man)
+            return
+        # Determine column indexes
+        model = table.model()
+        active_col = tools_qt.get_col_index_by_col_name(table, 'active')
+        if active_col is None or active_col == -1:
+            # Fallback: try to find by header text
+            for i in range(model.columnCount()):
+                if str(model.headerData(i, Qt.Horizontal)).lower() == 'active':
+                    active_col = i
+                    break
+        id_col = 0  # id is first column in our population logic
+
+        ids = []
+        toggles = []
+        for index in selected:
+            row = index.row()
+            row_id = model.index(row, id_col).data()
+            current_active = model.index(row, active_col).data() if active_col is not None and active_col != -1 else None
+            current_active_bool = tools_os.set_boolean(current_active) if current_active is not None else False
+            ids.append(row_id)
+            toggles.append(not current_active_bool)
+
+        # Build SQL: update each selected id
+        sql_statements = []
+        for row_id, new_state in zip(ids, toggles):
+            sql_statements.append(f"UPDATE cm.{tablename} SET active = {str(new_state).lower()} WHERE {idname}::text = '{row_id}'")
+        if not sql_statements:
+            return
+        sql = ";".join(sql_statements)
+        try:
+            tools_db.execute_sql(sql, commit=True)
+        except Exception as e:
+            tools_qgis.show_warning(f"Error toggling state: {str(e)}", dialog=self.dlg_resources_man)
+            return
+
+        # Refresh table according to role and tablename
+        if self.user_data["role"] == "role_cm_admin":
+            self._populate_resource_tableview(tablename)
+        else:
+            if tablename == "cat_team":
+                self.filter_teams_by_name()
+            elif tablename == "cat_user":
+                self.filter_users_table()
 
     def delete_registers(self, tablename: str):
         """ Delete selected registers from the table."""
@@ -1135,7 +1577,7 @@ class AddNewLot:
         # If deleting users, get their login names first to also drop the DB user
         login_names_to_drop = []
         if tablename == "cat_user":
-            login_names_rows = tools_db.get_rows(f"SELECT loginname FROM cm.cat_user WHERE {idname} IN ({ids})")
+            login_names_rows = tools_db.get_rows(f"SELECT username FROM cm.cat_user WHERE {idname} IN ({ids})")
             if login_names_rows:
                 login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
 
@@ -1168,41 +1610,38 @@ class AddNewLot:
                 self._populate_resource_tableview(tablename)
             else:
                 if tablename == "cat_team":
-                    self.filter_teams_table()
+                    self.filter_teams_by_name()
                 elif tablename == "cat_user":
                     # Create sql filter and populate table
                     sql_filter = f"WHERE ct.team_id = any(SELECT team_id FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']})"
                     self._populate_resource_tableview(tablename, sql_filter)
 
     def open_create_team(self, is_update: Optional[bool] = False):
-        """ Open create team dialog """
+        """ Open dialog to create or update team """
 
-        user = tools_db.current_user
-        form = {"formName": "generic", "formType": "create_team"}
-        body = {"client": {"cur_user": user}, "form": form}
+        # Define the form type and create the body
+        form_type = "team_create"
+        body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
 
-        # DB fct
+        # Get dialog configuration from database
         json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name="cm")
+        
+        if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
+            tools_qgis.show_warning("Failed to load team creation dialog configuration. Please check database configuration.")
+            return
 
         # Create and open dialog
         self.dlg_create_team = TeamCreateUi(self)
         tools_gw.load_settings(self.dlg_create_team)
-        tools_gw.manage_dlg_widgets(self, self.dlg_create_team, json_result)
-
-        # Get organization widget combo
-        cmb_org = self.dlg_create_team.findChild(QWidget, "tab_none_org_id")
-
-        # Chek user role
-        if self.user_data["role"] != "admin":
-            # Set combo value to the user organization
-            tools_qt.set_combo_value(cmb_org, self.user_data['org_id'], 0, False)
-
-            # Disable combo
-            cmb_org.setEnabled(False)
+        
+        try:
+            tools_gw.manage_dlg_widgets(self, self.dlg_create_team, json_result)
+        except Exception as e:
+            tools_qgis.show_warning(f"Error creating dynamic dialog: {str(e)}")
+            return
 
         if is_update:
             # Get selected id from table
-
             selected_ids = self.get_selected_ids("cat_team")
             if not selected_ids:
                 return
@@ -1210,7 +1649,7 @@ class AddNewLot:
             self.team_id = selected_ids[0]  # Get first selected id
 
             # Get object_id from selected row
-            sql = f"SELECT teamname, descript, active, code, organization_id FROM cm.cat_team WHERE team_id = '{self.team_id}'"
+            sql = f"SELECT teamname, descript, active, code, organization_id, role_id FROM cm.cat_team WHERE team_id = '{self.team_id}'"
 
             rows = tools_db.get_rows(sql)
             if rows:
@@ -1220,59 +1659,20 @@ class AddNewLot:
                 if len(row) > 2:
                     tools_qt.set_checked(self.dlg_create_team, "tab_none_active", row[2])
                     tools_qt.set_widget_text(self.dlg_create_team, "tab_none_code", row[3])
-                    tools_qt.set_combo_value(cmb_org, row[4], 0, False)
+                    # Find and populate organization combo
+                    cmb_org = self.dlg_create_team.findChild(QComboBox, "tab_none_org_id")
+                    if cmb_org:
+                        tools_qt.set_combo_value(cmb_org, row[4], 0, False)
+                    # Find and populate role combo
+                    cmb_role = self.dlg_create_team.findChild(QComboBox, "tab_none_role_id")
+                    if cmb_role and len(row) > 5:
+                        tools_qt.set_combo_value(cmb_role, row[5], 0, False)
 
+        # Connect buttons to functions
+        self.dlg_create_team.btn_accept.clicked.connect(partial(upsert_team, dialog=self.dlg_create_team, class_obj=self))
+        self.dlg_create_team.btn_cancel.clicked.connect(partial(close, dialog=self.dlg_create_team))
+        
         tools_gw.open_dialog(self.dlg_create_team, "create_team")
-
-    def open_create_user(self, is_update: Optional[bool] = False):
-        """ Open create team dialog """
-
-        user = tools_db.current_user
-        form = {"formName": "generic", "formType": "create_user"}
-        body = {"client": {"cur_user": user}, "form": form}
-
-        # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name="cm")
-
-        # Create and open dialog
-        self.dlg_create_team = UserCreateUi(self)
-        tools_gw.load_settings(self.dlg_create_team)
-        tools_gw.manage_dlg_widgets(self, self.dlg_create_team, json_result)
-
-        # Get team widget combo
-        cmb_team = self.dlg_create_team.findChild(QWidget, "tab_none_team_id")
-
-        if self.user_data["role"] != "admin":
-            # Refresh values for team widget combo
-            sql = f"SELECT team_id AS id, teamname AS idval FROM cm.cat_team WHERE organization_id = {self.user_data['org_id']}"
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_values(cmb_team, rows)
-
-        if is_update:
-            # Get selected id from table
-
-            selected_ids = self.get_selected_ids("cat_user")
-            if not selected_ids:
-                return
-
-            self.user_id = selected_ids[0]  # Get first selected id
-
-            # Get object_id from selected row
-            sql = f"SELECT loginname, descript, active, code, username, fullname, team_id FROM cm.cat_user WHERE user_id = '{self.user_id}'"
-
-            rows = tools_db.get_rows(sql)
-            if rows:
-                row = rows[0]
-                tools_qt.set_widget_text(self.dlg_create_team, "tab_none_loginname", row[0])
-                tools_qt.set_widget_text(self.dlg_create_team, "tab_none_descript", row[1])
-                if len(row) > 2:
-                    tools_qt.set_checked(self.dlg_create_team, "tab_none_active", row[2])
-                    tools_qt.set_widget_text(self.dlg_create_team, "tab_none_code", row[3])
-                    tools_qt.set_widget_text(self.dlg_create_team, "tab_none_username", row[4])
-                    tools_qt.set_widget_text(self.dlg_create_team, "tab_none_fullname", row[5])
-                    tools_qt.set_combo_value(cmb_team, row[6], 0, False)
-
-        tools_gw.open_dialog(self.dlg_create_team, "create_user")
 
     def get_selected_ids(self, tablename: str) -> List[str]:
         """Get selected ids from QTableView."""
@@ -1296,24 +1696,48 @@ class AddNewLot:
 
         return values
 
+    def _get_role_from_team_name(self, team_name: str) -> Optional[str]:
+        """Determines the database role based on the team name."""
+        if not team_name:
+            return None
+
+        team_name_lower = team_name.lower()
+
+        if "admin" in team_name_lower:
+            return "role_cm_admin"
+        elif "manager" in team_name_lower:
+            return "role_cm_manager"
+        elif "field" in team_name_lower:
+            return "role_cm_field"
+        else:
+            return "role_basic"
+
 
 def upsert_team(**kwargs: Any):
-    """ Create organization """
+    """ Create or update team """
 
     dlg = kwargs["dialog"]
-    this = kwargs["class"]
+    this = kwargs["class_obj"]
     team_id = this.team_id
 
-    # Get input values
+    # Get input values from visible fields
     name = tools_qt.get_text(dlg, "tab_none_name")
     descript = tools_qt.get_text(dlg, "tab_none_descript")
     code = tools_qt.get_text(dlg, "tab_none_code")
     active = tools_qt.get_widget_value(dlg, "tab_none_active")
-    org_id = tools_qt.get_combo_value(dlg, "tab_none_org_id")
-    role_id = tools_qt.get_combo_value(dlg, "tab_none_role_id")
+    
+    # Set default values automatically
+    org_id = this.user_data['org_id']  # Current user's organization
+    role_id = "role_cm_field"  # Default role
+    
+    # Set default values if empty
+    if not descript or descript == "null":
+        descript = ""
+    if not code or code == "null":
+        code = ""
 
     # Validate input values
-    if name == "null" or descript == "null" or org_id == '' or code == 'null':
+    if name == "null" or org_id == '':
         msg = "Missing required fields"
         tools_qt.show_info_box(msg, "Info")
         return
@@ -1330,7 +1754,7 @@ def upsert_team(**kwargs: Any):
                 code = '{code}', role_id = '{role_id}', organization_id = '{org_id}' WHERE team_id = {team_id}"
         this.team_id = None
 
-    rows = tools_db.get_rows(sql_name_exists, commit=True)
+    rows = tools_db.get_rows(sql_name_exists)
     if rows:
         msg = "The team name already exists"
         tools_qt.show_info_box(msg, "Info", parameter=str(name))
@@ -1353,141 +1777,7 @@ def upsert_team(**kwargs: Any):
         this._populate_resource_tableview("cat_team")
     else:
         # Filter teams table by the user organization selected
-        this.filter_teams_table()
-
-
-def upsert_user(**kwargs: Any):
-    """ Create or update a user and its corresponding database role. """
-
-    dlg = kwargs["dialog"]
-    this = kwargs["class"]
-    user_id = this.user_id
-
-    # Get input values
-    login_name = tools_qt.get_text(dlg, "tab_none_loginname")
-    user_name = tools_qt.get_text(dlg, "tab_none_username")
-    full_name = tools_qt.get_text(dlg, "tab_none_fullname")
-    code = tools_qt.get_text(dlg, "tab_none_code")
-    descript = tools_qt.get_text(dlg, "tab_none_descript")
-    team_id = tools_qt.get_combo_value(dlg, "tab_none_team_id")
-    active = tools_qt.get_widget_value(dlg, "tab_none_active")
-    password = tools_qt.get_text(dlg, "tab_none_password")
-
-    # Validate input values
-    if any(value in (None, "", "null") for value in [login_name, user_name, full_name, code, descript, team_id]):
-        msg = "Missing required fields"
-        tools_qt.show_info_box(msg, "Info")
-        return
-
-    # Get team name and the corresponding role for the new/updated team
-    team_name_row = tools_db.get_row(f"SELECT teamname FROM cm.cat_team WHERE team_id = {team_id}")
-    if not team_name_row:
-        msg = "Selected team not found."
-        tools_qgis.show_warning(msg)
-        return
-    new_team_name = team_name_row[0]
-    new_role_name = this._get_role_from_team_name(new_team_name)
-
-    if not new_role_name:
-        msg = "Could not determine a valid role for team '{0}'."
-        msg_params = (new_team_name,)
-        tools_qgis.show_warning(msg, msg_params=msg_params)
-        return
-
-    # Validate if user name already exists
-    sql_name_exists = f"SELECT * FROM cm.cat_user WHERE username = '{str(user_name)}'"
-
-    if not user_id:  # This is a new user
-        # Create the database user
-        create_sql = f'CREATE USER "{login_name}" WITH LOGIN'
-        if password and password not in ('', 'null'):
-            create_sql += f" PASSWORD '{password}'"
-
-        if not tools_db.execute_sql(f"{create_sql};", commit=True):
-            msg = "Failed to create database user '{0}'. The user might already exist in the database."
-            msg_params = (login_name,)
-            tools_qgis.show_warning(msg, msg_params=msg_params)
-            return
-
-        # Grant the group role to the new user
-        grant_sql = f'GRANT "{new_role_name}", "role_basic" TO "{login_name}";'
-        if not tools_db.execute_sql(grant_sql, commit=True):
-            msg = "User '{0}' was created, but failed to grant roles ('{1}', 'role_basic')."
-            msg_params = (login_name, new_role_name)
-            tools_qgis.show_warning(msg, msg_params=msg_params)
-            # Continue to insert into cat_user anyway
-
-        # Prepare SQL to insert user data into the application table
-        sql = f"INSERT INTO cm.cat_user (username, descript, active, team_id, code, loginname, fullname) \
-                VALUES ('{user_name}', '{descript}', {active}, '{team_id}', '{code}', '{login_name}', '{full_name}')"
-
-    else:  # This is an existing user
-        sql_name_exists += f" AND user_id != {user_id}"
-
-        # Get original user data to check for changes in login name or team
-        user_data_row = tools_db.get_row(f"SELECT loginname, team_id FROM cm.cat_user WHERE user_id = {user_id}")
-        original_login_name = user_data_row[0] if user_data_row else None
-        old_team_id = user_data_row[1] if user_data_row else None
-
-        if not original_login_name:
-            msg = "Could not find the original user to update."
-            tools_qgis.show_warning(msg)
-            return
-
-        # If the login name was changed, rename the database user first
-        if original_login_name != login_name:
-            rename_sql = f'ALTER USER "{original_login_name}" RENAME TO "{login_name}";'
-            if not tools_db.execute_sql(rename_sql, commit=True):
-                msg = "Failed to rename user from '{0}' to '{1}'. The new name might already be in use in the database."
-                msg_params = (original_login_name, login_name)
-                tools_qgis.show_warning(msg, msg_params=msg_params)
-                return
-
-        # If the user's team has changed, update their database role accordingly
-        if old_team_id and old_team_id != int(team_id):
-            old_team_name_row = tools_db.get_row(f"SELECT teamname FROM cm.cat_team WHERE team_id = {old_team_id}")
-            if old_team_name_row:
-                old_role_name = this._get_role_from_team_name(old_team_name_row[0])
-                if old_role_name and old_role_name != new_role_name:
-                    revoke_sql = f'REVOKE "{old_role_name}" FROM "{login_name}";'
-                    grant_sql = f'GRANT "{new_role_name}" TO "{login_name}";'
-                    tools_db.execute_sql(revoke_sql, commit=True)
-                    tools_db.execute_sql(grant_sql, commit=True)
-
-        # If a new password was provided, update it in the database
-        if password and password not in ('', 'null'):
-            pw_change_sql = f'ALTER USER "{login_name}" WITH PASSWORD \'{password}\';'
-            if not tools_db.execute_sql(pw_change_sql, commit=True):
-                msg = "Failed to update password for user '{0}'."
-                msg_params = (login_name,)
-                tools_qgis.show_warning(msg, msg_params=msg_params)
-
-        # Grant basic role to make sure user has it
-        tools_db.execute_sql(f'GRANT "role_basic" TO "{login_name}"', commit=True)
-
-        # Prepare SQL to update the user data in the application table
-        sql = f"UPDATE cm.cat_user SET username = '{user_name}', fullname = '{full_name}', descript = '{descript}', active = {active}, \
-                code = '{code}', loginname = '{login_name}', team_id = '{team_id}' WHERE user_id = {user_id}"
-        this.user_id = None
-
-    rows = tools_db.get_rows(sql_name_exists, commit=True)
-    if rows:
-        msg = "The user name already exists"
-        tools_qt.show_info_box(msg, "Info", parameter=str(user_name))
-        return
-
-    # Save the user data to the application's user table
-    status = tools_db.execute_sql(sql, commit=True)
-
-    if not status:
-        msg = "Error creating or updating user in cat_user table."
-        tools_qgis.show_warning(msg, parameter=str(user_name))
-        return
-
-    # Close the dialog and refresh the user list
-    tools_gw.close_dialog(dlg)
-    if this.user_data["role"] == "role_cm_admin":
-        this._populate_resource_tableview("cat_user")
+        this.filter_teams_by_name()
 
 
 def close(**kwargs: Any):

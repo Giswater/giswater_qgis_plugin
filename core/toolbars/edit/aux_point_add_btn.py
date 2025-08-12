@@ -125,7 +125,7 @@ class GwAuxPointAddButton(GwMaptool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
-        self.layer_points = tools_qgis.get_layer_by_tablename('v_edit_cad_auxpoint', True, True)
+        self.layer_points = tools_qgis.get_layer_by_tablename('ve_cad_auxpoint', True, True)
         if self.layer_points is None:
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
@@ -168,14 +168,14 @@ class GwAuxPointAddButton(GwMaptool):
     def _load_missing_layers(self):
         """ Adds any missing Mincut layers to TOC """
 
-        sql = "SELECT id, alias FROM sys_table WHERE id LIKE 'v_edit_cad_aux%' AND alias IS NOT NULL"
+        sql = "SELECT id, alias FROM sys_table WHERE id LIKE 've_cad_aux%' AND alias IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
             for tablename, alias in rows:
                 lyr = tools_qgis.get_layer_by_tablename(tablename)
                 if not lyr:
                     geom = f'geom_{alias.lower()}'
-                    if tablename == 'v_edit_cad_auxcircle':
+                    if tablename == 've_cad_auxcircle':
                         geom = 'geom_polygon'
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
 

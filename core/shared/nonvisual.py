@@ -43,17 +43,17 @@ class GwNonVisual:
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg: GwNonVisualManagerUi = None
-        self.dict_views = {'ws': {'cat_mat_roughness': f'{tr("roughness")}', 'v_edit_inp_curve': f'{tr("curves")}',
-                                 'v_edit_inp_pattern': f'{tr("patterns")}', 'v_edit_inp_controls': f'{tr("controls")}',
-                                 'v_edit_inp_rules': f'{tr("rules")}'},
-                           'ud': {'v_edit_inp_curve': f'{tr("curves")}', 'v_edit_inp_pattern': f'{tr("patterns")}',
-                                 'v_edit_inp_timeseries': f'{tr("timeseries")}', 
-                                 'v_edit_inp_controls': f'{tr("controls")}', 'inp_lid': f'{tr("lids")}'}}
-        self.dict_ids = {'cat_mat_roughness': 'id', 'v_edit_inp_curve': 'id', 'v_edit_inp_curve_value': 'curve_id',
-                         'v_edit_inp_pattern': 'pattern_id', 'v_edit_inp_pattern_value': 'pattern_id',
-                         'v_edit_inp_controls': 'id',
-                         'v_edit_inp_rules': 'id',
-                         'v_edit_inp_timeseries': 'id', 'v_edit_inp_timeseries_value': 'timser_id',
+        self.dict_views = {'ws': {'cat_mat_roughness': f'{tr("roughness")}', 've_inp_curve': f'{tr("curves")}',
+                                 've_inp_pattern': f'{tr("patterns")}', 've_inp_controls': f'{tr("controls")}',
+                                 've_inp_rules': f'{tr("rules")}'},
+                           'ud': {'ve_inp_curve': f'{tr("curves")}', 've_inp_pattern': f'{tr("patterns")}',
+                                 've_inp_timeseries': f'{tr("timeseries")}',
+                                 've_inp_controls': f'{tr("controls")}', 'inp_lid': f'{tr("lids")}'}}
+        self.dict_ids = {'cat_mat_roughness': 'id', 've_inp_curve': 'id', 've_inp_curve_value': 'curve_id',
+                         've_inp_pattern': 'pattern_id', 've_inp_pattern_value': 'pattern_id',
+                         've_inp_controls': 'id',
+                         've_inp_rules': 'id',
+                         've_inp_timeseries': 'id', 've_inp_timeseries_value': 'timser_id',
                          'inp_lid': 'lidco_id', 'inp_lid_value': 'lidco_id',
                          }
         self.valid = (True, "")
@@ -147,18 +147,18 @@ class GwNonVisual:
     def _populate_filter_combos(self):
         """ cmb_curve_type, cmb_pattern_type, cmb_timser_type """
 
-        sql = "SELECT DISTINCT curve_type AS id, curve_type AS idval FROM v_edit_inp_curve"
+        sql = "SELECT DISTINCT curve_type AS id, curve_type AS idval FROM ve_inp_curve"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.manager_dlg.cmb_curve_type, rows, add_empty=True)
 
         if global_vars.project_type == 'ud':
-            sql = "SELECT DISTINCT pattern_type AS id, pattern_type AS idval FROM v_edit_inp_pattern"
+            sql = "SELECT DISTINCT pattern_type AS id, pattern_type AS idval FROM ve_inp_pattern"
             rows = tools_db.get_rows(sql)
             if rows:
                 tools_qt.fill_combo_values(self.manager_dlg.cmb_pattern_type, rows, add_empty=True)
 
-            sql = "SELECT DISTINCT timser_type AS id, timser_type AS idval FROM v_edit_inp_timeseries"
+            sql = "SELECT DISTINCT timser_type AS id, timser_type AS idval FROM ve_inp_timeseries"
             rows = tools_db.get_rows(sql)
             if rows:
                 tools_qt.fill_combo_values(self.manager_dlg.cmb_timser_type, rows, add_empty=True)
@@ -166,7 +166,7 @@ class GwNonVisual:
     def _manage_toggle_active(self):
         """ Toggle the active state of selected items in the current table. """
         tableview = self.manager_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
+        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -196,9 +196,9 @@ class GwNonVisual:
         tab_name = self.manager_dlg.main_tab.currentWidget().objectName()
 
         visibility_settings = {  # tab_name: (chk_active, btn_print, cmb_curve_type, cmb_pattern_type, cmb_timser_type)
-            'v_edit_inp_curve': (True, True, True, False, False),
-            'v_edit_inp_pattern': (True, False, False, True, False),
-            'v_edit_inp_timeseries': (True, False, False, False, True),
+            've_inp_curve': (True, True, True, False, False),
+            've_inp_pattern': (True, False, False, True, False),
+            've_inp_timeseries': (True, False, False, False, True),
             'inp_lid': (True, False, False, False, False),
         }
         default_visibility = (True, False, False, False, False)
@@ -334,9 +334,7 @@ class GwNonVisual:
         """ Creates a new non-visual object from the manager """
 
         table = dialog.main_tab.currentWidget()
-        print(table)
         function_name = table.property('function')
-        print(function_name)
 
         getattr(self, function_name)()
 
@@ -456,7 +454,7 @@ class GwNonVisual:
         cross_arccat = tools_qt.is_checked(self.dlg_print, 'chk_cross_arccat')
 
         if cross_arccat:
-            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from {self.schema_name}.v_edit_inp_curve ic join {self.schema_name}.cat_arc ca on ca.curve_id = ic.id " \
+            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from {self.schema_name}.ve_inp_curve ic join {self.schema_name}.cat_arc ca on ca.curve_id = ic.id " \
                   f"WHERE ic.curve_type = 'SHAPE' and ca.shape = 'CUSTOM' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
             if curve_results is None:
@@ -471,7 +469,7 @@ class GwNonVisual:
                 msg = "Export done succesfully"
                 tools_qgis.show_info(msg, dialog=self.manager_dlg)
         else:
-            sql = f"select id as curve_id from {self.schema_name}.v_edit_inp_curve ic " \
+            sql = f"select id as curve_id from {self.schema_name}.ve_inp_curve ic " \
                   f"WHERE ic.curve_type = 'SHAPE' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
             if curve_results is None:
@@ -811,7 +809,7 @@ class GwNonVisual:
         cmb_curve_type = self.dialog.cmb_curve_type
         tbl_curve_value = self.dialog.tbl_curve_value
 
-        sql = f"SELECT * FROM v_edit_inp_curve WHERE id = '{curve_id}'"
+        sql = f"SELECT * FROM ve_inp_curve WHERE id = '{curve_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -825,7 +823,7 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, cmb_curve_type, row['curve_type'])
 
         # Populate table curve_values
-        sql = f"SELECT x_value, y_value FROM v_edit_inp_curve_value WHERE curve_id = '{curve_id}'"
+        sql = f"SELECT x_value, y_value FROM ve_inp_curve_value WHERE curve_id = '{curve_id}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             return
@@ -1148,7 +1146,7 @@ class GwNonVisual:
             self._reload_manager_table()
         elif curve_id is not None:
             # Update curve fields
-            table_name = 'v_edit_inp_curve'
+            table_name = 've_inp_curve'
 
             curve_type = curve_type.strip("'")
             descript = descript.strip("'")
@@ -1159,7 +1157,7 @@ class GwNonVisual:
                 return
 
             # Delete existing curve values
-            sql = f"DELETE FROM v_edit_inp_curve_value WHERE curve_id = {curve_id}"
+            sql = f"DELETE FROM ve_inp_curve_value WHERE curve_id = {curve_id}"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old curve values."
@@ -1184,7 +1182,7 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
     def _insert_curve_values(self, dialog, tbl_curve_value, curve_id):
-        """ Insert table values into v_edit_inp_curve_values """
+        """ Insert table values into ve_inp_curve_values """
 
         values = self._read_tbl_values(tbl_curve_value)
 
@@ -1204,7 +1202,7 @@ class GwNonVisual:
             if row == (['null'] * tbl_curve_value.columnCount()):
                 continue
 
-            sql = f"INSERT INTO v_edit_inp_curve_value (curve_id, x_value, y_value) " \
+            sql = f"INSERT INTO ve_inp_curve_value (curve_id, x_value, y_value) " \
                   f"VALUES ({curve_id}, "
             for x in row:
                 sql += f"{x}, "
@@ -1321,7 +1319,7 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         tbl_pattern_value = self.dialog.tbl_pattern_value
 
-        sql = f"SELECT * FROM v_edit_inp_pattern WHERE pattern_id = '{pattern_id}'"
+        sql = f"SELECT * FROM ve_inp_pattern WHERE pattern_id = '{pattern_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1336,7 +1334,7 @@ class GwNonVisual:
         # Populate table pattern_values
         sql = f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, " \
               f"factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 " \
-              f"FROM v_edit_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
+              f"FROM ve_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             return
@@ -1420,7 +1418,7 @@ class GwNonVisual:
             self._reload_manager_table()
         elif pattern_id is not None:
             # Update inp_pattern
-            table_name = 'v_edit_inp_pattern'
+            table_name = 've_inp_pattern'
 
             observ = observ.strip("'")
             fields = f"""{{"expl_id": {expl_id}, "observ": "{observ}"}}"""
@@ -1430,7 +1428,7 @@ class GwNonVisual:
                 return
 
             # Update inp_pattern_value
-            sql = f"DELETE FROM v_edit_inp_pattern_value WHERE pattern_id = {pattern_id}"
+            sql = f"DELETE FROM ve_inp_pattern_value WHERE pattern_id = {pattern_id}"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old curve values."
@@ -1453,7 +1451,7 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
     def _insert_ws_pattern_values(self, dialog, tbl_pattern_value, pattern_id):
-        """ Insert table values into v_edit_inp_pattern_values """
+        """ Insert table values into ve_inp_pattern_values """
 
         # Insert inp_pattern_value
         values = self._read_tbl_values(tbl_pattern_value)
@@ -1474,7 +1472,7 @@ class GwNonVisual:
             if row == (['null'] * tbl_pattern_value.columnCount()):
                 continue
 
-            sql = f"INSERT INTO v_edit_inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, " \
+            sql = f"INSERT INTO ve_inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, " \
                   f"factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, " \
                   f"factor_15, factor_16, factor_17, factor_18) " \
                   f"VALUES ({pattern_id}, "
@@ -1592,7 +1590,7 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         cmb_pattern_type = self.dialog.cmb_pattern_type
 
-        sql = f"SELECT * FROM v_edit_inp_pattern WHERE pattern_id = '{pattern_id}'"
+        sql = f"SELECT * FROM ve_inp_pattern WHERE pattern_id = '{pattern_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1606,7 +1604,7 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, cmb_pattern_type, row['pattern_type'])
 
         # Populate table pattern_values
-        sql = f"SELECT * FROM v_edit_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
+        sql = f"SELECT * FROM ve_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             return
@@ -1723,7 +1721,7 @@ class GwNonVisual:
             self._reload_manager_table()
         elif pattern_id is not None:
             # Update inp_pattern
-            table_name = 'v_edit_inp_pattern'
+            table_name = 've_inp_pattern'
 
             observ = observ.strip("'")
             fields = f"""{{"pattern_type": "{pattern_type}", "expl_id": {expl_id}, "observ": "{observ}"}}"""
@@ -1733,7 +1731,7 @@ class GwNonVisual:
                 return
 
             # Update inp_pattern_value
-            sql = f"DELETE FROM v_edit_inp_pattern_value WHERE pattern_id = {pattern_id}"
+            sql = f"DELETE FROM ve_inp_pattern_value WHERE pattern_id = {pattern_id}"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old pattern values."
@@ -1756,7 +1754,7 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
     def _insert_ud_pattern_values(self, dialog, pattern_type, pattern_id):
-        """ Insert table values into v_edit_inp_pattern_values """
+        """ Insert table values into ve_inp_pattern_values """
 
         table = dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
 
@@ -1778,7 +1776,7 @@ class GwNonVisual:
             if row == (['null'] * table.columnCount()):
                 continue
 
-            sql = "INSERT INTO v_edit_inp_pattern_value (pattern_id, "
+            sql = "INSERT INTO ve_inp_pattern_value (pattern_id, "
             for n, x in enumerate(row):
                 sql += f"factor_{n + 1}, "
             sql = sql.rstrip(', ') + ")"
@@ -1881,7 +1879,7 @@ class GwNonVisual:
         if dscenario_id is not None:
             sql = f"SELECT * FROM inp_dscenario_controls WHERE id = '{control_id}'"
         else:
-            sql = f"SELECT * FROM v_edit_inp_controls WHERE id = '{control_id}'"
+            sql = f"SELECT * FROM ve_inp_controls WHERE id = '{control_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1961,7 +1959,7 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
         elif control_id is not None:
-            table_name = 'v_edit_inp_controls'
+            table_name = 've_inp_controls'
 
             text = text.strip("'")
             text = text.replace("\n", "\\n")
@@ -2017,7 +2015,7 @@ class GwNonVisual:
         if dscenario_id is not None:
             sql = f"SELECT * FROM inp_dscenario_rules WHERE dscenario_id = '{dscenario_id}' AND id = '{rule_id}'"
         else:
-            sql = f"SELECT * FROM v_edit_inp_rules WHERE id = '{rule_id}'"
+            sql = f"SELECT * FROM ve_inp_rules WHERE id = '{rule_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -2097,7 +2095,7 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
         elif rule_id is not None:
-            table_name = 'v_edit_inp_rules'
+            table_name = 've_inp_rules'
 
             text = text.strip("'")
             text = text.replace("\n", "\\n")
@@ -2231,7 +2229,7 @@ class GwNonVisual:
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
         txt_addparam = self.dialog.txt_addparam
 
-        sql = f"SELECT * FROM v_edit_inp_timeseries WHERE id = '{timser_id}'"
+        sql = f"SELECT * FROM ve_inp_timeseries WHERE id = '{timser_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -2249,7 +2247,7 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_addparam, addparam)
 
         # Populate table timeseries_values
-        sql = f"SELECT id, date, hour, time, value FROM v_edit_inp_timeseries_value WHERE timser_id = '{timser_id}'"
+        sql = f"SELECT id, date, hour, time, value FROM ve_inp_timeseries_value WHERE timser_id = '{timser_id}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             return
@@ -2379,7 +2377,7 @@ class GwNonVisual:
             self._reload_manager_table()
         elif timeseries_id is not None:
             # Update inp_timeseries
-            table_name = 'v_edit_inp_timeseries'
+            table_name = 've_inp_timeseries'
 
             active = active.strip("'")
             timser_type = timser_type.strip("'")
@@ -2398,7 +2396,7 @@ class GwNonVisual:
                 return
 
             # Update inp_timeseries_value
-            sql = f"DELETE FROM v_edit_inp_timeseries_value WHERE timser_id = {timeseries_id}"
+            sql = f"DELETE FROM ve_inp_timeseries_value WHERE timser_id = {timeseries_id}"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old timeseries values."
@@ -2421,7 +2419,7 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
     def _insert_timeseries_value(self, dialog, tbl_timeseries_value, times_type, timeseries_id):
-        """ Insert table values into v_edit_inp_timeseries_value """
+        """ Insert table values into ve_inp_timeseries_value """
 
         values = list()
         for y in range(0, tbl_timeseries_value.rowCount()):
@@ -2460,7 +2458,7 @@ class GwNonVisual:
                     tools_db.dao.rollback()
                     return False
 
-                sql = "INSERT INTO v_edit_inp_timeseries_value (timser_id, date, hour, value) "
+                sql = "INSERT INTO ve_inp_timeseries_value (timser_id, date, hour, value) "
                 sql += f"VALUES ({timeseries_id}, {row[0]}, {row[1]}, {row[2]})"
 
                 result = tools_db.execute_sql(sql, commit=False)
@@ -2480,7 +2478,7 @@ class GwNonVisual:
                     tools_db.dao.rollback()
                     return False
 
-                sql = "INSERT INTO v_edit_inp_timeseries_value (timser_id, time, value) "
+                sql = "INSERT INTO ve_inp_timeseries_value (timser_id, time, value) "
                 sql += f"VALUES ({timeseries_id}, {row[1]}, {row[2]})"
 
                 result = tools_db.execute_sql(sql, commit=False)
@@ -2521,7 +2519,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
 
         # Populate Control Curve combo
-        sql = "SELECT id, id as idval FROM v_edit_inp_curve; "
+        sql = "SELECT id, id as idval FROM ve_inp_curve; "
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.dialog.txt_7_cmb_control_curve, rows)
@@ -2911,7 +2909,7 @@ class GwNonVisual:
 
         tooltip = "Active sectors for user selection (check selector sector)"
         combobox.setToolTip(tooltip)
-        sql = "SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
+        sql = "SELECT sector_id as id, name as idval FROM ve_sector WHERE sector_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(combobox, rows)

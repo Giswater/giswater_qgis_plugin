@@ -27,7 +27,7 @@ class StaticCalibration:
         dlg = self.dlg_epa
         tools_gw.load_settings(dlg)
 
-        sql = "select name, dscenario_id from v_edit_cat_dscenario where active is true"
+        sql = "select name, dscenario_id from ve_cat_dscenario where active is true"
         if tools_db.dao.conn.closed:
             tools_db.dao.init_db()
         rows = tools_db.get_rows(sql)

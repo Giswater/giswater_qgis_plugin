@@ -59,7 +59,7 @@ class GwPrintButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [['Fast print', '_fastprint'], ['Massive composer', '_massive_composer']]
+        buttons = [[tools_qt.tr('Print'), '_fastprint'], [tools_qt.tr('Massive composer'), '_massive_composer']]
 
         for button in buttons:
             button_name = button[0]
@@ -75,11 +75,11 @@ class GwPrintButton(GwAction):
         menu.setProperty("last_selection", button_function)
 
     def _fastprint(self):
-        print("fastprint")
+
         self.fastprint = GwFastprint()
         self.fastprint.open_print()
 
     def _massive_composer(self):
-        print("massive composer")
+
         self.massive_composer = GwMassiveComposer()
         self.massive_composer.open_massive_composer()

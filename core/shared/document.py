@@ -142,7 +142,7 @@ class GwDocument(QObject):
         # Adding auto-completion to a QLineEdit for default feature
         if feature_type is None:
             feature_type = "arc"
-        viewname = f"v_edit_{feature_type}"
+        viewname = f"ve_{feature_type}"
         tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(feature_type) + "_id")
 
         # Config Workcat
@@ -170,8 +170,8 @@ class GwDocument(QObject):
             partial(tools_gw.set_completer_object, self.dlg_add_doc, "visit"))
 
         # Set signals
-        self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                                "v_edit_element", "v_edit_link"]
+        self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_gully",
+                                "ve_man_genelem", "ve_link"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         # Dialog
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
@@ -211,15 +211,15 @@ class GwDocument(QObject):
         )
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                               self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+                                                               self.dlg_add_doc.tbl_doc_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
         self.dlg_add_doc.tbl_doc_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                self.dlg_add_doc.tbl_doc_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+                                                                self.dlg_add_doc.tbl_doc_x_node, "ve_node", "node_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                  self.dlg_add_doc.tbl_doc_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+                                                                  self.dlg_add_doc.tbl_doc_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dlg_add_doc.tbl_doc_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+                                                                 self.dlg_add_doc.tbl_doc_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dlg_add_doc.tbl_doc_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
+                                                                 self.dlg_add_doc.tbl_doc_x_link, "ve_link", "link_id", self.rubber_band, 10))
 
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
@@ -562,7 +562,7 @@ class GwDocument(QObject):
         expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        table_name = f"{self.schema_name}.v_edit_{feature_type}"
+        table_name = f"{self.schema_name}.ve_{feature_type}"
         message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)

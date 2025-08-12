@@ -33,6 +33,7 @@ class GwI18NGenerator:
         self.last_error = None
         self.path_dic = None
         self.dlg_qm = None
+        self.project_type = None
 
     def init_dialog(self):
         """ Constructor """
@@ -134,14 +135,16 @@ class GwI18NGenerator:
             self._create_path_dic()
             for type_db_file in self.path_dic:
                 if tools_qt.is_checked(self.dlg_qm, self.path_dic[type_db_file]['checkbox']):
-                    status_all_db_msg, dbtable = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
+                    status_all_db_msg, text_error = self._create_all_db_files(self.path_dic[type_db_file]["path"], type_db_file)
                     if status_all_db_msg is True:
-                        translated_langs['db'].append(self.language)
+                        if self.language not in translated_langs['db']:
+                            translated_langs['db'].append(self.language)
                     elif status_all_db_msg is False:
-                        error_langs['db'][self.language].append(dbtable)
+                        error_langs['db'].setdefault(self.language, []).append(text_error)
                     elif status_all_db_msg is None:
-                        canceled_langs['db'][self.language].append(dbtable)
-                    type_db_file_translated.append(type_db_file)
+                        canceled_langs['db'].setdefault(self.language, []).append(text_error)
+                    if type_db_file not in type_db_file_translated:
+                        type_db_file_translated.append(type_db_file)
 
         # Write a message with the results
         if py_msg:
@@ -178,7 +181,7 @@ class GwI18NGenerator:
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = "{0} ({1}) - Updating python files..."
+        msg = "{0} ({1}) - python - Updating python files..."
         msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}")
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
@@ -374,7 +377,9 @@ class GwI18NGenerator:
     def _create_all_db_files(self, cfg_path, file_type):
         """ Read the values of the database and update the i18n files """
 
-        file_name = f"{self.path_dic[file_type]["name"]}"
+        file_name = f"{self.path_dic[file_type]['name']}"
+        self.project_type = self.path_dic[file_type]["project_type"][0]
+        text_error = ""
 
         # Check if file exist
         if os.path.exists(cfg_path + file_name) and not self.multiple_languages:
@@ -382,7 +387,7 @@ class GwI18NGenerator:
             title = "Overwrite"
             answer = tools_qt.show_question(msg, title, parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
-                return None, ""
+                return None, "Translation canceled"
         elif not os.path.exists(cfg_path + file_name):
             os.makedirs(cfg_path, exist_ok=True)
 
@@ -391,7 +396,6 @@ class GwI18NGenerator:
         dbtables = self.path_dic[file_type]["tables"]
         if self.language == 'no_TR':
             if file_type not in ['i18n_ws', 'i18n_ud']:
-                print(f"file_type: {file_type}")
                 return True, f"{file_type}, not translated"
             dbtables = ['dbconfig_form_fields', 'dbconfig_param_system', 'dbconfig_typevalue', 
                               'dbconfig_form_tableview', 'dbconfig_form_fields_feat']
@@ -399,13 +403,14 @@ class GwI18NGenerator:
         for dbtable in dbtables:
             dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
             if not dbtable_rows:
-                return False, dbtable
+                return False, f"No rows found in: {dbtable}"
             else:
                 if "json" in dbtable:
-                    self._write_dbjson_values(dbtable_rows, cfg_path + file_name)
+                    text_error += self._write_dbjson_values(dbtable_rows, cfg_path + file_name)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name, file_type)
-
+        if text_error != "":
+            return False, text_error
         return True, ""
 
     # endregion
@@ -416,8 +421,8 @@ class GwI18NGenerator:
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = "{0} ({1}) - Updating {2}..."
-        msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}", table)
+        msg = "{0} ({1}) - {2} - Updating {3}..."
+        msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}", self.project_type, table)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
         colums = []
@@ -507,11 +512,11 @@ class GwI18NGenerator:
         sql=""
         try:
             if self.lower_lang == 'en_us':
-                sql = (f"SELECT {", ".join(colums)} "
+                sql = (f"SELECT {', '.join(colums)} "
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY context;")
             else:
-                sql = (f"SELECT {", ".join(colums)}, {", ".join(lang_colums)} "
+                sql = (f"SELECT {', '.join(colums)}, {', '.join(lang_colums)} "
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY context;")
         except Exception as e:
@@ -689,7 +694,6 @@ class GwI18NGenerator:
         for key, related_rows in updates.items():
             # Unpack key
             source, context, original_text, *extra = key
-
             # Correct column based on context
             if context == "config_report":
                 column = "filterparam"
@@ -704,23 +708,9 @@ class GwI18NGenerator:
                 continue
 
             # Parse JSON safely
-            if context != "config_form_fields":
-                try:
-                    json_data = ast.literal_eval(original_text)
-                except (ValueError, SyntaxError):
-                    msg = "Error parsing JSON from text: {0}"
-                    msg_params = (original_text,)
-                    tools_log.log_error(msg, msg_params=msg_params)
-                    continue
-            else:
-                modified = original_text.replace("'", "\"").replace("False", "false").replace("True", "true").replace("None", "null")
-                try:
-                    json_data = json.loads(modified)
-                except json.JSONDecodeError as e:
-                    msg = "Error decoding JSON: {0}"
-                    msg_params = (e,)
-                    tools_log.log_error(msg, msg_params=msg_params)
-                    continue
+            json_data = self.safe_parse(source, original_text)
+            if json_data is None:
+                return f'{context} - Error parsing JSON source (Log_info)'
 
             # Translate fields
             for row in related_rows:
@@ -784,8 +774,8 @@ class GwI18NGenerator:
                     file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
 
             if closing:
-                file.write("UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n")
-
+                file.write("UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';\n")
+        return ""
     # endregion
     # region Extra functions
 
@@ -802,7 +792,7 @@ class GwI18NGenerator:
                   'General Public License as published by the Free Software Foundation, either version 3 of the '
                   'License, or (at your option) any later version.\n'
                   '*/\n\n\n')
-        if file_type in ["i18n_ws", "i18n_ud"]:
+        if file_type in ["i18n_ws", "i18n_ud", "i18n_utils"]:
             header += ('SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
                        "UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n")
         elif file_type == "am":
@@ -880,6 +870,24 @@ class GwI18NGenerator:
             status = False
 
         return status
+    
+    def safe_parse(self, source, text):
+        try:
+            # Try JSON first (safer if it's valid JSON)
+            modified = text.replace("'", "\"").replace("False", "false").replace("True", "true").replace("None", "null")
+            return json.loads(modified)
+        except json.JSONDecodeError as e:
+            e1 = e
+
+        try:
+            # Try Python literal (e.g., from repr())
+            modified = text.replace("false", "False").replace("true", "True").replace("null", "None")
+            return ast.literal_eval(modified)
+        except (ValueError, SyntaxError) as e2:
+            msg = "Error parsing JSON source: {0} - {1} - {2}"
+            msg_params = (source, e1, e2)
+            tools_log.log_error(msg, msg_params=msg_params)
+            return None
 
     def _commit(self):
         """ Commit current database transaction """
@@ -935,8 +943,8 @@ class GwI18NGenerator:
 
         self.path_dic = {
             "i18n_ws": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}i18n{os.sep}{self.language}{os.sep}",
-                "name": "ws_dml.sql",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}ws{os.sep}i18n{os.sep}",
+                "name": f"{self.language}.sql",
                 "project_type": ["ws", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
@@ -946,14 +954,25 @@ class GwI18NGenerator:
                     "dbconfig_form_fields_json"]
             },
             "i18n_ud": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}i18n{os.sep}{self.language}{os.sep}",
-                "name": "ud_dml.sql",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}ud{os.sep}i18n{os.sep}",
+                "name": f"{self.language}.sql",
                 "project_type": ["ud", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
+                    "dbconfig_form_fields_json"]
+            },
+            "i18n_utils": {
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}utils{os.sep}i18n{os.sep}",
+                "name": f"{self.language}.sql",
+                "project_type": ["utils", "ud", "ws"],
+                "checkbox": self.dlg_qm.chk_i18n_files,
+                "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "su_feature", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "am": {
@@ -968,8 +987,8 @@ class GwI18NGenerator:
                 "name": f"{self.language}.sql",
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
-                "tables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json"]
+                "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
+                             "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbtypevalue", "dbfprocess"]
             }
         }
 

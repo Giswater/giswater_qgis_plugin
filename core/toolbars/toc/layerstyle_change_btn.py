@@ -110,6 +110,13 @@ class GwLayerStyleChangeButton(GwAction):
             action.triggered.connect(partial(self._apply_context, styleconfig_id, style_name))
             self.menu.addAction(action)
 
+        # Add "Refresh all" option to menu that will update all layer styles 
+        # by re-applying them from the current QGIS layer styles
+        self.menu.addSeparator()
+        action = QAction("Refresh all", self.menu)
+        action.triggered.connect(partial(tools_gw.refresh_all_styles))
+        self.menu.addAction(action)
+
     def _apply_context(self, styleconfig_id: int, style_name: str) -> None:
         """Apply styles for the selected context."""
 

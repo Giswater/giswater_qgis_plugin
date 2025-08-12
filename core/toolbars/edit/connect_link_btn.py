@@ -19,8 +19,8 @@ from ...ui.ui_manager import GwConnectLinkUi
 
 
 class SelectAction(Enum):
-    CONNEC_LINK = tools_qt.tr('Connec to link')
-    GULLY_LINK = tools_qt.tr('Gully to link')
+    CONNEC_LINK = tools_qt.tr('Connec to network')
+    GULLY_LINK = tools_qt.tr('Gully to network')
 
 
 class GwConnectLinkButton(GwMaptool):
@@ -79,23 +79,17 @@ class GwConnectLinkButton(GwMaptool):
         # Set combo ids editable
         self.txt_id.setEditable(True)
 
-        # Connect signal when row is clicked
-        self.tbl_ids.clicked.connect(self.on_row_clicked)
-
         # Add headers to table
         tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header': f'{self.feature_type}_id'}])
+
+        # Connect signal when dialog is rejected
+        self.dlg_connect_link.rejected.connect(lambda: close(**{'class': self, 'dialog': self.dlg_connect_link}))
 
         # Set window title from dialog depending of the current feature
         self.dlg_connect_link.setWindowTitle(tools_qt.tr(f"{self.feature_type.capitalize()} to link"))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_connect_link, 'connect_link')
-
-    def on_row_clicked(self, index):
-        """ Set QLineEdit text of id with selected row id """
-
-        value = self.tbl_ids.model().data(index)
-        tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_id", value)
 
     def fill_tbl_ids(self, layer):
         """ Fill table with selected features """
@@ -220,8 +214,8 @@ class GwConnectLinkButton(GwMaptool):
             tools_gw.reset_rubberband(self.rubber_band)
 
             # Force reload dataProvider of layer
-            tools_qgis.set_layer_index('v_edit_link')
-            tools_qgis.set_layer_index('v_edit_vnode')
+            tools_qgis.set_layer_index('ve_link')
+            tools_qgis.set_layer_index('ve_vnode')
 
     def manage_result(self, result):
 
@@ -231,14 +225,17 @@ class GwConnectLinkButton(GwMaptool):
             msg = "gw_fct_setlinktonetwork (Check log messages)"
             tools_qgis.show_warning(msg, title='Function error')
 
+        # Remove selection from layers
+        tools_gw.remove_selection()
+        
         # Refresh map canvas
         tools_gw.reset_rubberband(self.rubber_band)
         self.refresh_map_canvas()
         self.iface.actionPan().trigger()
 
         # Force reload dataProvider of layer
-        tools_qgis.set_layer_index('v_edit_link')
-        tools_qgis.set_layer_index('v_edit_vnode')
+        tools_qgis.set_layer_index('ve_link')
+        tools_qgis.set_layer_index('ve_vnode')
 
     # endregion
 
@@ -268,32 +265,16 @@ class GwConnectLinkButton(GwMaptool):
     def _select_multiple_features(self, select_geometry):
         """ Select multiple features on canvas """
 
+        # TODO: Create button add_forced_arcs and manage selection with arcs
+
         # Get pressed keys on keyboard
         key = QApplication.keyboardModifiers()
 
         # Set behaviour depending of the pressed keys on keyboard
         behaviour = QgsVectorLayer.RemoveFromSelection if key == (Qt.ControlModifier | Qt.ShiftModifier) else QgsVectorLayer.AddToSelection
 
-        # Get arc layer
-        layer = tools_qgis.get_layer_by_tablename('v_edit_arc')
-
-        # Check if layer exists
-        if layer:
-            # Use selectByRect to initially select features
-            layer.selectByRect(select_geometry, behaviour)
-
-            # Get the selected features after selection
-            features_list = layer.selectedFeatures()
-
-            # If more than one feature is selected, keep only the first one
-            if len(features_list) > 1:
-                # Get the IDs of all selected features
-                selected_ids = [feature.id() for feature in features_list]
-                # Keep only the first ID and deselect the others
-                layer.selectByIds([selected_ids[0]])
-
         # Get current feature layer (connec/gully)
-        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature_type}')
+        layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
 
         # Check if layer exists
         if layer:
@@ -313,7 +294,7 @@ class GwConnectLinkButton(GwMaptool):
         """ Process selected features """
 
         # Get current feature layer (connec/gully)
-        layer = tools_qgis.get_layer_by_tablename(f'v_edit_{self.feature_type}')
+        layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
 
         # Refresh table
         self.fill_tbl_ids(layer)
@@ -342,7 +323,7 @@ def add(**kwargs):
     is_valid, expr = tools_qt.check_expression_filter(expr_filter)
 
     # Get layer from feature
-    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature_type}')
+    layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
 
     # Check if layer exists and expression is valid
     if layer and is_valid:
@@ -359,42 +340,75 @@ def add(**kwargs):
 
 
 def remove(**kwargs):
-    """ Remove button clicked event """
+    """ Remove button clicked event - Remove selected rows from table """
 
     # Get class
     this = kwargs['class']
 
-    # Get selected id
-    selected_id = tools_qt.get_combo_value(this.dlg_connect_link, "tab_none_id")
-
-    # Check if selected id is not empty
-    if selected_id is None or selected_id == '':
-        message = "Please select a feature to remove"
-        tools_qgis.show_warning(message, title='Connect to network')
-        return
-
-    # Get layer from feature
-    layer = tools_qgis.get_layer_by_tablename(f'v_edit_{this.feature_type}')
-
-    # Check if layer exists
-    if layer:
-
-        # Initialize an empty list
-        id_list = []
-
-        # Loop througth selected features
-        for feature in layer.selectedFeatures():
-
-            # Append features expect the feature to remove
-            if feature.attribute(f"{this.feature_type}_id") != selected_id:
-                id_list.append(feature.id())
-
-        # Show selected ids in canvas
-        layer.selectByIds(id_list)
-
-    # Clear selected id txt and refresh table
-    tools_qt.set_widget_text(this.dlg_connect_link, "tab_none_id", "")
-    this.fill_tbl_ids(layer)
+    try:
+        # Get the table model and selection model
+        model = this.tbl_ids.model()
+        selection_model = this.tbl_ids.selectionModel()
+        
+        if not model or not selection_model:
+            return
+            
+        # Get selected rows
+        selected_rows = selection_model.selectedRows()
+        
+        if not selected_rows:
+            message = "Please select rows to remove from the table"
+            tools_qgis.show_warning(message, title='Connect to network')
+            return
+        
+        # Get IDs from selected rows
+        selected_ids = []
+        for index in selected_rows:
+            item = model.item(index.row(), 0)  # Get the first column
+            if item and item.text():
+                selected_ids.append(item.text())
+        
+        if not selected_ids:
+            return
+            
+        # Remove selected rows from the model
+        # We need to remove rows in reverse order to avoid index issues
+        rows_to_remove = sorted([index.row() for index in selected_rows], reverse=True)
+        for row in rows_to_remove:
+            model.removeRow(row)
+        
+        # Clear any selection in the combo box
+        tools_qt.set_widget_text(this.dlg_connect_link, "tab_none_id", "")
+        
+        # Update canvas selection to show only remaining items in the table
+        layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
+        if layer:
+            # Get remaining IDs from the table
+            remaining_ids = []
+            for row in range(model.rowCount()):
+                item = model.item(row, 0)
+                if item and item.text():
+                    remaining_ids.append(int(item.text()))
+            
+            # Clear current selection and select only remaining features
+            layer.removeSelection()
+            if remaining_ids:
+                # Create expression to select remaining features
+                expr_filter = f"{this.feature_type}_id IN ({','.join(map(str, remaining_ids))})"
+                is_valid, expr = tools_qt.check_expression_filter(expr_filter)
+                if is_valid:
+                    layer.selectByExpression(expr_filter)  # Use expr_filter (string) instead of expr (QgsExpression)
+            
+            # Refresh the layer to show updated selection
+            layer.triggerRepaint()
+        
+        # Show success message
+        removed_count = len(selected_ids)
+        tools_qgis.show_info(f"{removed_count} item(s) removed from the list: {', '.join(selected_ids)}")
+            
+    except Exception as e:
+        tools_qgis.show_warning(f"Error removing items: {str(e)}")
+        tools_gw.log_info(f"Error in remove function: {str(e)}")
 
 
 def accept(**kwargs):
@@ -413,7 +427,7 @@ def accept(**kwargs):
         return
 
     # Get arc layer
-    layer_arc = tools_qgis.get_layer_by_tablename('v_edit_arc')
+    layer_arc = tools_qgis.get_layer_by_tablename('ve_arc')
     selected_arc = None
 
     # Check if the layer is valid and has selected arc
@@ -444,6 +458,9 @@ def accept(**kwargs):
     QgsApplication.taskManager().addTask(this.connect_link_task)
     QgsApplication.taskManager().triggerTask(this.connect_link_task)
 
+    # Remove selection from layers before canceling map tool
+    tools_gw.remove_selection()
+    
     # Cancel map tool if no features are selected or the layer is not visible
     this.cancel_map_tool()
 
@@ -457,7 +474,16 @@ def snapping(**kwargs):
 def close(**kwargs):
     """ Close button clicked event """
 
-    kwargs['class'].cancel_map_tool()
+    # Get class
+    this = kwargs['class']
+    
+    # Remove selection from layers before canceling map tool
+    tools_gw.remove_selection()
+    
+    # Cancel map tool
+    this.cancel_map_tool()
+    
+    # Close dialog
     tools_gw.close_dialog(kwargs['dialog'])
 
 
@@ -468,7 +494,7 @@ def filter_expression(**kwargs):
     this = kwargs['class']
 
     # Get current layer and feature type
-    layer_name = f'v_edit_{this.feature_type}'
+    layer_name = f've_{this.feature_type}'
 
     layer = tools_qgis.get_layer_by_tablename(layer_name)
     if not layer:

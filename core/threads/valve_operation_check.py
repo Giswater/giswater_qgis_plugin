@@ -9,19 +9,30 @@ import csv
 import json
 from pathlib import Path
 
-import wntr
 from qgis.core import QgsTask
 from wntr.epanet.util import to_si, FlowUnits, HydParam
 
 from .task import GwTask
 from ...libs import tools_db, lib_vars
 
+try:
+    import wntr
+    from wntr.network import WaterNetworkModel, Link, LinkStatus
+    from wntr.sim import EpanetSimulator
+    from wntr.metrics.hydraulics import average_expected_demand
+except ImportError:
+    wntr = None
+    WaterNetworkModel = None
+    Link = None
+    LinkStatus = None
+    EpanetSimulator = None
+
 
 class GwValveOperationCheck(GwTask):
     def __init__(
         self,
         description,
-        network: wntr.network.WaterNetworkModel,
+        network: WaterNetworkModel,
         config,
         output_folder,
         file_name,
@@ -75,7 +86,7 @@ class GwValveOperationCheck(GwTask):
     def _prepare_network(self):
         self._add_log("Preparing network...")
         adjusted_demands = (
-            wntr.metrics.hydraulic.average_expected_demand(self.input_network)
+            average_expected_demand(self.input_network)
             * self.config.options["base_demand_multiplier"]
         )
 
@@ -162,15 +173,15 @@ class GwValveOperationCheck(GwTask):
                         not_found.append(link_name)
                         continue
                     link = scenario_network.get_link(link_name)
-                    if link.initial_status == wntr.network.LinkStatus.Closed:
-                        link.initial_status = wntr.network.LinkStatus.Opened
+                    if link.initial_status == LinkStatus.Closed:
+                        link.initial_status = LinkStatus.Opened
 
                 for link_name in scenario["closed"]:
                     if link_name not in scenario_network.link_name_list:
                         not_found.append(link_name)
                         continue
                     link = scenario_network.get_link(link_name)
-                    link.initial_status = wntr.network.LinkStatus.Closed
+                    link.initial_status = LinkStatus.Closed
 
                 if len(not_found):
                     message = "These links could not be located within the network: "
@@ -200,7 +211,7 @@ class GwValveOperationCheck(GwTask):
             self._save_scenario_to_infile(scenario["name"])
         return True
 
-    def _run_simulation(self, network: wntr.network.WaterNetworkModel):
+    def _run_simulation(self, network: WaterNetworkModel):
         nodes = {}
         unserviced = 0
         partial = 0
@@ -214,7 +225,7 @@ class GwValveOperationCheck(GwTask):
         prefix = str(Path.home() / "temp")
         try:
             pressures = (
-                wntr.sim.EpanetSimulator(network)
+                EpanetSimulator(network)
                 .run_sim(file_prefix=prefix)
                 .node["pressure"]
                 .loc[0]
@@ -395,7 +406,7 @@ class GwValveOperationCheck(GwTask):
                 ]
                 writer.writerow(line)
 
-    def _wkt_from_link(self, link: wntr.network.Link):
+    def _wkt_from_link(self, link: Link):
         linestring = "LINESTRING ("
         x1, y1 = link.start_node.coordinates
         linestring += f"{x1} {y1},"

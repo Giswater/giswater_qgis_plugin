@@ -111,7 +111,7 @@ class GwGisFileCreate:
             if isinstance(group, QgsLayerTreeLayer):
                 group.setExpanded(False)
 
-        # Set camera position on v_edit_node
+        # Set camera position on ve_node
         global_vars.iface.mapCanvas().setExtent(tools_gw._get_extent_parameters(schema))
 
         # Save project
@@ -136,7 +136,7 @@ class GwGisFileCreate:
             tools_qgis.show_warning(msg)
             return False, None
         else:
-            layer_source['srid'] = tools_db.get_srid('v_edit_node', schema)
+            layer_source['srid'] = tools_db.get_srid('ve_node', schema)
             return True, layer_source
 
     def _replace_spatial_parameters(self, srid):

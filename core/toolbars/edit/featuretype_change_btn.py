@@ -43,7 +43,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             self.actions = ['ARC', 'NODE', 'CONNEC']
         self.list_tables = list_tables
         if not self.list_tables:
-            self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
+            self.list_tables = ['ve_arc', 've_node', 've_connec', 've_gully']
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -91,7 +91,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            msg = "Click on feature to change its type"
+            msg = "Click on the object to change its class"
             tools_qgis.show_info(msg)
 
     def canvasMoveEvent(self, event):
@@ -100,12 +100,12 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)
 
-        # Snapping layers 'v_edit_'
+        # Snapping layers 've_'
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename and 'v_edit' in tablename:
+            if tablename and 've' in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def canvasReleaseEvent(self, event):
@@ -141,8 +141,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
     def _set_active_layer(self, name):
         """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
 
-        layers = {"ARC": "v_edit_arc", "NODE": "v_edit_node",
-                  "CONNEC": "v_edit_connec", "GULLY": "v_edit_gully"}
+        layers = {"ARC": "ve_arc", "NODE": "ve_node",
+                  "CONNEC": "ve_connec", "GULLY": "ve_gully"}
         tablename = layers.get(name.upper())
         self.current_layer = tools_qgis.get_layer_by_tablename(tablename)
         self.iface.setActiveLayer(self.current_layer)
@@ -242,14 +242,14 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         layer = self.snapper_manager.get_snapped_layer(result)
         tablename = tools_qgis.get_layer_source_table_name(layer)
-        if tablename and 'v_edit' in tablename:
-            if tablename == 'v_edit_node':
+        if tablename and 've' in tablename:
+            if tablename == 've_node':
                 self.feature_type = 'node'
-            elif tablename == 'v_edit_connec':
+            elif tablename == 've_connec':
                 self.feature_type = 'connec'
-            elif tablename == 'v_edit_gully':
+            elif tablename == 've_gully':
                 self.feature_type = 'gully'
-            elif tablename == 'v_edit_arc':
+            elif tablename == 've_arc':
                 self.feature_type = 'arc'
 
         self.tablename = tablename
@@ -271,7 +271,7 @@ def btn_cancel_featuretype_change(**kwargs):
 def btn_accept_featuretype_change(**kwargs):
     """ Update current type of feature and save changes in database """
 
-    this = kwargs["class"]
+    class_obj = kwargs["class"]
     dialog = kwargs["dialog"]
 
     project_type = tools_gw.get_project_type()
@@ -301,8 +301,8 @@ def btn_accept_featuretype_change(**kwargs):
                 project_type == 'ud'):
 
             # Get function input parameters
-            feature = f'"type":"{this.feature_type}"'
-            extras = f'"feature_id":"{this.feature_id}"'
+            feature = f'"type":"{class_obj.feature_type}"'
+            extras = f'"feature_id":"{class_obj.feature_id}"'
             extras += f', "feature_type_new":"{feature_type_new}"'
             extras += f', "featurecat_id":"{featurecat_id}"'
             extras += f', "fluid_type":"{fluid_type}"'
@@ -318,7 +318,7 @@ def btn_accept_featuretype_change(**kwargs):
                 msg = "Error replacing feature"
                 tools_qgis.show_warning(msg)
                 # Check in init config file if user wants to keep map tool active or not
-                this.manage_active_maptool()
+                class_obj.manage_active_maptool()
                 tools_gw.close_dialog(dialog)
                 return
 
@@ -346,23 +346,23 @@ def btn_accept_featuretype_change(**kwargs):
     tools_gw.close_dialog(dialog)
 
     # Refresh map canvas
-    this.refresh_map_canvas()
+    class_obj.refresh_map_canvas()
 
     # Check if the expression is valid
-    expr_filter = f"{this.feature_type}_id = '{this.feature_id}'"
+    expr_filter = f"{class_obj.feature_type}_id = '{class_obj.feature_id}'"
     (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
     if not is_valid:
         return
 
     # Check in init config file if user wants to keep map tool active or not
-    this.manage_active_maptool()
+    class_obj.manage_active_maptool()
 
 
 def btn_catalog_featuretype_change(**kwargs):
     """ Open Catalog form """
 
     dialog = kwargs["dialog"]
-    this = kwargs["class"]
+    class_obj = kwargs["class"]
 
     # Get feature_type
     child_type = tools_qt.get_text(dialog, "tab_none_feature_type_new")
@@ -371,8 +371,8 @@ def btn_catalog_featuretype_change(**kwargs):
         tools_qt.show_info_box(msg, "Info")
         return
 
-    this.catalog = GwCatalog()
-    this.catalog.open_catalog(dialog, 'tab_none_featurecat_id', this.feature_type, child_type)
+    class_obj.catalog = GwCatalog()
+    class_obj.catalog.open_catalog(dialog, 'tab_none_featurecat_id', class_obj.feature_type, child_type)
 
 
 def cmb_new_featuretype_selection_changed(**kwargs):
@@ -380,14 +380,14 @@ def cmb_new_featuretype_selection_changed(**kwargs):
 
     dialog = kwargs["dialog"]
     cmb_new_feature_type = kwargs["widget"]
-    this = kwargs["class"]
+    class_obj = kwargs["class"]
     reload_fields = []
 
     # Fetch the new feature type
     feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
 
     # Create body with only newFeatureCat in extras
-    feature = f'"tableName":"{this.tablename}", "id":"{this.feature_id}"'
+    feature = f'"tableName":"{class_obj.tablename}", "id":"{class_obj.feature_id}"'
     extras = f'"newFeatureCat":"{feature_type_new}"'
     body = tools_gw.create_body(feature=feature, extras=extras)
 

@@ -40,7 +40,7 @@ class GwFastprint:
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.my_json = {}
 
-        composers_list = self._get_composer()
+        composers_list = tools_qgis.get_composer()
         if composers_list == '"{}"':
             msg = "No composers found."
             tools_qt.show_info_box(msg, "Info")
@@ -105,23 +105,6 @@ class GwFastprint:
         else:
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
-
-    def _get_composer(self, removed=None):
-        """ Get all composers from current QGis project """
-
-        composers = '"{'
-        active_composers = tools_qgis.get_composers_list()
-
-        for composer in active_composers:
-            if type(composer) is QgsPrintLayout:  # TODO: use isinstance(composer, QgsPrintLayout)
-                if composer != removed and composer.name():
-                    cur = composer.name()
-                    composers += cur + ', '
-        if len(composers) > 2:
-            composers = composers[:-2] + '}"'
-        else:
-            composers += '}"'
-        return composers
 
     def _create_dialog(self, dialog, fields):
 

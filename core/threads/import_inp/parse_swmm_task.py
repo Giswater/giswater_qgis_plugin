@@ -114,8 +114,10 @@ class Catalogs:
         if log:
             log.append("Getting flwreg catalog from DB...")
         rows = tools_db.get_rows("""
-                SELECT id, flwreg_type
-                FROM cat_flwreg
+                SELECT ce.id, ce.element_type
+                FROM cat_element ce
+                JOIN cat_feature cf ON (ce.element_type = cf.id)
+                WHERE cf.feature_class = 'FRELEM'
             """)
         db_flwreg_catalog: dict[str, str] = {}
         if rows:

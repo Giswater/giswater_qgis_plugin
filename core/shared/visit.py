@@ -89,7 +89,7 @@ class GwVisit(QObject):
         tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
-        for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_link", "v_edit_element", "v_edit_gully"]:
+        for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_link", "ve_man_frelem", "ve_man_genelem", "ve_gully"]:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer:
                 layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
@@ -227,8 +227,8 @@ class GwVisit(QObject):
         self._event_feature_type_selected(self.dlg_add_visit, "link")
 
         # Force _visit_tab_feature_changed
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                           "v_edit_element", "v_edit_link"]
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_gully",
+                           "ve_link"]
         self.excluded_layers = excluded_layers
         self._visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=excluded_layers)
 
@@ -245,7 +245,7 @@ class GwVisit(QObject):
             # self.dlg_add_visit.tab_feature.tabBar().setEnabled(False)
 
             # Zoom to selected geometry or relations
-            visit_layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
+            visit_layer = tools_qgis.get_layer_by_tablename('ve_om_visit')
             if visit_layer:
                 visit_layer.selectByExpression(f'"id"={visit_id}')
                 box = visit_layer.boundingBoxOfSelected()
@@ -514,15 +514,15 @@ class GwVisit(QObject):
         self.cmb_feature_type.currentIndexChanged.connect(partial(self._manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self._get_feature_type_of_parameter)
         self.dlg_add_visit.tbl_visit_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                   self.dlg_add_visit.tbl_visit_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+                                                                   self.dlg_add_visit.tbl_visit_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
         self.dlg_add_visit.tbl_visit_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                    self.dlg_add_visit.tbl_visit_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+                                                                    self.dlg_add_visit.tbl_visit_x_node, "ve_node", "node_id", self.rubber_band, 10))
         self.dlg_add_visit.tbl_visit_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                      self.dlg_add_visit.tbl_visit_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+                                                                      self.dlg_add_visit.tbl_visit_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_visit.tbl_visit_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                    self.dlg_add_visit.tbl_visit_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
+                                                                    self.dlg_add_visit.tbl_visit_x_link, "ve_link", "link_id", self.rubber_band, 10))
         self.dlg_add_visit.tbl_visit_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                     self.dlg_add_visit.tbl_visit_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+                                                                     self.dlg_add_visit.tbl_visit_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
 
     def _add_feature_clicked(self):
 
@@ -590,7 +590,7 @@ class GwVisit(QObject):
         if self.point_xy['x'] is not None:
             self._update_geom()
 
-        layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
+        layer = tools_qgis.get_layer_by_tablename('ve_om_visit')
         if layer:
             layer.dataProvider().reloadData()
 
@@ -601,7 +601,7 @@ class GwVisit(QObject):
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
 
-        layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
+        layer = tools_qgis.get_layer_by_tablename('ve_om_visit')
         if layer:
             layer.dataProvider().reloadData()
         tools_qgis.refresh_map_canvas()
@@ -915,8 +915,8 @@ class GwVisit(QObject):
     def _manage_tabs_enabled(self, enable_tabs=False):
         """ Enable/Disable tabs depending feature_type """
 
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_link", "v_edit_element", "v_edit_gully",
-                          "v_edit_element"]
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_link", "ve_element", "ve_gully",
+                          "ve_element"]
         self.excluded_layers = excluded_layers
         if self.feature_type is None:
             return
@@ -964,7 +964,7 @@ class GwVisit(QObject):
 
         # tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_visit_x_{self.rel_feature_type}"
-        viewname = f"v_edit_{self.rel_feature_type}"
+        viewname = f"ve_{self.rel_feature_type}"
         widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
 
         try:
@@ -996,11 +996,11 @@ class GwVisit(QObject):
 
         # configure model visibility
         if self.current_tab_index == self._tab_index('tab_event'):
-            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_arc", "v_edit_arc")
-            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_node", "v_edit_node")
-            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_connec", "v_edit_connec")
-            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_link", "v_edit_link")
-            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_gully", "v_edit_gully")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_arc", "ve_arc")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_node", "ve_node")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_connec", "ve_connec")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_link", "ve_link")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_gully", "ve_gully")
 
     def _event_feature_type_selected(self, dialog, feature_type=None):
         """ Manage selection change in feature_type combo box.
@@ -1027,7 +1027,7 @@ class GwVisit(QObject):
         if feature_type.lower() == 'all':
             return
 
-        viewname = f"v_edit_{feature_type}"
+        viewname = f"ve_{feature_type}"
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(feature_type) + "_id")
 
         # set table model and completer
@@ -1835,7 +1835,7 @@ class GwVisit(QObject):
 
         tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.rel_feature_type}"
-        viewname = f"v_edit_{self.rel_feature_type}"
+        viewname = f"ve_{self.rel_feature_type}"
         widget_table = tools_qt.get_widget(dialog, widget_name)
 
         try:

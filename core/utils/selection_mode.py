@@ -21,4 +21,5 @@ class GwSelectionMode(Enum):
     ELEMENT = 7
     FEATURE_END = 8
     VISIT = 9
+    MINCUT_CONNEC = 10
 

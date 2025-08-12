@@ -46,9 +46,9 @@ class GwMapzoneManager:
         self.netscenario_id = None
 
         self.mapzone_status = {
-            "enabled": ["sector", "dma", "dqa", "presszone"],
+            "enabled": ["sector", "dma", "dqa", "presszone", "dwfzone"],
             "enabledMacromapzone": ["macrosector", "macrodma", "macrodqa", "macroomzone"],
-            "disabled": ["omzone", "supplyzone"]
+            "disabled": ["omzone", "supplyzone", "drainzone"]
         }
 
         # The -901 is transformed to user selected exploitation in the mapzones analysis
@@ -65,8 +65,8 @@ class GwMapzoneManager:
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "174")
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
-        tabs = ['sector', 'macrosector', 'omzone', 'macroomzone']
-        project_tabs = {'ws': ['dma', 'dqa', 'macrodma', 'macrodqa', 'supplyzone', 'presszone'],
+        tabs = ['sector', 'dma', 'macrosector', 'omzone', 'macroomzone']
+        project_tabs = {'ws': ['dqa', 'macrodma', 'macrodqa', 'supplyzone', 'presszone'],
                         'ud': ['drainzone', 'dwfzone']}
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
@@ -249,8 +249,7 @@ class GwMapzoneManager:
     def _open_mapzones_analysis(self):
         """ Opens the toolbox 'mapzones_analysis' with the current type of mapzone set """
         mapzone_name = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
-        print(mapzone_name)
-        print(self.mapzone_status["enabledMacromapzone"])
+
         # Execute toolbox function
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         macromapzone_function_id: int = 3482
@@ -261,6 +260,7 @@ class GwMapzoneManager:
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'graphClass'), f"{mapzone_type.upper()}", 0)
+        tools_qt.set_widget_enabled(dlg_functions, 'graphClass', False)
 
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
@@ -600,14 +600,14 @@ class GwMapzoneManager:
         # nodeParent
         self.config_dlg.btn_snapping_nodeParent.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_nodeParent,
-                    'v_edit_node', 'nodeParent', None,
+                    've_node', 'nodeParent', None,
                     self.child_type))
         self.config_dlg.btn_expr_nodeParent.clicked.connect(
             partial(self._select_with_expression_dialog, self.config_dlg, 'nodeParent'))
         self.config_dlg.txt_nodeParent.textEdited.connect(partial(self._txt_node_parent_finished))
         # toArc
         self.config_dlg.btn_snapping_toArc.clicked.connect(
-            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 'v_edit_arc',
+            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 've_arc',
                     'toArc', None,
                     self.child_type))
         self.config_dlg.btn_expr_toArc.clicked.connect(
@@ -619,9 +619,12 @@ class GwMapzoneManager:
             partial(self._remove_node_parent, self.config_dlg)
         )
         # Force closed
+        # Set variables based on project type
+        layer = 've_node' if global_vars.project_type == 'ws' else 've_arc'
+
         self.config_dlg.btn_snapping_forceClosed.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_forceClosed,
-                    'v_edit_node', 'forceClosed', None,
+                    layer, 'forceClosed', None,
                     self.child_type))
         self.config_dlg.btn_expr_forceClosed.clicked.connect(
             partial(self._select_with_expression_dialog, self.config_dlg, 'forceClosed'))
@@ -632,9 +635,12 @@ class GwMapzoneManager:
             partial(self._remove_force_closed, self.config_dlg)
         )
         # Ignore
+        # Set variables based on project type
+        layer = 've_node' if global_vars.project_type == 'ws' else 've_arc'
+
         self.config_dlg.btn_snapping_ignore.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_ignore,
-                    'v_edit_node', 'ignore', None, self.child_type))
+                    layer, 'ignore', None, self.child_type))
         self.config_dlg.btn_expr_ignore.clicked.connect(
             partial(self._select_with_expression_dialog, self.config_dlg, 'ignore'))
         self.config_dlg.btn_add_ignore.clicked.connect(
@@ -778,8 +784,12 @@ class GwMapzoneManager:
         """ Get selected attribute from snapped feature """
 
         # @options{'key':['att to get from snapped feature', 'function to call']}
+        # Set ID field based on project type for forceClosed and ignore
+        force_closed_id_field = 'node_id' if global_vars.project_type == 'ws' else 'arc_id'
+        ignore_id_field = 'node_id' if global_vars.project_type == 'ws' else 'arc_id'
+
         options = {'nodeParent': ['node_id', '_set_node_parent'], 'toArc': ['arc_id', '_set_to_arc'],
-                   'forceClosed': ['node_id', '_set_force_closed'], 'ignore': ['node_id', '_set_ignore']}
+                   'forceClosed': [force_closed_id_field, '_set_force_closed'], 'ignore': [ignore_id_field, '_set_ignore']}
 
         if event == Qt.RightButton:
             self._cancel_snapping_tool(dialog, action)
@@ -1146,9 +1156,9 @@ class GwMapzoneManager:
         """Select features by expression for mapzone config"""
 
         # Get current layer and feature type
-        layer_name = 'v_edit_node'  # Default to node layer
+        layer_name = 've_node'  # Default to node layer
         if option == 'toArc':
-            layer_name = 'v_edit_arc'
+            layer_name = 've_arc'
         self.feature_type = layer_name.split('_')[-1]
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if not layer:
@@ -1197,11 +1207,11 @@ class GwMapzoneManager:
             for arc_id in selected_ids:
                 self._set_to_arc(arc_id)
         elif option == 'forceClosed':
-            for node_id in selected_ids:
-                self._set_force_closed(node_id)
+            for feat_id in selected_ids:
+                self._set_force_closed(feat_id)
         elif option == 'ignore':
-            for node_id in selected_ids:
-                self._set_ignore(node_id)
+            for feat_id in selected_ids:
+                self._set_ignore(feat_id)
 
         # Clean up
         tools_gw.disconnect_signal('mapzone_manager_snapping')

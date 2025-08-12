@@ -103,7 +103,7 @@ class GwProfileButton(GwAction):
         self.composers_path = self.dlg_draw_profile.findChild(QLineEdit, "composers_path")
 
         # Set layer_node
-        self.layer_node = tools_qgis.get_layer_by_tablename('v_edit_node', show_warning_=False)
+        self.layer_node = tools_qgis.get_layer_by_tablename('ve_node', show_warning_=False)
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
@@ -147,7 +147,7 @@ class GwProfileButton(GwAction):
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_draw_profile, dlg_name='profile')
+            tools_gw.docker_dialog(self.dlg_draw_profile, dlg_name='profile', title='profile')
         else:
             tools_gw.open_dialog(self.dlg_draw_profile, dlg_name='profile')
 
@@ -313,7 +313,7 @@ class GwProfileButton(GwAction):
                 expr_filter = expr_filter[:-2] + ")"
                 expr = QgsExpression(expr_filter)
                 # Get a featureIterator from this expression:
-                self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+                self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
                 it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
 
                 self.id_list = [i.id() for i in it]
@@ -447,7 +447,7 @@ class GwProfileButton(GwAction):
                         result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
                         if result is None or result['status'] == 'Failed':
                             return
-                        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+                        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
 
                         # Manage level and message from query result
                         if result['message']:

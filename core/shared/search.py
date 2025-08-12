@@ -485,7 +485,7 @@ class GwSearch:
 
         if basic_search_hydrometer:
             self.customForm = GwInfo(tab_type='data')
-            # feature_type (v_edit_connec or v_edit_node) is the exact view to see the details of the feature
+            # feature_type (ve_connec or ve_node) is the exact view to see the details of the feature
             complet_result, dialog = self.customForm.get_info_from_id(
                 feature_type, tab_type='data', feature_id=sys_feature_type_id, is_add_schema=False)
 

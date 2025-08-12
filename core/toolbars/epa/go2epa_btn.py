@@ -14,8 +14,9 @@ from sip import isdeleted
 from time import time
 from datetime import timedelta
 
-from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer, QRegularExpression
-from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QLabel, QTabWidget
+from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer, QRegularExpression, QPoint
+from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QLabel, QTabWidget, QMenu, QAction, QActionGroup
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsApplication
 
 from ...shared.selector import GwSelector
@@ -25,6 +26,7 @@ from ...ui.ui_manager import GwGo2EpaUI, GwSelectorUi, GwGo2EpaOptionsUi
 from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
 from ..dialog import GwAction
+from .epa_tools.go2iber import Go2Iber
 
 
 class GwGo2EpaButton(GwAction):
@@ -36,10 +38,69 @@ class GwGo2EpaButton(GwAction):
             super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.project_type = global_vars.project_type
         self.epa_options_list = []
+        self.iface = global_vars.iface
+
+        if self.project_type == 'ud':
+            # Create a menu and add all the actions
+            self.menu = QMenu()
+            self.menu.setObjectName("GW_epa_tools")
+            self._fill_action_menu()
+
+            if toolbar is not None:
+                self.action.setMenu(self.menu)
+                toolbar.addAction(self.action)
 
     def clicked_event(self):
+        if self.project_type == 'ud':
+            button = self.action.associatedWidgets()[1]
+            menu_point = button.mapToGlobal(QPoint(0, button.height()))
+            self.menu.exec(menu_point)
+        else:
+            self._open_go2epa()
 
-        self._open_go2epa()
+    def _fill_action_menu(self):
+        """ Fill action menu """
+
+        # disconnect and remove previuos signals and actions
+        actions = self.menu.actions()
+        for action in actions:
+            action.disconnect()
+            self.menu.removeAction(action)
+            del action
+        ag = QActionGroup(self.iface.mainWindow())
+
+        new_actions = [
+            (self.menu, ('ud'), tools_qt.tr('Go2EPA'), None),
+            (self.menu, ('ud'), tools_qt.tr('Go2IBER'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"))
+        ]
+
+        for menu, types, action, icon in new_actions:
+            if global_vars.project_type in types:
+                if icon:
+                    obj_action = QAction(icon, f"{action}", ag)
+                else:
+                    obj_action = QAction(f"{action}", ag)
+                menu.addAction(obj_action)
+                obj_action.triggered.connect(partial(self._get_selected_action, action))
+
+        # Remove menu if it is empty
+        for menu in self.menu.findChildren(QMenu):
+            if not len(menu.actions()):
+                menu.menuAction().setParent(None)
+
+    def _get_selected_action(self, name):
+        """ Gets selected action """
+
+        if name == tools_qt.tr('Go2EPA'):
+            self._open_go2epa()
+
+        elif name == tools_qt.tr('Go2IBER'):
+            go2iber = Go2Iber()
+            if go2iber.check_ibergis_project():
+                go2iber.clicked_event()
+            else:
+                msg = "You have to import a ibergis GPKG project first"
+                tools_qgis.show_warning(msg)
 
     def check_result_id(self):
         """ Check if selected @result_id already exists """
@@ -87,7 +148,7 @@ class GwGo2EpaButton(GwAction):
         self._set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         self.check_result_id()
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_go2epa, dlg_name='go2epa')
+            tools_gw.docker_dialog(self.dlg_go2epa, dlg_name='go2epa', title='go2epa')
             self.dlg_go2epa.btn_close.clicked.disconnect()
             self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
         else:
@@ -110,6 +171,13 @@ class GwGo2EpaButton(GwAction):
         Disable btn_accept when on tab info log and/or if go2epa_task is active
             :param index: tab index (passed by signal)
         """
+        # Set network mode to 1
+        if self.project_type == 'ud':
+            form = '"formName":"epaoptions"'
+            my_json = '[{"widget": "inp_options_networkmode", "value": "1"}]'
+            extras = f'"fields":{my_json}'
+            body = tools_gw.create_body(form=form, extras=extras)
+            tools_gw.execute_procedure('gw_fct_setconfig', body)
 
         if index == 1:
             self.dlg_go2epa.btn_accept.setEnabled(False)
@@ -284,12 +352,12 @@ class GwGo2EpaButton(GwAction):
         # Open form
         if lib_vars.session_vars['dialog_docker']:
             # Set signals when have docker form
-            dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa, dlg_name='selector'))
+            dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa, dlg_name='selector', title='selector'))
             dlg_selector.btn_close.clicked.connect(partial(self._manage_form_settings, 'restore'))
             # Save widgets settings from go2epa form
             self._manage_form_settings('save')
             # Open form
-            tools_gw.docker_dialog(dlg_selector, dlg_name='selector')
+            tools_gw.docker_dialog(dlg_selector, dlg_name='selector', title='selector')
         else:
             # Set signals when have not docker form
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
@@ -393,7 +461,7 @@ class GwGo2EpaButton(GwAction):
 
         # Set background task 'Go2Epa'
         description = "Go2Epa"
-        self.go2epa_task = GwEpaFileManager(description, self, timer=self.timer)
+        self.go2epa_task = GwEpaFileManager(description, self, timer=self.timer, network_mode=1)
         self.go2epa_task.step_completed.connect(self.step_completed)
         QgsApplication.taskManager().addTask(self.go2epa_task)
         QgsApplication.taskManager().triggerTask(self.go2epa_task)
@@ -520,7 +588,6 @@ class GwGo2EpaButton(GwAction):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        tools_gw.manage_current_selections_docker(json_result)
         # Refresh epa world view if is active and it has changed
         if any(widget['widget'] == 'inp_options_networkmode' for widget in _json):
             tools_qgis.force_refresh_map_canvas()

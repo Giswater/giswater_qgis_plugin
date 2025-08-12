@@ -11,7 +11,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
-from qgis.PyQt.QtWidgets import QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
+from qgis.PyQt.QtWidgets import QMenu, QPushButton, QTreeWidget, QTreeWidgetItem, QHeaderView
 from qgis.core import QgsApplication
 
 from .ui.ui_manager import GwLoadMenuUi
@@ -74,14 +74,14 @@ class GwMenuLoad(QObject):
             action_reset_plugin.triggered.connect(self._reset_plugin)
 
             # Action 'Show current selectors'
-            action_open_selections = actions_menu.addAction(tools_qt.tr("Show current selectors"))
+            action_open_selections = actions_menu.addAction(tools_qt.tr("Show current psector"))
             action_open_selections_shortcut = tools_gw.get_config_parser("actions_shortcuts",
                 "shortcut_open_curselectors", "user", "init", prefix=False)
             if not action_open_selections_shortcut:
                 tools_gw.set_config_parser("actions_shortcuts", "shortcut_open_curselectors",
                     f"{action_open_selections_shortcut}", "user", "init", prefix=False)
             action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
-            action_open_selections.triggered.connect(self._open_current_selections)
+            action_open_selections.triggered.connect(self._open_current_psector)
 
         # Action 'Toggle Log DB'
         action_set_log_sql = actions_menu.addAction(tools_qt.tr("Toggle Log DB"))
@@ -180,6 +180,10 @@ class GwMenuLoad(QObject):
         if not answer:
             return
 
+        # Resize columns
+        header = self.tree_config_files.header()
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_menu, dlg_name='load_menu', title="Advanced Menu")
 
@@ -266,10 +270,10 @@ class GwMenuLoad(QObject):
 
         tools_qgis.show_info(msg)
 
-    def _open_current_selections(self):
+    def _open_current_psector(self):
 
-        if lib_vars.session_vars['current_selections']:
-            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, lib_vars.session_vars['current_selections'])
+        if lib_vars.session_vars['current_psector']:
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, lib_vars.session_vars['current_psector'])
 
     def _reset_plugin(self):
         """ Called in reset plugin action """

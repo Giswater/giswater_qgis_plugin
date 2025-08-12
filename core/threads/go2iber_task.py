@@ -7,8 +7,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import importlib
+import json
 
 from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtWidgets import QTextEdit
+from qgis.core import QgsVectorLayer
 
 from .epa_file_manager import GwEpaFileManager
 from ..utils import tools_gw
@@ -24,7 +27,6 @@ class GwGo2IberTask(GwTask):
 
     def __init__(self, description, go2iber, timer=None):
 
-        print("go2iber init 00")
         super().__init__(description)
         self.go2iber = go2iber
         self.json_result = None
@@ -32,13 +34,13 @@ class GwGo2IberTask(GwTask):
         self.fid = 140
         self.function_name = None
         self.timer = timer
-        print("go2iber init 10")
         self.initialize_variables()
-        print("go2iber init 20")
         self.set_variables_from_go2iber()
-        print("go2iber init 30")
-        self.drain_execute_model = importlib.import_module('.execute_model', package=f'{self.drain_folder}.core.threads')
-        print("go2iber init 40")
+        self.ig_execute_model = importlib.import_module('.execute_model', package=f'{self.ibergis_folder}.core.threads')
+        self.ig_feedback_class = importlib.import_module('.feedback', package=f'{self.ibergis_folder}.core.utils')
+        self.cur_process = None
+        self.cur_text = None
+        self.ig_feedback = None
 
     def initialize_variables(self):
 
@@ -56,48 +58,95 @@ class GwGo2IberTask(GwTask):
         self.dlg_go2iber = self.go2iber.dlg_go2iber
         self.result_name = self.go2iber.result_name
         self.folder_path = self.go2iber.folder_path
-        self.drain_folder = self.go2iber.drain_folder
+        self.ibergis_folder = self.go2iber.ibergis_folder
 
     def run(self):
 
         super().run()
 
-        print("go2iber run 00")
         self.step_completed.emit({"message": {"level": 1, "text": "GO2IBER - Work in progress"}}, "\n")
         self.step_completed.emit({"message": {"level": 1, "text": "--------------------------"}}, "\n")
 
-        print("go2iber run 10")
         self.initialize_variables()
-        print("go2iber run 20")
         # TODO:
         # - Generate INP file with Giswater (go2iber)
-        self.go2epa_task = GwEpaFileManager("Go2Epa", self.dlg_go2iber)
+        self.go2epa_task = GwEpaFileManager("Go2Epa", self.dlg_go2iber, network_mode=2)
         self.go2epa_task.go2epa_export_inp = True
-        self.go2epa_task.go2epa_execute_epa = True  # TODO: Check if this is necessary
-        self.go2epa_task.go2epa_import_result = True  # TODO: Check if this is necessary
+        self.go2epa_task.go2epa_execute_epa = False
+        self.go2epa_task.go2epa_import_result = False
         self.go2epa_task.result_name = self.result_name
         self.go2epa_task.file_inp = self.folder_path + os.sep + "Iber_SWMM.inp"
-        self.go2epa_task.file_rpt = self.folder_path + os.sep + "Iber_SWMM.rpt"  # TODO: Check if this is necessary
-        print("go2iber run 30")
+        self.go2epa_task.file_rpt = self.folder_path + os.sep + "Iber_SWMM.rpt"
+        # Create folders path
+        os.makedirs(self.folder_path, exist_ok=True)
         self.go2epa_task.main_process()
-        print("go2iber run 40")
 
-        # - Execute model with DRAIN plugin
-        # params = {
-        #     "folder_path": self.folder_path,
-        #     "do_generate_inp": False,
-        #     "do_export": True,
-        #     "do_run": True,
-        #     "do_import": True,
-        # }
-        # self.drain_execute_model = self.dr_execute_model.DrExecuteModel("Execute Drain Model", params)
-        # self.drain_execute_model.run()
+        pgully_geojson = tools_gw.execute_procedure('gw_fct_pg2iber_pgully')
+        geojson_str: str = json.dumps(pgully_geojson['body']['data']['result'])
+        if geojson_str:
+            pgully_layer: QgsVectorLayer = QgsVectorLayer(geojson_str, 'pgully', 'ogr')
+        else:
+            pgully_layer = None
 
-        # - Import results to DRAIN mainly, but rpt to Giswater
+        # - Execute model with IBERGIS plugin
+        params = {
+            "dialog": self.dlg_go2iber,
+            "folder_path": self.folder_path,
+            "do_generate_inp": False,
+            "do_export": True,
+            "do_run": True,
+            "do_import": True,
+            "do_write_inlets": False,
+            "pinlet_layer": pgully_layer,  # TODO: Generate pinlet layer from pgully
+        }
+        self.ig_feedback = self.ig_feedback_class.Feedback()
+        self.ig_execute_model = self.ig_execute_model.DrExecuteModel("Execute IberGIS Model", params, self.ig_feedback)
+        self.ig_execute_model.progress_changed.connect(self._progress_changed)
+        self.ig_feedback.progressChanged.connect(self._progress_changed)
+        # Show tab log
+        tools_gw.set_tabs_enabled(self.dlg_go2iber)
+        self.dlg_go2iber.mainTab.setCurrentIndex(1)
+        self.ig_execute_model.run()
+
+        # - Import results to IBERGIS mainly, but rpt to Giswater
+        # import rpt to Giswater
+        self.go2epa_task.go2epa_export_inp = False
+        self.go2epa_task.go2epa_execute_epa = False
+        self.go2epa_task.go2epa_import_result = True
+        self.go2epa_task.main_process()
 
         status = True
 
         return status
+
+    def _progress_changed(self, process, progress, text, new_line):
+        # Progress bar
+        if progress is not None:
+            self.dlg_go2iber.progress_bar.setValue(progress)
+
+        # TextEdit log
+        txt_infolog = self.dlg_go2iber.findChild(QTextEdit, 'tab_log_txt_infolog')
+        cur_text = tools_qt.get_text(self.dlg_go2iber, txt_infolog, return_string_null=False)
+        if process and process != self.cur_process:
+            cur_text = f"{cur_text}\n" \
+                       f"--------------------\n" \
+                       f"{process}\n" \
+                       f"--------------------\n\n"
+            self.cur_process = process
+            self.cur_text = None
+
+        if self.cur_text:
+            cur_text = self.cur_text
+
+        end_line = '\n' if new_line else ''
+        if text:
+            txt_infolog.setText(f"{cur_text}{text}{end_line}")
+        else:
+            txt_infolog.setText(f"{cur_text}{end_line}")
+        txt_infolog.show()
+        # Scroll to the bottom
+        scrollbar = txt_infolog.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
 
     def finished(self, result):
 
@@ -105,6 +154,10 @@ class GwGo2IberTask(GwTask):
 
         self.dlg_go2iber.btn_cancel.setEnabled(False)
         self.dlg_go2iber.btn_accept.setEnabled(True)
+
+        if not self.isCanceled() and result:
+            self.ig_execute_model._create_results_folder()
+            self.ig_execute_model._delete_raster_results()
 
         if self.timer:
             self.timer.stop()

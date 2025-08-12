@@ -27,8 +27,12 @@ from ....utils import tools_gw
 
 try:
     import wntr
+    from wntr.network import WaterNetworkModel 
+    from wntr.sim import EpanetSimulator
 except ImportError:
     wntr = None
+    WaterNetworkModel = None
+    EpanetSimulator = None
 
 
 class EmitterCalibration:
@@ -145,9 +149,9 @@ class EmitterCalibration:
         else:
             tools_qt.set_stylesheet(self.dlg_vol_cal.data_inp_input_file, style="")
             # Create & run network
-            self.network = wntr.network.WaterNetworkModel(self.input_file)
+            self.network = WaterNetworkModel(self.input_file)
 
-            self.sim = wntr.sim.EpanetSimulator(self.network)
+            self.sim = EpanetSimulator(self.network)
             self.results = self.sim.run_sim()
 
         # OUTPUT FILE
@@ -255,7 +259,7 @@ class EmitterCalibration:
                 demand.pattern_name = patterns_by_dma[j_dma]
 
         # Update results
-        self.sim = wntr.sim.EpanetSimulator(self.network)
+        self.sim = EpanetSimulator(self.network)
         self.results = self.sim.run_sim()
 
     def _fill_tab_log(self, signal):
@@ -395,7 +399,7 @@ class ConfigEC:
         self._get_emitters_coefficients(inpfile)
 
     def _get_emitters_coefficients(self, inpfile):
-        wn = wntr.network.WaterNetworkModel(inpfile)
+        wn = WaterNetworkModel(inpfile)
         len_by_node = {}
 
         for _, pipe in wn.pipes():

@@ -222,7 +222,7 @@ class GwWorkspaceManagerButton(GwAction):
         body = tools_gw.create_body(extras=extras)
 
         # Execute the stored procedure to retrieve the current workspace information
-        result = tools_gw.execute_procedure("gw_fct_set_current", body)
+        result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
 
         # Check if the stored procedure returned a successful status
         if result.get("status") != "Accepted":
@@ -269,9 +269,9 @@ class GwWorkspaceManagerButton(GwAction):
             global_vars.iface.mapCanvas().refresh()
 
             # Zoom to layer
-            layer = tools_qgis.get_layer_by_tablename('v_edit_inp_junction')
+            layer = tools_qgis.get_layer_by_tablename('ve_inp_junction')
             if not layer:
-                layer = tools_qgis.get_layer_by_tablename('v_edit_node')
+                layer = tools_qgis.get_layer_by_tablename('ve_node')
             tools_qgis.zoom_to_layer(layer)
 
             # Refresh selector docker if open

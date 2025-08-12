@@ -135,10 +135,11 @@ class GwCreateSchemaCmTask(GwTask):
             dict_folders[self.admin.folder_cm_base] = 0
 
         elif process_name == 'load_parent_schema':
+            dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.project_type, 'ddl.sql')] = 0
             dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.file_pattern_fct)] = 0
             dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.file_pattern_ftrg)] = 0
             dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.file_pattern_utils)] = 0
-            dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.project_type)] = 0
+            dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.project_type, 'trg.sql')] = 0
 
         elif process_name == 'load_example':
             dict_folders[os.path.join(self.admin.folder_cm_example, self.admin.file_pattern_utils)] = 0

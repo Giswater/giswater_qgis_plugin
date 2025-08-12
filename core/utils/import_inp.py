@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 import json
 import os
+import ast
 
 from enum import Enum
 from functools import partial
@@ -32,7 +33,7 @@ class GwInpConfig:
 
     def __init__(self, file_path: Optional[Path] = None, workcat: Optional[str] = None, exploitation: Optional[int] = None,
                  sector: Optional[int] = None, municipality: Optional[int] = None, dscenario: Optional[str] = None,
-                 raingage: Optional[str] = None, catalogs: Optional[dict] = None) -> None:
+                 raingage: Optional[str] = None, catalogs: Optional[dict] = None, psector: Optional[bool] = None) -> None:
         self.file_path: Optional[Path] = file_path
         self.workcat: Optional[str] = workcat
         self.exploitation: Optional[int] = exploitation
@@ -41,6 +42,7 @@ class GwInpConfig:
         self.dscenario: Optional[str] = dscenario
         self.raingage: Optional[str] = raingage
         self.catalogs: Optional[dict] = catalogs
+        self.psector: Optional[bool] = psector
 
     def serialize(self) -> dict:
         return_dict = {
@@ -49,13 +51,13 @@ class GwInpConfig:
             "exploitation": self.exploitation,
             "sector": self.sector,
             "municipality": self.municipality,
-            "catalogs": self.catalogs
+            "catalogs": self.catalogs,
+            "psector": self.psector
         }
         if self.dscenario:
             return_dict["dscenario"] = self.dscenario
         if self.raingage:
             return_dict["raingage"] = self.raingage
-
         return return_dict
 
     def deserialize(self, data: dict) -> None:
@@ -66,6 +68,7 @@ class GwInpConfig:
         self.municipality = data.get("municipality")
         self.dscenario = data.get("dscenario")
         self.catalogs = data.get("catalogs")
+        self.psector = data.get("psector")
 
     def write_to_file(self, file_path: Path) -> None:
         """Write the serialized configuration to a file."""
@@ -212,12 +215,12 @@ def save_config_to_file(self_cls):
     config_path: Optional[Path] = tools_qt.get_file("Select a configuration file", "", "JSON files (*.json)")
 
     if config_path:
-        workcat, exploitation, sector, municipality, dscenario, catalogs = self_cls._get_config_values()
-        save_config(self_cls, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs, _config_path=config_path)
+        workcat, exploitation, sector, municipality, dscenario, catalogs, psector = self_cls._get_config_values()
+        save_config(self_cls, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs, psector=psector, _config_path=config_path)
 
 
 def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[int] = None, sector: Optional[int] = None,
-                    municipality: Optional[int] = None, dscenario: Optional[str] = None, raingage: Optional[str] = None, catalogs: Optional[dict] = None, _config_path: Optional[Path] = None) -> None:
+                    municipality: Optional[int] = None, dscenario: Optional[str] = None, raingage: Optional[str] = None, catalogs: Optional[dict] = None, psector: Optional[bool] = None, _config_path: Optional[Path] = None) -> None:
 
     try:
         if _config_path is None:
@@ -230,7 +233,7 @@ def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[
         else:
             config_path = _config_path
         config = GwInpConfig(file_path=self_cls.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
-                                municipality=municipality, dscenario=dscenario, raingage=raingage, catalogs=catalogs)
+                                municipality=municipality, dscenario=dscenario, raingage=raingage, catalogs=catalogs, psector=psector)
         config.write_to_file(config_path)
         msg = "Configuration saved to {0}"
         msg_params = (config_path,)
@@ -255,6 +258,14 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
     if not config.file_path:
         return None
 
+    if str(self_cls.file_path) != str(config.file_path):
+        msg = "The configuration file doesn't match the selected INP file. Some options may not be loaded or may be incorrect. Do you want to continue?"
+        result = tools_qt.show_question(msg, force_action=True)
+        if result:
+            config.file_path = self_cls.file_path
+        else:
+            return
+
     # Fill 'Basic' tab widgets
     tools_qt.set_widget_text(self_cls.dlg_config, 'txt_workcat', config.workcat)
     if global_vars.project_type == ProjectType.WS.value:
@@ -264,6 +275,7 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_expl, config.exploitation, 0)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_sector, config.sector, 0)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_muni, config.municipality, 0)
+    tools_qt.set_checked(self_cls.dlg_config, "chk_psector", config.psector)
 
     # Fill tables from catalogs
     if global_vars.project_type == ProjectType.WS.value:
@@ -271,12 +283,8 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
     elif global_vars.project_type == ProjectType.UD.value:
         _set_combo_values_from_swmm_catalogs(self_cls, config.catalogs)
 
-    if str(self_cls.file_path) != str(config.file_path):
-        msg = "The configuration file doesn't match the selected INP file. Some options may not be loaded."
-        tools_qgis.show_warning(msg, dialog=self_cls.dlg_config)
-    else:
-        msg = "Configuration loaded successfully"
-        tools_qgis.show_success(msg, dialog=self_cls.dlg_config)
+    msg = "Configuration loaded successfully"
+    tools_qgis.show_success(msg, dialog=self_cls.dlg_config)
 
     return config
 
@@ -328,6 +336,12 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
         ("tanks", catalogs.get("tanks")),
         ("pumps", catalogs.get("pumps")),
         ("valves", catalogs.get("valves")),
+        ("prv", catalogs.get("prv")),
+        ("psv", catalogs.get("psv")),
+        ("pbv", catalogs.get("pbv")),
+        ("fcv", catalogs.get("fcv")),
+        ("tcv", catalogs.get("tcv")),
+        ("gpv", catalogs.get("gpv")),
     ]
 
     for element_type, element_catalog in elements:
@@ -339,8 +353,11 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
 
         combo: QComboBox = self_cls.tbl_elements[element_type][0]
         if element_catalog:
+            if combo.findText(element_catalog) == -1:
+                combo.setCurrentText('Create new')
+                self_cls.tbl_elements[element_type][1].setText(element_catalog)
+                continue
             combo.setCurrentText(element_catalog)
-            # TODO: manage CREATE_NEW option (the widget is in self.tbl_elements[element_type][1])
 
     if catalogs.get("pipes") is not None:
         for dint_rough_str, pipe_catalog in catalogs["pipes"].items():
@@ -350,6 +367,10 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
 
             combo: QComboBox = self_cls.tbl_elements["pipes"][dint_rough_tuple][0]
             if pipe_catalog:
+                if combo.findText(pipe_catalog) == -1:
+                    combo.setCurrentText('Create new')
+                    self_cls.tbl_elements["pipes"][dint_rough_tuple][1].setText(pipe_catalog)
+                    continue
                 combo.setCurrentText(pipe_catalog)
 
 
@@ -388,15 +409,23 @@ def _set_combo_values_from_swmm_catalogs(self_cls, catalogs):
 
         combo: QComboBox = self_cls.tbl_elements[element_type][0]
         if element_catalog:
+            if combo.findText(element_catalog) == -1:
+                combo.setCurrentText('Create new')
+                self_cls.tbl_elements[element_type][1].setText(element_catalog)
+                continue
             combo.setCurrentText(element_catalog)
 
     if catalogs.get("conduits") is not None:
         for tuple_str, conduits_catalog in catalogs["conduits"].items():
-            catalog_list = tuple_str.strip("()").split(", ")
-            catalog_tuple = (str(catalog_list[0]), float(catalog_list[1]), float(catalog_list[2]), float(catalog_list[3]), float(catalog_list[4]))
+            catalog_tuple = ast.literal_eval(tuple_str)
+
             if catalog_tuple not in self_cls.tbl_elements["conduits"]:
                 continue
 
             combo: QComboBox = self_cls.tbl_elements["conduits"][catalog_tuple][0]
             if conduits_catalog:
+                if combo.findText(conduits_catalog) == -1:
+                    combo.setCurrentText('Create new')
+                    self_cls.tbl_elements["conduits"][catalog_tuple][1].setText(conduits_catalog)
+                    continue
                 combo.setCurrentText(conduits_catalog)

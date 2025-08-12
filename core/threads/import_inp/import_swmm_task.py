@@ -99,6 +99,8 @@ class GwImportInpTask(GwTask):
         municipality,
         raingage,
         catalogs,
+        state,
+        state_type,
         manage_flwreg: dict[str, bool] = {"pumps": False, "orifices": False, "weirs": False, "outlets": False},
         force_commit: bool = False,
     ) -> None:
@@ -111,6 +113,8 @@ class GwImportInpTask(GwTask):
         self.municipality: int = municipality
         self.default_raingage: Optional[str] = raingage
         self.catalogs: dict[str, Any] = catalogs
+        self.state: int = state
+        self.state_type: int = state_type
         self.manage_flwreg: dict[str, bool] = manage_flwreg
         self.force_commit: bool = force_commit
         self.update_municipality: bool = False
@@ -120,6 +124,7 @@ class GwImportInpTask(GwTask):
         self.db_units = None
         self.exception: str = ""
         self.debug_mode: bool = False  # TODO: add checkbox or something to manage debug_mode, and put logs into tab_log
+        self.flwreg_ids: dict[str, list] = {}
 
         self.node_ids: dict[str, str] = {}
         self.results: dict[str, int] = {}
@@ -127,8 +132,8 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
-            # Disable triggers
-            self._enable_triggers(False)
+            # Disable triggers except plan trigger
+            self._enable_triggers(False, plan_trigger=True)
 
             self.progress_changed.emit("Validate inputs", self.PROGRESS_INIT, "Validating inputs...", False)
             self._validate_inputs()
@@ -159,13 +164,16 @@ class GwImportInpTask(GwTask):
 
             self._manage_others()
 
+            # Enable plan and topocontrol triggers
+            self._enable_triggers(False, plan_trigger=True, geometry_trigger=True)
+
             if any(self.manage_flwreg.values()):
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_SOURCES, "Converting to flwreg...", False)
                 log_str = self._manage_flwreg()
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_END, "done!", True)
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_END, log_str, True)
 
-            # Enable triggers
+            # Enable ALL triggers
             self._enable_triggers(True)
 
             execute_sql("select 1", commit=True)
@@ -181,7 +189,8 @@ class GwImportInpTask(GwTask):
 
     def _manage_catalogs(self) -> None:
         self.progress_changed.emit("Create catalogs", lerp_progress(0, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating workcat", True)
-        self._create_workcat_id()
+        if self.state != 2:
+            self._create_workcat_id()
         self.progress_changed.emit("Create catalogs", lerp_progress(20, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new node catalogs", True)
         self._create_new_node_catalogs()
 
@@ -273,12 +282,18 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Others", lerp_progress(40, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing subcatchments", True)
             self._save_subcatchments()
 
-    def _enable_triggers(self, enable: bool) -> None:
+    def _enable_triggers(self, enable: bool, plan_trigger: bool = False, geometry_trigger: bool = False) -> None:
         op = "ENABLE" if enable else "DISABLE"
         queries = [
             f'ALTER TABLE arc {op} TRIGGER ALL;',
             f'ALTER TABLE node {op} TRIGGER ALL;',
+            f'ALTER TABLE element {op} TRIGGER ALL;',
         ]
+        if plan_trigger:
+            queries.append('ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;')
+            queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;')
+        if geometry_trigger:
+            queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
         for sql in queries:
             result = tools_db.execute_sql(sql, commit=self.force_commit)
             if not result:
@@ -287,36 +302,42 @@ class GwImportInpTask(GwTask):
     def _manage_flwreg(self) -> str:
         """ Execute database function 'gw_fct_import_swmm_flwreg' """
 
+        import json
+
         extras = ""
         if self.manage_flwreg["pumps"]:
             extras += f'''"pump": {{
                 "featureClass": "{self.catalogs['features']['pumps']}",
-                "catalog": "{self.catalogs['pumps']}"
+                "catalog": "{self.catalogs['pumps']}",
+                "ids": {json.dumps(self.flwreg_ids["pumps"])}
             }},'''
         if self.manage_flwreg["orifices"]:
             extras += f'''"orifice": {{
                 "featureClass": "{self.catalogs['features']['orifices']}",
-                "catalog": "{self.catalogs['orifices']}"
+                "catalog": "{self.catalogs['orifices']}",
+                "ids": {json.dumps(self.flwreg_ids["orifices"])}
             }},'''
         if self.manage_flwreg["weirs"]:
             extras += f'''"weir": {{
                 "featureClass": "{self.catalogs['features']['weirs']}",
-                "catalog": "{self.catalogs['weirs']}"
+                "catalog": "{self.catalogs['weirs']}",
+                "ids": {json.dumps(self.flwreg_ids["weirs"])}
             }},'''
         if self.manage_flwreg["outlets"]:
             extras += f'''"outlet": {{
                 "featureClass": "{self.catalogs['features']['outlets']}",
-                "catalog": "{self.catalogs['outlets']}"
+                "catalog": "{self.catalogs['outlets']}",
+                "ids": {json.dumps(self.flwreg_ids["outlets"])}
             }},'''
+        extras += f'''"state": {self.state},'''
 
         if extras:
             extras = extras[:-1]
-
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_import_swmm_flwreg', body, commit=self.force_commit,
                                                     is_thread=True)
             if not json_result or json_result.get('status') != 'Accepted':
-                message = "Error executing gw_fct_import_swmm_flwreg"
+                message = f"Error executing gw_fct_import_swmm_flwreg - {json_result.get('NOSQLERR')}"
                 raise ValueError(message)
             try:
                 if json_result['body']['data']['info']:
@@ -550,7 +571,10 @@ class GwImportInpTask(GwTask):
                 self.arccat_db.append(catalog)
 
     def _create_new_flwreg_catalogs(self):
-        cat_flwreg_ids = get_rows("SELECT id FROM cat_flwreg", commit=self.force_commit)
+        cat_flwreg_ids = get_rows("""SELECT ce.id, ce.element_type
+                                        FROM cat_element ce
+                                        JOIN cat_feature cf ON (ce.element_type = cf.id)
+                                        WHERE cf.feature_class = 'FRELEM'""", commit=self.force_commit)
         flwregcat_db: list[str] = []
         if cat_flwreg_ids:
             flwregcat_db = [x[0] for x in cat_flwreg_ids]
@@ -568,7 +592,7 @@ class GwImportInpTask(GwTask):
 
             flwregtype_id: str = self.catalogs["features"][flwreg_type]
             sql = """
-                INSERT INTO cat_flwreg (id, flwreg_type)
+                INSERT INTO cat_element (id, element_type)
                 VALUES (%s, %s)
             """
             execute_sql(
@@ -850,8 +874,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             node_params.append(
                 (
@@ -959,8 +983,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             elevation = o.elevation
             node_params.append(
@@ -1036,7 +1060,7 @@ class GwImportInpTask(GwTask):
             RETURNING node_id, code
         """
         node_template = (
-            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         man_sql = f"""
@@ -1070,8 +1094,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             elevation = d.elevation
             node_params.append(
@@ -1128,7 +1152,7 @@ class GwImportInpTask(GwTask):
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (node_id, inp_data["divider_type"], inp_data["arc_id"], inp_data["curve_id"],
+                (node_id, inp_data["divider_type"], None, inp_data["curve_id"],
                  inp_data["qmin"], inp_data["ht"], inp_data["cd"], inp_data["y0"], inp_data["ysur"], inp_data["apond"])
             )
 
@@ -1185,8 +1209,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             elevation = s.elevation
             node_params.append(
@@ -1311,8 +1335,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             arc_params.append(
                 (
@@ -1351,6 +1375,7 @@ class GwImportInpTask(GwTask):
 
         man_params = []
         inp_params = []
+        self.flwreg_ids["pumps"] = []
 
         for p in pumps:
             arc_id = p[0]
@@ -1358,6 +1383,8 @@ class GwImportInpTask(GwTask):
             man_params.append(
                 (arc_id,)
             )
+            if self.manage_flwreg["pumps"]:
+                self.flwreg_ids["pumps"].append(arc_id)
 
             inp_data = inp_dict[code]
             inp_params.append(
@@ -1426,8 +1453,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             arc_params.append(
                 (
@@ -1472,6 +1499,7 @@ class GwImportInpTask(GwTask):
 
         man_params = []
         inp_params = []
+        self.flwreg_ids["orifices"] = []
 
         for o in orifices:
             arc_id = o[0]
@@ -1479,6 +1507,8 @@ class GwImportInpTask(GwTask):
             man_params.append(
                 (arc_id,)
             )
+            if self.manage_flwreg["orifices"]:
+                self.flwreg_ids["orifices"].append(arc_id)
 
             inp_data = inp_dict[code]
             inp_params.append(
@@ -1549,8 +1579,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             arc_params.append(
                 (
@@ -1599,6 +1629,7 @@ class GwImportInpTask(GwTask):
 
         man_params = []
         inp_params = []
+        self.flwreg_ids["weirs"] = []
 
         for w in weirs:
             arc_id = w[0]
@@ -1606,6 +1637,8 @@ class GwImportInpTask(GwTask):
             man_params.append(
                 (arc_id,)
             )
+            if self.manage_flwreg["weirs"]:
+                self.flwreg_ids["weirs"].append(arc_id)
 
             inp_data = inp_dict[code]
             inp_params.append(
@@ -1676,8 +1709,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             arc_params.append(
                 (
@@ -1718,6 +1751,7 @@ class GwImportInpTask(GwTask):
 
         man_params = []
         inp_params = []
+        self.flwreg_ids["outlets"] = []
 
         for o in outlets:
             arc_id = o[0]
@@ -1725,6 +1759,8 @@ class GwImportInpTask(GwTask):
             man_params.append(
                 (arc_id,)
             )
+            if self.manage_flwreg["outlets"]:
+                self.flwreg_ids["outlets"].append(arc_id)
 
             inp_data = inp_dict[code]
             inp_params.append(
@@ -1791,8 +1827,8 @@ class GwImportInpTask(GwTask):
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
-            state = 1
-            state_type = 2
+            state = self.state
+            state_type = self.state_type
             workcat_id = self.workcat
             dma_id = 0  # TODO: get rid of dma_id
             arc_params.append(

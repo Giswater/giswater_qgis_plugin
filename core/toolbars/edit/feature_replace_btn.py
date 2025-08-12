@@ -39,7 +39,7 @@ class GwFeatureReplaceButton(GwMaptool):
             self.actions = [tools_qt.tr('ARC'), tools_qt.tr('NODE'), tools_qt.tr('CONNEC')]
         self.list_tables = list_tables
         if not self.list_tables:
-            self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
+            self.list_tables = ['ve_arc', 've_node', 've_connec', 've_gully']
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -95,12 +95,12 @@ class GwFeatureReplaceButton(GwMaptool):
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)
 
-        # Snapping layers 'v_edit_'
+        # Snapping layers 've_'
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename and 'v_edit' in tablename:
+            if tablename and 've' in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def canvasReleaseEvent(self, event):
@@ -121,14 +121,14 @@ class GwFeatureReplaceButton(GwMaptool):
 
         layer = self.snapper_manager.get_snapped_layer(result)
         tablename = tools_qgis.get_layer_source_table_name(layer)
-        if tablename and 'v_edit' in tablename:
-            if tablename == 'v_edit_node':
+        if tablename and 've' in tablename:
+            if tablename == 've_node':
                 self.feature_type = 'node'
-            elif tablename == 'v_edit_connec':
+            elif tablename == 've_connec':
                 self.feature_type = 'connec'
-            elif tablename == 'v_edit_gully':
+            elif tablename == 've_gully':
                 self.feature_type = 'gully'
-            elif tablename == 'v_edit_arc':
+            elif tablename == 've_arc':
                 self.feature_type = 'arc'
 
             self.geom_view = tablename
@@ -167,7 +167,7 @@ class GwFeatureReplaceButton(GwMaptool):
     def _set_active_layer(self, name):
         """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
 
-        tablename = f"v_edit_{name.lower()}"
+        tablename = f"ve_{name.lower()}"
         layer = tools_qgis.get_layer_by_tablename(tablename)
         if layer:
             self.iface.setActiveLayer(layer)

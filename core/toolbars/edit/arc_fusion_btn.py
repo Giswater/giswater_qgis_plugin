@@ -35,8 +35,8 @@ class GwArcFusionButton(GwMaptool):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        # Set active layer to 'v_edit_node'
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        # Set active layer to 've_node'
+        self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer_node)
 
         # Change cursor
