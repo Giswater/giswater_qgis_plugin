@@ -23,7 +23,7 @@ SELECT columns_are(
         'node_id', 'closed', 'broken', 'buried', 'irrigation_indicator', 'pressure_entry', 'pressure_exit',
         'depth_valveshaft', 'regulator_situation', 'regulator_location', 'regulator_observ', 'lin_meters',
         'exit_type', 'exit_code', 'drive_type', 'cat_valve2', 'ordinarystatus', 'shutter', 'brand2',
-        'model2', 'valve_type', 'to_arc', 'automated', 'connection_type'
+        'model2', 'valve_type', 'to_arc', 'automated', 'connection_type', 'flowsetting'
     ],
     'Table man_valve should have the correct columns'
 );
@@ -56,6 +56,7 @@ SELECT col_type_is('man_valve', 'valve_type', 'text', 'Column valve_type should 
 SELECT col_type_is('man_valve', 'to_arc', 'integer', 'Column to_arc should be integer');
 SELECT col_type_is('man_valve', 'automated', 'boolean', 'Column automated should be boolean');
 SELECT col_type_is('man_valve', 'connection_type', 'integer', 'Column connection_type should be integer');
+SELECT col_type_is('man_valve', 'flowsetting', 'numeric(12,3)', 'Column flowsetting should be numeric(12,3)');
 
 -- Check default values
 SELECT col_default_is('man_valve', 'closed', 'false', 'Column closed should default to false');
