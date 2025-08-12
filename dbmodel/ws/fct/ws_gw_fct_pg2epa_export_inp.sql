@@ -337,7 +337,23 @@ BEGIN
 		    dqa_id,
 		    minsector_id,
 		    arccat_id
-		   FROM temp_t_arc t JOIN inp_pump ON arc_id::text = concat(inp_pump.node_id, '_n2a_4')) a;
+		   FROM temp_t_arc t JOIN inp_pump ON arc_id::text = concat(inp_pump.node_id, '_n2a_4')
+		UNION
+		 SELECT arc_id,
+		    node_1,
+		    node_2,
+		    diameter,
+		    'PRV'::character varying(18) AS valve_type,
+		    addparam::json ->> 'pressure'::text AS setting,
+		    minorloss,
+		    sector_id,
+		    dma_id,
+		    presszone_id,
+		    dqa_id,
+		    minsector_id,
+		    arccat_id
+		   FROM temp_t_arc t JOIN inp_frpump ON arc_id::text = concat(inp_frpump.element_id::text, '_n2a_1')) a;
+
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_pumps AS
@@ -383,7 +399,7 @@ BEGIN
 	   FROM ve_inp_frpump w
 			JOIN man_frelem m ON m.element_id = w.element_id
 			JOIN temp_t_arc a ON a.arc_id = w.element_id::text
-		WHERE a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRPUMP'::text
+		WHERE (a.arc_type::text = 'NODE2ARC' AND a.epa_type::text = 'FRPUMP'::text) OR (a.arc_type::text = 'DOUBLE-NOD2ARC(PUMP)' AND a.epa_type::text = 'PUMP'::text)
 	  ORDER BY arc_id;
 
 
