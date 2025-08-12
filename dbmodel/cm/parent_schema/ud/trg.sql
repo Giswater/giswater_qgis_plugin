@@ -9,17 +9,18 @@ or (at your option) any later version.
 SET search_path = cm, public, pg_catalog;
 
 
-DROP TRIGGER IF EXISTS trg_lot_x_gully_feature ON cm.om_campaign_lot_x_gully;
-CREATE TRIGGER trg_lot_x_gully_feature AFTER INSERT OR DELETE OR UPDATE ON cm.om_campaign_lot_x_gully
+DROP TRIGGER IF EXISTS trg_lot_x_gully_feature_before ON cm.om_campaign_lot_x_gully;
+DROP TRIGGER IF EXISTS trg_lot_x_gully_feature_after ON cm.om_campaign_lot_x_gully;
+
+CREATE TRIGGER trg_lot_x_gully_feature_before BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_gully
+FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature('gully');
+
+CREATE TRIGGER trg_lot_x_gully_feature_after AFTER INSERT OR DELETE ON cm.om_campaign_lot_x_gully
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature('gully');
 
 DROP TRIGGER IF EXISTS trg_validate_lot_x_gully_feature ON cm.om_campaign_lot_x_gully;
 CREATE TRIGGER trg_validate_lot_x_gully_feature BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_gully
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_lot_x_feature_check_campaign('gully');
-
-DROP TRIGGER IF EXISTS trg_update_action_gully ON cm.om_campaign_lot_x_gully;
-CREATE TRIGGER trg_update_action_gully BEFORE INSERT OR UPDATE ON cm.om_campaign_lot_x_gully
-FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_update_lot_action(); 
 
 DO $$
 DECLARE
@@ -34,8 +35,8 @@ BEGIN
     LOOP
         v_feature_id := lower(v_rec.id);
         v_feature_type := lower(v_rec.feature_type);
-        -- Construct the view name exactly as in ddl.sql
-        v_view_name := 've_' || 'PARENT_SCHEMA' || '_lot_' || v_feature_type;
+
+        v_view_name := 've_' || 'PARENT_SCHEMA' || '_lot_' || v_feature_id;
         v_trigger_name := 'trg_PARENT_SCHEMA_edit_lot_' || v_feature_type;
 
         EXECUTE
