@@ -212,7 +212,7 @@ BEGIN
 
 			--create a child view name if doesnt exist
 			IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
-				UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=rec.id;
+				UPDATE cat_feature SET child_layer=concat(v_parent_layer,'_',lower(id)) WHERE id=rec.id;
 			END IF;
 			v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
 
@@ -369,7 +369,7 @@ BEGIN
 
 		--create a child view name if doesnt exist
 		IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
-			UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=v_cat_feature;
+			UPDATE cat_feature SET child_layer=concat(v_parent_layer,'_',lower(id)) WHERE id=v_cat_feature;
 		END IF;
 		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
 

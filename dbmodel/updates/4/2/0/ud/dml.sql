@@ -669,9 +669,9 @@ UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTool
 UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionDemand","actionTooltip": "DWF","disabled": false}]'::json WHERE formname='ve_epa_pgully' AND tabname='tab_epa';
 UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionDemand","actionTooltip": "DWF","disabled": false}]'::json WHERE formname='ve_epa_junction' AND tabname='tab_epa';
 UPDATE config_form_tabs SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false}]'::json WHERE formname='ve_epa_storage' AND tabname='tab_epa';
-UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_epa';
-UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_documents';
-UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_features';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_epa';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_documents';
+UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_features';
 UPDATE config_form_tabs SET tabfunction=NULL, tabactions='[{"actionName": "actionEdit", "disabled": false},{"actionName": "actionSetToArc","disabled": false}]'::json WHERE formname='ve_frelem' AND tabname='tab_data';
 
 -- Correct expl_id
@@ -1267,6 +1267,77 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
   "tableUpsert": "v_ui_element_x_node",
   "featureType": "node"
 }'::json,'tbl_element_x_node',false);
+
+
+UPDATE config_form_fields SET widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}'::json WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+
+UPDATE config_form_fields SET "datatype"='string', widgettype='combo', ismandatory=true, iseditable=true, dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type''', dv_isnullvalue=true WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+
+DELETE FROM config_form_fields WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='n_hydrometer' AND tabname='tab_none';
+
+DELETE FROM config_form_fields WHERE formname ILIKE '%ve_gully%' AND formtype='form_feature' AND columnname IN ('connec_y1', 'connec_y2') AND tabname='tab_none';
+
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_edit_', 've_')::json WHERE widgetcontrols::text ilike '%v_edit_%';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_connec", "column":"active", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_gully", "column":"active", "dataType":"boolean"}}$$);
+
+update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';					
+delete from sys_param_user where id = 'edit_gully_linkcat_vdefault';
+update sys_param_user set id = 'edit_gully_linkcat_vdefault' where id = 'edit_linkcat_vdefault';
+
+
+-- 08/08/2025
+DELETE FROM config_form_fields WHERE formname ILIKE '%elem%' AND formtype='form_feature' AND columnname='element_id' AND tabname='tab_data';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='cat_element';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='cat_feature_element';
+
+-- Config_form_fields
+DO $$
+DECLARE
+  rec record;
+BEGIN
+-- frelem
+  FOR rec IN (SELECT * FROM config_form_fields WHERE formname ILIKE '%frelem_%')
+  LOOP
+    UPDATE config_form_fields SET formname = replace(rec.formname, 'frelem', 'element') WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND columnname = rec.columnname;
+  END LOOP;
+  -- genelem
+  FOR rec IN (SELECT * FROM config_form_fields WHERE formname ILIKE '%genelem_%')
+  LOOP
+    UPDATE config_form_fields SET formname = replace(rec.formname, 'genelem', 'element') WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND columnname = rec.columnname;
+  END LOOP;
+END $$;
+
+-- cat_feature
+UPDATE cat_feature SET parent_layer = 've_element' WHERE feature_type = 'ELEMENT';
+DO $$
+DECLARE
+  rec record;
+BEGIN
+  FOR rec IN (SELECT * FROM cat_feature WHERE feature_type = 'ELEMENT')
+  LOOP
+    UPDATE cat_feature SET child_layer = 've_element_' || lower(rec.id) WHERE id = rec.id;
+  END LOOP;
+END $$;
+
+-- config_form_tabs
+UPDATE config_form_tabs SET formname = 've_element' WHERE formname = 've_frelem' AND tabname = 'tab_documents';
+DELETE FROM config_form_tabs WHERE (formname = 've_genelem' AND (tabname = 'tab_epa' OR tabname = 'tab_documents')) OR (formname = 've_frelem' AND (tabname = 'tab_documents' OR tabname = 'tab_features'));
+
+DO $$
+DECLARE
+  rec record;
+BEGIN
+  FOR rec IN (SELECT * FROM config_form_tabs WHERE formname = 've_frelem')
+  LOOP
+    UPDATE config_form_tabs SET formname = replace(rec.formname, 'frelem', 'man_frelem') WHERE formname = rec.formname AND tabname = rec.tabname;
+  END LOOP;
+  FOR rec IN (SELECT * FROM config_form_tabs WHERE formname = 've_genelem')
+  LOOP
+    UPDATE config_form_tabs SET formname = replace(rec.formname, 'genelem', 'man_genelem') WHERE formname = rec.formname AND tabname = rec.tabname;
+  END LOOP;
+END $$;
 
 
 

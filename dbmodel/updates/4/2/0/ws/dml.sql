@@ -2378,3 +2378,61 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 
 
 INSERT INTO cat_element (id,element_type,active) VALUES ('EMETER-01','EMETER',true);
+-- 08/08/2025
+DELETE FROM config_form_fields WHERE formname ILIKE '%elem%' AND formtype='form_feature' AND columnname='element_id' AND tabname='tab_data';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='cat_element';
+UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb WHERE id='cat_feature_element';
+
+-- Config_form_fields
+DO $$
+DECLARE
+  rec record;
+BEGIN
+-- frelem
+  FOR rec IN (SELECT * FROM config_form_fields WHERE formname ILIKE '%frelem_%')
+  LOOP
+    UPDATE config_form_fields SET formname = replace(rec.formname, 'frelem', 'element') WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND columnname = rec.columnname;
+  END LOOP;
+  -- genelem
+  FOR rec IN (SELECT * FROM config_form_fields WHERE formname ILIKE '%genelem_%')
+  LOOP
+    UPDATE config_form_fields SET formname = replace(rec.formname, 'genelem', 'element') WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND columnname = rec.columnname;
+  END LOOP;
+END $$;
+
+-- cat_feature
+UPDATE cat_feature SET parent_layer = 've_element' WHERE feature_type = 'ELEMENT';
+DO $$
+DECLARE
+  rec record;
+BEGIN
+  FOR rec IN (SELECT * FROM cat_feature WHERE feature_type = 'ELEMENT')
+  LOOP
+    UPDATE cat_feature SET child_layer = 've_element_' || lower(rec.id) WHERE id = rec.id;
+  END LOOP;
+END $$;
+
+-- config_form_tabs
+UPDATE config_form_tabs SET formname = 've_element' WHERE formname = 've_frelem' AND tabname = 'tab_documents';
+DELETE FROM config_form_tabs WHERE (formname = 've_genelem' AND (tabname = 'tab_epa' OR tabname = 'tab_documents')) OR (formname = 've_frelem' AND (tabname = 'tab_documents' OR tabname = 'tab_features'));
+
+DO $$
+DECLARE
+  rec record;
+BEGIN
+  FOR rec IN (SELECT * FROM config_form_tabs WHERE formname = 've_frelem')
+  LOOP
+    UPDATE config_form_tabs SET formname = replace(rec.formname, 'frelem', 'man_frelem') WHERE formname = rec.formname AND tabname = rec.tabname;
+  END LOOP;
+  FOR rec IN (SELECT * FROM config_form_tabs WHERE formname = 've_genelem')
+  LOOP
+    UPDATE config_form_tabs SET formname = replace(rec.formname, 'genelem', 'man_genelem') WHERE formname = rec.formname AND tabname = rec.tabname;
+  END LOOP;
+END $$;
+
+UPDATE config_form_tabs
+	SET tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json
+	WHERE formname='ve_element' AND tabname='tab_documents';
+UPDATE config_form_tabs
+	SET tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json
+	WHERE formname='ve_man_frelem' AND tabname='tab_epa';

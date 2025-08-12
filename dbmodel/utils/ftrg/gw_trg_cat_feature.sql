@@ -146,8 +146,8 @@ BEGIN
 
         SELECT parent_layer INTO v_parent_layer FROM cat_feature WHERE id=NEW.id;
 		IF v_parent_layer IS NULL THEN
-        	EXECUTE 'UPDATE cat_feature SET parent_layer =  concat(''ve_'',lower('||quote_literal(v_feature.type)||'))
-        	WHERE id = '||quote_literal(NEW.id)||';';
+			EXECUTE 'UPDATE cat_feature SET parent_layer =  concat(''ve_'',lower('||quote_literal(v_feature.type)||'))
+			WHERE id = '||quote_literal(NEW.id)||';';
 		END IF;
 		EXECUTE 'UPDATE cat_feature SET feature_type = '||quote_literal(v_feature.type)||' WHERE id = '||quote_literal(NEW.id)||';';
 

@@ -39,6 +39,7 @@ v_man_addfields text;
 v_orderby integer;
 v_datatype text;
 v_widgettype text;
+v_formname text;
 
 BEGIN
 
@@ -55,20 +56,15 @@ BEGIN
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_view_name = ((p_data ->>'data')::json->>'view_name')::text;
 	v_feature_type = lower(((p_data ->>'data')::json->>'feature_type')::text);
-
-	v_feature_class  = (SELECT lower(feature_class) FROM cat_feature where id=v_cat_feature);
+    v_feature_class  = (SELECT lower(feature_class) FROM cat_feature where id=v_cat_feature);
+    v_formname := 've_'||lower(v_feature_type);
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
         INSERT INTO sys_table(id, descript, sys_role)
         VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit') ON CONFLICT (id) DO NOTHING;
-        IF v_version >'3.5.020' or v_version is null THEN
-        	IF v_feature_type = 'ELEMENT' THEN
-            	UPDATE sys_table st SET context = concat('{"levels": ["INVENTORY", "NETWORK", "',feature_class,'"]}'), alias = initcap(cf.id)
-            	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
-           ELSE
-           		UPDATE sys_table st SET context = concat('{"levels": ["INVENTORY", "NETWORK", "',feature_type,'"]}'), alias = initcap(cf.id)
-            	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
-           END IF;
+        IF v_version >'3.5.020' OR v_version IS NULL THEN
+			UPDATE sys_table st SET context = concat('{"levels": ["INVENTORY", "NETWORK", "',feature_type,'"]}'), alias = initcap(cf.id)
+			FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
         END IF;
 
 	    PERFORM gw_fct_admin_role_permissions();
@@ -96,37 +92,39 @@ BEGIN
 	--select list of fields different than id and formname from config_form_fields
 	EXECUTE 'SELECT DISTINCT string_agg(concat(column_name)::text,'' ,'') FROM (SELECT column_name
 	FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
-	AND column_name!=''id'' AND column_name!=''formname'' ORDER BY ordinal_position)a;'
+	AND column_name not in (''id'', ''formname'', ''formtype'') ORDER BY ordinal_position)a;'
 	INTO v_insert_fields;
 
 	--insert configuration copied from the parent view config
-	FOR rec IN (SELECT * FROM config_form_fields WHERE formname=concat('ve_',v_feature_type))
-	LOOP
-
-		EXECUTE 'INSERT INTO config_form_fields('||v_config_fields||')
-		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_form_fields WHERE columnname='''||rec.columnname||'''
-		AND formname=concat(''ve_'','''||v_feature_type||''')
-		ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING';
-
-	END LOOP;
+	EXECUTE 'INSERT INTO config_form_fields('||v_config_fields||')
+	SELECT '''||v_view_name||''', ''form_feature'', '||v_insert_fields||' FROM config_form_fields
+	WHERE formname='''||v_formname||'''
+	ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING';
 
 	--update configuration of man_type fields setting featurecat related to the view
 	IF v_project_type = 'WS' THEN
-		EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, '' OR '''||quote_literal(v_cat_feature)||''' = ANY(featurecat_id::text[])'')
+		EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, '' OR '''||quote_literal(upper(v_cat_feature))||''' = ANY(featurecat_id::text[])'')
 		WHERE formname = '''||v_view_name||'''
-		and (columnname =''location_type'' OR columnname =''fluid_type'' OR columnname =''function_type'' OR columnname =''category_type'')
+		AND (columnname =''location_type'' OR columnname =''fluid_type'' OR columnname =''function_type'' OR columnname =''category_type'')
 		AND dv_querytext NOT ILIKE ''% OR%'';';
 	ELSE
-		EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, '' OR '''||quote_literal(v_cat_feature)||''' = ANY(featurecat_id::text[])'')
+		EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, '' OR '''||quote_literal(upper(v_cat_feature))||''' = ANY(featurecat_id::text[])'')
 		WHERE formname = '''||v_view_name||'''
-		and (columnname =''location_type'' OR columnname =''function_type'' OR columnname =''category_type'')
+		AND (columnname =''location_type'' OR columnname =''function_type'' OR columnname =''category_type'')
 		AND dv_querytext NOT ILIKE ''% OR%'';';
 	END IF;
 
+	-- Update brand_id and model_id
+	EXECUTE 'UPDATE config_form_fields SET dv_querytext = ''SELECT id, id as idval FROM cat_brand WHERE '''||quote_literal(upper(v_cat_feature))||''' = ANY(featurecat_id::text[])''
+	WHERE formname = '''||v_view_name||''' AND columnname =''brand_id'';';
+
+	EXECUTE 'UPDATE config_form_fields SET dv_querytext = ''SELECT id, id as idval FROM cat_brand_model WHERE '''||quote_literal(upper(v_cat_feature))||''' = ANY(featurecat_id::text[])''
+	WHERE formname = '''||v_view_name||''' AND columnname =''model_id'';';
+
 	--select columns from man_* table without repeating the identifier
 	v_man_fields = 'SELECT DISTINCT column_name::text, data_type::text, numeric_precision, numeric_scale
-	FROM information_schema.columns where table_name=''man_'||v_feature_class||''' and table_schema='''||v_schemaname||''' 
-	and column_name!='''||v_feature_type||'_id'' group by column_name, data_type,numeric_precision, numeric_scale';
+	FROM information_schema.columns where table_name=''man_'||lower(v_feature_class)||''' and table_schema='''||v_schemaname||''' 
+	and column_name!='''||lower(v_feature_type)||'_id'' group by column_name, data_type,numeric_precision, numeric_scale;';
 
 
 	--insert configuration from the man_* tables of the feature type
