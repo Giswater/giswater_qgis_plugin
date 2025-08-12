@@ -78,21 +78,21 @@ BEGIN
 
 	-- TODO: review this code, with new elements logic of flow regulators
 	FOR rec_flowreg IN
-		SELECT element_id, to_arc, flwreg_length, flw_type, order_id, epa_type, node_id FROM
+		SELECT element_id, to_arc, flwreg_length, flw_type, epa_type, node_id FROM
 		(
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, node_id, order_id, 'FRORIFICE' as epa_type FROM inp_frorifice join man_frelem using (element_id)
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, node_id, 'FRORIFICE' as epa_type FROM inp_frorifice join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, node_id, order_id, 'FROUTLET' as epa_type FROM inp_froutlet join man_frelem using (element_id)
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, node_id, 'FROUTLET' as epa_type FROM inp_froutlet join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, node_id, order_id, 'FRPUMP' as epa_type FROM inp_frpump join man_frelem using (element_id)
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, node_id, 'FRPUMP' as epa_type FROM inp_frpump join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, node_id, order_id, 'FRWEIR' as epa_type FROM inp_frweir join man_frelem using (element_id)
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, node_id, 'FRWEIR' as epa_type FROM inp_frweir join man_frelem using (element_id)
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 		) a
@@ -156,7 +156,7 @@ BEGIN
 				INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, expl_id, the_geom)
 				VALUES(result_id_var, rec_new_arc.arc_id, rec_new_arc.node_1, rec_new_arc.node_2, rec_new_arc.arc_type, rec_new_arc.arccat_id,
 				rec_new_arc.epa_type, rec_new_arc.sector_id, rec_new_arc.state, rec_new_arc.state_type, rec_new_arc.annotation, rec_new_arc.length, rec_new_arc.expl_id, rec_new_arc.the_geom);
-				
+
 
 				IF old_node_id= rec_flowreg.node_id::text AND old_to_arc =rec_flowreg.to_arc::text THEN
 
@@ -202,7 +202,7 @@ BEGIN
 					rec_node.sector_id, rec_node.state, rec_node.state_type, rec_node.annotation, v_node_yinit, rec_node.ysur, rec_node.apond, rec_node.expl_id, v_nodarc_node_2_geom)
 					ON CONFLICT (node_id) DO NOTHING;
 
-					SELECT * INTO nodarc_rec FROM temp_t_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.flw_type, rec_flowreg.order_id);
+					SELECT * INTO nodarc_rec FROM temp_t_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.flw_type);
 
 					-- udpating the feature
 					v_counter :=1;
