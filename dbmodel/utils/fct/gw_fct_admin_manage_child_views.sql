@@ -46,23 +46,15 @@ DECLARE
 v_schemaname text = 'SCHEMA_NAME';
 v_cat_feature text;
 v_viewname text;
-v_definition text;
 v_feature_type text;
 v_feature_class text;
 v_feature_childtable_name text;
-v_man_fields text;
-v_feature_childtable_fields text;
 v_parent_layer text;
 
 rec record;
-rec_orderby record;
-
-v_multi_create boolean;
 v_project_type text;
 v_querytext text;
-v_orderby integer;
 v_data_view json;
-v_view_type text;
 v_action text;
 v_childview text;
 v_return_status text = 'Failed';
@@ -199,9 +191,6 @@ BEGIN
 
 		FOR rec IN EXECUTE v_querytext LOOP
 
-			--set view definition to null
-			v_definition = null;
-
 			--get the system type and feature_class of the feature and view name
 			v_feature_type = lower(rec.feature_type);
 			v_feature_class  = lower(rec.feature_class);
@@ -221,126 +210,23 @@ BEGIN
 				UPDATE cat_feature SET child_layer=v_viewname WHERE id=rec.id;
 			END IF;
 
-			--check if the defined view exists and create it id it doesn't
-			IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
-					EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
-					INTO v_definition;
-			END IF;
-
 			-- drop view before to recreate it if exists
-			IF v_definition IS NOT NULL THEN
+			IF v_viewname IS NOT NULL THEN
 				EXECUTE 'DROP VIEW IF EXISTS '||v_viewname;
 			END IF;
 
-			--select columns from man_* table without repeating the identifier
-			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_class||'.'',column_name)::text,'', '')
-			FROM information_schema.columns where table_name=''man_'||v_feature_class||''' and table_schema='''||v_schemaname||''' 
-			and column_name!='''||v_feature_type||'_id'''
-			INTO v_man_fields;
+			v_data_view = '{
+			"schema":"'||v_schemaname ||'",
+			"body":{"viewname":"'||v_viewname||'",
+				"feature_type":"'||v_feature_type||'",
+				"parent_layer":"'||v_parent_layer||'",
+				"feature_class":"'||v_feature_class||'",
+				"feature_cat":"'||v_cat_feature||'",
+				"feature_childtable_name":"'||v_feature_childtable_name||'"
+				}
+			}';
 
-			RAISE NOTICE '4/addfields=1,v_man_fields,%',v_man_fields;
-
-
-			--select columns from v_feature_childtable_name.* table without repeating the identifiers
-			EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
-			FROM information_schema.columns where table_name='''||v_feature_childtable_name||''' and table_schema='''||v_schemaname||'''
-			and column_name!=''id'' and column_name!='''||v_feature_type||'_id'''
-			INTO v_feature_childtable_fields;
-
-			RAISE NOTICE 'v_feature_childtable_fields,%',v_feature_childtable_fields;
-
-
-			--check and select the addfields if are already created
-			IF (SELECT count(id) FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) != 0 THEN
-
-				IF (SELECT orderby FROM sys_addfields WHERE cat_feature_id=rec.id limit 1) IS NULL THEN
-					v_orderby = 1;
-					FOR rec_orderby IN (SELECT * FROM sys_addfields WHERE cat_feature_id=rec.id ORDER BY id) LOOP
-						UPDATE sys_addfields SET orderby =v_orderby where id=rec_orderby.id;
-						v_orderby = v_orderby+1;
-					END LOOP;
-				END IF;
-
-				IF (SELECT orderby FROM sys_addfields WHERE cat_feature_id IS NULL limit 1) IS NULL THEN
-					v_orderby = 10000;
-					FOR rec_orderby IN (SELECT * FROM sys_addfields WHERE cat_feature_id IS NULL ORDER BY id) LOOP
-						UPDATE sys_addfields SET orderby =v_orderby where id=rec_orderby.id;
-						v_orderby = v_orderby+1;
-					END LOOP;
-				END IF;
-
-				--create views with fields from parent table,man table and addfields
-				IF v_man_fields IS NULL THEN
-					--view for WS and UD features that only have feature_id in man table and have defined addfields
-					v_view_type = 3;
-				ELSE
-					--view for WS and UD features that have many fields in man table and have defined addfields
-					v_view_type = 4;
-
-				END IF;
-
-				v_man_fields := COALESCE(v_man_fields, 'null');
-				v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-				v_data_view = '{
-				"schema":"'||v_schemaname ||'",
-				"body":{"viewname":"'||v_viewname||'",
-					"feature_type":"'||v_feature_type||'",
-					"parent_layer":"'||v_parent_layer||'",
-					"feature_class":"'||v_feature_class||'",
-					"feature_cat":"'||v_cat_feature||'",
-					"feature_childtable_name":"'||v_feature_childtable_name||'",
-					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
-					"man_fields":"'||v_man_fields||'",
-					"view_type":"'||v_view_type||'"
-					}
-				}';
-
-				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-			ELSE
-				--create views with fields from parent table and man table
-				IF v_man_fields IS NULL THEN
-					--view for WS and UD features that only have feature_id in man table
-					v_view_type = 1;
-				ELSE
-					--view for WS and UD features that have many fields in man table
-					v_view_type = 2;
-
-				END IF;
-
-				v_man_fields := COALESCE(v_man_fields, 'null');
-				v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-				v_data_view = '{
-				"schema":"'||v_schemaname ||'",
-				"body":{"viewname":"'||v_viewname||'",
-					"feature_type":"'||v_feature_type||'",
-					"parent_layer":"'||v_parent_layer||'",
-					"feature_class":"'||v_feature_class||'",
-					"feature_cat":"'||v_cat_feature||'",
-					"feature_childtable_name":"'||v_feature_childtable_name||'",
-					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
-					"man_fields":"'||v_man_fields||'",
-					"view_type":"'||v_view_type||'"
-					}
-				}';
-
-				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-			END IF;
-
-			--create trigger on view
-			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||
-			v_schemaname||'.'||v_viewname||';';
-
-			EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||'
-			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
-
-			EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-			"feature":{"catFeature":"'||v_cat_feature||'"}, 
-			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
+			SELECT gw_fct_admin_manage_child_views_view(v_data_view) INTO v_return_status, v_return_msg;
 
 		END LOOP;
 
@@ -366,135 +252,23 @@ BEGIN
 			UPDATE cat_feature SET child_layer=v_viewname WHERE id=v_cat_feature;
 		END IF;
 
-		--check if the defined view exists
-		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
-				EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
-				INTO v_definition;
-		END IF;
-
 		-- drop view before to recreate it if exists
-		IF v_definition IS NOT NULL THEN
+		IF v_viewname IS NOT NULL THEN
 			EXECUTE 'DROP VIEW IF EXISTS '||v_viewname;
 		END IF;
 
-		--select columns from man_* table without repeating the identifier
-		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_class||'.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name=''man_'||v_feature_class||''' and table_schema='''||v_schemaname||''' 
-		and column_name!='''||v_feature_type||'_id'''
-		INTO v_man_fields;
+		v_data_view = '{
+		"schema":"'||v_schemaname ||'",
+		"body":{"viewname":"'||v_viewname||'",
+			"feature_type":"'||v_feature_type||'",
+			"parent_layer":"'||v_parent_layer||'",
+			"feature_class":"'||v_feature_class||'",
+			"feature_cat":"'||v_cat_feature||'",
+			"feature_childtable_name":"'||v_feature_childtable_name||'"
+			}
+		}';
 
-		RAISE NOTICE 'v_man_fields,%',v_man_fields;
-
-
-		--select columns from v_feature_childtable_name.* table without repeating the identifiers
-		EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name='''||v_feature_childtable_name||''' and table_schema='''||v_schemaname||'''
-		and column_name!=''id'' and column_name!='''||v_feature_type||'_id'''
-		INTO v_feature_childtable_fields;
-
-		RAISE NOTICE 'v_feature_childtable_fields,%',v_feature_childtable_fields;
-
-		--check and select the addfields if are already created
-		IF (SELECT count(id) FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) != 0 THEN
-		raise notice '4/addfields=1,v_man_fields,%',v_man_fields;
-
-			IF (SELECT orderby FROM sys_addfields WHERE cat_feature_id=v_cat_feature LIMIT 1) IS NULL THEN
-				v_orderby = 1;
-				FOR rec_orderby IN (SELECT * FROM sys_addfields WHERE cat_feature_id=v_cat_feature ORDER BY id) LOOP
-					UPDATE sys_addfields SET orderby =v_orderby where id=rec_orderby.id;
-					v_orderby = v_orderby+1;
-				END LOOP;
-			END IF;
-
-			IF (SELECT orderby FROM sys_addfields WHERE cat_feature_id IS NULL limit 1) IS NULL THEN
-				v_orderby = 10000;
-				FOR rec_orderby IN (SELECT * FROM sys_addfields WHERE cat_feature_id IS NULL ORDER BY id) LOOP
-					UPDATE sys_addfields SET orderby =v_orderby where id=rec_orderby.id;
-					v_orderby = v_orderby+1;
-				END LOOP;
-				raise notice 'v_orderby,%',v_orderby;
-			END IF;
-
-			--create views with fields from parent table,man table and addfields
-			IF v_man_fields IS NULL THEN
-				--view for WS and UD features that only have feature_id in man table and have defined addfields
-				v_view_type = 3;
-			ELSE
-				--view for WS and UD features that have many fields in man table and have defined addfields
-				v_view_type = 4;
-
-			END IF;
-
-			RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
-
-			v_man_fields := COALESCE(v_man_fields, 'null');
-			v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-			v_data_view = '{
-			"schema":"'||v_schemaname ||'",
-			"body":{"viewname":"'||v_viewname||'",
-				"feature_type":"'||v_feature_type||'",
-				"parent_layer":"'||v_parent_layer||'",
-				"feature_class":"'||v_feature_class||'",
-				"feature_cat":"'||v_cat_feature||'",
-				"feature_childtable_name":"'||v_feature_childtable_name||'",
-				"feature_childtable_fields":"'||v_feature_childtable_fields||'",
-				"man_fields":"'||v_man_fields||'",
-				"view_type":"'||v_view_type||'"
-				}
-			}';
-
-			PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-		ELSE
-
-			--create views with fields from parent table and man table
-			IF v_man_fields IS NULL THEN
-				--view for WS and UD features that only have feature_id in man table
-				v_view_type = 1;
-			ELSE
-				--view for WS and UD features that have many fields in man table
-				v_view_type = 2;
-
-			END IF;
-
-			RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
-
-			v_man_fields := COALESCE(v_man_fields, 'null');
-			v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-			v_data_view = '{
-			"schema":"'||v_schemaname ||'",
-			"body":{"viewname":"'||v_viewname||'",
-				"feature_type":"'||v_feature_type||'",
-				"parent_layer":"'||v_parent_layer||'",
-				"feature_class":"'||v_feature_class||'",
-				"feature_cat":"'||v_cat_feature||'",
-				"feature_childtable_name":"'||v_feature_childtable_name||'",
-				"feature_childtable_fields":"'||v_feature_childtable_fields||'",
-				"man_fields":"'||v_man_fields||'",
-				"view_type":"'||v_view_type||'"
-				}
-			}';
-
-			PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-			v_return_status = 'Accepted';
-			v_return_msg = 'Process finished successfully';
-			END IF;
-
-			EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-			"feature":{"catFeature":"'||v_cat_feature||'"}, 
-			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
-
-			--create trigger on view
-			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||
-			v_schemaname||'.'||v_viewname||';';
-
-			EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
-			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
-
+		SELECT gw_fct_admin_manage_child_views_view(v_data_view) INTO v_return_status, v_return_msg;
 
 		v_return_status = 'Accepted';
 		v_return_msg = 'Single-create view successfully';

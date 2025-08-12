@@ -1,232 +1,162 @@
-/*
-This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU
-General Public License as published by the Free Software Foundation, either version 3 of the License,
-or (at your option) any later version.
-*/
-
---FUNCTION CODE: 2752
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_views_view(p_data json)
-  RETURNS void AS
-$BODY$
-
-/*EXAMPLE
-select gw_fct_admin_manage_child_views_view($${
-        "schema":"ws_36012_2",
-        "body":{"viewname":"ve_node_adaptation",
-          "feature_type":"node",
-          "feature_class":"junction",
-          "feature_cat":"ADAPTATION",
-          "feature_childtable_name":"man_node_adaptation",
-          "feature_childtable_fields":"null",
-          "man_fields":"null",
-          "view_type":"1"
-          }
-        }$$);
-*/
-
+RETURNS json
+LANGUAGE plpgsql
+AS $$
 DECLARE
+	v_schemaname text := (p_data ->> 'schema');
+	v_viewname text := ((p_data ->> 'body')::json ->> 'viewname');
+	v_feature_type text := ((p_data ->> 'body')::json ->> 'feature_type'); -- e.g. 'node', 'element', etc.
+	v_parent_layer text := ((p_data ->> 'body')::json ->> 'parent_layer'); -- parent view/table name
+	v_feature_class text := ((p_data ->> 'body')::json ->> 'feature_class'); -- e.g. 'manhole', 'valve'
+	v_feature_cat text := ((p_data ->> 'body')::json ->> 'feature_cat'); -- cat_feature.id
+	v_feature_childtable_name text := ((p_data ->> 'body')::json ->> 'feature_childtable_name'); -- e.g. 'man_node_adaptation'
 
-v_project_type text;
-v_schemaname text = 'SCHEMA_NAME';
-v_viewname text;
-v_feature_type text;
-v_parent_layer text;
-v_feature_class text;
-v_feature_cat text;
-v_feature_childtable_name text;
-v_feature_childtable_fields text;
-v_man_fields text;
-v_view_type integer;
-v_tableversion text = 'sys_version';
-v_columntype text = 'project_type';
-v_sql text;
-v_node_fields text;
-v_element_fields text;
+	v_join_key text; -- *_id join key
+	v_man_table text; -- man_* table name
+	v_parent_cols text; -- qualified parent columns (with exclusions)
+	v_man_cols text; -- qualified man_* columns (excluding *_id)
+	v_add_cols text; -- qualified add table columns (excluding id, *_id)
+	v_has_man_extra boolean := false;
+	v_has_add_extra boolean := false;
 
+	v_sql text;
 BEGIN
+  -- Set search_path to the target schema
+  EXECUTE format('SET search_path = %I, public;', v_schemaname);
 
-	-- search path
-	SET search_path = "SCHEMA_NAME", public;
+  v_join_key  := v_feature_type || '_id';
+  v_man_table := 'man_' || v_feature_class;
 
-	-- get info from version table
-	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'version') IS NOT NULL THEN v_tableversion = 'version'; v_columntype = 'wsoftware'; END IF;
- 	EXECUTE 'SELECT '||quote_ident(v_columntype)||' FROM '||quote_ident(v_tableversion)||' LIMIT 1' INTO v_project_type;
-
-  v_schemaname = (p_data ->> 'schema');
-  v_viewname = ((p_data ->> 'body')::json->>'viewname')::text;
-  v_feature_type = ((p_data ->> 'body')::json->>'feature_type')::text;
-  v_parent_layer = ((p_data ->> 'body')::json->>'parent_layer')::text;
-  v_feature_class = ((p_data ->> 'body')::json->>'feature_class')::text;
-  v_feature_cat = ((p_data ->> 'body')::json->>'feature_cat')::text;
-  v_feature_childtable_name = ((p_data ->> 'body')::json->>'feature_childtable_name')::text;
-  v_feature_childtable_fields = ((p_data ->> 'body')::json->>'feature_childtable_fields')::text;
-  v_man_fields = ((p_data ->> 'body')::json->>'man_fields')::text;
-  v_view_type =((p_data ->> 'body')::json->>'view_type')::integer;
-
-  -- list all columns from ve_node excluding 'broken_valve' and 'closed_valve' in order to take those from man_valve table
-  EXECUTE 'SELECT 
-  REPLACE(REPLACE(array_agg('''||v_parent_layer||'.'' || column_name)::text, ''{'', ''''), ''}'', '''') 
-  FROM information_schema.columns
-  WHERE table_schema = '||quote_literal(v_schemaname)||' 
-  AND table_name = ''ve_node'' 
-  AND column_name NOT IN (''closed_valve'', ''broken_valve'')'
-  INTO v_node_fields;
-
-  EXECUTE 'SELECT 
-  REPLACE(REPLACE(array_agg('''||v_parent_layer||'.'' || column_name)::text, ''{'', ''''), ''}'', '''') 
-  FROM information_schema.columns
-  WHERE table_schema = '||quote_literal(v_schemaname)||' 
-  AND column_name NOT IN (''node_id'', ''order_id'', ''nodarc_id'', ''to_arc'', ''flwreg_length'')
-  AND table_name = '||quote_literal(v_parent_layer)||''
-  INTO v_element_fields;
-
-  IF v_view_type = 1 THEN
-    --view for WS and UD features that only have feature_id in man table
-    IF v_feature_type = 'node' then
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_node_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
-
-    ELSIF v_feature_type = 'element' then
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_element_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
-
-    ELSE
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT *
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
-
-    END IF;
-
-  ELSIF v_view_type = 2 THEN
-    --view for WS and UD features that have many fields in man table
-    IF v_feature_type = 'node' then
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_node_fields||',
-      '||v_man_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
-
-    ELSIF v_feature_type = 'element' then
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_element_fields||',
-      '||v_man_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
-
-    ELSE
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_parent_layer||'.*,
-      '||v_man_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
-
-    END IF;
-
-  ELSIF v_view_type = 3 THEN
-    --view for WS and UD features that only have feature_id in man table and have defined addfields
-    IF v_feature_type = 'node' THEN
-
-       EXECUTE '
-       CREATE OR REPLACE VIEW '||v_viewname||' AS
-       SELECT '||v_node_fields||',
-       '||v_feature_childtable_fields||'
-       FROM '||v_parent_layer||'
-       JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-       LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
-
-    ELSIF v_feature_type = 'element' then
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_element_fields||',
-      '||v_feature_childtable_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
-
-    ELSE
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_parent_layer||'.*,
-      '||v_feature_childtable_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
-
-    END IF;
-
-  ELSIF v_view_type = 4 THEN
-    --view for WS and UD features that have many fields in man table and have defined addfields
-    IF v_feature_type = 'node' then
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_node_fields||',
-      '||v_man_fields||',
-      '||v_feature_childtable_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
-
-    ELSIF v_feature_type = 'element' then
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_element_fields||',
-      '||v_man_fields||',
-      '||v_feature_childtable_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
-
-    ELSE
-
-      EXECUTE '
-      CREATE OR REPLACE VIEW '||v_viewname||' AS
-      SELECT '||v_parent_layer||'.*,
-      '||v_man_fields||',
-      '||v_feature_childtable_fields||'
-      FROM '||v_parent_layer||'
-      JOIN man_'||v_feature_class||' USING ('||v_feature_type||'_id)
-      LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
-
-    END IF;
-
+  -- Check parent existence (table or view)
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = v_schemaname AND table_name = v_parent_layer
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.views
+    WHERE table_schema = v_schemaname AND table_name = v_parent_layer
+  ) THEN
+    RAISE EXCEPTION 'Parent layer %.% does not exist', v_schemaname, v_parent_layer;
   END IF;
 
+  -- Check man_* table existence
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = v_schemaname AND table_name = v_man_table
+  ) THEN
+    RAISE EXCEPTION 'man_* table %.% does not exist', v_schemaname, v_man_table;
+  END IF;
+
+  -- Get man_* columns (all except *_id). Don't filter overlaps here, will remove from parent selection.
+  SELECT
+    CASE WHEN COUNT(*) FILTER (WHERE c.column_name <> v_join_key) > 0 THEN true ELSE false END,
+    NULLIF(string_agg(
+      CASE WHEN c.column_name <> v_join_key
+           THEN format('%I.%I', v_man_table, c.column_name)
+           ELSE NULL END,
+      ', '
+    ), '')
+  INTO v_has_man_extra, v_man_cols
+  FROM information_schema.columns c
+  WHERE c.table_schema = v_schemaname
+    AND c.table_name   = v_man_table;
+
+  -- Get parent columns, excluding:
+  --   - any column that exists in man_* (except *_id, which is kept from parent)
+  WITH man_names AS (
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = v_schemaname
+      AND table_name   = v_man_table
+      AND column_name <> v_join_key
+  )
+  SELECT string_agg(format('%I.%I', v_parent_layer, c.column_name), ', ')
+  INTO v_parent_cols
+  FROM information_schema.columns c
+  WHERE c.table_schema = v_schemaname
+    AND c.table_name   = v_parent_layer
+    AND c.column_name NOT IN (SELECT column_name FROM man_names);
+
+  IF v_parent_cols IS NULL THEN
+    -- This can happen if parent and man_* have the same columns (except *_id).
+    -- In that case, at least select *_id from parent.
+    SELECT string_agg(format('%I.%I', v_parent_layer, c.column_name), ', ')
+    INTO v_parent_cols
+    FROM information_schema.columns c
+    WHERE c.table_schema = v_schemaname
+      AND c.table_name   = v_parent_layer
+      AND c.column_name = v_join_key;
+
+    IF v_parent_cols IS NULL THEN
+      RAISE EXCEPTION 'Parent %.% does not have column %', v_schemaname, v_parent_layer, v_join_key;
+    END IF;
+  END IF;
+
+  -- Get add table columns (if exists and has more than just id and *_id)
+  IF v_feature_childtable_name IS NOT NULL
+     AND EXISTS (
+       SELECT 1 FROM information_schema.tables
+       WHERE table_schema = v_schemaname AND table_name = v_feature_childtable_name
+     )
+  THEN
+    SELECT
+      CASE WHEN COUNT(*) FILTER (WHERE c.column_name NOT IN ('id', v_join_key)) > 0 THEN true ELSE false END,
+      NULLIF(string_agg(
+        CASE WHEN c.column_name NOT IN ('id', v_join_key)
+             THEN format('%I.%I', v_feature_childtable_name, c.column_name)
+             ELSE NULL END,
+        ', '
+      ), '')
+    INTO v_has_add_extra, v_add_cols
+    FROM information_schema.columns c
+    WHERE c.table_schema = v_schemaname
+      AND c.table_name   = v_feature_childtable_name;
+  ELSE
+    v_has_add_extra := false;
+    v_add_cols      := NULL;
+  END IF;
+
+  -- Build final SELECT
+  v_sql := 'CREATE OR REPLACE VIEW ' || quote_ident(v_viewname) || ' AS ' ||
+           'SELECT ' || v_parent_cols;
+
+  IF v_has_man_extra AND v_man_cols IS NOT NULL THEN
+    v_sql := v_sql || ', ' || v_man_cols;
+  END IF;
+
+  IF v_has_add_extra AND v_add_cols IS NOT NULL THEN
+    v_sql := v_sql || ', ' || v_add_cols;
+  END IF;
+
+  v_sql := v_sql || ' FROM ' || format('%I', v_parent_layer) ||
+         ' JOIN ' || format('%I', v_man_table) || ' USING (' || quote_ident(v_join_key) || ')';
+
+  IF v_has_add_extra THEN
+    v_sql := v_sql || ' LEFT JOIN ' || format('%I', v_feature_childtable_name) ||
+            ' USING (' || quote_ident(v_join_key) || ')';
+  END IF;
+
+  v_sql := v_sql || ' WHERE ' || format('%I.%I', v_parent_layer, v_feature_type || '_type') ||
+          ' = ' || quote_literal(v_feature_cat) || ';';
+
+  EXECUTE v_sql;
+  RAISE NOTICE 'View % created in %', v_viewname, v_schemaname;
+
+  --create trigger on view
+  EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_feature_cat, ' ','_'),'-','_'),'.','_'))||' ON '||
+  v_schemaname||'.'||v_viewname||';';
+  RAISE NOTICE 'Trigger % dropped in %', v_viewname, v_schemaname;
+
+  EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_feature_cat, ' ','_'),'-','_'),'.','_'))||'
+  INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
+  FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_feature_cat||''');';
+  RAISE NOTICE 'Trigger % created in %', v_viewname, v_schemaname;
+
+  EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+  "feature":{"catFeature":"'||v_feature_cat||'"}, 
+  "data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
+  RAISE NOTICE 'Config % created in %', v_viewname, v_schemaname;
+
+  RETURN json_build_object('status', 'Accepted', 'message', 'View created successfully')::json;
+
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+$$;
