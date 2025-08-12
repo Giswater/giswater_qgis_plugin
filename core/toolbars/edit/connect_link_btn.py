@@ -79,9 +79,6 @@ class GwConnectLinkButton(GwMaptool):
         # Set combo ids editable
         self.txt_id.setEditable(True)
 
-        # Connect signal when row is clicked
-        self.tbl_ids.clicked.connect(self.on_row_clicked)
-
         # Add headers to table
         tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header': f'{self.feature_type}_id'}])
 
@@ -94,11 +91,6 @@ class GwConnectLinkButton(GwMaptool):
         # Open dialog
         tools_gw.open_dialog(self.dlg_connect_link, 'connect_link')
 
-    def on_row_clicked(self, index):
-        """ Set QLineEdit text of id with selected row id """
-
-        value = self.tbl_ids.model().data(index)
-        tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_id", value)
 
     def fill_tbl_ids(self, layer):
         """ Fill table with selected features """
@@ -365,42 +357,75 @@ def add(**kwargs):
 
 
 def remove(**kwargs):
-    """ Remove button clicked event """
+    """ Remove button clicked event - Remove selected rows from table """
 
     # Get class
     this = kwargs['class']
 
-    # Get selected id
-    selected_id = tools_qt.get_combo_value(this.dlg_connect_link, "tab_none_id")
-
-    # Check if selected id is not empty
-    if selected_id is None or selected_id == '':
-        message = "Please select a feature to remove"
-        tools_qgis.show_warning(message, title='Connect to network')
-        return
-
-    # Get layer from feature
-    layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
-
-    # Check if layer exists
-    if layer:
-
-        # Initialize an empty list
-        id_list = []
-
-        # Loop througth selected features
-        for feature in layer.selectedFeatures():
-
-            # Append features expect the feature to remove
-            if feature.attribute(f"{this.feature_type}_id") != selected_id:
-                id_list.append(feature.id())
-
-        # Show selected ids in canvas
-        layer.selectByIds(id_list)
-
-    # Clear selected id txt and refresh table
-    tools_qt.set_widget_text(this.dlg_connect_link, "tab_none_id", "")
-    this.fill_tbl_ids(layer)
+    try:
+        # Get the table model and selection model
+        model = this.tbl_ids.model()
+        selection_model = this.tbl_ids.selectionModel()
+        
+        if not model or not selection_model:
+            return
+            
+        # Get selected rows
+        selected_rows = selection_model.selectedRows()
+        
+        if not selected_rows:
+            message = "Please select rows to remove from the table"
+            tools_qgis.show_warning(message, title='Connect to network')
+            return
+        
+        # Get IDs from selected rows
+        selected_ids = []
+        for index in selected_rows:
+            item = model.item(index.row(), 0)  # Get the first column
+            if item and item.text():
+                selected_ids.append(item.text())
+        
+        if not selected_ids:
+            return
+            
+        # Remove selected rows from the model
+        # We need to remove rows in reverse order to avoid index issues
+        rows_to_remove = sorted([index.row() for index in selected_rows], reverse=True)
+        for row in rows_to_remove:
+            model.removeRow(row)
+        
+        # Clear any selection in the combo box
+        tools_qt.set_widget_text(this.dlg_connect_link, "tab_none_id", "")
+        
+        # Update canvas selection to show only remaining items in the table
+        layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
+        if layer:
+            # Get remaining IDs from the table
+            remaining_ids = []
+            for row in range(model.rowCount()):
+                item = model.item(row, 0)
+                if item and item.text():
+                    remaining_ids.append(int(item.text()))
+            
+            # Clear current selection and select only remaining features
+            layer.removeSelection()
+            if remaining_ids:
+                # Create expression to select remaining features
+                expr_filter = f"{this.feature_type}_id IN ({','.join(map(str, remaining_ids))})"
+                is_valid, expr = tools_qt.check_expression_filter(expr_filter)
+                if is_valid:
+                    layer.selectByExpression(expr_filter)  # Use expr_filter (string) instead of expr (QgsExpression)
+            
+            # Refresh the layer to show updated selection
+            layer.triggerRepaint()
+        
+        # Show success message
+        removed_count = len(selected_ids)
+        tools_qgis.show_info(f"{removed_count} item(s) removed from the list: {', '.join(selected_ids)}")
+            
+    except Exception as e:
+        tools_qgis.show_warning(f"Error removing items: {str(e)}")
+        tools_gw.log_info(f"Error in remove function: {str(e)}")
 
 
 def accept(**kwargs):
