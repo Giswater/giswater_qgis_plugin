@@ -287,6 +287,16 @@
                  </item>
                 </layout>
                </widget>
+			   <widget class="QWidget" name="tab_shortpipe">
+                <attribute name="title">
+                 <string>Shortpipe</string>
+                </attribute>
+                <layout class="QGridLayout" name="gridLayout_29">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="lyt_elem_dsc_shortpipe"/>
+                 </item>
+                </layout>
+               </widget>
               </widget>
              </item>
             </layout>
