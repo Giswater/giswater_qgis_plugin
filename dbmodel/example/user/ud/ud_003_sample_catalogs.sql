@@ -182,10 +182,10 @@ UPDATE cat_feature SET shortcut_key='Alt+Z' WHERE id = 'ESCOMESA_FICTICIA';
 UPDATE cat_feature SET shortcut_key='Alt+1' WHERE id = 'VGULLY';
 UPDATE cat_feature SET shortcut_key='Alt+2' WHERE id = 'VCONNEC';
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EORIFICE', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_orifice', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EOUTLET', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_outlet', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EWEIR', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_eweir', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EPUMP', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_pump', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EORIFICE', 'FRELEM','ELEMENT', 've_element', 've_element_orifice', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EOUTLET', 'FRELEM','ELEMENT', 've_element', 've_element_outlet', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EWEIR', 'FRELEM','ELEMENT', 've_element', 've_element_eweir', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EPUMP', 'FRELEM','ELEMENT', 've_element', 've_element_pump', true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_element (id, element_type, active) VALUES ('ORIFICE-01', 'EORIFICE', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('OUTLET-01', 'EOUTLET', TRUE) ON CONFLICT (id) DO NOTHING;

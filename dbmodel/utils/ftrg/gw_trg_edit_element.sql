@@ -66,6 +66,7 @@ v_childtable_name TEXT;
 v_element_id TEXT;
 v_feature_type TEXT;
 v_length_arc numeric;
+v_inp_table TEXT;
 
 BEGIN
 
@@ -276,6 +277,10 @@ BEGIN
 			END IF;
 		END IF;
 
+		IF v_man_table = 'man_frelem' THEN
+			NEW.the_geom = NULL;
+		END IF;
+
 		INSERT INTO "element" (element_id, code, sys_code, elementcat_id, serial_number, num_elements, state, state_type, observ, "comment", function_type, category_type,
 		location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified, label_x, label_y, label_rotation,
 		publish, inventory, expl_id, feature_type, top_elev, expl_visibility, trace_featuregeom, muni_id, sector_id, brand_id, model_id, /*asset_id,*/ datasource,
@@ -339,10 +344,51 @@ BEGIN
 
 	-- UPDATE
 	ELSIF TG_OP = 'UPDATE' THEN
+		-- epa type
+		IF (NEW.epa_type != OLD.epa_type) THEN
+			IF (OLD.epa_type = 'FRPUMP') THEN
+				v_inp_table:= 'inp_frpump';
+			ELSIF (OLD.epa_type = 'FRVALVE') THEN
+				v_inp_table:= 'inp_frvalve';
+			ELSIF (OLD.epa_type = 'FRWEIR') THEN
+				v_inp_table:= 'inp_frweir';
+			ELSIF (OLD.epa_type = 'FRORIFICE') THEN
+				v_inp_table:= 'inp_frorifice';
+			ELSIF (OLD.epa_type = 'FROUTLET') THEN
+				v_inp_table:= 'inp_froutlet';
+			END IF;
+
+			IF v_inp_table IS NOT NULL THEN
+				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE element_id = '||quote_literal(OLD.element_id);
+				EXECUTE v_sql;
+			END IF;
+
+			v_inp_table := NULL;
+
+			IF (NEW.epa_type = 'FRPUMP') THEN
+				v_inp_table:= 'inp_frpump';
+			ELSIF (NEW.epa_type = 'FRVALVE') THEN
+				v_inp_table:= 'inp_frvalve';
+			ELSIF (NEW.epa_type = 'FRWEIR') THEN
+				v_inp_table:= 'inp_frweir';
+			ELSIF (NEW.epa_type = 'FRORIFICE') THEN
+				v_inp_table:= 'inp_frorifice';
+			ELSIF (NEW.epa_type = 'FROUTLET') THEN
+				v_inp_table:= 'inp_froutlet';
+			END IF;
+			IF v_inp_table IS NOT NULL THEN
+				v_sql:= 'INSERT INTO '||v_inp_table||' (element_id) VALUES ('||quote_literal(NEW.element_id)||') ON CONFLICT (element_id) DO NOTHING';
+				EXECUTE v_sql;
+			END IF;
+		END IF;
 
 		-- Sector
 		IF (NEW.sector_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
+		END IF;
+
+		IF v_man_table='man_genelem' THEN
+			UPDATE element SET the_geom = NEW.the_geom WHERE element_id = OLD.element_id;
 		END IF;
 
 		UPDATE "element" SET code=NEW.code, sys_code=NEW.sys_code, elementcat_id=NEW.elementcat_id, serial_number=NEW.serial_number, num_elements=NEW.num_elements, state=NEW.state,
@@ -351,7 +397,7 @@ BEGIN
 		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish,
 		inventory=NEW.inventory, expl_id=NEW.expl_id, feature_type=upper(v_feature_type), top_elev=NEW.top_elev, expl_visibility=NEW.expl_visibility, trace_featuregeom=NEW.trace_featuregeom,
 		muni_id=NEW.muni_id, sector_id=NEW.sector_id, brand_id=NEW.brand_id, model_id=NEW.model_id, asset_id=NEW.asset_id, datasource=NEW.datasource,
-		lock_level=NEW.lock_level, the_geom=NEW.the_geom, created_at=NEW.created_at, created_by=NEW.created_by, updated_at=NEW.updated_at, updated_by=NEW.updated_by, epa_type=NEW.epa_type, omzone_id=NEW.omzone_id
+		lock_level=NEW.lock_level, created_at=NEW.created_at, created_by=NEW.created_by, updated_at=NEW.updated_at, updated_by=NEW.updated_by, epa_type=NEW.epa_type, omzone_id=NEW.omzone_id
 		WHERE element_id=OLD.element_id;
 
 

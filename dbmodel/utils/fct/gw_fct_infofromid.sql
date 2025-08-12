@@ -90,6 +90,7 @@ tableparent_id_arg text;
 parent_child_relation boolean = false;
 v_idname text;
 v_featuretype text;
+v_featureclass text;
 column_type text;
 v_schemaname text;
 v_version json;
@@ -144,6 +145,7 @@ v_record record;
 v_cur_user text;
 v_prev_cur_user text;
 v_table_child text;
+v_table_class varchar;
 v_table_epa text;
 v_epatype text;
 v_tablename_aux text;
@@ -188,6 +190,7 @@ BEGIN
 
 	-- control of nulls
 	IF v_addschema = 'NULL' THEN v_addschema = null; END IF;
+	IF v_tablename = 've_man_frelem' THEN v_tablename := 've_element'; END IF;
 
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
@@ -421,9 +424,9 @@ BEGIN
 
 
 	-- Get feature type
-	v_querystring = concat('SELECT lower(feature_type), lower(parent_layer) FROM cat_feature WHERE  (parent_layer = ',quote_nullable(v_tablename),' OR child_layer = ',quote_nullable(v_tablename),') LIMIT 1');
+	v_querystring = concat('SELECT lower(feature_type), lower(parent_layer), lower(feature_class) FROM cat_feature WHERE  (parent_layer = ',quote_nullable(v_tablename),' OR child_layer = ',quote_nullable(v_tablename),') LIMIT 1');
 
-	EXECUTE v_querystring INTO v_featuretype, v_parent_layer;
+	EXECUTE v_querystring INTO v_featuretype, v_parent_layer, v_featureclass;
 	v_featuretype := LOWER(v_featuretype);
 	v_featuretype := COALESCE(v_featuretype, '');
 
@@ -601,9 +604,10 @@ BEGIN
 		EXECUTE v_querystring INTO v_featuretype;
 	end if;
 
+	v_table_class = 've_man_' || lower(v_featureclass);
 	v_querystring = concat(
 	'SELECT array_agg(row_to_json(a)) FROM(
-	SELECT formname, "tabName", "tabLabel", "tooltip", tabactions, orderby, device
+	SELECT '||quote_nullable(v_table_parent)||' as formname, "tabName", "tabLabel", "tooltip", tabactions, orderby, device
 	FROM (
     SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabactions, orderby, device,
            ROW_NUMBER() OVER (
@@ -612,12 +616,13 @@ BEGIN
                    CASE
                        WHEN formname = '||quote_nullable(v_tablename) ||' THEN 0
                        WHEN formname = '||quote_nullable(v_table_child)||' THEN 1
-                       WHEN formname = '||quote_nullable(v_table_parent)||' THEN 2
-                       ELSE 2
+                       WHEN formname = '||quote_nullable(v_table_class)||' THEN 2
+                       WHEN formname = '||quote_nullable(v_table_parent)||' THEN 3
+                       ELSE 3
                    END
            ) as rn
     FROM config_form_tabs
-    WHERE (formname ='||quote_nullable(v_table_parent)||' OR formname ='||quote_nullable(v_table_child)||' OR formname ='||quote_nullable(v_tablename)||' OR formname IS NULL)
+    WHERE (formname ='||quote_nullable(v_table_parent)||' OR formname ='||quote_nullable(v_table_class)||' OR formname ='||quote_nullable(v_table_child)||' OR formname ='||quote_nullable(v_tablename)||' OR formname IS NULL)
           AND 4 = ANY(device)
 	) AS subquery
 	WHERE rn = 1
@@ -769,7 +774,7 @@ BEGIN
                 SELECT * INTO v_noderecord1 FROM ve_node WHERE ST_DWithin(ST_startpoint(v_inputgeometry), ve_node.the_geom, v_arc_searchnodes)
                 ORDER BY ST_Distance(ve_node.the_geom, ST_startpoint(v_inputgeometry)) LIMIT 1;
                 -- Get order_id
-                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM ve_frelem WHERE node_id = v_noderecord1.node_id ::text; -- afegir flwreg_type
+                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM man_frelem WHERE node_id = v_noderecord1.node_id ::text; -- afegir flwreg_type
                 -- Get flowreg_type
                 v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(v_tablename) ,' LIMIT 1');
                 EXECUTE v_querystring INTO v_flwreg_type;

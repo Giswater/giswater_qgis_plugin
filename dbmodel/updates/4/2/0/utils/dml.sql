@@ -268,6 +268,7 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 
 
 -- 07/08/2025
+-- Delete element from element_manager
 UPDATE config_form_fields
 	SET widgetfunction='{
   "functionName": "delete_manager_item",
@@ -395,3 +396,39 @@ END $$;
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName":"open_selected_manager_item", "parameters":{"columnfind":"element_id", "elem_manager": true, "sourcetable": "v_ui_element"}}'::json
 	WHERE formname='element_manager' AND formtype='form_element' AND columnname='tbl_element' AND tabname='tab_none';
+
+-- Update element views names in sys_table
+UPDATE sys_table SET id = 've_man_frelem' WHERE id = 've_frelem';
+UPDATE sys_table SET id = 've_man_genelem' WHERE id = 've_genelem';
+INSERT INTO sys_table (id, sys_role, descript, project_template, context, alias, orderby, source) VALUES 
+('ve_element', 'role_edit', 'Shows information about elements', '{"template": [1], "visibility": true, "levels_to_read": 2}', '{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}', 'Elements', 5, 'core');
+
+-- Open correctly the forms
+DELETE FROM config_info_layer WHERE layer_id IN ('ve_frelem', 've_genelem');
+INSERT INTO config_info_layer (layer_id,is_parent,is_editable,formtemplate,headertext,orderby)
+	VALUES ('ve_element',true,true,'info_feature','Element',4);
+
+INSERT INTO config_info_layer (layer_id,is_parent,is_editable,formtemplate,headertext,orderby)
+	VALUES ('ve_man_frelem',true,true,'info_feature','FR. Element',4);
+
+-- Make element menu work in info
+DO $$
+DECLARE
+  v_widgetfucntion jsonb;
+  v_table text;
+  rec record;
+BEGIN
+  FOR rec IN SELECT * FROM config_form_fields WHERE formtype='form_feature' AND columnname='tbl_elements' AND tabname='tab_elements'
+  LOOP
+    v_widgetfucntion := rec.widgetfunction;
+    IF rec.formname LIKE '%link%' THEN 
+      v_table := 'v_ui_element_x_link'; 
+    ELSE 
+      v_table := 'v_ui_element_x_' || rec.formname; 
+    END IF;
+    v_widgetfucntion := jsonb_set(v_widgetfucntion, '{parameters, sourcetable}', to_jsonb(v_table));
+    UPDATE config_form_fields
+      SET widgetfunction=v_widgetfucntion
+      WHERE formname=rec.formname AND formtype=rec.formtype AND columnname=rec.columnname AND tabname=rec.tabname;
+  END LOOP;
+END $$;
