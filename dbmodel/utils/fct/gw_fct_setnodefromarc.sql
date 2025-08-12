@@ -15,10 +15,19 @@ $BODY$
 
 /*EXAMPLE
 
+MODE 1: complete
 SELECT SCHEMA_NAME.gw_fct_setnodefromarc (2118)($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"exploitation":"1", "inserIntoNode":"true", "nodeTolerance":"0.01", "saveOnDatabase":"true"}}}$$)::text
+
+MODE 2: usign pure SQL
+SELECT SCHEMA_NAME.gw_fct_setnodefromarc(concat('{"client":{"device":4,"lang":"ES","version":"4.0.001","infoType":1,"epsg":25831},
+"form":{},"feature":{"tableName":"ve_arc","featureType":"ARC","id":["',arc_id,'"]},
+"data":{"filterFields":{},"pageInfo":{},"selectionMode":"previousSelection",
+"parameters":{"insertIntoNode":"true","nodeTolerance":"0.1","exploitation":"10",
+"stateType":"2","builtdate":null,"nodeType":"JUNCTION","nodeCat":"JUNCTION"},"aux_params":null}}')::json
+) FROM .... WHERE ....;
 
 -- fid: 116
 */
@@ -130,8 +139,17 @@ EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2118", "fid":"116", "cr
 	-- repair arcs
 	IF v_insertnode THEN
 
-		EXECUTE 'SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)'
-		INTO v_arclist;
+
+		if v_selection_mode = 'previousSelection' then
+			EXECUTE 'SELECT array_to_json(array_agg(arc_id::text)) 
+			FROM arc WHERE expl_id='||v_expl||' AND arc_id in ('||v_id||')'
+			INTO v_arclist;
+		else
+			EXECUTE 'SELECT array_to_json(array_agg(arc_id::text)) 
+			FROM arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)'
+			INTO v_arclist;
+		end if;
+
 		-- execute function
 		EXECUTE 'SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":'||v_arclist||'},
 		"data":{}}$$);';
