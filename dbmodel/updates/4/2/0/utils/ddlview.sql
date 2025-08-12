@@ -406,7 +406,66 @@ WHERE EXISTS (SELECT 1 FROM sel_psector WHERE sel_psector.psector_id = plan_psec
 DROP VIEW IF EXISTS vcv_emitters;
 
 -- Rename views to element
-ALTER VIEW ve_frelem RENAME TO ve_man_frelem;
+CREATE OR REPLACE VIEW ve_man_frelem AS
+  SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
+    man_frelem.node_id,
+    man_frelem.order_id,
+    concat(man_frelem.node_id, '_FR', man_frelem.order_id) AS nodarc_id,
+    man_frelem.to_arc,
+    man_frelem.flwreg_length,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+        CASE
+            WHEN man_frelem.node_id = a.node_1 THEN st_setsrid(st_makeline(node.the_geom, st_lineinterpolatepoint(a.the_geom, man_frelem.flwreg_length::double precision / st_length(a.the_geom))), 25831)::geometry(LineString,25831)
+            WHEN man_frelem.node_id = a.node_2 THEN st_setsrid(st_makeline(node.the_geom, st_lineinterpolatepoint(a.the_geom, 1::double precision - man_frelem.flwreg_length::double precision / st_length(a.the_geom))), 25831)::geometry(LineString,25831)
+            ELSE NULL::geometry(LineString,25831)
+        END AS the_geom
+   FROM ve_element
+     JOIN man_frelem ON ve_element.element_id = man_frelem.element_id
+     JOIN arc a ON a.arc_id = man_frelem.to_arc
+     JOIN node USING (node_id);
+
 ALTER VIEW ve_genelem RENAME TO ve_man_genelem;
 
 DO $$
