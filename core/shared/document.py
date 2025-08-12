@@ -170,8 +170,8 @@ class GwDocument(QObject):
             partial(tools_gw.set_completer_object, self.dlg_add_doc, "visit"))
 
         # Set signals
-        self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_gully",
-                                "ve_genelem", "ve_link"]
+        self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_gully",
+                                "ve_man_genelem", "ve_link"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         # Dialog
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))

@@ -309,8 +309,8 @@ class GwWorkcat:
             tools_qgis.get_layer_by_tablename("ve_node"),
             tools_qgis.get_layer_by_tablename("ve_connec"),
             tools_qgis.get_layer_by_tablename("ve_link"),
-            tools_qgis.get_layer_by_tablename("ve_frelem"),
-            tools_qgis.get_layer_by_tablename("ve_genelem"),
+            tools_qgis.get_layer_by_tablename("ve_man_frelem"),
+            tools_qgis.get_layer_by_tablename("ve_man_genelem"),
             tools_qgis.get_layer_by_tablename("ve_gully"),
         ]
         expr = QgsExpression(expr)

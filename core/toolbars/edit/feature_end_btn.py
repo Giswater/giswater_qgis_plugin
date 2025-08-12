@@ -55,7 +55,7 @@ class GwFeatureEndButton(GwAction):
         self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        self.rel_layers['element'] = [tools_qgis.get_layer_by_tablename('ve_genelem'), tools_qgis.get_layer_by_tablename('ve_frelem')]
+        self.rel_layers['element'] = [tools_qgis.get_layer_by_tablename('ve_man_genelem'), tools_qgis.get_layer_by_tablename('ve_man_frelem')]
         self.rel_layers['link'] = [tools_qgis.get_layer_by_tablename('ve_link')]
 
         self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
@@ -102,7 +102,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
-        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_gully", "ve_link"]
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_gully", "ve_link"]
         self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))

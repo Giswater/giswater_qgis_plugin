@@ -89,7 +89,7 @@ class GwVisit(QObject):
         tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
-        for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_link", "ve_frelem", "ve_genelem", "ve_gully"]:
+        for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_link", "ve_man_frelem", "ve_man_genelem", "ve_gully"]:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer:
                 layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
@@ -227,7 +227,7 @@ class GwVisit(QObject):
         self._event_feature_type_selected(self.dlg_add_visit, "link")
 
         # Force _visit_tab_feature_changed
-        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_gully",
+        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_gully",
                            "ve_link"]
         self.excluded_layers = excluded_layers
         self._visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=excluded_layers)

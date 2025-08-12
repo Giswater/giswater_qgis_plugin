@@ -574,7 +574,7 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_link"]
+    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("ve_gully")
 
@@ -682,7 +682,7 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
     viewname = f"ve_{feature_type}"
     field_id = feature_type
     if feature_type == "element":
-        viewname = ["ve_frelem", "ve_genelem"]
+        viewname = ["ve_man_frelem", "ve_man_genelem"]
         field_id = ["element", "element"]
 
     # Adding auto-completion to a QLineEdit
@@ -3773,7 +3773,7 @@ def remove_selection(remove_groups=True, layers=None):
     :return: Dictionary of layers with removed selection
     """
 
-    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_link"]
+    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("ve_gully")
 
@@ -4477,7 +4477,7 @@ def get_parent_layers_visibility():
     """
 
     layers_visibility = {}
-    for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_frelem", "ve_genelem", "ve_gully", "ve_link"]:
+    for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_gully", "ve_link"]:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer:
             layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
