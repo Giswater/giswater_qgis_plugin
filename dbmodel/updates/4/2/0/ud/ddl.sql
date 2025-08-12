@@ -256,3 +256,18 @@ CREATE TABLE om_waterbalance_dma_graph (
     CONSTRAINT om_waterbalance_dma_graph_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT om_waterbalance_dma_graph_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+CREATE TABLE man_cjoin (
+	connec_id int4 NOT NULL,
+	CONSTRAINT man_cjoin_pkey PRIMARY KEY (connec_id),
+	CONSTRAINT man_cjoin_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE man_ginlet (
+	gully_id int4 NOT NULL,
+	CONSTRAINT man_ginlet_pkey PRIMARY KEY (gully_id),
+	CONSTRAINT man_ginlet_gully_id_fkey FOREIGN KEY (gully_id) REFERENCES gully(gully_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+

@@ -114,14 +114,6 @@ BEGIN
     END IF;
 
   ELSIF v_view_type = 2 THEN
-    --view for ud connec y gully which dont have man_type table
-    EXECUTE '
-    CREATE OR REPLACE VIEW '||v_viewname||' AS
-    SELECT *
-    FROM '||v_parent_layer||'
-    WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
-
-  ELSIF v_view_type = 3 THEN
     --view for WS and UD features that have many fields in man table
     IF v_feature_type = 'node' then
 
@@ -155,7 +147,7 @@ BEGIN
 
     END IF;
 
-  ELSIF v_view_type = 4 THEN
+  ELSIF v_view_type = 3 THEN
     --view for WS and UD features that only have feature_id in man table and have defined addfields
     IF v_feature_type = 'node' THEN
 
@@ -192,17 +184,7 @@ BEGIN
 
     END IF;
 
-  ELSIF v_view_type = 5 THEN
-    --view for ud connec y gully which dont have man_type table and have defined addfields
-    EXECUTE '
-    CREATE OR REPLACE VIEW '||v_viewname||' AS
-    SELECT '||v_parent_layer||'.*,
-    '||v_feature_childtable_fields||'
-    FROM '||v_parent_layer||'
-    LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-    WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
-
-  ELSIF v_view_type = 6 THEN
+  ELSIF v_view_type = 4 THEN
     --view for WS and UD features that have many fields in man table and have defined addfields
     IF v_feature_type = 'node' then
 

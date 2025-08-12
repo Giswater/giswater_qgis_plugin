@@ -270,18 +270,12 @@ BEGIN
 				END IF;
 
 				--create views with fields from parent table,man table and addfields
-				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
-					( v_feature_type='arc' OR v_feature_type='node')) THEN
+				IF v_man_fields IS NULL THEN
 					--view for WS and UD features that only have feature_id in man table and have defined addfields
-					v_view_type = 4;
-
-				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-					--view for ud connec y gully which dont have man_type table and have defined addfields
-					v_view_type = 5;
-
+					v_view_type = 3;
 				ELSE
 					--view for WS and UD features that have many fields in man table and have defined addfields
-					v_view_type = 6;
+					v_view_type = 4;
 
 				END IF;
 
@@ -306,18 +300,12 @@ BEGIN
 
 			ELSE
 				--create views with fields from parent table and man table
-				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
-					( v_feature_type='arc' OR v_feature_type='node')) THEN
+				IF v_man_fields IS NULL THEN
 					--view for WS and UD features that only have feature_id in man table
 					v_view_type = 1;
-
-				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-					--view for ud connec y gully which dont have man_type table
-					v_view_type = 2;
-
 				ELSE
 					--view for WS and UD features that have many fields in man table
-					v_view_type = 3;
+					v_view_type = 2;
 
 				END IF;
 
@@ -428,18 +416,12 @@ BEGIN
 			END IF;
 
 			--create views with fields from parent table,man table and addfields
-			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
-				( v_feature_type='arc' OR v_feature_type='node')) THEN
+			IF v_man_fields IS NULL THEN
 				--view for WS and UD features that only have feature_id in man table and have defined addfields
-				v_view_type = 4;
-
-			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-				--view for ud connec y gully which dont have man_type table and have defined addfields
-				v_view_type = 5;
-
+				v_view_type = 3;
 			ELSE
 				--view for WS and UD features that have many fields in man table and have defined addfields
-				v_view_type = 6;
+				v_view_type = 4;
 
 			END IF;
 
@@ -467,18 +449,12 @@ BEGIN
 		ELSE
 
 			--create views with fields from parent table and man table
-			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
-				( v_feature_type='arc' OR v_feature_type='node')) THEN
+			IF v_man_fields IS NULL THEN
 				--view for WS and UD features that only have feature_id in man table
 				v_view_type = 1;
-
-			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-				--view for ud connec y gully which dont have man_type table
-				v_view_type = 2;
-
 			ELSE
 				--view for WS and UD features that have many fields in man table
-				v_view_type = 3;
+				v_view_type = 2;
 
 			END IF;
 

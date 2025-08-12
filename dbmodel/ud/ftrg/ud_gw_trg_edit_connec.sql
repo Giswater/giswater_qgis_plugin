@@ -20,6 +20,7 @@ v_count integer;
 v_addfields record;
 v_new_value_param text;
 v_old_value_param text;
+v_man_table varchar;
 v_customfeature text;
 v_featurecat text;
 v_psector_vdefault integer;
@@ -49,11 +50,12 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	--set custom feature custom view inserts
-	v_customfeature = TG_ARGV[0];
+	v_man_table:= TG_ARGV[0];
     v_schemaname:= TG_TABLE_SCHEMA;
 
-	IF v_customfeature='parent' THEN
-		v_customfeature:=NULL;
+	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'CONNEC') THEN
+		v_customfeature:=v_man_table;
+		v_man_table:=(SELECT man_table FROM cat_feature_connec c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id=v_man_table);
 	END IF;
 
 	--get system and user variables
@@ -507,9 +509,25 @@ BEGIN
 			from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
 		END IF;
 
+		IF v_man_table = 'man_cjoin' THEN
+			INSERT INTO man_cjoin (connec_id) VALUES (NEW.connec_id);
+		ELSIF v_man_table = 'man_vconnec' THEN
+			INSERT INTO man_vconnec (connec_id) VALUES (NEW.connec_id);
+		ELSIF v_man_table = 'parent' THEN
+			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN cat_connec ON cat_connec.id=NEW.conneccat_id
+		    	WHERE c.id = cat_connec.connec_type LIMIT 1)::text;
+
+			IF v_man_table IS NOT NULL THEN
+			    v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
+			    EXECUTE v_sql;
+			END IF;
+		END IF;
+
+
+
 		-- insertint on psector table
 		IF NEW.state=2 THEN
-		
+
 			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id)
 			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, NEW.arc_id)
 			ON CONFLICT (connec_id, psector_id, state) DO NOTHING;

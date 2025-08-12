@@ -17,6 +17,7 @@ v_code_autofill_bool boolean;
 v_link_path varchar;
 v_record_link record;
 v_record_vnode record;
+v_man_table varchar;
 v_customfeature text;
 v_addfields record;
 v_new_value_param text;
@@ -76,8 +77,13 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	-- get custom gully type
-	v_customfeature:= TG_ARGV[0];
+	v_man_table:= TG_ARGV[0];
     v_schemaname:= TG_TABLE_SCHEMA;
+
+	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'GULLY') THEN
+		v_customfeature:=v_man_table;
+		v_man_table:=(SELECT man_table FROM cat_feature_gully c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id=v_man_table);
+	END IF;
 
 	IF v_customfeature='parent' THEN
 		v_customfeature:=NULL;
@@ -601,6 +607,20 @@ BEGIN
 				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length, NEW.expl_visibility, NEW.adate, NEW.adescript,
 				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id, NEW.dma_id);
 
+		END IF;
+
+		IF v_man_table = 'man_ginlet' THEN
+			INSERT INTO man_ginlet (gully_id) VALUES (NEW.gully_id);
+		ELSIF v_man_table = 'man_vgully' THEN
+			INSERT INTO man_vgully (gully_id) VALUES (NEW.gully_id);
+		ELSIF v_man_table = 'parent' THEN
+			v_man_table:= (SELECT man_table FROM cat_feature_gully c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN cat_gully ON cat_gully.id=NEW.gullycat_id
+		    	WHERE c.id = cat_gully.gully_type LIMIT 1)::text;
+
+			IF v_man_table IS NOT NULL THEN
+			    v_sql:= 'INSERT INTO '||v_man_table||' (gully_id) VALUES ('||quote_literal(NEW.gully_id)||')';
+			    EXECUTE v_sql;
+			END IF;
 		END IF;
 
 		-- insertint on psector table and setting visible

@@ -1450,3 +1450,26 @@ UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "le
 UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=11, alias='Link catalog' WHERE id='cat_link';
 UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=12, alias='Element catalog' WHERE id='cat_element';
 UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=13, alias='Material catalog' WHERE id='cat_material';
+
+DO $$
+DECLARE
+	rec record;
+BEGIN
+
+	FOR rec IN (SELECT * FROM connec WHERE connec_type = 'CJOIN') LOOP
+		INSERT INTO man_cjoin (connec_id) VALUES (rec.connec_id);
+	END LOOP;
+
+	FOR rec IN (SELECT * FROM gully WHERE gully_type = 'GINLET') LOOP
+		INSERT INTO man_ginlet (gully_id) VALUES (rec.gully_id);
+	END LOOP;
+
+	FOR rec IN (SELECT * FROM gully WHERE gully_type = 'VGINLET') LOOP
+		INSERT INTO man_vgully (gully_id) VALUES (rec.gully_id);
+	END LOOP;
+
+	FOR rec IN (SELECT * FROM gully WHERE gully_type = 'VGULLY') LOOP
+		INSERT INTO man_vgully (gully_id) VALUES (rec.gully_id);
+	END LOOP;
+
+END $$;
