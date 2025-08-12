@@ -867,8 +867,12 @@ class GwPsector:
 
     def check_tab_position(self):
 
-        self.insert_or_update_new_psector(close_dlg=False)
         psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
+        cur_psector = tools_gw.get_config_value('plan_psector_current')
+
+        if psector_id in (None, "null") or psector_id == int(cur_psector[0]):
+            self.insert_or_update_new_psector(close_dlg=False)
+        
         self.psector_id = psector_id
         if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
             tableleft = "v_price_compost"
