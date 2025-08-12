@@ -1044,7 +1044,7 @@ class GwPsector:
                     cur_psector = tools_gw.get_config_value('plan_psector_current')
                     if cur_psector is not None:
                         sql = ("UPDATE config_param_user "
-                            " SET value = $${new_psector_id[0]}$$ "
+                            f" SET value = '{new_psector_id[0]}' "
                             " WHERE parameter = 'plan_psector_current'"
                             " AND cur_user=current_user; ")
                     else:
