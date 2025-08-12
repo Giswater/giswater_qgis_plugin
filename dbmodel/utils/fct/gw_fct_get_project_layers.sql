@@ -176,7 +176,7 @@ BEGIN
 				(c.column_name IS NULL OR c.column_name != 'link_the_geom') AND
 				st.project_template->'template' @> to_jsonb(ARRAY[project_type_id]) AND
 				st.project_template IS NOT NULL
-			ORDER BY group_order desc, st.orderby
+			ORDER BY group_order desc, st.orderby desc
 		) d), '[]'::json) INTO v_final;
 	END IF;
 
