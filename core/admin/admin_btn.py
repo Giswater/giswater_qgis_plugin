@@ -2233,6 +2233,15 @@ class GwAdminButton:
             return True
 
         status = True
+        # Allow passing a single SQL file path to control execution order
+        if os.path.isfile(filedir) and filedir.lower().endswith('.sql'):
+            self.current_sql_file += 1
+            tools_log.log_info(filedir)
+            status = self._read_execute_cm_file(filedir, set_progress_bar, schema_option)
+            if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
+                return False
+            return status
+
         for dirpath, _, files in os.walk(filedir):
             for file in sorted(files):
                 if file.endswith(".sql"):
