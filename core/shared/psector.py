@@ -2888,55 +2888,60 @@ class GwPsector:
         return dlg_functions
 
     def _manage_selection_changed(self, layer: QgsMapLayer):
-        if layer is None:
-            return
 
-        if layer.providerType() != 'postgres':
-            return
+        try:
+            if layer is None:
+                return
 
-        tablename = tools_qgis.get_layer_source_table_name(layer)
-        if not tablename:
-            return
+            if layer.providerType() != 'postgres':
+                return
 
-        mapping_dict = {
-            "ve_node": ("node_id", self.qtbl_node),
-            "ve_arc": ("arc_id", self.qtbl_arc),
-            "ve_connec": ("connec_id", self.qtbl_connec),
-            "ve_gully": ("gully_id", self.qtbl_gully),
-        }
-        idname, tableview = mapping_dict[tablename]
-        if layer.selectedFeatureCount() > 0:
-            # Get selected features of the layer
-            features = layer.selectedFeatures()
-            feature_ids = [f"{feature.attribute(idname)}" for feature in features]
+            tablename = tools_qgis.get_layer_source_table_name(layer)
+            if not tablename:
+                return
 
-            # Select in table
-            selection_model = tableview.selectionModel()
+            mapping_dict = {
+                "ve_node": ("node_id", self.qtbl_node),
+                "ve_arc": ("arc_id", self.qtbl_arc),
+                "ve_connec": ("connec_id", self.qtbl_connec),
+                "ve_gully": ("gully_id", self.qtbl_gully),
+            }
+            idname, tableview = mapping_dict[tablename]
+            if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
+                features = layer.selectedFeatures()
+                feature_ids = [f"{feature.attribute(idname)}" for feature in features]
 
-            # Clear previous selection
-            selection_model.clearSelection()
+                # Select in table
+                selection_model = tableview.selectionModel()
 
-            model = tableview.model()
+                # Clear previous selection
+                selection_model.clearSelection()
 
-            # Loop through the model rows to find matching feature_ids
-            for row in range(model.rowCount()):
-                if isinstance(model, QSqlTableModel):
-                    index = model.index(row, model.fieldIndex(idname))
-                    feature_id = model.data(index)
+                model = tableview.model()
 
-                    index = model.index(row, model.fieldIndex("state"))
-                    state = model.data(index)
-                elif isinstance(model, QStandardItemModel):
-                    index = model.index(row, tools_qt.get_col_index_by_col_name(tableview, idname))
-                    feature_id = model.data(index)
+                # Loop through the model rows to find matching feature_ids
+                for row in range(model.rowCount()):
+                    if isinstance(model, QSqlTableModel):
+                        index = model.index(row, model.fieldIndex(idname))
+                        feature_id = model.data(index)
 
-                    index = model.index(row, tools_qt.get_col_index_by_col_name(tableview, "state"))
-                    state = model.data(index)
-                else:
-                    continue
+                        index = model.index(row, model.fieldIndex("state"))
+                        state = model.data(index)
+                    elif isinstance(model, QStandardItemModel):
+                        index = model.index(row, tools_qt.get_col_index_by_col_name(tableview, idname))
+                        feature_id = model.data(index)
 
-                if f"{feature_id}" in feature_ids and f"{state}" == "1":
-                    selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
+                        index = model.index(row, tools_qt.get_col_index_by_col_name(tableview, "state"))
+                        state = model.data(index)
+                    else:
+                        continue
+
+                    if f"{feature_id}" in feature_ids and f"{state}" == "1":
+                        selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
+        except Exception as e:
+            print(f"Error in _manage_selection_changed: {e}")
+            pass
 
     def _show_selection_on_top(self, button: QPushButton):
         """
@@ -3150,6 +3155,12 @@ def close_dlg(**kwargs):
         tools_qgis.disconnect_snapping()
         tools_gw.disconnect_signal('psector')
         tools_qgis.disconnect_signal_selection_changed()
+        
+        try:
+            global_vars.canvas.selectionChanged.disconnect(partial(class_obj._manage_selection_changed))
+        except (RuntimeError, TypeError):
+            pass
+        
         # Apply filters on tableview
         if hasattr(class_obj, 'dlg_psector_mng'):
             class_obj._filter_table(class_obj.dlg_psector_mng, class_obj.qtbl_psm, class_obj.dlg_psector_mng.txt_name, class_obj.dlg_psector_mng.chk_active, class_obj.dlg_psector_mng.chk_archived, 'v_ui_plan_psector')
