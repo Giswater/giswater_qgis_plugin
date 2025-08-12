@@ -95,3 +95,5 @@ UPDATE sys_table SET descript='archived_psector_arc', id='archived_psector_arc' 
 UPDATE sys_table SET descript='archived_psector_node', id='archived_psector_node' WHERE id='archived_psector_node_traceability';
 UPDATE sys_table SET descript='archived_psector_connec', id='archived_psector_connec' WHERE id='archived_psector_connec_traceability';
 UPDATE sys_table SET descript='archived_psector_link', id='archived_psector_link' WHERE id='archived_psector_link_traceability';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"flowsetting", "dataType":"numeric(12,3)"}}$$);
