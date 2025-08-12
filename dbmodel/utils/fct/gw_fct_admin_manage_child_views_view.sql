@@ -142,18 +142,37 @@ BEGIN
   RAISE NOTICE 'View % created in %', v_viewname, v_schemaname;
 
   --create trigger on view
-  EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_feature_cat, ' ','_'),'-','_'),'.','_'))||' ON '||
-  v_schemaname||'.'||v_viewname||';';
-  RAISE NOTICE 'Trigger % dropped in %', v_viewname, v_schemaname;
+  EXECUTE format(
+    'DROP TRIGGER IF EXISTS gw_trg_edit_%s_%s ON %I.%I;',
+    v_feature_type,
+    lower(replace(replace(replace(v_feature_cat, ' ','_'),'-','_'),'.','_')),
+    v_schemaname,
+    v_viewname
+  );
+  RAISE NOTICE 'Trigger gw_trg_edit_% dropped in %', v_viewname, v_schemaname;
 
-  EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_feature_cat, ' ','_'),'-','_'),'.','_'))||'
-  INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-  FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_feature_cat||''');';
+  EXECUTE format(
+    'CREATE TRIGGER gw_trg_edit_%s_%s INSTEAD OF INSERT OR UPDATE OR DELETE ON %I.%I FOR EACH ROW EXECUTE PROCEDURE %I.gw_trg_edit_%s(%L);',
+    v_feature_type,
+    lower(replace(replace(replace(v_feature_cat, ' ','_'),'-','_'),'.','_')),
+    v_schemaname,
+    v_viewname,
+    v_schemaname,
+    v_feature_type,
+    v_feature_cat
+  );
   RAISE NOTICE 'Trigger % created in %', v_viewname, v_schemaname;
 
-  EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-  "feature":{"catFeature":"'||v_feature_cat||'"}, 
-  "data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
+  EXECUTE format(
+    'SELECT gw_fct_admin_manage_child_config(%L);',
+    json_build_object(
+      'feature', json_build_object('catFeature', v_feature_cat),
+      'data', json_build_object(
+        'view_name', v_viewname,
+        'feature_type', v_feature_type
+      )
+    )::text
+  );
   RAISE NOTICE 'Config % created in %', v_viewname, v_schemaname;
 
   RETURN json_build_object('status', 'Accepted', 'message', 'View created successfully')::json;
