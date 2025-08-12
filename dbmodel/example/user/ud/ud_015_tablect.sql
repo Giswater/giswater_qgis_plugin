@@ -14,3 +14,5 @@ DROP VIEW IF EXISTS v_edit_node;
 DROP VIEW IF EXISTS v_edit_connec;
 DROP VIEW IF EXISTS v_edit_link;
 DROP VIEW IF EXISTS v_edit_gully;
+
+SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);

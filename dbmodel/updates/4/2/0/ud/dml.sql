@@ -1339,7 +1339,41 @@ BEGIN
   END LOOP;
 END $$;
 
+UPDATE config_form_tabs
+	SET tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json
+	WHERE formname='ve_element' AND tabname='tab_documents';
+UPDATE config_form_tabs
+	SET tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json
+	WHERE formname='ve_man_frelem' AND tabname='tab_epa';
 
+-- Editable, datatype and mandatory fields for frelemnts
+UPDATE config_form_fields
+	SET ismandatory=true,iseditable=true
+	WHERE formname='ve_element_epump' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET iseditable=true,"datatype"='integer'
+	WHERE formname='ve_element_eorifice' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET iseditable=true,"datatype"='integer'
+	WHERE formname='ve_element_eoutlet' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET iseditable=true,"datatype"='integer'
+	WHERE formname='ve_element_eweir' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+
+-- Update element_id in config_form_fields
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName":"open_selected_manager_item", "parameters":{"columnfind":"element_id", "elem_manager": true, "sourcetable": "v_ui_element"}}'::json
+	WHERE formname='element_manager' AND formtype='form_element' AND columnname='tbl_element' AND tabname='tab_none';
+
+-- 12/08/2025
+DELETE FROM config_form_fields WHERE formname ILIKE '%element%' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=4 WHERE formname ILIKE '%element%' AND formtype='form_feature'AND tabname='tab_data' AND columnname='expl_id' AND layoutorder=5;
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_element_epump' AND formtype='form_feature' AND columnname='flwreg_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=2
+	WHERE formname='ve_element_epump' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
 
 
 -- last update
@@ -1398,20 +1432,3 @@ WHERE config_param_system."parameter" = sub."parameter"
         LEFT("label", 1) <> UPPER(LEFT("label", 1))
      OR RIGHT(sub.cleaned, 1) <> ':'
   );
-
-UPDATE config_form_fields SET widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}'::json WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
-
-UPDATE config_form_fields SET "datatype"='string', widgettype='combo', ismandatory=true, iseditable=true, dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type''', dv_isnullvalue=true WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
-
-DELETE FROM config_form_fields WHERE formname ILIKE '%ve_link%' AND formtype='form_feature' AND columnname='n_hydrometer' AND tabname='tab_none';
-
-DELETE FROM config_form_fields WHERE formname ILIKE '%ve_gully%' AND formtype='form_feature' AND columnname IN ('connec_y1', 'connec_y2') AND tabname='tab_none';
-
-UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_edit_', 've_')::json WHERE widgetcontrols::text ilike '%v_edit_%';
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_connec", "column":"active", "dataType":"boolean"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_gully", "column":"active", "dataType":"boolean"}}$$);
-
-update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';					
-delete from sys_param_user where id = 'edit_gully_linkcat_vdefault';
-update sys_param_user set id = 'edit_gully_linkcat_vdefault' where id = 'edit_linkcat_vdefault';

@@ -2436,3 +2436,34 @@ UPDATE config_form_tabs
 UPDATE config_form_tabs
 	SET tabactions='[{"actionName": "actionEdit", "disabled": false}]'::json
 	WHERE formname='ve_man_frelem' AND tabname='tab_epa';
+
+-- Editable, datatype and mandatory fields for frelemnts
+UPDATE config_form_fields
+	SET ismandatory=true,iseditable=true
+	WHERE formname='ve_element_epump' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET iseditable=true,"datatype"='integer'
+	WHERE formname='ve_element_eorifice' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET iseditable=true,"datatype"='integer'
+	WHERE formname='ve_element_eoutlet' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET iseditable=true,"datatype"='integer'
+	WHERE formname='ve_element_eweir' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+
+-- Update element_id in config_form_fields
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName":"open_selected_manager_item", "parameters":{"columnfind":"element_id", "elem_manager": true, "sourcetable": "v_ui_element"}}'::json
+	WHERE formname='element_manager' AND formtype='form_element' AND columnname='tbl_element' AND tabname='tab_none';
+
+-- 12/08/2025
+DELETE FROM config_form_fields WHERE formname ILIKE '%element%' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=4 WHERE formname ILIKE '%element%' AND formtype='form_feature'AND tabname='tab_data' AND columnname='expl_id' AND layoutorder=5;
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_element_epump' AND formtype='form_feature' AND columnname='flwreg_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=2
+	WHERE formname='ve_element_epump' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_data';
+
+
