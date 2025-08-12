@@ -7,13 +7,13 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3502
 
-CREATE OR REPLACE FUNCTION cm.gw_fct_admin_manage_role_cm(p_data json DEFAULT '{}'::json)
+CREATE OR REPLACE FUNCTION cm.gw_fct_cm_admin_manage_role(p_data json DEFAULT '{}'::json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
 
 /*
-SELECT cm.gw_fct_admin_manage_role_cm($${"client":{"device":4, "lang":"es_ES", "version":"4.0.001", "infoType":1, "epsg":25831},
+SELECT cm.gw_fct_cm_admin_manage_role($${"client":{"device":4, "lang":"es_ES", "version":"4.0.001", "infoType":1, "epsg":25831},
 "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters": {}}}$$);
 
 */
