@@ -209,8 +209,6 @@ INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('in
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'inlet_medium_typevalue', 'man_netinit', 'inlet_medium', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 UPDATE config_form_fields SET layoutname='lyt_data_1', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''inlet_medium_typevalue''', dv_isnullvalue=TRUE WHERE columnname='inlet_medium' AND formname ILIKE '%netinit%';
 
-
-
 -- 07/08/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_dscenario_frpump", "column":"pump_type", "isUtils":"False"}}$$);
 ALTER TABLE inp_dscenario_froutlet ALTER COLUMN outlet_type DROP NOT NULL;
@@ -234,3 +232,17 @@ ALTER TABLE archived_psector_gully drop column streetname2;
 
 UPDATE sys_foreignkey SET target_table='archived_psector_gully' WHERE typevalue_table='om_typevalue' AND typevalue_name='fluid_type' AND target_table='archived_psector_gully_traceability' AND target_field='fluid_type';
 UPDATE sys_table SET descript='archived_psector_gully', id='archived_psector_gully' WHERE id='archived_psector_gully_traceability';
+
+-- 06/08/2025
+DO $function$
+DECLARE
+    v_crm boolean;
+BEGIN
+
+    SELECT value::boolean INTO v_crm FROM config_param_system WHERE parameter='admin_crm_schema';
+
+    PERFORM gw_fct_admin_manage_fields(format($${"data":{"action":"RENAME", "table":"ext_cat_hydrometer", "column":"voltman_flow", "newName":"type", "isCrm":%s}}$$, v_crm::text)::json);
+    PERFORM gw_fct_admin_manage_fields(format($${"data":{"action":"RENAME", "table":"ext_cat_hydrometer", "column":"multi_jet_flow", "newName":"flownom", "isCrm":%s}}$$, v_crm::text)::json);
+
+END $function$;
+
