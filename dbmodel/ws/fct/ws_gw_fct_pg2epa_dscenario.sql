@@ -84,7 +84,7 @@ BEGIN
 		INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 		SELECT dscenario_id, feature_id, d.demand, d.pattern_id, d.demand_type, d.source
 		FROM temp_t_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id::text AND d.demand IS NOT NULL AND d.demand <> 0
-		AND dscenario_id IN (SELECT unnest(v_userscenario));
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND n.dma_id IN (SELECT DISTINCT dma_id FROM temp_t_arc);
 
 		-- insert connec demands from dscenario into temp_t_demand linking object which is exported
 		IF v_networkmode IN(1,2,5) THEN
@@ -207,82 +207,29 @@ BEGIN
 		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'pattern',d.pattern_id) FROM inp_dscenario_pump d
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL;
 
+		-- updating values for frpump (POWERPUMPS)
+		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = d.element_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL AND p.pump_type = 'POWERPUMP';
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'power',d.power) FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = d.element_id::text  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.power IS NOT NULL AND d.power !='' AND p.pump_type = 'POWERPUMP';
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = d.element_id::text  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL AND p.pump_type = 'POWERPUMP';
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'speed',d.speed) FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = d.element_id::text  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.speed IS NOT NULL AND p.pump_type = 'POWERPUMP';
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'pattern',d.pattern_id) FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = d.element_id::text  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL AND p.pump_type = 'POWERPUMP';
 
-		-- updating values for pumps additional
-		FOR v_node IN (SELECT DISTINCT a.node_id FROM inp_dscenario_pump_additional a JOIN temp_t_arc ON concat(node_id,'_n2a')=arc_id
-		JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'POWERPUMP')
-		LOOP
-			SELECT * INTO arc_rec FROM temp_t_arc WHERE arc_id=concat(v_node,'_n2a');
-
-			-- Loop for additional pumps
-			FOR pump_rec IN SELECT * FROM inp_dscenario_pump_additional WHERE node_id=v_node
-			LOOP
-
-				-- Id creation from pattern arc
-				v_old_arc_id = arc_rec.arc_id;
-				record_new_arc.arc_id=concat(arc_rec.arc_id,pump_rec.order_id);
-
-				-- Right or left hand
-				odd_var = pump_rec.order_id %2;
-
-				if (odd_var)=0 then
-					angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))+1.57;
-				else
-					angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))-1.57;
-				end if;
-
-				pump_order = (pump_rec.order_id);
-
-				-- Copiyng values from patter arc
-				record_new_arc.node_1 = arc_rec.node_1;
-				record_new_arc.node_2 = arc_rec.node_2;
-				record_new_arc.epa_type = arc_rec.epa_type;
-				record_new_arc.sector_id = arc_rec.sector_id;
-				record_new_arc.sector_id = arc_rec.sector_id;
-				record_new_arc.dma_id = arc_rec.dma_id;
-				record_new_arc.presszone_id = arc_rec.presszone_id;
-				record_new_arc.dqa_id = arc_rec.dqa_id;
-				record_new_arc.minsector_id = arc_rec.minsector_id;
-				record_new_arc.state = arc_rec.state;
-				record_new_arc.arccat_id = arc_rec.arccat_id;
-
-				-- intermediate variables
-				n1_geom = ST_LineInterpolatePoint(arc_rec.the_geom, 0.500000);
-				dist = (ST_Distance(ST_transform(ST_startpoint(arc_rec.the_geom),rec_version.epsg), ST_LineInterpolatePoint(arc_rec.the_geom, 0.5000000)));
-
-				--create point1
-				xp1 = ST_x(n1_geom)-(sin(angle))*dist*0.15000*(pump_order::float);
-				yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.15000*(pump_order::float);
-
-				p1_geom = ST_SetSRID(ST_MakePoint(xp1, yp1),rec_version.epsg);
-
-				--create arc
-				record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, ST_endpoint(arc_rec.the_geom)]);
-
-				IF pump_rec.curve_id IS NOT NULL THEN
-					pump_rec.power = '';
-				END IF;
-
-				IF pump_rec.power IS NOT NULL AND pump_rec.power !='' THEN
-					pump_rec.curve_id = '';
-				END IF;
-
-				--addparam
-				v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern":"', pump_rec.pattern_id,'","to_arc":"',
-							 arc_rec.addparam::json->>'to_arc','"}');
-
-				-- delete from temp_t_arc in case additional pump exists because in this scenario we are overlaping the original one
-				DELETE FROM temp_t_arc WHERE arc_id = record_new_arc.arc_id;
-
-				-- Inserting into temp_t_arc
-				INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam,
-				length, diameter, roughness, dma_id, presszone_id, dqa_id, minsector_id)
-				VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id,
-				record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam,
-				arc_rec.length,	arc_rec.diameter, arc_rec.roughness, record_new_arc.dma_id, record_new_arc.presszone_id, record_new_arc.dqa_id, record_new_arc.minsector_id);
-
-			END LOOP;
-		END LOOP;
+		-- updating values for frpump (HEADPUMPS)
+		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = concat(d.element_id::text, '_n2a_1') AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL AND p.pump_type = 'HEADPUMP';
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'power',d.power) FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = concat(d.element_id::text, '_n2a_1')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.power IS NOT NULL AND d.power !='' AND p.pump_type = 'HEADPUMP';
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = concat(d.element_id::text, '_n2a_1')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL AND p.pump_type = 'HEADPUMP';
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'speed',d.speed) FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = concat(d.element_id::text, '_n2a_1')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.speed IS NOT NULL AND p.pump_type = 'HEADPUMP';
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'pattern',d.pattern_id) FROM inp_dscenario_frpump d JOIN inp_frpump p ON p.element_id = d.element_id
+		WHERE t.arc_id = concat(d.element_id::text, '_n2a_1')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL AND p.pump_type = 'HEADPUMP';
 
 		-- updating values for valves
 		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_valve d
@@ -295,6 +242,18 @@ BEGIN
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
 		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'minorloss',d.minorloss) FROM inp_dscenario_valve d
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
+
+		-- updating values for frvalve
+		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_frvalve d
+		WHERE t.arc_id = d.element_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'valve_type',d.valve_type) FROM inp_dscenario_frvalve d
+		WHERE t.arc_id = d.element_id::text  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.valve_type IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'setting',d.setting) FROM inp_dscenario_frvalve d
+		WHERE t.arc_id = d.element_id::text  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.setting IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM inp_dscenario_frvalve d
+		WHERE t.arc_id = d.element_id::text  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'minorloss',d.minorloss) FROM inp_dscenario_frvalve d
+		WHERE t.arc_id = d.element_id::text  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
 
 		-- updating values for reservoir
 		UPDATE temp_t_node t SET pattern_id = d.pattern_id FROM inp_dscenario_reservoir d

@@ -133,7 +133,7 @@ BEGIN
 				 ,pump_rec.energy_pattern_id,'", "pump_type":"',pump_rec.pump_type,'"}');
 			ELSIF flwreg_rec.epa_type = 'FRVALVE' THEN
 				SELECT * INTO valve_rec FROM ve_inp_frvalve WHERE element_id = flwreg_rec.element_id;
-				v_addparam=concat('{"valve_type":"',valve_rec.valve_type,'", "setting":"',valve_rec.setting,'", "curve_id":"',valve_rec.curve_id,'",
+				v_addparam=concat('{"valve_type":"',valve_rec.valve_type,'", "setting":"',valve_rec.setting,'", "curve_id":"',valve_rec.curve_id,'", "status":"',valve_rec.status,'",
 				 "minorloss":"',valve_rec.minorloss,'", "to_arc":"',valve_rec.to_arc,'", "add_settings":"',valve_rec.add_settings,'"}');
 			ELSIF flwreg_rec.epa_type = 'FRSHORTPIPE' THEN
 				IF EXISTS (SELECT 1 FROM temp_t_node WHERE node_id = concat(flwreg_rec.node_id, '_n2a_1')) THEN
@@ -182,7 +182,7 @@ BEGIN
 
 		-- New arc (PRV)
 		SELECT * INTO v_record_a1 FROM temp_t_arc WHERE arc_id = v_arc_id;
-		v_record_a1.arc_id = concat (v_record_a1.arc_id, '_n2a_1');
+		v_record_a1.arc_id = concat (v_record_a1.arc_id, '_n2a_2');
 		v_record_a1.arc_type =  'DOUBLE-NOD2ARC(PRV)';
 		v_record_a1.epa_type =  'VALVE';
 		v_record_a1.node_2 = v_record.node_id;
@@ -198,7 +198,7 @@ BEGIN
 
 		-- New arc (PUMP)
 		SELECT * INTO v_record_a2 FROM temp_t_arc WHERE arc_id = v_arc_id;
-		v_record_a2.arc_id = v_arc_id;
+		v_record_a2.arc_id = concat (v_record_a2.arc_id, '_n2a_1');
 		v_record_a2.arc_type =  'DOUBLE-NOD2ARC(PUMP)';
 		v_record_a2.epa_type =  'PUMP';
 		v_record_a2.node_1 = v_record.node_id;

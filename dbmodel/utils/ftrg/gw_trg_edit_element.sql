@@ -356,6 +356,8 @@ BEGIN
 				v_inp_table:= 'inp_frorifice';
 			ELSIF (OLD.epa_type = 'FROUTLET') THEN
 				v_inp_table:= 'inp_froutlet';
+			ELSIF (OLD.epa_type = 'FRSHORTPIPE') THEN
+				v_inp_table:= 'inp_frshortpipe';
 			END IF;
 
 			IF v_inp_table IS NOT NULL THEN
@@ -375,6 +377,8 @@ BEGIN
 				v_inp_table:= 'inp_frorifice';
 			ELSIF (NEW.epa_type = 'FROUTLET') THEN
 				v_inp_table:= 'inp_froutlet';
+			ELSIF (NEW.epa_type = 'FRSHORTPIPE') THEN
+				v_inp_table:= 'inp_frshortpipe';
 			END IF;
 			IF v_inp_table IS NOT NULL THEN
 				v_sql:= 'INSERT INTO '||v_inp_table||' (element_id) VALUES ('||quote_literal(NEW.element_id)||') ON CONFLICT (element_id) DO NOTHING';
