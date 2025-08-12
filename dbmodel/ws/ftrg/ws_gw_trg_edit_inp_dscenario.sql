@@ -241,6 +241,18 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			INSERT INTO inp_dscenario_frvalve (dscenario_id, element_id, valve_type, custom_dint, setting, curve_id, minorloss, add_settings, init_quality)
 			VALUES (NEW.dscenario_id, NEW.element_id, NEW.valve_type, NEW.custom_dint, NEW.setting, NEW.curve_id, NEW.minorloss, NEW.add_settings, NEW.init_quality);
+		
+		ELSIF v_dscenario_type = 'FLWREG-SHORTPIPE' THEN
+
+			-- default values
+			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM ve_inp_frshortpipe WHERE element_id = NEW.element_id);END IF;
+			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM ve_inp_frshortpipe WHERE element_id = NEW.element_id);END IF;
+			IF NEW.bulk_coeff IS NULL THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM ve_inp_frshortpipe WHERE element_id = NEW.element_id);END IF;
+			IF NEW.wall_coeff IS NULL THEN NEW.wall_coeff = (SELECT wall_coeff FROM ve_inp_frshortpipe WHERE element_id = NEW.element_id);END IF;
+			IF NEW.custom_dint IS NULL THEN NEW.custom_dint = (SELECT custom_dint FROM ve_inp_frshortpipe WHERE element_id = NEW.element_id);END IF;
+
+			INSERT INTO inp_dscenario_frshortpipe(dscenario_id, element_id, minorloss, status, bulk_coeff, wall_coeff, custom_dint)
+			VALUES (NEW.dscenario_id, NEW.element_id, NEW.minorloss, NEW.status, NEW.bulk_coeff, NEW.wall_coeff, NEW.custom_dint);
 
 		ELSIF v_dscenario_type = 'RULES' THEN
 			INSERT INTO inp_dscenario_rules(dscenario_id, sector_id, text, active)
@@ -330,6 +342,11 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			UPDATE inp_dscenario_frvalve SET dscenario_id=NEW.dscenario_id, element_id=NEW.element_id, valve_type=NEW.valve_type, custom_dint=NEW.custom_dint,
 			setting=NEW.setting, curve_id=NEW.curve_id, minorloss=NEW.minorloss, add_settings=NEW.add_settings, init_quality=NEW.init_quality
 			WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
+		
+		ELSIF v_dscenario_type = 'FLWREG-SHORTPIPE' THEN
+			UPDATE inp_dscenario_frshortpipe SET dscenario_id=NEW.dscenario_id, element_id=NEW.element_id, minorloss=NEW.minorloss,
+			bulk_coeff=NEW.bulk_coeff, wall_coeff=NEW.wall_coeff, custom_dint=NEW.custom_dint, status=NEW.status
+			WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
 
 		ELSIF v_dscenario_type = 'RULES' THEN
 			UPDATE inp_dscenario_rules SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text, active=NEW.active
@@ -382,6 +399,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		ELSIF v_dscenario_type = 'FLWREG-VALVE' THEN
 			DELETE FROM inp_dscenario_frvalve WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
+		
+		ELSIF v_dscenario_type = 'FLWREG-SHORTPIPE' THEN
+			DELETE FROM inp_dscenario_frshortpipe WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
 
 		ELSIF v_dscenario_type = 'RULES' THEN
 			DELETE FROM inp_dscenario_rules WHERE id=OLD.id;

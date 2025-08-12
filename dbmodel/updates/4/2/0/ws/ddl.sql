@@ -151,3 +151,31 @@ CREATE TABLE element_add(
 	CONSTRAINT element_add_pkey PRIMARY KEY(element_id),
 	CONSTRAINT element_add_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP TABLE IF EXISTS inp_frshortpipe;
+CREATE TABLE inp_frshortpipe (
+    element_id int4 NOT NULL,
+	minorloss numeric(12, 6) DEFAULT 0 NULL,
+	status varchar(12) NULL,
+	bulk_coeff float8 NULL,
+	wall_coeff float8 NULL,
+	custom_dint int4 NULL,
+	CONSTRAINT inp_frshortpipe_pk PRIMARY KEY (element_id),
+	CONSTRAINT inp_frshortpipe_status_check CHECK (((status)::text = ANY (ARRAY[('CLOSED'::character varying)::text, ('CV'::character varying)::text, ('OPEN'::character varying)::text]))),
+	CONSTRAINT inp_frshortpipe_fk_element_id FOREIGN KEY (element_id) REFERENCES element(element_id)
+);
+
+DROP TABLE IF EXISTS inp_dscenario_frshortpipe;
+CREATE TABLE inp_dscenario_frshortpipe (
+	dscenario_id int4 NOT NULL,
+	element_id int4 NOT NULL,
+	minorloss numeric(12, 6) NULL,
+	status varchar(12) NULL,
+	custom_dint int4 NULL,
+	bulk_coeff float8 NULL,
+	wall_coeff float8 NULL,
+    CONSTRAINT inp_dscenario_frshortpipe_pk PRIMARY KEY (element_id, dscenario_id),
+    CONSTRAINT inp_dscenario_frshortpipe_dscenario_id_fkey FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT inp_dscenario_frshortpipe_status_check CHECK (((status)::text = ANY (ARRAY[('CLOSED'::character varying)::text, ('CV'::character varying)::text, ('OPEN'::character varying)::text]))),
+	CONSTRAINT inp_dscenario_frshortpipe_element_id_fkey FOREIGN KEY (element_id) REFERENCES inp_frshortpipe(element_id) ON DELETE CASCADE ON UPDATE CASCADE
+);

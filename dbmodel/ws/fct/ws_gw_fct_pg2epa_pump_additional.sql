@@ -56,7 +56,7 @@ BEGIN
     RAISE NOTICE 'Starting flowreg process.';
 
 	FOR flwreg_rec IN (SELECT element.*, m.node_id FROM element JOIN man_frelem m ON m.element_id = element.element_id LEFT JOIN temp_t_arc t ON t.arc_id = element.element_id::text
-						WHERE element.epa_type IN ('FRPUMP', 'FRVALVE') AND t.arc_id IS NULL)
+						WHERE element.epa_type IN ('FRPUMP', 'FRVALVE', 'FRSHORTPIPE') AND t.arc_id IS NULL)
 	LOOP
 		
 		IF EXISTS (SELECT 1 FROM temp_t_node WHERE node_id = concat(flwreg_rec.node_id, '_n2a_1')) THEN
@@ -128,6 +128,18 @@ BEGIN
 				SELECT * INTO valve_rec FROM ve_inp_frvalve WHERE element_id = flwreg_rec.element_id;
 				v_addparam=concat('{"valve_type":"',valve_rec.valve_type,'", "setting":"',valve_rec.setting,'", "curve_id":"',valve_rec.curve_id,'",
 				 "minorloss":"',valve_rec.minorloss,'", "to_arc":"',valve_rec.to_arc,'", "add_settings":"',valve_rec.add_settings,'"}');
+			ELSIF flwreg_rec.epa_type = 'FRSHORTPIPE' THEN
+				IF EXISTS (SELECT 1 FROM temp_t_node WHERE node_id = concat(flwreg_rec.node_id, '_n2a_1')) THEN
+					UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',arc_rec.roughness,'"}')
+					FROM ve_inp_frshortpipe
+					WHERE temp_t_node.node_id=concat(ve_inp_frshortpipe.node_id, '_n2a_1') AND ve_inp_frshortpipe.node_id = flwreg_rec.node_id;
+				END IF;
+
+				IF EXISTS (SELECT 1 FROM temp_t_node WHERE node_id = concat(flwreg_rec.node_id, '_n2a_2')) THEN
+					UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',arc_rec.roughness,'"}')
+					FROM ve_inp_frshortpipe
+					WHERE temp_t_node.node_id=concat(ve_inp_frshortpipe.node_id, '_n2a_2') AND ve_inp_frshortpipe.node_id = flwreg_rec.node_id;
+				END IF;
 			END IF;
 
 	-- 		-- Inserting into temp_t_arc

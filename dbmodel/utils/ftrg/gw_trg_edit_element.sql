@@ -302,9 +302,6 @@ BEGIN
 		ELSIF (NEW.epa_type = 'FRVALVE') THEN
 		    INSERT INTO inp_frvalve (element_id) VALUES (NEW.element_id);
 
-		ELSIF (NEW.epa_type = 'FRSHORTPIPE') THEN
-		    INSERT INTO inp_frmeter (element_id) VALUES (NEW.element_id);
-
 		ELSIF (NEW.epa_type = 'FRWEIR') THEN
 		    INSERT INTO inp_frweir (element_id) VALUES (NEW.element_id);
 
@@ -313,6 +310,9 @@ BEGIN
 
 		ELSIF (NEW.epa_type = 'FROUTLET') THEN
 		    INSERT INTO inp_froutlet (element_id) VALUES (NEW.element_id);
+		
+		ELSIF (NEW.epa_type = 'FRSHORTPIPE') THEN
+		    INSERT INTO inp_frshortpipe (element_id) VALUES (NEW.element_id);
 
 		END IF;
 
