@@ -637,7 +637,7 @@ class GwAdminButton:
                     return False
 
         return True
-                
+
     def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False) -> bool:
         """
         Update the patch folders for a given update directory.
@@ -715,7 +715,7 @@ class GwAdminButton:
         # Process each version folder in order
         for major, minor, patch, folder_path in version_folders:
             current_folder_version = f"{major}.{minor}.{patch}"
-            if current_folder_version <= str(self.plugin_version):
+            if current_folder_version > str(self.project_version) and current_folder_version <= str(self.plugin_version):
                 status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
                 if tools_os.set_boolean(status, False) is False:
                     return False
