@@ -74,39 +74,41 @@ BEGIN
 	v_fluid = ((p_data ->>'data')::json->>'fluid_type')::text;
 	v_location = ((p_data ->>'data')::json->>'location_type')::text;
 
-	if v_category = '' then v_category = null; end if;
-	if v_function = '' then v_function = null; end if;
-	if v_fluid = '' then v_fluid = null; end if;
-	if v_location = '' then v_location = null; end if;
+	IF v_category = '' THEN v_category = null; END IF;
+	IF v_function = '' THEN v_function = null; END IF;
+	IF v_fluid = '' THEN v_fluid = null; END IF;
+	IF v_location = '' THEN v_location = null; END IF;
 
 	--define columns used for feature_cat
 	v_feature_layer = concat('ve_',v_feature_type);
 	v_id_column:=concat(v_feature_type,'_id');
 	v_cat_column= concat(v_feature_type,'cat_id');
 
-	if v_category is not null then
+	IF v_category IS NOT NULL THEN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET category_type='|| quote_literal(v_category)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	else
+	ELSE
 		EXECUTE 'UPDATE '||v_feature_layer||' SET category_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	end if;
+	END IF;
 
-	if v_function is not null then
+	IF v_function IS NOT NULL THEN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET function_type='|| quote_literal(v_function)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	else
+	ELSE
 		EXECUTE 'UPDATE '||v_feature_layer||' SET function_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	END IF;
+
+	if v_project_type = 'WS' THEN
+		IF v_fluid IS NOT NULL THEN
+			EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type='|| quote_literal(v_fluid)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+		ELSE
+			EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+		END IF;
 	end if;
 
-	if v_fluid is not null then
-		EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type='|| quote_literal(v_fluid)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	else
-		EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	end if;
-
-	if v_location is not null then
+	IF v_location IS NOT NULL THEN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type='|| quote_literal(v_location)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	else
+	ELSE
 		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	end if;
+	END IF;
 
 
 	IF v_project_type = 'WS' THEN
