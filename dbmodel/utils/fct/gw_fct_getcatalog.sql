@@ -91,7 +91,6 @@ BEGIN
 
 	-- Set 1st parent field
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
-    last_index := array_length(fields_array, 1);
 	IF v_formname='new_mapzone' THEN
 		v_querystring = concat('SELECT ARRAY( SELECT lower(unnest(graph_delimiter)) FROM cat_feature_node WHERE id=',quote_literal(v_feature_type),');');
 		v_debug_vars := json_build_object('v_feature_type', v_feature_type);
@@ -112,7 +111,7 @@ BEGIN
 	-- 	Calling function to build form fields
 	SELECT gw_fct_getformfields(v_formname, 'form_catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',NULL, v_device, null)
 	INTO fields_array;
-
+	last_index := array_length(fields_array, 1);
 
 	--	Remove selectedId form fields
 	FOREACH field in ARRAY fields_array
@@ -191,6 +190,7 @@ BEGIN
 		            END IF;
 		        END IF;
 		    END LOOP;
+			v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' AND active IS TRUE ';
 		END IF;
 
 		v_querystring = concat('SELECT array_to_json(array_agg(id)) FROM (',(v_query_result),') a');
