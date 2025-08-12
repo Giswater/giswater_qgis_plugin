@@ -19,8 +19,8 @@ from ...ui.ui_manager import GwConnectLinkUi
 
 
 class SelectAction(Enum):
-    CONNEC_LINK = tools_qt.tr('Connec to link')
-    GULLY_LINK = tools_qt.tr('Gully to link')
+    CONNEC_LINK = tools_qt.tr('Connec to network')
+    GULLY_LINK = tools_qt.tr('Gully to network')
 
 
 class GwConnectLinkButton(GwMaptool):
@@ -266,29 +266,13 @@ class GwConnectLinkButton(GwMaptool):
     def _select_multiple_features(self, select_geometry):
         """ Select multiple features on canvas """
 
+        #TODO: Create button add_forced_arcs and manage selection with arcs
+
         # Get pressed keys on keyboard
         key = QApplication.keyboardModifiers()
 
         # Set behaviour depending of the pressed keys on keyboard
         behaviour = QgsVectorLayer.RemoveFromSelection if key == (Qt.ControlModifier | Qt.ShiftModifier) else QgsVectorLayer.AddToSelection
-
-        # Get arc layer
-        layer = tools_qgis.get_layer_by_tablename('ve_arc')
-
-        # Check if layer exists
-        if layer:
-            # Use selectByRect to initially select features
-            layer.selectByRect(select_geometry, behaviour)
-
-            # Get the selected features after selection
-            features_list = layer.selectedFeatures()
-
-            # If more than one feature is selected, keep only the first one
-            if len(features_list) > 1:
-                # Get the IDs of all selected features
-                selected_ids = [feature.id() for feature in features_list]
-                # Keep only the first ID and deselect the others
-                layer.selectByIds([selected_ids[0]])
 
         # Get current feature layer (connec/gully)
         layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
