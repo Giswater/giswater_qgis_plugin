@@ -202,11 +202,11 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_wtp"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_wtp", "column":"chemtreatment"}}$$);
 
 
-DROP VIEW v_edit_inp_dscenario_frvalve;
-DROP VIEW v_edit_inp_frvalve;
-DROP VIEW ve_epa_frvalve;
-DROP VIEW ve_element_epump;
-DROP VIEW ve_element_evalve;
-DROP VIEW ve_man_frelem;
-DROP VIEW ve_frelem;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frvalve;
+DROP VIEW IF EXISTS v_edit_inp_frvalve;
+DROP VIEW IF EXISTS ve_epa_frvalve;
+DROP VIEW IF EXISTS ve_element_epump;
+DROP VIEW IF EXISTS ve_element_evalve;
+DROP VIEW IF EXISTS ve_man_frelem;
+DROP VIEW IF EXISTS ve_frelem;
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_frelem", "column":"order_id"}}$$);
