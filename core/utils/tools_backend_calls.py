@@ -955,6 +955,9 @@ def open_selected_manager_item(**kwargs):
     table = func_params.get('sourcetable')
     complet_result = kwargs.get('complet_result')
     columnname = func_params.get('columnfind')
+    connect = None
+    linked_feature = None
+    elem_manager = func_params.get('elem_manager')
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
@@ -966,16 +969,22 @@ def open_selected_manager_item(**kwargs):
     index = selected_list[0]
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
-    linked_feature = {"table_name": table, "new_id": "", "dialog": dialog, "self": feature_class, 
-                      "complet_result": complet_result, "columnname": columnname}
+    if not elem_manager:
+        linked_feature = {"table_name": table, "new_id": "", "dialog": dialog, "self": feature_class, 
+                        "complet_result": complet_result, "columnname": columnname}
+    if table == 'v_ui_element': 
+        connect = [partial(reload_table_manager, **kwargs)]
+    elif table == 'v_ui_element_x_arc':
+        connect = [partial(add_object, **kwargs), partial(_reload_table, **kwargs)]
 
     if qtable.property('linkedobject') in ('v_ui_element', 'tbl_element_x_arc', 'tbl_element_x_node', 'tbl_element_x_connec', 'tbl_element_x_link', 'tbl_element_x_gully'):
         # Open selected element
         element_id = index.sibling(row, column_index).data()
-        sql = f"SELECT concat('ve_', lower(feature_class)) from v_ui_element where element_id = '{element_id}' "
+        sql = f"SELECT concat('ve_', lower(feature_type)) from v_ui_element where element_id = '{element_id}' "
         table_name = tools_db.get_row(sql)
         info_feature = GwInfo('tab_data')
-        complet_result, dialog = info_feature.open_form(table_name=table_name[0], feature_id=element_id, tab_type='data', linked_feature=linked_feature)
+        complet_result, dialog = info_feature.open_form(table_name=table_name[0], feature_id=element_id, tab_type='data', 
+                                                        connect_signal=connect, linked_feature=linked_feature)
         if not complet_result:
             tools_log.log_info("FAIL open_selected_manager_item")
             return
@@ -988,23 +997,28 @@ def manage_element_menu(**kwargs):
     # Get widget from kwargs
     button = kwargs['widget']
     func_params = kwargs['func_params']
-    dialog = kwargs['dialog']
-    feature_class = kwargs['class']
     table = func_params['sourcetable']
-    complet_result = kwargs.get('complet_result')
-    geometry = complet_result.get('body').get('feature').get('geometry')
     connect = None
     if table == 'v_ui_element': 
         connect = [partial(reload_table_manager, **kwargs)]
     elif table == 'v_ui_element_x_arc':
         connect = [partial(add_object, **kwargs), partial(_reload_table, **kwargs)]
 
-    linked_feature_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": geometry, 
-                           "self": feature_class, "complet_result": complet_result, 
-                           "columnname": "element_id"}
-    linked_feature_no_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": None, 
-                              "self": feature_class, "complet_result": complet_result,
-                              "columnname": "element_id"}
+    # Generate linked_feature
+    linked_feature_geom = None
+    linked_feature_no_geom = None
+    is_linked = func_params['linked_feature']
+    if is_linked:
+        feature_class = kwargs['class']
+        dialog = kwargs['dialog']
+        complet_result = kwargs.get('complet_result')
+        geometry = complet_result.get('body').get('feature').get('geometry')
+        linked_feature_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": geometry, 
+                            "self": feature_class, "complet_result": complet_result, 
+                            "columnname": "element_id"}
+        linked_feature_no_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": None, 
+                                "self": feature_class, "complet_result": complet_result,
+                                "columnname": "element_id"}
     # Create menu for button
     btn_menu = QMenu()
     # Create info feature object for tab_data
@@ -1016,7 +1030,7 @@ def manage_element_menu(**kwargs):
         list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
         # Add FRELEM type features first
         for feature_cat in list_feature_cat:
-            if feature_cat.feature_class.upper() == 'FRELEM' and 'node' in table.lower():
+            if feature_cat.feature_class.upper() == 'FRELEM' and ('node' in table.lower() or not is_linked):
                 action_frelem = btn_menu.addAction(feature_cat.id)
                 action_frelem.triggered.connect(partial(info_feature.add_feature, feature_cat, connect_signal=connect,
                                                         linked_feature=linked_feature_geom))

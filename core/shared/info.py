@@ -324,7 +324,7 @@ class GwInfo(QObject):
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
 
         # Order liked_feature
-        if self.info_layer and (feature_cat.parent_layer == 've_genelem' or linked_feature):
+        if self.info_layer and (feature_cat.feature_class == 'GENELEM' or linked_feature):
             tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
 
             config = self.info_layer.editFormConfig()
@@ -623,7 +623,7 @@ class GwInfo(QObject):
                 last_info.setParent(None)
                 del last_info
 
-            tools_gw.docker_dialog(dlg_cf, dlg_name='info_feature')
+            tools_gw.docker_dialog(dlg_cf, dlg_name='info_feature', title='info_feature')
             lib_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
             lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self._manage_docker_close)
@@ -667,6 +667,7 @@ class GwInfo(QObject):
                     signal_kwargs['complet_result_info'] = complet_result
 
                 self.dlg_cf.dlg_closed.connect(signal)
+                self.dlg_cf.btn_apply.clicked.connect(signal)
 
         return self.complet_result, self.dlg_cf
 
@@ -1691,7 +1692,7 @@ class GwInfo(QObject):
 
     def _manage_linked_feature(self, linked_feature):
         """ Manage linked feature after accept action """
-        if linked_feature['table_name']:
+        if linked_feature.get('table_name'):
             sql = f"SELECT * FROM {linked_feature['table_name']} WHERE {linked_feature['columnname']} = '{linked_feature['element_id']}'"
             linked = tools_db.get_row(sql)
             if not linked:
@@ -3305,7 +3306,7 @@ class GwInfo(QObject):
 
         tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
-        if linked_feature and linked_feature.get('geometry'):
+        if (linked_feature and linked_feature.get('geometry')):
             geom = QgsGeometry.fromWkt(linked_feature.get('geometry', {}).get("st_astext"))
             if geom:
                 feature.setGeometry(geom)
@@ -3324,6 +3325,7 @@ class GwInfo(QObject):
             else:
                 msg = "NO FEATURE TYPE DEFINED"
                 tools_log.log_info(msg)
+            test = self.info_layer.geometryType()
         except Exception:
             pass
 
@@ -4231,7 +4233,7 @@ def add_frelem_to_dscenario(**kwargs):
             element_id = index.sibling(row, column_index).data()
 
             # Get frelem epa_type
-            sql = f"SELECT epa_type FROM ve_frelem WHERE element_id = '{element_id}'"
+            sql = f"SELECT epa_type FROM ve_man_frelem WHERE element_id = '{element_id}'"
             row_data = tools_db.get_row(sql)
             if not row_data:
                 continue
@@ -4325,8 +4327,9 @@ def _reload_table(**kwargs):
         widgetname = table.objectName()
         columnname = table.property('columnname')
         if columnname is None:
-            msg = f"widget {widgetname} in tab {dialog.tab_main.widget(index_tab).objectName()} has not columnname and can't be configured"
-            tools_qgis.show_info(msg, 1)
+            msg = "widget {0} in tab {1} has not columnname and can't be configured"
+            msg_params = (widgetname, dialog.tab_main.widget(index_tab).objectName(),)
+            tools_qgis.show_info(msg, 1, msg_params=msg_params)
             continue
 
         # Get value from filter widgets
