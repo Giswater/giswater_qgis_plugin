@@ -246,3 +246,13 @@ BEGIN
 
 END $function$;
 
+
+CREATE TABLE om_waterbalance_dma_graph (
+    node_id int4 NOT NULL,
+    dma_id int4 NOT NULL,
+    flow_sign int2 NULL,
+    CONSTRAINT om_waterbalance_dma_graph_unique UNIQUE (dma_id, node_id),
+    CONSTRAINT om_waterbalance_dma_graph_pkey PRIMARY KEY (node_id, dma_id),
+    CONSTRAINT om_waterbalance_dma_graph_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT om_waterbalance_dma_graph_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
