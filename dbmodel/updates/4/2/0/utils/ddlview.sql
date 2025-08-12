@@ -404,3 +404,23 @@ SELECT plan_psector.psector_id,
 WHERE EXISTS (SELECT 1 FROM sel_psector WHERE sel_psector.psector_id = plan_psector.psector_id);
 
 DROP VIEW IF EXISTS vcv_emitters;
+
+-- Rename views to element
+ALTER VIEW ve_frelem RENAME TO ve_man_frelem;
+ALTER VIEW ve_genelem RENAME TO ve_man_genelem;
+
+DO $$
+DECLARE
+  rec record;
+BEGIN
+-- frelem
+  FOR rec IN (SELECT table_schema, table_name FROM information_schema.views WHERE table_name LIKE '%frelem_%')
+  LOOP
+    EXECUTE format( 'ALTER VIEW %I.%I RENAME TO %I', rec.table_schema, rec.table_name, replace(rec.table_name, 'frelem', 'element')  );
+  END LOOP;
+  -- genelem
+  FOR rec IN (SELECT table_schema, table_name FROM information_schema.views WHERE table_name LIKE '%genelem_%')
+  LOOP
+    EXECUTE format( 'ALTER VIEW %I.%I RENAME TO %I', rec.table_schema, rec.table_name, replace(rec.table_name, 'genelem', 'element')  );
+  END LOOP;
+END $$;
