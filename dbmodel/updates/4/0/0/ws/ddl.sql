@@ -1785,6 +1785,7 @@ CREATE TABLE link (
 	fluid_type varchar(50) NULL,
 	custom_length numeric(12, 2) NULL,
 	staticpressure numeric(12, 3) NULL,
+	staticpressure2 numeric(12, 3) NULL,
 	annotation text NULL,
 	observ text NULL,
 	"comment" text NULL,
