@@ -980,7 +980,7 @@ def open_selected_manager_item(**kwargs):
     if qtable.property('linkedobject') in ('v_ui_element', 'tbl_element_x_arc', 'tbl_element_x_node', 'tbl_element_x_connec', 'tbl_element_x_link', 'tbl_element_x_gully'):
         # Open selected element
         element_id = index.sibling(row, column_index).data()
-        sql = f"SELECT concat('ve_', lower(feature_type)) from v_ui_element where element_id = '{element_id}' "
+        sql = f"SELECT concat('ve_', lower(feature_type), '_', lower(element_type)) from v_ui_element where element_id = '{element_id}' "
         table_name = tools_db.get_row(sql)
         info_feature = GwInfo('tab_data')
         complet_result, dialog = info_feature.open_form(table_name=table_name[0], feature_id=element_id, tab_type='data', 
