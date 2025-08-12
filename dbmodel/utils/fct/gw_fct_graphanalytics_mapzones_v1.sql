@@ -1510,6 +1510,21 @@ BEGIN
 				-- TODO GENERATE DRAINZONE MAPS
 			END IF;
 		END IF;
+
+		-- clear geometries of mapzones that are not assigned to any feature
+		v_query_text = '
+			UPDATE '||v_mapzone_name||' SET the_geom = NULL
+			WHERE NOT EXISTS (
+				SELECT 1
+				FROM node n
+				WHERE n.'||v_mapzone_field||' = '||v_mapzone_name||'.'||v_mapzone_field||'
+			)
+			AND NOT EXISTS (
+				SELECT 1
+				FROM arc a
+				WHERE a.'||v_mapzone_field||' = '||v_mapzone_name||'.'||v_mapzone_field||'
+			);';
+		EXECUTE v_query_text;
 	END IF;
 
 
