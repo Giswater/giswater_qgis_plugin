@@ -85,6 +85,9 @@ class GwConnectLinkButton(GwMaptool):
         # Add headers to table
         tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header': f'{self.feature_type}_id'}])
 
+        # Connect signal when dialog is rejected
+        self.dlg_connect_link.rejected.connect(lambda: close(**{'class': self, 'dialog': self.dlg_connect_link}))
+
         # Set window title from dialog depending of the current feature
         self.dlg_connect_link.setWindowTitle(tools_qt.tr(f"{self.feature_type.capitalize()} to link"))
 
@@ -231,6 +234,9 @@ class GwConnectLinkButton(GwMaptool):
             msg = "gw_fct_setlinktonetwork (Check log messages)"
             tools_qgis.show_warning(msg, title='Function error')
 
+        # Remove selection from layers
+        tools_gw.remove_selection()
+        
         # Refresh map canvas
         tools_gw.reset_rubberband(self.rubber_band)
         self.refresh_map_canvas()
@@ -444,6 +450,9 @@ def accept(**kwargs):
     QgsApplication.taskManager().addTask(this.connect_link_task)
     QgsApplication.taskManager().triggerTask(this.connect_link_task)
 
+    # Remove selection from layers before canceling map tool
+    tools_gw.remove_selection()
+    
     # Cancel map tool if no features are selected or the layer is not visible
     this.cancel_map_tool()
 
@@ -457,7 +466,16 @@ def snapping(**kwargs):
 def close(**kwargs):
     """ Close button clicked event """
 
-    kwargs['class'].cancel_map_tool()
+    # Get class
+    this = kwargs['class']
+    
+    # Remove selection from layers before canceling map tool
+    tools_gw.remove_selection()
+    
+    # Cancel map tool
+    this.cancel_map_tool()
+    
+    # Close dialog
     tools_gw.close_dialog(kwargs['dialog'])
 
 
