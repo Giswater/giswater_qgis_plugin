@@ -29,9 +29,9 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'vnodetrimarcs 1 - starting process';
-	TRUNCATE t_go2epa;
+	TRUNCATE temp_t_go2epa;
 
-	CREATE TEMP TABLE t_t_go2epa (LIKE SCHEMA_NAME.t_go2epa INCLUDING ALL);
+	CREATE TEMP TABLE t_t_go2epa (LIKE SCHEMA_NAME.temp_t_go2epa INCLUDING ALL);
 
 
 	RAISE NOTICE 'vnodetrimarcs 2 - insert node_1 (locate 0 & 1)';
