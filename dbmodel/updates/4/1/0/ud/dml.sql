@@ -469,7 +469,7 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_dwf_drain_type', 'drainzone', 'drainzone_type', NULL, true) ON CONFLICT DO NOTHING;
 
 -- 19/05/2025
-INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_dwfzone', 'Shows editable information about dwfzone.', 'role_edit', '{"template": [1]}', '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 1, 'DWFZONE', NULL, NULL, NULL, 'core', NULL);
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_dwfzone', 'Shows editable information about dwfzone.', 'role_edit', '{"template": [1]}', '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 1, 'Dwfzone', NULL, NULL, NULL, 'core', NULL);
 
 UPDATE sys_table SET project_template = '{"template": [1]}'
 WHERE id IN (

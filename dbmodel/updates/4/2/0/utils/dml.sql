@@ -44,8 +44,8 @@ UPDATE sys_table SET alias = 'Arc' WHERE id='v_edit_arc' AND alias='Arc (parent)
 UPDATE sys_table SET alias = 'Connec' WHERE id='v_edit_connec' AND alias='Connec (parent)';
 UPDATE sys_table SET alias = 'Link' WHERE id='v_edit_link' AND alias='Link (parent)';
 UPDATE sys_table SET alias = 'Gully' WHERE id='v_edit_gully' AND alias='Gully (parent)';
-UPDATE sys_table SET alias = 'Flow Regulator Elements' WHERE id='ve_frelem';
-UPDATE sys_table SET alias = 'General Elements', context='{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}', orderby=1 WHERE id='ve_genelem';
+UPDATE sys_table SET alias = 'FRElement' WHERE id='ve_frelem';
+UPDATE sys_table SET alias = 'GenElement', context='{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}', orderby=1 WHERE id='ve_genelem';
 UPDATE sys_table SET alias = 'Municipality' WHERE id='v_ext_municipality';
 
 UPDATE config_form_fields SET dv_querytext='SELECT element_id as id, element_id as idval FROM v_ui_element WHERE element_id IS NOT NULL', widgetfunction='{"functionName": "filter_table", "parameters":{"columnfind":"element_id"}}'::json WHERE formname='element_manager' AND formtype='form_element' AND columnname='element_id' AND tabname='tab_none';

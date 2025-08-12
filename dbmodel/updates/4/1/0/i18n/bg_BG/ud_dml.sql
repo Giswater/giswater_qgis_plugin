@@ -6217,7 +6217,7 @@ UPDATE sys_table SET alias = 'Table used during pg2epa export for lid usage conf
 UPDATE sys_table SET alias = 'Editable view of links type connec', descript = 'Link connec' WHERE id = 'v_edit_link_connec';
 UPDATE sys_table SET alias = 'Catalog of shapes of node', descript = 'Node shape catalog' WHERE id = 'cat_node_shape';
 UPDATE sys_table SET alias = 'Table of spatial objects representing Drainage zones', descript = '' WHERE id = 'drainzone';
-UPDATE sys_table SET alias = 'Shows editable information about drainzone.', descript = 'DRAINZONE' WHERE id = 'v_edit_drainzone';
+UPDATE sys_table SET alias = 'Shows editable information about drainzone.', descript = 'Drainzone' WHERE id = 'v_edit_drainzone';
 UPDATE sys_table SET alias = 'Table to analyze gullies', descript = '' WHERE id = 'anl_gully';
 UPDATE sys_table SET alias = 'Unfiltered view of links', descript = '' WHERE id = 'vu_link_connec';
 UPDATE sys_table SET alias = 'Unfiltered view of gully links ', descript = '' WHERE id = 'vu_link_gully';
