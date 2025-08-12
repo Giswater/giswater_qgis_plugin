@@ -103,7 +103,7 @@ class Go2Iber:
                 pass
 
         mesh = tools_qt.get_combo_value(self.dlg_go2iber, 'cmb_mesh', 1)
-        if mesh is None:
+        if mesh is None or mesh == "":
             msg = "You need to have a mesh"
             tools_qt.show_warning(msg)
             return
