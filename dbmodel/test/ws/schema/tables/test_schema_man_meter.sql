@@ -21,7 +21,7 @@ SELECT columns_are(
     'man_meter',
     ARRAY[
         'node_id', 'real_press_max', 'real_press_min', 'real_press_avg', 'meter_code',
-        'automated', 'closed', 'to_arc', 'meter_type', 'name'
+        'automated', 'closed', 'to_arc', 'meter_type', 'name', 'nominal_flowrate'
     ],
     'Table man_meter should have the correct columns'
 );
@@ -40,6 +40,7 @@ SELECT col_type_is('man_meter', 'closed', 'boolean', 'Column closed should be bo
 SELECT col_type_is('man_meter', 'to_arc', 'integer', 'Column to_arc should be integer');
 SELECT col_type_is('man_meter', 'meter_type', 'integer', 'Column meter_type should be integer');
 SELECT col_type_is('man_meter', 'name', 'text', 'Column name should be text');
+SELECT col_type_is('man_meter', 'nominal_flowrate', 'numeric(12,3)', 'Column nominal_flowrate should be numeric(12,3)');
 
 -- Check not null constraints
 SELECT col_not_null('man_meter', 'node_id', 'Column node_id should be NOT NULL');

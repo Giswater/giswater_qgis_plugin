@@ -2535,3 +2535,31 @@ BEGIN
     hidden = EXCLUDED.hidden;
   END LOOP;
 END $$;
+
+DO $$
+DECLARE
+  rec record;
+BEGIN
+  FOR rec IN (SELECT child_layer FROM cat_feature WHERE feature_class = 'METER')
+  LOOP
+    INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder,
+    "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
+    dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,
+    stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder, field_layoutorder)
+    VALUES(rec.child_layer, 'form_feature', 'tab_data', 'nominal_flowrate', 'lyt_data_2', (SELECT max(layoutorder) + 1 AS layoutorder FROM config_form_fields WHERE formname = rec.child_layer AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+    'numeric', 'text', 'Nominal Flowrate:', 'Nominal Flowrate:', NULL, false, false, true, false, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, true, NULL, NULL)
+    ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
+    layoutorder = EXCLUDED.layoutorder,
+    datatype = EXCLUDED.datatype,
+    widgettype = EXCLUDED.widgettype,
+    label = EXCLUDED.label,
+    dv_querytext = EXCLUDED.dv_querytext,
+    dv_orderby_id = EXCLUDED.dv_orderby_id,
+    dv_isnullvalue = EXCLUDED.dv_isnullvalue,
+    dv_parent_id = EXCLUDED.dv_parent_id,
+    dv_querytext_filterc = EXCLUDED.dv_querytext_filterc,
+    hidden = EXCLUDED.hidden;
+  END LOOP;
+END $$;
