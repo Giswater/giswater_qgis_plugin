@@ -569,8 +569,8 @@ BEGIN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
 
 		ELSIF v_man_table='man_pump' THEN
-				INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure_exit, elev_height, name, pump_number, to_arc)
-				VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure_exit, NEW.elev_height, NEW.name, NEW.pump_number, NEW.to_arc);
+				INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure_exit, elev_height, name, pump_number, to_arc, pump_type, engine_type)
+				VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure_exit, NEW.elev_height, NEW.name, NEW.pump_number, NEW.to_arc, NEW.pump_type, NEW.engine_type);
 
 		ELSIF v_man_table='man_reduction' THEN
 
@@ -862,7 +862,7 @@ BEGIN
 		IF NEW.rotation IS DISTINCT FROM OLD.rotation THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;
-		
+
 		-- hemisphere
 		IF NEW.hemisphere IS DISTINCT FROM OLD.hemisphere THEN
 			UPDATE node SET hemisphere=NEW.hemisphere WHERE node_id = OLD.node_id;
@@ -1267,7 +1267,7 @@ BEGIN
 				update node set label_rotation = new.rotation where node_id = new.node_id;
 
 			end if;
-	
+
 		-- CASE: if rotation of the node changes
 		if new.rotation::text != old.rotation::text OR (OLD.rotation IS NULL AND NEW.rotation IS NOT NULL) then
 

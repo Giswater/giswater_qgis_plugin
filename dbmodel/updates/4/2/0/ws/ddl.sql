@@ -192,3 +192,7 @@ BEGIN
 	PERFORM gw_fct_admin_manage_fields(format($${"data":{"action":"RENAME", "table":"ext_cat_hydrometer", "column":"multi_jet_flow", "newName":"flownom", "isCrm":%s}}$$, v_crm::text)::json);
 
 END $function$;
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"pump_type", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"engine_type", "dataType":"int4"}}$$);

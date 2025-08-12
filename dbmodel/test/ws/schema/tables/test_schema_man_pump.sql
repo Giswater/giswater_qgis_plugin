@@ -21,7 +21,7 @@ SELECT columns_are(
     'man_pump',
     ARRAY[
         'node_id', 'max_flow', 'min_flow', 'nom_flow', 'power', 'pressure_exit', 'elev_height',
-        'name', 'pump_number', 'to_arc'
+        'name', 'pump_number', 'to_arc', 'pump_type', 'engine_type'
     ],
     'Table man_pump should have the correct columns'
 );
@@ -40,6 +40,8 @@ SELECT col_type_is('man_pump', 'elev_height', 'numeric(12,4)', 'Column elev_heig
 SELECT col_type_is('man_pump', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('man_pump', 'pump_number', 'integer', 'Column pump_number should be integer');
 SELECT col_type_is('man_pump', 'to_arc', 'integer', 'Column to_arc should be integer');
+SELECT col_type_is('man_pump', 'pump_type', 'integer', 'Column pump_type should be integer');
+SELECT col_type_is('man_pump', 'engine_type', 'integer', 'Column engine_type should be integer');
 
 -- Check not null constraints
 SELECT col_not_null('man_pump', 'node_id', 'Column node_id should be NOT NULL');
