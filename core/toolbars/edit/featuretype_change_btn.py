@@ -91,7 +91,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            msg = "Click on feature to change its type"
+            msg = "Click on the object to change its class"
             tools_qgis.show_info(msg)
 
     def canvasMoveEvent(self, event):

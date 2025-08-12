@@ -146,7 +146,7 @@
 		</message>
 		<message>
 			<source>GwFeatureTypeChangeButton</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>toolbar_edit_name</source>
@@ -4506,8 +4506,8 @@
 			<translation>Failed to retrieve GeoJSON data.</translation>
 		</message>
 		<message>
-			<source>Click on feature to change its type</source>
-			<translation>Click on feature to change its type</translation>
+			<source>Click on the object to change its class</source>
+			<translation>Click on the object to change its class</translation>
 		</message>
 		<message>
 			<source>Task canceled:</source>
@@ -5682,11 +5682,15 @@
 			<translation>Task aborted: {0}.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</translation>
 		</message>
 		<message>
@@ -13564,11 +13568,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>
@@ -13576,7 +13580,7 @@
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>

@@ -4510,8 +4510,8 @@
 			<translation>Failed to retrieve GeoJSON data.</translation>
 		</message>
 		<message>
-			<source>Click on feature to change its type</source>
-			<translation>Feu clic a l'element per canviar el vostre tipus</translation>
+			<source>Click on the object to change its class</source>
+			<translation>Feu clic a l'objecte per canviar la seva classe</translation>
 		</message>
 		<message>
 			<source>Task canceled:</source>
@@ -4619,7 +4619,8 @@
 		</message>
 		<message>
 			<source>No results found. Please check values set on selector of state and exploitation</source>
-			<translation>No s'han trobat resultats. Si us plau, comproveu els valors establerts al selector d'estat i explotació
+			<translation>No s'han trobat resultats. Si us plau, comproveu els valors establerts al selector d'estat i explotació
+
 </translation>
 		</message>
 		<message>
@@ -5687,8 +5688,10 @@
 			<translation>Task aborted: {0}.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
 			<translation>El procediment eliminarà elements de xaraxa en la base de dades a menys que sigui un node que no divideix l'arc. \ N Assegureu-vos que els elements de la xarxa no tinguin un valor de recuperació vertader.\ NPer altra banda, ha de saber que la traçabilitat emmagatzemarà informació precedent.</translation>
 		</message>
@@ -13567,11 +13570,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>

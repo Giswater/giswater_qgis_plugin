@@ -4506,7 +4506,7 @@
 			<translation>Failed to retrieve GeoJSON data.</translation>
 		</message>
 		<message>
-			<source>Click on feature to change its type</source>
+			<source>Click on the object to change its class</source>
 			<translation>Щракнете върху функцията, за да промените нейния тип</translation>
 		</message>
 		<message>
@@ -5682,11 +5682,15 @@
 			<translation>Task aborted: {0}.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>Процедурата ще изтрие характеристики в базата данни, освен ако не е възел, който не разделя дъга.\n
- Моля, уверете се, че функциите нямат стойност за изтриване true.\n
+			<translation>Процедурата ще изтрие характеристики в базата данни, освен ако не е възел, който не разделя дъга.\n
+
+ Моля, уверете се, че функциите нямат стойност за изтриване true.\n
+
  От друга страна, трябва да знаете, че в таблицата за проследимост ще се съхранява предходна информация.</translation>
 		</message>
 		<message>
@@ -13565,11 +13569,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>

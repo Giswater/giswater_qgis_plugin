@@ -4506,7 +4506,7 @@
 			<translation>Failed to retrieve GeoJSON data.</translation>
 		</message>
 		<message>
-			<source>Click on feature to change its type</source>
+			<source>Click on the object to change its class</source>
 			<translation>機能をクリックしてタイプを変更する</translation>
 		</message>
 		<message>
@@ -5682,11 +5682,15 @@
 			<translation>Task aborted: {0}.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>このプロシージャは、arcを分割しないノードでない限り、データベース上のフィーチャーを削除します。
- featuresにundeleteの値がtrueになっていないことを確認してください。
+			<translation>このプロシージャは、arcを分割しないノードでない限り、データベース上のフィーチャーを削除します。
+
+ featuresにundeleteの値がtrueになっていないことを確認してください。
+
  一方、トレーサビリティ・テーブルには先例情報が格納されることを知っておく必要があります。</translation>
 		</message>
 		<message>
@@ -13564,11 +13568,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>

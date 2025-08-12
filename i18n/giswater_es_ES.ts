@@ -74,7 +74,7 @@
 		</message>
 		<message>
 			<source>GwFeatureDeleteButton</source>
-			<translation>Eliminar elemento de red</translation>
+			<translation>Eliminar objeto de red</translation>
 		</message>
 		<message>
 			<source>GwArcAddButton</source>
@@ -146,7 +146,7 @@
 		</message>
 		<message>
 			<source>GwFeatureTypeChangeButton</source>
-			<translation>Cambiar el tipo de elemento</translation>
+			<translation>Cambiar la clase del objeto</translation>
 		</message>
 		<message>
 			<source>toolbar_edit_name</source>
@@ -4510,8 +4510,8 @@
 			<translation>Failed to retrieve GeoJSON data.</translation>
 		</message>
 		<message>
-			<source>Click on feature to change its type</source>
-			<translation>Haga clic en el elemento para cambiar su tipo</translation>
+			<source>Click on the object to change its class</source>
+			<translation>Haga clic en el objeto para cambiar su clase</translation>
 		</message>
 		<message>
 			<source>Task canceled:</source>
@@ -5686,11 +5686,15 @@
 			<translation>Task aborted: {0}.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
-Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero.\ N
+			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
+
+Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero.\ N
+
 Por otro lado, debe saber que la tabla de trazabilidad almacenará información precedente.</translation>
 		</message>
 		<message>
@@ -13568,11 +13572,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change feature class</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>
