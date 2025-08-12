@@ -15,6 +15,7 @@ DECLARE
     -- Configuration
     v_search_tolerance double precision;
     v_state_filter boolean := TRUE;
+    v_disable_topocontrol boolean := FALSE;
 
     -- State
     v_node_start RECORD;
@@ -27,6 +28,14 @@ BEGIN
     SELECT ((value::json)->>'value') INTO v_search_tolerance 
     FROM PARENT_SCHEMA.config_param_system 
     WHERE parameter='edit_arc_searchnodes';
+    
+    -- Check per-user flag to disable CM topology control
+    SELECT COALESCE((SELECT value::boolean FROM cm.config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user = current_user), FALSE)
+    INTO v_disable_topocontrol;
+
+    IF v_disable_topocontrol IS TRUE THEN
+        RETURN NEW;
+    END IF;
     
     -- Fallback to default if not configured
     IF v_search_tolerance IS NULL THEN

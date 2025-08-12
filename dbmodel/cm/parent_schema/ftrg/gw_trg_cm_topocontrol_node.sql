@@ -13,6 +13,7 @@ DECLARE
     v_node_geom geometry;
     v_count integer;
     v_has_arc boolean := false;
+    v_disable_topocontrol boolean := FALSE;
 BEGIN
     -- tolerance: reuse arc searchnodes if no node-specific param
     SELECT COALESCE(((value::json)->>'value')::double precision, 0.1)
@@ -21,6 +22,14 @@ BEGIN
     WHERE parameter IN ('edit_node_proximity','edit_arc_searchnodes')
     ORDER BY CASE WHEN parameter='edit_node_proximity' THEN 0 ELSE 1 END
     LIMIT 1;
+
+    -- Check per-user flag to disable CM topology control
+    SELECT COALESCE((SELECT value::boolean FROM cm.config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user = current_user), FALSE)
+    INTO v_disable_topocontrol;
+
+    IF v_disable_topocontrol IS TRUE THEN
+        RETURN NEW;
+    END IF;
 
     IF TG_TABLE_NAME = 'om_campaign_x_node' THEN
         -- use edited campaign node geometry when available, fallback to parent node

@@ -22,6 +22,22 @@ INSERT INTO cat_role VALUES ('role_cm_field');
 INSERT INTO cat_role VALUES ('role_cm_edit');
 INSERT INTO cat_role VALUES ('role_cm_manager');
 
+-- Per-user switch to disable topocontrol in CM
+INSERT INTO sys_param_user (
+  id, formname, descript, sys_role, idval, "label",
+  dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent,
+  dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate,
+  "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname,
+  iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source"
+) VALUES (
+  'edit_disable_topocontrol', 'hidden', 'If true, CM topocontrol and feature proximity checks are disabled to allow data migration', 'role_cm_manager',
+  NULL, NULL,
+  NULL, NULL, TRUE, NULL, 'utils', NULL,
+  NULL, NULL, NULL, FALSE,
+  'boolean', 'check', TRUE, NULL, 'false', NULL,
+  TRUE, NULL, NULL, NULL, NULL, 'core'
+) ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO config_param_system VALUES ('basic_selector_tab_lot',
 '{"table":"temp_om_campaign_lot","selector":"selector_lot","table_id":"lot_id","selector_id":"lot_id","label":"lot_id, '' - '', name","orderBy":"lot_id","manageAll":true,"typeaheadFilter":" AND lower(concat(lot_id, '' - '', name))","query_filter":"AND active is true ","typeaheadForced":true,"selectionMode":"keepPreviousUsingShift"}',
 'Variable to configura all options related to search for the specificic tab','Selector variables',null, null, true, null, 'utils', null, null, 'json','text');
