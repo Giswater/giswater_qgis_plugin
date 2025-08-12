@@ -362,3 +362,36 @@ UPDATE config_form_fields SET layoutorder=5 WHERE formname='new_dma' AND formtyp
 UPDATE config_form_fields SET layoutorder=6 WHERE formname='new_dma' AND formtype='form_catalog' AND columnname='descript' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutorder=7 WHERE formname='new_dma' AND formtype='form_catalog' AND columnname='link' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutorder=8 WHERE formname='new_dma' AND formtype='form_catalog' AND columnname='stylesheet' AND tabname='tab_none';
+
+-- Create menu element from element_manager
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_element_menu",
+  "parameters": {
+    "sourcetable": "v_ui_element",
+    "targetwidget": "tbl_element",
+    "field_object_id": "id",
+    "linked_feature": false  }
+}'::json
+	WHERE formname='element_manager' AND formtype='form_element' AND columnname='create' AND tabname='tab_none';
+
+-- Make element menu work in info
+DO $$
+DECLARE
+  v_widgetfucntion jsonb;
+  rec record;
+BEGIN
+  FOR rec IN SELECT * FROM config_form_fields WHERE formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements'
+  LOOP
+    v_widgetfucntion := rec.widgetfunction;
+    v_widgetfucntion := jsonb_set(v_widgetfucntion, '{parameters, linked_feature}', 'true');
+    UPDATE config_form_fields
+      SET widgetfunction=v_widgetfucntion
+      WHERE formname=rec.formname AND formtype=rec.formtype AND columnname=rec.columnname AND tabname=rec.tabname;
+  END LOOP;
+END $$;
+
+-- Update table from element_manager
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName":"open_selected_manager_item", "parameters":{"columnfind":"element_id", "elem_manager": true, "sourcetable": "v_ui_element"}}'::json
+	WHERE formname='element_manager' AND formtype='form_element' AND columnname='tbl_element' AND tabname='tab_none';
