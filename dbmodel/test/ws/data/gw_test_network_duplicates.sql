@@ -63,44 +63,44 @@ SELECT is(
     (SELECT COUNT(*)
     FROM (
         SELECT element_id, COUNT(*) as cnt
-        FROM ve_frelem
+        FROM ve_man_frelem
         GROUP BY element_id
         HAVING COUNT(*) > 1
     ) a),
     0::bigint,
-    'There should be no duplicate element_ids on ve_frelem'
+    'There should be no duplicate element_ids on ve_man_frelem'
 );
 
 SELECT ok(
     NOT EXISTS (
         SELECT element_id, COUNT(*)
-        FROM ve_frelem
+        FROM ve_man_frelem
         GROUP BY element_id
         HAVING COUNT(*) > 1
     ),
-    'Each element_id should be unique in ve_frelem'
+    'Each element_id should be unique in ve_man_frelem'
 );
 
 SELECT is(
     (SELECT COUNT(*)
     FROM (
         SELECT element_id, COUNT(*) as cnt
-        FROM ve_genelem
+        FROM ve_element
         GROUP BY element_id
         HAVING COUNT(*) > 1
     ) a),
     0::bigint,
-    'There should be no duplicate element_ids on ve_genelem'
+    'There should be no duplicate element_ids on ve_element'
 );
 
 SELECT ok(
     NOT EXISTS (
         SELECT element_id, COUNT(*)
-        FROM ve_genelem
+        FROM ve_element
         GROUP BY element_id
         HAVING COUNT(*) > 1
     ),
-    'Each element_id should be unique in ve_genelem'
+    'Each element_id should be unique in ve_element'
 );
 
 -- LINK TESTS
