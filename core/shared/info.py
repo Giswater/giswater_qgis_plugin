@@ -3325,7 +3325,6 @@ class GwInfo(QObject):
             else:
                 msg = "NO FEATURE TYPE DEFINED"
                 tools_log.log_info(msg)
-            test = self.info_layer.geometryType()
         except Exception:
             pass
 

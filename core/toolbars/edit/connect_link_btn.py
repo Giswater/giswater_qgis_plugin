@@ -91,7 +91,6 @@ class GwConnectLinkButton(GwMaptool):
         # Open dialog
         tools_gw.open_dialog(self.dlg_connect_link, 'connect_link')
 
-
     def fill_tbl_ids(self, layer):
         """ Fill table with selected features """
 
@@ -266,7 +265,7 @@ class GwConnectLinkButton(GwMaptool):
     def _select_multiple_features(self, select_geometry):
         """ Select multiple features on canvas """
 
-        #TODO: Create button add_forced_arcs and manage selection with arcs
+        # TODO: Create button add_forced_arcs and manage selection with arcs
 
         # Get pressed keys on keyboard
         key = QApplication.keyboardModifiers()

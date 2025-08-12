@@ -973,14 +973,15 @@ class GwPsector:
         status_id = tools_qt.get_combo_value(self.dlg_plan_psector, 'tab_general_status')
         # Check if psector status is "Executed" (status_id == 4) and has no workcat_id
         if status_id == 4 and workcat_id in (None, 'null', ''):
-            msg = f"Psector {psector_id} has no workcat_id value set. Do you want to continue with the default value?"
-            answer = tools_qgis.ask_question(msg, parameter='Psector', dialog=self.dlg_plan_psector)
+            msg = "Psector {0} has no workcat_id value set. Do you want to continue with the default value?"
+            msg_params = (psector_id,)
+            answer = tools_qgis.ask_question(msg, parameter='Psector', dialog=self.dlg_plan_psector, msg_params=msg_params)
             if answer is False:
                 return
 
-        sql = (f"UPDATE config_param_user "
-                f"SET value = True "
-                f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+        sql = ("UPDATE config_param_user "
+                "SET value = True "
+                "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
         columns = []
         for row in rows:
@@ -1038,19 +1039,19 @@ class GwPsector:
                     tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id[0]))
                     cur_psector = tools_gw.get_config_value('plan_psector_current')
                     if cur_psector is not None:
-                        sql = (f"UPDATE config_param_user "
-                            f" SET value = $${new_psector_id[0]}$$ "
-                            f" WHERE parameter = 'plan_psector_current'"
-                            f" AND cur_user=current_user; ")
+                        sql = ("UPDATE config_param_user "
+                            " SET value = $${new_psector_id[0]}$$ "
+                            " WHERE parameter = 'plan_psector_current'"
+                            " AND cur_user=current_user; ")
                     else:
                         sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                             f" VALUES ('plan_psector_current', '{new_psector_id[0]}', current_user);")
                     tools_db.execute_sql(sql)
                     self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
 
-        sql = (f"UPDATE config_param_user "
-                f"SET value = False "
-                f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+        sql = ("UPDATE config_param_user "
+                "SET value = False "
+                "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
 
         # Refresh selectors UI if it is open and and the form will close
@@ -1688,9 +1689,9 @@ class GwPsector:
                 tools_qgis.show_info(msg, dialog=dialog)
                 selector_updated = True
             else:
-                sql = (f"UPDATE config_param_user "
-                        f"SET value = True "
-                        f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+                sql = ("UPDATE config_param_user "
+                        "SET value = True "
+                        "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
                 tools_db.execute_sql(sql)
 
                 sql = f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
@@ -1698,9 +1699,9 @@ class GwPsector:
                 # Check topology
                 self.check_topology_psector(psector_id, psector_name)
 
-                sql = (f"UPDATE config_param_user "
-                        f"SET value = False "
-                        f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+                sql = ("UPDATE config_param_user "
+                        "SET value = False "
+                        "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
                 tools_db.execute_sql(sql)
 
         tools_db.execute_sql(sql)
@@ -2414,9 +2415,9 @@ class GwPsector:
             msg = "This psector does not match the current one. Value of current psector will be updated."
             tools_qt.show_info_box(msg)
 
-            sql = (f"UPDATE config_param_user "
+            sql = ("UPDATE config_param_user "
                    f"SET value = '{selected_psector}' "
-                   f"WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
+                   "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
             tools_db.execute_sql(sql)
 
         # Snap point
@@ -2512,9 +2513,9 @@ class GwPsector:
             msg = "This psector does not match the current one. Value of current psector will be updated."
             tools_qt.show_info_box(msg)
 
-            sql = (f"UPDATE config_param_user "
+            sql = ("UPDATE config_param_user "
                    f"SET value = '{selected_psector}' "
-                   f"WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
+                   "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
             tools_db.execute_sql(sql)
 
         # Snap point
@@ -2662,9 +2663,9 @@ class GwPsector:
                     msg = "This psector does not match the current one. Value of current psector will be updated."
                     tools_qt.show_info_box(msg)
 
-                    sql = (f"UPDATE config_param_user "
+                    sql = ("UPDATE config_param_user "
                            f"SET value = '{selected_psector}' "
-                           f"WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
+                           "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
                     tools_db.execute_sql(sql)
 
                 # Execute setarcfusion

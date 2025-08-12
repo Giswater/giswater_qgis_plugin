@@ -167,12 +167,12 @@ class GwFeatureEndButton(GwAction):
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
         row = tools_gw.get_config_value('edit_arc_downgrade_force')
         if row:
-            sql = (f"UPDATE config_param_user "
+            sql = ("UPDATE config_param_user "
                    f"SET value = '{value}' "
-                   f"WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
+                   "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
             tools_db.execute_sql(sql)
         else:
-            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
+            sql = ("INSERT INTO config_param_user (parameter, value, cur_user) "
                    f"VALUES ('edit_arc_downgrade_force', '{value}', current_user)")
             tools_db.execute_sql(sql)
 
