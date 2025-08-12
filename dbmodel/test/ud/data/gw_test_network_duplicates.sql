@@ -63,7 +63,7 @@ SELECT is(
     (SELECT COUNT(*)
     FROM (
         SELECT element_id, COUNT(*) as cnt
-        FROM ve__manfrelem
+        FROM ve_man_frelem
         GROUP BY element_id
         HAVING COUNT(*) > 1
     ) a),
