@@ -631,10 +631,10 @@ BEGIN
 			VALUES (NEW.node_id, NEW.lab_code);
 
 		ELSIF v_man_table='man_wtp' THEN
-			INSERT INTO man_wtp (node_id, name, maxflow, opsflow, screening, desander, chemcond, oxidation, coagulation, floculation, presendiment, sediment,
-			filtration, disinfection, chemtreatment, storage, sludgeman, inlet_arc)
-			VALUES (NEW.node_id, NEW.name, NEW.maxflow, NEW.opsflow, NEW.screening, NEW.desander, NEW.chemcond, NEW.oxidation, NEW.coagulation, NEW.floculation,
-			NEW.presendiment, NEW.sediment, NEW.filtration, NEW.disinfection, NEW.chemtreatment, NEW.storage, NEW.sludgeman, NEW.inlet_arc);
+			INSERT INTO man_wtp (node_id, name, maxflow, opsflow, screening, desander, chemical, oxidation, coagulation, floculation, presendiment, sediment,
+			filtration, disinfection, storage, sludgeman, inlet_arc)
+			VALUES (NEW.node_id, NEW.name, NEW.maxflow, NEW.opsflow, NEW.screening, NEW.desander, NEW.chemical, NEW.oxidation, NEW.coagulation, NEW.floculation,
+			NEW.presendiment, NEW.sediment, NEW.filtration, NEW.disinfection, NEW.storage, NEW.sludgeman, NEW.inlet_arc);
 
 		END IF;
 
@@ -1036,9 +1036,9 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_wtp' THEN
-			UPDATE man_wtp SET name = NEW.name, maxflow = NEW.maxflow, opsflow = NEW.opsflow, screening = NEW.screening, desander = NEW.desander, chemcond = NEW.chemcond,
+			UPDATE man_wtp SET name = NEW.name, maxflow = NEW.maxflow, opsflow = NEW.opsflow, screening = NEW.screening, desander = NEW.desander, chemical = NEW.chemical,
     		oxidation = NEW.oxidation, coagulation = NEW.coagulation, floculation = NEW.floculation, presendiment = NEW.presendiment, sediment = NEW.sediment,
-    		filtration = NEW.filtration, disinfection = NEW.disinfection, chemtreatment = NEW.chemtreatment, storage = NEW.storage, sludgeman = NEW.sludgeman, inlet_arc=NEW.inlet_arc
+    		filtration = NEW.filtration, disinfection = NEW.disinfection, storage = NEW.storage, sludgeman = NEW.sludgeman, inlet_arc=NEW.inlet_arc
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_filter' THEN

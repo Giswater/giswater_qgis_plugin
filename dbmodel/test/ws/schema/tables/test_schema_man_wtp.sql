@@ -20,9 +20,9 @@ SELECT has_table('man_wtp'::name, 'Table man_wtp should exist');
 SELECT columns_are(
     'man_wtp',
     ARRAY[
-        'node_id', 'name', 'maxflow', 'opsflow', 'screening', 'desander', 'chemcond', 'oxidation',
+        'node_id', 'name', 'maxflow', 'opsflow', 'screening', 'desander', 'chemical', 'oxidation',
         'coagulation', 'floculation', 'presendiment', 'sediment', 'filtration', 'disinfection',
-        'chemtreatment', 'storage', 'sludgeman', 'inlet_arc'
+        'storage', 'sludgeman', 'inlet_arc'
     ],
     'Table man_wtp should have the correct columns'
 );
@@ -37,7 +37,7 @@ SELECT col_type_is('man_wtp', 'maxflow', 'double precision', 'Column maxflow sho
 SELECT col_type_is('man_wtp', 'opsflow', 'double precision', 'Column opsflow should be double precision');
 SELECT col_type_is('man_wtp', 'screening', 'integer', 'Column screening should be integer');
 SELECT col_type_is('man_wtp', 'desander', 'integer', 'Column desander should be integer');
-SELECT col_type_is('man_wtp', 'chemcond', 'integer', 'Column chemcond should be integer');
+SELECT col_type_is('man_wtp', 'chemical', 'integer', 'Column chemical should be integer');
 SELECT col_type_is('man_wtp', 'oxidation', 'integer', 'Column oxidation should be integer');
 SELECT col_type_is('man_wtp', 'coagulation', 'integer', 'Column coagulation should be integer');
 SELECT col_type_is('man_wtp', 'floculation', 'integer', 'Column floculation should be integer');
@@ -45,7 +45,6 @@ SELECT col_type_is('man_wtp', 'presendiment', 'integer', 'Column presendiment sh
 SELECT col_type_is('man_wtp', 'sediment', 'integer', 'Column sediment should be integer');
 SELECT col_type_is('man_wtp', 'filtration', 'integer', 'Column filtration should be integer');
 SELECT col_type_is('man_wtp', 'disinfection', 'integer', 'Column disinfection should be integer');
-SELECT col_type_is('man_wtp', 'chemtreatment', 'integer', 'Column chemtreatment should be integer');
 SELECT col_type_is('man_wtp', 'storage', 'integer', 'Column storage should be integer');
 SELECT col_type_is('man_wtp', 'sludgeman', 'integer', 'Column sludgeman should be integer');
 SELECT col_type_is('man_wtp', 'inlet_arc', 'integer[]', 'Column inlet_arc should be integer[]');

@@ -440,3 +440,13 @@ BEGIN
   END LOOP;
 END $$;
 
+DO $$
+DECLARE
+  rec record;
+BEGIN
+  FOR rec IN (SELECT child_layer FROM cat_feature WHERE feature_class = 'WTP')
+  LOOP
+    UPDATE config_form_fields SET columnname = 'chemical' WHERE formname = rec.child_layer AND columnname = 'chemcond';
+    DELETE FROM config_form_fields WHERE formname = rec.child_layer AND columnname = 'chemtreatment';
+  END LOOP;
+END $$;
