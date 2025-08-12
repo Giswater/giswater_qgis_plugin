@@ -2518,8 +2518,8 @@ BEGIN
     "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
     dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,
     stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder, field_layoutorder)
-    VALUES(rec.child_layer, 'form_feature', 'tab_data', 'pump_type', 'lyt_data_2', (SELECT max(layoutorder) + 1 AS layoutorder FROM config_form_fields WHERE formname = rec.child_layer AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
-    'integer', 'combo', 'Pump Type:', 'Pump Type', NULL, false, false, true, false, NULL,
+    VALUES(rec.child_layer, 'form_feature', 'tab_data', 'engine_type', 'lyt_data_2', (SELECT max(layoutorder) + 1 AS layoutorder FROM config_form_fields WHERE formname = rec.child_layer AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+    'integer', 'combo', 'Engine Type:', 'Engine Type', NULL, false, false, true, false, NULL,
     'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_pump_engine_type''', true, false, NULL, NULL,
     NULL, NULL, NULL, NULL, true, NULL, NULL)
     ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET
