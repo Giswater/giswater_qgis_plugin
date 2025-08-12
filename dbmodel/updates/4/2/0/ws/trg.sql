@@ -30,11 +30,17 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frpump');
 CREATE TRIGGER gw_trg_edit_ve_epa_frvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_frvalve
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frvalve');
 
+CREATE TRIGGER gw_trg_edit_ve_epa_frshortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_frshortpipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('frshortpipe');
+
 CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_inp_dscenario_frvalve
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-VALVE');
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_inp_dscenario_frpump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-PUMP');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_inp_dscenario_frshortpipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-SHORTPIPE');
 
 CREATE TRIGGER gw_trg_edit_ve_epa_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_valve
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('valve');

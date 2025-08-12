@@ -2316,6 +2316,22 @@ AS SELECT f.element_id,
    FROM ve_frelem f
      JOIN inp_frpump p ON f.element_id = p.element_id;
 
+CREATE OR REPLACE VIEW ve_inp_frshortpipe
+AS SELECT f.element_id,
+    f.node_id,
+    f.order_id,
+    f.nodarc_id,
+    f.to_arc,
+    f.flwreg_length,
+	p.minorloss,
+    p.bulk_coeff,
+	p.wall_coeff,
+	p.custom_dint,
+	p.status,
+    f.the_geom
+   FROM ve_frelem f
+     JOIN inp_frshortpipe p ON f.element_id = p.element_id;
+
 
 CREATE OR REPLACE VIEW ve_epa_frpump
 AS SELECT p.element_id,
@@ -2385,8 +2401,23 @@ AS SELECT s.dscenario_id,
     n.the_geom
    FROM selector_inp_dscenario s,
     inp_dscenario_frvalve v
-     JOIN ve_inp_frvalve n USING (element_id)
+     JOIN ve_inp_frvalve n ON n.element_id = v.element_id
   WHERE s.dscenario_id = v.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+CREATE OR REPLACE VIEW ve_inp_dscenario_frshortpipe
+AS SELECT s.dscenario_id,
+    p.element_id,
+	n.node_id,
+    p.minorloss,
+    p.bulk_coeff,
+    p.wall_coeff,
+    p.custom_dint,
+    p.status,
+    n.the_geom
+   FROM selector_inp_dscenario s,
+    inp_dscenario_frshortpipe p
+     JOIN ve_inp_frshortpipe n ON n.element_id = p.element_id
+  WHERE s.dscenario_id = p.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 CREATE OR REPLACE VIEW ve_samplepoint
 AS SELECT sm.sample_id,
@@ -3244,7 +3275,7 @@ AS SELECT p.arc_id,
 CREATE OR REPLACE VIEW ve_epa_frvalve
 AS SELECT v.element_id,
     man_frelem.node_id,
-    concat(man_frelem.node_id, '_FR', man_frelem.order_id) AS nodarc_id,
+    man_frelem.element_id AS nodarc_id,
     man_frelem.to_arc,
     v.valve_type,
     v.custom_dint,
@@ -3269,13 +3300,43 @@ AS SELECT v.element_id,
     r.ffactor_min
    FROM inp_frvalve v
      LEFT JOIN man_frelem USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = concat(man_frelem.node_id, '_FR', man_frelem.order_id);
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = man_frelem.element_id::text;
+
+
+CREATE OR REPLACE VIEW ve_epa_frshortpipe
+AS SELECT inp_frshortpipe.element_id,
+	ve_frelem.node_id,
+	ve_frelem.to_arc,
+	ve_frelem.element_id AS nodarc_id,
+    inp_frshortpipe.minorloss,
+    inp_frshortpipe.custom_dint,
+    inp_frshortpipe.status,
+    inp_frshortpipe.bulk_coeff,
+    inp_frshortpipe.wall_coeff,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min
+   FROM inp_frshortpipe
+	 JOIN ve_frelem USING (element_id)
+     LEFT JOIN v_rpt_arc_stats ON inp_frshortpipe.element_id::text = v_rpt_arc_stats.arc_id::text;
 
 
 CREATE OR REPLACE VIEW ve_epa_frpump
 AS SELECT p.element_id,
     man_frelem.node_id,
-    concat(man_frelem.node_id, '_FR', man_frelem.order_id) AS nodarc_id,
+    man_frelem.element_id AS nodarc_id,
     man_frelem.to_arc,
     p.power,
     p.curve_id,
@@ -3305,7 +3366,7 @@ AS SELECT p.element_id,
     r.ffactor_min
    FROM inp_frpump p
      LEFT JOIN man_frelem USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = concat(man_frelem.node_id, '_FR', man_frelem.order_id);
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id::text = man_frelem.element_id::text;
 
 
 CREATE OR REPLACE VIEW ve_epa_junction

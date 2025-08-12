@@ -1842,6 +1842,10 @@ INSERT INTO config_typevalue
 (typevalue, id, idval, camelstyle, addparam)
 VALUES('layout_name_typevalue', 'lyt_elem_dsc_valve', 'lyt_elem_dsc_valve', 'layoutElemDscValve', '{"lytOrientation": "vertical"}'::json);
 
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_elem_dsc_shortpipe', 'lyt_elem_dsc_shortpipe', 'layoutElemDscShortpipe', '{"lytOrientation": "vertical"}'::json);
+
 -- buttons
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
@@ -1883,6 +1887,10 @@ INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('node', 'form_feature', 'tab_elements', 'tbl_frelem_dsc_valve', 'lyt_elem_dsc_valve', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, NULL, 'tbl_frelem_dsc_valve', false, NULL);
 
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('node', 'form_feature', 'tab_elements', 'tbl_frelem_dsc_shortpipe', 'lyt_elem_dsc_shortpipe', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, NULL, 'tbl_frelem_dsc_shortpipe', false, NULL);
+
 
 -- tables
 INSERT INTO config_form_list
@@ -1892,6 +1900,12 @@ VALUES('tbl_frelem_dsc_pump', 'SELECT * FROM ve_inp_dscenario_frpump WHERE eleme
 INSERT INTO config_form_list
 (listname, query_text, device, listtype, listclass, vdefault, addparam)
 VALUES('tbl_frelem_dsc_valve', 'SELECT * FROM ve_inp_dscenario_frvalve WHERE element_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+
+
+INSERT INTO config_form_list
+(listname, query_text, device, listtype, listclass, vdefault, addparam)
+VALUES('tbl_frelem_dsc_shortpipe','SELECT * FROM ve_inp_dscenario_frshortpipe WHERE element_id IS NOT NULL',4,'tab','list',NULL,NULL);
+
 
 -- config_from_tableview
 INSERT INTO config_form_tableview
@@ -1925,6 +1939,18 @@ VALUES
 ('feature form', 'ws', 'tbl_frelem_dsc_valve', 'add_settings', 9, true, NULL, 'Add settings', NULL, NULL),
 ('feature form', 'ws', 'tbl_frelem_dsc_valve', 'init_quality', 10, true, NULL, 'Init quality', NULL, NULL),
 ('feature form', 'ws', 'tbl_frelem_dsc_valve', 'the_geom', 11, false, NULL, 'the_geom', NULL, NULL);
+
+INSERT INTO config_form_tableview
+(location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES
+('feature form', 'ws', 'tbl_frelem_dsc_shortpipe', 'dscenario_id', 1, true, NULL, 'Dscenario id', NULL, NULL),
+('feature form', 'ws', 'tbl_frelem_dsc_shortpipe', 'element_id', 2, true, NULL, 'Element id', NULL, NULL),
+('feature form', 'ws', 'tbl_frelem_dsc_shortpipe', 'node_id', 3, true, NULL, 'Node id', NULL, NULL),
+('feature form', 'ws', 'tbl_frelem_dsc_shortpipe', 'minorloss', 4, true, NULL, 'Minorloss', NULL, NULL),
+('feature form', 'ws', 'tbl_frelem_dsc_shortpipe', 'bulk_coeff', 5, true, NULL, 'Bulk coeff', NULL, NULL),
+('feature form', 'ws', 'tbl_frelem_dsc_shortpipe', 'wall_coeff', 6, true, NULL, 'Wall coeff', NULL, NULL),
+('feature form', 'ws', 'tbl_frelem_dsc_shortpipe', 'custom_dint', 7, true, NULL, 'Custom dint', NULL, NULL),
+('feature form', 'ws', 'tbl_frelem_dsc_shortpipe', 'the_geom', 8, false, NULL, 'the_geom', NULL, NULL);
 
 -- 08/08/2025
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder, field_layoutorder)
@@ -1973,6 +1999,17 @@ VALUES
 ('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'add_settings', 'lyt_main_1', 8, 'double', 'text', 'Add settings:', 'Add settings', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
 ('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'init_quality', 'lyt_main_1', 9, 'double', 'text', 'Init quality:', 'Init quality', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL);
 
+-- config_form_fields inp_dscenario_frshortpipe
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder, field_layoutorder)
+VALUES
+('inp_dscenario_frshortpipe', 'form_feature', 'tab_none', 'dscenario_id', 'lyt_main_1', 1, 'integer', 'text', 'Dscenario id:', 'Dscenario id', NULL, true, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frshortpipe', 'form_feature', 'tab_none', 'element_id', 'lyt_main_1', 2, 'integer', 'text', 'Element id:', 'Element id', NULL, true, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frshortpipe', 'form_feature', 'tab_none', 'minorloss', 'lyt_main_1', 4, 'numeric', 'text', 'Minorloss:', 'Minorloss', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frshortpipe', 'form_feature', 'tab_none', 'status', 'lyt_main_1', 7, 'string', 'combo', 'Status:', 'Status', NULL, false, NULL, true, NULL, false, 'SELECT DISTINCT id AS id, idval AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue = ''inp_value_status_shortpipe_dscen''', true, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frshortpipe', 'form_feature', 'tab_none', 'bulk_coeff', 'lyt_main_1', 5, 'numeric', 'text', 'Bulk coeff:', 'Bulk coeff', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL),
+('inp_dscenario_frshortpipe', 'form_feature', 'tab_none', 'wall_coeff', 'lyt_main_1', 5, 'numeric', 'text', 'Wall coeff:', 'Wall coeff', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, NULL, false, NULL, NULL);
+
 UPDATE sys_table
 	SET addparam='{"pkey": "dscenario_id, element_id"}'::json
 	WHERE id IN ('inp_dscenario_frpump', 'inp_dscenario_frvalve', 've_inp_dscenario_frpump', 've_inp_dscenario_frvalve');
@@ -1981,3 +2018,106 @@ UPDATE sys_table
 update sys_param_user set dv_querytext= 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link' where id ='edit_linkcat_vdefault';					
 delete from sys_param_user where id = 'edit_connec_linkcat_vdefault';
 update sys_param_user set id = 'edit_connec_linkcat_vdefault' where id = 'edit_linkcat_vdefault';
+
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FRSHORTPIPE', 'ELEMENT', 'inp_frshortpipe', NULL, true);
+
+INSERT INTO cat_feature (id,feature_class,feature_type,parent_layer,child_layer,code_autofill,active) VALUES ('EMETER','FRELEM','ELEMENT','ve_frelem','ve_frelem_emeter',true,true);
+
+-- FRSHORTPIPE
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','to_arc','lyt_epa_data_1',3,'string','text','To arc:','To arc',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','add_to_dscenario','lyt_epa_dsc_1',1,'button',false,false,false,false,false,'{"icon":"113"}'::json,'{"saveValue": false}'::json,'{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_frshortpipe",
+    "tablename": "ve_inp_dscenario_frshortpipe",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_frshortpipe", "view": "ve_inp_dscenario_frshortpipe", "add_view": "ve_inp_dscenario_frshortpipe", "pk": ["dscenario_id", "node_id"]}
+   ]
+, "add_dlg_title":"Shortpipe"   }
+}'::json,'tbl_inp_dscenario_frshortpipe',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','edit_dscenario','lyt_epa_dsc_1',3,'button',false,false,true,false,false,'{"icon":"101"}'::json,'{"saveValue":false, "onContextMenu":"Edit dscenario"}'::json,'{
+  "functionName": "edit_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_frshortpipe",
+    "tablename": "ve_inp_dscenario_frshortpipe",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_frshortpipe", "view": "ve_inp_dscenario_frshortpipe", "add_view": "ve_inp_dscenario_frshortpipe", "pk": ["dscenario_id", "node_id"]}
+   ]
+, "add_dlg_title":"Shortpipe"   }
+}'::json,'tbl_inp_dscenario_frshortpipe',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','remove_from_dscenario','lyt_epa_dsc_1',2,'button',false,false,false,false,false,'{"icon":"114"}'::json,'{"saveValue":false, "onContextMenu":"Delete dscenario"}'::json,'{
+  "functionName": "remove_from_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_frshortpipe",
+    "tablename": "ve_inp_dscenario_frshortpipe",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_frshortpipe", "view": "ve_inp_dscenario_frshortpipe", "add_view": "ve_inp_dscenario_frshortpipe", "pk": ["dscenario_id", "node_id"]}
+   ]
+  }
+}'::json,'tbl_inp_dscenario_frshortpipe',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,linkedobject,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','tbl_inp_shortpipe','lyt_epa_dsc_3',1,'tableview',false,false,false,false,false,'{"saveValue": false, "tableUpsert":"ve_inp_dscenario_frshortpipe"}'::json,'tbl_inp_dscenario_frshortpipe',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','nodarc_id','lyt_epa_data_1',1,'string','text','Nodarc id:','Nodarc id',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','minorloss','lyt_epa_data_1',2,'string','text','Minorloss:','Minorloss',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','wall_coeff','lyt_epa_data_1',6,'string','text','Wall coefficient:','Wall coefficient',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','result_id','lyt_epa_data_2',1,'string','text','Result id:','Result id',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','headloss_max','lyt_epa_data_2',8,'string','text','Max headloss:','Max headloss',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','headloss_min','lyt_epa_data_2',9,'string','text','Min uheadloss:','Max uheadloss',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','setting_max','lyt_epa_data_2',12,'string','text','Max setting:','Max setting',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','setting_min','lyt_epa_data_2',13,'string','text','Min setting:','Min setting',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','reaction_max','lyt_epa_data_2',14,'string','text','Max reaction:','Max reaction',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','reaction_min','lyt_epa_data_2',15,'string','text','Min reaction:','Min reaction',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','ffactor_max','lyt_epa_data_2',16,'string','text','Max Ffactor:','Max Ffactor',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','ffactor_min','lyt_epa_data_2',17,'string','text','Min Ffactor:','Min Ffactor',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','bulk_coeff','lyt_epa_data_1',5,'string','text','Buk coefficient:','Buk coefficient',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,linkedobject,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','hspacer_epa_1','lyt_epa_dsc_1',4,'hspacer',false,false,false,false,false,'{"saveValue": false}'::json,'tbl_inp_dscenario_frshortpipe',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','cat_dint','lyt_epa_data_1',7,'string','text','Cat dint:','Cat dint',false,false,false,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','custom_dint','lyt_epa_data_1',8,'string','text','Custom dint:','Custom dint',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','flow_max','lyt_epa_data_2',2,'string','text','Max flow:','Max Flow',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','flow_min','lyt_epa_data_2',3,'string','text','Min flow:','Min Flow',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','vel_max','lyt_epa_data_2',5,'string','text','Max velocity:','Max velocity',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','vel_min','lyt_epa_data_2',6,'string','text','Min velocity:','Min velocity',false,false,false,false,false,'{"filterSign":"ILIKE"}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)
+	VALUES ('ve_epa_frshortpipe','form_feature','tab_epa','status','lyt_epa_data_1',4,'string','text','Status:','Status',false,false,false,false,false,'{"setMultiline":false}'::json,false);
+
+
+INSERT INTO cat_element (id,element_type,active) VALUES ('EMETER-01','EMETER',true);

@@ -251,7 +251,7 @@ BEGIN
 	CREATE OR REPLACE TEMP VIEW vi_t_pipes AS
 	 SELECT arc_id, node_1, node_2, length, diameter, roughness, minorloss, status::character varying(30) AS status,
 	 concat(';', sector_id, ' ', COALESCE(presszone_id, '0'::text), ' ', COALESCE(dma_id, 0), ' ', COALESCE(dqa_id, 0), ' ', COALESCE(minsector_id, 0), ' ', arccat_id) AS other
-	 FROM temp_t_arc  WHERE epa_type::text = ANY (ARRAY['PIPE'::character varying::text, 'SHORTPIPE'::character varying::text, 'NODE2NODE'::character varying::text]);
+	 FROM temp_t_arc  WHERE epa_type::text = ANY (ARRAY['PIPE'::character varying::text, 'SHORTPIPE'::character varying::text, 'NODE2NODE'::character varying::text, 'FRSHORTPIPE'::character varying::text]);
 
 
 
