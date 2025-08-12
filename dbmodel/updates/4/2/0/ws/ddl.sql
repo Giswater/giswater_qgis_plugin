@@ -91,7 +91,7 @@ CREATE TABLE inp_frpump (
 	CONSTRAINT inp_frpump_status_check CHECK (((status)::text = ANY (ARRAY[('CLOSED'::character varying)::text, ('OPEN'::character varying)::text]))),
 	CONSTRAINT inp_frpump_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT inp_frpump_energy_pattern_id_fkey FOREIGN KEY (energy_pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT inp_frpump_fk_element_id FOREIGN KEY (element_id) REFERENCES element(element_id),
+	CONSTRAINT inp_frpump_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT inp_frpump_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -179,3 +179,16 @@ CREATE TABLE inp_dscenario_frshortpipe (
 	CONSTRAINT inp_dscenario_frshortpipe_status_check CHECK (((status)::text = ANY (ARRAY[('CLOSED'::character varying)::text, ('CV'::character varying)::text, ('OPEN'::character varying)::text]))),
 	CONSTRAINT inp_dscenario_frshortpipe_element_id_fkey FOREIGN KEY (element_id) REFERENCES inp_frshortpipe(element_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- 06/08/2025
+DO $function$
+DECLARE
+    v_crm boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_crm FROM config_param_system WHERE parameter='admin_crm_schema';
+
+	PERFORM gw_fct_admin_manage_fields(format($${"data":{"action":"RENAME", "table":"ext_cat_hydrometer", "column":"voltman_flow", "newName":"type", "isCrm":%s}}$$, v_crm::text)::json);
+	PERFORM gw_fct_admin_manage_fields(format($${"data":{"action":"RENAME", "table":"ext_cat_hydrometer", "column":"multi_jet_flow", "newName":"flownom", "isCrm":%s}}$$, v_crm::text)::json);
+
+END $function$;

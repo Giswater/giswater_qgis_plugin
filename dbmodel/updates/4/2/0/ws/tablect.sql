@@ -16,6 +16,10 @@ ALTER TABLE "element" ADD CONSTRAINT element_expl_id_fkey FOREIGN KEY (expl_id) 
 ALTER TABLE man_frelem ADD CONSTRAINT man_frelem_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id);
 
 ALTER TABLE rpt_arc_stats ADD CONSTRAINT rpt_arc_stats_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- 06/08/2025
+ALTER TABLE om_waterbalance_dma_graph ADD CONSTRAINT om_waterbalance_dma_graph_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
 ALTER TABLE arc ADD CONSTRAINT arc_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id);
 ALTER TABLE connec ADD CONSTRAINT connec_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id);
 ALTER TABLE node ADD CONSTRAINT node_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id);

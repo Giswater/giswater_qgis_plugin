@@ -47,3 +47,6 @@ ALTER TABLE "element" ADD CONSTRAINT element_brand_id_fkey FOREIGN KEY (brand_id
 ALTER TABLE arc ADD CONSTRAINT arc_model_id_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id);
 ALTER TABLE node ADD CONSTRAINT node_model_id_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id);
 ALTER TABLE "element" ADD CONSTRAINT element_model_id_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id);
+
+-- 12/08/2025
+ALTER TABLE inp_froutlet ADD CONSTRAINT inp_froutlet_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE RESTRICT ON UPDATE CASCADE;
