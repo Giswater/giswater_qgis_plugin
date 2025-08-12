@@ -5142,15 +5142,37 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
     insert_cols = ", ".join(base_insert_cols + extra_cols)
     select_cols = ", ".join(base_select_cols + select_extras)
 
-    for feature_id in ids or []:
-        sql = f"""
-            INSERT INTO {tablename} ({insert_cols})
-            SELECT {select_cols}
-            {from_clause}
-            WHERE p.{feature_type}_id = {feature_id}
-            ON CONFLICT DO NOTHING;
-        """
-        tools_db.execute_sql(sql)
+    # Temporarily disable CM topocontrol strictly for Campaign > Relations inserts
+    toggled = False
+    try:
+        if tools_db.check_schema('cm') and feature_type in ('arc', 'node'):
+            tools_db.execute_sql(
+                """
+                INSERT INTO cm.config_param_user(parameter, value, cur_user)
+                VALUES ('edit_disable_topocontrol','true', current_user)
+                ON CONFLICT (parameter, cur_user) DO UPDATE SET value='true';
+                """
+            )
+            toggled = True
+
+        for feature_id in ids or []:
+            sql = f"""
+                INSERT INTO {tablename} ({insert_cols})
+                SELECT {select_cols}
+                {from_clause}
+                WHERE p.{feature_type}_id = {feature_id}
+                ON CONFLICT DO NOTHING;
+            """
+            tools_db.execute_sql(sql)
+    finally:
+        if toggled:
+            tools_db.execute_sql(
+                """
+                UPDATE cm.config_param_user
+                SET value='false'
+                WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user;
+                """
+            )
 
 
 def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
