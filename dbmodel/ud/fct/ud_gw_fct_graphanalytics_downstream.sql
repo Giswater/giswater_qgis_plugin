@@ -115,9 +115,11 @@ BEGIN
 	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	-- create temp tables
+	DROP TABLE IF EXISTS t_anl_arc;
+	DROP TABLE IF EXISTS t_anl_node;
+	CREATE TEMP TABLE t_anl_arc (LIKE anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE t_anl_node (LIKE anl_node INCLUDING ALL);
 
 	-- mainstream + diverted flow
 	v_query = '
@@ -139,7 +141,7 @@ BEGIN
 	EXECUTE 'select count(*)::int from ve_arc'
 	INTO v_distance;
 
-	INSERT INTO anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
+	INSERT INTO t_anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
 	SELECT n.node_id, v_fid, n.node_type, n.state, n.expl_id, n.drainzone_id, v_diverted_flow, n.the_geom
 	FROM (
 		SELECT node
@@ -157,11 +159,10 @@ BEGIN
 				AND a.node_2 IS NOT NULL 
 				AND a.state > 0 
 				AND a.is_operative = TRUE
-				AND a.initoverflowpath IS DISTINCT FROM FALSE
+				AND a.initoverflowpath IS DISTINCT FROM TRUE
 				AND EXISTS (
-					SELECT 1 FROM anl_node an 
-					WHERE an.cur_user = '''||"current_user"()||'''
-					AND an.fid = '''||v_fid||'''
+					SELECT 1 FROM t_anl_node an 
+					WHERE an.fid = '''||v_fid||'''
 					AND an.node_id = a.'||v_source||'::text
 				)
 			)
@@ -171,21 +172,18 @@ BEGIN
 			FROM arc_selected a
 	';
 
-	UPDATE anl_node n set addparam = v_mainstream
+	UPDATE t_anl_node n set addparam = v_mainstream
 	FROM (
 		SELECT node
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
 	) p
-	WHERE n.cur_user="current_user"() AND n.fid = v_fid
-	AND n.node_id::int4 = p.node;
+	WHERE n.node_id::int4 = p.node;
 
-	INSERT INTO anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
+	INSERT INTO t_anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
 	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
 	FROM ve_arc a
-	JOIN anl_node n1 ON a.node_1::text = n1.node_id
-	JOIN anl_node n2 ON a.node_2::text = n2.node_id
-	WHERE n1.cur_user="current_user"() AND n1.fid = v_fid
-	AND n2.cur_user="current_user"() AND n2.fid = v_fid;
+	JOIN t_anl_node n1 ON a.node_1::text = n1.node_id
+	JOIN t_anl_node n2 ON a.node_2::text = n2.node_id;
 
 	SELECT jsonb_agg(features.feature) INTO v_result
 	FROM (
@@ -196,7 +194,7 @@ BEGIN
 	'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
 	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, the_geom
-	FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
+	FROM t_anl_arc) row) features;
 
 	v_result := COALESCE(v_result, '{}');
 	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowtrace arc", "features":',v_result, '}');
@@ -210,18 +208,16 @@ BEGIN
 		'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
 	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid
+	FROM  t_anl_node
 	UNION
 	SELECT v_context as context, c.expl_id, c.connec_id::text, c.state, c.connec_type, 'CONNEC' as feature_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
-	FROM anl_arc a JOIN ve_connec c ON c.arc_id::text = a.arc_id
-	WHERE cur_user="current_user"() AND fid=v_fid
-	AND c.state > 0
+	FROM t_anl_arc a JOIN ve_connec c ON c.arc_id::text = a.arc_id
+	WHERE c.state > 0
 	AND c.is_operative = TRUE
 	UNION
 	SELECT v_context as context, g.expl_id, g.gully_id::text, g.state, g.gully_type, 'GULLY' as feature_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
-	FROM anl_arc a JOIN ve_gully g ON g.arc_id::text = a.arc_id
-	WHERE cur_user="current_user"() AND fid=v_fid
-	AND g.state > 0
+	FROM t_anl_arc a JOIN ve_gully g ON g.arc_id::text = a.arc_id
+	WHERE g.state > 0
 	AND g.is_operative = TRUE) row) features;
 
 	v_result := COALESCE(v_result, '{}');
