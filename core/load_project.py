@@ -216,7 +216,7 @@ class GwLoadProject(QObject):
 
         # Get PostgreSQL versions
         postgresql_version = tools_db.get_pg_version()
-        pgrouting_version = tools_db.get_pgrouting_version()
+        pgrouting_version = str(tools_db.get_pgrouting_version()).replace('.', '')
 
         # Get version compatiblity from metadata.txt
         minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir).replace('.', '')
@@ -229,7 +229,7 @@ class GwLoadProject(QObject):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
                 tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
         if pgrouting_version is not None and minorPgrVersion is not None:
-            if int(str(pgrouting_version).replace('.', '')) < int(minorPgrVersion):
+            if int(pgrouting_version) < int(minorPgrVersion):
                 msg = "pgRouting version is not compatible with Giswater. Please check wiki"
                 tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
 
