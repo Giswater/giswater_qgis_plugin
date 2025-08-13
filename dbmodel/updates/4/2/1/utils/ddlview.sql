@@ -73,3 +73,6 @@ LEFT JOIN plan_typevalue p ON p.id::text = plan_psector.priority::text AND p.typ
 LEFT JOIN plan_typevalue s ON s.id::text = plan_psector.status::text AND s.typevalue = 'psector_status'::text
 LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
 WHERE EXISTS (SELECT 1 FROM sel_expl WHERE sel_expl.expl_id = plan_psector.expl_id);
+
+
+ALTER TABLE plan_psector DROP COLUMN archived;

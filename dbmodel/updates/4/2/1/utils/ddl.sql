@@ -8,5 +8,3 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE plan_psector DROP COLUMN archived;
-
