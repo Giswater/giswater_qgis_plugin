@@ -43,4 +43,6 @@ UPDATE config_param_system
 	SET value='{"sys_table_id":"ve_man_genelem","sys_id_field":"element_id","sys_search_field":"element_id","alias":"General element","cat_field":"elementcat_id","orderby":"5","search_type":"element"}'
 	WHERE "parameter"='basic_search_network_genelem';
 
+-- Fix function id
+UPDATE config_function SET id= 2646, function_name='gw_fct_pg2epa_main' WHERE id=2848;
 

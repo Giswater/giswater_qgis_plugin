@@ -73,7 +73,7 @@ BEGIN
 
 	-- step 1: pre-process
 	IF v_step = 1 THEN
-	
+
 		-- drop profilactic temp table of polygon
 		DROP TABLE IF EXISTS temp_anl_polygon;
 
@@ -193,7 +193,7 @@ BEGIN
 		DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
 
 		-- create return
-		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
+		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"fid":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
