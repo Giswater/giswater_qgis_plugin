@@ -71,8 +71,11 @@ class GwGo2EpaButton(GwAction):
 
         new_actions = [
             (self.menu, ('ud'), tools_qt.tr('Go2EPA'), None),
-            (self.menu, ('ud'), tools_qt.tr('Go2IBER'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"))
         ]
+
+        # Add Go2Iber action if ibergis plugin is available
+        if tools_qgis.is_plugin_active('ibergis'):
+            new_actions.append((self.menu, ('ud'), tools_qt.tr('Go2IBER'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png")))
 
         for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:

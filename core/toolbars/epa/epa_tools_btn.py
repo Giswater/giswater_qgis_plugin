@@ -71,7 +71,7 @@ class GwEpaTools(GwAction):
             (cal_menu, ('ws'), tools_qt.tr('Emitter calibration'), None),
             (cal_menu, ('ws'), tools_qt.tr('Static calibration'), None)
         ]
-        # Add Go2Iber action if ibergis plugin is available
+        # Add import IberGIS GPKG project action if ibergis plugin is available
         if tools_qgis.is_plugin_active('ibergis'):
             ibergis_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"), "IberGIS")
             new_actions.append((ibergis_menu, ('ud'), tools_qt.tr('Import IberGIS GPKG project'), None))
