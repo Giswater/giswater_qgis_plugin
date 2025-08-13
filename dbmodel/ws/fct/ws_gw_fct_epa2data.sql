@@ -173,7 +173,7 @@ BEGIN
 
 		INSERT INTO element_add (element_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id)
 		SELECT arc_id::integer, avg(flow_max)::numeric(12,2), avg(flow_min)::numeric(12,2), avg(flow_avg)::numeric(12,2), avg(vel_max)::numeric(12,2), avg(vel_min)::numeric(12,2), avg(vel_avg)::numeric(12,2), avg(tot_headloss_max)::numeric(12,2), avg(tot_headloss_min)::numeric(12,2), result_id FROM
-		(SELECT arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id FROM v_rpt_arc_stats a JOIN ve_frelem ON a.arc_id=ve_frelem.element_id::text WHERE result_id=v_result_id)a
+		(SELECT arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id FROM v_rpt_arc_stats a JOIN ve_man_frelem ON a.arc_id=ve_man_frelem.element_id::text WHERE result_id=v_result_id)a
 		GROUP by arc_id, result_id
 		ON CONFLICT (element_id) DO UPDATE SET
 		flow_max = EXCLUDED.flow_max, flow_min = EXCLUDED.flow_min, flow_avg = EXCLUDED.flow_avg,
