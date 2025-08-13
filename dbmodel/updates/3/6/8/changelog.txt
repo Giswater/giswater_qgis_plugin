@@ -1,4 +1,4 @@
-3.6.008
+3.6.8
 *************
 - Refactor of inp_options_networkmode by using only [BASIC NETWORK, NETWORK & CONNECS]
 - Add new option in Minsector Analysis to ignore broken valves
