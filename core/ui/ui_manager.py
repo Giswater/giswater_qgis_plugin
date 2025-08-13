@@ -964,6 +964,14 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
             self.action.setText(text)
 
 
+UINAME = "admin_markdown_generator"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+class GwAdminMarkdownGeneratorUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
 UINAME = "admin_update_translation"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 

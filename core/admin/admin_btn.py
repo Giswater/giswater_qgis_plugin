@@ -29,11 +29,13 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmCreateUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmCreateUi, \
+    GwAdminMarkdownGeneratorUi
 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
+from .markdown_generator import GwAdminMarkdownGenerator
 from .schema_i18n_update import GwSchemaI18NUpdate
 from .i18n_manager import GwSchemaI18NManager
 from .import_osm import GwImportOsm
@@ -968,6 +970,9 @@ class GwAdminButton:
         self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
         self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
 
+        # Markdown generator
+        self.dlg_readsql.btn_markdown_generator.clicked.connect(partial(self._markdown_generator))
+
     def _activate_audit(self, other_project):
         """ Activate audit functionality """
 
@@ -996,6 +1001,12 @@ class GwAdminButton:
         if result:
             msg = "Triggers updated successfully"
             tools_qgis.show_success(msg)
+
+    def _markdown_generator(self):
+        """ Initialize the markdown generator functionalities """
+
+        qm_gen = GwAdminMarkdownGenerator()
+        qm_gen.init_dialog()
 
     def _manage_translations(self):
         """ Initialize the translation functionalities """
