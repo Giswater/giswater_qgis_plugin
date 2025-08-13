@@ -31,6 +31,15 @@ v_parentschema text;
 v_querytext text;
 v_column_list text;
 v_update_list text;
+v_ins integer := 0;
+v_upd integer := 0;
+v_del integer := 0;
+v_tot_ins integer := 0;
+v_tot_upd integer := 0;
+v_tot_del integer := 0;
+v_cat_result json;
+v_cat_log text;
+v_catalogs_created integer := 0;
 
 
 BEGIN
@@ -77,7 +86,9 @@ BEGIN
         'USING (' || v_catfeature.column_id || ') ' ||
         		'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
 
-		execute v_querytext;
+        execute v_querytext;
+        GET DIAGNOSTICS v_ins = ROW_COUNT;
+        v_tot_ins := v_tot_ins + v_ins;
 
 	    -- update (action = 2)
 		-- get columns excluding those are not used
@@ -98,7 +109,9 @@ BEGIN
             'SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign ||
                  ');';
 
-		execute v_querytext;
+        execute v_querytext;
+        GET DIAGNOSTICS v_upd = ROW_COUNT;
+        v_tot_upd := v_tot_upd + v_upd;
 
 		-- delete (action = 3)
 		v_querytext =
@@ -109,25 +122,39 @@ BEGIN
         ' USING (' || v_catfeature.column_id || ') ' ||
         	 ' WHERE action = 3 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || '));';
 
-		execute v_querytext;
+        execute v_querytext;
+        GET DIAGNOSTICS v_del = ROW_COUNT;
+        v_tot_del := v_tot_del + v_del;
 
 	END LOOP;
 
-	        -- Check and create missing catalog entries
-        PERFORM cm.gw_fct_cm_check_catalogs(json_build_object('data', json_build_object(
+	    -- Check and create missing catalog entries
+        SELECT cm.gw_fct_cm_check_catalogs(json_build_object('data', json_build_object(
             'projectType', v_project_type,
             'version', v_version,
             'fromProduction', true,
             'campaign_id', v_campaign::text,
             'lot_id', null
-        )));
+        ))) INTO v_cat_result;
+        v_cat_log := COALESCE(v_cat_result->'body'->>'log', '');
+        IF v_cat_log IS NOT NULL THEN
+            SELECT COUNT(*) INTO v_catalogs_created FROM regexp_matches(v_cat_log, 'Created new catalog entry', 'g');
+            v_catalogs_created := COALESCE(v_catalogs_created, 0);
+        END IF;
 
 	-- managing results
   	v_result := COALESCE(v_result, '{}');
 
-  	-- Control nulls
-  	v_result_info := COALESCE(v_result_info, '{}');
-  	v_result_point := COALESCE(v_result_point, '{}');
+    -- Build info messages with operation totals and catalog summary
+    v_result_info := json_build_object(
+        'values', json_build_array(
+            json_build_object('message', format('Inserted: %s', v_tot_ins)),
+            json_build_object('message', format('Updated: %s', v_tot_upd)),
+            json_build_object('message', format('Deleted: %s', v_tot_del)),
+            json_build_object('message', format('Catalogs created: %s', COALESCE(v_catalogs_created, 0)))
+        )
+    );
+    v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

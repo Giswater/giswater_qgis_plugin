@@ -128,11 +128,11 @@ BEGIN
 	END IF;
 
 	-- get process parameters
-	v_querystring = concat('SELECT row_to_json(a) FROM (
-			 SELECT id, alias, descript, functionparams, inputparams AS fields, observ AS isnotparammsg, sys_role, function_name as functionname
-			 FROM temp_sys_function
-			 JOIN temp_config_toolbox USING (id)
-			 WHERE id = '||v_function_id||') a');
+    v_querystring = concat('SELECT row_to_json(a) FROM (
+                 SELECT id, alias, descript, functionparams, inputparams AS fields, observ AS isnotparammsg, sys_role, function_name as functionname, source
+                 FROM temp_sys_function
+                 JOIN temp_config_toolbox USING (id)
+                 WHERE id = '||v_function_id||') a');
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
