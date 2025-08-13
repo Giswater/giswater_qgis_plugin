@@ -175,8 +175,9 @@ BEGIN
 	 	join plan_psector_x_arc px using (arc_id) 
 	 	LEFT JOIN node n ON n.node_id = a.node_1
 	 	LEFT JOIN node m ON m.node_id = a.node_2 
-	 	WHERE psector_id = '||v_psector||' 
-		AND st_distance(st_startpoint(a.the_geom), st_endpoint(a.the_geom)) != st_distance(n.the_geom, m.the_geom)';
+	 	WHERE psector_id = '||v_psector||'
+		AND st_distance(st_startpoint(a.the_geom), st_endpoint(a.the_geom)) - st_distance(n.the_geom, m.the_geom) 
+		NOT BETWEEN -0.05 AND 0.05';
 
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
