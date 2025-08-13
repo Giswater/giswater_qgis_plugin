@@ -153,12 +153,10 @@ BEGIN
 
 	SELECT count(*) INTO v_count FROM audit_check_data WHERE fid = v_fid AND cur_user = current_user;
 
-	IF v_count>0 THEN
 	
-		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (v_fid, v_fid, 3, FALSE, concat(v_count, ' features have been repaired in psector_id ', v_psector) ,v_count);
-	
-	END IF;
+	-- count of total repaired features
+	INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+	VALUES (v_fid, v_fid, 3, FALSE, concat(v_count, ' features have been repaired in psector_id ', v_psector) ,v_count);
 
 	
 	v_message = '{"level": 3, "text": "Feature have been succesfully updated."}';
