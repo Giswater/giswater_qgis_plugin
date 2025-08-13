@@ -156,7 +156,7 @@ BEGIN
 	IF v_count>0 THEN
 	
 		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (v_fid, v_fid, 3, FALSE, concat('No features have been repaired in psector_id ', v_psector) ,v_count);
+		VALUES (v_fid, v_fid, 3, FALSE, concat(v_count, ' features have been repaired in psector_id ', v_psector) ,v_count);
 	
 	END IF;
 
