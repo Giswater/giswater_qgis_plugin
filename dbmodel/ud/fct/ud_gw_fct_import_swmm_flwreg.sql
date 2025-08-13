@@ -60,7 +60,6 @@ v_flwreg_id integer;
 v_flwregcat_id text;
 v_flwreg_length float;
 v_toarc integer;
-v_order_id integer;
 v_node_id integer;
 v_node1 integer;
 v_node2 integer;
@@ -153,11 +152,6 @@ BEGIN
         FROM arc
         WHERE (node_1 = v_data.node_2) OR (node_2 = v_data.node_2 AND arc_id != v_data.arc_id AND epa_type NOT IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET')); -- AND epa_type != v_data.arc_id
 
-        -- Get order_id
-        SELECT coalesce(max(order_id), 0)+1 INTO v_order_id
-        FROM man_frelem
-        WHERE node_id = v_node_id AND to_arc = v_toarc;
-
         v_flwregcat_id := CASE v_data.epa_type
             WHEN 'PUMP' THEN v_pump_catalog
             WHEN 'ORIFICE' THEN v_orifice_catalog
@@ -175,8 +169,8 @@ BEGIN
         VALUES (v_fid, 4, '    Inserted into element with element_id='||v_flwreg_id||'.');
 
         -- Insert into man table
-        INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length)
-        VALUES (v_flwreg_id, v_node_id, v_order_id, v_toarc, v_flwreg_length);
+        INSERT INTO man_frelem (element_id, node_id, to_arc, flwreg_length)
+        VALUES (v_flwreg_id, v_node_id, v_toarc, v_flwreg_length);
         INSERT INTO t_audit_check_data (fid, criticity, error_message)
         VALUES (v_fid, 4, '    Inserted into '||v_mantablename||'.');
 
