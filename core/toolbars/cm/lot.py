@@ -659,11 +659,8 @@ class AddNewLot:
             self.lot_id = result["body"]["feature"]["id"]
             self.is_new_lot = False
 
-            tools_gw.remove_selection(True, layers=self.rel_layers)
-            tools_gw.reset_rubberband(self.rubber_band)
-            tools_qgis.force_refresh_map_canvas()
+            self._cleanup_map_selection()
             if not from_change_tab:
-                tools_qgis.disconnect_signal_selection_changed()
                 self.dlg_lot.accept()
         else:
             msg = "Error saving lot."
@@ -681,19 +678,20 @@ class AddNewLot:
     def manage_rejected(self):
         """Handles the cancellation or rejection of changes by disconnecting selection signals,
         clearing any active feature selections, saving user settings, switching the tool to pan mode, and closing the current dialog."""
-        tools_qgis.disconnect_signal_selection_changed()
-        layer = self.iface.activeLayer()
-        if layer:
-            layer.removeSelection()
+        self._cleanup_map_selection()
         tools_gw.save_settings(self.dlg_lot)
         self.iface.actionPan().trigger()
         tools_gw.close_dialog(self.dlg_lot)
 
     def _on_dialog_rejected(self):
         """Handles cleanup when the dialog is rejected."""
+        self._cleanup_map_selection()
+
+    def _cleanup_map_selection(self):
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
+        tools_qgis.force_refresh_map_canvas()
 
     def _refresh_relations_table(self):
         """Callback to refresh relations using the current lot_id."""

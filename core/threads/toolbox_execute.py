@@ -32,6 +32,7 @@ class GwToolBoxTask(GwTask):
         self.function_name = None
         self.timer = timer
         self.aux_params = aux_params
+        self.schema_name = None
 
     def run(self):
 
@@ -40,6 +41,13 @@ class GwToolBoxTask(GwTask):
         feature_field = ''
 
         self.function_name = self.result.get("functionname")
+        try:
+            if self.result.get('source') == 'cm':
+                self.schema_name = 'cm'
+            else:
+                self.schema_name = None
+        except Exception:
+            pass
 
         if self.function_name is not None:
             self.toolbox.save_settings_values(self.dialog, self.function_name)
@@ -145,7 +153,7 @@ class GwToolBoxTask(GwTask):
                       f"aux_conn={self.aux_conn}", "is_thread=True")
         tools_log.log_info(msg, msg_params=msg_params)
         self.json_result = tools_gw.execute_procedure(self.function_name, self.body,
-                                                      aux_conn=self.aux_conn, is_thread=True)
+                                                      aux_conn=self.aux_conn, is_thread=True, schema_name=self.schema_name)
 
         if self.isCanceled():
             return False

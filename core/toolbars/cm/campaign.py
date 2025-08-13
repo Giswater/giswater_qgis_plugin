@@ -292,9 +292,7 @@ class Campaign:
 
     def _on_dialog_rejected(self):
         """Clean up resources when the dialog is rejected."""
-        tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.reset_rubberband(self.rubber_band)
-        tools_gw.remove_selection(True, layers=self.rel_layers)
+        self._cleanup_map_selection()
 
     def _load_campaign_relations(self, campaign_id: int):
         """
@@ -463,9 +461,7 @@ class Campaign:
             tools_qgis.show_info(msg, dialog=self.dialog)
             self.campaign_saved = True
             self.is_new_campaign = False
-            tools_gw.remove_selection(True, layers=self.rel_layers)
-            tools_gw.reset_rubberband(self.rubber_band)
-            tools_qgis.force_refresh_map_canvas()
+            self._cleanup_map_selection()
 
             # Update campaign ID in the dialog
             campaign_id = result.get("body", {}).get("campaign_id")
@@ -480,12 +476,17 @@ class Campaign:
                 self.filter_campaigns()
 
             if not from_tab_change:
-                tools_qgis.disconnect_signal_selection_changed()
                 self.dialog.accept()
 
         else:
             msg = "Failed to save campaign"
             tools_qgis.show_warning(result.get("message", msg))
+
+    def _cleanup_map_selection(self):
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.reset_rubberband(self.rubber_band)
+        tools_gw.remove_selection(True, layers=self.rel_layers)
+        tools_qgis.force_refresh_map_canvas()
 
     def _get_checkbox_value_as_string(self, dialog: QDialog, widget: QCheckBox) -> str:
         """Helper to get QCheckBox value as a lowercase string ('true'/'false')."""

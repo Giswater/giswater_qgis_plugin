@@ -3441,11 +3441,11 @@ def select_with_expression_dialog(class_object, dialog, table_object, selection_
         selection_mode = GwSelectionMode.EXPRESSION
 
     # Get the current feature type
-    class_object.feature_type = get_signal_change_tab(dialog)
+    class_object.rel_feature_type = get_signal_change_tab(dialog)
     # Connect the signal selection changed
     connect_signal_selection_changed(class_object, dialog, table_object, selection_mode)
     # Show the expression dialog
-    show_expression_dialog(class_object.feature_type, dialog, table_object)
+    show_expression_dialog(class_object.rel_feature_type, dialog, table_object)
     # Disconnect the signal selection changed
     tools_qgis.disconnect_signal_selection_changed()
 
@@ -3457,7 +3457,7 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
     activation_function()
 
     # Show dialog
-    if show_expression_dialog(class_object.feature_type, dialog, table_object) in (QDialog.Accepted, QDialog.Rejected):
+    if show_expression_dialog(class_object.rel_feature_type, dialog, table_object) in (QDialog.Accepted, QDialog.Rejected):
         # Execute deactivation function
         deactivation_function()
 
@@ -4434,7 +4434,7 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
                 else:
                     state = model.item(selected_list[0].row(), col_index).text()
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
-        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id, class_object.rel_layers)
+        load_tableview_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, class_object.rel_layers)
 
     elif selection_mode == GwSelectionMode.LOT:
         state = None
@@ -4456,7 +4456,7 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
                 else:
                     state = model.item(selected_list[0].row(), col_index).text()
         _delete_feature_lot(dialog, feature_type, list_id, class_object.lot_id, state)
-        load_tableview_lot(dialog, class_object.feature_type, class_object.lot_id, class_object.rel_layers)
+        load_tableview_lot(dialog, class_object.rel_feature_type, class_object.lot_id, class_object.rel_layers)
     elif selection_mode == GwSelectionMode.FEATURE_END:
         load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type,
                                    expr_filter=expr_filter)

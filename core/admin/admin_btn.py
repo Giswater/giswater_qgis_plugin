@@ -2053,7 +2053,7 @@ class GwAdminButton:
             self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
             self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
             self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
-
+    
     def on_btn_create_parent_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         msg = "You are about to perform this action aiming to the following schema: {0}\n\nAre you sure you want to continue?"
@@ -2068,6 +2068,7 @@ class GwAdminButton:
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         self._run_create_cm_task(['load_parent_schema'], 'Link to parent schema')
         self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
+        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(True)
 
     def on_btn_create_example_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
