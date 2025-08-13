@@ -7,12 +7,12 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2318
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_pump_additional(result_id_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_flwreg2arc(result_id_var text)
   RETURNS integer AS
 $BODY$
 
 /*
-select SCHEMA_NAME.gw_fct_pg2epa_pump_additional('test1')
+select SCHEMA_NAME.gw_fct_pg2epa_flwreg2arc('test1')
 */
 
 DECLARE

@@ -193,8 +193,8 @@ BEGIN
 		RAISE NOTICE '4.3 - Call gw_fct_pg2epa_doublenod2arc';
 		PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
 
-		RAISE NOTICE '4.4 - Call gw_fct_pg2epa_pump_additional function';
-		PERFORM gw_fct_pg2epa_pump_additional(v_result);
+		RAISE NOTICE '4.4 - Call gw_fct_pg2epa_flwreg2arc function';
+		PERFORM gw_fct_pg2epa_flwreg2arc(v_result);
 
 		RAISE NOTICE '4.5 - manage varcs';
 		PERFORM gw_fct_pg2epa_manage_varc(v_result);
