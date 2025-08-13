@@ -90,7 +90,7 @@ BEGIN
 	
 		-- archived is false by default
 		INSERT INTO plan_psector (psector_id, name, psector_type, descript, priority, text1, text2, observ, rotation, scale,
-		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, archived, ext_code, status, text3, text4, text5, text6, num_value, workcat_id, workcat_id_plan, parent_id)
+		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, ext_code, status, text3, text4, text5, text6, num_value, workcat_id, workcat_id_plan, parent_id)
 		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation,
 		NEW.scale, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active, false,
 		NEW.ext_code, NEW.status, NEW.text3, NEW.text4, NEW.text5, NEW.text6, NEW.num_value, NEW.workcat_id, NEW.workcat_id_plan, NEW.parent_id);
@@ -102,12 +102,12 @@ BEGIN
 		UPDATE plan_psector
 		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1,
 		text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, atlas_id=NEW.atlas_id,
-		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, archived=NEW.archived, ext_code=NEW.ext_code, status=NEW.status,
+		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, ext_code=NEW.ext_code, status=NEW.status,
 		text3=NEW.text3, text4=NEW.text4, text5=NEW.text5, text6=NEW.text6, num_value=NEW.num_value, workcat_id=new.workcat_id, workcat_id_plan=new.workcat_id_plan, parent_id=new.parent_id, updated_at=now(), updated_by=current_user
 		WHERE psector_id=OLD.psector_id;
 
 		-- update psector status to EXECUTED (On Service)
-		IF (OLD.status != NEW.status) AND (NEW.status = 4) THEN
+		IF (OLD.status != NEW.status) AND (NEW.status = 5) THEN
 
 			-- get workcat id
 			IF NEW.workcat_id IS NULL THEN
@@ -418,21 +418,21 @@ BEGIN
 			END IF;
 
 			-- reset psector geometry and set inactive
-			UPDATE plan_psector SET the_geom=v_psector_geom, active=false, archived=true WHERE psector_id=NEW.psector_id;
+			UPDATE plan_psector SET the_geom=v_psector_geom, active=false WHERE psector_id=NEW.psector_id;
 
 			--reset topology control
 			UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
 
 		-- update psector status to EXECUTED (Traceability) or CANCELED (Traceability)
-		ELSIF (OLD.status != NEW.status) AND (NEW.status = 0 OR NEW.status = 3) THEN
+		ELSIF (OLD.status != NEW.status) AND (NEW.status = 6 OR NEW.status = 7) THEN
 
 			-- get psector geometry
 			v_psector_geom = (SELECT the_geom FROM plan_psector WHERE psector_id=NEW.psector_id);
 
 			--set v_action when status Executed or Canceled
-			IF NEW.status = 0 THEN
+			IF NEW.status = 6 THEN
 				v_action='Execute psector';
-			ELSIF NEW.status = 3 THEN
+			ELSIF NEW.status = 7 THEN
 				v_action='Cancel psector';
 			END IF;
 
@@ -637,7 +637,7 @@ BEGIN
 			END LOOP;
 
 			-- reset psector geometry and set inactive
-			UPDATE plan_psector SET the_geom=v_psector_geom, active=false, archived=true WHERE psector_id=NEW.psector_id;
+			UPDATE plan_psector SET the_geom=v_psector_geom, active=false WHERE psector_id=NEW.psector_id;
 
 			-- reset plan_psector_force_delete
 			UPDATE config_param_user SET value=v_plan_psector_force_delete WHERE parameter='plan_psector_force_delete' AND cur_user=current_user;
