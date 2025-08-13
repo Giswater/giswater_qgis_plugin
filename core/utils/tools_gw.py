@@ -3465,7 +3465,7 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
 
-    if selection_mode in (GwSelectionMode.EXPRESSION, GwSelectionMode.EXPRESSION_CAMPAIGN, GwSelectionMode.EXPRESSION_LOT):
+    if selection_mode != GwSelectionMode.EXPRESSION:
         tools_qgis.disconnect_signal_selection_changed()
 
     field_id = f"{class_object.rel_feature_type}_id"
