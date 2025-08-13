@@ -74,7 +74,7 @@ class GwEpaTools(GwAction):
         # Add import IberGIS GPKG project action if ibergis plugin is available
         if tools_qgis.is_plugin_active('ibergis'):
             ibergis_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"), "IberGIS")
-            new_actions.append((ibergis_menu, ('ud'), tools_qt.tr('Import IberGIS GPKG project'), None))
+            new_actions.append((ibergis_menu, ('ud'), tools_qt.tr('Load IberGIS GPKG project'), None))
 
         for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:

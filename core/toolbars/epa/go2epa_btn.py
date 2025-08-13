@@ -40,7 +40,7 @@ class GwGo2EpaButton(GwAction):
         self.epa_options_list = []
         self.iface = global_vars.iface
 
-        if self.project_type == 'ud':
+        if self.project_type == 'ud' and tools_qgis.is_plugin_active('ibergis'):
             # Create a menu and add all the actions
             self.menu = QMenu()
             self.menu.setObjectName("GW_epa_tools")
@@ -51,7 +51,7 @@ class GwGo2EpaButton(GwAction):
                 toolbar.addAction(self.action)
 
     def clicked_event(self):
-        if self.project_type == 'ud':
+        if self.project_type == 'ud' and tools_qgis.is_plugin_active('ibergis'):
             button = self.action.associatedWidgets()[1]
             menu_point = button.mapToGlobal(QPoint(0, button.height()))
             self.menu.exec(menu_point)
@@ -175,7 +175,7 @@ class GwGo2EpaButton(GwAction):
             :param index: tab index (passed by signal)
         """
         # Set network mode to 1
-        if self.project_type == 'ud':
+        if self.project_type == 'ud' and tools_qgis.is_plugin_active('ibergis'):
             form = '"formName":"epaoptions"'
             my_json = '[{"widget": "inp_options_networkmode", "value": "1"}]'
             extras = f'"fields":{my_json}'
