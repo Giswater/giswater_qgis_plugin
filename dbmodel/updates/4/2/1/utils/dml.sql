@@ -35,3 +35,12 @@ UPDATE sys_table SET id = 'archived_psector_gully' WHERE id = 'archived_psector_
 UPDATE sys_table SET id = 'archived_psector_link' WHERE id = 'archived_psector_link_traceability';
 
 
+-- Solve issue with search
+UPDATE config_param_system
+	SET value='{"sys_table_id":"ve_man_frelem","sys_id_field":"element_id","sys_search_field":"element_id","alias":"Flow regulator element","cat_field":"elementcat_id","orderby":"5","search_type":"element"}'
+	WHERE "parameter"='basic_search_network_frelem';
+UPDATE config_param_system
+	SET value='{"sys_table_id":"ve_man_genelem","sys_id_field":"element_id","sys_search_field":"element_id","alias":"General element","cat_field":"elementcat_id","orderby":"5","search_type":"element"}'
+	WHERE "parameter"='basic_search_network_genelem';
+
+
