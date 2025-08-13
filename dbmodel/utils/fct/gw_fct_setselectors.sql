@@ -707,17 +707,18 @@ BEGIN
 		(SELECT psector_id FROM selector_psector WHERE cur_user=current_user)) b) a;		
 
 	ELSIF v_tabname IN ('tab_exploitation') THEN
+
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM ve_arc where expl_id IN
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc where expl_id IN
 		(SELECT expl_id FROM selector_expl WHERE cur_user=current_user)) b) a;
 
 	ELSIF v_tabname='tab_municipality' THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM ve_arc where muni_id IN
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc where muni_id IN
 		(SELECT muni_id FROM selector_municipality WHERE cur_user=current_user)) b) a;
 
 	END IF;
@@ -777,8 +778,6 @@ BEGIN
 		END IF;
 
 	END IF;
-
-
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);

@@ -46,3 +46,6 @@ UPDATE config_param_system
 -- Fix function id
 UPDATE config_function SET id= 2646, function_name='gw_fct_pg2epa_main' WHERE id=2848;
 
+UPDATE config_toolbox SET inputparams = replace(inputparams::text , 'FROM exploitation WHERE active IS NOT FALSE', 'FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0')::json
+WHERE id =2768;
+
