@@ -160,7 +160,7 @@ INSERT INTO config_param_user VALUES ('qgis_form_docker', 'TRUE', current_user);
 INSERT INTO config_param_user VALUES ('edit_elementcat_vdefault', NULL, current_user);
 INSERT INTO config_param_user VALUES ('om_visit_status_vdefault', '4', current_user);
 INSERT INTO config_param_user VALUES ('edit_plan_order_control', 'true', current_user);
-INSERT INTO config_param_user VALUES ('utils_workspace_vdefault', NULL, current_user);
+INSERT INTO config_param_user VALUES ('utils_workspace_current', NULL, current_user);
 
 
 INSERT INTO exploitation (expl_id, code, "name", descript, macroexpl_id, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
