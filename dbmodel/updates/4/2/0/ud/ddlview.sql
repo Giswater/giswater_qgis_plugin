@@ -602,6 +602,7 @@ AS WITH typevalue AS (
             node.enddate,
             node.ownercat_id,
             node.conserv_state,
+            node.om_state,
             node.access_type,
             node.placement_type,
             node.brand_id,
@@ -738,6 +739,7 @@ AS WITH typevalue AS (
             node_selected.enddate,
             node_selected.ownercat_id,
             node_selected.conserv_state,
+            node_selected.om_state,
             node_selected.access_type,
             node_selected.placement_type,
             node_selected.brand_id,
@@ -853,6 +855,7 @@ AS WITH typevalue AS (
     enddate,
     ownercat_id,
     conserv_state,
+    om_state,
     access_type,
     placement_type,
     brand_id,
@@ -1090,6 +1093,7 @@ AS WITH typevalue AS (
             connec.builtdate,
             connec.enddate,
             connec.ownercat_id,
+            connec.om_state,
                 CASE
                     WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
                     ELSE link_planned.exit_id
@@ -1214,6 +1218,7 @@ AS WITH typevalue AS (
     builtdate,
     enddate,
     ownercat_id,
+    om_state,
     pjoint_id,
     pjoint_type,
     access_type,
@@ -1848,6 +1853,7 @@ AS WITH typevalue AS (
             gully.builtdate,
             gully.enddate,
             gully.ownercat_id,
+            gully.om_state,
                 CASE
                     WHEN link_planned.exit_id IS NULL THEN gully.pjoint_id
                     ELSE link_planned.exit_id
@@ -1982,6 +1988,7 @@ AS WITH typevalue AS (
     builtdate,
     enddate,
     ownercat_id,
+    om_state,
     pjoint_id,
     pjoint_type,
     placement_type,
@@ -5474,6 +5481,7 @@ AS WITH typevalue AS (
             node.enddate,
             node.ownercat_id,
             node.conserv_state,
+            node.om_state,
             node.access_type,
             node.placement_type,
             node.brand_id,
@@ -5610,6 +5618,7 @@ AS WITH typevalue AS (
             node_selected.enddate,
             node_selected.ownercat_id,
             node_selected.conserv_state,
+            node_selected.om_state,
             node_selected.access_type,
             node_selected.placement_type,
             node_selected.brand_id,
@@ -5725,6 +5734,7 @@ AS WITH typevalue AS (
     enddate,
     ownercat_id,
     conserv_state,
+    om_state,
     access_type,
     placement_type,
     brand_id,
@@ -5962,6 +5972,7 @@ AS WITH typevalue AS (
             connec.builtdate,
             connec.enddate,
             connec.ownercat_id,
+            connec.om_state,
                 CASE
                     WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
                     ELSE link_planned.exit_id
@@ -6086,6 +6097,7 @@ AS WITH typevalue AS (
     builtdate,
     enddate,
     ownercat_id,
+    om_state,
     pjoint_id,
     pjoint_type,
     access_type,
@@ -6720,6 +6732,7 @@ AS WITH typevalue AS (
             gully.builtdate,
             gully.enddate,
             gully.ownercat_id,
+            gully.om_state,
                 CASE
                     WHEN link_planned.exit_id IS NULL THEN gully.pjoint_id
                     ELSE link_planned.exit_id
@@ -6854,6 +6867,7 @@ AS WITH typevalue AS (
     builtdate,
     enddate,
     ownercat_id,
+    om_state,
     pjoint_id,
     pjoint_type,
     placement_type,
@@ -7422,6 +7436,7 @@ AS WITH typevalue AS (
             node.enddate,
             node.ownercat_id,
             node.conserv_state,
+            node.om_state,
             node.access_type,
             node.placement_type,
             node.brand_id,
@@ -7558,6 +7573,7 @@ AS WITH typevalue AS (
             node_selected.enddate,
             node_selected.ownercat_id,
             node_selected.conserv_state,
+            node_selected.om_state,
             node_selected.access_type,
             node_selected.placement_type,
             node_selected.brand_id,
@@ -7673,6 +7689,7 @@ AS WITH typevalue AS (
     enddate,
     ownercat_id,
     conserv_state,
+    om_state,
     access_type,
     placement_type,
     brand_id,
@@ -7910,6 +7927,7 @@ AS WITH typevalue AS (
             connec.builtdate,
             connec.enddate,
             connec.ownercat_id,
+            connec.om_state,
                 CASE
                     WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
                     ELSE link_planned.exit_id
@@ -8034,6 +8052,7 @@ AS WITH typevalue AS (
     builtdate,
     enddate,
     ownercat_id,
+    om_state,
     pjoint_id,
     pjoint_type,
     access_type,
@@ -8525,6 +8544,7 @@ AS WITH typevalue AS (
             gully.builtdate,
             gully.enddate,
             gully.ownercat_id,
+            gully.om_state,
                 CASE
                     WHEN link_planned.exit_id IS NULL THEN gully.pjoint_id
                     ELSE link_planned.exit_id
@@ -8659,6 +8679,7 @@ AS WITH typevalue AS (
     builtdate,
     enddate,
     ownercat_id,
+    om_state,
     pjoint_id,
     pjoint_type,
     placement_type,

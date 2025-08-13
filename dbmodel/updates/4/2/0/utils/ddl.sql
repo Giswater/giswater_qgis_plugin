@@ -15,8 +15,8 @@ ALTER TABLE plan_psector ADD COLUMN workcat_id_plan text;
 ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_workcat_id_plan_fkey FOREIGN KEY (workcat_id_plan) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 CREATE INDEX idx_plan_psector_workcat_id_plan ON plan_psector(workcat_id_plan);
 
-DROP RULE insert_plan_psector_x_node ON node;
-DROP RULE insert_plan_psector_x_arc ON arc;
+DROP RULE IF EXISTS insert_plan_psector_x_node ON node;
+DROP RULE IF EXISTS insert_plan_psector_x_arc ON arc;
 
 ALTER TABLE archived_psector_connec_traceability RENAME COLUMN tstamp TO created_at;
 ALTER TABLE archived_psector_connec_traceability RENAME COLUMN insert_user TO created_by;
