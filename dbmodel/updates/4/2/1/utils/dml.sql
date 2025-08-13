@@ -49,3 +49,10 @@ UPDATE config_function SET id= 2646, function_name='gw_fct_pg2epa_main' WHERE id
 UPDATE config_toolbox SET inputparams = replace(inputparams::text , 'FROM exploitation WHERE active IS NOT FALSE', 'FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0')::json
 WHERE id =2768;
 
+INSERT INTO sys_table (id,descript,sys_role,project_template,context,orderby,alias,notify_action,isaudit,keepauditdays,"source",addparam) values
+('v_value_domain','Dominios de valor','role_edit','{"template": [1], "visibility": true, "levels_to_read": 2}','{"levels": ["BASEMAP", "ADDRESS"]}',5,'Domain value',NULL,NULL,NULL,'core',NULL);
+
+UPDATE config_form_fields SET 
+widgetcontrols ='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_value_domain", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": 
+"typevalue = ''graphdelimiter_type''", "allowMulti": true, "nofColumns": 2}}' 
+where columnname = 'graph_delimiter' and formname = 've_cat_feature_node';

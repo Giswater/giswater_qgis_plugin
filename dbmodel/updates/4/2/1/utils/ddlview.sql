@@ -76,3 +76,7 @@ WHERE EXISTS (SELECT 1 FROM sel_expl WHERE sel_expl.expl_id = plan_psector.expl_
 
 
 ALTER TABLE plan_psector DROP COLUMN archived;
+
+create or replace view v_value_domain as select row_number() over (order by id) as rid, typevalue, id, idval 
+from edit_typevalue et where typevalue = 'graphdelimiter_type'
+
