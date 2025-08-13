@@ -229,7 +229,7 @@ class GwLoadProject(QObject):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
                 tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
         if pgrouting_version is not None and minorPgrVersion is not None:
-            if int(pgrouting_version) < int(minorPgrVersion):
+            if int(str(pgrouting_version).replace('.', '')) < int(minorPgrVersion):
                 msg = "pgRouting version is not compatible with Giswater. Please check wiki"
                 tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
 
