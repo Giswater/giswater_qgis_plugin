@@ -34,7 +34,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
-    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle
+    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsMapLayer
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -849,6 +849,46 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     if create_project is False:
         global_vars.iface.mapCanvas().refresh()
+
+
+def hide_layer_from_toc(layer):
+    """Hide layer from the QGIS layer tree view.
+    
+    Args:
+        layer: Layer to hide
+    """
+    if layer is None:
+        return
+        
+    root = QgsProject.instance().layerTreeRoot()
+    if root is None:
+        return
+        
+    ltv = global_vars.iface.layerTreeView()
+    if ltv is None:
+        return
+         
+    tools_qgis.hide_node_from_treeview(root.findLayer(layer.id()), root, ltv)
+
+def hide_group_from_toc(group):
+    """Hide group from the QGIS layer tree view.
+    
+    Args:
+        group: Group to hide. Can be QgsMapLayer objects or .
+    """
+    if group is None:
+        return
+        
+    root = QgsProject.instance().layerTreeRoot()
+    if root is None:
+        return
+        
+    ltv = global_vars.iface.layerTreeView()
+    if ltv is None:
+        return
+
+    tools_qgis.hide_node_from_treeview(root.findGroup(group), root, ltv)
+
 
 
 def validate_qml(qml_content):
