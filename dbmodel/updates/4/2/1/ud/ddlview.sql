@@ -22,3 +22,90 @@ AS SELECT s.dscenario_id,
     FROM selector_inp_dscenario s, inp_dscenario_frpump f
     JOIN ve_inp_frpump n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+
+CREATE OR REPLACE VIEW v_ui_arc_x_relations
+AS WITH links_node AS (
+         SELECT n.node_id,
+            l.feature_id,
+            l.exit_type AS proceed_from,
+            l.exit_id AS proceed_from_id,
+            l.state AS l_state,
+            n.state AS n_state
+           FROM node n
+             JOIN link l ON n.node_id = l.exit_id
+          WHERE l.state = 1
+        )
+ SELECT row_number() OVER () + 1000000 AS rid,
+    ve_connec.arc_id,
+    ve_connec.connec_type AS featurecat_id,
+    ve_connec.conneccat_id AS catalog,
+    ve_connec.connec_id AS feature_id,
+    ve_connec.code AS feature_code,
+    ve_connec.sys_type,
+    a.state AS arc_state,
+    ve_connec.state AS feature_state,
+    st_x(ve_connec.the_geom) AS x,
+    st_y(ve_connec.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    've_connec'::text AS sys_table_id
+   FROM ve_connec
+     JOIN link l ON ve_connec.connec_id = l.feature_id
+     JOIN arc a ON a.arc_id = ve_connec.arc_id
+  WHERE ve_connec.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND l.state = 1 AND a.state = 1
+UNION
+ SELECT DISTINCT ON (c.connec_id) row_number() OVER () + 2000000 AS rid,
+    a.arc_id,
+    c.connec_type AS featurecat_id,
+    c.conneccat_id AS catalog,
+    c.connec_id AS feature_id,
+    c.code AS feature_code,
+    c.sys_type,
+    a.state AS arc_state,
+    c.state AS feature_state,
+    st_x(c.the_geom) AS x,
+    st_y(c.the_geom) AS y,
+    n.proceed_from,
+    n.proceed_from_id,
+    've_connec'::text AS sys_table_id
+   FROM arc a
+     JOIN links_node n ON a.node_1 = n.node_id
+     JOIN ve_connec c ON c.connec_id = n.feature_id
+UNION
+ SELECT row_number() OVER () + 3000000 AS rid,
+    ve_gully.arc_id,
+    ve_gully.gully_type AS featurecat_id,
+    ve_gully.gullycat_id AS catalog,
+    ve_gully.gully_id AS feature_id,
+    ve_gully.code AS feature_code,
+    ve_gully.sys_type,
+    a.state AS arc_state,
+    ve_gully.state AS feature_state,
+    st_x(ve_gully.the_geom) AS x,
+    st_y(ve_gully.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    've_gully'::text AS sys_table_id
+   FROM ve_gully
+     JOIN link l ON ve_gully.gully_id = l.feature_id
+     JOIN arc a ON a.arc_id = ve_gully.arc_id
+  WHERE ve_gully.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND a.state = 1
+UNION
+ SELECT DISTINCT ON (g.gully_id) row_number() OVER () + 4000000 AS rid,
+    a.arc_id,
+    g.gully_type AS featurecat_id,
+    g.gullycat_id AS catalog,
+    g.gully_id AS feature_id,
+    g.code AS feature_code,
+    g.sys_type,
+    a.state AS arc_state,
+    g.state AS feature_state,
+    st_x(g.the_geom) AS x,
+    st_y(g.the_geom) AS y,
+    n.proceed_from,
+    n.proceed_from_id,
+    've_gully'::text AS sys_table_id
+   FROM arc a
+     JOIN links_node n ON a.node_1 = n.node_id
+     JOIN ve_gully g ON g.gully_id = n.feature_id;
