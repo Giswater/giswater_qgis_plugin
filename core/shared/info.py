@@ -1763,10 +1763,6 @@ class GwInfo(QObject):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        # Set image
-        img = json_result['body']['data']['shapepng']
-        tools_qt.add_image(dlg_sections, 'lbl_section_image', f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
-
         # Set values into QLineEdits
         for field in json_result['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['columnname'])
@@ -1775,7 +1771,12 @@ class GwInfo(QObject):
                     tools_qt.set_widget_text(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_sections))
+        
+        # Open the dialog first
         tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect')
+        
+        img = json_result['body']['data']['shapepng']
+        tools_qt.add_image(dlg_sections, 'lbl_section_image', f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
 
     def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
         """
