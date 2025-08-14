@@ -60,7 +60,7 @@ class GwEpaTools(GwAction):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        anl_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}42.png"), tools_qt.tr("Analytics"))
+        anl_menu = self.menu.addMenu(tools_qt.tr("Analytics"))
         cal_menu = self.menu.addMenu(tools_qt.tr("Calibration"))
 
         new_actions = [
