@@ -677,12 +677,14 @@ class GwI18NGenerator:
     # endregion
     # region Generate from Json
 
-    def _write_dbjson_values(self, rows, path):
+    def _write_dbjson_values(self, rows, path, file_type):
         closing = False
         values_by_context = {}
 
         updates = {}
         for row in rows:
+            if row['project_type'] not in self.path_dic[file_type]["project_type"]:
+                continue
             # Set key depending on context
             if row["context"] == "config_form_fields":
                 closing = True
