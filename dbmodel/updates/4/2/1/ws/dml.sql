@@ -357,3 +357,6 @@ BEGIN
     }'::json,'tbl_element_x_node',false);
       END LOOP;
 END $$;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4342, 'Node not valid because it has more than 2 arcs', 'Select a valid node', 1, true, 'utils', 'core', 'UI');

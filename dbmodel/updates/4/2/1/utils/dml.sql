@@ -58,6 +58,3 @@ UPDATE config_form_fields SET
 widgetcontrols ='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_value_domain", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": 
 "typevalue = ''graphdelimiter_type''", "allowMulti": true, "nofColumns": 2}}' 
 where columnname = 'graph_delimiter' and formname = 've_cat_feature_node';
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4342, 'Node not valid because it has more than 2 arcs', 'Select a valid node', 1, true, 'utils', 'core', 'UI');

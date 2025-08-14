@@ -517,11 +517,12 @@ BEGIN
 				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3694", "function":"2560","parameters":null, "is_process":true}}$$);
 			END IF;
-
-			SELECT count(arc_id) INTO v_arc_count FROM ve_arc WHERE node_1 = v_node_id OR node_2 = v_node_id;
-			IF v_arc_count > 2 THEN
-				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"4342", "function":"2560","parameters":null, "is_process":true}}$$);
+			IF v_project_type = 'WS' THEN
+				SELECT count(arc_id) INTO v_arc_count FROM ve_arc WHERE node_1 = v_node_id OR node_2 = v_node_id;
+				IF v_arc_count > 2 THEN
+					SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"4342", "function":"2560","parameters":null, "is_process":true}}$$);
+				END IF;
 			END IF;
 							
 			-- get to_arc
