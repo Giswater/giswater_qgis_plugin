@@ -320,6 +320,10 @@ BEGIN
   -- Specific cm tables: campaign, lot, selectors, catalogs (exclude cat_role), x_*, lot_x_*
   tbls := 'cm.om_campaign, cm.om_campaign_lot, cm.selector_campaign, cm.selector_lot, cm.cat_team, cm.cat_user, cm.cat_organization' || tbls;
   EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON %s TO %s', tbls, role_csv);
+
+  -- Configure audit schema visibility (INSERT allowed to all mapped roles, SELECT restricted via per-role MVs)
+  PERFORM cm.apply_cm_audit_rls(role_org_map);
+
   v_return := json_build_object('status','ok','roles',role_org_map,'features',p_features);
   RETURN v_return;
 
