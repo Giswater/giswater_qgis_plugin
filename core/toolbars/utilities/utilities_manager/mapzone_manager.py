@@ -85,6 +85,9 @@ class GwMapzoneManager:
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
             self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
 
+        # Restore last active tab for this project type
+        self._restore_last_tab()
+
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
         self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis, self.mapzone_mng_dlg))
@@ -99,6 +102,7 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
         self.mapzone_mng_dlg.finished.connect(partial(self._on_dialog_closed))
+        self.mapzone_mng_dlg.finished.connect(partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, 'mapzone_manager'))
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
 
         self._manage_current_changed()
@@ -1463,3 +1467,21 @@ class GwMapzoneManager:
 
         msg = "Error"
         tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)
+
+    def _restore_last_tab(self):
+        """Restores the last active tab for the current project type."""
+        try:
+            # Get the last active tab from configuration using existing tools_gw functions
+            dlg_name = self.mapzone_mng_dlg.objectName()
+            last_active_tab_name = tools_gw.get_config_parser('dialogs_tab', f"{dlg_name}_mapzone_manager", 'user', 'session')
+            
+            if last_active_tab_name:
+                # Find the tab index by name
+                for i in range(self.mapzone_mng_dlg.main_tab.count()):
+                    if self.mapzone_mng_dlg.main_tab.widget(i).objectName() == last_active_tab_name:
+                        self.mapzone_mng_dlg.main_tab.setCurrentIndex(i)
+                        # Refresh table data after restoring tab
+                        self._manage_current_changed()
+                        break
+        except Exception:
+            pass
