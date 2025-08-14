@@ -83,7 +83,7 @@ class GwI18NGenerator:
         """ Populate combo with languages values """
 
         self.dlg_qm.btn_translate.setEnabled(True)
-        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host) 
+        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         msg = 'Connected to {0}'
         msg_params = (host,)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
@@ -120,7 +120,7 @@ class GwI18NGenerator:
         # Create the translation files and see which where successful, which failed and which were canceled
         for self.language in self.languages:
             self.lower_lang = self.language.lower()
-            if self.language != 'no_TR':        
+            if self.language != 'no_TR':
                 if py_msg:
                     status_py_msg = self._create_py_files()
                     if status_py_msg is True:
@@ -154,7 +154,7 @@ class GwI18NGenerator:
                 msg += f'''{tools_qt.tr('Python translation canceled:')} {", ".join(canceled_langs['python'])}\n'''
             if translated_langs['python']:
                 msg += f'''{tools_qt.tr('Python translation successful:')} {", ".join(translated_langs['python'])}\n'''
-        
+
         if type_db_file_translated:
             for type_db_file in type_db_file_translated:
                 msg += f'''{tools_qt.tr('Schemas translated:')} {type_db_file}\n'''
@@ -326,7 +326,7 @@ class GwI18NGenerator:
         lrelease_path = f"{self.plugin_dir}{os.sep}resources{os.sep}i18n{os.sep}lrelease.exe"
         try:
             tools_log.log_info(f"Running lrelease: {lrelease_path} {ts_path}")
-            
+
             # Use subprocess.run to capture output and errors
             process = subprocess.run(
                 [lrelease_path, ts_path],
@@ -397,7 +397,7 @@ class GwI18NGenerator:
         if self.language == 'no_TR':
             if file_type not in ['i18n_ws', 'i18n_ud']:
                 return True, f"{file_type}, not translated"
-            dbtables = ['dbconfig_form_fields', 'dbconfig_param_system', 'dbconfig_typevalue', 
+            dbtables = ['dbconfig_form_fields', 'dbconfig_param_system', 'dbconfig_typevalue',
                               'dbconfig_form_tableview', 'dbconfig_form_fields_feat']
             self.lower_lang = 'en_us'
         for dbtable in dbtables:
@@ -406,7 +406,7 @@ class GwI18NGenerator:
                 return False, f"No rows found in: {dbtable}"
             else:
                 if "json" in dbtable:
-                    text_error += self._write_dbjson_values(dbtable_rows, cfg_path + file_name)
+                    text_error += self._write_dbjson_values(dbtable_rows, cfg_path + file_name, file_type)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name, file_type)
         if text_error != "":
@@ -872,11 +872,11 @@ class GwI18NGenerator:
             status = False
 
         return status
-    
+
     def safe_parse(self, source, text):
         try:
             # Try JSON first (safer if it's valid JSON)
-            modified = text.replace("'", "\"").replace("False", "false").replace("True", "true").replace("None", "null")
+            modified = text.replace("''", '\\"').replace("'", "\"").replace("False", "false").replace("True", "true").replace("None", "null")
             return json.loads(modified)
         except json.JSONDecodeError as e:
             e1 = e
