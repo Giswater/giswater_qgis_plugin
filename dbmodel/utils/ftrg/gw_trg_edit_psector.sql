@@ -56,45 +56,45 @@ BEGIN
 		IF (NEW.scale IS NULL) THEN
 			NEW.scale := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_scale_vdefault' AND "cur_user"="current_user"())::numeric (8,2);
 		END IF;
-	
+
 		-- Rotation_vdefault
 		IF (NEW.rotation IS NULL) THEN
 			NEW.rotation := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_rotation_vdefault' AND "cur_user"="current_user"())::numeric (8,4);
 		END IF;
-	
+
 		-- Gexpenses_vdefault
 		IF (NEW.gexpenses IS NULL) THEN
 			NEW.gexpenses := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_gexpenses_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
 		END IF;
-	
+
 		-- Vat_vdefault
 		IF (NEW.vat IS NULL) THEN
 			NEW.vat := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_vat_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
 		END IF;
-	
+
 		-- Other_vdefault
 		IF (NEW.other IS NULL) THEN
 			NEW.other := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_other_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
 		END IF;
-	
+
 		-- Type_vdefault
 		IF (NEW.psector_type IS NULL) THEN
 			NEW.psector_type := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_type_vdefault' AND "cur_user"="current_user"())::integer;
 		END IF;
-	
+
 		IF NEW.workcat_id NOT IN (SELECT id FROM cat_work) THEN
 			NEW.workcat_id = NULL;
 		END IF;
-	
+
 		NEW.psector_id:= (SELECT nextval('plan_psector_id_seq'));
-	
+
 		-- archived is false by default
 		INSERT INTO plan_psector (psector_id, name, psector_type, descript, priority, text1, text2, observ, rotation, scale,
 		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, ext_code, status, text3, text4, text5, text6, num_value, workcat_id, workcat_id_plan, parent_id)
 		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation,
-		NEW.scale, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active, false,
+		NEW.scale, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active,
 		NEW.ext_code, NEW.status, NEW.text3, NEW.text4, NEW.text5, NEW.text6, NEW.num_value, NEW.workcat_id, NEW.workcat_id_plan, NEW.parent_id);
-	
+
 	    RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -115,7 +115,7 @@ BEGIN
 
 				IF NEW.workcat_id IS NULL THEN
 					RAISE EXCEPTION 'YOU NEED TO SET SOME WORKCATID TO EXECUTE PSECTOR';
-				END IF; 
+				END IF;
 			END IF;
 
 
@@ -321,37 +321,37 @@ BEGIN
 
 				FOR rec IN EXECUTE v_sql LOOP
 
-					IF lower(rec_type.id) = 'arc' THEN 
+					IF lower(rec_type.id) = 'arc' THEN
 
 						-- capture if arc is child in order to add their parents' relations
 						SELECT ((addparam::json) ->> 'arcDivide') INTO v_ischild FROM plan_psector_x_arc WHERE arc_id=rec.id AND psector_id=OLD.psector_id;
-	
+
 						IF v_ischild='child' THEN
 							-- get its parent_id
 							SELECT arc_id::integer INTO v_parent_id FROM audit_arc_traceability WHERE (arc_id1=rec.id) or (arc_id2=rec.id);
-	
+
 							--insert related documents to child arc
 							INSERT INTO doc_x_arc(doc_id, arc_id)
 							SELECT doc_id, rec.id FROM (SELECT doc_id FROM doc_x_arc WHERE arc_id::integer=v_parent_id)a;
-	
+
 							--insert related elements to child arc
 							INSERT INTO element_x_arc(element_id, arc_id)
 							SELECT element_id, rec.id FROM (SELECT element_id FROM element_x_arc WHERE arc_id::integer=v_parent_id)a;
-	
+
 							--insert related visits to child arc
 							INSERT INTO om_visit_x_arc(visit_id, arc_id)
 							SELECT visit_id, rec.id FROM (SELECT visit_id FROM om_visit_x_arc WHERE arc_id::integer=v_parent_id)a;
-						
+
 						END IF;
-						
+
 						-- manage obsolete arcs for arc divide
 						IF (SELECT value::json->>'setArcObsolete' FROM config_param_system WHERE parameter = 'edit_arc_divide')::boolean = TRUE THEN
-					
+
 							EXECUTE 'UPDATE arc SET state = 0, workcat_id_end = '||quote_literal(NEW.workcat_id)||', state_type = '||v_statetype_obsolete||
 							' FROM plan_psector_x_arc p WHERE arc.arc_id = p.arc_id AND p.state = 1 AND p.psector_id='||OLD.psector_id||
 							' AND p.arc_id = '''||rec.id||''' AND arc.state_type='||v_state_obsolete_planified||';';
 						ELSE
-							EXECUTE 'DELETE FROM plan_psector_x_arc  WHERE arc_id = '''||rec.id||''' AND psector_id='||OLD.psector_id||';';		
+							EXECUTE 'DELETE FROM plan_psector_x_arc  WHERE arc_id = '''||rec.id||''' AND psector_id='||OLD.psector_id||';';
 							EXECUTE 'DELETE FROM arc WHERE arc_id = '''||rec.id||''';';
 						END IF;
 
@@ -368,7 +368,7 @@ BEGIN
 					AND p.state = 0 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''';';
 
 					IF lower(rec_type.id) IN ('connec', 'gully') THEN
-					
+
 						-- change arc_id for planified connecs (useful when existing connec changes to planified arc)
 						EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET arc_id = p.arc_id
 						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
