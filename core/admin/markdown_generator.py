@@ -107,22 +107,204 @@ class GwAdminMarkdownGenerator:
     def generate_markdown_file(self):
         """ Generate the markdown file """
 
-        sql = f"SELECT * FROM {self.schema}.cat_feature"
+        sql = f"SELECT lower(feature_type) as feature_type, lower(id) as id, lower(feature_class) as feature_class "
+        sql += f"FROM {self.schema}.cat_feature ORDER BY (feature_type, id)"
         rows = tools_db.get_rows(sql)
+        self.add_feature_to_index(rows)
+
         for row in rows:
-            feature_type = row['id']
             msg = "Generating markdown for {0}."
-            msg_params = (feature_type,)
+            msg_params = (row['id'],)
             self._change_table_lyt(msg, msg_params)
 
-            sql = f"SELECT * FROM {self.schema}.config_form_fields WHERE formname ILIKE '%{feature_type}%'"
-            rows_cff = tools_db.get_rows(sql)
-        
+            # Create tab index
+            self.create_tab_index(row['id'], row['feature_type'], row['feature_class'])
+
+            # Create dinamic tab_data
+            self.create_dinamic_tab_data(row['id'], row['feature_type'])
+
         msg = "Markdown Generated from {0}."
         msg_params = (self.project_type,)
         self._change_table_lyt(msg, msg_params)
         return
 
+    def add_feature_to_index(self, rows):
+        """ Add feature to the object index """
+        feature_index_path = f"{self.path}/info_feature_index.rst"
+
+        if not os.path.exists(feature_index_path):
+            os.makedirs(os.path.dirname(feature_index_path), exist_ok=True)
+        
+        done_types = []
+        with open(feature_index_path, 'w') as file:
+            file.write(f".. _info-feature-index\n\n")
+
+            # Title
+            self.title(file, "Feature Index", 1)
+    
+            # Introduction  
+            file.write(f"\n\nIn a giswater project for {self.project_type} the following features can be created and edited:\n\n")
+
+            # Create toctree structure
+            file.write(".. toctree::\n\t:maxdepth: 2\n\t:caption: Features\n\n")
+            
+            for row in rows:
+                if row['feature_type'] not in done_types:
+                    done_types.append(row['feature_type'])
+                    # Add a comment for the feature type
+                    file.write(f"\t# {row['feature_type'].title()}\n")            
+                file.write(f"\t_tab-index-{row['id']}\n")
+
+    def create_tab_index(self, feature_cat, feature_type, feature_class):
+        """ Create tab index """
+        sql = f"SELECT replace(tabname, '_', ' ') as tabname FROM {self.schema}.config_form_tabs WHERE "
+        sql += f"formname = 've_{feature_type}_{feature_cat}' OR formname = 've_{feature_type}' OR "
+        sql += f"formname = 've_man_{feature_class}'"
+        rows_cft = tools_db.get_rows(sql)
+
+        tab_index_path = f"{self.path}/{feature_cat}/index_{feature_cat}.rst"
+        
+        if not os.path.exists(tab_index_path):
+            os.makedirs(os.path.dirname(tab_index_path), exist_ok=True)
+
+        with open(tab_index_path, 'w') as file:
+            file.write(f".. _tab-index-{feature_cat}\n\n")
+
+            # Title
+            self.title(file, f"{feature_cat.title()} Tabs", 1)
+
+            # Introduction
+            file.write(f"\n\nThe feature {feature_cat}, has the following tabs:\n\n")
+
+            # Create toctree structure for tabs
+            file.write(".. toctree::\n\t:maxdepth: 1\n\t:caption: Tabs\n\n")
+
+            for row in rows_cft:
+                # Check if this is the "Data" tab to link to the dynamic tab_data file
+                file.write(f"\ttab_data_{feature_cat}\n")
+
+    def create_dinamic_tab_data(self, feature_cat, feature_type):
+        """ Create dinamic tab_data """
+        # Get rows from config_form_fields
+        sql = (f"""SELECT * FROM {self.schema}.config_form_fields WHERE formname = 've_{feature_type}_{feature_cat}'
+                AND tabname = 'tab_data' AND formtype = 'form_feature' ORDER BY
+                CASE
+                    WHEN layoutname ILIKE 'lyt_top%' THEN 1
+                    WHEN layoutname ILIKE 'lyt_data%' THEN 2
+                    WHEN layoutname ILIKE 'lyt_bottom%' THEN 3
+                ELSE 4
+                END, layoutorder;""")
+        rows_cff = tools_db.get_rows(sql)
+        
+        tab_data_path = f"{self.path}/{feature_cat}/tab_data_{feature_cat}.rst"
+        
+        if not os.path.exists(tab_data_path):
+            os.makedirs(os.path.dirname(tab_data_path), exist_ok=True)
+
+        with open(tab_data_path, 'w') as file:
+            # Header
+            file.write(f".. _tab-data-{feature_cat}\n\n")
+            self.title(file, f"{feature_cat.title()}: Tab Data", 1)
+            file.write(f"\n\nThe feature {feature_cat}, has the following data:\n\n")
+
+            for row in rows_cff:
+                # Define variables
+                mandatory = 'No' if not row['ismandatory'] else 'Sí'
+                editable = 'No' if not row['iseditable'] else 'Sí'
+                isparent = row['isparent']
+                dv_querytext = row['dv_querytext']
+                dv_querytext_filterc = row['dv_querytext_filterc']
+                style = row['stylesheet']
+                widgetcontrols = row['widgetcontrols']
+
+                # Write tooltip
+                if f'{row['columnname']} - ' in row['tooltip']:
+                    tooltip = row['tooltip'].split(f'{row['columnname']} - ')[1]
+                else:
+                    tooltip = row['tooltip']
+
+                # Mandatory camps
+                file.write(f".. raw:: html\n")
+                file.write(f"\t<details>\n\t\t<summary>{row['label'].title()}: {row['columnname']} - {tooltip}</summary>\n")
+                file.write(f"\t\t<ul>\n")
+                file.write(f"\t\t\t<li>**Tipo de dato:** {row['datatype']}.</li>\n")
+                file.write(f"\t\t\t<li>**Obligatorio:** {mandatory}.</li>\n")
+                file.write(f"\t\t\t<li>**Editable:** {editable}.</li>\n")
+                if dv_querytext:
+                    file.write(f"\t\t\t<li>**Valores:** Los valores de este desplegable estan determinados por la consulta: {dv_querytext}.</li>\n")
+                
+                if dv_querytext_filterc:
+                    file.write(f"\t\t\t<li>**Filtrado:** La consulta anterior esta filtrada por: {dv_querytext_filterc}.</li>\n")
+                
+                # Json camps
+                if style:
+                    file.write(f"\t\t\t<li>\n")
+                    file.write(f"\t\t\t\t<details class='no-square'>\n")
+                    file.write(f"\t\t\t\t\t<summary><b>Estilos:</b> Modificaciones esteticas del campo</summary>\n")
+                    file.write(f"\t\t\t\t\t<ul>\n")
+                    for key, item in style.items():
+                        file.write(f"\t\t\t\t\t\t<li>{key} ({item})</li>\n")
+                    file.write(f"\t\t\t\t\t</ul>\n")
+                    file.write(f"\t\t\t\t</details>\n")
+                    file.write(f"\t\t\t</li>\n")
+                if widgetcontrols:
+                    file.write(f"\t\t\t<li>\n")
+                    file.write(f"\t\t\t\t<details class='no-square'>\n")
+                    file.write(f"\t\t\t\t\t<summary><b>Controles:</b> Controles del campo</summary>\n")
+                    file.write(f"\t\t\t\t\t<ul>\n")
+                    for key, item in widgetcontrols.items():
+                        file.write(f"\t\t\t\t\t\t<li>{key} ({item}): Hola</li>\n")
+                    file.write(f"\t\t\t\t\t</ul>\n")
+                    file.write(f"\t\t\t\t</details>\n")
+                    file.write(f"\t\t\t</li>\n")
+                file.write(f"\t\t</ul>\n")
+                file.write(f"\t</details>\n\n")
+                
+    def get_column_and_table_name(self, dv_querytext):
+        """ Get column and table name from dv_querytext """
+        column_name = None
+        table_name = None
+
+        # Check if the query contains id pattern
+        id_pattern = None
+        if 'id, ' in dv_querytext:
+            id_pattern = 'id, '
+        elif 'id,' in dv_querytext:
+            id_pattern = 'id,'
+        
+        if id_pattern:
+            # Determine FROM clause (case insensitive)
+            from_clause = None
+            if ' FROM ' in dv_querytext:
+                from_clause = ' FROM '
+            elif ' from ' in dv_querytext:
+                from_clause = ' from '
+            
+            # Extract column and table information
+            if ' JOIN ' in dv_querytext:
+                # Handle JOIN queries
+                column_info = dv_querytext.split(id_pattern)[1].split(' ')[0]
+                column_name = column_info.split('.')[1]
+                table_alias = column_info.split('.')[0]
+                table_name = dv_querytext.split(f' {table_alias} ')[0].split(' ')[-1]
+            else:
+                # Handle simple queries
+                column_name = dv_querytext.split(id_pattern)[1].split(' ')[0]
+                if from_clause:
+                    table_name = dv_querytext.split(from_clause)[1].split(' ')[0]
+                else:
+                    # This case might not occur based on the original logic, but keeping it safe
+                    table_name = "unknown"
+        return column_name, table_name
+
+    def title(self, file, text, level=1):
+        """ Create a title """
+        if level == 1:
+            for i in range(len(text)):
+                file.write(f"=")
+        file.write(f"\n{text.title()}\n")
+        for i in range(len(text)):
+            file.write(f"=")
     # endregion
 
     # region private functions
