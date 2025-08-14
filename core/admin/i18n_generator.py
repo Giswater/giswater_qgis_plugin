@@ -876,7 +876,7 @@ class GwI18NGenerator:
     def safe_parse(self, source, text):
         try:
             # Try JSON first (safer if it's valid JSON)
-            modified = text.replace("''", '\\"').replace("'", "\"").replace("False", "false").replace("True", "true").replace("None", "null")
+            modified = text.replace("'", "\"").replace("\"\"", "'").replace("False", "false").replace("True", "true").replace("None", "null")
             return json.loads(modified)
         except json.JSONDecodeError as e:
             e1 = e
