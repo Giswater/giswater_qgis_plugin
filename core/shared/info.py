@@ -35,6 +35,7 @@ from .visit import GwVisit
 from .workcat import GwWorkcat
 from ..utils import tools_gw, tools_backend_calls
 from ..threads.toggle_valve_state import GwToggleValveTask
+from ..toolbars.epa.dscenario_manager_btn import GwDscenarioManagerButton
 
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
@@ -1771,10 +1772,10 @@ class GwInfo(QObject):
                     tools_qt.set_widget_text(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_sections))
-        
+
         # Open the dialog first
         tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect')
-        
+
         img = json_result['body']['data']['shapepng']
         tools_qt.add_image(dlg_sections, 'lbl_section_image', f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
 
@@ -2716,15 +2717,7 @@ class GwInfo(QObject):
                 grb_dscenario.setCollapsed(False)
             # Populate widgets
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_elements')
-            # Hide dscenario tabs
-            tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
-            if global_vars.project_type == 'ud':
-                tab_widget.setTabVisible(4, False)
-                tab_widget.setTabEnabled(4, False)
-            elif global_vars.project_type == 'ws':
-                for i in [0, 1, 3]:
-                    tab_widget.setTabVisible(i, False)
-                    tab_widget.setTabEnabled(i, False)
+            self._manage_dscenario_elements_tabs()
             # Init tab
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
@@ -2830,6 +2823,63 @@ class GwInfo(QObject):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self._fill_tab_plan(self.complet_result)
             self.tab_plan_loaded = True
+
+    def _manage_dscenario_elements_tabs(self):
+        """ Manage dscenario elements tabs """
+
+        if global_vars.project_type == 'ud':
+            # Disable dscenario tabs
+            tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
+            tab_widget.setTabVisible(4, False)
+            tab_widget.setTabEnabled(4, False)
+            tab_widget.setTabVisible(5, False)
+            tab_widget.setTabEnabled(5, False)
+        elif global_vars.project_type == 'ws':
+            # Disable dscenario tabs
+            tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
+            for i in [0, 1, 3]:
+                tab_widget.setTabVisible(i, False)
+                tab_widget.setTabEnabled(i, False)
+
+        # Create double click event for dscenario tables
+        tableviews = self.dlg_cf.findChildren(QTableView, QRegularExpression('tbl_frelem_dsc_'))
+        for tableview in tableviews:
+            tableview.doubleClicked.connect(partial(self._open_dscenario_element, self.dlg_cf, tableview))
+
+    def _open_dscenario_element(self, dlg_cf, tableview):
+        """ Open dscenario element """
+        # Create double click event for dscenario tables
+        dscenario_manager_btn = GwDscenarioManagerButton('', None, None, None, None)
+        # Get first column value from the selected row
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dlg_cf)
+            return
+        index = selected_list[0]
+        row = index.row()
+        first_col_value = index.sibling(row, 0).data()
+        dscenario_manager_btn.selected_dscenario_id = int(first_col_value)
+        # Pass a refresh callback so Info tables reload when generic form closes
+        try:
+            def _refresh_dscenario_table():
+                try:
+                    tbl = tableview
+                    dlg = self.dlg_cf
+                    complet_result = self.complet_result
+                    feature_id = complet_result['body']['feature']['id']
+                    id_name = complet_result['body']['feature']['idName']
+                    view = tbl.property('linkedobject')
+                    if not view:
+                        return
+                    complet_list = get_list(view, id_name, feature_id)
+                    fill_tbl(complet_list, tbl, self, view, dlg)
+                    tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=self.schema_name)
+                except Exception:
+                    pass
+            dscenario_manager_btn.manage_update(dlg_cf, tableview, on_close=_refresh_dscenario_table)
+        except Exception:
+            dscenario_manager_btn.manage_update(dlg_cf, tableview)
 
     def force_enable_clear_button(self, widget):
         # Always ensure nulls are allowed

@@ -34,7 +34,7 @@ class GwDscenarioManagerButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = 'node'
-        self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id', 'element_id']
+        self.feature_types = ['element_id', 'node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id']
         self.filter_dict = {"inp_dscenario_controls": {"filter_table": "ve_sector", "feature_type": "sector"},
                             "inp_dscenario_rules": {"filter_table": "ve_sector", "feature_type": "sector"},
                             "inp_dscenario_demand": {"filter_table": ["ve_inp_junction", "ve_inp_connec"], "feature_type": ["node", "connec"]},
@@ -661,7 +661,7 @@ class GwDscenarioManagerButton(GwAction):
                 tab_idx = self.dlg_dscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
                 self.dlg_dscenario.main_tab.widget(tab_idx).setObjectName(view)
                 # Manage editability
-                qtableview.doubleClicked.connect(partial(self._manage_update, self.dlg_dscenario, qtableview))
+                qtableview.doubleClicked.connect(partial(self.manage_update, self.dlg_dscenario, qtableview))
                 if view.split('_')[-1].upper() == self.selected_dscenario_type:
                     default_tab_idx = tab_idx
 
@@ -754,7 +754,7 @@ class GwDscenarioManagerButton(GwAction):
         """ Fill dscenario table with data from its corresponding table """
 
         # Manage exception if dialog is closed
-        if isdeleted(self.dlg_dscenario):
+        if not hasattr(self, 'dlg_dscenario') or isdeleted(self.dlg_dscenario):
             return
 
         self.table_name = f"{self.dlg_dscenario.main_tab.currentWidget().objectName()}"
@@ -915,13 +915,25 @@ class GwDscenarioManagerButton(GwAction):
             table = f"ve_{feature_type.split('_')[0]}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
-    def _manage_update(self, dialog, tableview):
+    def manage_update(self, dialog, tableview, on_close=None):
         # Get selected row
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '')
-        # if 've_' not in tablename:
-        #     tablename = f've_{tablename}'
+
+        obj_name = tableview.objectName()
+        frelem_name = None
+        if obj_name.startswith('tab_elements_tbl_frelem_dsc_'):
+            frelem_name = obj_name.replace('tab_elements_tbl_frelem_dsc_', '')
+        elif obj_name.startswith('tab_elements_frelem_dsc_'):
+            frelem_name = obj_name.replace('tab_elements_frelem_dsc_', '')
+        elif obj_name.startswith('tbl_frelem_dsc_'):
+            frelem_name = obj_name.replace('tbl_frelem_dsc_', '')
+
+        if frelem_name:
+            tablename = f'inp_dscenario_fr{frelem_name}'
+        else:
+            tablename = obj_name.replace('tbl_', '')
+
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -944,7 +956,15 @@ class GwDscenarioManagerButton(GwAction):
                     break
 
         feature_id = index.sibling(index.row(), col_idx).data()
-        field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
+        # Ensure dscenario_id is set when coming from Info's frelem lists
+        if self.selected_dscenario_id is None:
+            try:
+                col_idx_ds = tools_qt.get_col_index_by_col_name(tableview, 'dscenario_id')
+                if col_idx_ds not in (None, False):
+                    self.selected_dscenario_id = index.sibling(index.row(), col_idx_ds).data()
+            except Exception:
+                pass
+        field_id = tableview.model().headerData(col_idx, Qt.Horizontal).lower().replace(' ', '_')
 
         if tablename == "inp_dscenario_controls":
             return self._manage_upsert_controls(feature_id)
@@ -969,6 +989,12 @@ class GwDscenarioManagerButton(GwAction):
         dlg_title = f"Update {tablename.split('_')[-1].capitalize()} ({feature_id})"
 
         self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE")
+        # If a callback is provided, refresh external context (e.g., Info dialog tables) on close
+        if on_close and getattr(self, 'add_dlg', None) is not None:
+            try:
+                self.add_dlg.dlg_closed.connect(on_close)
+            except Exception:
+                pass
 
     def _manage_properties(self, dialog, view, feature_id=None):
         tablename = view
