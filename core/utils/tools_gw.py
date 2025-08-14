@@ -34,7 +34,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
-    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsMapLayer
+    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -870,9 +870,9 @@ def hide_layer_from_toc(layer):
          
     tools_qgis.hide_node_from_treeview(root.findLayer(layer.id()), root, ltv)
 
+
 def hide_group_from_toc(group):
     """Hide group from the QGIS layer tree view.
-    
     Args:
         group: Group to hide. Can be QgsMapLayer objects or .
     """
@@ -888,7 +888,6 @@ def hide_group_from_toc(group):
         return
 
     tools_qgis.hide_node_from_treeview(root.findGroup(group), root, ltv)
-
 
 
 def validate_qml(qml_content):

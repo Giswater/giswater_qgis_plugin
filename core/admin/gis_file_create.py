@@ -120,7 +120,6 @@ class GwGisFileCreate:
             if isinstance(group, QgsLayerTreeGroup):
                 group.setExpanded(False)
 
-
         # Set camera position on ve_node
         global_vars.iface.mapCanvas().setExtent(tools_gw._get_extent_parameters(schema))
 
