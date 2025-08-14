@@ -30,7 +30,7 @@ from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
     GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmCreateUi, \
-    GwAdminMarkdownGeneratorUi
+    GwAdminMarkdownGeneratorUi  # noqa: F401
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -639,7 +639,7 @@ class GwAdminButton:
                     return False
 
         return True
-                
+
     def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False) -> bool:
         """
         Update the patch folders for a given update directory.
@@ -2064,7 +2064,7 @@ class GwAdminButton:
             self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
             self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
             self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
-    
+
     def on_btn_create_parent_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         msg = "You are about to perform this action aiming to the following schema: {0}\n\nAre you sure you want to continue?"
