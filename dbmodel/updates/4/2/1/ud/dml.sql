@@ -15,7 +15,7 @@ DECLARE
   rec record;
   v_view text;
 BEGIN
-  FOR rec IN (SELECT * FROM _element_type)
+  FOR rec IN (SELECT * FROM _element_type WHERE id NOT IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET'))
   LOOP
     v_view := concat('ve_element_e', lower(REPLACE(REC.id, ' ', '_')));
 
