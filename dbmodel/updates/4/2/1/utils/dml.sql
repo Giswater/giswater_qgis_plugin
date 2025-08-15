@@ -58,3 +58,10 @@ UPDATE config_form_fields SET
 widgetcontrols ='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_value_domain", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": 
 "typevalue = ''graphdelimiter_type''", "allowMulti": true, "nofColumns": 2}}' 
 where columnname = 'graph_delimiter' and formname = 've_cat_feature_node';
+
+
+update sys_param_user set feature_field_id = 'fluid_type' WHERE id like '%fluid_vdefault';
+update sys_param_user set feature_field_id = 'location_type' WHERE id like '%location_vdefault';
+update sys_param_user set feature_field_id = 'category_type' WHERE id like '%category_vdefault';
+update sys_param_user set feature_field_id = 'funtion_type' WHERE id like '%function_vdefault';
+
