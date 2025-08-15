@@ -108,7 +108,7 @@ BEGIN
 
 		IF v_view_name = 'UI' THEN
 			IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
-				PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'dma', 'mapzoneId', OLD.dma_id)));
+				--PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'dma', 'mapzoneId', OLD.dma_id)));
 			END IF;
 		END IF;
 
