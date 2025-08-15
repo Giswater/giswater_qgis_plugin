@@ -272,16 +272,6 @@ UPDATE config_toolbox SET inputparams='[
     "isMandatory": false,
     "placeholder": "5-30",
     "value": null
-  },
-  {
-    "widgetname": "fromZero",
-    "label": "Mapzones from zero:",
-    "widgettype": "check",
-    "datatype": "boolean",
-    "tooltip": "If true, mapzones are calculated automatically from zero",
-    "layoutname": "grl_option_parameters",
-    "layoutorder": 12,
-    "value": null
   }
 ]'::json WHERE id=2768;
 
