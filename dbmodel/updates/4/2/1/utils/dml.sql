@@ -52,10 +52,10 @@ WHERE id =2768;
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('sys_table_context', '{"levels": ["HIDDEN"]}', NULL, NULL, '{"orderBy":0}'::json);
 
 INSERT INTO sys_table (id,descript,sys_role,project_template,context,orderby,alias,notify_action,isaudit,keepauditdays,"source",addparam) values
-('v_value_domain','Dominios de valor','role_edit','{"template": [1], "visibility": true, "levels_to_read": 1}','{"levels": ["HIDDEN"]}',5,'Domain value',NULL,NULL,NULL,'core',NULL);
+('v_value_relation','Domain value table','role_basic','{"template": [1], "visibility": true, "levels_to_read": 1}','{"levels": ["HIDDEN"]}',5,'Domain value',NULL,NULL,NULL,'core',NULL);
 
 UPDATE config_form_fields SET 
-widgetcontrols ='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_value_domain", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": 
+widgetcontrols ='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_value_relation", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": 
 "typevalue = ''graphdelimiter_type''", "allowMulti": true, "nofColumns": 2}}' 
 where columnname = 'graph_delimiter' and formname = 've_cat_feature_node';
 
