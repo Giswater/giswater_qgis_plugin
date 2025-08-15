@@ -314,41 +314,6 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
     "layoutname": "grl_option_parameters",
     "layoutorder": 8,
     "value": null
-  },
-  {
-    "widgetname": "updateMapZone",
-    "label": "Mapzone constructor method:",
-    "widgettype": "combo",
-    "datatype": "integer",
-    "layoutname": "grl_option_parameters",
-    "layoutorder": 10,
-    "comboIds": [
-      0,
-      1,
-      2,
-      3,
-      4
-    ],
-    "comboNames": [
-      "NONE",
-      "CONCAVE POLYGON",
-      "PIPE BUFFER",
-      "PLOT & PIPE BUFFER",
-      "LINK & PIPE BUFFER"
-    ],
-    "selectedId": null
-  },
-  {
-    "widgetname": "geomParamUpdate",
-    "label": "Pipe buffer",
-    "widgettype": "text",
-    "datatype": "float",
-    "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.",
-    "layoutname": "grl_option_parameters",
-    "layoutorder": 11,
-    "isMandatory": false,
-    "placeholder": "5-30",
-    "value": null
   }
 ]'::json, NULL, true, '{4}');
 -- 30/06/2025

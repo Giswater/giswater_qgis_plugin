@@ -124,8 +124,8 @@ BEGIN
 
 		EXECUTE '
 		UPDATE '|| v_macro_table ||' t SET the_geom = a.the_geom FROM ('||v_query_geom||')a 
-		WHERE t.'||v_macro_id_field||' = a.'||v_macro_id_field||'
-		';
+		WHERE t.'||v_macro_id_field||' = a.mapzone_id';
+
 	ELSE -- temporal layer
 
 		EXECUTE '
