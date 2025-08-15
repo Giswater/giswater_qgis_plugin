@@ -66,7 +66,7 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         tabs = []
-        project_tabs = {'ws': ['supplyzone', 'macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa'],
+        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa'],
                         'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma']}
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
