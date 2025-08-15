@@ -1504,10 +1504,17 @@ BEGIN
 				INTO v_pgr_root_vids;
 
 				v_query_text = 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
-					FROM temp_pgr_arc
-				';
+					FROM temp_pgr_arc';
 
-				-- TODO GENERATE DRAINZONE MAPS
+				-- update macrozone the_geom
+				UPDATE drainzone d SET the_geom = a.the_geom FROM 
+				(SELECT drainzone_id, st_union(the_geom) as the_geom FROM dwfzone WHERE drainzone_id IS NOT NULL AND dwfzone_id in (select dwfzone_id FROM dwfzone) GROUP BY drainzone_id) a
+				WHERE a.drainzone_id = d.drainzone_id;
+
+				-- clear geometries of drainzones that are not assigned
+				UPDATE drainzone SET the_geom = NULL
+				WHERE NOT EXISTS (SELECT 1 FROM node n JOIN dwfzone USING (dwfzone_id) WHERE n.dwfzone_id = dwfzone.dwfzone_id)
+				  AND NOT EXISTS (SELECT 1 FROM arc a JOIN dwfzone USING (dwfzone_id) WHERE a.dwfzone_id = dwfzone.dwfzone_id);
 			END IF;
 		END IF;
 
