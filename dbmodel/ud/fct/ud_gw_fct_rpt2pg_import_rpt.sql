@@ -42,7 +42,6 @@ v_path text;
 v_result_id text;
 v_error_context text;
 v_epaversion text;
-v_poll text;
 v_count1 integer;
 
 BEGIN
@@ -300,75 +299,8 @@ BEGIN
 
 		ELSIF  type_aux='rpt_subcatchwashoff_sum' then
 
-			LOOP
-				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
-				i = i+1;
-
-				EXIT WHEN v_poll IS NULL;
-
-				IF i = 1 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv2::numeric;
-				ELSIF i = 2 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv3::numeric;
-				ELSIF i = 3 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv4::numeric;
-				ELSIF i = 4 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv5::numeric;
-				ELSIF i = 5 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv6::numeric;
-				ELSIF i = 6 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv7::numeric;
-				ELSIF i = 7 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv8::numeric;
-				ELSIF i = 8 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv9::numeric;
-				ELSIF i = 9 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv10::numeric;
-				ELSIF i = 10 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv11::numeric;
-				ELSIF i = 11 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv12::numeric;
-				ELSIF i = 12 THEN
-					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
-				END IF;
-			END LOOP;
 
 		ELSIF type_aux='rpt_arcpollutant_sum' then
-
-			i = 0;
-
-			LOOP
-				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
-				i = i+1;
-
-				EXIT WHEN v_poll IS NULL;
-
-				IF i = 1 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv2::numeric;
-				ELSIF i = 2 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv3::numeric;
-				ELSIF i = 3 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv4::numeric;
-				ELSIF i = 4 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv5::numeric;
-				ELSIF i = 5 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv6::numeric;
-				ELSIF i = 6 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv7::numeric;
-				ELSIF i = 7 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv8::numeric;
-				ELSIF i = 8 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv9::numeric;
-				ELSIF i = 9 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv10::numeric;
-				ELSIF i = 10 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv11::numeric;
-				ELSIF i = 11 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv12::numeric;
-				ELSIF i = 12 THEN
-					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
-				END IF;
-			END LOOP;
 
 
 		ELSIF type_aux='rpt_nodedepth_sum' then
@@ -395,40 +327,6 @@ BEGIN
 
 			INSERT INTO rpt_outfallflow_sum(result_id, node_id, flow_freq, avg_flow, max_flow, total_vol)
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric);
-
-			-- relocate pollutants using the order by of polluntant to get the name. It works if nobody modifies inp file changing the order or polluntants
-			LOOP
-				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
-				i = i+1;
-
-				EXIT WHEN v_poll IS NULL;
-
-				IF i = 1 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv6::numeric;
-				ELSIF i = 2 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv7::numeric;
-				ELSIF i = 3 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv8::numeric;
-				ELSIF i = 4 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv9::numeric;
-				ELSIF i = 5 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv10::numeric;
-				ELSIF i = 6 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv11::numeric;
-				ELSIF i = 7 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv12::numeric;
-				ELSIF i = 8 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
-				ELSIF i = 9 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv14::numeric;
-				ELSIF i = 10 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv15::numeric;
-				ELSIF i = 11 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv16::numeric;
-				ELSIF i = 12 THEN
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv17::numeric;
-				END IF;
-			END LOOP;
 
 		ELSIF type_aux='rpt_storagevol_sum' then
 
