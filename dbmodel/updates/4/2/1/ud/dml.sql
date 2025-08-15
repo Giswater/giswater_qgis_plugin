@@ -363,3 +363,6 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 
 
 update config_toolbox set active = false where id in (3424,3492);
+
+INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,sample_query,"source",function_alias) VALUES
+	 (3302,'gw_fct_getgraphconfig','utils','function','json','json','Function to recover graphconfig values. ','role_om',NULL,'core',NULL);
