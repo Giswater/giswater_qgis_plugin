@@ -362,3 +362,19 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4342, 'Node not valid because it has more than 2 arcs', 'Select a valid node', 1, true, 'utils', 'core', 'UI');
 
 UPDATE sys_function SET project_type = 'utils' WHERE id =3302;
+
+UPDATE sys_fprocess set query_text = 'SELECT node_id, nodecat_id, expl_id, the_geom FROM temp_t_pgr_go2epa_node WHERE dma_id = 0 and sector_id > 0'
+WHERE fid = 233;
+
+
+UPDATE sys_fprocess set fprocess_name = 'Node orphan', except_level = 2, info_msg ='No nodes orphan found', except_msg ='nodes orphan with is_arcdivide in true', except_table='anl_node', function_name ='[gw_fct_om_check_data]',
+query_text = 'SELECT n.node_id, n.nodecat_id, n.the_geom, n.expl_id FROM t_node n JOIN cat_feature on node_type = id 
+WHERE NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_1 = n.node_id) AND NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_2 = n.node_id) AND isarcdivide' 
+WHERE fid = 107;
+ 
+UPDATE sys_fprocess set fprocess_name = 'Node orphan (EPA)', except_level = 2, info_msg ='No nodes orphan found',  except_msg ='nodes orphan ready-to-export ', except_table='anl_node', function_name ='[gw_fct_pg2epa_check_result]',
+query_text = 'SELECT n.node_id, n.nodecat_id, n.the_geom, n.expl_id FROM t_node n WHERE NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_1 = n.node_id) AND NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_2 = n.node_id)
+AND epa_type !=''UNDEFINED'' AND sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user) AND is_operative'
+WHERE fid = 228;
+
+update sys_fprocess set active =false WHERE fid = 460;

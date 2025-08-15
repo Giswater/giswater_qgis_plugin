@@ -7,17 +7,19 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2316
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean, p_check boolean)
+DROP FUNCTION IF EXISTS "ws421".gw_fct_pg2epa_nod2arc(varchar);
+DROP FUNCTION IF EXISTS "ws421".gw_fct_pg2epa_nod2arc(varchar, boolean);
+CREATE OR REPLACE FUNCTION ws421.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean, p_check boolean)
 RETURNS integer
 AS $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{"resultId":"t1", "useNetworkGeom":"false"}}$$)
+SELECT ws421.gw_fct_pg2epa_main($${"data":{"resultId":"t1", "useNetworkGeom":"false"}}$$)
 
 fid: 124
 */
+select * from anl_node
+delete  from anl_node
 
 
 DECLARE
@@ -40,7 +42,7 @@ v_error_context text;
 BEGIN
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws421", public;
 
 	-- Profilactic controls for nodarc value
 	SELECT min(st_length(the_geom)) FROM temp_t_arc JOIN selector_sector ON selector_sector.sector_id=temp_t_arc.sector_id
@@ -352,6 +354,9 @@ BEGIN
 
 	-- update nodarc diameter when is null, keeping possible values of inp_valve.diameter USING cat_node.dint
 	UPDATE temp_t_arc SET diameter = dint FROM cat_node c WHERE arccat_id = c.id AND c.id IS NOT NULL AND diameter IS NULL;
+	
+	-- delete values to do not intersect with the log process
+	delete from t_anl_node WHERE fid = 124;
 
 	RETURN 0;
 
