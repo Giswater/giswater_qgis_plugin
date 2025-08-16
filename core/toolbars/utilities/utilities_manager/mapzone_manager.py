@@ -1329,49 +1329,68 @@ class GwMapzoneManager:
             self._manage_current_changed()
 
     def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
-        # Build dlg
-        self.add_dlg = GwInfoGenericUi(self)
-        tools_gw.load_settings(self.add_dlg)
-        self.my_json_add = {}
-        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
-        layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
-        self.add_dlg.actionEdit.setVisible(False)
-        # Disable widgets if updating
-        if force_action == "UPDATE":
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
-        # Populate netscenario_id
-        if self.netscenario_id is not None:
-            tools_qt.set_widget_text(self.add_dlg, 'tab_none_netscenario_id', self.netscenario_id)
-            tools_qt.set_widget_enabled(self.add_dlg, 'tab_none_netscenario_id', False)
-            tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
-            field_id = ['netscenario_id', field_id]
-
-        # Get every widget in the layout
-        widgets = []
-        for row in range(layout.rowCount()):
-            for column in range(layout.columnCount()):
-                item = layout.itemAtPosition(row, column)
-                if item is not None:
-                    widget = item.widget()
-                    if widget is not None and type(widget) is not QLabel:
-                        widgets.append(widget)
-        # Get all widget's values
-        for widget in widgets:
-            tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)
-        # Remove Nones from self.my_json_add
-        keys_to_remove = []
-        for key, value in self.my_json_add.items():
-            if value is None:
-                keys_to_remove.append(key)
-        for key in keys_to_remove:
-            del self.my_json_add[key]
-        # Signals
-        self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))
-        self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
-        self.add_dlg.dlg_closed.connect(self._manage_current_changed)
-        self.add_dlg.btn_accept.clicked.connect(
-            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
-        # Open dlg
+        # Build dlg  
+        
+        self.add_dlg = GwInfoGenericUi(self)  
+        tools_gw.load_settings(self.add_dlg)  
+        self.my_json_add = {}  
+      
+        # Aplicar la lògica de posicions millorada  
+        layout_positions = {}  
+      
+        # Ordenar els camps per layoutorder abans de construir el diàleg  
+        if 'body' in result and 'data' in result['body'] and 'fields' in result['body']['data']:  
+            sorted_fields = sorted(result['body']['data']['fields'],   
+                                    key=lambda x: x.get('layoutorder', 0))  
+            result['body']['data']['fields'] = sorted_fields  
+      
+        # Construir el diàleg amb la versió millorada  
+        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add, layout_positions=layout_positions)  
+      
+        layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')  
+        self.add_dlg.actionEdit.setVisible(False)  
+      
+        # Disable widgets if updating  
+        if force_action == "UPDATE":  
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  
+      
+        # Populate netscenario_id  
+        if self.netscenario_id is not None:  
+            tools_qt.set_widget_text(self.add_dlg, f'tab_none_netscenario_id', self.netscenario_id)  
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_netscenario_id', False)  
+            tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)  
+            field_id = ['netscenario_id', field_id]  
+  
+        # Get every widget in the layout  
+        widgets = []  
+        for row in range(layout.rowCount()):  
+            for column in range(layout.columnCount()):  
+                item = layout.itemAtPosition(row, column)  
+                if item is not None:  
+                    widget = item.widget()  
+                    if widget is not None and type(widget) != QLabel:  
+                        widgets.append(widget)  
+      
+        # Get all widget's values  
+        for widget in widgets:  
+            tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)  
+      
+        # Remove Nones from self.my_json_add  
+        keys_to_remove = []  
+        for key, value in self.my_json_add.items():  
+            if value is None:  
+                keys_to_remove.append(key)  
+        for key in keys_to_remove:  
+            del self.my_json_add[key]  
+      
+        # Signals  
+        self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))  
+        self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))  
+        self.add_dlg.dlg_closed.connect(self._manage_current_changed)  
+        self.add_dlg.btn_accept.clicked.connect(  
+            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))  
+      
+        # Open dlg  
         tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
 
     def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action):
