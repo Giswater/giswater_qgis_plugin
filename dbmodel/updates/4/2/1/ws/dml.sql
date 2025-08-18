@@ -379,5 +379,5 @@ WHERE fid = 228;
 
 update sys_fprocess set active =false WHERE fid = 460;
 
-UPDATE config_param_system set enabled =true where parameter = 'basic_search_hydrometer';
+UPDATE config_param_system set isenabled =true where parameter = 'basic_search_hydrometer';
 
