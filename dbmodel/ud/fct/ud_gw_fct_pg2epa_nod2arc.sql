@@ -60,6 +60,8 @@ v_count integer = 1;
 
 old_node_2 varchar;
 
+max_flwreg_length numeric;
+
 
 BEGIN
 
@@ -102,6 +104,8 @@ BEGIN
 		-- Getting data from node
 		SELECT * INTO rec_node FROM temp_t_node WHERE node_id = rec_flowreg.node_id::text;
 
+		SELECT max(flwreg_length) INTO max_flwreg_length FROM man_frelem WHERE node_id=rec_flowreg.node_id AND to_arc=rec_flowreg.to_arc;
+
 		-- Getting data from arc
 		SELECT arc_id, node_1, node_2, the_geom INTO v_arc, v_node_1, v_node_2, v_geom FROM temp_t_arc WHERE arc_id=rec_flowreg.to_arc::text;
 		IF v_arc IS NULL THEN
@@ -115,10 +119,11 @@ BEGIN
 			ELSE
 				-- Create the extrem nodes of the new nodarc
 				v_nodarc_node_1_geom := ST_StartPoint(v_geom);
-				v_nodarc_node_2_geom := ST_LineInterpolatePoint(v_geom, (rec_flowreg.flwreg_length / ST_Length(v_geom)));
+				v_nodarc_node_2_geom := ST_LineInterpolatePoint(v_geom, (max_flwreg_length / ST_Length(v_geom)));
 
 				-- Correct old arc geometry
-				v_arc_reduced_geom := ST_LineSubstring(v_geom, (rec_flowreg.flwreg_length / ST_Length(v_geom)),1);
+				v_arc_reduced_geom := ST_LineSubstring(v_geom, (max_flwreg_length / ST_Length(v_geom)),1);
+				UPDATE temp_t_arc SET the_geom = v_arc_reduced_geom WHERE arc_id = v_arc;
 
 				IF ST_GeometryType(v_arc_reduced_geom) != 'ST_LineString' THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
