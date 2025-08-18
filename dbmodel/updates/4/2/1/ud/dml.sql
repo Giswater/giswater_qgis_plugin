@@ -375,3 +375,23 @@ VALUES(638, 'Check that all flow regulator elements have the same length', 'ud',
 'nodes with flowregulators with different lengths and same to_arc', NULL, NULL,
 'SELECT count(DISTINCT flwreg_length) FROM man_frelem GROUP BY node_id, to_arc HAVING count(DISTINCT flwreg_length) > 1',
 'All flow regulator elements with the same node_id and to_arc have the same length', '[gw_fct_pg2epa_check_data]', true);
+
+UPDATE condig_form_fields se dv_querytext =
+'SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_outlet'''
+WHERE formnname = 've_epa_froutlet' and columnname = 'outlet_type';
+
+UPDATE sys_table SET context = '{"levels": ["EPA", "HYDRAULICS"]}' WHERE id LIKE '%ve_inp_fr%';
+UPDATE sys_table SET context = '{"levels": ["EPA", "DSCENARIO"]}' WHERE id LIKE '%ve_inp_dscenario_fr%';
+
+update sys_table set context = '{"levels": ["EPA", "HYDRAULICS"]}' where id like '%ve_inp_fr%';
+update sys_table set context = '{"levels": ["EPA", "DSCENARIO"]}' where id like '%ve_inp_dscenario_fr%';
+
+update sys_table set alias = 'FRoutlet Dscenario' where id = 've_inp_dscenario_froutlet';
+update sys_table set alias = 'FRpump Dscenario' where id = 've_inp_dscenario_frpump';
+update sys_table set alias = 'FRorifice Dscenario' where id = 've_inp_dscenario_frorifice';
+update sys_table set alias = 'FRweir Dscenario' where id = 've_inp_dscenario_frweir';
+
+update sys_table set alias = 'FRoutlet' where id = 've_inp_froutlet';
+update sys_table set alias = 'FRpump' where id = 've_inp_frpump';
+update sys_table set alias = 'FRorifice' where id = 've_inp_frorifice';
+update sys_table set alias = 'FRweir' where id = 've_inp_frweir';
