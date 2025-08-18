@@ -381,3 +381,8 @@ update sys_fprocess set active =false WHERE fid = 460;
 
 UPDATE config_param_system set isenabled =true where parameter = 'basic_search_hydrometer';
 
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_pump' WHERE formname='ve_epa_frpump' AND formtype='form_feature' AND columnname='hspacer_epa_1' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_pump' WHERE formname='ve_epa_frpump' AND formtype='form_feature' AND columnname='remove_from_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_pump' WHERE formname='ve_epa_frpump' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_pump' WHERE formname='ve_epa_frpump' AND formtype='form_feature' AND columnname='edit_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_pump' WHERE formname='ve_epa_frpump' AND formtype='form_feature' AND columnname='tbl_inp_pump' AND tabname='tab_epa';
