@@ -366,3 +366,12 @@ update config_toolbox set active = false where id in (3424,3492);
 
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,sample_query,"source",function_alias) VALUES
 	 (3302,'gw_fct_getgraphconfig','utils','function','json','json','Function to recover graphconfig values. ','role_om',NULL,'core',NULL);
+
+
+-- 18/08/2025
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
+query_text, info_msg, function_name, active)
+VALUES(638, 'Check that all flow regulator elements have the same length', 'ud', NULL, 'core', NULL, 'Check epa-data', NULL, 2,
+'nodes with flowregulators with different lengths and same to_arc', NULL, NULL,
+'SELECT count(DISTINCT flwreg_length) FROM man_frelem GROUP BY node_id, to_arc HAVING count(DISTINCT flwreg_length) > 1',
+'All flow regulator elements with the same node_id and to_arc have the same length', '[gw_fct_pg2epa_check_data]', true);
