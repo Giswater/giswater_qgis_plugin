@@ -39,7 +39,6 @@ class GwDscenarioManagerButton(GwAction):
                             "inp_dscenario_rules": {"filter_table": "ve_sector", "feature_type": "sector"},
                             "inp_dscenario_demand": {"filter_table": ["ve_inp_junction", "ve_inp_connec"], "feature_type": ["node", "connec"]},
                             "inp_dscenario_raingage": {"filter_table": "ve_raingage", "feature_type": "rg"},
-                            "inp_dscenario_pump_additional": {"filter_table": "inp_pump_additional", "feature_type": "id"},
                             # DISABLED:
                             # "inp_dscenario_lids": {"filter_table": "ve_inp_dscenario_lids", "feature_type": "lidco"},
                             # "inp_dscenario_inflows": {"filter_table": "ve_inp_inflows", "feature_type": "node"},
@@ -650,7 +649,7 @@ class GwDscenarioManagerButton(GwAction):
         # Select all dscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{lib_vars.schema_name}' " \
               f"AND table_name LIKE 'inp_dscenario%'" \
-              f"ORDER BY array_position(ARRAY['inp_dscenario_virtualvalve', 'inp_dscenario_pump', 'inp_dscenario_pump_additional', 'inp_dscenario_controls', 'inp_dscenario_rules'], table_name::text);"
+              f"ORDER BY table_name;"
         rows = tools_db.get_rows(sql)
         if rows:
             views = [x[0] for x in rows]
