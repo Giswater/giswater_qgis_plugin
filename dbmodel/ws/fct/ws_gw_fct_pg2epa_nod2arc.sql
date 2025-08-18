@@ -18,9 +18,6 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{"resultId":"t1", "useNetworkGeo
 
 fid: 124
 */
-select * from anl_node
-delete  from anl_node
-
 
 DECLARE
 
