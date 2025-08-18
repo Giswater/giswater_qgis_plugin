@@ -120,9 +120,6 @@ class GwAdminMarkdownGenerator:
             # Create tab index
             self.create_tab_index(row['id'], row['feature_type'], row['feature_class'])
 
-            # Create dinamic tab_data
-            self.create_dinamic_tab_data(row['id'], row['feature_type'])
-
         msg = "Markdown Generated from {0}."
         msg_params = (self.project_type,)
         self._change_table_lyt(msg, msg_params)
@@ -130,7 +127,7 @@ class GwAdminMarkdownGenerator:
 
     def add_feature_to_index(self, rows):
         """ Add feature to the object index """
-        feature_index_path = f"{self.path}/info_feature_index.rst"
+        feature_index_path = f"{self.path}/info_feature/index.rst"
 
         if not os.path.exists(feature_index_path):
             os.makedirs(os.path.dirname(feature_index_path), exist_ok=True)
@@ -146,14 +143,14 @@ class GwAdminMarkdownGenerator:
             file.write(f"\n\nIn a giswater project for {self.project_type} the following features can be created and edited:\n\n")
 
             # Create toctree structure
-            file.write(".. toctree::\n\t:maxdepth: 2\n\t:caption: Features\n\n")
+            file.write(".. toctree::\n\t:maxdepth: 1\n\t:caption: Features\n\n")
             
             for row in rows:
                 if row['feature_type'] not in done_types:
                     done_types.append(row['feature_type'])
                     # Add a comment for the feature type
                     file.write(f"\t# {row['feature_type'].title()}\n")            
-                file.write(f"\t_tab-index-{row['id']}\n")
+                file.write(f"\t{row['feature_type']}/{row['id']}/index_{row['id']}\n")
 
     def create_tab_index(self, feature_cat, feature_type, feature_class):
         """ Create tab index """
@@ -162,7 +159,7 @@ class GwAdminMarkdownGenerator:
         sql += f"formname = 've_man_{feature_class}'"
         rows_cft = tools_db.get_rows(sql)
 
-        tab_index_path = f"{self.path}/{feature_cat}/index_{feature_cat}.rst"
+        tab_index_path = f"{self.path}/info_feature/{feature_type}/{feature_cat}/index_{feature_cat}.rst"
         
         if not os.path.exists(tab_index_path):
             os.makedirs(os.path.dirname(tab_index_path), exist_ok=True)
@@ -181,85 +178,308 @@ class GwAdminMarkdownGenerator:
 
             for row in rows_cft:
                 # Check if this is the "Data" tab to link to the dynamic tab_data file
-                file.write(f"\ttab_data_{feature_cat}\n")
+                if row['tabname'] == 'tab data':
+                    file.write(f"\ttab_data_{feature_cat}\n")
+                    self.create_dinamic_tab(f've_{feature_type}', feature_cat, f'{feature_type}/{feature_cat}/tab_data_{feature_cat}.rst')
+                elif row['tabname'] == 'tab epa':
+                    file.write(f"\ttab_epa_{feature_cat}\n")
+                    self.create_index_tab_epa(feature_cat, feature_type, feature_class)
+                else:
+                    file.write(f"\t../../{row['tabname'].split(' ')[1]}\n")
+                    self.create_other_tab(row)
 
-    def create_dinamic_tab_data(self, feature_cat, feature_type):
+    def create_index_tab_epa(self, feature_cat, feature_type, feature_class):
+        """ Create dinamic tab_epa """
+        sql = f"SELECT * FROM {self.schema}.sys_feature_epa_type WHERE feature_type = '{feature_type.upper()}'"
+        rows_sfet = tools_db.get_rows(sql)
+
+        tab_epa_path = f"{self.path}/info_feature/{feature_type}/{feature_cat}/tab_epa_{feature_cat}.rst"
+        
+        if not os.path.exists(tab_epa_path):
+            os.makedirs(os.path.dirname(tab_epa_path), exist_ok=True)
+
+        with open(tab_epa_path, 'w') as file:
+            # Header
+            file.write(f".. _index-epa-{feature_cat}\n\n")
+            self.title(file, f"{feature_cat.title()}: Tab EPA", 1)
+            file.write(f"\n\nThe feature {feature_cat}, has the following EPA types:\n\n")
+            file.write(f".. toctree::\n\t:maxdepth: 1\n\t:caption: EPA Types\n\n")
+
+            for row in rows_sfet:
+                epa_type = row['id'].lower()
+                if epa_type == 'undefined':
+                    continue 
+                file.write(f"\t../tab_epa/epa_type_{epa_type}\n")
+                self.create_dinamic_tab('ve_epa', epa_type, f'{feature_type}/tab_epa/epa_type_{epa_type}.rst')
+
+    def create_other_tab(self, row):
+        """ Create other tab """
+
+        tabname = row['tabname'].split(' ')[1]
+        tab_path = f"{self.path}/info_feature/{tabname}.rst"
+        if not os.path.exists(tab_path):
+            os.makedirs(os.path.dirname(tab_path), exist_ok=True)
+
+            with open(tab_path, 'w') as file:
+                file.write(f".. _tab-{tabname}\n\n")
+                self.title(file, f"Tab {tabname}", 1)
+
+    def create_dinamic_tab(self, prefix, feature, extra_path):
         """ Create dinamic tab_data """
         # Get rows from config_form_fields
-        sql = (f"""SELECT * FROM {self.schema}.config_form_fields WHERE formname = 've_{feature_type}_{feature_cat}'
-                AND tabname = 'tab_data' AND formtype = 'form_feature' ORDER BY
+        done_layouts = []
+        tabname = 'tab_epa' if 'epa' in prefix else 'tab_data'
+        sql = (f"""SELECT * FROM {self.schema}.config_form_fields WHERE formname = '{prefix}_{feature}'
+                AND tabname = '{tabname}' AND formtype = 'form_feature' AND layoutname != 'lyt_none' AND hidden = False ORDER BY
                 CASE
                     WHEN layoutname ILIKE 'lyt_top%' THEN 1
                     WHEN layoutname ILIKE 'lyt_data%' THEN 2
-                    WHEN layoutname ILIKE 'lyt_bottom%' THEN 3
+                    WHEN layoutname ILIKE 'lyt_bot%' THEN 3
                 ELSE 4
-                END, layoutorder;""")
+                END, layoutname, layoutorder;""")
         rows_cff = tools_db.get_rows(sql)
         
-        tab_data_path = f"{self.path}/{feature_cat}/tab_data_{feature_cat}.rst"
+        tab_data_path = f"{self.path}/info_feature/{extra_path}"
         
         if not os.path.exists(tab_data_path):
             os.makedirs(os.path.dirname(tab_data_path), exist_ok=True)
 
         with open(tab_data_path, 'w') as file:
             # Header
-            file.write(f".. _tab-data-{feature_cat}\n\n")
-            self.title(file, f"{feature_cat.title()}: Tab Data", 1)
-            file.write(f"\n\nThe feature {feature_cat}, has the following data:\n\n")
+            file.write(f".. _tab-{tabname.split('_')[1]}-{feature}\n\n")
+            self.title(file, f"{feature.title()}: Tab {tabname.split('_')[1].title()}", 1)
+            file.write(f"\n\nThe feature {feature}, has the following data:\n\n")
+
+            if not rows_cff:
+                print(f"No data found for {feature}: {prefix}_{feature}")
+                return
 
             for row in rows_cff:
+                if row['layoutname'] not in done_layouts:
+                    done_layouts.append(row['layoutname'])
+                    file.write(f".. raw:: html\n\n")
+                    file.write(f"\t<p class='layout-header'>The widgets in the layout {row['layoutname']} are:</p>\n\n")
                 # Define variables
                 mandatory = 'No' if not row['ismandatory'] else 'Sí'
                 editable = 'No' if not row['iseditable'] else 'Sí'
-                isparent = row['isparent']
+                datatype = row['datatype'].capitalize() if row['datatype'] else 'Unknown'
                 dv_querytext = row['dv_querytext']
                 dv_querytext_filterc = row['dv_querytext_filterc']
                 style = row['stylesheet']
                 widgetcontrols = row['widgetcontrols']
 
                 # Write tooltip
-                if f'{row['columnname']} - ' in row['tooltip']:
+                if f'{row['columnname']} - ' in (row['tooltip'] or ''):
                     tooltip = row['tooltip'].split(f'{row['columnname']} - ')[1]
                 else:
                     tooltip = row['tooltip']
 
+                if row['label']:
+                    if row['label'].endswith(':'):
+                        label = row['label'][0:-1]
+                    else:
+                        label = f"{row['label']}"  
+                elif row['columnname'].startswith('tbl_'):
+                    label = f"Tabla {row['columnname'].split('_')[2].title()}"
+                elif row['columnname'].startswith('hspacer_'):
+                    continue
+                else:
+                    label = row['columnname']
+
                 # Mandatory camps
-                file.write(f".. raw:: html\n")
-                file.write(f"\t<details>\n\t\t<summary>{row['label'].title()}: {row['columnname']} - {tooltip}</summary>\n")
+                file.write(f".. raw:: html\n\n")
+                file.write(f"\t<details>\n\t\t<summary><strong>{label.title()}:</strong> {row['columnname']} - {tooltip}</summary>\n")
                 file.write(f"\t\t<ul>\n")
-                file.write(f"\t\t\t<li>**Tipo de dato:** {row['datatype']}.</li>\n")
-                file.write(f"\t\t\t<li>**Obligatorio:** {mandatory}.</li>\n")
-                file.write(f"\t\t\t<li>**Editable:** {editable}.</li>\n")
+                file.write(f"\t\t\t<li><strong>Datatype:</strong> {datatype}.</li>\n")
+                file.write(f"\t\t\t<li><strong>Mandatory:</strong> {mandatory}.</li>\n")
+                file.write(f"\t\t\t<li><strong>Editable:</strong> {editable}.</li>\n")
                 if dv_querytext:
-                    file.write(f"\t\t\t<li>**Valores:** Los valores de este desplegable estan determinados por la consulta: {dv_querytext}.</li>\n")
+                    file.write(f"\t\t\t<li><strong>Dvquerytext:</strong> Los valores de este desplegable estan determinados por la consulta:\n")
+                    file.write(f"\t\t\t\t<code>\n")
+                    file.write(f"\t\t\t\t\t{dv_querytext.replace(chr(10), ' ').replace(chr(13), ' ')}\n")
+                    file.write(f"\t\t\t\t</code>\n")
+                    file.write(f"\t\t\t</li>\n")
                 
                 if dv_querytext_filterc:
-                    file.write(f"\t\t\t<li>**Filtrado:** La consulta anterior esta filtrada por: {dv_querytext_filterc}.</li>\n")
+                    file.write(f"\t\t\t<li><strong>Filterc:</strong> La consulta anterior esta filtrada por:\n")
+                    file.write(f"\t\t\t\t<code>\n")
+                    file.write(f"\t\t\t\t\t{dv_querytext_filterc}\n")
+                    file.write(f"\t\t\t\t</code>\n")
+                    file.write(f"\t\t\t</li>\n")
                 
                 # Json camps
                 if style:
                     file.write(f"\t\t\t<li>\n")
                     file.write(f"\t\t\t\t<details class='no-square'>\n")
-                    file.write(f"\t\t\t\t\t<summary><b>Estilos:</b> Modificaciones esteticas del campo</summary>\n")
+                    file.write(f"\t\t\t\t\t<summary><strong>Stylesheet:</strong> Modificaciones esteticas del campo</summary>\n")
                     file.write(f"\t\t\t\t\t<ul>\n")
                     for key, item in style.items():
-                        file.write(f"\t\t\t\t\t\t<li>{key} ({item})</li>\n")
+                        self._write_item_with_nested_toggle(file, key, item, "\t\t\t\t\t\t", False)
                     file.write(f"\t\t\t\t\t</ul>\n")
                     file.write(f"\t\t\t\t</details>\n")
                     file.write(f"\t\t\t</li>\n")
                 if widgetcontrols:
+                    self._write_widgetcontrols_dict()
                     file.write(f"\t\t\t<li>\n")
                     file.write(f"\t\t\t\t<details class='no-square'>\n")
-                    file.write(f"\t\t\t\t\t<summary><b>Controles:</b> Controles del campo</summary>\n")
+                    file.write(f"\t\t\t\t\t<summary><strong>Widgetcontrols:</strong> Controles del campo</summary>\n")
                     file.write(f"\t\t\t\t\t<ul>\n")
                     for key, item in widgetcontrols.items():
-                        file.write(f"\t\t\t\t\t\t<li>{key} ({item}): Hola</li>\n")
+                        self._write_item_with_nested_toggle(file, key, item, "\t\t\t\t\t\t", True)
                     file.write(f"\t\t\t\t\t</ul>\n")
                     file.write(f"\t\t\t\t</details>\n")
                     file.write(f"\t\t\t</li>\n")
                 file.write(f"\t\t</ul>\n")
-                file.write(f"\t</details>\n\n")
+                file.write(f"\t</details>\n\n\n")
                 
+    def _is_dict_like(self, item):
+        """ Check if item is a dictionary or JSON-like string """
+        if isinstance(item, dict):
+            return True
+        
+        if isinstance(item, str):
+            # Try to parse as JSON
+            try:
+                parsed = json.loads(item)
+                return isinstance(parsed, dict)
+            except (json.JSONDecodeError, ValueError):
+                pass
+            
+            # Try to parse as Python literal (dict-like string)
+            try:
+                parsed = ast.literal_eval(item)
+                return isinstance(parsed, dict)
+            except (ValueError, SyntaxError):
+                pass
+            
+            # Check for CSS-style properties (key:value; key:value;)
+            if self._is_css_style(item):
+                return True
+        
+        return False
+    
+    def _parse_dict_like(self, item):
+        """ Parse dict-like item into a dictionary """
+        if isinstance(item, dict):
+            return item
+        
+        if isinstance(item, str):
+            # Try JSON first
+            try:
+                parsed = json.loads(item)
+                if isinstance(parsed, dict):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                pass
+            
+            # Try Python literal
+            try:
+                parsed = ast.literal_eval(item)
+                if isinstance(parsed, dict):
+                    return parsed
+            except (ValueError, SyntaxError):
+                pass
+            
+            # Try CSS-style parsing
+            if self._is_css_style(item):
+                return self._parse_css_style(item)
+        
+        return {}
+    
+    def _is_css_style(self, item):
+        """ Check if item is a CSS-style property string """
+        if not isinstance(item, str):
+            return False
+        
+        # Remove whitespace and check basic pattern
+        item = item.strip()
+        if not item:
+            return False
+        
+        # Must contain at least one colon and should end with semicolon or not
+        if ':' not in item:
+            return False
+        
+        # Split by semicolon and check each part
+        parts = [part.strip() for part in item.split(';') if part.strip()]
+        if not parts:
+            return False
+        
+        # Each part should have exactly one colon
+        for part in parts:
+            if part.count(':') != 1:
+                return False
+            key_part, value_part = part.split(':', 1)
+            if not key_part.strip() or not value_part.strip():
+                return False
+        
+        return True
+    
+    def _parse_css_style(self, item):
+        """ Parse CSS-style property string into dictionary """
+        if not isinstance(item, str):
+            return {}
+        
+        result = {}
+        item = item.strip()
+        
+        # Split by semicolon and process each property
+        parts = [part.strip() for part in item.split(';') if part.strip()]
+        
+        for part in parts:
+            if ':' in part:
+                key, value = part.split(':', 1)
+                key = key.strip()
+                value = value.strip()
+                if key and value:
+                    result[key] = value
+        
+        return result
+    
+    def _write_item_with_nested_toggle(self, file, key, item, indent, is_main_widget=False):
+        """ Write item with nested toggle if it's a dictionary/JSON """
+        if self._is_dict_like(item):
+            parsed_dict = self._parse_dict_like(item)
+            if parsed_dict:
+                if is_main_widget:
+                    # For main widget controls with toggles, format as "Key: description"
+                    description = self.widgetcontrols_simple.get(key, "")
+                    file.write(f"{indent}<li>\n")
+                    file.write(f"{indent}\t<details class='no-square'>\n")
+                    file.write(f"{indent}\t\t<summary><strong>{key}:</strong> {description}</summary>\n")
+                    file.write(f"{indent}\t\t<ul>\n")
+                    for nested_key, nested_item in parsed_dict.items():
+                        self._write_item_with_nested_toggle(file, nested_key, nested_item, indent + "\t\t\t", False)
+                    file.write(f"{indent}\t\t</ul>\n")
+                    file.write(f"{indent}\t</details>\n")
+                    file.write(f"{indent}</li>\n")
+                else:
+                    file.write(f"{indent}<li>\n")
+                    file.write(f"{indent}\t<details class='no-square'>\n")
+                    file.write(f"{indent}\t\t<summary><strong>{key}:</strong></summary>\n")
+                    file.write(f"{indent}\t\t<ul>\n")
+                    for nested_key, nested_item in parsed_dict.items():
+                        self._write_item_with_nested_toggle(file, nested_key, nested_item, indent + "\t\t\t", False)
+                    file.write(f"{indent}\t\t</ul>\n")
+                    file.write(f"{indent}\t</details>\n")
+                    file.write(f"{indent}</li>\n")
+            else:
+                # Fallback if parsing failed
+                if is_main_widget:
+                    # For main widget controls, format as "KEY (value): Description"
+                    description = self.widgetcontrols_simple.get(key, "")
+                    file.write(f"{indent}<li><strong>{key}</strong> ({item}): {description}</li>\n")
+                else:
+                    file.write(f"{indent}<li>{key}: {item}</li>\n")
+        else:
+            # Regular item
+            if is_main_widget:
+                # For main widget controls, format as "KEY (value): Description"
+                description = self.widgetcontrols_simple.get(key, "")
+                file.write(f"{indent}<li><strong>{key}</strong> ({item}): {description}</li>\n")
+            else:
+                file.write(f"{indent}<li>{key}: {item}</li>\n")
+
     def get_column_and_table_name(self, dv_querytext):
         """ Get column and table name from dv_querytext """
         column_name = None
@@ -309,6 +529,22 @@ class GwAdminMarkdownGenerator:
 
     # region private functions
 
+    def _write_widgetcontrols_dict(self):
+        self.widgetcontrols_simple = {
+            "autoupdateReloadFields": "Recarga al momento otros campos en caso de que uno sea modificado. Actua en combinación con isautoupdate",
+            "enableWhenParent": "Habilita un combo solo en caso que el campo parent tenga ciertos valores", 
+            "regexpControl": "Control de lo que puede escribir usuario mediante expresion regular en widgets tipo texto libre",
+            "maxMinValues": "Establece un valor máximo para campos numéricos en widgets de texto libre",
+            "setMultiline": "Establece la posibilidad de campos multilinea para escritura con enter",
+            "spinboxDecimals": "Establece numero decimales concretos para el widget spinbox (vdef 2)",
+            "widgetdim": "Dimensiones para el widget",
+            "vdefault_value": "Valor por defecto del widget. Tiene sentido para aquellos widgets que no pertenecen a datos de un feature, puesto que los valores por defecto se definen en los que el usuario ya tiene establecidos en config_param_user. De especial interés para los widgets filtro.",
+            "vdefault_querytext": "Valor por defecto del widget a partir del resultado de la query. Tiene sentido para aquellos widgets que no pertenecen a datos de un feature, puesto que los valores por defecto se definen en los que el usuario ya tiene establecidos en config_param_user. De especial interés para los widgets filtro.",
+            "listFilterSign": "Signo (LIKE, ILIKE, =, >, < ) para los campos tipo filtro. En caso de omisión se usará ILIKE para listas tipo tableview e = para listas tipo tab",
+            "skipSaveValue": "Si se define este valor como true, no se guardaran los cambios realizados en el widget correspondiente. Por defecto no hace falta poner nada porque se sobreentiende true.",
+            "labelPosition": "Si se define este valor [top, left, none], el label ocupará la posición relativa respecto al widget. Por defecto se sobreentiende left. Si el campo label está vacío, labelPosition se omite."
+        }
+    
     def _save_user_values(self):
         """ Save selected user values """
 
