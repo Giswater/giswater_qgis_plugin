@@ -368,7 +368,7 @@ WHERE fid = 233;
 
 
 UPDATE sys_fprocess set fprocess_name = 'Node orphan', except_level = 2, info_msg ='No nodes orphan found', except_msg ='nodes orphan with is_arcdivide in true', except_table='anl_node', function_name ='[gw_fct_om_check_data]',
-query_text = 'SELECT n.node_id, n.nodecat_id, n.the_geom, n.expl_id FROM t_node n JOIN cat_feature on node_type = id 
+query_text = 'SELECT n.node_id, n.nodecat_id, n.the_geom, n.expl_id FROM t_node n JOIN cat_feature_node on node_type = id 
 WHERE NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_1 = n.node_id) AND NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_2 = n.node_id) AND isarcdivide' 
 WHERE fid = 107;
  
