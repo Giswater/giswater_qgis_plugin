@@ -162,6 +162,7 @@ v_noderecord1 record;
 v_order_id integer;
 v_flwreg_type text;
 v_arc_searchnodes double precision;
+v_talblenameorigin text;
 
 
 BEGIN
@@ -187,6 +188,7 @@ BEGIN
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_featuredialog := coalesce((p_data ->> 'form')::json->> 'featureDialog','[]');
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	v_talblenameorigin := v_tablename;
 
 	-- control of nulls
 	IF v_addschema = 'NULL' THEN v_addschema = null; END IF;
@@ -525,9 +527,13 @@ BEGIN
 
 	-- Get geometry (to feature response)
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
-
-		v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable);
-
+		
+		IF v_talblenameorigin = 've_man_frelem' THEN 
+			v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_talblenameorigin);
+		ELSE
+			v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable);
+		END IF;
+		
 		i = 1;
 		v_querytext := v_querytext || ' WHERE ';
 		FOREACH idname IN ARRAY v_idname_array loop
