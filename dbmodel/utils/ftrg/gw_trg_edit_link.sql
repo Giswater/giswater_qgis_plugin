@@ -81,6 +81,8 @@ v_check_arcdnom_status boolean;
 v_check_arcdnom integer;
 v_sql varchar;
 
+v_linkcat_id text;
+
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -670,8 +672,9 @@ BEGIN
 				IF v_customfeature IS NOT NULL THEN
 					NEW.linkcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat('feat_',v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 				ELSE
-					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					IF v_linkcat_id IS NOT NULL THEN
+						NEW.linkcat_id = v_linkcat_id;
 					ELSE
 						NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
 					END IF;
@@ -690,15 +693,16 @@ BEGIN
 
 		ELSIF  v_projectype = 'UD' THEN
 			IF NEW.linkcat_id IS NULL THEN
+				v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 				IF NEW.feature_type ='CONNEC' THEN
-					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					IF v_linkcat_id IS NOT NULL THEN
+						NEW.linkcat_id = v_linkcat_id;
 					ELSE
 						NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
 					END IF;
 				ELSEIF NEW.feature_type ='GULLY' THEN
-					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					IF v_linkcat_id IS NOT NULL THEN
+						NEW.linkcat_id = v_linkcat_id;
 					ELSE
 						NEW.linkcat_id = (SELECT _connec_arccat_id FROM gully WHERE gully_id = NEW.feature_id);
 					END IF;

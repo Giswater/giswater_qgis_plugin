@@ -106,12 +106,12 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_check_status boolean;
 v_check_arcdnom float;
 v_check_maxdistance float;
 v_checkeddiam text;
 v_querytext text;
 v_linkcat_id text;
+v_linkcat_id_default text;
 v_link_type text;
 
 BEGIN
@@ -124,7 +124,6 @@ BEGIN
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	SELECT value INTO v_dma_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_dma';
 	SELECT value INTO v_fluidtype_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_fluid';
-	v_check_status:= (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_link2network');
 
 	-- get user variables
 	v_psector_current = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current' AND cur_user = current_user);
@@ -138,6 +137,7 @@ BEGIN
 	v_isarcdivide = (p_data->>'data')::json->>'isArcDivide';
 	v_link_id = (p_data->>'data')::json->>'linkId';
 	v_linkcat_id = (p_data->>'data')::json->>'linkcatId';
+	v_linkcat_id_default = (SELECT value FROM config_param_user WHERE parameter = 'edit_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	v_check_arcdnom = (p_data->>'data')::json->>'pipeDiameter';
 	v_check_maxdistance = (p_data->>'data')::json->>'maxDistance';
 
@@ -145,9 +145,14 @@ BEGIN
 	IF v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
 
 	--control v_check status and value and distance
-	IF v_check_status IS FALSE OR v_check_maxdistance IS NULL THEN v_check_maxdistance = 999; END IF;
-  	IF v_check_status IS TRUE and v_projecttype = 'WS' THEN
-  	  	IF v_check_arcdnom IS NULL THEN v_check_arcdnom = 2000; END IF;
+	IF v_check_maxdistance IS NULL THEN v_check_maxdistance = 9999; END IF;
+	IF v_check_arcdnom IS NULL THEN v_check_arcdnom = 9999; END IF;
+
+	IF v_linkcat_id IS NULL AND v_linkcat_id_default IS NOT NULL THEN
+		v_linkcat_id = v_linkcat_id_default;
+	END IF;
+
+  	IF v_projecttype = 'WS' THEN
 		IF v_check_arcdnom <= (SELECT min(cat_dnom::float) FROM ve_arc) THEN
 		  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		  "data":{"message":"3260", "function":"3188","parameters":{"edit_link_check_arcdnom":"'||v_check_arcdnom||'"}, "is_process":true}}$$);';
@@ -196,67 +201,45 @@ BEGIN
 	    LOOP
 
 			IF v_linkcat_id IS NULL THEN
-				IF v_projecttype = 'WS' THEN
-					IF v_feature_type ='CONNEC' THEN
-						IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-							v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-						ELSE
-							v_linkcat_id = (SELECT id FROM cat_link limit 1 offset 1);
-						END IF;
-					END IF;
-				ELSE
-					IF v_feature_type ='CONNEC' THEN
-						IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-							v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-						ELSE
-							v_linkcat_id = (SELECT id FROM cat_link limit 1 offset 1);
-						END IF;
-					ELSEIF v_feature_type ='GULLY' THEN
-						IF (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-							v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-						ELSE
-							v_linkcat_id = (SELECT id FROM cat_link limit 1 offset 1);
-						END IF;
-					END IF;
-				END IF;
+				v_linkcat_id = (SELECT id FROM cat_link limit 1 offset 1);
 			END IF;
-	
+
 			v_linktype = (SELECT link_type FROM cat_link WHERE id = v_linkcat_id);
-	
+
 			v_i = v_i+1;
-	
+
 			RAISE NOTICE '% - %', v_i, v_connect_id;
-	
+
 			IF v_isforcedarcs IS FALSE THEN
 				v_forcedarcs= '';
 			END IF;
-	
-			IF v_check_status IS TRUE and v_projecttype = 'WS' THEN
+
+			IF v_projecttype = 'WS' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1107","function":"3188","fid": 217,"v_criticity": 4, 
 				"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "check_arcdnom":"'||v_check_arcdnom||'", 
 				"max_distance":"'||v_check_maxdistance||'"}}}$$);';
-			ELSIF v_check_status IS TRUE and v_projecttype = 'UD' THEN
+				ELSIF v_projecttype = 'UD' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1109","function":"3188","fid": 217,"v_criticity": 4, 
 				"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "max_distance":"'||v_check_maxdistance||'"}}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1111","function":"3188","fid": 217,"v_criticity": 4, 
 				"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'"}}}$$);';
 			END IF;
-	
+
 			-- get feature information
 			IF v_feature_type ='CONNEC' THEN
 				SELECT * INTO v_connect FROM ve_connec WHERE connec_id = v_connect_id;
-	
+
 				IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id = v_psector_current AND psector_id
 					IN (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
 					v_isoperative_psector = true;
 					v_linkfrompsector = (SELECT link_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id IN
 							    (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1 LIMIT 1);
 				END IF;
-	
+
 			ELSIF v_feature_type ='GULLY' THEN
 				SELECT * INTO v_connect FROM ve_gully WHERE gully_id = v_connect_id;
-	
+
 				IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_current AND psector_id IN
 				   (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
 					v_isoperative_psector = true;
@@ -264,109 +247,109 @@ BEGIN
 							    (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1 LIMIT 1);
 				END IF;
 			END IF;
-	
+
 			-- getting link values
 			IF v_isoperative_psector THEN -- getting values from the operative one
-	
+
 				IF v_linkfrompsector IS NULL THEN
 					SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id and state = 1 limit 1;
 					v_link.link_id = null;
-	
+
 				ELSIF v_linkfrompsector IS NOT NULL THEN
 					SELECT * INTO v_link FROM link WHERE link_id =  v_linkfrompsector;
 				END IF;
 			ELSE
 				SELECT * INTO v_link FROM ve_link WHERE feature_id = v_connect_id limit 1;
 			END IF;
-	
+
 			-- exception control. It is not possible to create a link for connec over arc
 			SELECT * INTO v_arc FROM ve_arc WHERE ST_DWithin(v_connect.the_geom, ve_arc.the_geom, 0.001);
-	
+
 			-- Use connect.arc_id as forced arcs in case of exists
 			IF v_connect.arc_id IS NOT NULL AND v_isforcedarcs is False THEN
 				v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
-	
+
 				-- check if forced arc diameter is smaller than configured
 				IF v_projecttype = 'WS' then
-					if (SELECT cat_dnom::integer FROM ve_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_status IS TRUE THEN
+					if (SELECT cat_dnom::integer FROM ve_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3232", "function":"3188", "fid": 217, "parameters"{"diameter":'||v_check_arcdnom||'}:, "is_process":true}}$$);';
 					end if;
 				END IF;
 			END IF;
-	
+
 			IF v_arc.arc_id IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1113","function":"3188","fid": 217,"v_criticity": 4, 
 				"parameters":{"connect_id":"'||v_connect_id||'", "arc_id":"'||v_arc.arc_id||'"}}}$$);';
 			ELSE
-	
+
 				-- Use check arc diameter variable
-				IF v_check_status IS TRUE and v_projecttype = 'WS' THEN
+				IF v_projecttype = 'WS' THEN
 					v_checkeddiam = concat(' AND cat_dnom::float <',v_check_arcdnom,' ');
 				ELSE v_checkeddiam = '';
 				END IF;
-	
+
 				IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
 					EXECUTE 'WITH index_query AS(
 					SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id 
 					FROM ve_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 					SELECT arc_id FROM index_query WHERE distance < '||v_check_maxdistance||'  ORDER BY distance limit 1'
 					INTO v_connect.arc_id;
-	
+
 				ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
 					EXECUTE 'WITH index_query AS(
 					SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id 
 					FROM ve_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 					SELECT arc_id FROM index_query WHERE distance < '||v_check_maxdistance||'  ORDER BY distance limit 1'
 					INTO v_connect.arc_id;
-	
+
 					IF v_connect.arc_id IS NULL and v_forcedarcs is not null THEN -- looking for closest arc from connect
 						EXECUTE 'WITH index_query AS(
 						SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id FROM arc WHERE state > 0 '||v_forcedarcs||')
 						SELECT arc_id FROM index_query WHERE distance < '||v_check_maxdistance||'  ORDER BY distance limit 1'
 						INTO v_connect.arc_id;
 					END IF;
-	
+
 				END IF;
-	
+
 				if v_connect.arc_id is null then
 				--pass
 				else
-	
+
 					-- get ve_arc information
 					SELECT * INTO v_arc FROM arc WHERE arc_id = v_connect.arc_id;
-	
+
 					-- state control
 					IF v_arc.state=2 AND v_connect.state=1 AND v_isarcdivide is false THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3050", "function":"2124","fid": 217, "parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 					END IF;
-	
+
 					-- get endfeature attributes
 					IF v_link.exit_type='NODE' THEN
 						SELECT node_id, the_geom INTO v_pjointid, v_endfeature_geom FROM node WHERE node_id=v_link.exit_id;
 						v_pjointtype='NODE';
 						v_link.exit_type = 'NODE';
 						v_link.exit_id = v_pjointid;
-	
+
 						-- case when planned node over existing node
 						SELECT count(*) INTO v_count2 FROM ve_node WHERE node_id = v_link.exit_id;
 						IF v_count2 = 0 AND v_ispsector IS TRUE THEN
 							SELECT node_id INTO v_link.exit_id FROM node WHERE state = 2 AND st_dwithin(the_geom,v_link.the_geom,0.01) ORDER BY tstamp DESC LIMIT 1;
 						END IF;
-	
+
 					ELSIF v_link.exit_type='CONNEC' THEN
 						SELECT pjoint_type, connec_id, the_geom INTO v_pjointtype, v_pjointid, v_endfeature_geom FROM connec WHERE connec_id=v_link.exit_id;
 						v_pjointtype='CONNEC';
 						v_link.exit_type = 'CONNEC';
 						v_link.exit_id = v_pjointid;
-	
+
 					ELSIF v_link.exit_type='GULLY' THEN
 						SELECT pjoint_type, gully_id, the_geom INTO v_pjointtype, v_pjointid, v_endfeature_geom FROM gully WHERE gully_id=v_link.exit_id;
 						v_pjointtype='GULLY';
 						v_link.exit_type = 'GULLY';
 						v_link.exit_id = v_pjointid;
-	
+
 					ELSE  -- it means ARC or NOTHING
 						v_pjointtype='ARC';
 						v_endfeature_geom = v_arc.the_geom;
@@ -374,10 +357,10 @@ BEGIN
 						v_link.exit_id = v_arc.arc_id;
 						v_pjointid = v_arc.arc_id;
 					END IF;
-	
+
 					-- compute link
 					IF v_arc.the_geom IS NOT NULL THEN
-	
+
 						-- setting distance factor
 						IF v_projecttype  ='WS' THEN
 							v_dfactor = 0.3/(st_length(v_arc.the_geom));
@@ -385,84 +368,81 @@ BEGIN
 						ELSIF  v_projecttype  ='UD' THEN
 							v_dfactor = 0;
 						END IF;
-	
+
 						-- setting point aux
 						SELECT geom_point INTO v_geom_point FROM temp_table WHERE fid = 485 and cur_user = current_user;
-	
+
 						if v_geom_point is not null then
 							v_point_aux := St_closestpoint(v_arc.the_geom, v_geom_point);
 						end if;
-	
+
 						DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
-	
+
 						IF v_point_aux IS NULL THEN
-	
+
 							-- getting the appropiate vertex of link to check distance againts arc
 							select geom INTO v_link_point from (select (st_dumppoints(the_geom)).geom, (st_dumppoints(the_geom)).path, the_geom
 							from link where link.link_id = v_link.link_id) a where path[1] = st_numpoints(the_geom)-1;
 							v_point_aux := St_closestpoint(v_arc.the_geom, v_link_point);
-	
+
 							-- profilactic control for v_point_aux
 							IF v_point_aux IS NULL THEN
 								v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
 							END IF;
-	
+
 							-- changing closest point
 							IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
 								v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
-	
+
 							ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
 								v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
-	
+
 							END IF;
-	
+
 							-- profilactic control for v_point_aux
 							IF v_point_aux IS NULL THEN
 								v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
 							END IF;
-	
+
 						END IF;
-	
+
 						IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
-	
+
 							IF v_link.the_geom IS NULL THEN
 								SELECT the_geom INTO v_link.the_geom FROM link WHERE feature_id = v_connect_id AND feature_type=v_feature_type AND state=1 LIMIT 1;
 							END IF;
-	
+
 							IF v_link.the_geom IS NULL THEN
 								-- create link geom
 								v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), SRID_VALUE);
-	
-								IF  v_check_status IS TRUE THEN
-									EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1115","function":"3188","fid": 217,"v_criticity": 4}}$$);';
+
+
+								IF v_isforcedarcs THEN
+									EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1117","function":"3188","fid": 217,"v_criticity": 4, 
+									"parameters":{"arc_id":"'||v_connect.arc_id||'"}}}$$);';
 								ELSE
-								    IF v_isforcedarcs THEN
-										EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1117","function":"3188","fid": 217,"v_criticity": 4, 
-										"parameters":{"arc_id":"'||v_connect.arc_id||'"}}}$$);';
-								    ELSE
-										EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1119","function":"3188","fid": 217,"v_criticity": 4}}$$);';
-								    END IF;
+									EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1119","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 								END IF;
 							ELSE
 								v_link.state = 2; -- because it is copied from existing one but related to psector
 								EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1121","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 							END IF;
-	
+
 						ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype='ARC' THEN
-	
+
 							-- Reverse (if it's need) the existing link geometry
 							IF (st_dwithin (st_startpoint(v_link.the_geom), v_connect.the_geom, 0.01)) IS FALSE THEN
 								v_point_aux := St_closestpoint(v_endfeature_geom, St_startpoint(v_link.the_geom));
 								v_link.the_geom = ST_SetPoint(v_link.the_geom, 0, v_point_aux) ;
-	
+
 								EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1123","function":"3188","fid": 217,"v_criticity": 4}}$$);';
 							ELSE
 								v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux);
 							END IF;
-	
+
 						-- when we are forcing arc_id for those links coming from connec, guly, node
 						ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype !='ARC' AND (v_forcedarcs IS NOT NULL AND v_forcedarcs !='') AND v_forceendpoint IS TRUE THEN
-	
+
 							IF st_dwithin(v_link.the_geom, v_arc.the_geom,0) is true then
 								-- do not modify geometry of link
 							ELSE
@@ -477,27 +457,27 @@ BEGIN
 							-- do nothing for those links coming from connec, guly, node and they not are forced with some arc_id
 						END IF;
 					END IF;
-	
+
 					-- getting values for dma and fluidtype automatic values
-					v_dma_value = v_arc.dma_id;					
+					v_dma_value = v_arc.dma_id;
 					v_fluidtype_value = v_connect.fluid_type;
-						
+
 					IF v_link.link_id IS NULL THEN
-	
+
 						-- creation of link
 						v_link.link_id = (SELECT nextval('urn_id_seq'));
-	
+
 						SELECT link_type INTO v_link_type FROM cat_link WHERE id = v_linkcat_id LIMIT 1;
-	
+
 						IF v_projecttype = 'WS' THEN
 							INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, omzone_id,
 							presszone_id, dqa_id, minsector_id, fluid_type, muni_id, linkcat_id, state_type)
 							VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
 							v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.omzone_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id,
 							v_linkcat_id, v_connect.state_type);
-	
+
 							EXECUTE 'INSERT INTO man_'||v_link_type||' values ('||v_link.link_id||')';
-		
+
 						ELSIF v_projecttype = 'UD' THEN
 							INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, omzone_id, fluid_type, muni_id, linkcat_id, link_type, state_type)
 							VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
@@ -524,67 +504,67 @@ BEGIN
 								WHERE link_id = v_link.link_id;
 							END IF;
 						END IF;
-	
+
 						IF v_projecttype = 'WS' THEN
 							UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, dma_id = v_dma_value, minsector_id=v_arc.minsector_id
 							WHERE link_id = v_link.link_id;
 						END IF;
 					END IF;
-	
+
 					-- update connect values
 					IF v_connect.state=1 then
-	
+
 						IF v_ispsector AND v_forceendpoint IS FALSE THEN -- then returning link
-	
+
 							IF v_feature_type ='CONNEC' THEN
 								UPDATE plan_psector_x_connec SET link_id = v_link.link_id WHERE psector_id = v_psector_current
 								AND connec_id = v_connect_id AND state = 1;
-	
+
 							ELSIF v_feature_type ='GULLY' THEN
 								UPDATE plan_psector_x_gully SET link_id = v_link.link_id WHERE psector_id = v_psector_current
 								AND gully_id = v_connect_id  AND state = 1;
 							END IF;
-	
+
 							UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
-	
+
 						ELSIF v_isarcdivide or v_isoperative_psector or (v_ispsector and v_forceendpoint) THEN -- then returning link & arc_id
-	
+
 							IF v_feature_type ='CONNEC' THEN
 								UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id
 								WHERE psector_id = v_psector_current AND connec_id = v_connect_id AND state = 1;
-	
+
 							ELSIF v_feature_type ='GULLY' THEN
 								UPDATE plan_psector_x_gully SET link_id = v_link.link_id, arc_id = v_arc.arc_id
 								WHERE psector_id = v_psector_current AND gully_id = v_connect_id  AND state = 1;
 							END IF;
-	
+
 							UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
-	
+
 							IF v_isoperative_psector THEN
-	
+
 								SELECT link_id INTO v_existing_link FROM link WHERE feature_id = v_connect_id AND state = 1 LIMIT 1;
-	
+
 								IF v_feature_type ='CONNEC' THEN
 									INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, link_id) VALUES (v_psector_current, v_connect_id, 0, v_existing_link)
 									ON CONFLICT (psector_id, connec_id, state) DO UPDATE set link_id = v_existing_link;
-	
+
 								ELSIF v_feature_type ='GULLY' THEN
 									INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, link_id) VALUES (v_psector_current, v_connect_id, 0, v_existing_link)
 									ON CONFLICT (psector_id, gully_id, state) DO UPDATE set link_id = v_existing_link;
 								END IF;
 							END IF;
-	
+
 						ELSE -- Update connect attributes
-	
+
 							IF v_feature_type ='CONNEC' THEN
-	
+
 								-- update specific fields for ws projects
 								IF v_projecttype = 'WS' THEN
-	
+
 									UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, omzone_id=v_arc.omzone_id, sector_id=v_arc.sector_id,
 									pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_fluidtype_value
 									WHERE connec_id = v_connect_id;
-	
+
 									UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id, dma_id = v_dma_value, presszone_id=v_arc.presszone_id,
 									staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connect.top_elev)
 									WHERE connec_id = v_connect_id;
@@ -593,42 +573,42 @@ BEGIN
 									pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_fluidtype_value::INTEGER
 									WHERE connec_id = v_connect_id;
 								END IF;
-	
+
 							ELSIF v_feature_type ='GULLY' THEN
-	
+
 								UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, omzone_id=v_arc.omzone_id, sector_id=v_arc.sector_id,
 								pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_fluidtype_value::INTEGER
 								WHERE gully_id = v_connect_id;
 							END IF;
 						END IF;
-	
+
 					ELSIF v_connect.state=2 THEN
-	
+
 						IF v_ispsector IS TRUE THEN -- then returning link
-	
+
 							IF v_feature_type ='CONNEC' THEN
 								UPDATE plan_psector_x_connec SET link_id = v_link.link_id WHERE psector_id = v_psector_current
 								AND connec_id = v_connect_id AND state = 1;
-	
+
 							ELSIF v_feature_type ='GULLY' THEN
 								UPDATE plan_psector_x_gully SET link_id = v_link.link_id WHERE psector_id = v_psector_current
 								 AND gully_id = v_connect_id AND state = 1;
 							END IF;
-	
+
 						ELSE -- then updating psector with link and arc
-	
+
 							IF v_feature_type ='CONNEC' THEN
 								UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id
 								WHERE psector_id = v_psector_current AND connec_id = v_connect_id AND state = 1;
-	
+
 							ELSIF v_feature_type ='GULLY' THEN
-	
+
 								UPDATE plan_psector_x_gully SET link_id = v_link.link_id, arc_id = v_arc.arc_id
 								WHERE psector_id = v_psector_current AND gully_id = v_connect_id AND state = 1;
 							END IF;
 						END IF;
 					END IF;
-	
+
 					RAISE NOTICE 'LINK:%, %:%, %:%',v_link.link_id, v_link.feature_type, v_link.feature_id, v_link.exit_type, v_link.exit_id;
 					-- reset values
 				end if;

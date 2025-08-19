@@ -54,9 +54,9 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 INSERT INTO sys_table (id,descript,sys_role,project_template,context,orderby,alias,notify_action,isaudit,keepauditdays,"source",addparam) values
 ('v_value_relation','Domain value table','role_basic','{"template": [1], "visibility": true, "levels_to_read": 1}','{"levels": ["HIDDEN"]}',5,'Domain value',NULL,NULL,NULL,'core',NULL);
 
-UPDATE config_form_fields SET 
+UPDATE config_form_fields SET
 widgetcontrols ='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_value_relation", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": 
-"typevalue = ''graphdelimiter_type''", "allowMulti": true, "nofColumns": 2}}' 
+"typevalue = ''graphdelimiter_type''", "allowMulti": true, "nofColumns": 2}}'
 where columnname = 'graph_delimiter' and formname = 've_cat_feature_node';
 
 
@@ -65,3 +65,8 @@ update sys_param_user set feature_field_id = 'location_type' WHERE id like '%loc
 update sys_param_user set feature_field_id = 'category_type' WHERE id like '%category_vdefault';
 update sys_param_user set feature_field_id = 'funtion_type' WHERE id like '%function_vdefault';
 
+-- Delete parameter edit_link_link2network now is not used
+DELETE FROM config_param_system WHERE parameter = 'edit_link_link2network';
+
+INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
+VALUES('edit_linkcat_vdefault', 'config', 'Default value of link catalog', 'role_edit', NULL, 'Link catalog for automatic inserts:', 'SELECT cat_link.id AS id, cat_link.id as idval FROM cat_link WHERE id IS NOT NULL AND active IS TRUE ', NULL, true, 1, 'utils', false, NULL, 'linkcat_id', NULL, false, 'string', 'combo', false, NULL, NULL, 'lyt_link', true, NULL, NULL, NULL, NULL, 'core');
