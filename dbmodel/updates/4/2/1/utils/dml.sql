@@ -132,3 +132,17 @@ UPDATE config_param_system SET value =
 '{"table":"plan_psector","selector":"selector_psector","table_id":"psector_id","selector_id":"psector_id","label":"psector_id, '' - '', name","orderBy":"psector_id","manageAll":true,"typeaheadFilter":" AND lower(concat(expl_id, '' - '', name))","query_filter":"AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)","typeaheadForced":true,"selectionMode":"keepPreviousUsingShift"}' 
 WHERE parameter = 'basic_selector_tab_psector';
 
+INSERT INTO sys_param_user
+(id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, 
+feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, 
+dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
+VALUES('edit_arc_division_dsbl', 'dynamic', 'If true, disable the arc divide in a internal proces of database', 'role_edit', NULL, 'Disable arc division', 
+NULL, NULL, true, null, 'utils', false, NULL, NULL, NULL, false, 'boolean', null, false, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, 'core');
+
+INSERT INTO sys_param_user
+(id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc,
+ feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, 
+ dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
+VALUES('utils_transaction_mode', 'dynamic', 'Gets the transaction mode on functions', 'role_basic', NULL, 'Transaction mode', NULL, NULL, true, null, 
+'utils', false, NULL, NULL, NULL, false, 'boolean', null, false, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, 'core');
+
