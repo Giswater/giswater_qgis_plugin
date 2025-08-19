@@ -120,3 +120,10 @@ AND CASE
   ELSE id < 2 
 END' 
 WHERE columnname = 'state';
+
+
+alter table plan_typevalue disable trigger gw_trg_typevalue_config_fk;
+delete from plan_typevalue where typevalue = 'psector_status' and id = '0';
+alter table plan_typevalue enable trigger gw_trg_typevalue_config_fk;
+
+update config_form_fields set dv_orderby_id = true where formtype ='psector' and columnname ='status';

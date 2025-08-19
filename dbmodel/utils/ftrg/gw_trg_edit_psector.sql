@@ -210,8 +210,8 @@ BEGIN
 					annotation, observ, "comment", sys_slope, inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 					ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom, label_x, label_y, label_rotation,
 					publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, updated_at, updated_by, created_by, district_id, workcat_id_plan, asset_id, pavcat_id, drainzone_id, nodetype_1, node_sys_top_elev_1,
-					node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_visibility, adate, adescript, visitability, label_quadrant, minsector_id, brand_id, model_id, serial_number, streetname,
-					streetname2, dwfzone_id, initoverflowpath, omunit_id, registration_date, meandering, conserv_state, om_state, last_visitdate, negative_offset
+					node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_visibility, adate, adescript, visitability, label_quadrant, minsector_id, brand_id, model_id, serial_number,
+					dwfzone_id, initoverflowpath, omunit_id, registration_date, meandering, conserv_state, om_state, last_visitdate, negative_offset
 				)
 				SELECT
 					nextval('SCHEMA_NAME.archived_psector_arc_id_seq'), pa.psector_id, pa.state, pa.doable, pa.addparam, now(), current_user, 'Execute psector',
@@ -221,8 +221,8 @@ BEGIN
 					a.postcode, a.streetaxis_id, a.postnumber, a.postcomplement, a.streetaxis2_id, a.postnumber2, a.postcomplement2, a.descript, a.link, a.verified, a.the_geom,
 					a.label_x, a.label_y, a.label_rotation, a.publish, a.inventory, a.uncertain, a.expl_id, a.num_value, a.feature_type, a.created_at, a.updated_at, a.updated_by, a.created_by,
 					a.district_id, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.drainzone_id, a.nodetype_1, a.node_sys_top_elev_1, a.node_sys_elev_1, a.nodetype_2, a.node_sys_top_elev_2,
-					a.node_sys_elev_2, a.parent_id, a.expl_visibility, a.adate, a.adescript, a.visitability, a.label_quadrant, a.minsector_id, a.brand_id, a.model_id, a.serial_number, a.streetname,
-					a.streetname2, a.dwfzone_id, a.initoverflowpath, a.omunit_id, a.registration_date, a.meandering, a.conserv_state, a.om_state, a.last_visitdate, a.negative_offset
+					a.node_sys_elev_2, a.parent_id, a.expl_visibility, a.adate, a.adescript, a.visitability, a.label_quadrant, a.minsector_id, a.brand_id, a.model_id, a.serial_number,
+					a.dwfzone_id, a.initoverflowpath, a.omunit_id, a.registration_date, a.meandering, a.conserv_state, a.om_state, a.last_visitdate, a.negative_offset
 				FROM plan_psector_x_arc pa
 				JOIN arc a USING (arc_id)
 				WHERE psector_id=NEW.psector_id;
@@ -524,8 +524,8 @@ BEGIN
 					annotation, observ, "comment", sys_slope, inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 					ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom, label_x, label_y, label_rotation,
 					publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, updated_at, updated_by, created_by, district_id, workcat_id_plan, asset_id, pavcat_id, drainzone_id, nodetype_1, node_sys_top_elev_1,
-					node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_visibility, adate, adescript, visitability, label_quadrant, minsector_id, brand_id, model_id, serial_number, streetname,
-					streetname2, dwfzone_id, initoverflowpath, omunit_id, registration_date, meandering, conserv_state, om_state, last_visitdate, negative_offset
+					node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_visibility, adate, adescript, visitability, label_quadrant, minsector_id, brand_id, model_id, serial_number,
+					dwfzone_id, initoverflowpath, omunit_id, registration_date, meandering, conserv_state, om_state, last_visitdate, negative_offset
 				)
 				SELECT
 					nextval('SCHEMA_NAME.archived_psector_arc_id_seq'), pa.psector_id, pa.state, pa.doable, pa.addparam, now(), current_user, v_action,
@@ -535,8 +535,8 @@ BEGIN
 					a.postcode, a.streetaxis_id, a.postnumber, a.postcomplement, a.streetaxis2_id, a.postnumber2, a.postcomplement2, a.descript, a.link, a.verified, a.the_geom,
 					a.label_x, a.label_y, a.label_rotation, a.publish, a.inventory, a.uncertain, a.expl_id, a.num_value, a.feature_type, a.created_at, a.updated_at, a.updated_by, a.created_by,
 					a.district_id, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.drainzone_id, a.nodetype_1, a.node_sys_top_elev_1, a.node_sys_elev_1, a.nodetype_2, a.node_sys_top_elev_2,
-					a.node_sys_elev_2, a.parent_id, a.expl_visibility, a.adate, a.adescript, a.visitability, a.label_quadrant, a.minsector_id, a.brand_id, a.model_id, a.serial_number, a.streetname,
-					a.streetname2, a.dwfzone_id, a.initoverflowpath, a.omunit_id, a.registration_date, a.meandering, a.conserv_state, a.om_state, a.last_visitdate, a.negative_offset
+					a.node_sys_elev_2, a.parent_id, a.expl_visibility, a.adate, a.adescript, a.visitability, a.label_quadrant, a.minsector_id, a.brand_id, a.model_id, a.serial_number,
+					a.dwfzone_id, a.initoverflowpath, a.omunit_id, a.registration_date, a.meandering, a.conserv_state, a.om_state, a.last_visitdate, a.negative_offset
 				FROM plan_psector_x_arc pa
 				JOIN arc a USING (arc_id)
 				WHERE psector_id=NEW.psector_id;

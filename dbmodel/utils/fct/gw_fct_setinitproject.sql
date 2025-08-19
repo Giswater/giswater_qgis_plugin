@@ -177,11 +177,12 @@ BEGIN
 	INSERT INTO cat_users (id,name,active) values (v_user, v_user, true) ON CONFLICT (id) DO NOTHING;
 
 	-- Disable psector mode
+	DELETE FROM config_param_user WHERE parameter = 'plan_psector_current' and cur_user = current_user;
+	/*
 	INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('plan_psector_current', NULL, current_user)
 	ON CONFLICT("parameter", cur_user) DO NOTHING;
-
 	UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-
+	*/
 
     --    Control null
 	v_message := COALESCE(v_message, '{}');
