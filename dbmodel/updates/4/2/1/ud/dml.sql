@@ -378,7 +378,7 @@ VALUES(638, 'Check that all flow regulator elements have the same length', 'ud',
 
 UPDATE config_form_fields SET dv_querytext =
 'SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_outlet'''
-WHERE formnname = 've_epa_froutlet' and columnname = 'outlet_type';
+WHERE formname = 've_epa_froutlet' and columnname = 'outlet_type';
 
 UPDATE sys_table SET context = '{"levels": ["EPA", "HYDRAULICS"]}' WHERE id LIKE '%ve_inp_fr%';
 UPDATE sys_table SET context = '{"levels": ["EPA", "DSCENARIO"]}' WHERE id LIKE '%ve_inp_dscenario_fr%';
