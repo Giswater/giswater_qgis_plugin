@@ -75,3 +75,28 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 INSERT INTO config_function (id, function_name, "style", layermanager, actions) VALUES(3508, 'gw_fct_graphanalytics_mapzones_v1', '{"style": {"point": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
 "line": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
   "polygon": {"style": "categorized","field": "descript",  "transparency": 0.5}}}'::json, NULL, '[{"funcName": "set_style_mapzones", "params": {}}, {"funcName": "get_graph_config", "params": {}}]'::json);
+
+-- Normalize "label": replace underscores with spaces, trim, ensure only the first letter is uppercase,
+-- and append a colon if missing. Only updates rows needing changes.
+UPDATE sys_param_user
+SET "label" =
+    UPPER(LEFT(cleaned, 1)) ||
+    SUBSTRING(cleaned FROM 2) ||
+    CASE WHEN RIGHT(cleaned, 1) = ':' THEN '' ELSE ':' END
+FROM (
+    SELECT
+        "id",
+        TRIM(
+            regexp_replace(
+                regexp_replace(replace("label", '_', ' '), '\s+', ' ', 'g'),
+                '\s+$', '', 'g'
+            )
+        ) AS cleaned
+    FROM sys_param_user
+) AS sub
+WHERE sys_param_user."id" = sub."id"
+  AND "label" IS NOT NULL
+  AND (
+        LEFT("label", 1) <> UPPER(LEFT("label", 1))
+     OR RIGHT(sub.cleaned, 1) <> ':'
+  );
