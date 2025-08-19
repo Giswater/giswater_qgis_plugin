@@ -869,8 +869,12 @@ class GwPsector:
 
         psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
         cur_psector = tools_gw.get_config_value('plan_psector_current')
+        if cur_psector and cur_psector[0] is not None:
+            cur_psector = int(cur_psector[0])
+        else:
+            cur_psector = None
 
-        if psector_id in (None, "null") or psector_id == int(cur_psector[0]):
+        if psector_id in (None, "null") or psector_id == cur_psector:
             self.insert_or_update_new_psector(close_dlg=False)
 
         self.psector_id = psector_id
