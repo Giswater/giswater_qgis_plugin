@@ -222,3 +222,5 @@ UPDATE sys_table SET orderby=4 WHERE id='ve_connec';
 UPDATE sys_table SET orderby=5 WHERE id='ve_link';
 
 
+update plan_psector set active = true;
+

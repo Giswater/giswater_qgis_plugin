@@ -251,3 +251,6 @@ UPDATE sys_table SET orderby=3 WHERE id='ve_arc';
 UPDATE sys_table SET orderby=4 WHERE id='ve_connec';
 UPDATE sys_Table SET orderby=5 WHERE id='ve_gully';
 UPDATE sys_table SET orderby=6 WHERE id='ve_link';
+
+
+update plan_psector set active = true;
