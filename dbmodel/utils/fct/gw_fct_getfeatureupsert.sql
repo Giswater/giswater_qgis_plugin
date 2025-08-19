@@ -248,6 +248,17 @@ BEGIN
 	SELECT tablename INTO v_visit_tablename FROM config_visit_class WHERE formname=v_table_id;
 	IF v_visit_tablename IS NOT NULL THEN v_tablename = v_visit_tablename; v_formname = v_table_id;	END IF;
 
+	-- manage with the dynamic state by using the variable of utils_transaction_mode
+	INSERT INTO config_param_user VALUES ('utils_transaction_mode', v_tg_op, current_user) ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_tg_op; 
+
+
+	-- force state vdefault in function of psector mode)
+	IF (SELECT value FROM config_param_user WHERE "parameter" = 'plan_psector_current' and value::integer in (select psector_id from plan_psector)) IS NOT NULL THEN
+		UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault';
+	ELSE
+		UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault';
+	END IF;
+
 	--  get feature propierties
 	---------------------------
 	v_active_feature = concat('SELECT cat_feature.* FROM cat_feature WHERE active IS TRUE
@@ -677,13 +688,6 @@ BEGIN
 		-- static pressure
 		IF v_project_type = 'WS' AND v_presszone_id IS NOT NULL THEN
 			v_staticpressure = (SELECT head from presszone WHERE presszone_id = v_presszone_id) - v_elevation;
-		END IF;
-	
-		-- force state vdefault in function of psector mode
-		IF (SELECT value FROM config_param_user WHERE "parameter" = 'plan_psector_current' and value::integer in (select psector_id from plan_psector)) IS NOT NULL THEN
-				UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault';
-			else
-				UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault';			
 		END IF;
 	
 	ELSIF v_tg_op ='UPDATE' OR v_tg_op ='SELECT' then
@@ -1176,6 +1180,9 @@ BEGIN
 		END LOOP;
 	END IF;
 
+	-- setting the user variable on normal mode in order to make able all states
+	UPDATE config_param_user SET value = 'SELECT' WHERE parameter = 'utils_transaction_mode' AND cur_user = current_user;
+	
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
 	  	v_status = TRUE;

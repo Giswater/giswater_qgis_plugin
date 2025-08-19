@@ -100,3 +100,23 @@ WHERE sys_param_user."id" = sub."id"
         LEFT("label", 1) <> UPPER(LEFT("label", 1))
      OR RIGHT(sub.cleaned, 1) <> ':'
   );
+
+
+UPDATE config_form_fields SET dv_querytext =
+'WITH psector_value AS (
+  		SELECT value::integer AS psector_value 
+  		FROM config_param_user 
+  		WHERE parameter = ''plan_psector_current'' AND cur_user = current_user),
+	 tg_op_value AS (
+  		SELECT value::text AS tg_op_value 
+  		FROM config_param_user 
+  		WHERE parameter = ''utils_transaction_mode'' AND cur_user = current_user)  
+SELECT id::integer as id, name as idval
+FROM value_state 
+WHERE id IS NOT NULL 
+AND CASE 
+  WHEN (SELECT tg_op_value FROM tg_op_value)!=''INSERT'' THEN id IN (0,1,2)
+  WHEN (SELECT tg_op_value FROM tg_op_value) =''INSERT'' AND (SELECT psector_value FROM psector_value) IS NOT NULL THEN id = 2 
+  ELSE id < 2 
+END' 
+WHERE columnname = 'state';
