@@ -83,13 +83,13 @@ BEGIN
    		SELECT COALESCE(row_to_json(OLD), '{}') INTO v_json_data;
 
    END IF;
-  -- RAISE EXCEPTION 'v_json_new_data %', v_json_old_data;
-
+  
+	-- offset 2 because the first two columns are id and campaign id. We need lot_id and feature_id
    	EXECUTE '
     WITH aaa AS (
 	   	SELECT column_name AS col FROM information_schema.COLUMNS 
 	  	WHERE table_schema = '||quote_literal(TG_TABLE_SCHEMA)||' AND table_name = '||quote_literal(TG_TABLE_NAME)||'
-	  	LIMIT '||v_num_pkeys||' OFFSET 1
+	  	LIMIT '||v_num_pkeys||' OFFSET 2
 	), aux AS (
    			SELECT 1 AS id, '||QUOTE_LITERAL(v_json_data)||'::json AS js
 	), prep_pkey_syntax AS (		
