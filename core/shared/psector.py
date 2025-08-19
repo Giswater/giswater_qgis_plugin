@@ -508,13 +508,13 @@ class GwPsector:
                 tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
             else:
                 tools_qgis.force_refresh_map_canvas()
-        
+
         # Force refresh of selector docker to reflect any value changes
         tools_gw.refresh_selectors()
-        
+
         if form_opened:
             self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
-        
+
     def psector_name_changed(self):
         """ Enable buttons and tabs when name is changed """
 
@@ -872,7 +872,7 @@ class GwPsector:
 
         if psector_id in (None, "null") or psector_id == int(cur_psector[0]):
             self.insert_or_update_new_psector(close_dlg=False)
-        
+
         self.psector_id = psector_id
         if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
             tableleft = "v_price_compost"
@@ -1782,7 +1782,7 @@ class GwPsector:
         # Prepare the JSON body for gw_fct_set_toggle_current
         extras = f'"type": "{scenario_type}", "id": "{scenario_id}"'
         body = tools_gw.create_body(extras=extras)
-        
+
         # Execute the stored procedure
         result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
 
@@ -1810,7 +1810,7 @@ class GwPsector:
     def _filter_table(self, dialog, table, widget_txt, chk_active=None, chk_archived=None, tablename=None):
 
         result_select = tools_qt.get_text(dialog, widget_txt)
-        
+
         # Get checkbox states safely
         try:
             active_checked = chk_active.isChecked()
@@ -1991,6 +1991,7 @@ class GwPsector:
             sql = f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;" \
                 f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({psector_id}, current_user);"
             tools_db.execute_sql(sql)
+            self.psector_editable = True if tools_gw.get_config_value('plan_psector_current') is not None else False
             if not cur_psector or (cur_psector and (cur_psector[0] is None or psector_id != int(cur_psector[0]))):
                 # Ask user if they want to set this psector as current
                 msg = "Do you want to set this psector as current?"
@@ -2019,7 +2020,7 @@ class GwPsector:
             return
 
         # Get selected psector_id from the first column (adjust index if needed)
-        psector_id = selected_rows[0].data()        
+        psector_id = selected_rows[0].data()
 
         # Call the SQL function to get the sector features
         extras = f'"psector_id":"{psector_id}"'
@@ -2161,7 +2162,7 @@ class GwPsector:
                 msg = f"Cannot merge archived psector {id_feature}. Please unarchive it first."
                 tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
                 return
-        
+
         # Get selected dscenario id
         value = ""
         for i in range(0, len(selected_list)):
@@ -3160,12 +3161,12 @@ def close_dlg(**kwargs):
         tools_qgis.disconnect_snapping()
         tools_gw.disconnect_signal('psector')
         tools_qgis.disconnect_signal_selection_changed()
-        
+
         try:
             global_vars.canvas.selectionChanged.disconnect(partial(class_obj._manage_selection_changed))
         except (RuntimeError, TypeError):
             pass
-        
+
         # Apply filters on tableview
         if hasattr(class_obj, 'dlg_psector_mng'):
             class_obj._filter_table(class_obj.dlg_psector_mng, class_obj.qtbl_psm, class_obj.dlg_psector_mng.txt_name, class_obj.dlg_psector_mng.chk_active, class_obj.dlg_psector_mng.chk_archived, 'v_ui_plan_psector')
