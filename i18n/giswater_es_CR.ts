@@ -2626,7 +2626,7 @@
 			<translation>Este nodo tiene datos redundantes en los valores (top_elev, ymax  elev). Revísalo y utiliza como máximo dos.</translation>
 		</message>
 		<message>
-			<source>Please fill all fields in the dialog</source>
+			<source>Please fill link catalog field in the dialog</source>
 			<translation>Rellene todos los campos del cuadro de diálogo</translation>
 		</message>
 		<message>
@@ -5686,11 +5686,15 @@
 			<translation>Tarea abortada: {0}.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
-Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero.\ N
+			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
+
+Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero.\ N
+
 Por otro lado, debe saber que la tabla de trazabilidad almacenará información precedente.</translation>
 		</message>
 		<message>

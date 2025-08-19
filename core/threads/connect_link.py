@@ -46,12 +46,18 @@ class GwConnectLink(GwTask):
         """ Link selected @feature_type to the pipe """
 
         # Get selected features from layers of selected @feature_type
-        feature_id = f'"id":"{self.connect_link_class.ids}"'
+        feature_id = f'"id":{self.connect_link_class.ids}'
 
-        extras = f'"feature_type": "{feature_type.upper()}", \
-                   "pipeDiameter": "{self.connect_link_class.pipe_diameter.text()}", \
-                   "maxDistance": "{self.connect_link_class.max_distance.text()}", \
-                   "linkcatId": "{tools_qt.get_combo_value(self.connect_link_class.dlg_connect_link, "tab_none_linkcat")}"'
+        pipe_diameter = 'null' if not self.connect_link_class.pipe_diameter.text() else f'"{self.connect_link_class.pipe_diameter.text()}"'
+        max_distance = 'null' if not self.connect_link_class.max_distance.text() else f'"{self.connect_link_class.max_distance.text()}"'
+        linkcat_id = tools_qt.get_combo_value(self.connect_link_class.dlg_connect_link, "tab_none_linkcat")
+
+        extras = (
+            f'"feature_type":"{feature_type.upper()}",'
+            f'"pipeDiameter":{pipe_diameter},'
+            f'"maxDistance":{max_distance},'
+            f'"linkcatId":"{linkcat_id}"'
+        )
 
         if selected_arc:
             extras += f', "forcedArcs":["{selected_arc}"]'

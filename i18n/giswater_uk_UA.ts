@@ -2630,8 +2630,8 @@
 			<translation>This node has redundant data on (top_elev, ymax  elev) values. Review it and use at most two.</translation>
 		</message>
 		<message>
-			<source>Please fill all fields in the dialog</source>
-			<translation>Please fill all fields in the dialog</translation>
+			<source>Please fill link catalog field in the dialog</source>
+			<translation>Please fill link catalog field in the dialog</translation>
 		</message>
 		<message>
 			<source>Variable log_sql from user config file has been disabled.</source>
