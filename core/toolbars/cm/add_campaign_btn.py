@@ -35,10 +35,10 @@ class GwAddCampaignButton(GwAction):
         # Fetch and parse the campaign type configuration from the database for other roles
         config_query = "SELECT value FROM cm.config_param_system WHERE parameter = 'admin_campaign_type'"
         config_result = tools_db.get_row(config_query)
-        
+
         show_review = True
         show_visit = True
-        
+
         if config_result and config_result['value']:
             try:
                 config = json.loads(config_result['value'])
@@ -69,7 +69,7 @@ class GwAddCampaignButton(GwAction):
                 self.action.triggered.connect(lambda: self.clicked_event(tools_qt.tr("Review")))
             elif show_visit:
                 self.action.triggered.connect(lambda: self.clicked_event(tools_qt.tr("Visit")))
-            
+
             if toolbar is not None:
                 toolbar.addAction(self.action)
 
@@ -87,12 +87,22 @@ class GwAddCampaignButton(GwAction):
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(self.clicked_event, action))
+            obj_action.triggered.connect(partial(self._save_last_selection, self.menu, action))
 
     def clicked_event(self, selected_action):
         """ Open the correct campaign dialog based on user selection """
+
+        self._fill_action_menu()
+
+        if self.menu.property('last_selection') is not None:
+            self.new_campaign.create_campaign(dialog_type=self.menu.property('last_selection'))
+
         if selected_action == tools_qt.tr("Review"):
             self.new_campaign.create_campaign(dialog_type="review")
         elif selected_action == tools_qt.tr("Visit"):
             self.new_campaign.create_campaign(dialog_type="visit")
         elif selected_action == tools_qt.tr("Inventory"):
             self.new_campaign.create_campaign(dialog_type="inventory")
+
+    def _save_last_selection(self, menu, action):
+        menu.setProperty("last_selection", action.lower())
