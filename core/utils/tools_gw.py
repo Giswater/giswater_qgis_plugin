@@ -81,17 +81,18 @@ def _get_geom_type(geometry_type: QgsGeometryType = None):
 
 
 def normalize_label(label: str, add_colon: bool = False) -> str:
-    """ Normalize label: replace underscores with spaces, trim, ensure only the first letter is uppercase,
-    and append a colon if missing. """
-
+    """
+    Normalize label: underscores to spaces, trim, capitalize first char, handle colon.
+    """
+    if not isinstance(label, str):
+        return ""
     normalized = label.replace('_', ' ').strip()
-
     if normalized:
-        normalized = normalized[0].upper() + normalized[1:]
-
-    if add_colon and not normalized.endswith(':'):
-        normalized += ':'
-
+        normalized = normalized[:1].upper() + normalized[1:]
+    if add_colon:
+        normalized = normalized.rstrip(':') + ':'
+    else:
+        normalized = normalized.rstrip(':').rstrip()
     return normalized
 
 
@@ -1148,7 +1149,8 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
 
         # Set alias column
         if field['label']:
-            layer.setFieldAlias(field_index, field['label'])
+            norm_label = normalize_label(field['label'], add_colon=False)
+            layer.setFieldAlias(field_index, norm_label)
 
         # widgetcontrols
         widgetcontrols = field.get('widgetcontrols')
@@ -1268,7 +1270,7 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
     for field in layer.fields():
         if field.name() not in [field_json['columnname'] for field_json in json_result['body']['data']['fields']]:
             field_index = layer.fields().indexFromName(field.name())
-            layer.setFieldAlias(field_index, normalize_label(field.name(), add_colon=True))
+            layer.setFieldAlias(field_index, normalize_label(field.name(), add_colon=False))
 
 
 def load_missing_layers(filter, group="GW Layers", sub_group=None):
