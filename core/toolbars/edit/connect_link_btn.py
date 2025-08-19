@@ -76,6 +76,17 @@ class GwConnectLinkButton(GwMaptool):
         self.max_distance = self.dlg_connect_link.findChild(QWidget, "tab_none_max_distance")
         self.tbl_ids = self.dlg_connect_link.findChild(QWidget, "tab_none_tbl_ids")
 
+        pipe_diameter_value = tools_gw.get_config_parser('btn_connect_link', 'pipe_diameter', "user", "session")
+        max_distance_value = tools_gw.get_config_parser('btn_connect_link', 'max_distance', "user", "session")
+        linkcat_id_value = tools_gw.get_config_parser('btn_connect_link', 'linkcat_id', "user", "session")
+
+        if pipe_diameter_value not in (None, 'None', ''):
+            tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_pipe_diameter", pipe_diameter_value)
+        if max_distance_value not in (None, 'None', ''):
+            tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_max_distance", max_distance_value)
+        if linkcat_id_value not in (None, 'None', ''):
+            tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_linkcat", linkcat_id_value)
+
         # Set combo ids editable
         self.txt_id.setEditable(True)
 
@@ -225,6 +236,9 @@ class GwConnectLinkButton(GwMaptool):
             msg = "gw_fct_setlinktonetwork (Check log messages)"
             tools_qgis.show_warning(msg, title='Function error')
 
+        # Recover dialog values
+        self._save_dlg_values()
+
         # Remove selection from layers
         tools_gw.remove_selection()
 
@@ -300,8 +314,18 @@ class GwConnectLinkButton(GwMaptool):
         self.fill_tbl_ids(layer)
         self.iface.actionPan().trigger()
 
-    # endregion
+    def _save_dlg_values(self):
+        """ Save dialog values """
 
+        pipe_diameter_value = self.pipe_diameter.text()
+        max_distance_value = self.max_distance.text()
+        linkcat_id_value = tools_qt.get_combo_value(self.dlg_connect_link, "tab_none_linkcat")
+
+        tools_gw.set_config_parser('btn_connect_link', 'pipe_diameter', pipe_diameter_value)
+        tools_gw.set_config_parser('btn_connect_link', 'max_distance', max_distance_value)
+        tools_gw.set_config_parser('btn_connect_link', 'linkcat_id', linkcat_id_value)
+
+    # endregion
 
 def add(**kwargs):
     """ Add button clicked event """
