@@ -327,6 +327,7 @@ class GwConnectLinkButton(GwMaptool):
 
     # endregion
 
+
 def add(**kwargs):
     """ Add button clicked event """
 

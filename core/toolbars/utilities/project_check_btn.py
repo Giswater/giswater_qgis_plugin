@@ -197,7 +197,6 @@ class GwProjectCheckButton(GwAction):
         if lbl_time:
             lbl_time.setVisible(False)
 
-
     def _save_dlg_values(self):
         """ Save dialog values """
 

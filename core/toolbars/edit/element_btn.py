@@ -40,7 +40,6 @@ class GwElementButton(GwAction):
         if self.menu.property('last_selection') is not None:
             self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
 
-
     def _fill_element_menu(self):
         """ Fill add point menu """
 
