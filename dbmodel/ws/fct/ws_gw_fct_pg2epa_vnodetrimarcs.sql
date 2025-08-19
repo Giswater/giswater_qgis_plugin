@@ -90,7 +90,7 @@ BEGIN
 
 
 	RAISE NOTICE 'vnodetrimarcs 7 - insert previous data into data on temp_table';
-	INSERT INTO t_t_go2epa (arc_id, vnode_id, locate, elevation, depth)
+	INSERT INTO temp_t_go2epa (arc_id, vnode_id, locate, elevation, depth)
 	SELECT  arc.arc_id::text, vnode_id, locate,
 	case when t.elevation is null then (n1.top_elev - locate*(n1.top_elev-n2.top_elev))::numeric(12,3) ELSE t.elevation END as elevation,
 	(CASE WHEN (n1.depth - locate*(n1.depth-n2.depth)) IS NULL THEN 0 ELSE (n1.depth - locate*(n1.depth-n2.depth)) END)::numeric (12,3) as depth
