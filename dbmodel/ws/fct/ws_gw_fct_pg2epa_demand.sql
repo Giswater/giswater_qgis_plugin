@@ -95,13 +95,13 @@ BEGIN
 	ELSIF v_networkmode = 4 THEN 
 
 		-- update patterns for connecs with associated link
-		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM ve_inp_connec c WHERE connec_id = node_id  AND temp_t_node.epa_type ='JUNCTION';
+		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM ve_inp_connec c WHERE connec_id::text = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- update patterns for pattern on connecs over arc
 		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM ve_inp_connec c WHERE concat('VC',connec_id) = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- demand on connecs with associated link
-		UPDATE temp_t_node SET demand=v.demand FROM ve_inp_connec v WHERE connec_id = node_id  AND temp_t_node.epa_type ='JUNCTION';
+		UPDATE temp_t_node SET demand=v.demand FROM ve_inp_connec v WHERE connec_id::text = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- demand on connecs over arc
 		UPDATE temp_t_node SET demand=v.demand FROM ve_inp_connec v WHERE concat('VC',connec_id) = node_id  AND temp_t_node.epa_type ='JUNCTION';
