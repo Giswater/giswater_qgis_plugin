@@ -71,8 +71,8 @@ BEGIN
 
 	ELSIF v_networkmode = 3 THEN -- TRIMED NETWORK
 
-		INSERT INTO temp_t_link (link_id, feature_id, feature_type, state, expl_id, the_geom) 
-		SELECT link_id, feature_id, feature_type, state, expl_id, the_geom from ve_link; 
+		INSERT INTO temp_t_link (link_id, feature_id, feature_type, state, expl_id, the_geom, linkcat_id, state_type) 
+		SELECT link_id, feature_id, feature_type, state, expl_id, the_geom, linkcat_id, state_type from ve_link; 
 
 		
 		-- insertar all connecs
