@@ -76,9 +76,9 @@ class GwConnectLinkButton(GwMaptool):
         self.max_distance = self.dlg_connect_link.findChild(QWidget, "tab_none_max_distance")
         self.tbl_ids = self.dlg_connect_link.findChild(QWidget, "tab_none_tbl_ids")
 
-        pipe_diameter_value = tools_gw.get_config_parser('btn_connect_link', 'pipe_diameter', "user", "session")
-        max_distance_value = tools_gw.get_config_parser('btn_connect_link', 'max_distance', "user", "session")
-        linkcat_id_value = tools_gw.get_config_parser('btn_connect_link', 'linkcat_id', "user", "session")
+        pipe_diameter_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'pipe_diameter', "user", "session")
+        max_distance_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'max_distance', "user", "session")
+        linkcat_id_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'linkcat_id', "user", "session")
 
         if pipe_diameter_value not in (None, 'None', ''):
             tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_pipe_diameter", pipe_diameter_value)
@@ -321,9 +321,9 @@ class GwConnectLinkButton(GwMaptool):
         max_distance_value = self.max_distance.text()
         linkcat_id_value = tools_qt.get_combo_value(self.dlg_connect_link, "tab_none_linkcat")
 
-        tools_gw.set_config_parser('btn_connect_link', 'pipe_diameter', pipe_diameter_value)
-        tools_gw.set_config_parser('btn_connect_link', 'max_distance', max_distance_value)
-        tools_gw.set_config_parser('btn_connect_link', 'linkcat_id', linkcat_id_value)
+        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'pipe_diameter', pipe_diameter_value)
+        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'max_distance', max_distance_value)
+        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'linkcat_id', linkcat_id_value)
 
     # endregion
 
