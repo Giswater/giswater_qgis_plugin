@@ -67,6 +67,7 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 last_index integer;
+v_feature text;
 
 BEGIN
 
@@ -147,25 +148,14 @@ BEGIN
 	END LOOP;
 
 	-- Set featuretype_id
-	IF v_formname='upsert_catalog_arc' THEN
-		v_featurecat_id = 'arc_type';
-	ELSIF v_formname='upsert_catalog_node' THEN
-		v_featurecat_id = 'node_type';
-	ELSIF v_formname='upsert_catalog_connec' THEN
-		v_featurecat_id = 'connec_type';
-	ELSIF v_formname='upsert_catalog_gully' THEN
-		v_featurecat_id = 'gully_type';
-	END IF;
+	v_feature = replace(v_formname, 'upsert_catalog_', '');
+	v_featurecat_id = v_feature || '_type';
 
 	--	Setting the catalog 'id' value  (hard coded for catalogs, fixed objective field as id on 4th position
 	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' OR v_formname='upsert_catalog_gully' THEN
 
 		--  get querytext
-		v_querystring = concat('SELECT dv_querytext FROM config_form_fields WHERE formname = ',quote_nullable(v_formname), ' and columnname=''matcat_id''');
-		v_debug_vars := json_build_object('v_formname', v_formname);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 50);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_query_result;
+		v_query_result = concat('SELECT DISTINCT(id) AS id,  id  AS idval FROM cat_',lower(v_feature),' WHERE id IS NOT NULL');
 
 		-- Add filters
 		v_filter_values := (p_data ->> 'data')::json->> 'fields';
