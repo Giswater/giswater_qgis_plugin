@@ -127,3 +127,8 @@ delete from plan_typevalue where typevalue = 'psector_status' and id = '0';
 alter table plan_typevalue enable trigger gw_trg_typevalue_config_fk;
 
 update config_form_fields set dv_orderby_id = true where formtype ='psector' and columnname ='status';
+
+UPDATE config_param_system SET value = 
+'{"table":"plan_psector","selector":"selector_psector","table_id":"psector_id","selector_id":"psector_id","label":"psector_id, '' - '', name","orderBy":"psector_id","manageAll":true,"typeaheadFilter":" AND lower(concat(expl_id, '' - '', name))","query_filter":"AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)","typeaheadForced":true,"selectionMode":"keepPreviousUsingShift"}' 
+WHERE parameter = 'basic_selector_tab_psector';
+

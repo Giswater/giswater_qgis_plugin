@@ -210,7 +210,7 @@ BEGIN
 		IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations
 
 			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
-			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) AND active = true ON CONFLICT DO NOTHING';
+			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
 
 		ELSIF v_tabname in ('tab_hydro_state', 'tab_mincut') THEN
 			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
@@ -642,8 +642,21 @@ BEGIN
 
 	-- manage cross-reference for psectors
 	DELETE FROM selector_psector WHERE psector_id NOT IN
-	(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+	(SELECT psector_id FROM plan_psector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 	
+	-- manage psector logics 
+	v_psector_current_value := (select value from config_param_user  WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user); 
+	IF v_psector_current_value  IS NOT NULL THEN
+		IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
+			AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN		
+		
+			-- remove current psector if explitation have been changed
+			UPDATE config_param_user SET value = NULL WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
+		ELSE		
+			-- force current if have been disabled and its expl_id is enabled
+			INSERT INTO selector_psector values (v_psector_current_value, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
+		END IF;
+	END IF;	
 
 	-- manage cross reference schema for state 
 	IF v_addschema IS NOT NULL THEN 
@@ -691,22 +704,6 @@ BEGIN
 	-- force 0
 	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
-
- 	-- exit psector mode if current psector is outside the selected expl
-
-	-- manage psector logics 
-	v_psector_current_value := (select value from config_param_user  WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user); 
-	IF v_psector_current_value  IS NOT NULL THEN
-		IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
-			AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN		
-		
-			-- remove current psector if explitation have been changed
-			UPDATE config_param_user SET value = NULL WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
-		ELSE		
-			-- force current if have been disabled and its expl_id is enabled
-			INSERT INTO selector_psector values (v_psector_current_value, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
-		END IF;
-	END IF;	
 
 	-- warn the user that in the selected psectors, there is a connec connected to different arcs
 	WITH mec AS ( 
