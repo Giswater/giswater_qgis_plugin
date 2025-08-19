@@ -32,10 +32,14 @@ class GwElementButton(GwAction):
         if toolbar is not None:
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
-        
+
     def clicked_event(self):
 
         self._fill_element_menu()
+
+        if self.menu.property('last_selection') is not None:
+            self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
+
 
     def _fill_element_menu(self):
         """ Fill add point menu """
