@@ -319,17 +319,11 @@ def add_btn_help(dlg):
     # Get formtype, formname & tabname
     context = dlg.property('context')
     uiname = dlg.property('uiname')
-    tabname = 'tab_none'
-    tab_widgets = dlg.findChildren(QTabWidget, "")
-    if tab_widgets:
-        tab_widget = tab_widgets[0]
-        index_tab = tab_widget.currentIndex()
-        tabname = tab_widget.widget(index_tab).objectName()
 
-    btn_help.clicked.connect(partial(open_help_link, context, uiname, tabname))
+    btn_help.clicked.connect(partial(open_help_link, context, uiname, dlg))
 
 
-def open_help_link(context, uiname, tabname=None):
+def open_help_link(context, uiname, dlg=None):
     """ Opens the help link for the given dialog, or a default link if not found. """
 
     # Base URL for the documentation
@@ -344,15 +338,35 @@ def open_help_link(context, uiname, tabname=None):
 
     uiname = uiname.replace("_", "-").replace(" ", "-").lower() + ".html"  # sanitize uiname
 
+    tabname = 'tab_none'
+    tab_widgets = dlg.findChildren(QTabWidget)
+    if tab_widgets:
+        tab_widget = tab_widgets[0]
+        index_tab = tab_widget.currentIndex()
+        tabname = tab_widget.widget(index_tab).objectName()
+
     # Construct the path dynamically
     if uiname:
-        file_path = f"{base_url}/dialogs/{uiname}"
-        if tabname != 'tab_none':
-            file_path += f"#{tabname}"  # Append tabname as an anchor if provided
+        if uiname == 'info-feature.html':
+            feature = dlg.windowTitle().split(' ')[0]
+            sql = f"SELECT feature_type FROM {lib_vars.schema_name}.cat_feature WHERE id = '{feature}'"
+            print(sql)
+            feature_type = tools_db.get_rows(sql)[0]['feature_type']
+            if tabname.lower() == 'tab_data':
+                file_path = f"{base_url}/dialogs/info_feature/{global_vars.project_type.lower()}/{feature_type.lower()}/{feature.lower()}/tab_data.html"
+            elif tabname.lower() == 'tab_epa':
+                file_path = f"{base_url}/dialogs/info_feature/{global_vars.project_type.lower()}/{feature_type.lower()}/{feature.lower()}/tab_epa.html"
+            else:
+                file_path = f"{base_url}/dialogs/info_feature/{tabname.lower()}.html"
+        else:
+            file_path = f"{base_url}/dialogs/{uiname}"
+            if tabname != 'tab_none':
+                file_path += f"#{tabname}"  # Append tabname as an anchor if provided
     else:
         # Fallback to the general manual link if context and uiname are missing
         file_path = f"{base_url}/index.html"
 
+    print(file_path)
     tools_os.open_file(file_path)
 
 
