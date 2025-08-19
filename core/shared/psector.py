@@ -2405,30 +2405,6 @@ class GwPsector:
         event_point = self.snapper_manager.get_event_point(point=point)
         self.arc_id = None
 
-        # Manage current psector
-        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
-               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
-        row = tools_db.get_row(sql)
-
-        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-
-        if row is None:
-            msg = "Current user does not have 'plan_psector_current'. Value of current psector will be inserted."
-            tools_qt.show_info_box(msg)
-
-            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_current', '{selected_psector}', current_user)")
-            tools_db.execute_sql(sql)
-
-        elif str(row[0]) != str(selected_psector):
-            msg = "This psector does not match the current one. Value of current psector will be updated."
-            tools_qt.show_info_box(msg)
-
-            sql = ("UPDATE config_param_user "
-                   f"SET value = '{selected_psector}' "
-                   "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
-            tools_db.execute_sql(sql)
-
         # Snap point
         result = self.snapper_manager.snap_to_current_layer(event_point)
 
@@ -2509,23 +2485,6 @@ class GwPsector:
 
         event_point = self.snapper_manager.get_event_point(point=point)
         self.arc_id = None
-
-        # Manage current psector
-        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
-               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
-        row = tools_db.get_row(sql)
-        current_psector = row[0]
-        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-
-        if str(current_psector) != str(selected_psector):
-            msg = "This psector does not match the current one. Value of current psector will be updated."
-            tools_qt.show_info_box(msg)
-
-            sql = ("UPDATE config_param_user "
-                   f"SET value = '{selected_psector}' "
-                   "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
-            tools_db.execute_sql(sql)
 
         # Snap point
         result = self.snapper_manager.snap_to_current_layer(event_point)
@@ -2659,23 +2618,6 @@ class GwPsector:
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 self.node_id = snapped_feat.attribute('node_id')
                 self.node_state = snapped_feat.attribute('state')
-
-                # Manage current psector
-                sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
-                       " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-                       " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
-                row = tools_db.get_row(sql)
-                current_psector = row[0]
-                selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-
-                if str(current_psector) != str(selected_psector):
-                    msg = "This psector does not match the current one. Value of current psector will be updated."
-                    tools_qt.show_info_box(msg)
-
-                    sql = ("UPDATE config_param_user "
-                           f"SET value = '{selected_psector}' "
-                           "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
-                    tools_db.execute_sql(sql)
 
                 # Execute setarcfusion
                 workcat_id = tools_qt.get_combo_value(self.dlg_plan_psector, self.workcat_id)
