@@ -271,11 +271,10 @@ BEGIN
 
 				-- check if forced arc diameter is smaller than configured
 				IF v_projecttype = 'WS' then
-					if (SELECT cat_dnom::integer FROM ve_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom THEN
-						IF (SELECT cat_dnom::integer FROM ve_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom THEN
-							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},' ||
-							'"data":{"message":"3232", "function":"3188", "fid": 217, "parameters":{"diameter":' || v_check_arcdnom || '}}, "is_process":true}$$);';
-						END IF;
+					IF (SELECT cat_dnom::integer FROM ve_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},' ||
+						'"data":{"message":"3232", "function":"3188", "fid": 217, "parameters":{"diameter":' || v_check_arcdnom || '}}, "is_process":true}$$);';
+					END IF;
 				END IF;
 			END IF;
 
