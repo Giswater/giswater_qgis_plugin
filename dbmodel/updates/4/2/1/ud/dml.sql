@@ -376,7 +376,7 @@ VALUES(638, 'Check that all flow regulator elements have the same length', 'ud',
 'SELECT count(DISTINCT flwreg_length) FROM man_frelem GROUP BY node_id, to_arc HAVING count(DISTINCT flwreg_length) > 1',
 'All flow regulator elements with the same node_id and to_arc have the same length', '[gw_fct_pg2epa_check_data]', true);
 
-UPDATE condig_form_fields SET dv_querytext =
+UPDATE config_form_fields SET dv_querytext =
 'SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_outlet'''
 WHERE formnname = 've_epa_froutlet' and columnname = 'outlet_type';
 
