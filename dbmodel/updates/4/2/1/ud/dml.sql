@@ -395,3 +395,9 @@ update sys_table set alias = 'FRoutlet' where id = 've_inp_froutlet';
 update sys_table set alias = 'FRpump' where id = 've_inp_frpump';
 update sys_table set alias = 'FRorifice' where id = 've_inp_frorifice';
 update sys_table set alias = 'FRweir' where id = 've_inp_frweir';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4342, 'There are %v_count% %v_feature_type%s with fluid_type equal to zero.', NULL, 0, true, 'ud', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4344, 'There are %v_count% %v_feature_type%s with fluid_type different to zero.', NULL, 0, true, 'ud', 'core', 'AUDIT');
