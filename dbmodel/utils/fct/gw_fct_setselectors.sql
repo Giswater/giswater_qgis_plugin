@@ -372,29 +372,6 @@ BEGIN
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
 
-			-- scenarios
-			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
-				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-			END IF;
-
-			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN
-			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-
-			SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current'
-			INTO v_psector_current_value;
-
-			-- Check if current psector is in the selected exploitations
-			IF v_psector_current_value IS NOT NULL THEN
-				IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
-					AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN
-					-- Current psector is not in selected exploitations, set to NULL
-					UPDATE config_param_user SET value = NULL
-					WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
-				END IF;
-			END IF;
-
 		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 
 			IF v_tabname = 'tab_sector' THEN
@@ -419,16 +396,6 @@ BEGIN
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;
-
-			-- scenarios
-			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
-				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-			END IF;
-
-			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN
-			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
 
 		-- inserting muni_id from selected muni
@@ -485,7 +452,7 @@ BEGIN
 
 			-- psector
 			DELETE FROM selector_psector WHERE psector_id NOT IN
-			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+			(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
 			-- manage add schema for muni
 			IF v_addschema IS NOT NULL THEN
@@ -496,9 +463,7 @@ BEGIN
 				SELECT muni_id, current_user FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
 
 				EXECUTE 'SET search_path = '||v_schemaname||', public';
-
 			END IF;
-
 		END IF;
 	END IF;
 
@@ -667,20 +632,20 @@ BEGIN
 		SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
 		ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-		-- scenarios
-		IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
-			DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-			(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-		END IF;
-
-		-- psector
-		DELETE FROM selector_psector WHERE psector_id NOT IN
-		(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN
-	    (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-
 	END IF;
 
-	-- cross reference schema for state 
+	-- manage cross-reference for scenarios
+	IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
+		DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
+		(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+	END IF;
+
+	-- manage cross-reference for psectors
+	DELETE FROM selector_psector WHERE psector_id NOT IN
+	(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+	
+
+	-- manage cross reference schema for state 
 	IF v_addschema IS NOT NULL THEN 
 		EXECUTE 'DELETE FROM '||v_addschema||'.selector_state WHERE cur_user = current_user';
 		EXECUTE 'INSERT INTO '||v_addschema||'.selector_state SELECT state_id, current_user FROM selector_state WHERE cur_user = current_user';
@@ -728,19 +693,20 @@ BEGIN
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
 
  	-- exit psector mode if current psector is outside the selected expl
-	
-	IF EXISTS (
-	    SELECT 1
-	    FROM config_param_user a
-	    LEFT JOIN plan_psector b ON a.value::integer = b.psector_id
-	    JOIN selector_expl c ON b.expl_id = c.expl_id
-	    WHERE a."parameter" = 'plan_psector_current'
-	    AND c.cur_user = current_user
-		) THEN
-	
-		UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-	
-	END IF;
+
+	-- manage psector logics 
+	v_psector_current_value := (select value from config_param_user  WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user); 
+	IF v_psector_current_value  IS NOT NULL THEN
+		IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
+			AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN		
+		
+			-- remove current psector if explitation have been changed
+			UPDATE config_param_user SET value = NULL WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
+		ELSE		
+			-- force current if have been disabled and its expl_id is enabled
+			INSERT INTO selector_psector values (v_psector_current_value, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
+		END IF;
+	END IF;	
 
 	-- warn the user that in the selected psectors, there is a connec connected to different arcs
 	WITH mec AS ( 
