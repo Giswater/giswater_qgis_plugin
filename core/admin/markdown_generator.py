@@ -107,18 +107,20 @@ class GwAdminMarkdownGenerator:
     def generate_markdown_file(self):
         """ Generate the markdown file """
 
-        sql = f"SELECT lower(feature_type) as feature_type, lower(id) as id, lower(feature_class) as feature_class "
-        sql += f"FROM {self.schema}.cat_feature ORDER BY (feature_type, id)"
+        sql = f"SELECT lower(feature_type) as feature_type, lower(id) as id, lower(feature_class) as feature_class, "
+        sql += f"descript FROM {self.schema}.cat_feature ORDER BY (feature_type, id)"
         rows = tools_db.get_rows(sql)
         self.add_feature_to_index(rows)
 
         for row in rows:
+            descript = row['descript'] if row['descript'] else f'El objeto {row["id"]} no tiene descripción.'
+
             msg = "Generating markdown for {0}."
             msg_params = (row['id'],)
             self._change_table_lyt(msg, msg_params)
 
             # Create tab index
-            self.create_tab_index(row['id'], row['feature_type'], row['feature_class'])
+            self.create_tab_index(row['id'], row['feature_type'], row['feature_class'], descript)
 
         msg = "Markdown Generated from {0}."
         msg_params = (self.project_type,)
@@ -131,35 +133,124 @@ class GwAdminMarkdownGenerator:
 
         if not os.path.exists(feature_index_path):
             os.makedirs(os.path.dirname(feature_index_path), exist_ok=True)
-        
-        done_types = []
+            self._create_new_index_file(feature_index_path, rows)
+        else:
+            self._update_existing_index_file(feature_index_path, rows)
+
+    def _create_new_index_file(self, feature_index_path, rows):
+        """ Create a new index file with both project types """
         with open(feature_index_path, 'w') as file:
             file.write(f".. _info-feature-index\n\n")
 
-            # Title
-            self.title(file, "Feature Index", 1)
-    
+            # Title            
+            self.title(file, f"Objetos de Giswater", 1)
+
             # Introduction  
-            file.write(f"\n\nIn a giswater project for {self.project_type} the following features can be created and edited:\n\n")
+            file.write(f"\n\nEn un proyecto de Giswater se pueden crear y editar los siguientes objetos:\n\n")
 
-            # Create toctree structure
-            file.write(".. toctree::\n\t:maxdepth: 1\n\t:caption: Features\n\n")
-            
-            for row in rows:
-                if row['feature_type'] not in done_types:
-                    done_types.append(row['feature_type'])
-                    # Add a comment for the feature type
-                    file.write(f"\t# {row['feature_type'].title()}\n")            
-                file.write(f"\t{row['feature_type']}/{row['id']}/index_{row['id']}\n")
+            # Create sections for both project types
+            for proj_type in ['ws', 'ud']:
+                project_type_title = "Water Supply" if proj_type.lower() == "ws" else "Urban Drainage"
+                
+                if self.project_type.lower() == proj_type:
+                    self._write_project_type_section(file, proj_type, project_type_title, rows)
+                else:
+                    self._write_placeholder_section(file, proj_type, project_type_title)
 
-    def create_tab_index(self, feature_cat, feature_type, feature_class):
+    def _update_existing_index_file(self, feature_index_path, rows):
+        """ Update existing index file - only modify the current project type section """
+        # Read the existing content
+        with open(feature_index_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        
+        # Find the section markers for the current project type
+        proj_type = self.project_type.lower()
+        project_type_title = "Water Supply" if proj_type == "ws" else "Urban Drainage"
+        
+        # Define the section markers
+        start_marker = f'''<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>'''
+        end_marker = "</details>"
+        
+        # Find the start and end positions of the current project type section
+        start_pos = content.find(start_marker)
+        if start_pos != -1:
+            # Find the corresponding end marker
+            temp_pos = start_pos + len(start_marker)
+            end_pos = content.find(end_marker, temp_pos)
+            if end_pos != -1:
+                end_pos += len(end_marker)
+                
+                # Extract the parts before and after the section
+                before_section = content[:start_pos]
+                after_section = content[end_pos:]
+                
+                # Generate the new section content
+                new_section = self._generate_project_section_content(proj_type, project_type_title, rows)
+                
+                # Write the updated content
+                with open(feature_index_path, 'w', encoding='utf-8') as file:
+                    file.write(before_section + new_section + after_section)
+            else:
+                self._create_new_index_file(feature_index_path, rows)
+        else:
+            self._create_new_index_file(feature_index_path, rows)
+
+    def _write_project_type_section(self, file, proj_type, project_type_title, rows):
+        """ Write a project type section with actual content """
+        # Start HTML toggle for this project type
+        file.write(f".. raw:: html\n\n")
+        file.write(f"\t<details class='toggle-details'>\n")
+        file.write(f'''\t\t<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>\n\n''')
+        
+        # Create toctree structure for this project type inside the toggle
+        file.write(f".. toctree::\n")
+        file.write(f"\t:maxdepth: 1\n\n")
+        
+        done_types = []
+        for row in rows:
+            if row['feature_type'] not in done_types:
+                done_types.append(row['feature_type'])
+                file.write(f"\t# {row['feature_type'].title()}\n")            
+            file.write(f"\t{proj_type}/{row['feature_type']}/{row['id']}/index\n")
+        
+        # Close HTML toggle
+        file.write(f"\n.. raw:: html\n\n")
+        file.write(f"\t</details>\n\n")
+
+    def _write_placeholder_section(self, file, proj_type, project_type_title):
+        """ Write a placeholder section for the other project type """
+        file.write(f".. raw:: html\n\n")
+        file.write(f"\t<details class='toggle-details'>\n")
+        file.write(f'''\t\t<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>\n''')
+        file.write(f"\t\t<p>Contenido será generado cuando se procese un proyecto de tipo {proj_type.upper()}.</p>\n")
+        file.write(f"\t</details>\n\n")
+
+    def _generate_project_section_content(self, proj_type, project_type_title, rows):
+        """ Generate the content for a project type section """
+        content = f'''<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>\n\n'''
+        content += f".. toctree::\n"
+        content += f"\t:maxdepth: 1\n\n"
+        
+        done_types = []
+        for row in rows:
+            if row['feature_type'] not in done_types:
+                done_types.append(row['feature_type'])
+                content += f"\t# {row['feature_type'].title()}\n"            
+            content += f"\t{proj_type}/{row['feature_type'].replace('_', ' ')}/{row['id']}/index\n"
+        
+        content += f"\n.. raw:: html\n\n"
+        content += f"\t</details>"
+        
+        return content
+
+    def create_tab_index(self, feature_cat, feature_type, feature_class, descript):
         """ Create tab index """
-        sql = f"SELECT replace(tabname, '_', ' ') as tabname FROM {self.schema}.config_form_tabs WHERE "
+        sql = f"SELECT replace(tabname, '_', ' ') as tabname, tooltip FROM {self.schema}.config_form_tabs WHERE "
         sql += f"formname = 've_{feature_type}_{feature_cat}' OR formname = 've_{feature_type}' OR "
-        sql += f"formname = 've_man_{feature_class}'"
+        sql += f"formname = 've_man_{feature_class}' ORDER BY tabname"
         rows_cft = tools_db.get_rows(sql)
 
-        tab_index_path = f"{self.path}/info_feature/{feature_type}/{feature_cat}/index_{feature_cat}.rst"
+        tab_index_path = f"{self.path}/info_feature/{self.project_type}/{feature_type}/{feature_cat}/index.rst"
         
         if not os.path.exists(tab_index_path):
             os.makedirs(os.path.dirname(tab_index_path), exist_ok=True)
@@ -168,10 +259,10 @@ class GwAdminMarkdownGenerator:
             file.write(f".. _tab-index-{feature_cat}\n\n")
 
             # Title
-            self.title(file, f"{feature_cat.title()} Tabs", 1)
+            self.title(file, f"{feature_cat.title().replace('_', ' ')}", 1)
 
             # Introduction
-            file.write(f"\n\nThe feature {feature_cat}, has the following tabs:\n\n")
+            file.write(f"\n\n{descript}\n\n")
 
             # Create toctree structure for tabs
             file.write(".. toctree::\n\t:maxdepth: 1\n\t:caption: Tabs\n\n")
@@ -179,21 +270,21 @@ class GwAdminMarkdownGenerator:
             for row in rows_cft:
                 # Check if this is the "Data" tab to link to the dynamic tab_data file
                 if row['tabname'] == 'tab data':
-                    file.write(f"\ttab_data_{feature_cat}\n")
-                    self.create_dinamic_tab(f've_{feature_type}', feature_cat, f'{feature_type}/{feature_cat}/tab_data_{feature_cat}.rst')
+                    file.write(f"\ttab_data\n")
+                    self.create_dinamic_tab(f've_{feature_type}', feature_cat, f'{self.project_type}/{feature_type}/{feature_cat}/tab_data.rst', row['tooltip'])
                 elif row['tabname'] == 'tab epa':
-                    file.write(f"\ttab_epa_{feature_cat}\n")
-                    self.create_index_tab_epa(feature_cat, feature_type, feature_class)
+                    file.write(f"\ttab_epa\n")
+                    self.create_index_tab_epa(feature_cat, feature_type, row['tooltip'])
                 else:
-                    file.write(f"\t../../{row['tabname'].split(' ')[1]}\n")
+                    file.write(f"\t../../{row['tabname'].replace(' ', '_')}\n")
                     self.create_other_tab(row)
 
-    def create_index_tab_epa(self, feature_cat, feature_type, feature_class):
+    def create_index_tab_epa(self, feature_cat, feature_type, descript):
         """ Create dinamic tab_epa """
         sql = f"SELECT * FROM {self.schema}.sys_feature_epa_type WHERE feature_type = '{feature_type.upper()}'"
         rows_sfet = tools_db.get_rows(sql)
 
-        tab_epa_path = f"{self.path}/info_feature/{feature_type}/{feature_cat}/tab_epa_{feature_cat}.rst"
+        tab_epa_path = f"{self.path}/info_feature/{self.project_type}/{feature_type}/{feature_cat}/tab_epa.rst"
         
         if not os.path.exists(tab_epa_path):
             os.makedirs(os.path.dirname(tab_epa_path), exist_ok=True)
@@ -201,34 +292,36 @@ class GwAdminMarkdownGenerator:
         with open(tab_epa_path, 'w') as file:
             # Header
             file.write(f".. _index-epa-{feature_cat}\n\n")
-            self.title(file, f"{feature_cat.title()}: Tab EPA", 1)
-            file.write(f"\n\nThe feature {feature_cat}, has the following EPA types:\n\n")
+            self.title(file, f"EPA", 1)
+            file.write(f"\n\nLos tipos de EPA que puede tener el objeto {feature_cat} son:\n\n")
             file.write(f".. toctree::\n\t:maxdepth: 1\n\t:caption: EPA Types\n\n")
 
             for row in rows_sfet:
                 epa_type = row['id'].lower()
                 if epa_type == 'undefined':
                     continue 
-                file.write(f"\t../tab_epa/epa_type_{epa_type}\n")
-                self.create_dinamic_tab('ve_epa', epa_type, f'{feature_type}/tab_epa/epa_type_{epa_type}.rst')
+                file.write(f"\t../tab_epa/{epa_type}\n")
+                self.create_dinamic_tab('ve_epa', epa_type, f'{self.project_type}/{feature_type}/tab_epa/{epa_type}.rst', descript)
 
     def create_other_tab(self, row):
         """ Create other tab """
 
         tabname = row['tabname'].split(' ')[1]
-        tab_path = f"{self.path}/info_feature/{tabname}.rst"
+        tab_path = f"{self.path}/info_feature/{self.project_type}/tab_{tabname}.rst"
         if not os.path.exists(tab_path):
             os.makedirs(os.path.dirname(tab_path), exist_ok=True)
 
-            with open(tab_path, 'w') as file:
-                file.write(f".. _tab-{tabname}\n\n")
-                self.title(file, f"Tab {tabname}", 1)
+        with open(tab_path, 'w') as file:
+            file.write(f".. _tab-{tabname}\n\n")
+            self.title(file, f"{tabname.title()}", 1)
+            file.write(f"\n\n{row['tooltip']}\n\n")
 
-    def create_dinamic_tab(self, prefix, feature, extra_path):
+    def create_dinamic_tab(self, prefix, feature, extra_path, descript):
         """ Create dinamic tab_data """
+             
         # Get rows from config_form_fields
         done_layouts = []
-        tabname = 'tab_epa' if 'epa' in prefix else 'tab_data'
+        tabname = 'tab_epa' if 'epa' in prefix else 'tab_data'  
         sql = (f"""SELECT * FROM {self.schema}.config_form_fields WHERE formname = '{prefix}_{feature}'
                 AND tabname = '{tabname}' AND formtype = 'form_feature' AND layoutname != 'lyt_none' AND hidden = False ORDER BY
                 CASE
@@ -247,8 +340,16 @@ class GwAdminMarkdownGenerator:
         with open(tab_data_path, 'w') as file:
             # Header
             file.write(f".. _tab-{tabname.split('_')[1]}-{feature}\n\n")
-            self.title(file, f"{feature.title()}: Tab {tabname.split('_')[1].title()}", 1)
-            file.write(f"\n\nThe feature {feature}, has the following data:\n\n")
+            if tabname == 'tab_data':
+                self.title(file, f"{tabname.split('_')[1].title()}", 1)
+            else:
+                self.title(file, f"{feature.title()}", 1)
+            
+            if tabname == 'tab_data':
+                file.write(f"\n\n{descript}\n\n")
+                file.write(f"\n\nSi quieres consultar la distribución de los layouts puedes ir a :ref:`Partes del formulario <partes-del-formulario>`\n\n")
+            else:
+                file.write(f"\n\n{descript}\n\n")
 
             if not rows_cff:
                 print(f"No data found for {feature}: {prefix}_{feature}")
@@ -258,7 +359,7 @@ class GwAdminMarkdownGenerator:
                 if row['layoutname'] not in done_layouts:
                     done_layouts.append(row['layoutname'])
                     file.write(f".. raw:: html\n\n")
-                    file.write(f"\t<p class='layout-header'>The widgets in the layout {row['layoutname']} are:</p>\n\n")
+                    file.write(f"\t<p class='layout-header'>Los campos en el layout {row['layoutname']} son:</p>\n\n")
                 # Define variables
                 mandatory = 'No' if not row['ismandatory'] else 'Sí'
                 editable = 'No' if not row['iseditable'] else 'Sí'
@@ -269,8 +370,12 @@ class GwAdminMarkdownGenerator:
                 widgetcontrols = row['widgetcontrols']
 
                 # Write tooltip
-                if f'{row['columnname']} - ' in (row['tooltip'] or ''):
-                    tooltip = row['tooltip'].split(f'{row['columnname']} - ')[1]
+                pattern = r"^\w+\s*-\s*"
+                if row['tooltip']:
+                    if bool(re.match(pattern, row['tooltip'])):
+                        tooltip = row['tooltip'].split('-', 1)[1].strip()
+                    else:
+                        tooltip = row['tooltip']
                 else:
                     tooltip = row['tooltip']
 
@@ -280,7 +385,7 @@ class GwAdminMarkdownGenerator:
                     else:
                         label = f"{row['label']}"  
                 elif row['columnname'].startswith('tbl_'):
-                    label = f"Tabla {row['columnname'].split('_')[2].title()}"
+                    label = f"Tabla {row['columnname'].replace('tbl_', '').replace('_', ' ').title()}"
                 elif row['columnname'].startswith('hspacer_'):
                     continue
                 else:
@@ -521,10 +626,12 @@ class GwAdminMarkdownGenerator:
         """ Create a title """
         if level == 1:
             for i in range(len(text)):
-                file.write(f"=")
-        file.write(f"\n{text.title()}\n")
+                file.write("=")
+            file.write("\n")
+        file.write(f"{text}\n")
         for i in range(len(text)):
-            file.write(f"=")
+            file.write("=")
+        file.write(f"\n")
     # endregion
 
     # region private functions
