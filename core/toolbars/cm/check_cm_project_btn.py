@@ -53,6 +53,14 @@ class GwCheckCMProjectButton(GwAction):
         self.campaign_combo = self.dialog.findChild(QComboBox, "tab_data_campaign")
         self.lot_combo = self.dialog.findChild(QComboBox, "tab_data_lot")
 
+        campagin_combo_value = tools_gw.get_config_parser('check_project_cm', 'campaign_combo', "user", "session")
+        lot_combo_value = tools_gw.get_config_parser('check_project_cm', 'lot_combo', "user", "session")
+
+        if campagin_combo_value not in (None, 'None', ''):
+            tools_qt.set_combo_value(self.campaign_combo, campagin_combo_value, 0)
+        if lot_combo_value not in (None, 'None', ''):
+            tools_qt.set_combo_value(self.lot_combo, lot_combo_value, 0)
+
         # Set listeners
         self.dialog.btn_accept.clicked.connect(self._on_accept_clicked)
         if self.campaign_combo:
@@ -130,6 +138,9 @@ class GwCheckCMProjectButton(GwAction):
                   "log_widget": log_widget, "campaign_id": campaign_id, "lot_id": lot_id,
                   "check_management_configs": check_management_configs, "check_data_related": check_data_related}
 
+        # Save dialog values
+        self._save_dlg_values()
+
         self.project_check_task = GwProjectCheckCMTask('check_project_cm', params)
 
         # Connect task signals to UI updates
@@ -158,6 +169,15 @@ class GwCheckCMProjectButton(GwAction):
         tools_qt.enable_tab_by_tab_name(self.dialog.mainTab, "tab_data", True)
         self.dialog.progressBar.setVisible(False)
         self.dialog.lbl_time.setVisible(False)
+
+    def _save_dlg_values(self):
+        """ Save dialog values """
+
+        campaign_combo = tools_qt.get_combo_value(self.dialog, "tab_data_campaign", index=0)
+        lot_combo = tools_qt.get_combo_value(self.dialog, "tab_data_lot", index=-1)
+
+        tools_gw.set_config_parser('check_project_cm', 'campaign_combo', campaign_combo)
+        tools_gw.set_config_parser('check_project_cm', 'lot_combo', lot_combo)
 
     # endregion
 
