@@ -6,7 +6,7 @@ or (at your option) any later version.
 */
 -- The code of this inundation function have been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
 
---FUNCTION CODE: 2710
+--FUNCTION CODE: 3508
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_mapzones_v1(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_v1(p_data json)
@@ -190,7 +190,7 @@ BEGIN
 		v_fid=481;
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3090", "function":"2710","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
+		"data":{"message":"3090", "function":"3508","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 	END IF;
 
 	-- SECTION[epic=mapzones]: SET VARIABLES
@@ -907,6 +907,8 @@ BEGIN
 
 		v_result := COALESCE(v_result, '{}');
 		v_result_point := concat ('{"geometryType":"Point", "features":',v_result,'}');
+
+		v_visible_layer := NULL;
 	END IF;
 	-- ENDSECTION
 
@@ -1507,7 +1509,7 @@ BEGIN
 					FROM temp_pgr_arc';
 
 				-- update macrozone the_geom
-				UPDATE drainzone d SET the_geom = a.the_geom FROM 
+				UPDATE drainzone d SET the_geom = a.the_geom FROM
 				(SELECT drainzone_id, st_union(the_geom) as the_geom FROM dwfzone WHERE drainzone_id IS NOT NULL AND dwfzone_id in (select dwfzone_id FROM dwfzone) GROUP BY drainzone_id) a
 				WHERE a.drainzone_id = d.drainzone_id;
 
@@ -1569,7 +1571,7 @@ BEGIN
 				"polygon":'||v_result_polygon||'
 			}
 		}
-	}')::json, 2710, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
+	}')::json, 3508, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
 
 END;
 $BODY$
