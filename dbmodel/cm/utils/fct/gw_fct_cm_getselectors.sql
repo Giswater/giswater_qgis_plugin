@@ -193,10 +193,8 @@ BEGIN
 		select l.* from om_campaign_lot l
 		join selector_campaign sc using (campaign_id)
 		join cat_team t using (team_id)
-		join cat_user using (team_id)
 		where l.active
-		and cur_user = current_user -- only campaigns enabled for user
-		and username = current_user; -- only lots enabled for user ;
+		and cur_user = current_user; -- only campaigns enabled for user
 
 	end if;
 
