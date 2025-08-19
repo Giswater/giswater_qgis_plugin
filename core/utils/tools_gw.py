@@ -807,13 +807,13 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                 for vr in valueRelation:
                     # Get required keys with safe defaults
                     vr_layer = tools_qgis.get_layer_by_tablename(vr.get('targerLayer', ''))  # Get 'Layer' with default
-                    
+
                     # Check if layer exists before proceeding
                     if vr_layer is None:
                         continue
-                        
+
                     field_index = vr_layer.fields().indexFromName(vr.get('targetColumn', 'id'))   # Get 'Column' index with default
-                    
+
                     # Check if field exists before proceeding
                     if field_index == -1:
                         continue
@@ -859,15 +859,15 @@ def hide_layer_from_toc(layer):
     """
     if layer is None:
         return
-        
+
     root = QgsProject.instance().layerTreeRoot()
     if root is None:
         return
-        
+
     ltv = global_vars.iface.layerTreeView()
     if ltv is None:
         return
-         
+
     tools_qgis.hide_node_from_treeview(root.findLayer(layer.id()), root, ltv)
 
 
@@ -878,11 +878,11 @@ def hide_group_from_toc(group):
     """
     if group is None:
         return
-        
+
     root = QgsProject.instance().layerTreeRoot()
     if root is None:
         return
-        
+
     ltv = global_vars.iface.layerTreeView()
     if ltv is None:
         return
@@ -1653,88 +1653,88 @@ def manage_feature_cat():
     return feature_cat
 
 
-def build_dialog_info(dialog, result, my_json=None, layout_positions=None):  
+def build_dialog_info(dialog, result, my_json=None, layout_positions=None):
     """
     Builds the dialog and configures fields and actions dynamically based on the provided result.
     Handles tab-specific action visibility and configurations.
     """
-    fields = result['body']['data']  
-    if 'fields' not in fields:  
-        return  
-    grid_layout = dialog.findChild(QGridLayout, 'lyt_main_1')  
-      
-    # Inicialitzar layout_positions si no es proporciona  
-    if layout_positions is None:  
-        layout_positions = {}  
-  
-    for order, field in enumerate(fields["fields"]):  
-        if field.get('hidden'):  
-            continue  
-  
-        label = QLabel()  
-        label.setObjectName('lbl_' + field['label'])  
-        label.setText(field['label'].capitalize())  
-  
-        if 'tooltip' in field:  
-            label.setToolTip(field['tooltip'])  
-        else:  
-            label.setToolTip(field['label'].capitalize())  
-  
-        widget = None  
-        if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':  
-            completer = QCompleter()  
-            widget = add_lineedit(field)  
-            widget = set_widget_size(widget, field)  
-            widget = set_data_type(field, widget)  
-            if field['widgettype'] == 'typeahead':  
-                widget = set_typeahead(field, dialog, widget, completer)  
-            widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))  
-        elif field['widgettype'] == 'datetime':  
-            widget = add_calendar(dialog, field)  
-            widget.valueChanged.connect(partial(get_values, dialog, widget, my_json))  
-        elif field['widgettype'] == 'hyperlink':  
-            widget = add_hyperlink(field)  
-        elif field['widgettype'] == 'textarea':  
-            widget = add_textarea(field)  
-            widget.textChanged.connect(partial(get_values, dialog, widget, my_json))  
-        elif field['widgettype'] in ('combo', 'combobox'):  
-            widget = add_combo(field)  
-            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)  
-            widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))  
-        elif field['widgettype'] in ('check', 'checkbox'):  
-            kwargs = {"dialog": dialog, "field": field}  
-            widget = add_checkbox(**kwargs)  
-            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))  
-        elif field['widgettype'] == 'button':  
-            kwargs = {"dialog": dialog, "field": field}  
-            widget = add_button(**kwargs)  
-  
-        if 'ismandatory' in field and widget is not None:  
-            widget.setProperty('ismandatory', field['ismandatory'])  
-  
-        # Gestió de posicions millorada - mantenir la lògica original però amb millores  
-        if 'layoutorder' in field and field['layoutorder'] is not None:  
-            order = field['layoutorder']  
-          
-        # Aplicar la lògica de posicions no repetides  
-        layout_name = 'lyt_main_1'  
-        if layout_positions is not None:  
-            if layout_name not in layout_positions:  
-                layout_positions[layout_name] = set()  
-              
-            widget_pos = order  
-            while widget_pos in layout_positions[layout_name]:  
-                widget_pos += 1  
-              
-            layout_positions[layout_name].add(widget_pos)  
-            order = widget_pos  
-          
-        grid_layout.addWidget(label, order, 0)  
-        grid_layout.addWidget(widget, order, 1)  
-  
-    vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)  
-    grid_layout.addItem(vertical_spacer1)  
-  
+    fields = result['body']['data']
+    if 'fields' not in fields:
+        return
+    grid_layout = dialog.findChild(QGridLayout, 'lyt_main_1')
+
+    # Inicialitzar layout_positions si no es proporciona
+    if layout_positions is None:
+        layout_positions = {}
+
+    for order, field in enumerate(fields["fields"]):
+        if field.get('hidden'):
+            continue
+
+        label = QLabel()
+        label.setObjectName('lbl_' + field['label'])
+        label.setText(field['label'].capitalize())
+
+        if 'tooltip' in field:
+            label.setToolTip(field['tooltip'])
+        else:
+            label.setToolTip(field['label'].capitalize())
+
+        widget = None
+        if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':
+            completer = QCompleter()
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
+            if field['widgettype'] == 'typeahead':
+                widget = set_typeahead(field, dialog, widget, completer)
+            widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'datetime':
+            widget = add_calendar(dialog, field)
+            widget.valueChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'hyperlink':
+            widget = add_hyperlink(field)
+        elif field['widgettype'] == 'textarea':
+            widget = add_textarea(field)
+            widget.textChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] in ('combo', 'combobox'):
+            widget = add_combo(field)
+            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] in ('check', 'checkbox'):
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_checkbox(**kwargs)
+            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'button':
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_button(**kwargs)
+
+        if 'ismandatory' in field and widget is not None:
+            widget.setProperty('ismandatory', field['ismandatory'])
+
+        # Gestió de posicions millorada - mantenir la lògica original però amb millores
+        if 'layoutorder' in field and field['layoutorder'] is not None:
+            order = field['layoutorder']
+
+        # Aplicar la lògica de posicions no repetides
+        layout_name = 'lyt_main_1'
+        if layout_positions is not None:
+            if layout_name not in layout_positions:
+                layout_positions[layout_name] = set()
+
+            widget_pos = order
+            while widget_pos in layout_positions[layout_name]:
+                widget_pos += 1
+
+            layout_positions[layout_name].add(widget_pos)
+            order = widget_pos
+
+        grid_layout.addWidget(label, order, 0)
+        grid_layout.addWidget(widget, order, 1)
+
+    vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    grid_layout.addItem(vertical_spacer1)
+
     return result
 
 
@@ -2336,19 +2336,19 @@ def add_calendar(dlg, fld, **kwargs):
 
 def set_typeahead(field, dialog, widget, completer, feature_id=None):
 
+    # Check for the second behavior: 'comboIds' and 'comboNames' are required
+    if 'comboIds' in field and 'comboNames' in field:
+        # Populate completer rows from comboIds and comboNames
+        rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
+        tools_qt.set_completer_rows(widget, rows)
+        return widget
+
     # Check for the first behavior: 'queryText' and 'queryTextFilter' are required
     if field.get('queryText') is not None and 'queryTextFilter' in field:
         # Typeahead with queryText and queryTextFilter
         widget.setProperty('typeahead', True)
         model = QStandardItemModel()
         widget.textEdited.connect(partial(fill_typeahead, completer, model, field, dialog, widget, feature_id))
-        return widget
-
-    # Check for the second behavior: 'comboIds' and 'comboNames' are required
-    if 'comboIds' in field and 'comboNames' in field:
-        # Populate completer rows from comboIds and comboNames
-        rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
-        tools_qt.set_completer_rows(widget, rows)
         return widget
 
     # If none of the conditions are met, log or display an appropriate message
