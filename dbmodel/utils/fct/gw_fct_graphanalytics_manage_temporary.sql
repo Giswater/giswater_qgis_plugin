@@ -52,6 +52,7 @@ BEGIN
             component int4,
             mapzone_id _int4,
             name VARCHAR(50),
+            pattern_id int4,
             the_geom geometry(Geometry, SRID_VALUE),
             CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (id)
         );
