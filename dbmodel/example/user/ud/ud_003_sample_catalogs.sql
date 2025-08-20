@@ -199,6 +199,11 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_la
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EWEIR', 'FRELEM','ELEMENT', 've_element', 've_element_eweir', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EPUMP', 'FRELEM','ELEMENT', 've_element', 've_element_pump', true) ON CONFLICT (id) DO NOTHING;
 
+UPDATE cat_feature_element SET epa_default='FRPUMP' WHERE id = 'EPUMP';
+UPDATE cat_feature_element SET epa_default='FRWEIR' WHERE id = 'EWEIR';
+UPDATE cat_feature_element SET epa_default='FRORIFICE' WHERE id = 'EORIFICE';
+UPDATE cat_feature_element SET epa_default='FROUTLET' WHERE id = 'EOUTLET';
+
 INSERT INTO cat_element (id, element_type, active) VALUES ('ORIFICE-01', 'EORIFICE', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('OUTLET-01', 'EOUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('WEIR-01', 'EWEIR', TRUE) ON CONFLICT (id) DO NOTHING;

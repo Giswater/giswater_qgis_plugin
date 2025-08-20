@@ -206,3 +206,7 @@ INSERT INTO cat_link (id, link_type, descript) VALUES('VIRTUAL', 'VLINK', 'Virtu
 ON CONFLICT (id) DO UPDATE SET link_type='VLINK', descript='Virtual link';
 
 UPDATE cat_feature SET feature_class='VCONNEC' WHERE id='VCONNEC';
+
+UPDATE cat_feature_element SET epa_default='FRPUMP' WHERE id = 'EPUMP';
+UPDATE cat_feature_element SET epa_default='FRVALVE' WHERE id = 'EVALVE';
+UPDATE cat_feature_element SET epa_default='FRSHORTPIPE' WHERE id = 'EMETER';

@@ -18,3 +18,6 @@ ADD CONSTRAINT chk_widgets_requires_dv_querytext
 CHECK (
     (widgettype NOT IN ('combo', 'typeahead')) OR dv_querytext IS NOT NULL
 );
+
+ALTER TABLE cat_feature_element DROP CONSTRAINT IF EXISTS cat_feature_element_inp_check;
+ALTER TABLE cat_feature_element ADD CONSTRAINT cat_feature_element_inp_check CHECK (((epa_default)::text = ANY (ARRAY['FRPUMP'::text,'FRWEIR'::text, 'FRORIFICE'::text, 'FROUTLET'::text,'UNDEFINED'::text])));
