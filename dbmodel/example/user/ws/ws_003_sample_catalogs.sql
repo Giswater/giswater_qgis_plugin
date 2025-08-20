@@ -46,13 +46,13 @@ INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, NULL);
 UPDATE cat_feature SET active = false WHERE id = 'VCONNEC';
 
 INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
-VALUES ('PVC25-PN16', 'PIPELINK', 'PVC', '16', '25', 25.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
+VALUES ('PVC25-PN16', 'PIPELINK', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
-VALUES ('PVC32-PN16', 'PIPELINK', 'PVC', '16', '32', 32.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
+VALUES ('PVC32-PN16', 'PIPELINK', 'PVC', '16', '32', 32.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
-VALUES ('PVC50-PN16', 'PIPELINK', 'PVC', '16', '50', 50.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
+VALUES ('PVC50-PN16', 'PIPELINK', 'PVC', '16', '50', 50.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
-VALUES ('PVC63-PN16', 'PIPELINK', 'PVC', '16', '63', 63.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
+VALUES ('PVC63-PN16', 'PIPELINK', 'PVC', '16', '63', 63.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 
 INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
 VALUES('FACADE-CABINET', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);

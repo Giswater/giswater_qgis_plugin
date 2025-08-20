@@ -51,18 +51,30 @@ INSERT INTO cat_brand_model VALUES ('model4', 'brand2', NULL, NULL, true, '{REGI
 INSERT INTO cat_brand_model VALUES ('model5', 'brand3', NULL, NULL, true, '{CJOIN, GINLET}');
 INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, '{EPUMP, VALVE, REGISTER}');
 
-INSERT INTO cat_connec VALUES ('PVC-CC025_D', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC040_I', 'CJOIN', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Concrete connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC-CC025_T', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC-CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC020_D', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Concrete connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CON-CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Concrete connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('VIRTUAL', 'VCONNEC', NULL, 'VIRTUAL', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Virtual connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC025_D', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC040_I', 'CJOIN', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC025_T', 'CJOIN', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC030_D', 'CJOIN', NULL, 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('CC020_D', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('PVC-CC025_D', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CON-CC040_I', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('PVC-CC025_T', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('PVC-CC030_D', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CON-CC020_D', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CON-CC030_D', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('VIRTUAL', 'VLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CC025_D', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CC040_I', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CC025_T', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CC030_D', 'CONDUITLINK', NULL, true);
+INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CC020_D', 'CONDUITLINK', NULL, true);
+
+INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('DIRECT-CONNECTION', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('INSPECTION-CHAMBER', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('GREASE-TRAP', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('SAMPLING-CHAMBER', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES ('VIRTUAL', 'VCONNEC', NULL, 'VIRTUAL', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Virtual connec', NULL, NULL, NULL, NULL, true, NULL, NULL);
+
 
 INSERT INTO cat_node VALUES ('CHAMBER-01', 'CHAMBER', NULL, NULL, 3.00, 2.50, 3.00, 'Chamber 3x2.5x3m', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_CH300x250-H300', true, NULL, NULL);
 INSERT INTO cat_node VALUES ('HIGH POINT-01', 'HIGHPOINT', NULL, NULL, 1.00, 1.00, NULL, 'High point', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD80-H160', true, NULL, NULL);
@@ -191,9 +203,5 @@ INSERT INTO cat_element (id, element_type, active) VALUES ('ORIFICE-01', 'EORIFI
 INSERT INTO cat_element (id, element_type, active) VALUES ('OUTLET-01', 'EOUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('WEIR-01', 'EWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('PUMP-01', 'EPUMP', TRUE) ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
-SELECT id, 'CONDUITLINK' as link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
-FROM cat_connec ON CONFLICT DO NOTHING;
 
 UPDATE cat_link SET link_type='VLINK' WHERE id='VIRTUAL';
