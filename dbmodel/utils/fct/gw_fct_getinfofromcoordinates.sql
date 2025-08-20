@@ -93,6 +93,7 @@ v_msgerr json;
 v_featuredialog text;
 v_client_epsg integer;
 v_field_state text;
+v_parent text;
 
 BEGIN
 
@@ -222,49 +223,66 @@ BEGIN
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 40);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
-		RAISE NOTICE 'v_querystring %', v_querystring;
 		EXECUTE v_querystring INTO v_the_geom;
-
+	
+		-- get table parent
+		select lower(feature_type) into v_parent from cat_feature where id = v_layer.layer_id ;
+		
+		if v_parent is null then -- look for parent
+			select lower(feature_type) into v_parent from cat_feature where parent_layer  = v_layer.layer_id limit 1;
+		end if;
+		
 		EXECUTE 'SELECT column_name FROM information_schema.columns 
 		WHERE table_name='||quote_literal(v_schemaname)||' and column_name=''state'' and table_schema='||quote_literal(v_layer)||''
 		INTO v_field_state;
-
+	        
 		IF v_layer.geomtype = 'polygon' THEN
 
-			--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)
+			--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
 			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
 			ORDER BY  ST_area(',v_layer.layer_id,'.',v_the_geom,') asc LIMIT 1');
 			v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 50);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-
+			
 			EXECUTE v_querystring INTO v_id;
-		ELSIF v_layer.layer_id ILIKE '%visit' or v_field_state is null THEN
+		
+		ELSIF v_layer.layer_id ILIKE '%visit' THEN
 			--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
 			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
 			ORDER BY ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
 			v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 60);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-
+			
 			EXECUTE v_querystring INTO v_id;
-
-		ELSE
+		else
 			--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
-			ORDER BY  CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
-			v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 60);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-
+			if v_parent is null then
+				v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
+				ORDER BY ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
+				v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 60);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			else 
+				
+			--  Get element from active layer, using parent layer with exists wich enhances a lot the performance
+				v_querystring = concat('WITH params AS (SELECT ''',v_point,'''::geometry(POINT,SRID_VALUE) as pt) 
+				SELECT lc.',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' lc WHERE EXISTS
+				(SELECT 1 FROM ',quote_ident(v_parent),' lp, params p WHERE lc.',quote_ident(v_idname),'= lp.',quote_ident(v_idname),' 
+				AND lp.the_geom && st_expand(p.pt, ',v_sensibility,')
+				AND st_dwithin (pt, lp.the_geom, ',v_sensibility,') 
+				ORDER BY  CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, ST_Distance(lp.the_geom, pt) asc LIMIT 1)');									
+			end if;			
+		
 			EXECUTE v_querystring INTO v_id;
-		END IF;
+		END IF;      
 
-		IF v_id IS NOT NULL THEN
+		IF v_id IS NOT NULL THEN 
 			v_flag = true;
 			exit;
-		ELSE
-		-- RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;
+		ELSE 
+		-- RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
 		END IF;
 	END LOOP;
 
