@@ -180,6 +180,24 @@ BEGIN
 		END IF;
 	END IF;
 
+	-- compare parameters in message with parameters recieved
+	IF rec_cat_error.error_message IS NOT NULL THEN
+		IF (select (select array(SELECT key FROM json_each_text(v_parameters) order by key)) =
+		(select array(select split_part(token, '%', 2) as msg_parameters
+		from string_to_table(rec_cat_error.error_message, ' ') token where token like '%\%%\%%'
+		order by msg_parameters))) THEN
+			-- replace parameter names in message with parameter values recieved
+			FOR _key, _value IN
+				SELECT * FROM json_each_text(v_parameters)
+			LOOP
+				rec_cat_error.error_message = replace(rec_cat_error.error_message, concat('%', _key, '%'), _value);
+			END LOOP;
+		ELSE
+			-- return error parameters aren't the same
+			RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Error in message parameters'))::json;
+		END IF;
+	END IF;
+
 	-- add specified headers
 	IF v_prefix_id IS NOT NULL THEN
 		-- select label record
