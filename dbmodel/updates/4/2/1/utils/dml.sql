@@ -146,3 +146,9 @@ INSERT INTO sys_param_user
 VALUES('utils_transaction_mode', 'dynamic', 'Gets the transaction mode on functions', 'role_basic', NULL, 'Transaction mode', NULL, NULL, true, null, 
 'utils', false, NULL, NULL, NULL, false, 'boolean', null, false, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, 'core');
 
+UPDATE sys_table
+SET addparam = CASE
+	WHEN addparam IS NULL THEN '{"layerProp":{"hiddenForm": "true"}}'::jsonb
+	ELSE addparam::jsonb || '{"layerProp":{"hiddenForm": "true"}}'::jsonb
+END
+WHERE id ilike 've_pol_%';

@@ -160,7 +160,8 @@ BEGIN
 				CASE
 					WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
 					ELSE st.addparam->>'pkey'
-				END AS "tableId"
+				END AS "tableId",
+				st.addparam
 			FROM sys_table st
 			JOIN config_typevalue ct ON ct.id = st.context
 			LEFT JOIN (
