@@ -152,3 +152,6 @@ SET addparam = CASE
 	ELSE addparam::jsonb || '{"layerProp":{"hiddenForm": "true"}}'::jsonb
 END
 WHERE id ilike 've_pol_%';
+
+
+UPDATE sys_style SET id = 've_man_frelem' WHERE id = 've_frelem';
