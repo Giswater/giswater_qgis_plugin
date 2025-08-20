@@ -22,11 +22,12 @@ SELECT columns_are(
     ARRAY[
         'id', 'psector_id', 'psector_state', 'doable', 'audit_tstamp', 'audit_user', 'action',
         'link_id', 'code', 'feature_id', 'feature_type', 'exit_id', 'exit_type', 'userdefined_geom',
-        'state', 'expl_id', 'the_geom', 'top_elev2', 'depth2', 'sector_id', 'dma_id',
+        'state', 'expl_id', 'the_geom', 'top_elev2', 'y1', 'y2', 'sector_id', 'dma_id',
         'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_visibility', 'epa_type',
         'is_operative', 'created_by', 'updated_at', 'updated_by', 'staticpressure1',
         'linkcat_id', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'uncertain',
-        'muni_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource', 'created_at', 'staticpressure2'
+        'muni_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource', 'created_at', 'staticpressure2',
+        'dwfzone_id'
     ],
     'Table archived_psector_link should have the correct columns'
 );
@@ -55,7 +56,8 @@ SELECT col_type_is('archived_psector_link', 'state', 'int2', 'Column state shoul
 SELECT col_type_is('archived_psector_link', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('archived_psector_link', 'the_geom', 'geometry(linestring, 25831)', 'Column the_geom should be geometry(linestring, 25831)');
 SELECT col_type_is('archived_psector_link', 'top_elev2', 'double precision', 'Column top_elev2 should be float8');
-SELECT col_type_is('archived_psector_link', 'depth2', 'numeric(12,3)', 'Column depth2 should be numeric(12,3)');
+SELECT col_type_is('archived_psector_link', 'y1', 'numeric(12,3)', 'Column y1 should be numeric(12,3)');
+SELECT col_type_is('archived_psector_link', 'y2', 'numeric(12,3)', 'Column y2 should be numeric(12,3)');
 SELECT col_type_is('archived_psector_link', 'sector_id', 'integer', 'Column sector_id should be integer');
 SELECT col_type_is('archived_psector_link', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('archived_psector_link', 'fluid_type', 'varchar(50)', 'Column fluid_type should be varchar(50)');
@@ -83,6 +85,7 @@ SELECT col_type_is('archived_psector_link', 'custom_length', 'numeric(12,2)', 'C
 SELECT col_type_is('archived_psector_link', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('archived_psector_link', 'created_at', 'varchar(50)', 'Column created_at should be varchar(50)');
 SELECT col_type_is('archived_psector_link', 'staticpressure2', 'numeric(12,3)', 'Column staticpressure2 should be numeric(12,3)');
+SELECT col_type_is('archived_psector_link', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
 
 -- Check default values
 SELECT col_has_default('archived_psector_link', 'id', 'Column id should have default value');
