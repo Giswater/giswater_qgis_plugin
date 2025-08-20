@@ -154,4 +154,4 @@ END
 WHERE id ilike 've_pol_%';
 
 
-UPDATE sys_style SET id = 've_man_frelem' WHERE id = 've_frelem';
+UPDATE sys_style SET layername = 've_man_frelem' WHERE layername = 've_frelem';
