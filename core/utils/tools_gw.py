@@ -34,7 +34,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
-    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle
+    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -738,7 +738,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
 
 
 def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None,
-                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=True, force_create_group=False):
+                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=True, force_create_group=False, properties=None):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -861,6 +861,13 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     if extent is not None:
         layer.setExtent(extent)
+    
+    if properties is not None:
+        for prop, value in properties.items():
+            if prop == 'hiddenForm' and value == 'true':
+                cfg = layer.editFormConfig()
+                cfg.setSuppress(QgsEditFormConfig.SuppressOn)
+                layer.setEditFormConfig(cfg)
 
     if create_project is False:
         global_vars.iface.mapCanvas().refresh()

@@ -78,6 +78,8 @@ class GwGisFileCreate:
         if layers:
             for layer in layers['body']['data']['layers']:
                 template = layer.get('project_template')
+                addparam = layer.get('addparam')
+                properties = addparam.get('layerProp', None) if addparam is not None else None
                 if not template:
                     continue
 
@@ -97,7 +99,8 @@ class GwGisFileCreate:
                     # Add project layer
                     tools_gw.add_layer_database(layer['tableName'], layer['geomField'], layer['tableId'], levels[0], levels[1] if len(levels) > 1 else None, style_id='-1', alias=layer['layerName'],
                                                  sub_sub_group=levels[2] if len(levels) > 2 else None, schema=layer['tableSchema'], visibility=template.get('visibility'), auth_id=auth_id,
-                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True, force_create_group=False)
+                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True, force_create_group=False,
+                                                 properties=properties)
 
         # Hide hidden group
         tools_gw.hide_group_from_toc('HIDDEN')
