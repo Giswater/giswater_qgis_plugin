@@ -2619,6 +2619,8 @@ class GwPsector:
                 self.node_id = snapped_feat.attribute('node_id')
                 self.node_state = snapped_feat.attribute('state')
 
+                selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+
                 # Execute setarcfusion
                 workcat_id = tools_qt.get_combo_value(self.dlg_plan_psector, self.workcat_id)
                 feature_id = f'"id":["{self.node_id}"]'
