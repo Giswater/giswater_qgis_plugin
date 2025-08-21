@@ -11,3 +11,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DROP TRIGGER IF EXISTS gw_trg_ui_rpt_cat_result ON v_ui_rpt_cat_result;
 CREATE TRIGGER gw_trg_ui_rpt_cat_result INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_rpt_cat_result
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_rpt_cat_result();
+
+CREATE TRIGGER gw_trg_edit_ve_epa_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('link');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('connec');
