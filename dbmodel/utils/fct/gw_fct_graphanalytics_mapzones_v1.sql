@@ -130,6 +130,7 @@ DECLARE
 	v_query_text text;
 	v_query_text_aux text;
 	v_data json;
+	rec_man record;
 
 	-- result variables
 	v_result text;
@@ -254,7 +255,7 @@ BEGIN
 
 	-- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_mapzone_name ||'"}}';
+	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_mapzone_name ||'", "from_zero":"'|| v_from_zero ||'"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -1125,8 +1126,25 @@ BEGIN
 					) as graphconfig
 					FROM temp_pgr_mapzone m
 					JOIN temp_pgr_node n ON n.mapzone_id = m.component
-					WHERE n.graph_delimiter = ' || v_mapzone_name || ' AND n.modif = TRUE
-					GROUP BY m.mapzone_id[1]';
+					WHERE n.graph_delimiter = ''' || v_mapzone_name || ''' AND n.modif = TRUE
+					GROUP BY m.mapzone_id[1], m.the_geom';
+
+					-- update to_arc in man_ tables
+					FOR rec_man IN
+						SELECT rn.node_id, tn.to_arc[1] AS to_arc, sfc.man_table
+						FROM node rn
+						JOIN temp_pgr_node tn ON tn.node_id = rn.node_id
+						JOIN cat_node cn ON cn.id = rn.nodecat_id
+						JOIN cat_feature_node cfn ON cfn.id = cn.node_type
+						JOIN cat_feature cf ON cf.id = cfn.id
+						JOIN sys_feature_class sfc ON sfc.id = cf.feature_class
+						WHERE tn.to_arc IS NOT NULL AND tn.node_id IS NOT NULL
+						AND sfc.man_table <> 'man_tank'
+					LOOP
+						EXECUTE format('UPDATE %I SET to_arc = $1 WHERE node_id = $2', rec_man.man_table)
+						USING rec_man.to_arc, rec_man.node_id;
+					END LOOP;
+
 				ELSE
 					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, the_geom, created_at, created_by, graphconfig)
 					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], m.the_geom, now(), current_user,
@@ -1139,41 +1157,47 @@ BEGIN
 					) as graphconfig
 					FROM temp_pgr_mapzone m
 					JOIN temp_pgr_node n ON n.mapzone_id = m.component
-					WHERE n.graph_delimiter = ' || v_mapzone_name || ' AND n.modif = TRUE
-					GROUP BY m.mapzone_id[1]';
+					WHERE n.graph_delimiter = ''' || v_mapzone_name || ''' AND n.modif = TRUE
+					GROUP BY m.mapzone_id[1], m.the_geom';
 				END IF;
 				EXECUTE v_query_text;
 
-				UPDATE v_table_name m
-				SET graphconfig = jsonb_set(
-					graphconfig::jsonb,
-					'{ignore}',
-					to_jsonb(a.node_id),
-					true
-				)
-				FROM (
-					SELECT n.node_id, m.mapzone_id[1] AS mapzone_id
-					FROM temp_pgr_node n
-					JOIN temp_pgr_mapzone m ON m.component = n.mapzone_id
-					WHERE n.graph_delimiter = 'IGNORE'
-				) a
-				WHERE m.mapzone_id = a.mapzone_id ;
+				-- ignore
+				v_query_text := '
+					UPDATE '||v_table_name||' m
+					SET graphconfig = jsonb_set(
+						graphconfig::jsonb,
+						''{ignore}'',
+						to_jsonb(a.node_id),
+						true
+					)
+					FROM (
+						SELECT n.node_id, m.mapzone_id[1] AS mapzone_id
+						FROM temp_pgr_node n
+						JOIN temp_pgr_mapzone m ON m.component = n.mapzone_id
+						WHERE n.graph_delimiter = ''INGORE''
+					) a
+					WHERE m.'||v_mapzone_field||' = a.mapzone_id';
+				EXECUTE v_query_text;
 
-				UPDATE v_mapzone_name m
-				SET graphconfig = jsonb_set(
-					graphconfig::jsonb,
-					'{forceClosed}',
-					to_jsonb(a.node_id),
-					true
-				)
+				-- forceclosed
+				v_query_text := '
+					UPDATE '||v_table_name||' m
+					SET graphconfig = jsonb_set(
+						graphconfig::jsonb,
+						''{forceClosed}'',
+						to_jsonb(a.node_id),
+						true
+					)
 				FROM (
 					SELECT DISTINCT ON (n.old_node_id) n.old_node_id AS node_id, m.mapzone_id[1] AS mapzone_id
 					FROM temp_pgr_node n
 					JOIN temp_pgr_mapzone m ON m.component = n.mapzone_id
-					WHERE n.graph_delimiter = 'FORCECLOSED'
+					WHERE n.graph_delimiter = ''FORCECLOSED''
 					AND n.old_mapzone_id IS NOT NULL
 				) a
-				WHERE m.mapzone_id = a.mapzone_id ;
+				WHERE m.'||v_mapzone_field||' = a.mapzone_id';
+				EXECUTE v_query_text;
 
 			ELSE
 				v_query_text := '
