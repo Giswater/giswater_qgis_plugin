@@ -1929,7 +1929,10 @@ class GwInfo(QObject):
             if global_vars.project_type == 'ws' and self.feature_type == 'connec' and epa_type == 'junction':
                 epa_table_id = 've_epa_connec'
             my_json = json.dumps(self.my_json_epa)
-            feature += f'"tableName":"{epa_table_id}", '
+            if self.feature_type.lower() == 'link':
+                feature += f'"tableName":"ve_epa_link", '
+            else:
+                feature += f'"tableName":"{epa_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
             extras = f'"fields":{my_json}, "afterInsert":"{after_insert}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
