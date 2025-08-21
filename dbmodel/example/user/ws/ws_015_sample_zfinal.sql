@@ -155,9 +155,6 @@ WHERE cf.feature_class='GENELEM';
 
 
 
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('sys_table_context', '{"levels": ["INVENTORY", "NETWORK", "FRELEMENT"]}', NULL, NULL, '{
-  "orderBy": 9
-}'::json);
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy":30}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["OM", "ANALYTICS"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy":29}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["BASEMAP", "CARTO"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy":28}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["BASEMAP", "ADDRESS"]}';
@@ -187,9 +184,6 @@ UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{
 }'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{
   "orderBy": 3
-}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "FRELEMENT"]}';
-UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{
-  "orderBy": 3
 }'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "LINK"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{
   "orderBy": 3
@@ -207,12 +201,9 @@ UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy":2}
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy":1}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "CATALOGS"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy":0}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["HIDDEN"]}';
 
-UPDATE sys_table SET context = '{"levels": ["INVENTORY", "NETWORK", "FRELEMENT"]}' WHERE id = 've_element_epump';
-UPDATE sys_table SET context = '{"levels": ["INVENTORY", "NETWORK", "FRELEMENT"]}' WHERE id = 've_element_evalve';
-UPDATE sys_table SET context = '{"levels": ["INVENTORY", "NETWORK", "FRELEMENT"]}' WHERE id = 've_element_emeter';
-UPDATE sys_table SET project_template = '{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context = '{"levels": ["INVENTORY", "NETWORK", "FRELEMENT"]}' WHERE id = 've_man_frelem';
+UPDATE sys_table SET project_template = '{"template": [1], "visibility": true, "levels_to_read": 3}'::jsonb, context = '{"levels": ["INVENTORY", "NETWORK", "ELEMENT"]}' WHERE id = 've_man_frelem';
 
-UPDATE sys_table SET project_template = '{"template": [1], "visibility": true, "levels_to_read": 3}'::jsonb WHERE id = 've_element';
+UPDATE sys_table SET project_template = '{"template": [1], "visibility": false, "levels_to_read": 3}'::jsonb WHERE id = 've_element';
 
 UPDATE sys_table SET orderby=1 WHERE id='ve_node';
 UPDATE sys_table SET orderby=2 WHERE id='ve_man_frelem';
