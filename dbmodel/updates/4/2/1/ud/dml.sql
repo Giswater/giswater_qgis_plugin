@@ -497,4 +497,5 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES('inp_dscenario_froutlet', 'form_feature', 'tab_none', 'cd2', 'lyt_main_1', 7, 'numeric', 'text', 'Cd2:', 'Discharge coefficient 2', NULL, false, NULL, true, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('inp_dscenario_froutlet', 'form_feature', 'tab_none', 'flap', 'lyt_main_1', 8, 'string', 'text', 'Flap:', 'Flap gate', NULL, false, NULL, true, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
- 
+
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_element_x_gully', 'Contains the elements related to gully', 'role_edit');
