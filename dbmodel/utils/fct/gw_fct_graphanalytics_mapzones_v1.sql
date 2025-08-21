@@ -126,6 +126,7 @@ DECLARE
 	v_pgr_root_vids int[];
 
 	-- query variables
+	v_query_text text;
 	v_query_text_aux text;
 	v_data json;
 
