@@ -87,10 +87,13 @@ BEGIN
 			demand=NEW.demand, demand_pattern_id=NEW.demand_pattern_id, emitter_coeff=NEW.emitter_coeff WHERE node_id=OLD.node_id;
 
 		ELSIF v_epatype = 'connec' THEN
-			UPDATE inp_connec SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, custom_roughness = NEW.custom_roughness,
-			custom_length = NEW.custom_length, custom_dint = NEW.custom_dint, status = NEW.status, minorloss = NEW.minorloss,
-			emitter_coeff=NEW.emitter_coeff,init_quality=NEW.init_quality, source_type=NEW.source_type, source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id
+			UPDATE inp_connec SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, emitter_coeff=NEW.emitter_coeff,
+			init_quality=NEW.init_quality, source_type=NEW.source_type, source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id
 			WHERE connec_id=OLD.connec_id;
+		
+		ELSIF v_epatype = 'link' THEN
+			UPDATE inp_connec SET minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness,
+			custom_dint=NEW.custom_dint, custom_length=NEW.custom_length WHERE connec_id=(SELECT feature_id FROM link WHERE link_id = OLD.link_id);
 
 		ELSIF v_epatype = 'pipe' THEN
 			UPDATE inp_pipe SET minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness,

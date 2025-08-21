@@ -79,3 +79,64 @@ UNION
    FROM arc a
      JOIN links_node n ON a.node_1 = n.node_id
      JOIN ve_connec c ON c.connec_id = n.feature_id;
+
+
+CREATE OR REPLACE VIEW ve_epa_link
+AS SELECT link.link_id,
+	  inp_connec.minorloss,
+	  inp_connec.status,
+	  cat_link.matcat_id,
+	  r.roughness AS cat_roughness,
+	  inp_connec.custom_roughness,
+	  cat_link.dint,
+	  inp_connec.custom_dint,
+	  inp_connec.custom_length,
+	  v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max,
+    v_rpt_arc_stats.flow_min,
+    v_rpt_arc_stats.flow_avg,
+    v_rpt_arc_stats.vel_max,
+    v_rpt_arc_stats.vel_min,
+    v_rpt_arc_stats.vel_avg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min,
+    v_rpt_arc_stats.tot_headloss_max,
+    v_rpt_arc_stats.tot_headloss_min
+  FROM inp_connec
+   	 JOIN link ON link.feature_id = inp_connec.connec_id
+     LEFT JOIN v_rpt_arc_stats ON concat('CO', inp_connec.connec_id)::text = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN cat_link ON cat_link.id::text = link.linkcat_id::TEXT
+     LEFT JOIN cat_mat_roughness r ON cat_link.matcat_id::text = r.matcat_id::text;
+
+DROP VIEW IF EXISTS ve_epa_connec;
+CREATE OR REPLACE VIEW ve_epa_connec
+AS SELECT inp_connec.connec_id,
+    inp_connec.demand,
+    inp_connec.pattern_id,
+    inp_connec.peak_factor,
+    inp_connec.emitter_coeff,
+    inp_connec.init_quality,
+    inp_connec.source_type,
+    inp_connec.source_quality,
+    inp_connec.source_pattern_id,
+    v_rpt_node_stats.result_id,
+    v_rpt_node_stats.demand_max AS demandmax,
+    v_rpt_node_stats.demand_min AS demandmin,
+    v_rpt_node_stats.demand_avg AS demandavg,
+    v_rpt_node_stats.head_max AS headmax,
+    v_rpt_node_stats.head_min AS headmin,
+    v_rpt_node_stats.head_avg AS headavg,
+    v_rpt_node_stats.press_max AS pressmax,
+    v_rpt_node_stats.press_min AS pressmin,
+    v_rpt_node_stats.press_avg AS pressavg,
+    v_rpt_node_stats.quality_max AS qualmax,
+    v_rpt_node_stats.quality_min AS qualmin,
+    v_rpt_node_stats.quality_avg AS qualavg
+   FROM inp_connec
+     LEFT JOIN v_rpt_node_stats ON inp_connec.connec_id::text = v_rpt_node_stats.node_id::text;
