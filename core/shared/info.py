@@ -1930,7 +1930,7 @@ class GwInfo(QObject):
                 epa_table_id = 've_epa_connec'
             my_json = json.dumps(self.my_json_epa)
             if self.feature_type.lower() == 'link':
-                feature += f'"tableName":"ve_epa_link", '
+                feature += '"tableName":"ve_epa_link", '
             else:
                 feature += f'"tableName":"{epa_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
