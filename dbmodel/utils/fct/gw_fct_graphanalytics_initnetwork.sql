@@ -30,7 +30,7 @@ DECLARE
     v_project_type TEXT;
 
     -- parameters
-    v_expl_id_array TEXT;
+    v_expl_id_array text[];
     v_mapzone_name TEXT;
 
     -- extra variables
@@ -48,8 +48,8 @@ BEGIN
     SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Get variables from input JSON
-    v_expl_id_array = (SELECT (p_data::json->>'data')::json->>'expl_id_array');
-    v_mapzone_name = (SELECT (p_data::json->>'data')::json->>'mapzone_name');
+    v_expl_id_array = string_to_array(p_data->'data'->>'expl_id_array', ',');
+    v_mapzone_name = p_data->'data'->>'mapzone_name';
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -88,7 +88,7 @@ BEGIN
             SELECT 1
             FROM v_temp_node vtn
             WHERE c.node = vtn.node_id
-            AND vtn.expl_id::text = ANY (''' || v_expl_id_array || ''')
+            AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])
             --AND vtn.node_id = -- node_1 from arc_id selected in mincut algorithm.
         )
         GROUP BY c.component

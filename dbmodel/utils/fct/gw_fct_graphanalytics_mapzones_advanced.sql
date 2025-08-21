@@ -39,6 +39,7 @@ DECLARE
 	v_value_for_disconnected integer;
 	v_flood_only_mapzone text;
 	v_commit_changes boolean;
+	v_from_zero boolean;
 
 	-- system variables
 	v_mapzones_version integer;
@@ -68,6 +69,7 @@ BEGIN
 	v_value_for_disconnected := p_data->'data'->'parameters'->>'valueForDisconnected';
 	v_flood_only_mapzone := p_data->'data'->'parameters'->>'floodOnlyMapzone';
 	v_commit_changes := p_data->'data'->'parameters'->>'commitChanges';
+	v_from_zero := p_data->'data'->'parameters'->>'fromZero';
 
 	SELECT (value::json->>'version')::int2 INTO v_mapzones_version FROM config_param_system WHERE parameter='mapzones_config';
 
@@ -81,6 +83,7 @@ BEGIN
 	IF v_value_for_disconnected IS NULL THEN v_value_for_disconnected = 0; END IF;
 	IF v_flood_only_mapzone IS NULL THEN v_flood_only_mapzone = ''; END IF;
 	IF v_commit_changes IS NULL THEN v_commit_changes = FALSE ; END IF;
+	IF v_from_zero IS NULL THEN v_from_zero = FALSE ; END IF;
 
 	v_data := json_build_object(
 		'data', json_build_object(
@@ -98,7 +101,8 @@ BEGIN
 				'valueForDisconnected', v_value_for_disconnected,
 				'floodOnlyMapzone', v_flood_only_mapzone,
 				'commitChanges', v_commit_changes,
-				'netscenario', v_netscenario
+				'netscenario', v_netscenario,
+				'fromZero', v_from_zero
 			)
 		)
 	);

@@ -90,7 +90,7 @@ DECLARE
 	-- dialog variables
 	v_class text;
 	v_expl_id text;
-	v_expl_id_array text;
+	v_expl_id_array text[];
 	v_update_map_zone integer = 0;
 	v_geom_param_update float;
 	v_use_plan_psector boolean;
@@ -111,6 +111,7 @@ DECLARE
 	v_source text;
 	v_target text;
 
+	v_mapzone_count integer;
 	v_arcs_count integer;
 	v_nodes_count integer;
 	v_connecs_count integer;
@@ -172,7 +173,6 @@ BEGIN
 		v_commit_changes := FALSE;
 	END IF;
 
-	-- TODO: if fromzero is true, we need to check if all mapzones are disabled
 
 	IF v_class = 'PRESSZONE' THEN
 		v_fid=146;
@@ -219,6 +219,18 @@ BEGIN
 		v_expl_id_array = string_to_array(v_expl_id, ',');
     END IF;
 
+	IF v_from_zero THEN
+		v_query_text := 'SELECT count (*) FROM '|| v_table_name ||' 
+		WHERE active
+		AND '|| v_mapzone_field ||' NOT IN (0, -1) -- 0 and -1 are conflict and undefined
+		AND expl_id && ARRAY['||array_to_string(v_expl_id_array, ',')||']';
+		RAISE NOTICE 'v_query_text: %', v_query_text;
+		EXECUTE v_query_text INTO v_mapzone_count;
+		IF v_mapzone_count > 0 THEN
+			RAISE EXCEPTION 'To execute from zero, all mapzones must be disabled';
+		END IF;
+	END IF;
+
 	-- Delete temporary tables
 	-- =======================
 	v_data := '{"data":{"action":"DROP", "fct_name":"'|| v_class ||'"}}';
@@ -226,7 +238,7 @@ BEGIN
 
 	-- Create temporary tables
 	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'", "use_psector":"'|| v_use_plan_psector ||'", "netscenario":"'|| v_netscenario ||'"}}';
+	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'", "use_psector":"'|| v_use_plan_psector ||'", "netscenario":"'|| v_quote_nullable(v_netscenario) ||'"}}';
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -256,7 +268,7 @@ BEGIN
 
 	-- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || v_expl_id_array || '", "mapzone_name":"'|| v_mapzone_name ||'"}}';
+	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_mapzone_name ||'"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -968,7 +980,6 @@ BEGIN
 
 	IF v_commit_changes IS TRUE THEN
 		IF v_netscenario IS NOT NULL THEN
-			-- TODO[epic=mapzones]: netscnearios
 			v_query_text := '
 					UPDATE '||v_table_name||' m SET the_geom = CASE
 						WHEN CARDINALITY(tm.mapzone_id) = 1 THEN tm.the_geom
