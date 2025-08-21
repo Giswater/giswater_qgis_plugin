@@ -109,3 +109,28 @@ UNION
    FROM arc a
      JOIN links_node n ON a.node_1 = n.node_id
      JOIN ve_gully g ON g.gully_id = n.feature_id;
+
+
+CREATE OR REPLACE VIEW v_element_x_gully
+AS SELECT element_x_gully.gully_id,
+    element_x_gully.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.serial_number,
+    element.brand_id,
+    element.model_id,
+    element.updated_at
+   FROM element_x_gully
+     JOIN element ON element.element_id::text = element_x_gully.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;

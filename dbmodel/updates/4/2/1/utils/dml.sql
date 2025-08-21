@@ -159,3 +159,8 @@ UPDATE sys_style SET layername = 've_man_frelem' WHERE layername = 've_frelem';
 -- 21/08/25
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3510, 'gw_fct_get_expl_id_array', 'utils', 'function', 'text', 'text', 'Function to get the exploitation ID array', 'role_basic', NULL, 'core', NULL);
+
+
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_element_x_node', 'Contains the elements related to node', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_element_x_connec', 'Contains the elements related to connec', 'role_edit');
+INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_element_x_arc', 'Contains the elements related to arc', 'role_edit');
