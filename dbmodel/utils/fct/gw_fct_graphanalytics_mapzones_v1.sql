@@ -238,7 +238,7 @@ BEGIN
 
 	-- Create temporary tables
 	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'", "use_psector":"'|| v_use_plan_psector ||'", "netscenario":"'|| v_quote_nullable(v_netscenario) ||'"}}';
+	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'", "use_psector":"'|| v_use_plan_psector ||'", "netscenario":"'|| quote_nullable(v_netscenario) ||'"}}';
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
