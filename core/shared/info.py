@@ -2251,14 +2251,17 @@ class GwInfo(QObject):
     def _reload_epa_tab(self, dialog):
         epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
         # call getinfofromid
-        if not epa_type or epa_type.lower() in ('undefined', 'null'):
+        if not epa_type or epa_type.lower() in ('undefined') or (epa_type.lower() == 'null' and self.feature_type.lower() != 'link'):
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
             return
 
         tablename = 've_epa_' + epa_type.lower()
         if global_vars.project_type == 'ws' and self.feature_type == 'connec' and epa_type.lower() == 'junction':
             tablename = 've_epa_connec'
-        feature = f'"tableName":"{tablename}", "id":"{self.feature_id}", "epaType": "{epa_type}"'
+        if self.feature_type.lower() == 'link':
+            feature = f'"tableName":"ve_epa_link", "id":"{self.feature_id}", "epaType": "link"'
+        else:
+            feature = f'"tableName":"{tablename}", "id":"{self.feature_id}", "epaType": "{epa_type}"'
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
         complet_result = tools_gw.execute_procedure(function_name, body)
