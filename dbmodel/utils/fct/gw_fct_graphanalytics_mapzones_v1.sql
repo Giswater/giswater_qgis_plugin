@@ -281,24 +281,25 @@ BEGIN
 		AND n.broken = FALSE;
 	END IF;
 
-	-- closed and open valves from netscenario
+	-- CLOSED AND OPEN VALVES FROM NETSCENARIO
+	-- ======================================
 	IF v_netscenario IS NOT NULL THEN
 		-- closed valves
-		UPDATE temp_pgr_node n SET modif = TRUE
+		UPDATE temp_pgr_node n
+		SET closed = TRUE, modif = TRUE
 		FROM plan_netscenario_valve v
 		WHERE n.node_id = v.node_id
 		AND v.netscenario_id = v_netscenario
 		AND v.closed IS TRUE;
 
 		-- open valves
-		UPDATE temp_pgr_node n SET modif = FALSE
+		UPDATE temp_pgr_node n
+		SET closed = FALSE, modif = TRUE
 		FROM plan_netscenario_valve v
 		WHERE n.node_id = v.node_id
 		AND v.netscenario_id = v_netscenario
 		AND v.closed IS FALSE;
 	END IF;
-
-
 
 	-- NODES MAPZONES
 	-- Nodes that are the starting/ending points of mapzones
@@ -1689,6 +1690,7 @@ BEGIN
 	v_level := COALESCE(v_level, 0);
 	v_message := COALESCE(v_message, '');
 	v_version := COALESCE(v_version, '');
+	v_netscenario := COALESCE(v_netscenario, -1);
 
 	-- Return JSON
 	RETURN gw_fct_json_create_return(('{
