@@ -88,7 +88,7 @@ DECLARE
 	-- dialog variables
 	v_process_name text;
 	v_expl_id text;
-	v_expl_id_array text;
+	v_expl_id_array text[];
     v_parameters json;
 	v_usepsector boolean;
 	v_commitchanges boolean;
@@ -190,7 +190,7 @@ BEGIN
 
 	-- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || v_expl_id_array || '", "mapzone_name":"'|| v_process_name ||'"}}';
+	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_process_name ||'"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
