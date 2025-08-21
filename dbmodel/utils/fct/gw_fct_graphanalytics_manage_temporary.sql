@@ -28,6 +28,7 @@ DECLARE
     v_fct_name TEXT;
     v_action TEXT;
     v_use_psector TEXT;
+    v_netscenario TEXT;
 
     -- extra variables
     v_return_message TEXT;
@@ -44,6 +45,7 @@ BEGIN
     v_fct_name = (SELECT (p_data::json->>'data')::json->>'fct_name');
     v_action = (SELECT (p_data::json->>'data')::json->>'action');
     v_use_psector = (SELECT (p_data::json->>'data')::json->>'use_psector');
+    v_netscenario = (SELECT (p_data::json->>'data')::json->>'netscenario');
 
     IF v_action = 'CREATE' THEN
         -- Create temporary tables
@@ -52,7 +54,6 @@ BEGIN
             component int4,
             mapzone_id _int4,
             name VARCHAR(50),
-            pattern_id int4,
             the_geom geometry(Geometry, SRID_VALUE),
             CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (id)
         );
@@ -152,6 +153,9 @@ BEGIN
                 -- used for MASSIVE MINCUT
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE temp_pgr_arc INCLUDING ALL);
+            END IF;
+            IF v_fct_name = 'DMA' AND v_netscenario IS NOT NULL THEN
+                ALTER TABLE temp_pgr_mapzone ADD COLUMN pattern_id varchar(16);
             END IF;
         END IF;
 

@@ -226,7 +226,7 @@ BEGIN
 
 	-- Create temporary tables
 	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'", "use_psector":"'|| v_use_plan_psector ||'"}}';
+	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'", "use_psector":"'|| v_use_plan_psector ||'", "netscenario":"'|| v_netscenario ||'"}}';
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -498,10 +498,17 @@ BEGIN
 		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(v_mapzone_name, '-', m.id);
 	ELSE
 		IF v_netscenario IS NOT NULL THEN
-			EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.'||LOWER(v_class)||'_name
-			FROM ' || v_table_name || ' mz
-			WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
-			AND CARDINALITY(m.mapzone_id) = 1';
+			IF v_mapzone_name = 'DMA' THEN
+				EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.'||LOWER(v_class)||'_name, pattern_id = mz.pattern_id
+				FROM ' || v_table_name || ' mz
+				WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
+				AND CARDINALITY(m.mapzone_id) = 1';
+			ELSE
+				EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.'||LOWER(v_class)||'_name
+				FROM ' || v_table_name || ' mz
+				WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
+				AND CARDINALITY(m.mapzone_id) = 1';
+			END IF;
 		ELSE
 			EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.name
 			FROM ' || v_table_name || ' mz
@@ -979,20 +986,62 @@ BEGIN
 			DELETE FROM plan_netscenario_node WHERE netscenario_id = v_netscenario::integer;
 			DELETE FROM plan_netscenario_connec WHERE netscenario_id = v_netscenario::integer;
 
-			EXECUTE 'INSERT INTO plan_netscenario_arc(netscenario_id, arc_id, '||quote_ident(v_mapzone_field)||', the_geom)
-			SELECT '|| v_netscenario||', va.arc_id, m.'||quote_ident(v_mapzone_field)||', va.the_geom FROM temp_pgr_arc t
-			JOIN v_temp_arc va USING (arc_id)
-			JOIN '||v_table_name||' m ON m.'||v_mapzone_field||' = t.mapzone_id WHERE netscenario_id =  '|| v_netscenario||'';
+			v_query_text := '
+				WITH mapzones AS (
+					SELECT
+						component,
+						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
+						ELSE 0
+						END AS mapzone_id
+					FROM temp_pgr_mapzone
+					UNION ALL
+    				SELECT 0 AS component, 0 AS mapzone_id
+				)
+				INSERT INTO plan_netscenario_arc(netscenario_id, arc_id, '||quote_ident(v_mapzone_field)||', the_geom)
+				SELECT '|| v_netscenario||', va.arc_id, m.mapzone_id, va.the_geom
+				FROM temp_pgr_arc t
+				JOIN v_temp_arc va USING (arc_id)
+				JOIN mapzones m ON m.component = t.mapzone_id
+			';
+			EXECUTE v_query_text;
 
-			EXECUTE 'INSERT INTO plan_netscenario_node(netscenario_id, node_id, '||quote_ident(v_mapzone_field)||', the_geom)
-			SELECT '|| v_netscenario||', vn.node_id, m.'||quote_ident(v_mapzone_field)||', vn.the_geom FROM temp_pgr_node t
-			JOIN v_temp_node vn USING (node_id)
-			JOIN '||v_table_name||' m ON m.'||v_mapzone_field||' = t.mapzone_id WHERE netscenario_id =  '|| v_netscenario||'';
+			v_query_text := '
+				WITH mapzones AS (
+					SELECT
+						component,
+						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
+						ELSE 0
+						END AS mapzone_id
+					FROM temp_pgr_mapzone
+					UNION ALL
+    				SELECT 0 AS component, 0 AS mapzone_id
+				)
+				INSERT INTO plan_netscenario_node(netscenario_id, node_id, '||quote_ident(v_mapzone_field)||', the_geom)
+				SELECT '|| v_netscenario||', vn.node_id, m.mapzone_id, vn.the_geom
+				FROM temp_pgr_node tn
+				JOIN v_temp_node vn USING (node_id)
+				JOIN mapzones m ON m.component = tn.mapzone_id
+			';
+			EXECUTE v_query_text;
 
-			EXECUTE 'INSERT INTO plan_netscenario_connec(netscenario_id, connec_id, '||quote_ident(v_mapzone_field)||', the_geom)
-			SELECT '|| v_netscenario||', vc.connec_id, m.'||quote_ident(v_mapzone_field)||', vc.the_geom FROM temp_pgr_arc t
-			JOIN v_temp_connec vc USING (arc_id)
-			JOIN '||v_table_name||' m ON m.'||v_mapzone_field||' = t.mapzone_id WHERE netscenario_id =  '|| v_netscenario||'';
+			v_query_text := '
+				WITH mapzones AS (
+					SELECT
+						component,
+						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
+						ELSE 0
+						END AS mapzone_id
+					FROM temp_pgr_mapzone
+					UNION ALL
+    				SELECT 0 AS component, 0 AS mapzone_id
+				)
+				INSERT INTO plan_netscenario_connec(netscenario_id, connec_id, '||quote_ident(v_mapzone_field)||', the_geom)
+				SELECT '|| v_netscenario||', vc.connec_id, m.mapzone_id, vc.the_geom
+				FROM temp_pgr_arc t
+				JOIN v_temp_connec vc USING (arc_id)
+				JOIN mapzones m ON m.component = t.mapzone_id
+			';
+			EXECUTE v_query_text;
 
 
 			IF v_class = 'PRESSZONE' THEN
@@ -1042,17 +1091,17 @@ BEGIN
 				UPDATE plan_netscenario_node SET pattern_id = t.pattern_id
 				FROM temp_pgr_mapzone t
 				WHERE (
-					CARDINALITY(t.mapzone_id) = 1 AND plan_netscenario_node.node_id = t.mapzone_id[1]
+					CARDINALITY(t.mapzone_id) = 1 AND plan_netscenario_node.dma_id = t.mapzone_id[1]
 				) OR (
-					CARDINALITY(t.mapzone_id) > 1 AND plan_netscenario_node.node_id = ANY (t.mapzone_id)
+					CARDINALITY(t.mapzone_id) > 1 AND plan_netscenario_node.dma_id = ANY (t.mapzone_id)
 				);
 
 				UPDATE plan_netscenario_connec SET pattern_id = t.pattern_id
 				FROM temp_pgr_mapzone t
 				WHERE (
-					CARDINALITY(t.mapzone_id) = 1 AND plan_netscenario_connec.connec_id = t.mapzone_id[1]
+					CARDINALITY(t.mapzone_id) = 1 AND plan_netscenario_connec.dma_id = t.mapzone_id[1]
 				) OR (
-					CARDINALITY(t.mapzone_id) > 1 AND plan_netscenario_connec.connec_id = ANY (t.mapzone_id)
+					CARDINALITY(t.mapzone_id) > 1 AND plan_netscenario_connec.dma_id = ANY (t.mapzone_id)
 				);
 
 			END IF;
