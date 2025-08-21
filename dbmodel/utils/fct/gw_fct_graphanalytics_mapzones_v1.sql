@@ -202,22 +202,8 @@ BEGIN
 	END IF;
 	v_mapzone_name = UPPER(v_mapzone_name);
 
-
-	-- MANAGE EXPL ARR
-
-    -- For user selected exploitations
-    IF v_expl_id = '-901' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-		FROM selector_expl;
-    -- For all exploitations
-    ELSIF v_expl_id = '-902' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-        FROM exploitation
-		WHERE active;
-    -- For a specific exploitation/s
-    ELSE
-		v_expl_id_array = string_to_array(v_expl_id, ',');
-    END IF;
+    -- Get exploitation ID array
+    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
 
 	IF v_from_zero THEN
 		v_query_text := 'SELECT count (*) FROM '|| v_table_name ||' 
