@@ -214,7 +214,8 @@ BEGIN
 		RAISE NOTICE 'v_query_text: %', v_query_text;
 		EXECUTE v_query_text INTO v_mapzone_count;
 		IF v_mapzone_count > 0 THEN
-			RAISE EXCEPTION 'To execute from zero, all mapzones must be disabled';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	        "data":{"message":"4344", "function":"3508","parameters":{"mapzone_name":"'|| v_mapzone_name ||'"}, "is_process":true}}$$)';
 		END IF;
 	END IF;
 
@@ -467,6 +468,7 @@ BEGIN
 			FROM temp_pgr_arc';
 	END IF;
 
+	DELETE FROM temp_pgr_drivingdistance;
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
     (
 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
