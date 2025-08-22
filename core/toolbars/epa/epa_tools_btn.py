@@ -117,7 +117,7 @@ class GwEpaTools(GwAction):
             valve_operation_check = ValveOperationCheck()
             valve_operation_check.clicked_event()
 
-        elif name == tools_qt.tr('Import IberGIS GPKG project'):
+        elif name == tools_qt.tr('Load IberGIS GPKG project'):
             go2iber = Go2Iber()
             # Get file path from user
             file_path: Optional[Path] = self._get_file()
