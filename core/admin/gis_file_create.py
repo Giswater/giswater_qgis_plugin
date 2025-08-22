@@ -12,7 +12,6 @@ from ..utils import tools_gw  # noqa: F401
 from ... import global_vars
 from ...libs import tools_log, tools_qt, tools_db, tools_qgis
 from qgis.core import QgsProject, QgsCoordinateReferenceSystem, QgsLayerTreeLayer, QgsLayerTreeGroup
-from qgis.gui import QgsLayerTreeMapCanvasBridge
 
 
 class GwGisFileCreate:
@@ -94,7 +93,7 @@ class GwGisFileCreate:
                             if levels[i] is not None:
                                 old_level = level.findGroup(levels[i])
                                 if old_level is None:
-                                    old_level = level.addGroup(levels[i])
+                                    old_level = level.insertGroup(0, levels[i])
                                 level = old_level
                     rectangle = tools_gw._get_extent_parameters(schema)
                     # Add project layer
@@ -124,19 +123,6 @@ class GwGisFileCreate:
             if isinstance(group, QgsLayerTreeGroup):
                 group.setExpanded(False)
 
-        # Make frelem layer render above arc layer
-        try:
-            arc_layer = project.mapLayersByName('Arc')[0]
-            frelem_layer = project.mapLayersByName('FRElement')[0]
-            bridge = QgsLayerTreeMapCanvasBridge(project.layerTreeRoot(), global_vars.iface.mapCanvas())
-            project.layerTreeRoot().setHasCustomLayerOrder(True)
-            order = project.layerTreeRoot().customLayerOrder()
-            order = [l for l in order if l not in [arc_layer, frelem_layer]]
-            order.extend([frelem_layer, arc_layer])
-            project.layerTreeRoot().setCustomLayerOrder(order)
-        except:
-            pass
-
         # Set camera position on ve_node
         global_vars.iface.mapCanvas().setExtent(tools_gw._get_extent_parameters(schema))
 
@@ -151,7 +137,7 @@ class GwGisFileCreate:
             tools_qgis.show_warning(msg, parameter=qgs_path)
             return False, qgs_path
 
-    # region private functions
+    # region private functions 
 
     def _get_database_parameters(self, schema):
         """ Get database parameters from layer source """
