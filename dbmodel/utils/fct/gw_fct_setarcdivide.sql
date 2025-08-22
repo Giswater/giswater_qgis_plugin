@@ -413,8 +413,7 @@ BEGIN
 
 						-- connec
 						FOR v_connec_id IN
-						SELECT connec_id FROM connec c JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id AND
-						c.state = 1
+						SELECT connec_id FROM connec c WHERE arc_id=v_arc_id AND c.state = 1
 						LOOP
 							v_array_connec:= array_append(v_array_connec, v_connec_id::text);
 						END LOOP;
@@ -568,13 +567,14 @@ BEGIN
 						END LOOP;
 
 						-- reconnect connecs without link but with arc_id
-						FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC'
+						FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1
 						AND connec_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 						LOOP
-							SELECT a.arc_id INTO v_arc_closest FROM connec c, ve_arc a WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND c.connec_id = rec_connec.connec_id
-							AND a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1;
-							UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_connec.connec_id;
-							v_arc_closest = null;
+							SELECT a.arc_id INTO v_arc_closest FROM connec c, v_edit_arc a WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND c.connec_id = rec_connec.connec_id
+							AND a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) ORDER BY st_distance(a.the_geom, c.the_geom) ASC LIMIT 1;
+							
+							UPDATE connec SET arc_id = v_arc_closest WHERE connec_id = rec_connec.connec_id;
+						
 						END LOOP;
 
 						-- reconnec operative gully without link but with arc_id
