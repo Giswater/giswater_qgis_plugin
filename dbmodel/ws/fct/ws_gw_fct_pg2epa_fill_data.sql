@@ -27,6 +27,7 @@ v_forcereservoirsoninlets boolean;
 v_forcetanksoninlets boolean;
 v_count integer;
 v_querytext text;
+v_exporthybriddma boolean;
 
 BEGIN
 
@@ -41,6 +42,7 @@ BEGIN
 	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
 	v_forcereservoirsoninlets := (SELECT value::json->>'forceReservoirsOnInlets' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 	v_forcetanksoninlets := (SELECT value::json->>'forceTanksOnInlets' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
+	v_exporthybriddma := (SELECT value::boolean FROM config_param_system WHERE parameter = 'epa_export_hybrid_dma');
 
 	-- get debug parameters
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -69,12 +71,6 @@ BEGIN
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
-	
-	IF v_networkmode = 1 THEN
-		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = n.dma_id WHERE dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
-	ELSIF v_networkmode = 5 THEN
-		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = n.dma_id WHERE dma.dma_id = (SELECT value::integer FROM config_param_user WHERE parameter = ''inp_options_selecteddma'' AND cur_user = current_user)';
-	END IF;
 
 	EXECUTE v_querytext;
 
@@ -175,7 +171,11 @@ BEGIN
 			AND st_length(ve_arc.the_geom) >= '||v_minlength;
 
 	IF v_networkmode = 1 THEN
-		v_querytext = v_querytext || ' AND dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
+		IF v_exporthybriddma THEN
+			v_querytext = v_querytext || ' AND dma.dma_type IN (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND (idval = ''TRANSMISSION'' OR idval = ''HYBRID''))';
+		ELSE
+			v_querytext = v_querytext || ' AND dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
+		END IF;
 	END IF;
 
 	IF v_networkmode = 5 THEN

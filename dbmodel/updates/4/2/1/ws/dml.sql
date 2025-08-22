@@ -480,3 +480,10 @@ UPDATE sys_table SET orderby=2 WHERE id='ve_element';
 UPDATE sys_table SET orderby=3 WHERE id='ve_arc';
 UPDATE sys_table SET orderby=4 WHERE id='ve_connec';
 UPDATE sys_table SET orderby=5 WHERE id='ve_link';
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder,
+project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet,
+widgetcontrols, placeholder, standardvalue, layoutname)
+VALUES('epa_export_hybrid_dma', 'false', 'If True, hybrid DMAs are exported when network mode is TRANSMISSION NETWORK',
+'EPA Export Hybrid DMA:', NULL, NULL, true, 8, 'ws', NULL, NULL, 'boolean', 'check', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+'lyt_admin_other');
