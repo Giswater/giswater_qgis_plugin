@@ -268,7 +268,7 @@ class GwMapzoneManager:
 
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
-        if run_button:
+        if run_button and self.mapzone_mng_dlg.btn_flood:
             run_button.clicked.connect(lambda: self.mapzone_mng_dlg.btn_flood.setEnabled(True))
 
     def _open_flood_analysis(self, dialog, mapzone_name):
