@@ -136,8 +136,8 @@ BEGIN
 					WHEN 'cm' THEN 2
 					ELSE 1
 				END,
-				group_order,
-				orderby
+				group_order desc,
+				orderby desc
 		) d), '[]'::json) INTO v_final;
 
 	ELSE
