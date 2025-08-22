@@ -24,7 +24,7 @@ from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
     QGridLayout, QTabWidget, QDialog
 from qgis.core import QgsProject, QgsApplication, QgsMessageLog
 from qgis.gui import QgsDateTimeEdit
-from qgis.utils import reloadPlugin, iface
+from qgis.utils import reloadPlugin
 
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
