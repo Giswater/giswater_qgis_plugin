@@ -488,6 +488,3 @@ VALUES('edit_linkcat_vdefault', 'config', 'Default value of link catalog', 'role
 
 UPDATE config_form_fields SET placeholder='Optional value for max distance: 100', ismandatory=false WHERE formname='generic' AND columnname='max_distance' AND tabname='tab_none';
 UPDATE config_form_fields SET placeholder='Optional value for max pipe diameter: 150', ismandatory=false WHERE formname='generic' AND columnname='pipe_diameter' AND tabname='tab_none';
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4344, 'To execute from zero, all %mapzone_name% mapzones must be disabled', 'Toggle active for all mapzones, or delete them', 2, true, 'utils', 'core', 'UI');

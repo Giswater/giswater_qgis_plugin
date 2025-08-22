@@ -164,3 +164,6 @@ VALUES(3510, 'gw_fct_get_expl_id_array', 'utils', 'function', 'text', 'text', 'F
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_element_x_node', 'Contains the elements related to node', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_element_x_connec', 'Contains the elements related to connec', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_element_x_arc', 'Contains the elements related to arc', 'role_edit');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4346, 'To execute from zero, all %mapzone_name% mapzones must be disabled', 'Toggle active for all mapzones, or delete them', 2, true, 'utils', 'core', 'UI');

@@ -215,7 +215,7 @@ BEGIN
 		EXECUTE v_query_text INTO v_mapzone_count;
 		IF v_mapzone_count > 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	        "data":{"message":"4344", "function":"3508","parameters":{"mapzone_name":"'|| v_mapzone_name ||'"}, "is_process":true}}$$)';
+	        "data":{"message":"4346", "function":"3508","parameters":{"mapzone_name":"'|| v_mapzone_name ||'"}, "is_process":true}}$$)';
 		END IF;
 	END IF;
 
