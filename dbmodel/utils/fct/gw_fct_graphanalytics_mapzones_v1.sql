@@ -256,7 +256,7 @@ BEGIN
 
 	-- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_mapzone_name ||'", "from_zero":"'|| v_from_zero ||'"}}';
+	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_mapzone_name ||'"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -413,7 +413,7 @@ BEGIN
 	-- Generate new arcs
 
 	-- =======================
-    v_data := '{"data":{"mapzone_name":"'|| v_mapzone_name ||'"}}';
+    v_data := '{"data":{"mapzone_name":"'|| v_mapzone_name ||'", "from_zero":"'|| v_from_zero ||'"}}';
     SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN

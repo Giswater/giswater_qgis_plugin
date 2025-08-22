@@ -32,18 +32,12 @@ DECLARE
     -- parameters
     v_expl_id_array text[];
     v_mapzone_name TEXT;
-    v_from_zero boolean;
 
     -- extra variables
     v_graph_delimiter TEXT;
     v_cost INTEGER = 1;
     v_reverse_cost INTEGER = 1;
     v_query_text TEXT;
-    v_pgr_root_vids INT[];
-    v_pgr_distance INTEGER = 1000000;
-    v_source TEXT;
-    v_target TEXT;
-    v_rows_affected INTEGER;
 BEGIN
 
 	-- Search path
@@ -55,7 +49,6 @@ BEGIN
 	-- Get variables from input JSON
     v_expl_id_array = string_to_array(p_data->'data'->>'expl_id_array', ',');
     v_mapzone_name = p_data->'data'->>'mapzone_name';
-    v_from_zero = p_data->'data'->>'from_zero';
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -80,13 +73,7 @@ BEGIN
         v_graph_delimiter := v_mapzone_name;
     END IF;
 
-    IF v_project_type = 'WS' THEN
-        v_source := 'pgr_node_1';
-        v_target := 'pgr_node_2';
-    ELSE
-        v_source := 'pgr_node_2';
-        v_target := 'pgr_node_1';
-    END IF;
+
 
     v_query_text = '
     WITH connectedcomponents AS (
@@ -255,59 +242,6 @@ BEGIN
                     GROUP BY pgr_node_1
                 )a
             WHERE t.graph_delimiter = v_graph_delimiter AND t.pgr_node_id = a.pgr_node_1;
-        END IF;
-
-        -- calculate to_arc of node parents in from zero mode
-        IF v_from_zero THEN
-            IF v_project_type = 'UD' AND v_mapzone_name = 'DWFZONE' THEN
-                v_query_text := 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
-                    FROM temp_pgr_arc
-                    WHERE graph_delimiter <> ''INITOVERFLOWPATH'' AND reverse_cost < 0'; -- if pgr_node_1 or pgr_node_2 have graph_delimiter = IGNORE, the arcs will not be filtered
-            ELSE
-                v_query_text := 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
-                    FROM temp_pgr_arc';
-
-                EXECUTE 'SELECT array_agg(pgr_node_id)::INT[] 
-                        FROM temp_pgr_node 
-                        JOIN man_tank ON man_tank.node_id = temp_pgr_node.node_id'
-                INTO v_pgr_root_vids;
-            END IF;
-
-            INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
-            (
-                SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
-                FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
-            );
-
-            -- update to_arc of nodes in from zero mode
-            v_query_text = '
-            WITH node_parents AS (
-                SELECT pgr_node_id, node_id
-                FROM temp_pgr_node
-                WHERE graph_delimiter = ''' || v_mapzone_name || '''
-                AND to_arc IS NULL
-                AND node_id IS NOT NULL
-            ), nodes_to_update AS (
-                SELECT node 
-                FROM temp_pgr_drivingdistance tpd
-                JOIN node_parents n ON tpd.pred = n.pgr_node_id
-            ), correct_to_arc AS (
-                SELECT *
-                FROM temp_pgr_arc tpa
-                JOIN nodes_to_update nu ON (tpa.pgr_node_1 = nu.node OR tpa.pgr_node_2 = nu.node)
-                JOIN node_parents np ON (tpa.node_1 = np.node_id OR tpa.node_2 = np.node_id)
-            )
-            UPDATE temp_pgr_node t
-            SET to_arc = a.to_arc
-            FROM (
-                SELECT pgr_node_id, array_agg(arc_id) AS to_arc
-                FROM correct_to_arc
-                GROUP BY pgr_node_id
-            ) a
-            WHERE t.pgr_node_id = a.pgr_node_id;';
-
-            EXECUTE v_query_text;
-
         END IF;
     END IF;
 
