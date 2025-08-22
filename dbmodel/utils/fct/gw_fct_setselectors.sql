@@ -20,6 +20,9 @@ SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "l
 
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_mincut", "tabName":"tab_mincut", "checkAll":"True", "addSchema":"NULL"}}$$);
 
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"", "epsg":25830}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+"selectorType":"explfrommuni", "id":527, "value":true, "isAlone":true, "addSchema":"ud"}
+
 fid: 397
 
 select * from SCHEMA_NAME.anl_arc
@@ -74,7 +77,11 @@ v_result_connec json;
 v_result_arc json;
 v_expl_x_user boolean;
 v_project_type text;
+<<<<<<< HEAD
 v_psector_current_value integer;
+=======
+v_sectorisexplismuni boolean;
+>>>>>>> 933834a42 (fix(initfrommapguige): Fix some issues when init from map guide)
 
 BEGIN
 
@@ -137,7 +144,10 @@ BEGIN
 	v_columnname = v_parameter_selector->>'selector_id';
 	v_table = v_parameter_selector->>'table';
 	v_tableid = v_parameter_selector->>'table_id';
+	v_sectorisexplismuni = (SELECT value::boolean FROM config_param_system WHERE parameter = 'basic_selector_sectorisexplismuni');
 
+	IF v_sectorisexplismuni IS NULL THEN v_sectorisexplismuni = TRUE; ELSE v_sectorisexplismuni = FALSE; END IF;
+	
 	-- setting schema add
 	IF v_tabname like '%add%' AND v_addschema IS NOT NULL THEN
 		v_tablename = concat(v_addschema,'.',v_tablename);
@@ -343,6 +353,7 @@ BEGIN
 
 			-- sector
 			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+<<<<<<< HEAD
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 
@@ -366,6 +377,24 @@ BEGIN
 			      AND se.expl_id = ANY(node.expl_visibility)
 			  )
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
+=======
+			IF v_sectorisexplismuni THEN
+				INSERT INTO selector_sector SELECT expl_id, current_user FROM selector_expl WHERE cur_user =current_user
+				ON CONFLICT (sector_id, cur_user) DO NOTHING;
+			ELSE 
+				INSERT INTO selector_sector
+				SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+				ON CONFLICT (sector_id, cur_user) DO NOTHING;
+			
+				-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+				INSERT INTO selector_sector
+				SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+				UNION
+				SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+				ON CONFLICT (sector_id, cur_user) DO NOTHING;
+
+			END IF;
+>>>>>>> 933834a42 (fix(initfrommapguige): Fix some issues when init from map guide)
 
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
@@ -386,13 +415,18 @@ BEGIN
 				SELECT DISTINCT sector_id, current_user FROM sector WHERE macrosector_id IN (SELECT macrosector_id FROM selector_macrosector WHERE cur_user = current_user)
 				ON CONFLICT (sector_id, cur_user) DO NOTHING;
 			END IF;
-
+		
 			-- expl
 			DELETE FROM selector_expl WHERE cur_user = current_user;
-			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
-			ON CONFLICT (expl_id, cur_user) DO NOTHING;
-
+			IF v_sectorisexplismuni THEN
+				INSERT INTO selector_expl SELECT sector_id, current_user FROM selector_sector WHERE cur_user =current_user
+				ON CONFLICT (expl_id, cur_user) DO NOTHING;
+			ELSE 
+				INSERT INTO selector_expl
+				SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
+				ON CONFLICT (expl_id, cur_user) DO NOTHING;
+			END IF;
+		
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
@@ -446,7 +480,7 @@ BEGIN
 			  )
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-			-- dscenarios
+			-- scenarios
 			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
 				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
 				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
@@ -703,7 +737,22 @@ BEGIN
 
 	END IF;
 
-	-- force 0
+	-- manage explfrommuni
+	IF v_selectortype ='explfrommuni' THEN
+	
+		DELETE FROM selector_municipality WHERE cur_user = current_user;
+		DELETE FROM selector_sector WHERE cur_user = current_user;
+		DELETE FROM selector_expl WHERE cur_user = current_user;
+		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
+		DELETE FROM selector_macrosector WHERE cur_user = current_user;
+
+		INSERT INTO selector_municipality VALUES (v_id::integer, current_user);
+		INSERT INTO selector_sector VALUES (v_id::integer, current_user);
+		INSERT INTO selector_expl VALUES (v_id::integer, current_user);
+		
+	END IF;
+
+	-- force 0 
 	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
 
