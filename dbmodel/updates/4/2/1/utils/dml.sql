@@ -19,6 +19,13 @@ UPDATE plan_typevalue SET idval = 'EXECUTION IN PROGRESS' WHERE typevalue = 'pse
 UPDATE plan_typevalue SET idval = 'PLANNED' WHERE typevalue = 'psector_status' AND id = '2';
 UPDATE plan_typevalue SET idval = 'PLANNING IN PROGRESS' WHERE typevalue = 'psector_status' AND id = '1';
 
+UPDATE config_param_system SET value = 
+'{"table":"plan_psector","selector":"selector_psector","table_id":"psector_id","selector_id":"psector_id","label":"psector_id, '' - '', name",
+"orderBy":"psector_id","manageAll":true,"typeaheadFilter":" AND lower(concat(expl_id, '' - '', name))",
+"query_filter":"AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND status IN (1,2,3,4,8)","typeaheadForced":true,"selectionMode":"keepPreviousUsingShift"}'
+WHERE parameter = 'basic_selector_tab_psector';
+
+
 UPDATE plan_psector SET status = 8 WHERE status = null;
 UPDATE plan_psector SET status = 7 WHERE status = 3;
 UPDATE plan_psector SET status = 6 WHERE status = 0;
@@ -33,7 +40,6 @@ UPDATE sys_table SET id = 'archived_psector_node' WHERE id = 'archived_psector_n
 UPDATE sys_table SET id = 'archived_psector_connec' WHERE id = 'archived_psector_connec_traceability';
 UPDATE sys_table SET id = 'archived_psector_gully' WHERE id = 'archived_psector_gully_traceability';
 UPDATE sys_table SET id = 'archived_psector_link' WHERE id = 'archived_psector_link_traceability';
-
 
 -- Solve issue with search
 UPDATE config_param_system
@@ -117,7 +123,7 @@ WHERE id IS NOT NULL
 AND CASE 
   WHEN (SELECT tg_op_value FROM tg_op_value)!=''INSERT'' THEN id IN (0,1,2)
   WHEN (SELECT tg_op_value FROM tg_op_value) =''INSERT'' AND (SELECT psector_value FROM psector_value) IS NOT NULL THEN id = 2 
-  ELSE id < 2 
+  ELSE id = 1 
 END'
 WHERE columnname = 'state';
 

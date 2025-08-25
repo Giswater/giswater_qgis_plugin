@@ -86,11 +86,6 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 
 UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;
 
--- run graphanalytics for presszone
-SELECT gw_fct_graphanalytics_mapzones_advanced($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"PRESSZONE", "exploitation":"1", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "commitChanges":"true", "valueForDisconnected":null, "updateMapZone":"2", "geomParamUpdate":"8"}, "aux_params":null}}$$);
-
-SELECT gw_fct_graphanalytics_mapzones_advanced($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"PRESSZONE", "exploitation":"2", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "commitChanges":"true", "valueForDisconnected":null, "updateMapZone":"2", "geomParamUpdate":"8"}, "aux_params":null}}$$);
-
 
 UPDATE ext_rtc_hydrometer SET is_waterbal = false WHERE  id::integer in (3,4);
 
@@ -155,8 +150,3 @@ LEFT JOIN cat_feature cf ON ce.element_type::text = cf.id::text
 WHERE cf.feature_class='GENELEM';
 
 update plan_psector set active = true;
-
-UPDATE plan_typevalue SET idval = 'EXECUTED' WHERE typevalue = 'psector_status' AND id = '4';
-UPDATE plan_typevalue SET idval = 'EXECUTION IN PROGRESS' WHERE typevalue = 'psector_status' AND id = '3';
-UPDATE plan_typevalue SET idval = 'PLANNED' WHERE typevalue = 'psector_status' AND id = '2';
-UPDATE plan_typevalue SET idval = 'PLANNING IN PROGRESS' WHERE typevalue = 'psector_status' AND id = '1';

@@ -177,8 +177,3 @@ INSERT INTO inp_frorifice (element_id, orifice_type, offsetval, cd, orate, flap,
 INSERT INTO element_x_node SELECT element_id, node_id from man_frelem;
 
 update plan_psector set active=true;
-
-UPDATE plan_typevalue SET idval = 'EXECUTED' WHERE typevalue = 'psector_status' AND id = '4';
-UPDATE plan_typevalue SET idval = 'EXECUTION IN PROGRESS' WHERE typevalue = 'psector_status' AND id = '3';
-UPDATE plan_typevalue SET idval = 'PLANNED' WHERE typevalue = 'psector_status' AND id = '2';
-UPDATE plan_typevalue SET idval = 'PLANNING IN PROGRESS' WHERE typevalue = 'psector_status' AND id = '1';

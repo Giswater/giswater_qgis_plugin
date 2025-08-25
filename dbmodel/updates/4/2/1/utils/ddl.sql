@@ -8,3 +8,6 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+alter table archived_psector_arc add column psector_descript text;
+alter table archived_psector_node add column psector_descript text;
+alter table archived_psector_connec add column psector_descript text;
