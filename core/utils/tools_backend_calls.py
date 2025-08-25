@@ -69,7 +69,7 @@ def add_object(**kwargs):
             return
         # Use the found document ID
         object_id = row['id']
-    elif qtable_name == 'tbl_element' or 'element' in tab_name: 
+    elif qtable_name == 'tbl_element' or 'element' in tab_name:
         id_name = 'element_id'
 
     # Check if this object exists
@@ -78,7 +78,7 @@ def add_object(**kwargs):
         tablename = func_params['sourceview'] + "_x_" + feature_type
     else:
         view_object = func_params['sourcetable']
-    
+
     sql = ("SELECT * FROM " + view_object + ""
            f" WHERE {id_name} = '{object_id}'")
     row = tools_db.get_row(sql, log_sql=True)
@@ -350,9 +350,10 @@ def open_selected_path(**kwargs):
     index = selected_list[0]
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
-    if row and column_index:
+    # row==0 is falsy, column_index==4 is truthy, so the condition fails if row==0.
+    if row is not None and column_index is not None:
         path = index.sibling(row, column_index).data()
-    
+
     # Check if file exist
     if path is not None and os.path.exists(path):
         # Open the document
@@ -970,9 +971,9 @@ def open_selected_manager_item(**kwargs):
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
     if not elem_manager:
-        linked_feature = {"table_name": table, "new_id": "", "dialog": dialog, "self": feature_class, 
+        linked_feature = {"table_name": table, "new_id": "", "dialog": dialog, "self": feature_class,
                         "complet_result": complet_result, "columnname": columnname}
-    if table == 'v_ui_element': 
+    if table == 'v_ui_element':
         connect = [partial(reload_table_manager, **kwargs)]
     elif table == 'v_ui_element_x_arc':
         connect = [partial(add_object, **kwargs), partial(_reload_table, **kwargs)]
@@ -983,7 +984,7 @@ def open_selected_manager_item(**kwargs):
         sql = f"SELECT concat('ve_', lower(feature_type), '_', lower(element_type)) from v_ui_element where element_id = '{element_id}' "
         table_name = tools_db.get_row(sql)
         info_feature = GwInfo('tab_data')
-        complet_result, dialog = info_feature.open_form(table_name=table_name[0], feature_id=element_id, tab_type='data', 
+        complet_result, dialog = info_feature.open_form(table_name=table_name[0], feature_id=element_id, tab_type='data',
                                                         connect_signal=connect, linked_feature=linked_feature)
         if not complet_result:
             tools_log.log_info("FAIL open_selected_manager_item")
@@ -993,13 +994,13 @@ def open_selected_manager_item(**kwargs):
 def manage_element_menu(**kwargs):
     """ Function called in class tools_gw.add_button(...) -->
             widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
-    
+
     # Get widget from kwargs
     button = kwargs['widget']
     func_params = kwargs['func_params']
     table = func_params['sourcetable']
     connect = None
-    if table == 'v_ui_element': 
+    if table == 'v_ui_element':
         connect = [partial(reload_table_manager, **kwargs)]
     elif table == 'v_ui_element_x_arc':
         connect = [partial(add_object, **kwargs), partial(_reload_table, **kwargs)]
@@ -1013,10 +1014,10 @@ def manage_element_menu(**kwargs):
         dialog = kwargs['dialog']
         complet_result = kwargs.get('complet_result')
         geometry = complet_result.get('body').get('feature').get('geometry')
-        linked_feature_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": geometry, 
-                            "self": feature_class, "complet_result": complet_result, 
+        linked_feature_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": geometry,
+                            "self": feature_class, "complet_result": complet_result,
                             "columnname": "element_id"}
-        linked_feature_no_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": None, 
+        linked_feature_no_geom = {"table_name": table, "new_id": "", "dialog": dialog, "geometry": None,
                                 "self": feature_class, "complet_result": complet_result,
                                 "columnname": "element_id"}
     # Create menu for button
@@ -1245,7 +1246,7 @@ def insert_feature(**kwargs):
     """
     func_params = kwargs.get('func_params')
     target_widget = func_params.get('targetwidget')
-    
+
     tools_gw.insert_feature(kwargs.get('class'), kwargs.get('dialog'), None, GwSelectionMode.ELEMENT, target_widget=target_widget)
 
 
