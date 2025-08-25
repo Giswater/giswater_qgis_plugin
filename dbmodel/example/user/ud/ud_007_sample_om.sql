@@ -8,7 +8,7 @@ or (at your option) any later version.
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO om_visit_cat VALUES (1, 'Test', '2024-02-21', '2024-02-21', NULL, true, NULL, NULL, NULL, NULL);
+INSERT INTO om_visit_cat VALUES (1, 'Test', '2024-02-21', '2024-02-21', NULL, true, NULL, NULL, NULL, 'Test');
 
 INSERT INTO om_typevalue VALUES ('visit_cleaned', '1', 'Yes', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_cleaned', '2', 'No', NULL, NULL);
