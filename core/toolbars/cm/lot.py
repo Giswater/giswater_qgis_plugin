@@ -117,6 +117,7 @@ class AddNewLot:
         if lot_id:
             self._load_lot_relations(lot_id)
             self.enable_feature_tabs_by_campaign(lot_id)
+            self._check_and_disable_campaign_combo()
 
         if tools_gw.get_project_type() == 'ws':
             tools_qt.enable_tab_by_tab_name(self.dlg_lot.tab_widget, 'LoadsTab', False)
@@ -187,7 +188,7 @@ class AddNewLot:
         for table_name in relation_table_names:
             view = getattr(self.dlg_lot, table_name, None)
             if view:
-                tools_qt.set_tableview_config(view)
+                tools_qt.set_tableview_config(view, sortingEnabled=False)
 
         # Connect selectionChanged signal to select features in relations tables when selecting them on the canvas
         global_vars.canvas.selectionChanged.connect(partial(self._manage_selection_changed))
@@ -461,7 +462,11 @@ class AddNewLot:
             view = getattr(self.dlg_lot, table_widget_name, None)
             if view:
                 db_table = f"om_campaign_lot_x_{feature}"
-                sql = f"SELECT * FROM cm.{db_table} WHERE lot_id = {lot_id}"
+                sql = (
+                    f"SELECT * FROM cm.{db_table} "
+                    f"WHERE lot_id = {lot_id} "
+                    f"ORDER BY id"
+                )
                 self.populate_tableview(view, sql)
 
     def get_widget_by_columnname(self, dialog: QWidget, columnname: str) -> Optional[QWidget]:
@@ -709,12 +714,14 @@ class AddNewLot:
         tools_gw.insert_feature(self, self.dlg_lot, "lot", GwSelectionMode.LOT, False, None, None,
                                 refresh_callback=self._refresh_relations_table)
         self._update_feature_completer_lot(self.dlg_lot)
+        self._check_and_disable_campaign_combo()
 
     def _delete_related_records(self):
         """Handles the 'delete records' button click action."""
         tools_gw.delete_records(self, self.dlg_lot, "lot", GwSelectionMode.LOT, None, None, None,
                                 refresh_callback=self._refresh_relations_table)
         self._update_feature_completer_lot(self.dlg_lot)
+        self._check_and_disable_campaign_combo()
 
     def _init_snapping_selection(self):
         """Handles the 'snapping selection' button click action."""
@@ -1709,6 +1716,28 @@ class AddNewLot:
             return "role_cm_field"
         else:
             return "role_basic"
+
+    def _check_and_disable_campaign_combo(self):
+        """Disable campaign combo if any relations exist."""
+        if not self.lot_id:
+            return
+
+        features = ["arc", "node", "connec", "link"]
+        if tools_gw.get_project_type() == 'ud':
+            features.append("gully")
+
+        has_relations = False
+        for feature in features:
+            db_table = f"om_campaign_lot_x_{feature}"
+            sql = f"SELECT 1 FROM cm.{db_table} WHERE lot_id = {self.lot_id} LIMIT 1"
+            if tools_db.get_row(sql):
+                has_relations = True
+                break
+
+        if has_relations:
+            campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
+            if campaign_combo:
+                campaign_combo.setEnabled(False)
 
 
 def upsert_team(**kwargs: Any):
