@@ -549,3 +549,5 @@ UPDATE sys_table SET orderby=3 WHERE id='ve_arc';
 UPDATE sys_table SET orderby=4 WHERE id='ve_connec';
 UPDATE sys_Table SET orderby=5 WHERE id='ve_gully';
 UPDATE sys_table SET orderby=6 WHERE id='ve_link';
+
+DELETE FROM cat_element WHERE id='GATE-01' AND element_type='EGATE';

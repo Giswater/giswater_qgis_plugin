@@ -23,6 +23,7 @@ INSERT INTO cat_element VALUES ('STEP200', 'ESTEP', 'Iron', '20x20X20cm', 'Step 
 INSERT INTO cat_element VALUES ('PUMP_ABS', 'EPUMP', 'Iron', NULL, 'Model ABS AFP 1001 M300/4-43', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('HYDROGEN SULFIDE SENSOR', 'EIOT_SENSOR', 'Iron', '10x10x10cm', 'Hydrogen sulfide sensor', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('WEEL PROTECTOR', 'EPROTECTOR', 'Iron', '50x10x5cm', 'Weel protector', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
+INSERT INTO cat_element (id, element_type, matcat_id, geometry, descript, link, brand, "type", model, svg, active, geom1, geom2, isdoublegeom) VALUES('GATE-01', 'EGATE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
 
 INSERT INTO cat_arc VALUES ('SIPHON-CC100', 'SIPHON', NULL, 'CIRCULAR', 1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 1.30, 0.7854, 2.20, 0.15, 'm', 'A_CON_DN100', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, NULL, 'N_CONNECTION', NULL);
 INSERT INTO cat_arc VALUES ('WACCEL-CC020', 'WACCEL', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 0.26, 0.0314, 1.40, 0.03, 'm', 'A_PVC_DN20', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, NULL, 'N_CONNECTION', NULL);
