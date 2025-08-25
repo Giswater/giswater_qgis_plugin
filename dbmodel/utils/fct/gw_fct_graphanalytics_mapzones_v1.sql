@@ -329,7 +329,7 @@ BEGIN
                 'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id
                 FROM (
                     SELECT ' || v_mapzone_field || ' AS mapzone_id,
-                    nullif (json_array_elements_text(graphconfig->''use''))->>''nodeParent'','''')::int4 AS node_id
+                    nullif ((json_array_elements_text(graphconfig->''use'')::json)->>''nodeParent'','''')::int4 AS node_id
                     FROM ' || v_table_name || ' 
 				';
 		END IF;
