@@ -267,7 +267,7 @@ class GwNonVisual:
 
         # Set widget & model properties
         tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=0, stretchLastSection=False)
+                                      sectionResizeMode=1, stretchLastSection=False)
         tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Sort the table by feature id
