@@ -155,3 +155,8 @@ LEFT JOIN cat_feature cf ON ce.element_type::text = cf.id::text
 WHERE cf.feature_class='GENELEM';
 
 update plan_psector set active = true;
+
+UPDATE plan_typevalue SET idval = 'EXECUTED' WHERE typevalue = 'psector_status' AND id = '4';
+UPDATE plan_typevalue SET idval = 'EXECUTION IN PROGRESS' WHERE typevalue = 'psector_status' AND id = '3';
+UPDATE plan_typevalue SET idval = 'PLANNED' WHERE typevalue = 'psector_status' AND id = '2';
+UPDATE plan_typevalue SET idval = 'PLANNING IN PROGRESS' WHERE typevalue = 'psector_status' AND id = '1';
