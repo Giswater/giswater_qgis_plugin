@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "l
 
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_mincut", "tabName":"tab_mincut", "checkAll":"True", "addSchema":"NULL"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"", "epsg":25830}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"", "epsg":25830}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
 "selectorType":"explfrommuni", "id":527, "value":true, "isAlone":true, "addSchema":"ud"}
 
 fid: 397
@@ -77,11 +77,8 @@ v_result_connec json;
 v_result_arc json;
 v_expl_x_user boolean;
 v_project_type text;
-<<<<<<< HEAD
 v_psector_current_value integer;
-=======
 v_sectorisexplismuni boolean;
->>>>>>> 933834a42 (fix(initfrommapguige): Fix some issues when init from map guide)
 
 BEGIN
 
@@ -147,7 +144,7 @@ BEGIN
 	v_sectorisexplismuni = (SELECT value::boolean FROM config_param_system WHERE parameter = 'basic_selector_sectorisexplismuni');
 
 	IF v_sectorisexplismuni IS NULL THEN v_sectorisexplismuni = TRUE; ELSE v_sectorisexplismuni = FALSE; END IF;
-	
+
 	-- setting schema add
 	IF v_tabname like '%add%' AND v_addschema IS NOT NULL THEN
 		v_tablename = concat(v_addschema,'.',v_tablename);
@@ -169,7 +166,7 @@ BEGIN
 		CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
 		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
 		CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
-		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active 
+		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
 		FROM om_typevalue WHERE typevalue = 'network_type' order by id;
 
 		IF v_project_type = 'WS' THEN
@@ -179,7 +176,7 @@ BEGIN
 		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e
 		JOIN config_user_x_expl USING (expl_id)	WHERE e.active and expl_id > 0 and username = current_user order by 1;
 
-		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active 
+		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
 		FROM om_typevalue WHERE typevalue = 'network_type' order by id;
 
 		CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
@@ -353,48 +350,30 @@ BEGIN
 
 			-- sector
 			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-<<<<<<< HEAD
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- sector for those objects wich has expl_visibility and expl_visibility is not selected but yes one
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM arc
-			WHERE sector_id > 0
-			  AND EXISTS (
-			    SELECT 1 FROM selector_expl se
-			    WHERE se.cur_user = current_user
-			      AND se.expl_id = ANY(arc.expl_visibility)
-			  )
-			UNION
-			SELECT DISTINCT sector_id, current_user FROM node
-			WHERE sector_id > 0
-			  AND EXISTS (
-			    SELECT 1 FROM selector_expl se
-			    WHERE se.cur_user = current_user
-			      AND se.expl_id = ANY(node.expl_visibility)
-			  )
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-=======
 			IF v_sectorisexplismuni THEN
-				INSERT INTO selector_sector SELECT expl_id, current_user FROM selector_expl WHERE cur_user =current_user
+				INSERT INTO selector_sector SELECT expl_id, current_user FROM selector_expl WHERE cur_user = current_user
 				ON CONFLICT (sector_id, cur_user) DO NOTHING;
-			ELSE 
+			ELSE
+				-- sector for those objects wich has expl_visibility and expl_visibility is not selected but yes one
 				INSERT INTO selector_sector
-				SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-				ON CONFLICT (sector_id, cur_user) DO NOTHING;
-			
-				-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
-				INSERT INTO selector_sector
-				SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+				SELECT DISTINCT sector_id, current_user FROM arc
+				WHERE sector_id > 0
+				AND EXISTS (
+					SELECT 1 FROM selector_expl se
+					WHERE se.cur_user = current_user
+					AND se.expl_id = ANY(arc.expl_visibility)
+				)
 				UNION
-				SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+				SELECT DISTINCT sector_id, current_user FROM node
+				WHERE sector_id > 0
+				AND EXISTS (
+					SELECT 1 FROM selector_expl se
+					WHERE se.cur_user = current_user
+					AND se.expl_id = ANY(node.expl_visibility)
+				)
 				ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
 			END IF;
->>>>>>> 933834a42 (fix(initfrommapguige): Fix some issues when init from map guide)
 
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
@@ -415,18 +394,18 @@ BEGIN
 				SELECT DISTINCT sector_id, current_user FROM sector WHERE macrosector_id IN (SELECT macrosector_id FROM selector_macrosector WHERE cur_user = current_user)
 				ON CONFLICT (sector_id, cur_user) DO NOTHING;
 			END IF;
-		
+
 			-- expl
 			DELETE FROM selector_expl WHERE cur_user = current_user;
 			IF v_sectorisexplismuni THEN
 				INSERT INTO selector_expl SELECT sector_id, current_user FROM selector_sector WHERE cur_user =current_user
 				ON CONFLICT (expl_id, cur_user) DO NOTHING;
-			ELSE 
+			ELSE
 				INSERT INTO selector_expl
 				SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 				ON CONFLICT (expl_id, cur_user) DO NOTHING;
 			END IF;
-		
+
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
@@ -493,7 +472,7 @@ BEGIN
 			-- manage add schema for muni
 			IF v_addschema IS NOT NULL THEN
 				EXECUTE 'SET search_path = '||v_addschema||', public';
-	
+
 				EXECUTE' DELETE FROM selector_municipality WHERE cur_user = current_user';
 				EXECUTE' INSERT INTO selector_municipality 
 				SELECT muni_id, current_user FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
@@ -679,27 +658,27 @@ BEGIN
 	-- manage cross-reference for psectors
 	DELETE FROM selector_psector WHERE psector_id NOT IN
 	(SELECT psector_id FROM plan_psector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-	
-	-- manage psector logics 
-	v_psector_current_value := (select value from config_param_user  WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user); 
+
+	-- manage psector logics
+	v_psector_current_value := (select value from config_param_user  WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user);
 	IF v_psector_current_value  IS NOT NULL THEN
 		IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
-			AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN		
-		
+			AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN
+
 			-- remove current psector if explitation have been changed
 			UPDATE config_param_user SET value = NULL WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
-		ELSE		
+		ELSE
 			-- force current if have been disabled and its expl_id is enabled
 			INSERT INTO selector_psector values (v_psector_current_value, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
 		END IF;
-	END IF;	
+	END IF;
 
-	-- manage cross reference schema for state 
-	IF v_addschema IS NOT NULL THEN 
+	-- manage cross reference schema for state
+	IF v_addschema IS NOT NULL THEN
 		EXECUTE 'DELETE FROM '||v_addschema||'.selector_state WHERE cur_user = current_user';
 		EXECUTE 'INSERT INTO '||v_addschema||'.selector_state SELECT state_id, current_user FROM selector_state WHERE cur_user = current_user';
 	END IF;
-	
+
 	-- get envelope
 	IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 		SELECT row_to_json (a)
@@ -718,7 +697,7 @@ BEGIN
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1,
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM plan_psector where psector_id IN
-		(SELECT psector_id FROM selector_psector WHERE cur_user=current_user)) b) a;		
+		(SELECT psector_id FROM selector_psector WHERE cur_user=current_user)) b) a;
 
 	ELSIF v_tabname IN ('tab_exploitation') THEN
 
@@ -739,7 +718,7 @@ BEGIN
 
 	-- manage explfrommuni
 	IF v_selectortype ='explfrommuni' THEN
-	
+
 		DELETE FROM selector_municipality WHERE cur_user = current_user;
 		DELETE FROM selector_sector WHERE cur_user = current_user;
 		DELETE FROM selector_expl WHERE cur_user = current_user;
@@ -749,33 +728,33 @@ BEGIN
 		INSERT INTO selector_municipality VALUES (v_id::integer, current_user);
 		INSERT INTO selector_sector VALUES (v_id::integer, current_user);
 		INSERT INTO selector_expl VALUES (v_id::integer, current_user);
-		
+
 	END IF;
 
-	-- force 0 
+	-- force 0
 	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
 
 	-- warn the user that in the selected psectors, there is a connec connected to different arcs
-	WITH mec AS ( 
+	WITH mec AS (
 		SELECT connec_id,
 		row_number() over(PARTITION BY connec_id ORDER BY connec_id) AS rowid_connec,
 		row_number() over(PARTITION BY arc_id ORDER BY arc_id) AS rowid_arc,
 		row_number() over(PARTITION BY psector_id ORDER BY psector_id) AS rowid_psector
-		FROM plan_psector_x_connec 
+		FROM plan_psector_x_connec
 		JOIN selector_psector USING (psector_id) WHERE cur_user = current_user
 	)
 	SELECT count(*) INTO v_count FROM mec WHERE rowid_connec>1 AND rowid_arc > 0 AND rowid_psector > 0;
 
 	IF v_count>0 then
-	
+
 		SELECT concat('{"level":',log_level, ', "text":"', error_message, '"}') INTO v_message FROM sys_message WHERE id = 4340;
 
 	END IF;
 
 	IF v_project_type = 'UD' THEN
 
-		WITH mec AS ( 
+		WITH mec AS (
 			SELECT gully_id,
 			row_number() over(PARTITION BY gully_id ORDER BY gully_id) AS rowid_gully,
 			row_number() over(PARTITION BY arc_id ORDER BY arc_id) AS rowid_arc,
@@ -786,7 +765,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM mec WHERE rowid_gully>1 AND rowid_arc > 0 AND rowid_psector > 0;
 
 		IF v_count>0 then
-	
+
 			SELECT concat('{"level":',log_level, ', "text":"', error_message, '"}') INTO v_message FROM sys_message WHERE id = 4340;
 
 		END IF;
