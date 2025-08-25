@@ -1110,6 +1110,15 @@ BEGIN
 		END IF;
 	END IF;
 
+	-- set to_arc to tables man_valve/pump
+	EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+	"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+	"arcIdOld":"'||v_arc_id||'","arcIdNew":'||rec_aux1.arc_id||', "nodeIdOld":"'||rec_aux1.node_1||'", "action":"updateArc"}}}$$);';
+
+	EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+	"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+	"arcIdOld":"'||v_arc_id||'","arcIdNew":'||rec_aux2.arc_id||',"nodeIdOld":"'||rec_aux2.node_2||'", "action":"updateArc"}}}$$);';
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
