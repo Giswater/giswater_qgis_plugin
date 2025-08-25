@@ -475,3 +475,33 @@ END'
 WHERE columnname = 'state';
 
 update config_form_fields set dv_orderby_id = true where formtype ='psector' and columnname ='status';
+
+-- Brand_id
+DO $$
+DECLARE
+  v_dv_querytext text;
+  v_layoutorder integer;
+  rec record;
+BEGIN
+  FOR rec IN SELECT * FROM config_form_fields WHERE formtype='form_feature' AND columnname='brand_id' AND tabname='tab_data' AND formname ilike any(array['ve_node_%', 've_arc_%', 've_connec_%', 've_gully_%'])
+  LOOP
+    v_dv_querytext := format('SELECT id, id as idval FROM cat_brand WHERE %L = ANY(featurecat_id::text[]) OR featurecat_id IS NULL', upper(regexp_replace(rec.formname, '^ve_(node|arc|connec|gully)_', '', 'i')));
+    v_layoutorder := (SELECT MAX(layoutorder) + 1 FROM config_form_fields WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND layoutname = 'lyt_data_2');
+	UPDATE config_form_fields SET dv_querytext = v_dv_querytext, widgettype = 'combo', layoutname = 'lyt_data_2', layoutorder = v_layoutorder WHERE formname = rec.formname AND formtype = rec.formtype AND columnname = rec.columnname AND tabname = rec.tabname;
+  END LOOP;
+END $$;
+
+-- Model_id
+DO $$
+DECLARE
+  v_dv_querytext text;
+  v_layoutorder integer;
+  rec record;
+BEGIN
+  FOR rec IN SELECT * FROM config_form_fields WHERE formtype='form_feature' AND columnname='model_id' AND tabname='tab_data' AND formname ilike any(array['ve_node_%', 've_arc_%', 've_connec_%', 've_gully_%'])
+  LOOP
+    v_dv_querytext := format('SELECT id, id as idval FROM cat_brand_model WHERE %L = ANY(featurecat_id::text[]) OR featurecat_id IS NULL', upper(regexp_replace(rec.formname, '^ve_(node|arc|connec|gully)_', '', 'i')));
+    v_layoutorder := (SELECT MAX(layoutorder) + 1 FROM config_form_fields WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND layoutname = 'lyt_data_2');
+	UPDATE config_form_fields SET dv_querytext = v_dv_querytext, widgettype = 'combo', layoutname = 'lyt_data_2', layoutorder = v_layoutorder WHERE formname = rec.formname AND formtype = rec.formtype AND columnname = rec.columnname AND tabname = rec.tabname;
+  END LOOP;
+END $$;

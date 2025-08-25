@@ -169,3 +169,164 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4346, 'To execute from zero, all %mapzone_name% mapzones must be disabled', 'Toggle active for all mapzones, or delete them', 2, true, 'utils', 'core', 'UI');
 
 UPDATE sys_table SET context = NULL WHERE id ilike 've_element_e%';
+
+-- 25/08/25
+-- ELEMENTS
+UPDATE config_form_fields
+	SET columnname='element_type'
+	WHERE formname='cat_element' AND formtype='form_feature' AND columnname='elementtype_id' AND tabname='tab_none' AND columnname='element_type';
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_element','form_feature','tab_none','active','boolean','check','Active:','active',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_element','form_feature','tab_none','code_autofill','boolean','check','Code autofill:','code_autofill',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_element','form_feature','tab_none','descript','string','text','Descript:','descript - Field to store additional information about the feature.',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,hidden)
+	VALUES ('ve_cat_feature_element','form_feature','tab_none','epa_default','string','combo','Epa default:','epa_default',true,false,true,false,false,'SELECT id as id, id as idval FROM sys_feature_epa_type WHERE feature_type =''ELEMENT''',true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_element','form_feature','tab_none','id','string','text','Id:','id',true,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_element','form_feature','tab_none','link_path','string','text','Link path:','link_path',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_element','form_feature','tab_none','shortcut_key','string','text','Shortcut:','shortcut_key',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,hidden)
+	VALUES ('ve_cat_feature_element','form_feature','tab_none','system_id','string','combo','Sys type:','system_id',true,false,true,false,false,'SELECT id as id, id as idval FROM  sys_feature_class WHERE id IS NOT NULL AND type=''ELEMENT'' ',true,false,false);
+
+-- LINKS
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_link','form_feature','tab_none','code_autofill','boolean','check','Code autofill:','code_autofill',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_link','form_feature','tab_none','descript','string','text','Descript:','descript - Field to store additional information about the feature.',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_link','form_feature','tab_none','id','string','text','Id:','id',true,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_link','form_feature','tab_none','link_path','string','text','Link path:','link_path',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_link','form_feature','tab_none','shortcut_key','string','text','Shortcut:','shortcut_key',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('ve_cat_feature_link','form_feature','tab_none','active','boolean','check','Active:','active',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,hidden)
+	VALUES ('ve_cat_feature_link','form_feature','tab_none','epa_default','string','combo','Epa default:','epa_default',true,false,true,false,false,'SELECT id as id, id as idval FROM sys_feature_epa_type WHERE feature_type =''LINK''',true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,hidden)
+	VALUES ('ve_cat_feature_link','form_feature','tab_none','system_id','string','combo','Sys type:','system_id',true,false,true,false,false,'SELECT id as id, id as idval FROM  sys_feature_class WHERE id IS NOT NULL AND type=''LINK'' ',true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','active','boolean','check','Active:','Active',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('cat_link','form_feature','tab_none','m2bottom_cost','string','typeahead','Bottom cost:','(Price_compost.id) of full cost of bottom''s trench arrangement',false,false,true,false,'SELECT id, id AS idval FROM plan_price WHERE id IS NOT NULL',true,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','area','double','text','Area:','Area',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','id','string','text','ID:','ID',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('cat_link','form_feature','tab_none','link_type','string','combo','Link type:','cat_linktype_id - Type of link. It is auto-populated based on the linkcat_id',false,false,true,false,'SELECT id, id AS idval FROM cat_feature_link WHERE id IS NOT NULL',true,false,'{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "ve_cat_feature_link", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression":"active=true"}}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('cat_link','form_feature','tab_none','cost_unit','string','combo','Cost unit:','Units measurements. (Only ml or ut. are allowed values). Sometimes the budget of an link could be treated as unitary price (applied using length=1)',false,false,true,false,'SELECT id, idval FROM plan_typevalue 
+WHERE typevalue = ''price_units''',true,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('cat_link','form_feature','tab_none','brand_id','string','combo','Brand:','Brand',false,false,true,false,'SELECT id, id AS idval FROM cat_brand WHERE id IS NOT NULL',true,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','label','string','text','Catalog label:','label - Label from the catalog of links, therefore it will not be editable in the form',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('cat_link','form_feature','tab_none','cost','string','typeahead','Cost:','(Price_compost.id) of full cost of conduit''s subministration and installation',false,false,true,false,'SELECT id, id AS idval FROM plan_price WHERE id IS NOT NULL',true,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','descript','string','text','Descript:','descript - Field to store additional information about the feature.',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','dnom','double','text','Dnom:','dnom',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','estimated_depth','double','text','Estimated depth:','Estimated depth',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','dext','double','text','External diameter:','External diameter',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','dint','double','text','Internal diamter:','Internal diamter',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','link','string','text','Link:','link - URL of the link that will open when clicking the button in the form bar. It must be edited from the database. link_path (from type tables) + link is concatenated',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('cat_link','form_feature','tab_none','matcat_id','string','combo','Material:','matcat_id - Material of the element. It cannot be filled in. The one with the matcat_id field of the corresponding catalog is used',false,false,true,false,'SELECT id, descript AS idval FROM cat_material WHERE ''LINK'' = ANY(feature_type) AND id IS NOT NULL',true,false,'{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "cat_material", "activated": true, "keyColumn": "id", "valueColumn": "descript", "filterExpression": null}}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('cat_link','form_feature','tab_none','model_id','string','combo','Model:','Model',false,false,true,false,'SELECT id, id AS idval FROM cat_brand_model WHERE id IS NOT NULL',true,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','pnom','double','text','Pnom:','pnom',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('cat_link','form_feature','tab_none','m3protec_cost','string','typeahead','Protection cost:','(Price_compost.id) of full cost of conduit''s proteccion material',false,false,true,false,'SELECT id, id AS idval FROM plan_price WHERE id IS NOT NULL',true,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','svg','string','text','Svg:','Svg',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','width','double','text','Width:','Width',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','z1','double','text','Z1:','z1',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','z2','double','text','Z2:','z2',false,false,true,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,hidden)
+	VALUES ('cat_link','form_feature','tab_none','thickness','string','text','Thickness:','Thickness:',false,false,true,false,false);
+
+
+-- Brand_id
+DO $$
+DECLARE
+  v_dv_querytext text;
+  v_layoutorder integer;
+  rec record;
+BEGIN
+  FOR rec IN SELECT * FROM config_form_fields WHERE formtype='form_feature' AND columnname='brand_id' AND tabname='tab_data' AND formname ilike any(array['ve_node_%', 've_arc_%', 've_connec_%', 've_gully_%'])
+  LOOP
+    v_dv_querytext := format('SELECT id, id as idval FROM cat_brand WHERE %L = ANY(featurecat_id::text[]) OR featurecat_id IS NULL', upper(regexp_replace(rec.formname, '^ve_(node|arc|connec|gully)_', '', 'i')));
+    v_layoutorder := (SELECT MAX(layoutorder) + 1 FROM config_form_fields WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND layoutname = 'lyt_data_2');
+	UPDATE config_form_fields SET dv_querytext = v_dv_querytext, widgettype = 'combo', layoutname = 'lyt_data_2', layoutorder = v_layoutorder WHERE formname = rec.formname AND formtype = rec.formtype AND columnname = rec.columnname AND tabname = rec.tabname;
+  END LOOP;
+END $$;
+
+UPDATE config_form_fields
+	SET columnname='brand_id',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand b JOIN cat_node n ON (n.node_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_node' AND formtype='form_feature' AND columnname='brand' AND tabname='tab_none';
+
+UPDATE config_form_fields
+	SET columnname='brand_id',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand b JOIN cat_arc a ON (a.arc_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_arc' AND formtype='form_feature' AND columnname='brand' AND tabname='tab_none';
+
+UPDATE config_form_fields
+	SET columnname='brand',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand b JOIN cat_element a ON (a.element_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_element' AND formtype='form_feature' AND columnname='brand' AND tabname='tab_none';
+
+UPDATE config_form_fields
+	SET columnname='brand_id',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand b JOIN cat_connec c ON (c.connec_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_connec' AND formtype='form_feature' AND columnname='brand' AND tabname='tab_none';
+  
+UPDATE config_form_fields
+	SET dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand b JOIN cat_link l ON (l.link_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_link' AND formtype='form_feature' AND columnname='brand_id' AND tabname='tab_none';
+
+
+-- Model_id
+DO $$
+DECLARE
+  v_dv_querytext text;
+  v_layoutorder integer;
+  rec record;
+BEGIN
+  FOR rec IN SELECT * FROM config_form_fields WHERE formtype='form_feature' AND columnname='model_id' AND tabname='tab_data' AND formname ilike any(array['ve_node_%', 've_arc_%', 've_connec_%', 've_gully_%'])
+  LOOP
+    v_dv_querytext := format('SELECT id, id as idval FROM cat_brand_model WHERE %L = ANY(featurecat_id::text[]) OR featurecat_id IS NULL', upper(regexp_replace(rec.formname, '^ve_(node|arc|connec|gully)_', '', 'i')));
+    v_layoutorder := (SELECT MAX(layoutorder) + 1 FROM config_form_fields WHERE formname = rec.formname AND formtype = rec.formtype AND tabname = rec.tabname AND layoutname = 'lyt_data_2');
+	UPDATE config_form_fields SET dv_querytext = v_dv_querytext, widgettype = 'combo', layoutname = 'lyt_data_2', layoutorder = v_layoutorder WHERE formname = rec.formname AND formtype = rec.formtype AND columnname = rec.columnname AND tabname = rec.tabname;
+  END LOOP;
+END $$;
+
+UPDATE config_form_fields
+	SET columnname='model_id',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand_model b JOIN cat_node n ON (n.node_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_node' AND formtype='form_feature' AND columnname='model' AND tabname='tab_none';
+
+UPDATE config_form_fields
+	SET columnname='model_id',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand_model b JOIN cat_arc a ON (a.arc_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_arc' AND formtype='form_feature' AND columnname='model' AND tabname='tab_none';
+
+UPDATE config_form_fields
+	SET columnname='model',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand_model b JOIN cat_element a ON (a.element_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_element' AND formtype='form_feature' AND columnname='model' AND tabname='tab_none';
+
+UPDATE config_form_fields
+	SET columnname='model_id',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand_model b JOIN cat_connec c ON (c.connec_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_connec' AND formtype='form_feature' AND columnname='model' AND tabname='tab_none';
+
+UPDATE config_form_fields
+	SET dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand_model b JOIN cat_link l ON (l.link_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
+	WHERE formname='cat_link' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_none';
