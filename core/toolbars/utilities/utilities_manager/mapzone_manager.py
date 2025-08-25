@@ -259,7 +259,13 @@ class GwMapzoneManager:
         macromapzone_function_id: int = 3482
         mapzone_function_id: int = 2768
         function_id: int = macromapzone_function_id if mapzone_name in self.mapzone_status["enabledMacromapzone"] else mapzone_function_id
-        dlg_functions = toolbox_btn.open_function_by_id(function_id, use_aux_conn=False)
+
+        # Connect signals - refresh table respecting current checkbox state
+        show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
+        expr = "" if show_inactive else "active is true"
+        connect = [partial(self._fill_mapzone_table, expr=expr)]
+
+        dlg_functions = toolbox_btn.open_function_by_id(function_id, use_aux_conn=False, connect_signal=connect)
 
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
@@ -1268,7 +1274,7 @@ class GwMapzoneManager:
         # Get selected row
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '')
+        tablename = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1277,13 +1283,13 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        col_name = f"{tablename.split('_')[-1].lower()}_id"
+        col_name = f"{tablename.split('_')[1].lower()}_id"
         if col_name == 'valve_id':
             col_name = 'node_id'
         col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
 
         mapzone_id = index.sibling(index.row(), col_idx).data()
-        field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
+        field_id = tableview.model().headerData(col_idx, Qt.Horizontal).lower()
 
         # Execute getinfofromid
         _id = f"{mapzone_id}"
