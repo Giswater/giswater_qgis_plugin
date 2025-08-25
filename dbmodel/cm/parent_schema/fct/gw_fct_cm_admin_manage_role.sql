@@ -66,6 +66,22 @@ BEGIN
 
     -- ENDSECTION
 
+    -- SECTION[epic=set_edit_param]: Set edit_disable_topocontrol for users with role_edit
+    v_querytext := '
+        INSERT INTO cm.config_param_user (parameter, value, cur_user)
+        SELECT ''edit_disable_topocontrol'', ''true'', r.rolname
+        FROM pg_roles r
+        JOIN pg_auth_members am ON r.oid = am.member
+        JOIN pg_roles role_edit ON am.roleid = role_edit.oid
+        WHERE role_edit.rolname ILIKE ''%role_edit%''
+          AND r.rolcanlogin = TRUE
+        ON CONFLICT (parameter, cur_user) DO UPDATE
+        SET value = ''true''
+    ';
+
+    EXECUTE v_querytext;
+    -- ENDSECTION
+
     -- SECTION[epic=return]: Build return
     -- Control null
     v_version:=COALESCE(v_version,'');
