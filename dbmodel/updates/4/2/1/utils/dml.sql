@@ -167,3 +167,5 @@ INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_element_x_arc', 'Conta
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4346, 'To execute from zero, all %mapzone_name% mapzones must be disabled', 'Toggle active for all mapzones, or delete them', 2, true, 'utils', 'core', 'UI');
+
+UPDATE sys_table SET context = NULL WHERE id ilike 've_element_e%';
