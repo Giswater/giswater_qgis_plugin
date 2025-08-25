@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from .campaign import Campaign
 from ..dialog import GwAction
+from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
 from ....libs import tools_qt, tools_db
@@ -64,6 +65,7 @@ class GwAddCampaignButton(GwAction):
                 self.action.setMenu(self.menu)
                 toolbar.addAction(self.action)
         else:
+            self.menu = None
             # Only one is true: create a simple button
             if show_review:
                 self.action.triggered.connect(lambda: self.clicked_event(tools_qt.tr("Review")))
@@ -75,6 +77,9 @@ class GwAddCampaignButton(GwAction):
 
     def _fill_action_menu(self):
         """ Fill action menu """
+        if self.menu is None:
+            return
+        
         actions = self.menu.actions()
         for action in actions:
             action.disconnect()
@@ -87,15 +92,18 @@ class GwAddCampaignButton(GwAction):
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(self.clicked_event, action))
-            obj_action.triggered.connect(partial(self._save_last_selection, self.menu, action))
 
     def clicked_event(self, selected_action):
         """ Open the correct campaign dialog based on user selection """
 
         self._fill_action_menu()
 
-        if self.menu.property('last_selection') is not None:
+        if self.menu and self.menu.property('last_selection') is not None:
             self.new_campaign.create_campaign(dialog_type=self.menu.property('last_selection'))
+        elif self.menu:
+            button = self.action.associatedWidgets()[1]
+            menu_point = button.mapToGlobal(QPoint(0, button.height()))
+            self.menu.popup(menu_point)
 
         if selected_action == tools_qt.tr("Review"):
             self.new_campaign.create_campaign(dialog_type="review")
@@ -104,5 +112,5 @@ class GwAddCampaignButton(GwAction):
         elif selected_action == tools_qt.tr("Inventory"):
             self.new_campaign.create_campaign(dialog_type="inventory")
 
-    def _save_last_selection(self, menu, action):
-        menu.setProperty("last_selection", action.lower())
+        if selected_action in (tools_qt.tr("Review"), tools_qt.tr("Visit"), tools_qt.tr("Inventory")):
+            self.menu.setProperty("last_selection", selected_action.lower())
