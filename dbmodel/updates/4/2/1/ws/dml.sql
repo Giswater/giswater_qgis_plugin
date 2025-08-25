@@ -464,7 +464,6 @@ UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy": 3
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy": 3}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "LINK"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy": 3}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "NODE"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy": 3}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "ARC"]}';
-UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy": 3}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "GULLY"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy": 3}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "NETWORK", "CONNEC"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy":2}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "MAP ZONES"]}';
 UPDATE config_typevalue SET idval=NULL, camelstyle=NULL, addparam='{"orderBy":1}'::json WHERE typevalue='sys_table_context' AND id='{"levels": ["INVENTORY", "CATALOGS"]}';
@@ -477,8 +476,8 @@ UPDATE sys_table SET project_template = NULL WHERE id = 've_man_genelem';
 UPDATE sys_table SET project_template = '{"template": [1], "visibility": false, "levels_to_read": 2}'::jsonb WHERE id = 've_element';
 
 UPDATE sys_table SET orderby=1 WHERE id='ve_node';
-UPDATE sys_table SET orderby=2 WHERE id='ve_man_frelem';
-UPDATE sys_table SET orderby=2 WHERE id='ve_element';
+UPDATE sys_table SET orderby=2, alias = 'FRegulator' WHERE id='ve_man_frelem';
+UPDATE sys_table SET orderby=6, alias = 'Element' WHERE id='ve_element';
 UPDATE sys_table SET orderby=3 WHERE id='ve_arc';
 UPDATE sys_table SET orderby=4 WHERE id='ve_connec';
 UPDATE sys_table SET orderby=5 WHERE id='ve_link';
@@ -489,3 +488,11 @@ widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('epa_export_hybrid_dma', 'false', 'If True, hybrid DMAs are exported when network mode is TRANSMISSION NETWORK',
 'EPA Export Hybrid DMA:', NULL, NULL, true, 8, 'ws', NULL, NULL, 'boolean', 'check', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 'lyt_admin_other');
+
+update sys_table set alias = 'FRpump Dscenario' where id = 've_inp_dscenario_frpump';
+update sys_table set alias = 'FRvalve Dscenario' where id = 've_inp_dscenario_frvalve';
+update sys_table set alias = 'FRshortpipe Dscenario' where id = 've_inp_dscenario_frshortpipe';
+
+update sys_table set alias = 'FRpump' where id = 've_inp_frpump';
+update sys_table set alias = 'FRvalve' where id = 've_inp_frvalve';
+update sys_table set alias = 'FRshortpipe' where id = 've_inp_frshortpipe';

@@ -9040,9 +9040,9 @@ CREATE OR REPLACE VIEW ve_man_frelem AS
     ve_element.updated_at,
     ve_element.updated_by,
         CASE
-            WHEN man_frelem.node_id = a.node_1 THEN st_setsrid(st_makeline(node.the_geom, st_lineinterpolatepoint(a.the_geom, man_frelem.flwreg_length::double precision / st_length(a.the_geom))), 25831)::geometry(LineString,25831)
-            WHEN man_frelem.node_id = a.node_2 THEN st_setsrid(st_makeline(node.the_geom, st_lineinterpolatepoint(a.the_geom, 1::double precision - man_frelem.flwreg_length::double precision / st_length(a.the_geom))), 25831)::geometry(LineString,25831)
-            ELSE NULL::geometry(LineString,25831)
+            WHEN man_frelem.node_id = a.node_1 THEN st_setsrid(st_makeline(node.the_geom, st_lineinterpolatepoint(a.the_geom, man_frelem.flwreg_length::double precision / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE)
+            WHEN man_frelem.node_id = a.node_2 THEN st_setsrid(st_makeline(node.the_geom, st_lineinterpolatepoint(a.the_geom, 1::double precision - man_frelem.flwreg_length::double precision / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE)
+            ELSE NULL::geometry(LineString,SRID_VALUE)
         END AS the_geom
    FROM ve_element
      JOIN man_frelem ON ve_element.element_id = man_frelem.element_id
