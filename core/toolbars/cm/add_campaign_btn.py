@@ -113,4 +113,5 @@ class GwAddCampaignButton(GwAction):
             self.new_campaign.create_campaign(dialog_type="inventory")
 
         if selected_action in (tools_qt.tr("Review"), tools_qt.tr("Visit"), tools_qt.tr("Inventory")):
-            self.menu.setProperty("last_selection", selected_action.lower())
+            if self.menu:
+                self.menu.setProperty("last_selection", selected_action.lower())
