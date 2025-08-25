@@ -77,11 +77,8 @@ v_result_connec json;
 v_result_arc json;
 v_expl_x_user boolean;
 v_project_type text;
-<<<<<<< HEAD
 v_psector_current_value integer;
-=======
 v_sectorisexplismuni boolean;
->>>>>>> 933834a42 (fix(initfrommapguige): Fix some issues when init from map guide)
 
 BEGIN
 
