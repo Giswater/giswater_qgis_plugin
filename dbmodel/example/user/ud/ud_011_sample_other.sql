@@ -644,6 +644,8 @@ UPDATE config_param_user SET value = null WHERE value ='COVER' and parameter = '
 
 UPDATE cat_feature_node SET double_geom = '{"activated":true,"value":4}' WHERE id IN ('SEWER_STORAGE');
 UPDATE cat_feature_node SET double_geom = '{"activated":true,"value":2}' WHERE id IN ('REGISTER');
+UPDATE cat_feature_node SET graph_delimiter='{DWFZONE}' WHERE id='WWTP';
+UPDATE cat_feature_node SET graph_delimiter='{DWFZONE}' WHERE id='OUTFALL';
 UPDATE cat_feature_gully SET double_geom = '{"activated":true,"value":1}' WHERE id = 'GULLY';
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_status_vdefault', '4', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
