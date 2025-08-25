@@ -358,6 +358,8 @@ BEGIN
       END LOOP;
 END $$;
 
+DELETE FROM cat_element WHERE id = 'EMETER-01' AND element_type = 'EMETER';
+
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4342, 'Node not valid because it has more than 2 arcs', 'Select a valid node', 1, true, 'utils', 'core', 'UI');
 

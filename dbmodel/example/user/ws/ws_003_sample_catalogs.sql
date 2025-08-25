@@ -86,6 +86,7 @@ INSERT INTO cat_element (id,element_type,active) VALUES ('MANHOLE-01','EMANHOLE'
 INSERT INTO cat_element (id,element_type,active) VALUES ('HYDRANT_PLATE-01','EHYDRANT_PLATE',true);
 INSERT INTO cat_element (id,element_type,active) VALUES ('RREGISTER-01','EREGISTER',true);
 INSERT INTO cat_element (id,element_type,active) VALUES ('STEP-01','ESTEP',true);
+INSERT INTO cat_element (id,element_type,active) VALUES ('EMETER-01','EMETER',true);
 
 
 UPDATE cat_feature SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL_CONTR_VALVE' OR id = 'GEN_PURP_VALVE' OR id = 'PR_SUSTA.VALVE' OR id = 'PR_BREAK.VALVE'
