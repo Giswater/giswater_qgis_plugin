@@ -339,3 +339,60 @@ UPDATE config_form_fields
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4348, 'It is not allowed to insert/updates arcs with the same geometry', NULL, 2, true, 'utils', 'core', 'UI');
+
+-- 26/08/2025
+-- arc form
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias) VALUES ('arc form','utils','tbl_element_x_arc','epa_type',6,true,'epa_type');
+UPDATE config_form_tableview SET columnindex=7 WHERE objectname='tbl_element_x_arc' AND columnname='state';
+UPDATE config_form_tableview SET columnindex=8 WHERE objectname='tbl_element_x_arc' AND columnname='state_type';
+UPDATE config_form_tableview SET columnindex=9 WHERE objectname='tbl_element_x_arc' AND columnname='observ';
+UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_arc' AND columnname='comment';
+UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_arc' AND columnname='builtdate';
+UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_arc' AND columnname='enddate';
+UPDATE config_form_tableview SET columnindex=13 WHERE objectname='tbl_element_x_arc' AND columnname='link';
+UPDATE config_form_tableview SET columnindex=14 WHERE objectname='tbl_element_x_arc' AND columnname='publish';
+UPDATE config_form_tableview SET columnindex=15 WHERE objectname='tbl_element_x_arc' AND columnname='inventory';
+UPDATE config_form_tableview SET columnindex=16 WHERE objectname='tbl_element_x_arc' AND columnname='descript';
+UPDATE config_form_tableview SET columnindex=17 WHERE objectname='tbl_element_x_arc' AND columnname='location_type';
+
+-- connec form
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias) VALUES ('connec form','utils','tbl_element_x_connec','epa_type',6,true,'epa_type');
+UPDATE config_form_tableview SET columnindex=7 WHERE objectname='tbl_element_x_connec' AND columnname='state';    
+UPDATE config_form_tableview SET columnindex=8 WHERE objectname='tbl_element_x_connec' AND columnname='state_type';
+UPDATE config_form_tableview SET columnindex=9 WHERE objectname='tbl_element_x_connec' AND columnname='observ';
+UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_connec' AND columnname='comment';
+UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_connec' AND columnname='builtdate';
+UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_connec' AND columnname='enddate';
+UPDATE config_form_tableview SET columnindex=13 WHERE objectname='tbl_element_x_connec' AND columnname='link';
+UPDATE config_form_tableview SET columnindex=14 WHERE objectname='tbl_element_x_connec' AND columnname='publish';
+UPDATE config_form_tableview SET columnindex=15 WHERE objectname='tbl_element_x_connec' AND columnname='inventory';
+UPDATE config_form_tableview SET columnindex=16 WHERE objectname='tbl_element_x_connec' AND columnname='descript';
+UPDATE config_form_tableview SET columnindex=17 WHERE objectname='tbl_element_x_connec' AND columnname='location_type';
+
+-- link form
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias) VALUES ('link form','utils','tbl_element_x_link','epa_type',6,true,'epa_type');
+UPDATE config_form_tableview SET columnindex=7 WHERE objectname='tbl_element_x_link' AND columnname='state';
+UPDATE config_form_tableview SET columnindex=8 WHERE objectname='tbl_element_x_link' AND columnname='state_type';
+UPDATE config_form_tableview SET columnindex=9 WHERE objectname='tbl_element_x_link' AND columnname='observ';
+UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_link' AND columnname='comment';
+UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_link' AND columnname='builtdate';
+UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_link' AND columnname='enddate';
+UPDATE config_form_tableview SET columnindex=13 WHERE objectname='tbl_element_x_link' AND columnname='link';
+UPDATE config_form_tableview SET columnindex=14 WHERE objectname='tbl_element_x_link' AND columnname='publish';
+UPDATE config_form_tableview SET columnindex=15 WHERE objectname='tbl_element_x_link' AND columnname='inventory';
+UPDATE config_form_tableview SET columnindex=16 WHERE objectname='tbl_element_x_link' AND columnname='descript';
+UPDATE config_form_tableview SET columnindex=17 WHERE objectname='tbl_element_x_link' AND columnname='location_type';
+
+-- node form
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias) VALUES ('node form','utils','tbl_element_x_node','epa_type',6,true,'epa_type');
+UPDATE config_form_tableview SET columnindex=7 WHERE objectname='tbl_element_x_node' AND columnname='state';
+UPDATE config_form_tableview SET columnindex=8 WHERE objectname='tbl_element_x_node' AND columnname='state_type';
+UPDATE config_form_tableview SET columnindex=9 WHERE objectname='tbl_element_x_node' AND columnname='observ';
+UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_node' AND columnname='comment';
+UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_node' AND columnname='builtdate';
+UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_node' AND columnname='enddate';
+UPDATE config_form_tableview SET columnindex=13 WHERE objectname='tbl_element_x_node' AND columnname='link';
+UPDATE config_form_tableview SET columnindex=14 WHERE objectname='tbl_element_x_node' AND columnname='publish';
+UPDATE config_form_tableview SET columnindex=15 WHERE objectname='tbl_element_x_node' AND columnname='inventory';
+UPDATE config_form_tableview SET columnindex=16 WHERE objectname='tbl_element_x_node' AND columnname='descript';
+UPDATE config_form_tableview SET columnindex=17 WHERE objectname='tbl_element_x_node' AND columnname='location_type';

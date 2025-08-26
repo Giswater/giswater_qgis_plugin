@@ -19,3 +19,6 @@ ve_inp_dscenario_frweir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario(
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON
 ve_inp_dscenario_froutlet FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-OUTLET');
+
+CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON 
+v_ui_element_x_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('gully');

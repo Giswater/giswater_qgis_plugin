@@ -554,3 +554,14 @@ DELETE FROM cat_element WHERE id='GATE-01' AND element_type='EGATE';
 
 -- 26/08/2025
 INSERT INTO sys_table (id, descript, sys_role, context, orderby, alias, source) VALUES ('ve_inp_inlet', 'Shows editable information about inlets.', 'role_epa', '{"levels": ["EPA", "HYDRAULICS"]}', 20, 'Inp Inlet', 'core');
+
+-- gully form
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias) VALUES ('gully form','ud','tbl_element_x_gully','epa_type',6,true,'epa_type');
+UPDATE config_form_tableview SET columnindex=7 WHERE objectname='tbl_element_x_gully' AND columnname='state';
+UPDATE config_form_tableview SET columnindex=8 WHERE objectname='tbl_element_x_gully' AND columnname='state_type';
+UPDATE config_form_tableview SET columnindex=9 WHERE objectname='tbl_element_x_gully' AND columnname='observ';
+UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_gully' AND columnname='comment';
+UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_gully' AND columnname='builtdate';
+UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_gully' AND columnname='enddate';
+UPDATE config_form_tableview SET columnindex=13 WHERE objectname='tbl_element_x_gully' AND columnname='descript';
+UPDATE config_form_tableview SET columnindex=14 WHERE objectname='tbl_element_x_gully' AND columnname='location_type';

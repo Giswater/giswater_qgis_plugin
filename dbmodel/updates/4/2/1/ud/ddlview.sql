@@ -134,3 +134,29 @@ AS SELECT element_x_gully.gully_id,
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
      LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+DROP VIEW IF EXISTS v_ui_element_x_gully;
+CREATE OR REPLACE VIEW v_ui_element_x_gully
+AS SELECT element_x_gully.gully_id,
+    element_x_gully.element_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    element.epa_type,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate
+   FROM element_x_gully
+     JOIN element ON element.element_id = element_x_gully.element_id
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
