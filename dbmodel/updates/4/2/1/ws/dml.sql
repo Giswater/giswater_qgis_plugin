@@ -509,3 +509,8 @@ UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_pr_reduc_
 UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_pr_susta_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
 UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_shutoff_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
 UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_throttle_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+
+DELETE FROM config_param_system WHERE "parameter"='basic_selector_tab_hydro_state';
+
+DELETE FROM sys_table WHERE id='ve_inp_dscenario_pump_additional';
+DELETE FROM sys_table WHERE id='ve_inp_pump_additional';
