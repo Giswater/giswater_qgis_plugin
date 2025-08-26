@@ -1438,6 +1438,7 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_other_prices_mine', 'tab_other_prices_mine', 'tabOtherPricesMine', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_other_prices_all_1', 'lyt_other_prices_all_1', 'layoutOtherPricesAll1', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_other_prices_mine_1', 'lyt_other_prices_mine_1', 'layoutOtherPricesMine1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_log_1', 'lyt_log_1', 'lytLog1', NULL) ON CONFLICT DO NOTHING;
 
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_node', 'Node', 'Node', 'role_basic', NULL, NULL, 0, '{5}');
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_connec', 'Connec', 'Connec', 'role_basic', NULL, NULL, 0, '{5}');
