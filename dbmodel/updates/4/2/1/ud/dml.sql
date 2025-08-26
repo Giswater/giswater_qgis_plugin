@@ -574,3 +574,5 @@ UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL', dv_isnullvalue=TRUE WHERE formname='ve_epa_froutlet' AND columnname='curve_id';
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL', dv_isnullvalue=true WHERE formname='ve_epa_frpump' AND columnname='curve_id';
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_outlet''', dv_isnullvalue=true WHERE formname='ve_epa_froutlet' AND columnname='outlet_type';
+
+DELETE FROM config_form_fields WHERE columnname = 'nodarc_id';
