@@ -355,6 +355,11 @@ BEGIN
 				INSERT INTO selector_sector SELECT expl_id, current_user FROM selector_expl WHERE cur_user = current_user
 				ON CONFLICT (sector_id, cur_user) DO NOTHING;
 			ELSE
+				
+				INSERT INTO selector_sector
+				SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+				ON CONFLICT (sector_id, cur_user) DO NOTHING;
+
 				-- sector for those objects wich has expl_visibility and expl_visibility is not selected but yes one
 				INSERT INTO selector_sector
 				SELECT DISTINCT sector_id, current_user FROM arc
