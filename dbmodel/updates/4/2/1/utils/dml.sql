@@ -336,3 +336,6 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand_model b JOIN cat_link l ON (l.link_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
 	WHERE formname='cat_link' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_none';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4348, 'It is not allowed to insert/updates arcs with the same geometry', NULL, 2, true, 'utils', 'core', 'UI');

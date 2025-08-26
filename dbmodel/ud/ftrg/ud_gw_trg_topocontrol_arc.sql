@@ -443,6 +443,19 @@ BEGIN
             END IF;
         END IF;
 
+		-- if the new arc is equal to an existing arc
+      	IF (SELECT EXISTS (SELECT 1 FROM arc WHERE ST_Equals(the_geom, NEW.the_geom))) IS TRUE THEN
+      
+			IF v_dsbl_error IS NOT TRUE THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4348", "function":"1344","parameters":null}}$$);';
+			ELSE
+				SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 4348;
+				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);
+			END IF;
+      
+	  	END IF;
+
     END IF;
 
 RETURN NEW;
