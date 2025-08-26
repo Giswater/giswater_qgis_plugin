@@ -565,3 +565,12 @@ UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_
 UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_gully' AND columnname='enddate';
 UPDATE config_form_tableview SET columnindex=13 WHERE objectname='tbl_element_x_gully' AND columnname='descript';
 UPDATE config_form_tableview SET columnindex=14 WHERE objectname='tbl_element_x_gully' AND columnname='location_type';
+
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status''', dv_isnullvalue=true WHERE formname='ve_epa_frpump' AND columnname='status';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_yesno'' ', dv_isnullvalue=true WHERE formname='ve_epa_frorifice' AND columnname='flap';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_orifice'' ', dv_isnullvalue=true WHERE formname='ve_epa_frorifice' AND columnname='shape';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_yesno'' ', dv_isnullvalue=true WHERE formname='ve_epa_froutlet' AND columnname='flap';
+
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL', dv_isnullvalue=TRUE WHERE formname='ve_epa_froutlet' AND columnname='curve_id';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL', dv_isnullvalue=true WHERE formname='ve_epa_frpump' AND columnname='curve_id';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_outlet''', dv_isnullvalue=true WHERE formname='ve_epa_froutlet' AND columnname='outlet_type';
