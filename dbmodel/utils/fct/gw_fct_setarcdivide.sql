@@ -1109,15 +1109,8 @@ BEGIN
 						update config_param_system set value = true WHERE parameter='edit_state_topocontrol' ;
 					END IF;
 					
-					-- set to_arc to tables man_valve/pump
-					EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-					"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
-					"arcIdOld":"'||v_arc_id||'","arcIdNew":'||rec_aux1.arc_id||', "nodeIdOld":"'||rec_aux1.node_1||'", "action":"updateArc"}}}$$);';
-
-					EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-					"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
-					"arcIdOld":"'||v_arc_id||'","arcIdNew":'||rec_aux2.arc_id||',"nodeIdOld":"'||rec_aux2.node_2||'", "action":"updateArc"}}}$$);';
-					END IF;
+					
+				END IF;
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3044", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
