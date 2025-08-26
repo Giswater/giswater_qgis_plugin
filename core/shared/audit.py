@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, 
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
-from ...libs import tools_qt, tools_db, tools_qgis
+from ...libs import tools_qt, tools_db, tools_qgis, lib_vars
 
 
 class GwAudit:
@@ -100,7 +100,7 @@ class GwAudit:
 
         # Get the first snapshot date
         sql = f"SELECT min(tstamp)::date FROM audit.log WHERE table_name = '{self.table_name}' \
-                AND feature_id = '{self.feature_id}';"
+                AND feature_id = '{self.feature_id}' AND \"schema\" = '{lib_vars.schema_name}';"
         result = tools_db.get_row(sql)
 
         # Check if result is not None
@@ -136,7 +136,8 @@ class GwAudit:
         results = []
         for log_id in form:
             # Create body
-            body = {"client": {"cur_user": tools_db.current_user}, "form": log_id}
+            # body = {"client": {"cur_user": tools_db.current_user}, "form": {"logId": log_id}, "schema": {"parent_schema": lib_vars.schema_name}}
+            body = {"client": {"cur_user": tools_db.current_user}, "form": log_id, "schema": {"parent_schema": lib_vars.schema_name}}
 
             # Execute procedure
             result = tools_gw.execute_procedure('gw_fct_getauditlogdata', body, schema_name='audit')
@@ -280,7 +281,7 @@ def open_date(**kwargs):
     """ Open audit in selected date """    
 
     class_obj = kwargs["class"]
-    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString('yyyy-MM-dd')}' ORDER BY tstamp ASC"""
+    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString('yyyy-MM-dd')}' AND \"schema\" = '{lib_vars.schema_name}' ORDER BY tstamp ASC"""
     rows = tools_db.get_rows(query)
 
     form = []

@@ -217,7 +217,7 @@ def run(**kwargs):
         "features": [feature.objectName().split('_')[-1] for feature in class_obj.features if feature.isChecked()]
     }
 
-    body = {"client": {"cur_user": tools_db.current_user}, "form": form}
+    body = {"client": {"cur_user": tools_db.current_user}, "form": form, "schema": {"parent_schema": lib_vars.schema_name}}
 
     # Execute procedure
     result = tools_gw.execute_procedure('gw_fct_getsnapshot', body, schema_name='audit')

@@ -139,9 +139,10 @@ class GwProjectCheckTask(GwTask):
             log_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
             log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
-
+        
         extras = f'"version":"{plugin_version}"'
         extras += ', "fid":101'
+        extras += f', "isAudit":"true"'
         extras += f', "initProject":{init_project}'
         extras += f', "addSchema":"{add_schema}"'
         extras += f', "mainSchema":"{main_schema}"'
