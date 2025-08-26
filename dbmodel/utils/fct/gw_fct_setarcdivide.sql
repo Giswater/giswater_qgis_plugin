@@ -306,6 +306,28 @@ BEGIN
 					v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
 					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'';
 
+					IF v_project_type = 'WS' THEN
+
+						--check if final nodes maybe graph delimiters
+						EXECUTE 'SELECT CASE WHEN (''NONE'' = ANY(graph_delimiter) OR ''MINSECTOR'' = ANY(graph_delimiter)) THEN NULL ELSE graph_delimiter END AS graph, node_1 FROM ve_arc a
+						JOIN ve_node n1 ON n1.node_id=node_1
+						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id
+						WHERE a.arc_id='||v_arc_id||''
+						INTO v_node1_graph, v_node_1;
+
+						EXECUTE 'SELECT CASE WHEN (''NONE'' = ANY(graph_delimiter) OR ''MINSECTOR'' = ANY(graph_delimiter)) THEN NULL ELSE graph_delimiter END AS graph,node_2 FROM ve_arc a
+						JOIN ve_node n2 ON n2.node_id=node_2
+						JOIN cat_feature_node cf2 ON n2.node_type = cf2.id
+						WHERE a.arc_id='||v_arc_id||''
+						INTO v_node2_graph, v_node_2;
+
+						EXECUTE 'SELECT CASE WHEN (''NONE'' = ANY(graph_delimiter) OR ''MINSECTOR'' = ANY(graph_delimiter)) THEN NULL ELSE graph_delimiter END AS graph FROM ve_node
+						JOIN cat_feature_node cf2 ON node_type = cf2.id
+						WHERE node_id='||v_node_id||';'
+						INTO v_new_node_graph;
+
+					END IF;
+
 
 					-- In function of states and user's variables proceed.....
 					IF v_state_node=1 THEN
