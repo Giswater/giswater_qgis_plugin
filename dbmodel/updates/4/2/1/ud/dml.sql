@@ -551,3 +551,6 @@ UPDATE sys_Table SET orderby=5 WHERE id='ve_gully';
 UPDATE sys_table SET orderby=6 WHERE id='ve_link';
 
 DELETE FROM cat_element WHERE id='GATE-01' AND element_type='EGATE';
+
+-- 26/08/2025
+INSERT INTO sys_table (id, descript, sys_role, context, orderby, alias, source) VALUES ('ve_inp_inlet', 'Shows editable information about inlets.', 'role_epa', '{"levels": ["EPA", "HYDRAULICS"]}', 20, 'Inp Inlet', 'core');
