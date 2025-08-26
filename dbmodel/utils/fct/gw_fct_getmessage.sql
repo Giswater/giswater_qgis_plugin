@@ -194,7 +194,7 @@ BEGIN
 			END LOOP;
 		ELSE
 			-- return error parameters aren't the same
-			RAISE EXCEPTION '%', upper(rec_cat_error.error_message);
+			--RAISE EXCEPTION '%', upper(rec_cat_error.error_message);
 		END IF;
 	END IF;
 
