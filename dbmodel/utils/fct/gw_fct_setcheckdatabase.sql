@@ -151,7 +151,7 @@ BEGIN
 
 	END IF;
 
-	--EXECUTE 'SELECT gw_fct_user_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
+	EXECUTE 'SELECT gw_fct_user_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true, "isAudit":true, "checkType": "Project"}}}$$)';
 
 	-- create json return to send client
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;

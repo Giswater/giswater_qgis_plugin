@@ -407,3 +407,4 @@ SET tabactions = COALESCE(
     '[]'::json
 )
 WHERE tabactions::text ILIKE '%"actionName":"actionPump"%';
+UPDATE config_form_list SET query_text = concat(query_text, ' AND "schema" = ''', current_schema, '''') WHERE listname = 'audit_results';

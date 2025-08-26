@@ -33,14 +33,16 @@ v_idname text;
 v_columns text;
 v_feature_class text;
 v_feature_type text;
+v_schema_parent text;
 
 BEGIN
 	-- search path
 	SET search_path = "audit", public;
 	v_schemaname = 'audit';
+	v_schema_parent := (p_data->'schema'->>'parent_schema');
 
 	-- Get api version
-    SELECT value INTO v_version FROM PARENT_SCHEMA.config_param_system WHERE parameter = 'admin_version';
+	EXECUTE format('SELECT value FROM %I.config_param_system WHERE parameter = ''admin_version''', v_schema_parent) INTO v_version;
 
 	v_date = ((p_data ->>'form')::json->>'date');
 	v_polygon = ST_GeomFromText(((p_data ->>'form')::json->>'polygon'), 25831);
@@ -55,7 +57,7 @@ BEGIN
 
 		-- Get first column assumming is pk
 		SELECT column_name INTO v_idname FROM information_schema.columns
-	    WHERE table_schema = 'PARENT_SCHEMA' AND table_name = v_table
+	    WHERE table_schema = v_schema_parent AND table_name = v_table
 	    ORDER BY ordinal_position LIMIT 1;
 
 		-- Get feature type from column name
@@ -63,10 +65,10 @@ BEGIN
 
 		IF v_feature_type = ANY(v_selected_features) THEN
 			-- Create dinamic table name
-			v_temp_table_name := FORMAT('temp_PARENT_SCHEMA_%I', v_table);
+			v_temp_table_name := FORMAT('temp_%I_%I',v_schema_parent, v_table);
 
 			-- Create temporal table with values of the last snapshot
-			EXECUTE FORMAT('CREATE TABLE %I AS SELECT * FROM PARENT_SCHEMA_%I WHERE date = %L',v_temp_table_name, v_table, v_last_snapshot_date);
+			EXECUTE FORMAT('CREATE TABLE %I AS SELECT * FROM %I_%I WHERE date = %L',v_temp_table_name, v_schema_parent, v_table, v_last_snapshot_date);
 
 			-- Get logs from v_table between last snapshot date and selected date
 			FOR v_record IN
@@ -79,10 +81,10 @@ BEGIN
 
 			-- Get column names from v_table
 		    SELECT string_agg(
-	        'PARENT_SCHEMA.' || v_table || '.' || column_name || '::text IS NOT DISTINCT FROM row.' || column_name|| '::text ',' AND ')
+	        v_schema_parent || '.' || v_table || '.' || column_name || '::text IS NOT DISTINCT FROM row.' || column_name|| '::text ',' AND ')
 		    INTO v_columns
 		    FROM information_schema.columns
-		    WHERE table_name = v_table AND table_schema = 'PARENT_SCHEMA';
+		    WHERE table_name = v_table AND table_schema = v_schema_parent;
 
 		    -- Build features
 			EXECUTE format(
@@ -91,13 +93,13 @@ BEGIN
 			        ''geometry'', ST_AsGeoJSON(the_geom)::jsonb,
 			        ''properties'', to_jsonb(row) - ''the_geom'',
 			        ''color'', CASE
-			                    WHEN NOT EXISTS (SELECT 1 FROM PARENT_SCHEMA.%I WHERE %I = row.%I) THEN ''red''
-			                    WHEN EXISTS (SELECT 1 FROM PARENT_SCHEMA.%I WHERE %s) THEN ''blue''
+			                    WHEN NOT EXISTS (SELECT 1 FROM %I.%I WHERE %I = row.%I) THEN ''red''
+			                    WHEN EXISTS (SELECT 1 FROM %I.%I WHERE %s) THEN ''blue''
 			                    ELSE ''yellow''
 			                  END
 			    )) 
-			    FROM (SELECT * FROM %I WHERE ST_Intersects(the_geom, %L)) row',
-			    v_table, v_idname, v_idname, v_table, v_columns, v_temp_table_name, v_polygon
+			    FROM (SELECT * FROM %I WHERE ST_Intersects(the_geom, %L)) row', v_schema_parent,
+			    v_table, v_idname, v_idname, v_schema_parent, v_table, v_columns, v_temp_table_name, v_polygon
 			) INTO v_features;
 
 			-- Get geometry type
@@ -105,8 +107,7 @@ BEGIN
 							   THEN 'LineString' ELSE 'Point' END;
 
 			-- Get feature class
-			SELECT id INTO v_feature_class
-			FROM PARENT_SCHEMA.cat_feature WHERE child_layer = v_table;
+			EXECUTE format('SELECT id FROM %I.cat_feature WHERE child_layer = ''%I''', v_schema_parent, v_table) INTO v_feature_class;
 
 			v_layer := COALESCE(v_layer, '[]'::jsonb) || jsonb_build_array(
 				    jsonb_build_object(

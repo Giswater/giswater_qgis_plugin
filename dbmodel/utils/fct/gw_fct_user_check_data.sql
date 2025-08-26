@@ -69,7 +69,7 @@ BEGIN
 	v_isaudit = json_extract_path_text(p_data,'data','parameters','isAudit')::boolean;
 	v_selection_mode = json_extract_path_text(p_data,'data','parameters','selectionMode')::text;
 
-	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":251, "project_type":"'||v_project_type||'", "action":"CREATE", "group":"USERCHECK"}}}$$)';
+	--EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":251, "project_type":"'||v_project_type||'", "action":"CREATE", "group":"USERCHECK"}}}$$)';
 
 	--if in schema audit doesnt exist or doesnt have table audit_fid_log - switch off audit option
 	IF v_isaudit IS TRUE and
@@ -171,8 +171,10 @@ BEGIN
 
 		IF v_groupby IS NULL THEN
 			IF v_isaudit IS TRUE THEN
-				INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
-				VALUES (rec.fid,  v_count::integer, v_criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl));
+				INSERT INTO audit.audit_fid_log (fid, type, fprocess_name, fcount, criticity, source)
+				SELECT rec.fid, s.fprocess_type, s.fprocess_name, v_count::integer, v_criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
+				FROM sys_fprocess s
+				WHERE s.isaudit IS TRUE AND rec.fid=s.fid;
 			END IF;
 			INSERT INTO t_audit_check_data(fid, result_id, criticity, error_message,  fcount)
 			SELECT 251,rec.fid, v_criticity, concat(v_infotext,sys_fprocess.fprocess_name, ': ',v_count), v_count::integer
@@ -182,8 +184,10 @@ BEGIN
 			FOREACH rec_result IN ARRAY(json_result) LOOP
 
 				IF v_isaudit IS TRUE  THEN
-					INSERT INTO audit_fid_log (fid, fcount, criticity, groupby, source)
-					VALUES (rec.fid,  (rec_result::json ->> 'fcount')::integer, v_criticity, (rec_result::json ->>'groupBy'), jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl));
+					INSERT INTO audit_fid_log (fid, type, fprocess_name, fcount, criticity, groupby, source)
+					SELECT rec.fid, s.fprocess_type, s.fprocess_name,  (rec_result::json ->> 'fcount')::integer, v_criticity, (rec_result::json ->>'groupBy'), jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
+					FROM sys_fprocess s
+					WHERE s.isaudit IS TRUE AND rec.fid=s.fid;
 				END IF;
 
 				INSERT INTO t_audit_check_data(fid, result_id, criticity, error_message, fcount)
@@ -211,12 +215,11 @@ BEGIN
 
 	--copy errors results from project check
 	IF v_log_project = 'Project' AND v_isaudit IS TRUE THEN
-
-		INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
-		SELECT result_id::integer, fcount, criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
+		INSERT INTO audit.audit_fid_log (fid, type, fprocess_name, fcount, criticity, source)
+		SELECT result_id::integer, f.fprocess_type, f.fprocess_name, fcount, criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
 		FROM t_audit_check_data a
 		JOIN sys_fprocess f ON f.fid=result_id::integer
-		WHERE a.fid=101 AND cur_user = current_user
+		WHERE a.fid=604 AND cur_user = current_user
 		AND ((criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%'))
 		OR (criticity IN (0) AND (error_message ILIKE 'DATA%')))
 		AND f.isaudit IS TRUE;
@@ -253,7 +256,7 @@ BEGIN
 	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 2, '');
 	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 1, '');
 
-	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":251, "project_type":"'||v_project_type||'", "action":"DROP", "group":"USERCHECK"}}}$$)';
+	--EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":251, "project_type":"'||v_project_type||'", "action":"DROP", "group":"USERCHECK"}}}$$)';
 
 
 	-- Control nulls

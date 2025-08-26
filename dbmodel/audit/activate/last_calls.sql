@@ -10,4 +10,4 @@ UPDATE PARENT_SCHEMA.sys_table SET isaudit = true WHERE
 id = ANY (SELECT child_layer FROM PARENT_SCHEMA.cat_feature) OR id = 'node';
 
 -- Execute the function to do the first snapshot
-SELECT audit.gw_fct_setsnapshot($${"description": "First water network snapshot"}$$);
+SELECT audit.gw_fct_setsnapshot($${"description": "First water network snapshot", "schema": {"parent_schema": "PARENT_SCHEMA"}}$$);

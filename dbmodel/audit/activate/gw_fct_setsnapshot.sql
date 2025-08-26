@@ -18,51 +18,54 @@ v_schemaname text;
 v_child text;
 v_pk_name text;
 v_table_name text;
---v_date date := CURRENT_DATE;
-v_date date := '2025-01-01';
+v_date date := CURRENT_DATE;
+--v_date date := '2025-01-01';
 v_tables text[];
 v_description text;
+v_schema_parent text;
 
 BEGIN
 	-- search path
 	SET search_path = "audit", public;
 	v_schemaname = 'audit';
-
+	v_schema_parent := (p_data->'schema'->>'parent_schema');
 	v_description = p_data ->>'description';
 
 	-- Insert the first snapshot
-	INSERT INTO snapshot (date, description, schema) VALUES (v_date, v_description, 'PARENT_SCHEMA');
+	EXECUTE 'INSERT INTO snapshot (date, description, schema) VALUES ('''||v_date||''', '''||v_description||''', '''||v_schema_parent||''');';
 
 	-- Get childs from cat_feature
-	FOR v_child IN (SELECT child_layer FROM PARENT_SCHEMA.cat_feature) LOOP
+	FOR v_child IN EXECUTE 'SELECT child_layer FROM '||v_schema_parent||'.cat_feature' LOOP
 
 		-- Create table name
-		v_table_name := format('PARENT_SCHEMA_%I', v_child);
+		v_table_name := format(v_schema_parent||'_%I', v_child);
 
 		-- Check if table exists
 		IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_table_name) THEN
 
 			 -- Create empty table with the same columns structure
-            EXECUTE FORMAT('CREATE TABLE %I (LIKE PARENT_SCHEMA.%I INCLUDING ALL)', v_table_name, v_child);
+            EXECUTE FORMAT('CREATE TABLE %I (LIKE %I.%I INCLUDING ALL)', v_table_name, v_schema_parent, v_child);
 
 			-- Get primary key column name
 			SELECT column_name INTO v_pk_name FROM information_schema.COLUMNS
-			WHERE table_schema = 'PARENT_SCHEMA' AND table_name = v_child
+			WHERE table_schema = v_schema_parent AND table_name = v_child
 			ORDER BY ordinal_position LIMIT 1;
 
 			-- Add date column at the end of the table
             EXECUTE format('ALTER TABLE %I ADD COLUMN date DATE ', v_table_name);
 
+			EXECUTE format('ALTER TABLE %I ADD COLUMN "schema" varchar(100) ', v_table_name);
+
 			-- Add foreign key constraint to reference the primary key of snapshot
-			EXECUTE format('ALTER TABLE %I ADD CONSTRAINT fk_snapshot_date FOREIGN KEY (date) REFERENCES snapshot(date)', v_table_name);
+			EXECUTE format('ALTER TABLE %I ADD CONSTRAINT fk_snapshot_date FOREIGN KEY (date, schema) REFERENCES snapshot(date, schema)', v_table_name);
 
 			-- Add primary keys
-            EXECUTE format('ALTER TABLE %I ADD PRIMARY KEY (date, %I)', v_table_name, v_pk_name);
+            EXECUTE format('ALTER TABLE %I ADD PRIMARY KEY (date, schema, %I)', v_table_name, v_pk_name);
 
 		END IF;
 
 		-- Insert current data and current date from v_child into v_table_name
-		EXECUTE format('INSERT INTO %I SELECT *, %L FROM PARENT_SCHEMA.%I', v_table_name, v_date, v_child);
+		EXECUTE format('INSERT INTO %I SELECT *, %L, %L FROM %I.%I', v_table_name, v_date, v_schema_parent, v_schema_parent, v_child);
 
 		v_tables := v_tables || v_child;
 
@@ -71,7 +74,7 @@ BEGIN
 	UPDATE snapshot SET tables = v_tables WHERE date = v_date;
 
 	-- Activate audit
-	PERFORM PARENT_SCHEMA.gw_fct_update_audit_triggers();
+	EXECUTE 'SELECT '||v_schema_parent||'.gw_fct_update_audit_triggers();';
 
 return 0;
 END;

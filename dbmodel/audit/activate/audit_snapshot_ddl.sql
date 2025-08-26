@@ -6,9 +6,10 @@ or (at your option) any later version.
 */
 
 
-CREATE TABLE audit.snapshot (
-    date DATE PRIMARY KEY DEFAULT CURRENT_DATE,
+CREATE TABLE IF NOT EXISTS audit.snapshot (
+    date DATE DEFAULT CURRENT_DATE,
     description TEXT NULL,
     tables TEXT[] NULL,
-    schema text
+    "schema" text,
+    CONSTRAINT snapshot_pkey PRIMARY KEY (date, "schema")
 );
