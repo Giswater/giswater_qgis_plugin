@@ -393,7 +393,7 @@ class GwI18NGenerator:
 
         # Get All table values
         self._write_header(cfg_path + file_name, file_type)
-        dbtables = self.path_dic[file_type]["tables"]
+        dbtables = self.path_dic[file_type]['tables']
         if self.language == 'no_TR':
             if file_type not in ['i18n_ws', 'i18n_ud']:
                 return True, f"{file_type}, not translated"
@@ -890,7 +890,7 @@ class GwI18NGenerator:
 
         try:
             # Try Python literal (e.g., from repr())
-            modified = text.replace("false", "False").replace("true", "True").replace("NULL", "None")
+            modified = text.replace("false", "False").replace("true", "True").replace("NULL", "None").replace("null", "None")
             return ast.literal_eval(modified)
         except (ValueError, SyntaxError) as e2:
             msg = "Error parsing JSON source: {0} - {1} - {2}"
@@ -996,7 +996,7 @@ class GwI18NGenerator:
                 "name": f"{self.language}.sql",
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
-                "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
+                "tables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
                              "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbtypevalue", "dbfprocess"]
             }
         }
