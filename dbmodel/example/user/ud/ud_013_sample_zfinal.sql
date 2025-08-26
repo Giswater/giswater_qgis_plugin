@@ -7,6 +7,7 @@ or (at your option) any later version.
 
 SET search_path = 'SCHEMA_NAME', public, pg_catalog;
 
+ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 
 INSERT INTO selector_sector SELECT sector_id, current_user from sector where sector_id > 0 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 DELETE FROM selector_psector;
@@ -177,3 +178,5 @@ INSERT INTO inp_frorifice (element_id, orifice_type, offsetval, cd, orate, flap,
 INSERT INTO element_x_node SELECT element_id, node_id from man_frelem;
 
 update plan_psector set active=true;
+
+ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
