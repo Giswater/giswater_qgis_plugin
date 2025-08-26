@@ -15,9 +15,12 @@ import json
 
 from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_db
+from ...libs import lib_vars, tools_qt, tools_db, tools_log, tools_qgis
+from ... import global_vars
 from PyQt5.QtWidgets import QApplication
-
+from qgis.PyQt.QtWidgets import QToolBar, QDockWidget, QTreeView, QWidget
+from qgis.PyQt.QtCore import Qt
+from qgis.core import QgsProject
 
 class GwSchemaI18NUpdate:
 
@@ -467,16 +470,26 @@ class GwSchemaI18NUpdate:
                     tools_db.dao.rollback()
 
     def _write_dbjson_values(self, rows):
-        query = ""
+        closing = False
+        values_by_context = {}
+
         updates = {}
+        project_types = [self.project_type, "utils"] if self.project_type in ["ud", "ws"] else [self.project_type]
         for row in rows:
+            if row['project_type'] not in project_types:
+                continue
+            # Set key depending on context
             if row["context"] == "config_form_fields":
+                closing = True
                 key = (row["source"], row["context"], row["text"], row["formname"], row["formtype"])
             else:
                 key = (row["source"], row["context"], row["text"])
             updates.setdefault(key, []).append(row)
 
-        for (source, context, original_text, *extra), related_rows in updates.items():
+        for key, related_rows in updates.items():
+            # Unpack key
+            source, context, original_text, *extra = key
+            # Correct column based on context
             if context == "config_report":
                 column = "filterparam"
             elif context == "config_toolbox":
@@ -484,37 +497,31 @@ class GwSchemaI18NUpdate:
             elif context == "config_form_fields":
                 column = "widgetcontrols"
             else:
-                continue  # unknown context
+                msg = "Unknown context: {0}, skipping."
+                msg_params = (context,)
+                tools_log.log_error(msg, msg_params=msg_params)
+                continue
 
-            # parse JSON-like data
-            if context != "config_form_fields":
-                try:
-                    json_data = ast.literal_eval(original_text)
-                except (ValueError, SyntaxError):
-                    continue
-            else:
-                modified = original_text.replace("'", "\"")
-                modified = modified.replace("False", "false").replace("True", "true").replace("None", "null")
-                try:
-                    json_data = json.loads(modified)
-                except json.JSONDecodeError as e:
-                    print(f"Error decoding JSON: {e}")
-                    continue
+            # Parse JSON safely
+            json_data = self.safe_parse(source, original_text)
+            if json_data is None:
+                return f'{context} - Error parsing JSON source (Log_info)'
 
+            # Translate fields
             for row in related_rows:
-                key_hint = row["hint"].split('_')[0]
+                key_hint = row["hint"].rsplit('_', 1)[0]
                 default_text = row.get("lb_en_us", "")
                 translated = (
-                    row.get(f"lb_{self.lower_lang}")
-                    or row.get(f"auto_lb_{self.lower_lang}")
-                    or default_text
+                    row.get(f"lb_{self.lower_lang}") or
+                    row.get(f"auto_lb_{self.lower_lang}") or
+                    default_text
                 )
 
-                if ", " in default_text:
+                if ", " in default_text and key_hint == "comboNames":
                     default_list = default_text.split(", ")
                     translated_list = translated.split(", ")
                     for item in json_data:
-                        if isinstance(item, dict) and key_hint in item and "comboNames" in item:
+                        if isinstance(item, dict) and key_hint in item:
                             if set(default_list).intersection(item["comboNames"]):
                                 item["comboNames"] = [
                                     t if d in default_list else d
@@ -522,36 +529,53 @@ class GwSchemaI18NUpdate:
                                 ]
                 else:
                     if isinstance(json_data, dict):
-                        for key, value in json_data.items():
-                            if key == key_hint and value == default_text:
-                                json_data[key] = translated
+                        for key_name, value in json_data.items():
+                            if key_name == key_hint and value == default_text:
+                                json_data[key_name] = translated
                     elif isinstance(json_data, list):
                         for item in json_data:
                             if isinstance(item, dict) and key_hint in item and item[key_hint] == default_text:
                                 item[key_hint] = translated
                     else:
-                        print("Unexpected json_data structure!")
+                        msg = "Unexpected json_data structure!"
+                        tools_log.log_error(msg)
 
-            new_text = json.dumps(json_data).replace("'", "''")
+            # Encode new JSON safely
+            new_text = json.dumps(json_data, ensure_ascii=False).replace("'", "''")
+
+            # Save the result grouped by context and column
+            if context not in values_by_context:
+                values_by_context[context] = []
+
+            values_by_context[context].append((source, related_rows[0], new_text, column))
+
+        # Now write to file
+        
+        for context, data in values_by_context.items():
+            # Assume all entries in this context share same column
+            column = data[0][3]
+            sql_text = ""
 
             if context == "config_form_fields":
-                query_text = (
-                    f"UPDATE {self.schema}.{context} SET {column} = '{new_text}'::json "
-                    f"WHERE formname = '{related_rows[0]['formname']}' "
-                    f"AND formtype = '{related_rows[0]['formtype']}' "
-                    f"AND columnname = '{source}';\n"
-                )
+                values_str = ",\n    ".join([
+                    f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{txt}')"
+                    for source, row, txt, col in data
+                ])
+                sql_text = (f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
+                print(sql_text)
             else:
-                query_text = f"UPDATE {self.schema}.{context} SET {column} = '{new_text}'::json WHERE id = {source};\n"
-
-            query += query_text
-
-        try:
-            self.cursor_dest.execute(query)
-            self.conn_dest.commit()
-        except Exception as e:
-            self.conn_dest.rollback()
-            print(e)
+                values_str = ",\n    ".join([
+                    f"({source}, '{txt}')"
+                    for source, row, txt, col in data
+                ])
+                sql_text = (f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
+    
+            try:
+                self.cursor_dest.execute(sql_text)
+                self._commit_dest()
+            except Exception as e:
+                print(e)
+                tools_db.dao.rollback()
 
     # endregion
 
@@ -773,6 +797,24 @@ class GwSchemaI18NUpdate:
         cur_dest.execute(final_query)
         conn_dest.commit()
 
+    def safe_parse(self, source, text):
+        try:
+            # Try JSON first (safer if it's valid JSON)
+            modified = text.replace("'", "\"").replace("\"\"", "'").replace("False", "false").replace("True", "true").replace("None", "null")
+            return json.loads(modified)
+        except json.JSONDecodeError as e:
+            e1 = e
+
+        try:
+            # Try Python literal (e.g., from repr())
+            modified = text.replace("false", "False").replace("true", "True").replace("NULL", "None")
+            return ast.literal_eval(modified)
+        except (ValueError, SyntaxError) as e2:
+            msg = "Error parsing JSON source: {0} - {1} - {2}"
+            msg_params = (source, e1, e2)
+            tools_log.log_error(msg, msg_params=msg_params)
+            return None
+
     def tables_dic(self):
         self.dbtables_dic = {
             "ws": {
@@ -781,6 +823,7 @@ class GwSchemaI18NUpdate:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
                  ]
+                 #"dbtables": ["dbtable"]
             },
             "ud": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
@@ -794,7 +837,7 @@ class GwSchemaI18NUpdate:
             },
             "cm": {
                 "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json"]
+                             "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbtypevalue", "dbfprocess"]
             },
         }
 

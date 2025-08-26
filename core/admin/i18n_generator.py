@@ -401,7 +401,13 @@ class GwI18NGenerator:
                               'dbconfig_form_tableview', 'dbconfig_form_fields_feat']
             self.lower_lang = 'en_us'
         for dbtable in dbtables:
-            dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
+            result = self._get_table_values(dbtable)
+            
+            # Handle case where _get_table_values returns unexpected format
+            if not isinstance(result, tuple) or len(result) != 2:
+                return False, f"Invalid return format from _get_table_values for: {dbtable}"
+                
+            dbtable_rows, dbtable_columns = result
             if not dbtable_rows:
                 return False, f"No rows found in: {dbtable}"
             else:
@@ -519,17 +525,18 @@ class GwI18NGenerator:
                 sql = (f"SELECT {', '.join(colums)}, {', '.join(lang_colums)} "
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY context;")
+            rows = self._get_rows(sql, self.cursor_i18n)
         except Exception as e:
             msg = "Error getting table values: {0}"
             msg_params = (e,)
             tools_log.log_error(msg, msg_params=msg_params)
             return False, colums
 
-        rows = self._get_rows(sql, self.cursor_i18n)
+
 
         # Return the corresponding information
         if not rows:
-            return False
+            return False, False
         return rows, colums
 
     def _write_table_values(self, rows, columns, table, path, file_type):
@@ -716,7 +723,7 @@ class GwI18NGenerator:
 
             # Translate fields
             for row in related_rows:
-                key_hint = row["hint"].split('_')[0]
+                key_hint = row["hint"].rsplit('_', 1)[0]
                 default_text = row.get("lb_en_us", "")
                 translated = (
                     row.get(f"lb_{self.lower_lang}") or
@@ -724,11 +731,11 @@ class GwI18NGenerator:
                     default_text
                 )
 
-                if ", " in default_text:
+                if ", " in default_text and key_hint == "comboNames":
                     default_list = default_text.split(", ")
                     translated_list = translated.split(", ")
                     for item in json_data:
-                        if isinstance(item, dict) and key_hint in item and "comboNames" in item:
+                        if isinstance(item, dict) and key_hint in item:
                             if set(default_list).intersection(item["comboNames"]):
                                 item["comboNames"] = [
                                     t if d in default_list else d
@@ -767,13 +774,13 @@ class GwI18NGenerator:
                         f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{txt}')"
                         for source, row, txt, col in data
                     ])
-                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
+                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
                 else:
                     values_str = ",\n    ".join([
                         f"({source}, '{txt}')"
                         for source, row, txt, col in data
                     ])
-                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
 
             if closing:
                 file.write("UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';\n")
@@ -883,7 +890,7 @@ class GwI18NGenerator:
 
         try:
             # Try Python literal (e.g., from repr())
-            modified = text.replace("false", "False").replace("true", "True").replace("null", "None")
+            modified = text.replace("false", "False").replace("true", "True").replace("NULL", "None")
             return ast.literal_eval(modified)
         except (ValueError, SyntaxError) as e2:
             msg = "Error parsing JSON source: {0} - {1} - {2}"
