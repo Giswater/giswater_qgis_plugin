@@ -204,7 +204,7 @@ class GwAdminMarkdownGenerator:
 
         # Create toctree structure for this project type inside the toggle
         file.write(f".. toctree::\n")
-        file.write(f"\t:maxdepth: 1\n\n")
+        file.write(f"\t:maxdepth: 1\n")
         file.write(f"\t:numbered: 4\n\n")
 
         done_types = []
@@ -230,7 +230,7 @@ class GwAdminMarkdownGenerator:
         """ Generate the content for a project type section """
         content = f'''<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>\n\n'''
         content += f".. toctree::\n"
-        content += f"\t:maxdepth: 1\n\n"
+        content += f"\t:maxdepth: 1\n"
         content += f"\t:numbered: 4\n\n"
 
         done_types = []
@@ -298,12 +298,13 @@ class GwAdminMarkdownGenerator:
             file.write(f"\n\nLos tipos de EPA que puede tener el objeto {feature_cat} son:\n\n")
             file.write(f".. toctree::\n\t:maxdepth: 1\n\t:caption: EPA Types\n\n")
 
-            for row in rows_sfet:
-                epa_type = row['id'].lower()
-                if epa_type == 'undefined':
-                    continue
-                file.write(f"\t../tab_epa/{epa_type}\n")
-                self.create_dinamic_tab('ve_epa', epa_type, f'{self.project_type}/{feature_type}/tab_epa/{epa_type}.rst', descript)
+            if rows_sfet:
+                for row in rows_sfet:
+                    epa_type = row['id'].lower()
+                    if epa_type == 'undefined':
+                        continue
+                    file.write(f"\t../tab_epa/{epa_type}\n")
+                    self.create_dinamic_tab('ve_epa', epa_type, f'{self.project_type}/{feature_type}/tab_epa/{epa_type}.rst', descript)
 
     def create_other_tab(self, row):
         """ Create other tab """
