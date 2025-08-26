@@ -733,7 +733,6 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_interpolate, "151")
         tools_gw.add_icon(self.action_orifice, "159")
         tools_gw.add_icon(self.action_outlet, "160")
-        tools_gw.add_icon(self.action_pump, "161")
         tools_gw.add_icon(self.action_weir, "162")
         tools_gw.add_icon(self.action_demand, "163")
         tools_gw.add_icon(self.action_audit, "177")
@@ -906,10 +905,8 @@ class GwInfo(QObject):
         self.action_outlet.triggered.connect(partial(self._open_outlet_dlg))
         self.action_weir.triggered.connect(partial(self._open_weir_dlg))
         if global_vars.project_type == 'ws':
-            self.action_pump.triggered.connect(partial(self._open_pump_additional_dlg))
             self.action_demand.triggered.connect(partial(self._open_demand_dlg))
         elif global_vars.project_type == 'ud':
-            self.action_pump.triggered.connect(partial(self._open_pump_dlg))
             self.action_demand.triggered.connect(partial(self._open_dwf_dlg))
 
         # Disable action edit if user can't edit
@@ -941,26 +938,6 @@ class GwInfo(QObject):
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Outlet", **kwargs)
-
-    def _open_pump_dlg(self):
-        # kwargs
-        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
-                       "tableviews": [
-                        {"tbl": "tbl", "view": "inp_flwreg_pump", "add_view": "ve_inp_flwreg_pump", "pk": "nodarc_id", "add_dlg_title": "Pump - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_pump", "add_view": "ve_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Pump - Dscenario"}
-                       ]}
-        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg("Pump", **kwargs)
-
-    def _open_pump_additional_dlg(self):
-        # kwargs
-        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
-                       "tableviews": [
-                        {"tbl": "tbl", "view": "inp_pump_additional", "add_view": "ve_inp_pump_additional", "pk": ["node_id", "order_id"], "add_dlg_title": "Pump Additional - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_pump_additional", "add_view": "ve_inp_dscenario_pump_additional", "pk": ["dscenario_id", "node_id", "order_id"], "add_dlg_title": "Pump Additional - Dscenario"}
-                       ]}
-        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg("Additional Pump", **kwargs)
 
     def _open_weir_dlg(self):
         # kwargs
