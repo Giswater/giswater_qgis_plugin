@@ -143,8 +143,8 @@ BEGIN
 	v_tableid = v_parameter_selector->>'table_id';
 	v_sectorisexplismuni = (SELECT value::boolean FROM config_param_system WHERE parameter = 'basic_selector_sectorisexplismuni');
 
-	IF v_sectorisexplismuni IS NULL THEN v_sectorisexplismuni = TRUE; ELSE v_sectorisexplismuni = FALSE; END IF;
-
+	IF v_sectorisexplismuni IS NULL THEN v_sectorisexplismuni = FALSE; END IF;
+	
 	-- setting schema add
 	IF v_tabname like '%add%' AND v_addschema IS NOT NULL THEN
 		v_tablename = concat(v_addschema,'.',v_tablename);
@@ -532,6 +532,13 @@ BEGIN
 		DELETE FROM selector_psector WHERE psector_id NOT IN
 		(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
+		-- manage explfrommuni
+		IF v_sectorisexplismuni THEN
+			DELETE FROM selector_expl WHERE cur_user = current_user;
+			INSERT INTO selector_expl SELECT expl_id, current_user FROM SCHEMA_NAME.selector_expl WHERE cur_user = current_user AND expl_id 
+			IN (SELECT expl_id FROM exploitation WHERE active);
+		END IF;		
+	
 		EXECUTE 'SET search_path = '||v_schemaname||', public';
 	END IF;
 
@@ -716,22 +723,7 @@ BEGIN
 
 	END IF;
 
-	-- manage explfrommuni
-	IF v_selectortype ='explfrommuni' THEN
-
-		DELETE FROM selector_municipality WHERE cur_user = current_user;
-		DELETE FROM selector_sector WHERE cur_user = current_user;
-		DELETE FROM selector_expl WHERE cur_user = current_user;
-		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-		DELETE FROM selector_macrosector WHERE cur_user = current_user;
-
-		INSERT INTO selector_municipality VALUES (v_id::integer, current_user);
-		INSERT INTO selector_sector VALUES (v_id::integer, current_user);
-		INSERT INTO selector_expl VALUES (v_id::integer, current_user);
-
-	END IF;
-
-	-- force 0
+	-- force 0 
 	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
 
