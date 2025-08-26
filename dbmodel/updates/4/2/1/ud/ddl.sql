@@ -79,7 +79,7 @@ CREATE TABLE archived_psector_link  (
 	CONSTRAINT archived_psector_link_pkey PRIMARY KEY (id)
 );
 CREATE INDEX archived_psector_link_exit_id ON archived_psector_link USING btree (exit_id);
-CREATE INDEX archived_psector_link_expl_visibility_idx ON ud421.link USING btree (expl_visibility);
+CREATE INDEX archived_psector_link_expl_visibility_idx ON link USING btree (expl_visibility);
 CREATE INDEX archived_psector_link_feature_id ON archived_psector_link USING btree (feature_id);
 CREATE INDEX archived_psector_link_index ON archived_psector_link USING gist (the_geom);
 CREATE INDEX archived_psector_link_muni ON archived_psector_link USING btree (muni_id);
