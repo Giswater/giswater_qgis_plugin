@@ -14592,14 +14592,6 @@
 			<translation>Delete</translation>
 		</message>
 		<message>
-			<source>actionPump</source>
-			<translation>Pump</translation>
-		</message>
-		<message>
-			<source>tooltip_actionPump</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_cancel</source>
 			<translation>Cancel</translation>
 		</message>

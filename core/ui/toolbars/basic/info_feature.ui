@@ -577,7 +577,6 @@
    <addaction name="separator"/>
    <addaction name="actionOrifice"/>
    <addaction name="actionOutlet"/>
-   <addaction name="actionPump"/>
    <addaction name="actionWeir"/>
    <addaction name="actionDemand"/>
    <addaction name="separator"/>
@@ -734,11 +733,6 @@
   <action name="actionOutlet">
    <property name="text">
     <string>Outlet</string>
-   </property>
-  </action>
-  <action name="actionPump">
-   <property name="text">
-    <string>Pump</string>
    </property>
   </action>
   <action name="actionWeir">

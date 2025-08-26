@@ -14973,14 +14973,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>actionPump</source>
-			<translation>Pump</translation>
-		</message>
-		<message>
-			<source>tooltip_actionPump</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>actionSetGeom</source>
 			<translation>Set Geom</translation>
 		</message>

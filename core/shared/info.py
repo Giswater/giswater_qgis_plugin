@@ -708,7 +708,6 @@ class GwInfo(QObject):
         self.action_section = self.dlg_cf.findChild(QAction, "actionSection")
         self.action_orifice = self.dlg_cf.findChild(QAction, "actionOrifice")
         self.action_outlet = self.dlg_cf.findChild(QAction, "actionOutlet")
-        self.action_pump = self.dlg_cf.findChild(QAction, "actionPump")
         self.action_weir = self.dlg_cf.findChild(QAction, "actionWeir")
         self.action_demand = self.dlg_cf.findChild(QAction, "actionDemand")
         self.action_audit = self.dlg_cf.findChild(QAction, "actionAudit")
@@ -1985,7 +1984,7 @@ class GwInfo(QObject):
         try:
             actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
-                              'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
+                              'actionSection', 'actionOrifice', 'actionOutlet', 'actionWeir', 'actionDemand')
 
             for action in actions_list:
                 if action.objectName() not in static_actions and action.objectName() != 'actionAudit':
