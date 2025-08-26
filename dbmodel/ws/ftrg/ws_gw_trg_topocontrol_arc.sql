@@ -274,7 +274,7 @@ BEGIN
         ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
             IF v_dsbl_error IS NOT TRUE THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"1042", "function":"1344","parameters":null}}$$);';
+                    "data":{"message":"1042", "function":"1344","parameters":{"arc_id":"'||NEW.arc_id||'"}}}$$);';
             ELSE
                 SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
                 INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);
@@ -287,7 +287,7 @@ BEGIN
         ELSE
             IF v_dsbl_error IS NOT TRUE THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"1042", "function":"1344","parameters":null}}$$);';
+                    "data":{"message":"1042", "function":"1344","parameters":{"arc_id":"'||NEW.arc_id||'"}}}$$);';
             ELSE
                 SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
                 INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);

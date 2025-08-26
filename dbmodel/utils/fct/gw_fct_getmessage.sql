@@ -194,7 +194,7 @@ BEGIN
 			END LOOP;
 		ELSE
 			-- return error parameters aren't the same
-			RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Error in message parameters'))::json;
+			RAISE EXCEPTION '%', upper(rec_cat_error.error_message);
 		END IF;
 	END IF;
 
