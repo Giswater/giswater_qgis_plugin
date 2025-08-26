@@ -396,3 +396,14 @@ UPDATE config_form_tableview SET columnindex=14 WHERE objectname='tbl_element_x_
 UPDATE config_form_tableview SET columnindex=15 WHERE objectname='tbl_element_x_node' AND columnname='inventory';
 UPDATE config_form_tableview SET columnindex=16 WHERE objectname='tbl_element_x_node' AND columnname='descript';
 UPDATE config_form_tableview SET columnindex=17 WHERE objectname='tbl_element_x_node' AND columnname='location_type';
+
+UPDATE config_form_tabs
+SET tabactions = COALESCE(
+    (
+        SELECT json_agg(elem)
+        FROM json_array_elements(tabactions) AS elem
+        WHERE elem->>'actionName' <> 'actionPump'
+    ),
+    '[]'::json
+)
+WHERE tabactions::text ILIKE '%"actionName":"actionPump"%';
