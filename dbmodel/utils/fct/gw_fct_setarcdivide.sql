@@ -434,12 +434,8 @@ BEGIN
 						END IF;
 
 						-- connec
-						FOR v_connec_id IN
-						SELECT connec_id FROM connec c WHERE arc_id=v_arc_id AND c.state = 1
-						LOOP
-							v_array_connec:= array_append(v_array_connec, v_connec_id::text);
-						END LOOP;
-
+						SELECT array_agg(connec_id) INTO v_array_connec FROM connec c WHERE arc_id=v_arc_id AND c.state = 1;
+			
 						SELECT count(connec_id) INTO v_count_connec FROM ve_connec WHERE arc_id=v_arc_id AND state > 0;
 
 						UPDATE plan_psector_x_connec SET link_id=NULL WHERE arc_id=v_arc_id;
@@ -448,12 +444,9 @@ BEGIN
 						-- gully
 						IF v_project_type='UD' THEN
 
-							FOR v_gully_id IN SELECT gully_id FROM gully g JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id  AND
-							g.state = 1
-							LOOP
-								v_array_gully:= array_append(v_array_gully, v_gully_id);
-							END LOOP;
-
+							SELECT array_agg(gully_id) INTO v_array_gully FROM gully g JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id  AND
+							g.state = 1;
+							
 							SELECT count(gully_id) INTO v_count_gully FROM ve_gully WHERE arc_id=v_arc_id AND state > 0;
 
 							UPDATE plan_psector_x_gully SET link_id=NULL WHERE arc_id=v_arc_id;
