@@ -444,3 +444,10 @@ DELETE FROM sys_function WHERE id=3496;
 UPDATE config_form_fields SET dv_isnullvalue = TRUE WHERE columnname IN ('ownercat_id', 'brand_id', 'model_id');
 UPDATE config_form_fields SET widgettype='combo', isparent=false, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext='SELECT id, id as idval FROM cat_brand_model WHERE ''EPUMP'' = ANY(featurecat_id::text[])', dv_parent_id='brand_id', dv_querytext_filterc='AND cat_brand_model.catbrand_id' WHERE formname ILIKE 've_element_%' AND columnname='model_id';
 UPDATE config_form_fields SET widgettype='combo', isparent=true, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext='SELECT id, id as idval FROM cat_brand WHERE ''EPUMP'' = ANY(featurecat_id::text[])', dv_parent_id=NULL, dv_querytext_filterc=NULL WHERE formname ILIKE 've_element_%' AND columnname='brand_id';
+
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_edit_controls;
+
+UPDATE config_form_fields SET widgettype='combo', isparent=true, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext='SELECT id, id as idval FROM cat_brand WHERE ''EPUMP'' = ANY(featurecat_id::text[])', dv_parent_id=NULL, dv_querytext_filterc=NULL WHERE formname ILIKE 've_element_%' AND columnname='brand_id';
+UPDATE config_form_fields SET widgettype='combo', isparent=false, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext='SELECT id, id as idval FROM cat_brand_model WHERE ''EPUMP'' = ANY(featurecat_id::text[])', dv_parent_id='brand_id', dv_querytext_filterc='AND cat_brand_model.catbrand_id' WHERE formname ILIKE 've_element_%' AND columnname='model_id';
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_edit_controls;
