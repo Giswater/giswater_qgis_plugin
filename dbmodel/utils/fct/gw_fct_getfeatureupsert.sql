@@ -321,6 +321,12 @@ BEGIN
 		IF v_id IS NULL THEN
 			v_id = (SELECT nextval('urn_id_seq'));
 		END IF;
+	
+		IF v_tablename = 've_drainzone' THEN
+			v_drainzone_id :=v_id;
+		ELSIF v_tablename = 've_dwfzone' THEN
+			v_dwfzone_id := v_id;
+		END IF;
 
 		IF v_catfeature.code_autofill IS TRUE THEN
 			v_code=concat(v_catfeature.addparam::json->>'code_prefix',v_id);
