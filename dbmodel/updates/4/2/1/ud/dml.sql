@@ -895,3 +895,14 @@ INSERT INTO edit_typevalue (typevalue,id,idval)
 -- 27/08/2025
 INSERT INTO config_typevalue (typevalue,id,idval) VALUES ('widgettype_typevalue','list','list');
 UPDATE config_form_fields SET widgettype='list' WHERE formname IN('ve_dma', 've_sector', 've_macrosector', 've_omzone', 've_macroomzone', 've_dwfzone', 've_drainzone') AND columnname IN('expl_id', 'sector_id', 'muni_id');
+
+
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+UPDATE inp_typevalue SET typevalue = 'inp_typevalue_weir' WHERE typevalue='inp_value_weirs';
+
+UPDATE sys_foreignkey SET typevalue_name='inp_typevalue_weir', target_table='inp_weir' WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_weirs' AND target_table='inp_weir' AND target_field='weir_type';
+UPDATE sys_foreignkey SET typevalue_name='inp_typevalue_weir', target_table='inp_frweir' WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_weirs' AND target_table='inp_flwreg_weir' AND target_field='weir_type';
+UPDATE sys_foreignkey SET typevalue_name='inp_typevalue_weir', target_table='inp_dscenario_frweir' WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_weirs' AND target_table='inp_dscenario_flwreg_weir' AND target_field='weir_type';
+ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'inp_value_weirs', 'inp_typevalue_weir')
