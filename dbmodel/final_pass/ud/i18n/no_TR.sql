@@ -11,6 +11,10 @@ UPDATE config_form_fields AS t
 SET label = v.label, tooltip = v.tooltip
 FROM (
     VALUES
+    ('custom_y1', 'v_edit_inp_outlet', 'form_feature', 'Custom Y1:', 'Custom Y1'),
+    ('custom_y1', 'v_edit_inp_weir', 'form_feature', 'Custom Y1:', 'Custom Y1'),
+    ('custom_y1', 'v_edit_inp_conduit', 'form_feature', 'Custom Y1:', 'Custom Y1'),
+    ('custom_y1', 'v_edit_inp_pump', 'form_feature', 'Custom Y1:', 'Custom Y1'),
     ('table_view_docs', 'generic', 'psector', NULL, 'Table'),
     ('delete_element', 'node', 'form_feature', NULL, 'Delete element'),
     ('btn_open_visit', 'node', 'form_feature', NULL, 'Open visit'),
@@ -2606,7 +2610,6 @@ FROM (
     ('road_surf', 've_epa_weir', 'form_feature', 'Road surf:', 'Road surf'),
     ('elev1', 'v_edit_inp_weir', 'form_feature', 'Elevation 1:', 'Elevation 1'),
     ('connec_type', 'v_edit_review_connec', 'form_feature', 'Connec_type:', 'connec_type'),
-    ('custom_y1', 'v_edit_inp_outlet', 'form_feature', 'Custom Y1:', 'Custom Y1'),
     ('sta', 'v_edit_raingage', 'form_feature', 'Sta:', 'sta'),
     ('rg_id', 'v_edit_raingage', 'form_feature', 'Rg_id:', 'rg_id'),
     ('cgw', 'inp_pollutant', 'form_feature', 'Cgw:', 'Concentration of pollutant in groundwater (concentration units).'),
@@ -2710,7 +2713,6 @@ FROM (
     ('both_ends', 'v_rpt_comp_condsurcharge_sum', 'form_feature', 'Both ends:', 'Both ends'),
     ('curve_id', 'v_edit_inp_dscenario_outfall', 'form_feature', 'Curve ID:', 'Curve ID'),
     ('mfactor', 'inp_inflows_pol_x_node', 'form_feature', 'Mass factor:', 'The factor that converts the inflowâ??s mass flow rate units into the projectâ??s mass units per second, where the projectâ??s mass units are those specified for the pollutant in the pollutants table (default is 1.0).'),
-    ('custom_y1', 'v_edit_inp_weir', 'form_feature', 'Custom Y1:', 'Custom Y1'),
     ('up_dry', 'v_rpt_comp_flowclass_sum', 'form_feature', 'Up dry:', 'Up dry'),
     ('sperv', 'v_edit_subcatchment', 'form_feature', 'Sperv:', 'Sperv:'),
     ('vhmax', 'v_rpt_comp_subcatchrunoff_sum', 'form_feature', 'Vhmax:', 'vhmax'),
@@ -3099,7 +3101,6 @@ FROM (
     ('brand', 'cat_grate', 'form_feature', 'Brand:', 'Brand'),
     ('qmax', 'v_edit_inp_conduit', 'form_feature', 'Maximum flow :', 'Maximum flow (flow units)'),
     ('init_stor', 'v_rpt_comp_groundwater_cont', 'form_feature', 'Initial storage:', 'Initial storage'),
-    ('custom_y1', 'v_edit_inp_conduit', 'form_feature', 'Custom Y1:', 'Custom Y1'),
     ('custom_y1', 'v_edit_inp_orifice', 'form_feature', 'Custom Y1:', 'Custom Y1'),
     ('rptfile', 'inp_lidusage_subc_x_lidco', 'form_feature', 'Rptfile:', 'Optional name of a file to which detailed time series results for the LID will be written. Enclose the name in double quotes if it contains spaces and include the full path if it is different than the SWMM input file path.'),
     ('flwreg_id', 'inp_flwreg_orifice', 'form_feature', 'Flwreg_id:', 'flwreg_id'),
@@ -3288,7 +3289,6 @@ FROM (
     ('new_feature_id', 'v_edit_review_audit_gully', 'form_feature', 'New feature id:', 'new_feature_id'),
     ('surcharge', 'inp_flwreg_weir', 'form_feature', 'Surcharge:', 'Identifies if weir can surcharge or not'),
     ('flap', 'v_edit_inp_conduit', 'form_feature', 'Flap:', 'YES if flap gate present to prevent reverse flow, NO if not (default is NO).'),
-    ('custom_y1', 'v_edit_inp_pump', 'form_feature', 'Custom Y1:', 'Custom Y1'),
     ('startup', 'v_edit_inp_dscenario_flwreg_pump', 'form_feature', 'Startup:', 'Startup'),
     ('lowzone_et', 'v_rpt_groundwater_cont', 'form_feature', 'Lowzone_et:', 'lowzone_et'),
     ('surf_runof', 'v_rpt_runoff_quant', 'form_feature', 'Surf runof:', 'Surf runof'),
@@ -4766,7 +4766,9 @@ UPDATE config_form_fields AS t
 SET label = v.label, tooltip = v.tooltip
 FROM (
     VALUES
-    ('elev2', '%_arc%', 'form_feature', 'Elev2:', 'elev2'),
+    ('custom_y1', '%_arc%', 'form_feature', 'Custom y1:', 'custom_y1'),
+('custom_y2', '%_arc%', 'form_feature', 'Custom y2:', 'custom_y2'),
+('elev2', '%_arc%', 'form_feature', 'Elev2:', 'elev2'),
 ('descript', '%_node%', 'form_feature', 'Descript:', 'descript'),
 ('inverted_slope', '%_arc%', 'form_feature', 'Inverted slope:', 'inverted_slope'),
 ('btn_doc_new', '%_link%', 'form_feature', NULL, 'New document'),
@@ -5070,14 +5072,12 @@ FROM (
 ('elevation1', '%_link%', 'form_feature', 'Elevation1:', 'elevation1'),
 ('elevation2', '%_link%', 'form_feature', 'Elevation2:', 'elevation2'),
 ('num_value', '%_connec%', 'form_feature', 'Number value:', 'Number value'),
-('custom_y2', '%_arc%', 'form_feature', 'Custom y2:', 'custom_y2'),
 ('region_id', '%_connec%', 'form_feature', 'Region:', 'region_id'),
 ('dma_id', '%_arc%', 'form_feature', 'Omzone:', 'omzone_id'),
 ('verified', '%_element%', 'form_feature', 'Verified:', 'verified'),
 ('brand_id', '%_arc%', 'form_feature', 'Brand id:', 'brand_id'),
 ('category_type', '%_element%', 'form_feature', 'Category type:', 'Category type'),
 ('postnumber', '%_node%', 'form_feature', 'Postnumber:', 'postnumber'),
-('custom_y1', '%_arc%', 'form_feature', 'Custom y1:', 'custom_y1'),
 ('muni_id', '%_node%', 'form_feature', 'Muni id:', 'muni_id'),
 ('serial_number', '%_element%', 'form_feature', 'Serial number:', 'serial number - Serial number of the element'),
 ('enddate', '%_link%', 'form_feature', 'Enddate:', 'enddate - End date of the element. It will only be filled in if the element is in a deregistration state.'),
