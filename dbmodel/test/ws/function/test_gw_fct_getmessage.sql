@@ -77,7 +77,7 @@ SELECT throws_ok(
 -- Extract and test the "text" field from the function's JSON response when parameters recieved are wrong
 SELECT throws_ok(
     'SELECT (gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"-999", "function":"-995","parameters":{"feature_id": 1}, "variables":"value", "is_process":true}}$$))',
+        "data":{"message":"-999", "function":"-995","parameters":{"feature_id": 1, "expl_id": 2}, "variables":"value", "is_process":true}}$$))',
         'GW001',
         'Function: [gw_test_function] - TEST MESSAGE: FEATURE IS OUT OF EXPLOITATION, FEATURE_ID: 1. HINT: TAKE A LOOK ON YOUR MAP AND USE THE APPROACH OF THE EXPLOITATIONS! - value',
         'Checking gw_fct_getmessage when there are more parameters than needed'

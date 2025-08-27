@@ -50,7 +50,7 @@ BEGIN
 			UPDATE sector SET the_geom = NEW.the_geom WHERE sector_id = NEW.sector_id;
 		END IF;
 
-		INSERT INTO selector_sector VALUES (NEW.sector_id, current_user);
+		INSERT INTO selector_sector VALUES (v_sector_id, current_user);
 
 		RETURN NEW;
 
