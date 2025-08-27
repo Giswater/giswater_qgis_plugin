@@ -43,3 +43,20 @@ CREATE RULE dqa_conflict AS
 CREATE RULE dqa_undefined AS
     ON UPDATE TO dqa
    WHERE ((new.dqa_id = 0) OR (old.dqa_id = 0)) DO INSTEAD NOTHING;
+
+-- expl_id is not void
+CREATE RULE dqa_expl AS
+    ON UPDATE TO dqa
+   WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
+
+CREATE RULE presszone_expl AS
+    ON UPDATE TO dqa
+   WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
+
+CREATE RULE dma_expl AS
+    ON UPDATE TO dqa
+   WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
+
+CREATE RULE omzone_expl AS
+    ON UPDATE TO dqa
+   WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;

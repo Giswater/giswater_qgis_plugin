@@ -42,3 +42,17 @@ CREATE RULE dwfzone_conflict AS
 CREATE RULE dwfzone_undefined AS
     ON UPDATE TO dwfzone
    WHERE ((new.dwfzone_id = 0) OR (old.dwfzone_id = 0)) DO INSTEAD NOTHING;
+
+
+-- expl_id is not void
+CREATE RULE dqa_expl AS
+    ON UPDATE TO dqa
+   WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
+
+CREATE RULE dwfzone_expl AS
+    ON UPDATE TO dqa
+   WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
+   
+CREATE RULE omzone_expl AS
+    ON UPDATE TO dqa
+   WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
