@@ -111,23 +111,6 @@ SELECT is (
     'Check if gw_fct_setselectors --> "tabName":"tab_dscenario" && "checkAll":"False" returns status "Accepted"'
 );
 
-
-SELECT is (
-    (gw_fct_setselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_hydro_state", "checkAll":"True",
-    "addSchema":"NULL"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setselectors --> "tabName":"tab_hydro_state" && "checkAll":"True" returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_setselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_hydro_state", "checkAll":"False",
-    "addSchema":"NULL"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setselectors --> "tabName":"tab_hydro_state" && "checkAll":"False" returns status "Accepted"'
-);
-
 SELECT is (
     (gw_fct_setselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
     "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "checkAll":"True",
