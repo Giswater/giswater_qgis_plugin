@@ -13,7 +13,7 @@ SELECT user_name,  count (*) , action, date FROM
 group by user_name, date, action
 ORDER BY date desc;
 
-GRANT ALL ON TABLE audit.v_log TO role_master;
+GRANT ALL ON TABLE audit.v_log TO role_plan;
 
 
 CREATE OR REPLACE VIEW v_fidlog_aux

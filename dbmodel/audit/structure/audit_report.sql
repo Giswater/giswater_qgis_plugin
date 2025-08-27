@@ -14,6 +14,6 @@ SELECT user_name,  count (*) , action, date FROM
 group by user_name, date, action, schema
 ORDER BY date desc;
 
-GRANT ALL ON TABLE audit.v_log TO role_master;
+GRANT ALL ON TABLE audit.v_log TO role_plan;
 
 INSERT INTO audit.sys_version (id, giswater, project_type, postgres, postgis, "date", "language", epsg) VALUES(2, '4.0.001', 'AUDIT', 'PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit', '3.4 USE_GEOS=1 USE_PROJ=1 USE_STATS=1', '2025-04-16 10:48:31.383', 'en_US', 25831) ON CONFLICT (id) DO NOTHING;

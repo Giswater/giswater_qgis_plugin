@@ -11,3 +11,18 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 alter table archived_psector_arc add column psector_descript text;
 alter table archived_psector_node add column psector_descript text;
 alter table archived_psector_connec add column psector_descript text;
+
+DO $$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN
+        SELECT pg_get_userbyid(member) AS username
+        FROM pg_auth_members
+        JOIN pg_roles ON pg_roles.oid = pg_auth_members.roleid
+        WHERE pg_roles.rolname = 'role_master'
+    LOOP
+        EXECUTE format('GRANT role_plan TO %I;', r.username);
+    END LOOP;
+END
+$$;

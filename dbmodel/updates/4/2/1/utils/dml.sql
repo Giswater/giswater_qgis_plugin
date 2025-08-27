@@ -451,3 +451,9 @@ UPDATE config_form_fields SET widgettype='combo', isparent=true, iseditable=true
 UPDATE config_form_fields SET widgettype='combo', isparent=false, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext='SELECT id, id as idval FROM cat_brand_model WHERE ''EPUMP'' = ANY(featurecat_id::text[])', dv_parent_id='brand_id', dv_querytext_filterc='AND cat_brand_model.catbrand_id' WHERE formname ILIKE 've_element_%' AND columnname='model_id';
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+UPDATE sys_param_user SET sys_role='role_plan' WHERE sys_role='role_master';
+
+UPDATE sys_message
+	SET hint_message='Please check if your profile has role_plan in order to manage with plan issues'
+	WHERE id=1080;

@@ -31,7 +31,7 @@ GRANT SELECT ON TABLE utils.address TO role_basic;
 GRANT ALL ON TABLE utils.address TO role_edit;
 GRANT SELECT ON TABLE utils.address TO role_om;
 GRANT SELECT ON TABLE utils.address TO role_epa;
-GRANT SELECT ON TABLE utils.address TO role_master;
+GRANT SELECT ON TABLE utils.address TO role_plan;
 GRANT SELECT ON TABLE utils.address TO role_admin;
 GRANT ALL ON TABLE utils.address TO postgres;
 
@@ -55,7 +55,7 @@ GRANT SELECT ON TABLE utils.streetaxis TO role_basic;
 GRANT ALL ON TABLE utils.streetaxis TO role_edit;
 GRANT SELECT ON TABLE utils.streetaxis TO role_om;
 GRANT SELECT ON TABLE utils.streetaxis TO role_epa;
-GRANT SELECT ON TABLE utils.streetaxis TO role_master;
+GRANT SELECT ON TABLE utils.streetaxis TO role_plan;
 GRANT SELECT ON TABLE utils.streetaxis TO role_admin;
 GRANT ALL ON TABLE utils.streetaxis TO postgres;
 
@@ -77,7 +77,7 @@ GRANT SELECT ON TABLE utils.municipality TO role_basic;
 GRANT ALL ON TABLE utils.municipality TO role_edit;
 GRANT SELECT ON TABLE utils.municipality TO role_om;
 GRANT SELECT ON TABLE utils.municipality TO role_epa;
-GRANT SELECT ON TABLE utils.municipality TO role_master;
+GRANT SELECT ON TABLE utils.municipality TO role_plan;
 GRANT SELECT ON TABLE utils.municipality TO role_admin;
 
 
@@ -105,7 +105,7 @@ GRANT SELECT ON TABLE utils.plot TO role_basic;
 GRANT ALL ON TABLE utils.plot TO role_edit;
 GRANT SELECT ON TABLE utils.plot TO role_om;
 GRANT SELECT ON TABLE utils.plot TO role_epa;
-GRANT SELECT ON TABLE utils.plot TO role_master;
+GRANT SELECT ON TABLE utils.plot TO role_plan;
 GRANT SELECT ON TABLE utils.plot TO role_admin;
 GRANT ALL ON TABLE utils.plot TO postgres;
 
@@ -125,7 +125,7 @@ GRANT SELECT ON TABLE utils.type_street TO role_basic;
 GRANT ALL ON TABLE utils.type_street TO role_edit;
 GRANT SELECT ON TABLE utils.type_street TO role_om;
 GRANT SELECT ON TABLE utils.type_street TO role_epa;
-GRANT SELECT ON TABLE utils.type_street TO role_master;
+GRANT SELECT ON TABLE utils.type_street TO role_plan;
 GRANT SELECT ON TABLE utils.type_street TO role_admin;
 
 
