@@ -588,7 +588,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("edit")
             self._enable_toolbar("epa")
 
-        elif project_role == 'role_master' or project_role == 'role_admin' or project_role == 'role_system':
+        elif project_role == 'role_plan' or project_role == 'role_admin' or project_role == 'role_system':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("epa")
