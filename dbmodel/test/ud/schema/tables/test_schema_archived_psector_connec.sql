@@ -30,7 +30,8 @@ SELECT columns_are(
          'link','verified', 'rotation', 'the_geom', 'label_x','label_y','label_rotation', 'accessibility', 'publish', 'inventory',
           'uncertain','expl_id', 'num_value', 'feature_type', 'pjoint_type','pjoint_id','updated_at', 'updated_by', 'created_by', 'matcat_id',
           'district_id','workcat_id_plan', 'asset_id', 'drainzone_id', 'adate','adescript','plot_code', 'placement_type', 'access_type', 'label_quadrant',
-          'n_hydrometer','minsector_id', 'dwfzone_id','datasource','omunit_id', 'lock_level', 'expl_visibility', 'label_quadrant', 'diagonal', 'created_at'
+          'n_hydrometer','minsector_id', 'dwfzone_id','datasource','omunit_id', 'lock_level', 'expl_visibility', 'label_quadrant', 'diagonal', 'created_at',
+          'psector_descript'
     ],
     'Table archived_psector_connec should have the correct columns'
 );

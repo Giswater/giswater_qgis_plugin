@@ -21,7 +21,8 @@ SELECT columns_are(
     'macrosector',
     ARRAY[
         'macrosector_id', 'code', 'name', 'descript', 'lock_level', 'active', 'the_geom',
-        'created_at', 'created_by', 'updated_at', 'updated_by'
+        'created_at', 'created_by', 'updated_at', 'updated_by', 'addparam', 'link',
+        'muni_id', 'expl_id', 'stylesheet'
     ],
     'Table macrosector should have the correct columns'
 );

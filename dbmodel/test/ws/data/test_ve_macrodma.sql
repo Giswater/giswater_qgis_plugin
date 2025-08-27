@@ -13,20 +13,20 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO ve_macrodma (macrodma_id, "name", descript, the_geom, expl_id)
-VALUES(-901, 'Undefined', NULL, NULL, '{0}');
-SELECT is((SELECT count(*)::integer FROM ve_macrodma WHERE macrodma_id = -901), 1, 'INSERT: ve_macrodma -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -901), 1, 'INSERT: macrodma -901 was inserted');
+INSERT INTO ve_macrodma (macrodma_id, code, "name", descript, the_geom, expl_id)
+VALUES(-901, '-901', 'Undefined', NULL, NULL, '{0}');
+SELECT is((SELECT count(*)::integer FROM ve_macrodma WHERE code = '-901'), 1, 'INSERT: ve_macrodma -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM macrodma WHERE code = '-901'), 1, 'INSERT: macrodma -901 was inserted');
 
 
-UPDATE ve_macrodma SET descript = 'updated descript' WHERE macrodma_id = -901;
-SELECT is((SELECT descript FROM ve_macrodma WHERE macrodma_id = -901), 'updated descript', 'UPDATE: ve_macrodma -901 was updated');
-SELECT is((SELECT descript FROM macrodma WHERE macrodma_id = -901), 'updated descript', 'UPDATE: macrodma -901 was updated');
+UPDATE ve_macrodma SET descript = 'updated descript' WHERE code = '-901';
+SELECT is((SELECT descript FROM ve_macrodma WHERE code = '-901'), 'updated descript', 'UPDATE: ve_macrodma -901 was updated');
+SELECT is((SELECT descript FROM macrodma WHERE code = '-901'), 'updated descript', 'UPDATE: macrodma -901 was updated');
 
 
-DELETE FROM ve_macrodma WHERE macrodma_id = -901;
-SELECT is((SELECT count(*)::integer FROM ve_macrodma WHERE macrodma_id = -901), 0, 'DELETE: ve_macrodma -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -901), 0, 'DELETE: macrodma -901 was deleted');
+DELETE FROM ve_macrodma WHERE code = '-901';
+SELECT is((SELECT count(*)::integer FROM ve_macrodma WHERE code = '-901'), 0, 'DELETE: ve_macrodma -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM macrodma WHERE code = '-901'), 0, 'DELETE: macrodma -901 was deleted');
 
 
 SELECT * FROM finish();

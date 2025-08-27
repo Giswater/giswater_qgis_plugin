@@ -16,16 +16,16 @@ SELECT plan(6);
 INSERT INTO ve_presszone
 (presszone_id, code, "name", muni_id, expl_id, sector_id, presszone_type, descript, head, graphconfig, stylesheet, link, avg_press, created_at, created_by, updated_at, updated_by, the_geom)
 VALUES('-901', '-901', 'pzone1-1s', NULL::int4[], '{1}', NULL::int4[], NULL, NULL, 103.85, '{"use":[{"nodeParent":"1105", "toArc":[113881]}], "ignore":[], "forceClosed":[]}', '{"color":[251,181,174], "featureColor":"251,181,174"}', NULL, NULL, '2024-02-21 12:08:16.880', 'postgres', '2024-09-20 11:43:42.716', 'postgres', 'SRID=25831;MULTIPOLYGON (((419236.42319 4576873.35927, 419236.45781 4576874.92716, 419236.79765 4576876.45817, 419237.42965 4576877.89347, 419238.32951 4576879.17788, 419239.46267 4576880.26207, 419240.78556 4576881.10435, 419242.24735 4576881.67237, 419257.22297 4576885.85642, 419259.23364 4576886.41818, 419260.77816 4576886.6901, 419262.34605 4576886.65548, 419263.87706 4576886.31564, 419265.31235 4576885.68364, 419266.59677 4576884.78378, 419267.68095 4576883.65063, 419268.52324 4576882.32773, 419269.09125 4576880.86594, 419269.36317 4576879.32142, 419269.32855 4576877.75353, 419268.98871 4576876.22252, 419268.35671 4576874.78723, 419267.45685 4576873.50281, 419266.3237 4576872.41862, 419265.00081 4576871.57634, 419263.53901 4576871.00832, 419261.52835 4576870.44656, 419246.55273 4576866.26251, 419245.00821 4576865.99059, 419243.44031 4576866.02521, 419241.9093 4576866.36505, 419240.47401 4576866.99705, 419239.18959 4576867.89691, 419238.10541 4576869.03007, 419237.26313 4576870.35296, 419236.69511 4576871.81475, 419236.42319 4576873.35927)))'::public.geometry);
-SELECT is((SELECT count(*)::integer FROM ve_presszone WHERE presszone_id = '-901'), 1, 'INSERT: ve_presszone -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM presszone WHERE presszone_id = '-901'), 1, 'INSERT: presszone -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM ve_presszone WHERE code = '-901'), 1, 'INSERT: ve_presszone -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM presszone WHERE code = '-901'), 1, 'INSERT: presszone -901 was inserted');
 
-UPDATE ve_presszone SET descript = 'updated descript' WHERE presszone_id = '-901';
-SELECT is((SELECT descript FROM ve_presszone WHERE presszone_id = '-901'), 'updated descript', 'UPDATE: ve_presszone -901 was updated');
-SELECT is((SELECT descript FROM presszone WHERE presszone_id = '-901'), 'updated descript', 'UPDATE: presszone -901 was updated');
+UPDATE ve_presszone SET descript = 'updated descript' WHERE code = '-901';
+SELECT is((SELECT descript FROM ve_presszone WHERE code = '-901'), 'updated descript', 'UPDATE: ve_presszone -901 was updated');
+SELECT is((SELECT descript FROM presszone WHERE code = '-901'), 'updated descript', 'UPDATE: presszone -901 was updated');
 
-DELETE FROM ve_presszone WHERE presszone_id = '-901';
-SELECT is((SELECT count(*)::integer FROM ve_presszone WHERE presszone_id = '-901'), 0, 'DELETE: ve_presszone -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM presszone WHERE presszone_id = '-901'), 0, 'DELETE: presszone -901 was deleted');
+DELETE FROM ve_presszone WHERE code = '-901';
+SELECT is((SELECT count(*)::integer FROM ve_presszone WHERE code = '-901'), 0, 'DELETE: ve_presszone -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM presszone WHERE code = '-901'), 0, 'DELETE: presszone -901 was deleted');
 
 
 SELECT * FROM finish();

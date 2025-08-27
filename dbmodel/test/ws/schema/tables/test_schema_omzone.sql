@@ -21,7 +21,8 @@ SELECT columns_are(
     'omzone',
     ARRAY[
         'omzone_id', 'code', 'name', 'descript', 'omzone_type', 'muni_id', 'expl_id', 'macroomzone_id',
-        'link', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'link', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by',
+        'addparam', 'graphconfig', 'sector_id', 'stylesheet'
     ],
     'Table omzone should have the correct columns'
 );

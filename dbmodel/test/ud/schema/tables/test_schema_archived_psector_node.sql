@@ -32,7 +32,7 @@ SELECT columns_are(
         'workcat_id_plan','asset_id','drainzone_id','parent_id','adate','adescript','placement_type',
         'access_type','label_quadrant','minsector_id','brand_id','model_id','serial_number',
         'dwfzone_id','datasource','omunit_id','lock_level','pavcat_id',
-        'conserv_state','expl_visibility'
+        'conserv_state','expl_visibility', 'psector_descript'
     ],
     'Table archived_psector_node should have the correct columns'
 );
@@ -128,7 +128,7 @@ SELECT col_type_is('archived_psector_node','lock_level','integer','Column lock_l
 SELECT col_type_is('archived_psector_node','pavcat_id','varchar(30)','Column pavcat_id should be varchar(30)');
 SELECT col_type_is('archived_psector_node','conserv_state','text','Column conserv_state should be text');
 SELECT col_type_is('archived_psector_node','expl_visibility','integer[]','Column expl_visibility should be integer[]');
-
+SELECT col_type_is('archived_psector_node','psector_descript','text','Column psector_descript should be text');
 
 -- Check default values
 SELECT col_has_default('archived_psector_node','audit_tstamp','Column audit_tstamp should have default value');

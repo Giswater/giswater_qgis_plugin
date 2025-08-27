@@ -21,7 +21,8 @@ SELECT columns_are(
     'macrodqa',
     ARRAY[
         'macrodqa_id', 'code', 'name', 'descript', 'expl_id', 'lock_level', 'active', 'the_geom',
-        'created_at', 'created_by', 'updated_at', 'updated_by'
+        'created_at', 'created_by', 'updated_at', 'updated_by', 'addparam', 'link',
+        'muni_id', 'sector_id', 'stylesheet'
     ],
     'Table macrodqa should have the correct columns'
 );
