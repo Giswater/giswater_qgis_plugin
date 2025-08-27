@@ -260,10 +260,8 @@ class GwMapzoneManager:
         mapzone_function_id: int = 2768
         function_id: int = macromapzone_function_id if mapzone_name in self.mapzone_status["enabledMacromapzone"] else mapzone_function_id
 
-        # Connect signals - refresh table respecting current checkbox state
-        show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
-        expr = "" if show_inactive else "active is true"
-        connect = [partial(self._fill_mapzone_table, expr=expr)]
+        # Connect signals - refresh table when dialog is closed
+        connect = [self._refresh_mapzone_table_on_close]
 
         dlg_functions = toolbox_btn.open_function_by_id(function_id, use_aux_conn=False, connect_signal=connect)
 
@@ -275,7 +273,15 @@ class GwMapzoneManager:
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
         if run_button and self.mapzone_mng_dlg.btn_flood:
-            run_button.clicked.connect(lambda: self.mapzone_mng_dlg.btn_flood.setEnabled(True))
+            run_button.clicked.connect(partial(self.mapzone_mng_dlg.btn_flood.setEnabled, True))
+
+    def _refresh_mapzone_table_on_close(self, result_ignored=None):
+        """ Refreshes the table when the dialog is closed, ignoring the result signal. """
+        if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
+            return
+        show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
+        expr = "" if show_inactive else "active is true"
+        self._fill_mapzone_table(expr=expr)
 
     def _open_flood_analysis(self, dialog, mapzone_name):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
