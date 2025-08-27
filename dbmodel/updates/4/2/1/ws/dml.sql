@@ -371,9 +371,9 @@ WHERE fid = 233;
 
 UPDATE sys_fprocess set fprocess_name = 'Node orphan', except_level = 2, info_msg ='No nodes orphan found', except_msg ='nodes orphan with is_arcdivide in true', except_table='anl_node', function_name ='[gw_fct_om_check_data]',
 query_text = 'SELECT n.node_id, n.nodecat_id, n.the_geom, n.expl_id FROM t_node n JOIN cat_feature_node on node_type = id 
-WHERE NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_1 = n.node_id) AND NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_2 = n.node_id) AND isarcdivide' 
+WHERE NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_1 = n.node_id) AND NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_2 = n.node_id) AND isarcdivide'
 WHERE fid = 107;
- 
+
 UPDATE sys_fprocess set fprocess_name = 'Node orphan (EPA)', except_level = 2, info_msg ='No nodes orphan found',  except_msg ='nodes orphan ready-to-export ', except_table='anl_node', function_name ='[gw_fct_pg2epa_check_result]',
 query_text = 'SELECT n.node_id, n.nodecat_id, n.the_geom, n.expl_id FROM t_node n WHERE NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_1 = n.node_id) AND NOT EXISTS (SELECT 1 FROM t_arc a WHERE a.node_2 = n.node_id)
 AND epa_type !=''UNDEFINED'' AND sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user) AND is_operative'
@@ -514,3 +514,10 @@ DELETE FROM config_param_system WHERE "parameter"='basic_selector_tab_hydro_stat
 
 DELETE FROM sys_table WHERE id='ve_inp_dscenario_pump_additional';
 DELETE FROM sys_table WHERE id='ve_inp_pump_additional';
+
+-- 27/08/2025
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='edit_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='hspacer_epa_1' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='remove_from_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='tbl_inp_valve' AND tabname='tab_epa';
