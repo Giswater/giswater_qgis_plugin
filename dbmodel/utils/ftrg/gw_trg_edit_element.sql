@@ -288,7 +288,7 @@ BEGIN
 		VALUES(NEW.element_id, NEW.code, NEW.sys_code, NEW.elementcat_id, NEW.serial_number, NEW.num_elements, NEW.state, NEW.state_type, NEW.observ, NEW."comment", NEW.function_type, NEW.category_type,
 		NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.label_x, NEW.label_y, NEW.label_rotation,
 		NEW.publish, NEW.inventory, NEW.expl_id, upper(v_feature_type), NEW.top_elev, NEW.expl_visibility, NEW.trace_featuregeom, NEW.muni_id, NEW.sector_id, NEW.brand_id, NEW.model_id, /*NEW.asset_id,*/ NEW.datasource,
-		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by, NEW.epa_type, NEW.omzone_id);
+		NEW.lock_level, NEW.the_geom, now(), CURRENT_USER, NEW.updated_at, NEW.updated_by, NEW.epa_type, NEW.omzone_id);
 
 		-- MAN TABLE INSERT AND EPA_TYPE INSERT
 		IF v_man_table='man_frelem' THEN
@@ -401,7 +401,7 @@ BEGIN
 		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish,
 		inventory=NEW.inventory, expl_id=NEW.expl_id, feature_type=upper(v_feature_type), top_elev=NEW.top_elev, expl_visibility=NEW.expl_visibility, trace_featuregeom=NEW.trace_featuregeom,
 		muni_id=NEW.muni_id, sector_id=NEW.sector_id, brand_id=NEW.brand_id, model_id=NEW.model_id, asset_id=NEW.asset_id, datasource=NEW.datasource,
-		lock_level=NEW.lock_level, created_at=NEW.created_at, created_by=NEW.created_by, updated_at=NEW.updated_at, updated_by=NEW.updated_by, epa_type=NEW.epa_type, omzone_id=NEW.omzone_id
+		lock_level=NEW.lock_level, created_at=NEW.created_at, created_by=NEW.created_by, updated_at=now(), updated_by=CURRENT_USER, epa_type=NEW.epa_type, omzone_id=NEW.omzone_id
 		WHERE element_id=OLD.element_id;
 
 
