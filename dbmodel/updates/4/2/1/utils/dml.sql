@@ -19,7 +19,7 @@ UPDATE plan_typevalue SET idval = 'EXECUTION IN PROGRESS' WHERE typevalue = 'pse
 UPDATE plan_typevalue SET idval = 'PLANNED' WHERE typevalue = 'psector_status' AND id = '2';
 UPDATE plan_typevalue SET idval = 'PLANNING IN PROGRESS' WHERE typevalue = 'psector_status' AND id = '1';
 
-UPDATE config_param_system SET value = 
+UPDATE config_param_system SET value =
 '{"table":"plan_psector","selector":"selector_psector","table_id":"psector_id","selector_id":"psector_id","label":"psector_id, '' - '', name",
 "orderBy":"psector_id","manageAll":true,"typeaheadFilter":" AND lower(concat(expl_id, '' - '', name))",
 "query_filter":"AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND status IN (1,2,3,4,8)","typeaheadForced":true,"selectionMode":"keepPreviousUsingShift"}'
@@ -296,7 +296,7 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET columnname='brand_id',dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand b JOIN cat_connec c ON (c.connec_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
 	WHERE formname='cat_connec' AND formtype='form_feature' AND columnname='brand' AND tabname='tab_none';
-  
+
 UPDATE config_form_fields
 	SET dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand b JOIN cat_link l ON (l.link_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
 	WHERE formname='cat_link' AND formtype='form_feature' AND columnname='brand_id' AND tabname='tab_none';
@@ -337,7 +337,7 @@ UPDATE config_form_fields
 	SET dv_querytext='SELECT DISTINCT b.id, b.id as idval FROM cat_brand_model b JOIN cat_link l ON (l.link_type = ANY(b.featurecat_id::text[]) OR b.featurecat_id::text[] IS NULL)'
 	WHERE formname='cat_link' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_none';
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4348, 'It is not allowed to insert/updates arcs with the same geometry', NULL, 2, true, 'utils', 'core', 'UI');
 
 -- 26/08/2025
@@ -357,7 +357,7 @@ UPDATE config_form_tableview SET columnindex=17 WHERE objectname='tbl_element_x_
 
 -- connec form
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias) VALUES ('connec form','utils','tbl_element_x_connec','epa_type',6,true,'epa_type');
-UPDATE config_form_tableview SET columnindex=7 WHERE objectname='tbl_element_x_connec' AND columnname='state';    
+UPDATE config_form_tableview SET columnindex=7 WHERE objectname='tbl_element_x_connec' AND columnname='state';
 UPDATE config_form_tableview SET columnindex=8 WHERE objectname='tbl_element_x_connec' AND columnname='state_type';
 UPDATE config_form_tableview SET columnindex=9 WHERE objectname='tbl_element_x_connec' AND columnname='observ';
 UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_connec' AND columnname='comment';
@@ -442,5 +442,5 @@ UPDATE config_form_fields SET layoutorder=16 WHERE formname='ve_epa_inlet' AND f
 
 DELETE FROM sys_function WHERE id=3496;
 UPDATE config_form_fields SET dv_isnullvalue = TRUE WHERE columnname IN ('ownercat_id', 'brand_id', 'model_id');
-UPDATE config_form_fields SET widgettype='combo', isparent=true, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext='SELECT id, id as idval FROM cat_brand WHERE ''EPUMP'' = ANY(featurecat_id::text[])', dv_parent_id=NULL, dv_querytext_filterc=NULL WHERE formname ILIKE 've_element_%' AND columnname='brand_id';
 UPDATE config_form_fields SET widgettype='combo', isparent=false, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext='SELECT id, id as idval FROM cat_brand_model WHERE ''EPUMP'' = ANY(featurecat_id::text[])', dv_parent_id='brand_id', dv_querytext_filterc='AND cat_brand_model.catbrand_id' WHERE formname ILIKE 've_element_%' AND columnname='model_id';
+UPDATE config_form_fields SET widgettype='combo', isparent=true, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext='SELECT id, id as idval FROM cat_brand WHERE ''EPUMP'' = ANY(featurecat_id::text[])', dv_parent_id=NULL, dv_querytext_filterc=NULL WHERE formname ILIKE 've_element_%' AND columnname='brand_id';
