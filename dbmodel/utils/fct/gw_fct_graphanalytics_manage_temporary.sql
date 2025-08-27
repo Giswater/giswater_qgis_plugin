@@ -156,6 +156,7 @@ BEGIN
             END IF;
             IF v_fct_name = 'DMA' AND v_netscenario IS NOT NULL THEN
                 ALTER TABLE temp_pgr_mapzone ADD COLUMN pattern_id varchar(16);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_om_waterbalance_dma_graph (LIKE SCHEMA_NAME.om_waterbalance_dma_graph INCLUDING ALL);
             END IF;
         END IF;
 
@@ -946,6 +947,8 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_pgr_minsector_mincut;
+
+        DROP TABLE IF EXISTS temp_pgr_om_waterbalance_dma_graph;
 
         v_return_message = 'The temporary tables/views have been dropped successfully';
     END IF;
