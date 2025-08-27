@@ -57,7 +57,7 @@ BEGIN
 			EXECUTE format('ALTER TABLE %I ADD COLUMN "schema" varchar(100) ', v_table_name);
 
 			-- Add foreign key constraint to reference the primary key of snapshot
-			EXECUTE format('ALTER TABLE %I ADD CONSTRAINT fk_snapshot_date FOREIGN KEY (date, schema) REFERENCES snapshot(date, schema)', v_table_name);
+			EXECUTE format('ALTER TABLE %I ADD CONSTRAINT fk_snapshot_date FOREIGN KEY (date, schema) REFERENCES snapshot(date, schema) ON UPDATE CASCADE', v_table_name);
 
 			-- Add primary keys
             EXECUTE format('ALTER TABLE %I ADD PRIMARY KEY (date, schema, %I)', v_table_name, v_pk_name);
