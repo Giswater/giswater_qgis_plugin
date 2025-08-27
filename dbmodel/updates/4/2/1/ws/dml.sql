@@ -537,8 +537,10 @@ UPDATE config_form_fields SET iseditable = TRUE, widgettype = 'combo',
 dv_querytext = 'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_valve'''
 WHERE formname = 've_epa_frvalve' AND columnname = 'status';
 
-UPDATE config_form_fields SET iseditable = TRUE, widgettype = 'combo', 
+UPDATE config_form_fields SET iseditable = TRUE, widgettype = 'combo',
 dv_querytext = 'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE typevalue=''inp_value_status_shortpipe_dscen'''
 WHERE formname = 've_epa_frshortpipe' AND columnname = 'status';
 
 DELETE FROM config_form_fields WHERE tabname = 'tab_epa' AND columnname = 'to_arc';
+
+UPDATE config_form_fields SET label = 'Bulk coefficient:', tooltip = 'Bulk coefficient' WHERE formtype = 'form_feature' AND columnname = 'bulk_coeff';

@@ -1110,6 +1110,34 @@ BEGIN
 			IF v_class = 'DMA' THEN
 				-- before inserted on om_waterbalance_dma_graph, remove obsolete nodes.
 				-- TODO[epic=mapzones]: fill om_waterbalance_dma_graph
+			RAISE NOTICE 'Filling om_waterbalance_dma_graph ';
+			DELETE FROM om_waterbalance_dma_graph
+			WHERE dma_id IN (
+				SELECT DISTINCT dma_id FROM om_waterbalance_dma_graph
+				WHERE dma_id
+			);
+
+			v_querytext = 'INSERT INTO om_waterbalance_dma_graph (node_id, '||quote_ident(v_field)||', flow_sign)
+			(SELECT DISTINCT n.node_id, a.'||quote_ident(v_field)||',
+			CASE 
+			WHEN n.'||quote_ident(v_field)||' =a.'||quote_ident(v_field)||' then 1
+			ELSE -1
+			END AS flow_sign
+			FROM temp_t_node n
+			JOIN value_state_type sn ON sn.state =n.state AND sn.id=n.state_type
+			JOIN temp_t_arc a  ON a.node_1 =n.node_id or a.node_2 =n.node_id 
+			JOIN value_state_type sa ON sa.state =a.state AND sa.id=a.state_type
+			WHERE sn.is_operative =true AND sa.is_operative =true AND 
+			n.node_id IN
+			(SELECT (json_array_elements(graphconfig->''use'')->>''nodeParent'')::integer as nodeparent
+			FROM '||quote_ident(v_table)||' WHERE active=true)
+			AND a.'||quote_ident(v_field)||' IN
+			(SELECT '||quote_ident(v_field)||'
+			FROM '||quote_ident(v_table)||' WHERE active=true
+			)
+			) ON CONFLICT (node_id, dma_id) DO NOTHING';
+			EXECUTE v_querytext;
+
 
 
 			END IF;

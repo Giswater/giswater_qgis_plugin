@@ -471,7 +471,7 @@ AND CASE
   WHEN (SELECT tg_op_value FROM tg_op_value)!=''INSERT'' THEN id IN (0,1,2)
   WHEN (SELECT tg_op_value FROM tg_op_value) =''INSERT'' AND (SELECT psector_value FROM psector_value) IS NOT NULL THEN id = 2 
   ELSE id < 2 
-END' 
+END'
 WHERE columnname = 'state';
 
 update config_form_fields set dv_orderby_id = true where formtype ='psector' and columnname ='status';
@@ -522,3 +522,5 @@ UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_throttle_
 -- 27/08/2025
 UPDATE config_form_fields SET widgetcontrols='{ "minRole": "role_plan"}'::json
 WHERE formname='generic' AND formtype='check_project' AND columnname='plan_check' AND tabname='tab_data';
+
+UPDATE config_form_fields SET label = 'Bulk coefficient:', tooltip = 'Bulk coefficient' WHERE formtype = 'form_feature' AND columnname = 'bulk_coeff';
