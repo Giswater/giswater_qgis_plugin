@@ -41,7 +41,7 @@ BEGIN
 		END IF;
 
 		INSERT INTO sector (sector_id, code, name, descript, active, macrosector_id, sector_type, expl_id, muni_id, graphconfig, stylesheet, lock_level, link, addparam)
-		VALUES (v_sector_id, NEW.code, NEW.name, NEW.descript, NEW.active, v_mapzone_id, NEW.sector_type, NEW.expl_id, NEW.muni_id, 
+		VALUES (v_sector_id, NEW.code, NEW.name, NEW.descript, NEW.active, v_mapzone_id, NEW.sector_type, NEW.expl_id, NEW.muni_id,
 		NEW.graphconfig::json, NEW.stylesheet::json, NEW.lock_level, NEW.link, NEW.addparam::json);
 
 		IF v_view_name = 'UI' THEN
@@ -64,7 +64,7 @@ BEGIN
 
 		UPDATE sector
 		SET sector_id=NEW.sector_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, macrosector_id=v_mapzone_id, sector_type=NEW.sector_type,
-		expl_id=NEW.expl_id, muni_id=NEW.muni_id, avg_press=NEW.avg_press, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json,
+		expl_id=NEW.expl_id, muni_id=NEW.muni_id, graphconfig=NEW.graphconfig::json,
 		stylesheet = NEW.stylesheet::json, lock_level=NEW.lock_level, link = NEW.link, addparam=NEW.addparam::json,
 		updated_at=now(), updated_by = current_user
 		WHERE sector_id=OLD.sector_id;
