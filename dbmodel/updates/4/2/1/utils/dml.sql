@@ -439,3 +439,5 @@ UPDATE config_form_fields SET layoutorder=13 WHERE formname='ve_epa_inlet' AND f
 UPDATE config_form_fields SET layoutorder=14 WHERE formname='ve_epa_inlet' AND formtype='form_feature' AND columnname='source_pattern_id' AND tabname='tab_epa';
 UPDATE config_form_fields SET layoutorder=15 WHERE formname='ve_epa_inlet' AND formtype='form_feature' AND columnname='pattern_id' AND tabname='tab_epa';
 UPDATE config_form_fields SET layoutorder=16 WHERE formname='ve_epa_inlet' AND formtype='form_feature' AND columnname='head' AND tabname='tab_epa';
+
+DELETE FROM sys_function WHERE id=3496;

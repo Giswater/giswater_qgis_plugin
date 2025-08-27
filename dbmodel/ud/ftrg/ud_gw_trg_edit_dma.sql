@@ -56,12 +56,6 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		IF view_name = 'UI' THEN
-			IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
-				PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'dma', 'mapzoneId', OLD.dma_id)));
-			END IF;
-		END IF;
-
 		UPDATE dma
 		SET dma_id=NEW.dma_id, name=NEW.name, expl_id=NEW.expl_id, muni_id=NEW.muni_id, sector_id=NEW.sector_id, graphconfig=NEW.graphconfig::json
 		WHERE dma_id=OLD.dma_id;

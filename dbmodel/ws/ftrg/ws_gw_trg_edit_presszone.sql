@@ -79,12 +79,6 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		IF v_view_name = 'UI' THEN
-			IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
-				PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'presszone', 'mapzoneId', OLD.presszone_id)));
-			END IF;
-		END IF;
-
 		UPDATE presszone
 		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, graphconfig=NEW.graphconfig::json,
 		head = NEW.head, stylesheet=NEW.stylesheet::json, descript=NEW.descript, updated_at=now(), updated_by = current_user,
