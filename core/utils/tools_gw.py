@@ -1275,6 +1275,9 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
             elif field['widgettype'] == 'textarea':
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'list':
+                editor_widget_setup = QgsEditorWidgetSetup('List', {})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
             else:
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
@@ -1704,7 +1707,7 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None):
             label.setToolTip(field['label'].capitalize())
 
         widget = None
-        if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':
+        if field['widgettype'] in ('text', 'textline', 'list') or field['widgettype'] == 'typeahead':
             completer = QCompleter()
             widget = add_lineedit(field)
             widget = set_widget_size(widget, field)
@@ -1791,7 +1794,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     lbl.setToolTip(field['tooltip'])
 
                 widget = None
-                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
+                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext' or field['widgettype'] == 'list':
                     widget = QLineEdit()
                     if 'isMandatory' in field:
                         widget.setProperty('ismandatory', field['isMandatory'])
@@ -1895,9 +1898,9 @@ def check_parameters(field):
     if 'widgetname' not in field:
         msg += tools_qt.tr("widgetname not found. ")
 
-    if field.get('widgettype') not in ('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button'):
+    if field.get('widgettype') not in ('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button', 'list'):
         msg += tools_qt.tr("widgettype is wrongly configured. Needs to be in ")
-        msg += "('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button')"
+        msg += "('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button', 'list')"
 
     if 'layoutorder' not in field:
         msg += tools_qt.tr("layoutorder not found. ")
