@@ -83,5 +83,3 @@ CREATE INDEX archived_psector_link_expl_visibility_idx ON link USING btree (expl
 CREATE INDEX archived_psector_link_feature_id ON archived_psector_link USING btree (feature_id);
 CREATE INDEX archived_psector_link_index ON archived_psector_link USING gist (the_geom);
 CREATE INDEX archived_psector_link_muni ON archived_psector_link USING btree (muni_id);
-
-ALTER TABLE macrodma ALTER COLUMN expl_id DROP NOT NULL;
