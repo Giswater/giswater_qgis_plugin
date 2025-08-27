@@ -71,14 +71,14 @@ BEGIN
 		END IF;
 
 		INSERT INTO sector (sector_id, code, name, descript, active, macrosector_id, sector_type, expl_id, muni_id, avg_press, pattern_id, graphconfig, stylesheet, lock_level, link, addparam)
-		VALUES (v_sector_id, NEW.code, NEW.name, NEW.descript, NEW.active, v_mapzone_id, NEW.sector_type, NEW.expl_id, NEW.muni_id, 
+		VALUES (v_sector_id, NEW.code, NEW.name, NEW.descript, NEW.active, v_mapzone_id, NEW.sector_type, NEW.expl_id, NEW.muni_id,
 		NEW.avg_press, NEW.pattern_id, NEW.graphconfig::json, NEW.stylesheet::json, NEW.lock_level, NEW.link, NEW.addparam::json);
 
 		IF v_view_name = 'EDIT' THEN
 			UPDATE sector SET the_geom = NEW.the_geom WHERE sector_id = NEW.sector_id;
 		END IF;
 
-		INSERT INTO selector_sector VALUES (NEW.sector_id, current_user);
+		INSERT INTO selector_sector VALUES (v_sector_id, current_user);
 
 		RETURN NEW;
 
