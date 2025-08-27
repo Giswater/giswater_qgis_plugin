@@ -69,7 +69,7 @@ BEGIN
 	v_isaudit = json_extract_path_text(p_data,'data','parameters','isAudit')::boolean;
 	v_selection_mode = json_extract_path_text(p_data,'data','parameters','selectionMode')::text;
 
-	--EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":251, "project_type":"'||v_project_type||'", "action":"CREATE", "group":"USERCHECK"}}}$$)';
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":251, "project_type":"'||v_project_type||'", "action":"CREATE", "group":"USERCHECK"}}}$$)';
 
 	--if in schema audit doesnt exist or doesnt have table audit_fid_log - switch off audit option
 	IF v_isaudit IS TRUE and

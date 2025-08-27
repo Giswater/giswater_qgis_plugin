@@ -56,18 +56,22 @@ INSERT INTO sys_function
 VALUES (-995, 'gw_test_function', 'utils', 'trigger');
 
 
-SELECT is(
-    (gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-    "data":{"message":"-999", "function":"-995","parameters":null, "variables":"value", "is_process":true}}$$)::JSON)->'message'->>'text',
-    'Error in message parameters',
-    'Checking gw_fct_getmessage when parameters are missing'
+
+SELECT throws_ok(
+    'SELECT (gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        "data":{"message":"-999", "function":"-995","parameters":null, "variables":"value", "is_process":true}}$$))',
+        'GW001',
+        'Function: [gw_test_function] - TEST MESSAGE: FEATURE IS OUT OF EXPLOITATION, FEATURE_ID: %FEATURE_ID%. HINT: TAKE A LOOK ON YOUR MAP AND USE THE APPROACH OF THE EXPLOITATIONS! - value',
+        'Checking gw_fct_getmessage when parameters are missing'
 );
 
-SELECT is(
-    (gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-    "data":{"message":"-999", "function":"-995","parameters":{"expl_id": 1}, "variables":"value", "is_process":true}}$$)::JSON)->'message'->>'text',
-    'Error in message parameters',
-    'Checking gw_fct_getmessage when parameters name are wrong'
+
+SELECT throws_ok(
+    'SELECT (gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        "data":{"message":"-999", "function":"-995","parameters":{"expl_id": 1}, "variables":"value", "is_process":true}}$$))',
+        'GW001',
+        'Function: [gw_test_function] - TEST MESSAGE: FEATURE IS OUT OF EXPLOITATION, FEATURE_ID: %FEATURE_ID%. HINT: TAKE A LOOK ON YOUR MAP AND USE THE APPROACH OF THE EXPLOITATIONS! - value',
+        'Checking gw_fct_getmessage when parameters name are wrong'
 );
 
 --v_debug = false

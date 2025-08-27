@@ -30,7 +30,7 @@ SELECT columns_are(
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility', 'workcat_id_plan',
         'asset_id', 'om_state', 'conserv_state', 'access_type', 'placement_type', 'expl_visibility', 'brand_id', 'model_id',
         'serial_number', 'label_quadrant', 'top_elev', 'custom_top_elev',
-        'datasource', 'supplyzone_id', 'lock_level', 'is_scadamap'
+        'datasource', 'supplyzone_id', 'lock_level', 'is_scadamap', 'psector_descript'
     ],
     'Table archived_psector_node should have the correct columns'
 );
@@ -56,6 +56,7 @@ SELECT col_type_is('archived_psector_node', 'datasource', 'integer', 'Column dat
 SELECT col_type_is('archived_psector_node', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
 SELECT col_type_is('archived_psector_node', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('archived_psector_node', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
+SELECT col_type_is('archived_psector_node', 'psector_descript', 'text', 'Column psector_descript should be text');
 
 -- Check foreign keys
 SELECT hasnt_fk('archived_psector_node', 'Table archived_psector_node should have no foreign keys');

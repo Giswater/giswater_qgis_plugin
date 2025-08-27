@@ -23,15 +23,17 @@ SELECT columns_are(
         'id', 'psector_id', 'psector_state', 'doable', 'audit_tstamp', 'audit_user', 'action', 'link_id', 'code',
         'feature_id', 'feature_type', 'exit_id', 'exit_type', 'userdefined_geom', 'state', 'expl_id', 'the_geom',
         'top_elev2', 'depth2', 'sector_id', 'dma_id', 'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id',
-        'expl_visibility', 'epa_type', 'is_operative', 'created_by', 'updated_at', 'updated_by', 'staticpressure1',
+        'expl_visibility', 'is_operative', 'created_by', 'updated_at', 'updated_by', 'staticpressure1',
         'linkcat_id', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'uncertain', 'muni_id',
-        'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource', 'created_at', 'staticpressure2'
+        'verified', 'supplyzone_id', 'custom_length', 'datasource', 'created_at', 'staticpressure2',
+        'annotation', 'brand_id', 'comment', 'depth1', 'descript', 'link', 'location_type', 'lock_level', 'model_id',
+        'num_value', 'observ', 'omzone_id', 'omzone_id', 'state_type', 'sys_code', 'top_elev1'
     ],
     'Table archived_psector_link should have the correct columns'
 );
 
 -- Check primary key
-SELECT col_is_pk('archived_psector_link', 'id', 'Column id should be primary key');
+SELECT col_is_pk('archived_psector_link', 'link_id', 'Column link_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('archived_psector_link', 'id', 'integer', 'Column id should be integer');
@@ -42,9 +44,9 @@ SELECT col_type_is('archived_psector_link', 'audit_tstamp', 'timestamp without t
 SELECT col_type_is('archived_psector_link', 'audit_user', 'text', 'Column audit_user should be text');
 SELECT col_type_is('archived_psector_link', 'action', 'character varying(16)', 'Column action should be varchar(16)');
 SELECT col_type_is('archived_psector_link', 'link_id', 'integer', 'Column link_id should be integer');
-SELECT col_type_is('archived_psector_link', 'feature_id', 'character varying(16)', 'Column feature_id should be varchar(16)');
+SELECT col_type_is('archived_psector_link', 'feature_id', 'integer', 'Column feature_id should be integer');
 SELECT col_type_is('archived_psector_link', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');
-SELECT col_type_is('archived_psector_link', 'depth2', 'numeric(12,3)', 'Column depth2 should be numeric(12,3)');
+SELECT col_type_is('archived_psector_link', 'depth2', 'numeric(12,4)', 'Column depth2 should be numeric(12,4)');
 SELECT col_type_is('archived_psector_link', 'staticpressure1', 'numeric(12,3)', 'Column staticpressure1 should be numeric(12,3)');
 SELECT col_type_is('archived_psector_link', 'staticpressure2', 'numeric(12,3)', 'Column staticpressure2 should be numeric(12,3)');
 

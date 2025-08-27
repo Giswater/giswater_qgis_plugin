@@ -576,9 +576,6 @@ BEGIN
 
         v_visible_layer ='"ve_minsector", "ve_minsector_mincut"';
 
-        -- Message
-        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4022", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001",	 "is_process":true}}$$)';
-
     END IF;
 
 

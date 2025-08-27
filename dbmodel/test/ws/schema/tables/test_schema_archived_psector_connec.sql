@@ -30,7 +30,7 @@ SELECT columns_are(
         'created_by', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority', 'access_type', 'placement_type',
         'crmzone_id', 'expl_visibility', 'plot_code', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
-        'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone', 'n_hydrometer'
+        'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone', 'n_hydrometer', 'psector_descript'
     ],
     'Table archived_psector_connec should have the correct columns'
 );
@@ -59,6 +59,7 @@ SELECT col_type_is('archived_psector_connec', 'datasource', 'integer', 'Column d
 SELECT col_type_is('archived_psector_connec', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('archived_psector_connec', 'block_zone', 'text', 'Column block_zone should be text');
 SELECT col_type_is('archived_psector_connec', 'n_hydrometer', 'integer', 'Column n_hydrometer should be integer');
+SELECT col_type_is('archived_psector_connec', 'psector_descript', 'text', 'Column psector_descript should be text');
 
 -- Check foreign keys
 SELECT hasnt_fk('archived_psector_connec', 'Table archived_psector_connec should have no foreign keys');

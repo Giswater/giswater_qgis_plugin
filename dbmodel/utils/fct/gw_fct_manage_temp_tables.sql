@@ -138,52 +138,52 @@ BEGIN
 
 
         IF 'LOG' = ANY(v_group_array) THEN
-            CREATE TEMP TABLE t_audit_check_data (LIKE audit_check_data INCLUDING ALL);
-            CREATE TEMP TABLE t_audit_check_project (LIKE audit_check_project INCLUDING ALL);
-            CREATE TEMP TABLE t_audit_log_data (LIKE audit_log_data INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS t_audit_check_data (LIKE audit_check_data INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS t_audit_check_project (LIKE audit_check_project INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS t_audit_log_data (LIKE audit_log_data INCLUDING ALL);
         END IF;
 
         IF 'ANL' = ANY(v_group_array) THEN
-            CREATE TEMP TABLE t_anl_arc (LIKE anl_arc INCLUDING ALL);
-            CREATE TEMP TABLE t_anl_node (LIKE anl_node INCLUDING ALL);
-            CREATE TEMP TABLE t_anl_connec (LIKE anl_connec INCLUDING ALL);
-            CREATE TEMP TABLE t_anl_polygon (LIKE anl_polygon INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS t_anl_arc (LIKE anl_arc INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS t_anl_node (LIKE anl_node INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS t_anl_connec (LIKE anl_connec INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS t_anl_polygon (LIKE anl_polygon INCLUDING ALL);
         END IF;
 
         IF 'MAPZONES' = ANY(v_group_array) THEN
 
             IF 'SECTOR' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                CREATE TEMP TABLE t_sector AS SELECT * FROM ve_sector;
+                CREATE TEMP TABLE IF NOT EXISTS t_sector AS SELECT * FROM ve_sector;
             END IF;
 
             IF 'OMZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                CREATE TEMP TABLE t_omzone AS SELECT * FROM ve_omzone;
+                CREATE TEMP TABLE IF NOT EXISTS t_omzone AS SELECT * FROM ve_omzone;
             END IF;
 
             IF v_project_type = 'WS' THEN
             	IF 'PRESSZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_presszone AS SELECT * FROM ve_presszone;
+                    CREATE TEMP TABLE IF NOT EXISTS t_presszone AS SELECT * FROM ve_presszone;
             	END IF;
 
 	            IF 'DQA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array)THEN
-	                CREATE TEMP TABLE t_dqa AS SELECT * FROM ve_dqa;
+	                CREATE TEMP TABLE IF NOT EXISTS t_dqa AS SELECT * FROM ve_dqa;
 	            END IF;
 
                 IF 'DMA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_dma AS SELECT * FROM ve_dma;
+                    CREATE TEMP TABLE IF NOT EXISTS t_dma AS SELECT * FROM ve_dma;
                 END IF;
 
                 IF 'SUPPLYZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_supplyzone AS SELECT * FROM ve_supplyzone;
+                    CREATE TEMP TABLE IF NOT EXISTS t_supplyzone AS SELECT * FROM ve_supplyzone;
                 END IF;
 
             ELSIF v_project_type = 'UD' THEN
                 IF 'DRAINZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_drainzone AS SELECT * FROM ve_drainzone;
+                    CREATE TEMP TABLE IF NOT EXISTS t_drainzone AS SELECT * FROM ve_drainzone;
                 END IF;
 
                 IF 'DWFZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_dwfzone AS SELECT * FROM ve_dwfzone;
+                    CREATE TEMP TABLE IF NOT EXISTS t_dwfzone AS SELECT * FROM ve_dwfzone;
                 END IF;
             END IF;
         END IF;
