@@ -521,3 +521,5 @@ UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname
 UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='hspacer_epa_1' AND tabname='tab_epa';
 UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='remove_from_dscenario' AND tabname='tab_epa';
 UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='tbl_inp_valve' AND tabname='tab_epa';
+
+DELETE FROM config_form_fields WHERE columnname = 'nodarc_id' and formname ilike 've_epa_fr%';
