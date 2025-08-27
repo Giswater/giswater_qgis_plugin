@@ -574,6 +574,8 @@ UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL', dv_isnullvalue=TRUE WHERE formname='ve_epa_froutlet' AND columnname='curve_id';
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL', dv_isnullvalue=true WHERE formname='ve_epa_frpump' AND columnname='curve_id';
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_outlet''', dv_isnullvalue=true WHERE formname='ve_epa_froutlet' AND columnname='outlet_type';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_orifice''', dv_isnullvalue=true WHERE formname='ve_epa_frorifice' AND columnname='outlet_type';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_weirs''', dv_isnullvalue=true WHERE formname='ve_epa_frweir' AND columnname='outlet_type';
 
 DELETE FROM config_form_fields WHERE columnname = 'nodarc_id';
 -- 25/08/2025
@@ -905,4 +907,4 @@ UPDATE sys_foreignkey SET typevalue_name='inp_typevalue_weir', target_table='inp
 UPDATE sys_foreignkey SET typevalue_name='inp_typevalue_weir', target_table='inp_dscenario_frweir' WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_weirs' AND target_table='inp_dscenario_flwreg_weir' AND target_field='weir_type';
 ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
-UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'inp_value_weirs', 'inp_typevalue_weir')
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'inp_value_weirs', 'inp_typevalue_weir') WHERE dv_querytext ILIKE '%inp_value_weirs%';
