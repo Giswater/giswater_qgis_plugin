@@ -31,7 +31,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QHBoxLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog, QActionGroup, QMenu, QToolButton, QAction
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog, QActionGroup
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -3504,6 +3504,7 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
         # Execute deactivation function
         deactivation_function()
 
+
 def activate_selection_mode(class_object, dialog, table_object, selection_mode, tool_type):
     """ Selection snapping """
     add_icon(dialog.btn_snapping, "137")
@@ -3511,8 +3512,10 @@ def activate_selection_mode(class_object, dialog, table_object, selection_mode, 
         partial(selection_init, class_object, dialog, table_object, selection_mode, tool_type))
     selection_init(class_object, dialog, table_object, selection_mode, tool_type)
 
+
 def update_default_action(dialog, action):
     dialog.btn_snapping.setDefaultAction(action)
+
 
 def menu_btn_snapping(class_object: Any, dialog: QDialog, table_object: str, selection_mode=GwSelectionMode.DEFAULT, 
                       callback: Callable[[], bool] | None = None, callback_kwargs: dict[str, Any] | None = None, 
@@ -3571,6 +3574,7 @@ def highlight_in_tab_changed(class_object, dialog, expected_table_name, parent_t
     else:
         tools_qgis.refresh_map_canvas()
         reset_rubberband(class_object.rubber_band)
+
 
 def get_expected_table_name(class_object, table_object, selection_mode):
     if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
@@ -3696,7 +3700,6 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Prevent UI interference while updating the table
     table_widget.blockSignals(True)
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
-    
     
     if selection_mode == GwSelectionMode.PSECTOR:
         _insert_feature_psector(dialog, class_object.rel_feature_type, ids=class_object.rel_list_ids[class_object.rel_feature_type])
@@ -3832,14 +3835,6 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
 
     tools_qgis.disconnect_signal_selection_changed()
     feature_type = get_signal_change_tab(dialog)
-
-    # Get expected table name
-    if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
-        expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
-    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
-        expected_table_name = f"tbl_{table_object}_{class_object.rel_feature_type}"
-    else:
-        expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
 
     # Initialize the list for the specific feature type if it doesn't exist
     if feature_type not in class_object.rel_list_ids:

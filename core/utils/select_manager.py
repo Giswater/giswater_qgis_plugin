@@ -11,7 +11,6 @@ from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsPointXY, QgsRectangle, QgsGeometry, QgsWkbTypes
 from qgis.gui import QgsMapTool
-from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -193,6 +192,7 @@ class GwSelectManager(QgsMapTool):
             pass
 
     # endregion
+
 
 class GwPolygonSelectManager(QgsMapTool):
     """Polygon selection tool"""
@@ -512,7 +512,6 @@ class GwFreehandSelectManager(QgsMapTool):
                     self.points.append(current_point)
                     self._update_rubber_band()
     
-
     def _update_rubber_band(self):
         """Update rubber band to show current freehand path as a filled polygon"""
         if len(self.points) >= 2:
