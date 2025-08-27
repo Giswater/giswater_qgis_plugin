@@ -58,7 +58,7 @@ BEGIN
 	v_omcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_om_check';
 	v_graphcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_graph_check';
 	v_epacheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_epa_check';
-	v_plancheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_master_check';
+	v_plancheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_plan_check';
 	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_admin_check';
 
 	-- get system parameters in case input parameter is null
