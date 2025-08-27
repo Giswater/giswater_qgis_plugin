@@ -883,18 +883,61 @@ class GwI18NGenerator:
     def safe_parse(self, source, text):
         try:
             # Try JSON first (safer if it's valid JSON)
-            modified = text.replace("'", "\"").replace("\"\"", "'").replace("False", "false").replace("True", "true").replace("None", "null")
+            # First handle empty values 
+            print(text)
+            modified = text.replace("False", "false").replace("True", "true").replace("None", "null")
+            
+            #Save values in special cases
+            modified = modified.replace(": ''", ': "a"').replace(":''", ': "a"').replace(':""', ': "a"')
+            modified = modified.replace("','. ", "',a'. ").replace("'T','TANK'", "a'T',a'TANK'a")
+            modified = modified.replace("-999,'ALL", "-999,a'ALL")
+            
+            # Adapt " in keys and values
+            modified = modified.replace("': '", '": "').replace("':'", '": "').replace("' :'", '": "').replace("' : '", '": "')
+            modified = modified.replace("': \"", '": "').replace("':\"", '": "').replace("' :\"", '": "').replace("' : \"", '": "')
+            modified = modified.replace("\": '", '": "').replace("\":'", '": "').replace("\" :\"", '": "').replace("\" : \"", '": "')
+            
+            modified = modified.replace("', '", '", "').replace("','", '", "').replace("' ,'", '", "').replace("' , '", '", "')
+            modified = modified.replace("', \"", '", "').replace("',\"", '", "').replace("' ,\"", '", "').replace("' , \"", '", "')
+            modified = modified.replace("\", '", '", "').replace("\",'", '", "').replace("\" ,'", '", "').replace("\" , '", '", "')
+
+            #{ cases
+            modified = modified.replace("{'", '{"').replace("'}", '"}')
+            modified = modified.replace("': {", '": {').replace("':{", '": {').replace("' :{", '": {').replace("' : {", '": {')
+            
+            #Null cases
+            modified = modified.replace("': null", '": null').replace("':null", '": null').replace("' :null", '": null').replace("' : null", '": null')
+            modified = modified.replace("null, '", 'null, "').replace("null,'", 'null, "').replace("null ,'", 'null, "').replace("null , '", 'null, "')
+            
+            #False cases
+            modified = modified.replace("': false", '": false').replace("':false", '": false').replace("' :false", '": false').replace("' : false", '": false')
+            modified = modified.replace("false, '", 'false, "').replace("false,'", 'false, "').replace("false ,'", 'false, "').replace("false , '", 'false, "')
+            
+            #True cases
+            modified = modified.replace("': true", '": true').replace("':true", '": true').replace("' :true", '": true').replace("' : true", '": true')
+            modified = modified.replace("true, '", 'true, "').replace("true,'", 'true, "').replace("true ,'", 'true, "').replace("true , '", 'true, "')
+            
+            #Number cases
+            modified = re.sub(r'(\d+)(\]?)\s*,\s*\'', r'\1\2, "', modified)  # number], ' or number, '
+            modified = re.sub(r'\':\s*(\[?)(\d+)', r'": \1\2', modified)     # ': [number or ': number
+            
+            #Combo cases
+            modified = modified.replace("': ['", '": ["').replace("':'[", '": ["').replace("' :['", '": ["').replace("' : ''[", '": ["')
+            modified = modified.replace("'], '", '"], "').replace("'],'", '"], "').replace("'] ,'", '"], "').replace("'] , ''", '"], "')
+            
+            modified = modified.replace("']}", '"]}')
+            
+            # Replace remaining single quotes with double quotes for JSON compatibility
+            modified = modified.replace("''", "'")
+
+            # Reload values in special cases
+            modified = modified.replace(': "a"', ': ""')
+            modified = modified.replace("',a'. ", "','. ").replace("a'T',a'TANK'a", "'T','TANK'").replace("-999,a'ALL", "-999, 'ALL'")
+            print(modified)
             return json.loads(modified)
         except json.JSONDecodeError as e:
-            e1 = e
-
-        try:
-            # Try Python literal (e.g., from repr())
-            modified = text.replace("false", "False").replace("true", "True").replace("NULL", "None").replace("null", "None")
-            return ast.literal_eval(modified)
-        except (ValueError, SyntaxError) as e2:
-            msg = "Error parsing JSON source: {0} - {1} - {2}"
-            msg_params = (source, e1, e2)
+            msg = "Error parsing JSON source: {0} - e1: {1} -- {2}"
+            msg_params = (source, e, modified)
             tools_log.log_error(msg, msg_params=msg_params)
             return None
 
