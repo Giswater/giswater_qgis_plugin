@@ -280,8 +280,8 @@ def open(**kwargs):
 def open_date(**kwargs):
     """ Open audit in selected date """    
 
-    class_obj = kwargs["class"]
-    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString('yyyy-MM-dd')}' AND \"schema\" = '{lib_vars.schema_name}' ORDER BY tstamp ASC"""
+    class_obj = kwargs["class"]    
+    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString('yyyy-MM-dd')}' AND \"schema\" = '{lib_vars.schema_name}' AND feature_id = '{class_obj.feature_id}' ORDER BY tstamp ASC"""
     rows = tools_db.get_rows(query)
 
     form = []
