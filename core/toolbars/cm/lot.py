@@ -172,8 +172,9 @@ class AddNewLot:
         # Relation feature buttons
         self.dlg_lot.btn_insert.clicked.connect(self._insert_related_feature)
         self.dlg_lot.btn_delete.clicked.connect(self._delete_related_records)
-        self.dlg_lot.btn_snapping.clicked.connect(self._init_snapping_selection)
         self.dlg_lot.btn_expr_select.clicked.connect(self._select_by_expression)
+
+        tools_gw.menu_btn_snapping(self, self.dlg_lot, "lot", GwSelectionMode.LOT, callback=self._init_snapping_selection)
 
         # Always set multi-row and full row selection for relation tables, both on create and edit
         relation_table_names = [
@@ -725,7 +726,6 @@ class AddNewLot:
 
     def _init_snapping_selection(self):
         """Handles the 'snapping selection' button click action."""
-        tools_gw.selection_init(self, self.dlg_lot, "lot", GwSelectionMode.LOT)
         self._update_feature_completer_lot(self.dlg_lot)
 
     def _select_by_expression(self):

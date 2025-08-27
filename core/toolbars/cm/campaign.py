@@ -7,11 +7,12 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 from typing import Optional, List, Any, Dict, Union
+import os
 
 from qgis.PyQt.QtCore import QDate, QModelIndex
-from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QIcon
 from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QTextEdit, QCompleter, \
-    QTableView, QToolBar, QActionGroup, QDialog
+    QTableView, QToolBar, QActionGroup, QDialog, QAction, QToolButton, QMenu
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
@@ -590,9 +591,6 @@ class Campaign:
         self.dialog.btn_delete.clicked.connect(self._check_and_disable_class_combos)
 
         self.dialog.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN),
-        )
-        self.dialog.btn_snapping.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
         )
 
@@ -604,6 +602,9 @@ class Campaign:
             partial(self._update_feature_completer, self.dialog)
         )
 
+        # Create menu for btn_snapping
+        tools_gw.menu_btn_snapping(self, self.dialog, table_object, GwSelectionMode.CAMPAIGN)
+        
     def _check_and_disable_class_combos(self):
         """Disable review/visit class combos if any relations exist."""
         if not self.campaign_id:
@@ -734,7 +735,9 @@ class Campaign:
         """
         rows = tools_db.get_rows(sql)
         # pull out non-null values
-        return [r["feature_type"] for r in rows if r.get("feature_type")]
+        if rows:
+            return [r["feature_type"] for r in rows if r.get("feature_type")]
+        return []
 
     def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int) -> List[str]:
         """

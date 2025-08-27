@@ -13,7 +13,7 @@ import random
 import re
 import sys
 import sqlite3
-from typing import Literal, Dict, Optional
+from typing import Literal, Dict, Optional, Any, Callable
 import webbrowser
 import xml.etree.ElementTree as ET
 from sip import isdeleted
@@ -31,7 +31,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QHBoxLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog, QActionGroup, QMenu, QToolButton, QAction
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -44,7 +44,7 @@ from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
-from ..utils.select_manager import GwSelectManager
+from ..utils.select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
@@ -3450,8 +3450,9 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
         tools_qgis.zoom_to_rectangle(bbox.xMinimum() - margin, bbox.yMinimum() - margin, bbox.xMaximum() + margin, bbox.yMaximum() + margin)
 
 
-def selection_init(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT):
-    """ Set canvas map tool to an instance of class 'GwSelectManager' """
+def selection_init(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, 
+                   tool_type="rectangle"):
+    """ Set canvas map tool to an instance of selection tool based on tool_type """
     try:
         class_object.rel_feature_type = get_signal_change_tab(dialog, excluded_layers=class_object.excluded_layers)
     except AttributeError as e:
@@ -3461,7 +3462,16 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
     if class_object.rel_feature_type in ('all', None):
         class_object.rel_feature_type = 'arc'
 
-    select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode)
+    # Choose selection tool based on tool_type
+    if tool_type == "polygon":
+        select_manager = GwPolygonSelectManager(class_object, table_object, dialog, selection_mode)
+    elif tool_type == "circle":
+        select_manager = GwCircleSelectManager(class_object, table_object, dialog, selection_mode)
+    elif tool_type == "freehand":
+        select_manager = GwFreehandSelectManager(class_object, table_object, dialog, selection_mode)
+    else:
+        select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode)
+
     global_vars.canvas.setMapTool(select_manager)
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
@@ -3494,10 +3504,141 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
         # Execute deactivation function
         deactivation_function()
 
+def activate_selection_mode(class_object, dialog, table_object, selection_mode, tool_type):
+    """ Selection snapping """
+    add_icon(dialog.btn_snapping, "137")
+    dialog.btn_snapping.clicked.connect(
+        partial(selection_init, class_object, dialog, table_object, selection_mode, tool_type))
+    selection_init(class_object, dialog, table_object, selection_mode, tool_type)
+
+def update_default_action(dialog, action):
+    dialog.btn_snapping.setDefaultAction(action)
+
+def menu_btn_snapping(class_object: Any, dialog: QDialog, table_object: str, selection_mode=GwSelectionMode.DEFAULT, 
+                      callback: Callable[[], bool] | None = None, callback_kwargs: dict[str, Any] | None = None, 
+                      callback_later: Callable = None, callback_values: Callable[[], tuple[Any, Any, Any]] | None = None):
+    """Create snapping button with menu (split button behavior)"""
+
+    def handle_action(tool_type):
+        if callback and callback() is False:
+            return
+        activate_selection_mode(class_object, dialog, table_object, selection_mode, tool_type)
+        if callback_later:
+            callback_later()
+
+    # Action group to keep exclusivity
+    tools = [("rectangle", "137.png"), ("polygon", "180.svg"), ("freehand", "182.svg"), ("circle", "181.svg")]
+    ag = QActionGroup(dialog)
+
+    # Action 1
+    for tool_type, icon_path in tools:
+        icon_path = os.path.join(lib_vars.plugin_dir, "icons", "dialogs", icon_path)
+        action = QAction(QIcon(icon_path), tool_type, dialog)
+        action.setProperty('has_icon', True)
+        action.triggered.connect(partial(handle_action, tool_type))
+        ag.addAction(action)
+
+    # Menu with both actions
+    menu = QMenu(dialog)
+    menu.addActions(ag.actions())
+
+    # Create a QToolButton that behaves like a split button
+    dialog.btn_snapping.setPopupMode(QToolButton.MenuButtonPopup)  # left = default, arrow = menu
+    dialog.btn_snapping.setMenu(menu)
+
+    # Set initial default action
+    dialog.btn_snapping.setDefaultAction(ag.actions()[0])
+
+    menu.triggered.connect(partial(update_default_action, dialog))
+
+    # parent_tab = find_parent_tab(dialog.btn_snapping)
+
+    # expected_table_name = get_expected_table_name(class_object, table_object, selection_mode)
+
+    # widget_table = tools_qt.get_widget(dialog, expected_table_name)
+    # parent_tab_table = find_parent_tab(widget_table)
+
+    # if callback_values and parent_tab_table:
+    #     parent_tab_table.currentChanged.connect(partial(highlight_in_table_changed, callback_values))
+    # if parent_tab:
+    #     parent_tab.currentChanged.connect(partial(highlight_in_tab_changed, class_object, dialog, expected_table_name, parent_tab))
+
+
+def highlight_in_tab_changed(class_object, dialog, expected_table_name, parent_tab):
+    widget = parent_tab.widget(parent_tab.currentIndex())
+    if widget.objectName() in ("tab_relations", "tab_features"):
+        highlight_features_in_table(class_object, dialog, expected_table_name)
+    else:
+        tools_qgis.refresh_map_canvas()
+        reset_rubberband(class_object.rubber_band)
+
+def get_expected_table_name(class_object, table_object, selection_mode):
+    if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+        expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+        expected_table_name = f"tbl_{table_object}_{class_object.rel_feature_type}"
+    else:
+        expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
+    
+    return expected_table_name
+
+
+def highlight_in_table_changed(callback_values: Callable[[], tuple[Any, Any, Any]] | None = None):
+    class_object, dialog, expected_table_name = callback_values()
+    highlight_features_in_table(class_object, dialog, expected_table_name)
+
+
+def find_parent_tab(widget):
+    """Find the parent QTabWidget of a given widget"""
+    current = widget
+    while current is not None:
+        if isinstance(current, QTabWidget):
+            return current
+        current = current.parent()
+    return None
+
+
+def highlight_features_in_table(class_object, dialog, expected_table_name):
+    """Selects all features on the map that are currently listed in the given table widget."""
+
+    # Refresh map canvas
+    tools_qgis.refresh_map_canvas()
+    reset_rubberband(class_object.rubber_band)
+
+    # Get main variables
+    widget_table = tools_qt.get_widget(dialog, expected_table_name)
+    feature_type = class_object.rel_feature_type or expected_table_name.split('_')[-1]
+
+    # Check if table is valid
+    if not widget_table or not widget_table.model() or not feature_type:
+        return
+    
+    model = widget_table.model()
+    if not model or model.rowCount() == 0:
+        remove_selection(layers=class_object.rel_layers)
+        return
+    
+    id_column_name = f"{feature_type}_id"
+    id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
+    if id_column_index == -1:
+        return
+    
+    ids_to_select = [str(model.index(row, id_column_index).data()) for row in range(model.rowCount())]
+
+    if not ids_to_select:
+        remove_selection(layers=class_object.rel_layers)
+        return
+
+    expr_filter = QgsExpression(f"{id_column_name} IN ({','.join(f'{i}' for i in ids_to_select)})")
+    tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
+
+    # Activate rubberband function 
+    tools_qgis.highlight_features_selected_in_table(class_object, dialog, expected_table_name, feature_type)
+
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
-
+    
     if selection_mode != GwSelectionMode.EXPRESSION:
         tools_qgis.disconnect_signal_selection_changed()
 
@@ -3555,6 +3696,8 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Prevent UI interference while updating the table
     table_widget.blockSignals(True)
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
+    
+    
     if selection_mode == GwSelectionMode.PSECTOR:
         _insert_feature_psector(dialog, class_object.rel_feature_type, ids=class_object.rel_list_ids[class_object.rel_feature_type])
         remove_selection()
@@ -3689,6 +3832,14 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
 
     tools_qgis.disconnect_signal_selection_changed()
     feature_type = get_signal_change_tab(dialog)
+
+    # Get expected table name
+    if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+        expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+        expected_table_name = f"tbl_{table_object}_{class_object.rel_feature_type}"
+    else:
+        expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
 
     # Initialize the list for the specific feature type if it doesn't exist
     if feature_type not in class_object.rel_list_ids:
@@ -4378,7 +4529,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     # Update model of the widget with selected expr_filter
     _perform_delete_and_refresh_view(class_object, dialog, table_object, feature_type, selection_mode, list_id,
                                      expr_filter, lazy_widget, lazy_init_function, extra_field, selected_list, widget)
-
+    
     # Select features with previous filter
     # Build a list of feature id's and select them
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.rel_layers)
