@@ -522,12 +522,17 @@ UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname
 UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='remove_from_dscenario' AND tabname='tab_epa';
 UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_valve' WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='tbl_inp_valve' AND tabname='tab_epa';
 
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_shortpipe' WHERE formname='ve_epa_frshortpipe' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_shortpipe' WHERE formname='ve_epa_frshortpipe' AND formtype='form_feature' AND columnname='edit_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_shortpipe' WHERE formname='ve_epa_frshortpipe' AND formtype='form_feature' AND columnname='hspacer_epa_1' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_shortpipe' WHERE formname='ve_epa_frshortpipe' AND formtype='form_feature' AND columnname='remove_from_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields SET linkedobject='tbl_frelem_dsc_shortpipe' WHERE formname='ve_epa_frshortpipe' AND formtype='form_feature' AND columnname='tbl_inp_shortpipe' AND tabname='tab_epa';
+
 DELETE FROM config_form_fields WHERE columnname = 'nodarc_id' and formname ilike 've_epa_fr%';
 
 UPDATE config_form_fields SET widgettype = 'combo', dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve'''
 WHERE formname = 've_epa_frvalve' AND columnname = 'valve_type';
 
-
-UPDATE config_form_fields SET iseditable = TRUE, widgettype = 'combo', 
+UPDATE config_form_fields SET iseditable = TRUE, widgettype = 'combo',
 dv_querytext = 'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_valve'''
-WHERE formname = 've_epa_frvalve' AND columnname = 'status'; 
+WHERE formname = 've_epa_frvalve' AND columnname = 'status';
