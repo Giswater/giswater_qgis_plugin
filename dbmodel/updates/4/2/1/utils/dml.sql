@@ -450,3 +450,7 @@ UPDATE sys_param_user SET sys_role='role_plan' WHERE sys_role='role_master';
 UPDATE sys_message
 	SET hint_message='Please check if your profile has role_plan in order to manage with plan issues'
 	WHERE id=1080;
+
+UPDATE edit_typevalue SET idval = 'FALSE1' WHERE typevalue = 'value_boolean' AND idval = 'UNKNOWN';
+UPDATE edit_typevalue SET idval = 'UNKNOWN' WHERE typevalue = 'value_boolean' AND idval = 'FALSE';
+UPDATE edit_typevalue SET idval = 'FALSE' WHERE typevalue = 'value_boolean' AND idval = 'FALSE1';
