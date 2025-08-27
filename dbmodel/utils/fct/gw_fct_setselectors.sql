@@ -659,7 +659,7 @@ BEGIN
     END IF;
 
 	-- get envelope
-	SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
+	SELECT count(the_geom) INTO v_count FROM v_edit_node LIMIT 1;
 
 	IF v_tabname IN ('tab_sector', 'tab_macrosector','tab_exploitation', 'tab_macroexploitation', 'tab_municipality') THEN
 		SELECT row_to_json (a)
@@ -668,7 +668,7 @@ BEGIN
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc) b) a;
 				
-	ELSIF (v_count_2 > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
+	ELSIF (v_count > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
