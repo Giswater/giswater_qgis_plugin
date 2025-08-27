@@ -332,7 +332,7 @@ BEGIN
 			IF v_tabname = 'tab_exploitation' THEN
 				DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 				INSERT INTO selector_macroexpl
-				SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+				SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND macroexpl_id is not null
 				ON CONFLICT (macroexpl_id, cur_user) DO NOTHING;
 
 			ELSIF v_tabname = 'tab_macroexploitation' THEN
@@ -346,7 +346,7 @@ BEGIN
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 			INSERT INTO selector_macrosector
 			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT (sector_id) FROM node
-			JOIN selector_expl using (expl_id) where cur_user = current_user)
+			JOIN selector_expl using (expl_id) where cur_user = current_user) AND macrosector_id is not null
 			ON CONFLICT (macrosector_id, cur_user) DO NOTHING;
 
 			-- sector
@@ -354,18 +354,33 @@ BEGIN
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-		
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+
+			-- those that are in expl_visibility
 			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+			SELECT DISTINCT sector_id, current_user FROM arc WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(arc.expl_visibility))
 			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+			SELECT DISTINCT sector_id, current_user FROM node WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(node.expl_visibility))
+			UNION	
+			SELECT DISTINCT sector_id, current_user FROM connec WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(connec.expl_visibility))
+			UNION 
+			SELECT DISTINCT sector_id, current_user FROM link WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(link.expl_visibility))
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+
+			-- those that are in expl_visibility
+			INSERT INTO selector_municipality
+			SELECT DISTINCT muni_id, current_user FROM arc WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(arc.expl_visibility))
+			UNION
+			SELECT DISTINCT muni_id, current_user FROM node WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(node.expl_visibility))
+			UNION	
+			SELECT DISTINCT muni_id, current_user FROM connec WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(connec.expl_visibility))
+			UNION 
+			SELECT DISTINCT muni_id, current_user FROM link WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(link.expl_visibility))
+			ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
 		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 
@@ -497,13 +512,6 @@ BEGIN
 		SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
 		ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-		-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
-		INSERT INTO selector_sector
-		SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-		UNION
-		SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-		ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
 		-- scenarios
 		IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
 			DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
@@ -581,11 +589,15 @@ BEGIN
 			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+			-- those that are in expl_visibility
 			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			SELECT DISTINCT sector_id, current_user FROM arc WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(arc.expl_visibility))
 			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			SELECT DISTINCT sector_id, current_user FROM node WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(node.expl_visibility))
+			UNION	
+			SELECT DISTINCT sector_id, current_user FROM connec WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(connec.expl_visibility))
+			UNION 
+			SELECT DISTINCT sector_id, current_user FROM link WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(link.expl_visibility))
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 			-- muni
@@ -593,12 +605,22 @@ BEGIN
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
 
+			-- those that are in expl_visibility
+			INSERT INTO selector_municipality
+			SELECT DISTINCT muni_id, current_user FROM arc WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(arc.expl_visibility))
+			UNION
+			SELECT DISTINCT muni_id, current_user FROM node WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(node.expl_visibility))
+			UNION	
+			SELECT DISTINCT muni_id, current_user FROM connec WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(connec.expl_visibility))
+			UNION 
+			SELECT DISTINCT muni_id, current_user FROM link WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(link.expl_visibility))
+			ON CONFLICT (muni_id, cur_user) DO NOTHING;
+
 			EXECUTE' DELETE FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
 			EXECUTE' INSERT INTO '||v_schemaname||'.selector_municipality 
 			SELECT muni_id, current_user FROM selector_municipality WHERE cur_user = current_user';
 
-			SELECT row_to_json (a)
-			INTO v_geometry
+			SELECT row_to_json (a) INTO v_geometry
 			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1,
 			st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 			FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
@@ -608,6 +630,7 @@ BEGIN
 		EXECUTE 'SET search_path = '||v_schemaname||', public';
 								
 		IF v_sectorisexplismuni IS FALSE THEN
+
 			-- macroexpl
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 			INSERT INTO selector_macroexpl
@@ -632,13 +655,6 @@ BEGIN
 			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 	
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-	
 			-- scenarios
 			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
 				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
@@ -659,20 +675,20 @@ BEGIN
     END IF;
 
 	-- get envelope
-	SELECT count(the_geom) INTO v_count FROM v_edit_node LIMIT 1;
+	SELECT count(the_geom) INTO v_count FROM ve_node LIMIT 1;
 
 	IF v_tabname IN ('tab_sector', 'tab_macrosector','tab_exploitation', 'tab_macroexploitation', 'tab_municipality') THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1,
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc) b) a;
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
 				
 	ELSIF (v_count > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc) b) a;
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
 		
 	ELSIF v_tabname IN ('tab_hydro_state', 'tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
