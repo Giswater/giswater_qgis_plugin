@@ -50,13 +50,13 @@ CREATE RULE dqa_expl AS
    WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
 
 CREATE RULE presszone_expl AS
-    ON UPDATE TO dqa
+    ON UPDATE TO presszone
    WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
 
 CREATE RULE dma_expl AS
-    ON UPDATE TO dqa
+    ON UPDATE TO dma
    WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
 
 CREATE RULE omzone_expl AS
-    ON UPDATE TO dqa
+    ON UPDATE TO omzone
    WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;

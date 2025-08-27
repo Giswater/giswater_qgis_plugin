@@ -45,14 +45,14 @@ CREATE RULE dwfzone_undefined AS
 
 
 -- expl_id is not void
-CREATE RULE dqa_expl AS
-    ON UPDATE TO dqa
+CREATE RULE dma_expl AS
+    ON UPDATE TO dma
    WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
 
 CREATE RULE dwfzone_expl AS
-    ON UPDATE TO dqa
+    ON UPDATE TO dwfzone
    WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
-   
+
 CREATE RULE omzone_expl AS
-    ON UPDATE TO dqa
+    ON UPDATE TO omzone
    WHERE ((new.expl_id = '{}'::integer[]) OR (old.expl_id = '{}'::integer[])) DO INSTEAD NOTHING;
