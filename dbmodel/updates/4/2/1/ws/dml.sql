@@ -965,3 +965,7 @@ UPDATE edit_typevalue
 	SET id='WATERWELL',idval='WATERWELL'
 	WHERE typevalue='presszone_type' AND id='PSV';
 ALTER TABLE edit_typevalue ENABLE TRIGGER ALL;
+
+-- 27/08/2025
+INSERT INTO config_typevalue (typevalue,id,idval) VALUES ('widgettype_typevalue','list','list');
+UPDATE config_form_fields SET widgettype='list' WHERE formname IN('ve_dma', 've_dqa', 've_sector', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_omzone', 've_macroomzone', 've_presszone') AND columnname IN('expl_id', 'sector_id', 'muni_id');

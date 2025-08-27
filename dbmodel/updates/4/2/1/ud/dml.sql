@@ -890,3 +890,8 @@ INSERT INTO edit_typevalue (typevalue,id,idval)
 	VALUES ('drainzone_type','1','STORMWATER');
 INSERT INTO edit_typevalue (typevalue,id,idval)
 	VALUES ('drainzone_type','0','NOT INFORMED');
+
+
+-- 27/08/2025
+INSERT INTO config_typevalue (typevalue,id,idval) VALUES ('widgettype_typevalue','list','list');
+UPDATE config_form_fields SET widgettype='list' WHERE formname IN('ve_dma', 've_sector', 've_macrosector', 've_omzone', 've_macroomzone', 've_dwfzone', 've_drainzone') AND columnname IN('expl_id', 'sector_id', 'muni_id');
