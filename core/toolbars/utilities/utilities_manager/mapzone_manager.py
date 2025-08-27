@@ -1252,7 +1252,7 @@ class GwMapzoneManager:
         active = tools_os.set_boolean(active)
         field_id = tableview.model().headerData(0, Qt.Horizontal)
 
-        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
+        sql = f"UPDATE {view.replace('v_ui_', 've_')} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
