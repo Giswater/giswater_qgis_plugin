@@ -66,8 +66,8 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         tabs = []
-        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa'],
-                        'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma']}
+        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa', 'supplyzone', 'macroomzone', 'omzone'],
+                        'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma', 'macroomzone', 'omzone']}
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
 
@@ -1261,7 +1261,7 @@ class GwMapzoneManager:
     def manage_create(self, dialog, tableview=None):
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '')
+        tablename = tableview.objectName().replace('tbl', '').replace('v_ui_', 've_')
         field_id = tableview.model().headerData(0, Qt.Horizontal)
 
         # Execute getinfofromid
@@ -1315,7 +1315,7 @@ class GwMapzoneManager:
     def _manage_delete(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
+        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1411,7 +1411,7 @@ class GwMapzoneManager:
             return
 
         # Change format when expl_id is an array
-        if tablename != 'v_ui_macrodma' and tablename != 'v_ui_drainzone' and tablename != 'v_ui_dwfzone':
+        if tablename != 've_macrodma' and tablename != 've_drainzone' and tablename != 've_dwfzone':
             if 'expl_id' in my_json:
                 expl_id = my_json['expl_id']
                 if expl_id is not None:
@@ -1436,7 +1436,7 @@ class GwMapzoneManager:
                 my_json['muni_id'] = muni_id
 
         # Change format when sector_id is an array
-        if tablename != 'v_ui_sector':
+        if tablename != 've_sector':
             if 'sector_id' in my_json:
                 sector_id = my_json['sector_id']
                 if sector_id is not None:
