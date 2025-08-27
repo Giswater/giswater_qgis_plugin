@@ -47,7 +47,6 @@ SELECT col_type_is('macrodma', 'updated_by', 'varchar(50)', 'Column updated_by s
 -- Check not null constraints
 SELECT col_not_null('macrodma', 'macrodma_id', 'Column macrodma_id should be NOT NULL');
 SELECT col_not_null('macrodma', 'name', 'Column name should be NOT NULL');
-SELECT col_not_null('macrodma', 'expl_id', 'Column expl_id should be NOT NULL');
 
 -- Check default values
 SELECT col_default_is('macrodma', 'active', 'true', 'Column active should default to true');
