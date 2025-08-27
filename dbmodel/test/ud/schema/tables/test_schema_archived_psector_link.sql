@@ -79,7 +79,7 @@ SELECT col_type_is('archived_psector_link', 'muni_id', 'integer', 'Column muni_i
 SELECT col_type_is('archived_psector_link', 'verified', 'int2', 'Column verified should be int2');
 SELECT col_type_is('archived_psector_link', 'custom_length', 'numeric(12,2)', 'Column custom_length should be numeric(12,2)');
 SELECT col_type_is('archived_psector_link', 'datasource', 'integer', 'Column datasource should be integer');
-SELECT col_type_is('archived_psector_link', 'created_at', 'varchar(50)', 'Column created_at should be varchar(50)');
+SELECT col_type_is('archived_psector_link', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
 SELECT col_type_is('archived_psector_link', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
 
 -- Check default values

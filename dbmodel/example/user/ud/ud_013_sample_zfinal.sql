@@ -179,4 +179,4 @@ INSERT INTO element_x_node SELECT element_id, node_id from man_frelem;
 
 update plan_psector set active=true;
 
-ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
+ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
