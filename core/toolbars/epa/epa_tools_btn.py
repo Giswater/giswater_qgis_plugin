@@ -84,6 +84,8 @@ class GwEpaTools(GwAction):
                     obj_action = QAction(f"{action}", ag)
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self._get_selected_action, action))
+                if action in [tools_qt.tr('Quantized demands'), tools_qt.tr('Valve operation check')]:
+                    obj_action.setVisible(False)
 
         # Remove menu if it is empty
         for menu in self.menu.findChildren(QMenu):
