@@ -150,3 +150,5 @@ LEFT JOIN cat_feature cf ON ce.element_type::text = cf.id::text
 WHERE cf.feature_class='GENELEM';
 
 update plan_psector set active = true;
+
+update element set code = element_id;
