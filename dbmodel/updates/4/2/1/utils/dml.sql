@@ -412,3 +412,7 @@ UPDATE config_form_list SET query_text = concat(query_text, ' AND "schema" = '''
 INSERT INTO config_param_system ("parameter",value,descript,"label",dv_querytext,dv_filterbyfield,isenabled,layoutorder,project_type,dv_isparent,isautoupdate,"datatype",widgettype,ismandatory,iseditable,dv_orderby_id,dv_isnullvalue,stylesheet,widgetcontrols,placeholder,standardvalue,layoutname) VALUES
 	 ('basic_selector_sectorisexplismuni','false','Variable to configure that explotation and sector has the same code in order to make a direct correlation one each other','Selector variables',NULL,NULL,true,NULL,'utils',NULL,NULL,'boolean',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)
 	 on conflict (parameter) do nothing;
+
+-- 27/08/2025
+UPDATE config_form_fields SET widgetcontrols='{ "minRole": "role_plan"}'::json
+WHERE formname='generic' AND formtype='check_project' AND columnname='plan_check' AND tabname='tab_data';

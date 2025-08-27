@@ -518,3 +518,7 @@ UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_pr_reduc_
 UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_pr_susta_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
 UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_shutoff_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
 UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_throttle_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+
+-- 27/08/2025
+UPDATE config_form_fields SET widgetcontrols='{ "minRole": "role_plan"}'::json
+WHERE formname='generic' AND formtype='check_project' AND columnname='plan_check' AND tabname='tab_data';
