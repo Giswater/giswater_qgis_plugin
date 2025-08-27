@@ -416,3 +416,15 @@ INSERT INTO config_param_system ("parameter",value,descript,"label",dv_querytext
 -- 27/08/2025
 UPDATE config_form_fields SET widgetcontrols='{ "minRole": "role_plan"}'::json
 WHERE formname='generic' AND formtype='check_project' AND columnname='plan_check' AND tabname='tab_data';
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden) VALUES ('ve_epa_tank','form_feature','tab_epa','reaction_coeff','lyt_epa_data_1',10,'string','text','Reaction coefficient:','Reaction coefficient',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+UPDATE config_form_fields SET layoutorder=11 WHERE formname='ve_epa_tank' AND formtype='form_feature' AND columnname='init_quality' AND tabname='tab_epa';
+UPDATE config_form_fields SET layoutorder=12 WHERE formname='ve_epa_tank' AND formtype='form_feature' AND columnname='source_type' AND tabname='tab_epa';
+UPDATE config_form_fields SET layoutorder=13 WHERE formname='ve_epa_tank' AND formtype='form_feature' AND columnname='source_quality' AND tabname='tab_epa';
+UPDATE config_form_fields SET layoutorder=14 WHERE formname='ve_epa_tank' AND formtype='form_feature' AND columnname='source_pattern_id' AND tabname='tab_epa';
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden) VALUES ('ve_inp_tank','form_feature','tab_epa','reaction_coeff','lyt_epa_data_1',10,'string','text','Reaction coefficient:','Reaction coefficient',false,false,true,false,false,'{"filterSign":"ILIKE"}'::json,false);
+UPDATE config_form_fields SET layoutorder=11 WHERE formname='ve_inp_tank' AND formtype='form_feature' AND columnname='init_quality' AND tabname='tab_epa';
+UPDATE config_form_fields SET layoutorder=12 WHERE formname='ve_inp_tank' AND formtype='form_feature' AND columnname='source_type' AND tabname='tab_epa';
+UPDATE config_form_fields SET layoutorder=13 WHERE formname='ve_inp_tank' AND formtype='form_feature' AND columnname='source_quality' AND tabname='tab_epa';
+UPDATE config_form_fields SET layoutorder=14 WHERE formname='ve_inp_tank' AND formtype='form_feature' AND columnname='source_pattern_id' AND tabname='tab_epa';
