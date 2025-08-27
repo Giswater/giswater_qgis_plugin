@@ -192,7 +192,7 @@ BEGIN
 				FROM information_schema.view_column_usage c
 				JOIN pg_views v 
 				    ON c.view_schema = v.schemaname 
-				    AND c.view_name = v.viewname
+				    AND c.v_view_name = v.viewname
 				WHERE v.viewname = v_origin_table
 				AND table_schema = CURRENT_SCHEMA 
 				)

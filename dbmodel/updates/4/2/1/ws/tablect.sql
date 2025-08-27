@@ -10,3 +10,36 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE rpt_cat_result DROP CONSTRAINT IF EXISTS rpt_cat_result_network_dma_corporate;
 ALTER TABLE rpt_cat_result ADD CONSTRAINT rpt_cat_result_network_dma_corporate CHECK (NOT (iscorporate = TRUE AND network_type = '5'));
+
+
+CREATE RULE omzone_conflict AS
+    ON UPDATE TO omzone
+   WHERE ((new.omzone_id = '-1'::integer) OR (old.omzone_id = '-1'::integer)) DO INSTEAD NOTHING;
+
+CREATE RULE omzone_undefined AS
+    ON UPDATE TO omzone
+   WHERE ((new.omzone_id = 0) OR (old.omzone_id = 0)) DO INSTEAD NOTHING;
+
+CREATE RULE dma_conflict AS
+    ON UPDATE TO dma
+   WHERE ((new.dma_id = '-1'::integer) OR (old.dma_id = '-1'::integer)) DO INSTEAD NOTHING;
+
+CREATE RULE dma_undefined AS
+    ON UPDATE TO dma
+   WHERE ((new.dma_id = 0) OR (old.dma_id = 0)) DO INSTEAD NOTHING;
+
+CREATE RULE presszone_conflict AS
+    ON UPDATE TO presszone
+   WHERE ((new.presszone_id = '-1'::integer) OR (old.presszone_id = '-1'::integer)) DO INSTEAD NOTHING;
+
+CREATE RULE presszone_undefined AS
+    ON UPDATE TO presszone
+   WHERE ((new.presszone_id = 0) OR (old.presszone_id = 0)) DO INSTEAD NOTHING;
+   
+CREATE RULE dqa_conflict AS
+    ON UPDATE TO dqa
+   WHERE ((new.dqa_id = '-1'::integer) OR (old.dqa_id = '-1'::integer)) DO INSTEAD NOTHING;
+
+CREATE RULE dqa_undefined AS
+    ON UPDATE TO dqa
+   WHERE ((new.dqa_id = 0) OR (old.dqa_id = 0)) DO INSTEAD NOTHING;

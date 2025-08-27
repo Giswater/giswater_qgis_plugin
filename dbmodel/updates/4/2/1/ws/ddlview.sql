@@ -140,3 +140,522 @@ AS SELECT inp_connec.connec_id,
     v_rpt_node_stats.quality_avg AS qualavg
    FROM inp_connec
      LEFT JOIN v_rpt_node_stats ON inp_connec.connec_id::text = v_rpt_node_stats.node_id::text;
+
+-- Refactor mapzones
+DROP VIEW IF EXISTS v_ui_omzone;
+DROP VIEW IF EXISTS ve_omzone;
+DROP VIEW IF EXISTS v_ui_sector;
+DROP VIEW IF EXISTS ve_sector;
+DROP VIEW IF EXISTS v_ui_dma;
+DROP VIEW IF EXISTS ve_dma;
+DROP VIEW IF EXISTS v_ui_dqa;
+DROP VIEW IF EXISTS ve_dqa;
+DROP VIEW IF EXISTS v_ui_presszone;
+DROP VIEW IF EXISTS ve_presszone;
+DROP VIEW IF EXISTS v_ui_supplyzone;
+DROP VIEW IF EXISTS ve_supplyzone;
+DROP VIEW IF EXISTS v_ui_macrosector;
+DROP VIEW IF EXISTS ve_macrosector;
+DROP VIEW IF EXISTS v_ui_macroomzone;
+DROP VIEW IF EXISTS ve_macroomzone;
+DROP VIEW IF EXISTS v_ui_macrodma;
+DROP VIEW IF EXISTS ve_macrodma;
+DROP VIEW IF EXISTS v_ui_macrodqa;
+DROP VIEW IF EXISTS ve_macrodqa;
+
+CREATE VIEW v_ui_omzone
+AS SELECT DISTINCT ON (o.omzone_id) o.omzone_id,
+    o.code,
+    o.name,
+    o.descript,
+    o.active,
+    et.idval AS omzone_type,
+    mo.name AS macroomzone,
+    o.expl_id,
+    o.sector_id,
+    o.muni_id,
+    o.graphconfig,
+    o.stylesheet,
+    o.lock_level,
+    o.link,
+    o.addparam,
+    o.created_at,
+    o.created_by,
+    o.updated_at,
+    o.updated_by
+   FROM selector_expl se, omzone o
+     LEFT JOIN macroomzone mo USING (macroomzone_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = o.omzone_type::text AND et.typevalue::text = 'omzone_type'::text
+  WHERE se.expl_id = ANY(o.expl_id) AND se.cur_user = CURRENT_USER AND o.omzone_id > 0
+  ORDER BY o.omzone_id;
+
+CREATE VIEW ve_omzone
+AS SELECT DISTINCT ON (o.omzone_id) o.omzone_id,
+    o.code,
+    o.name,
+    o.descript,
+    o.active,
+    o.omzone_type,
+    o.macroomzone_id,
+    o.expl_id,
+    o.sector_id,
+    o.muni_id,
+    o.graphconfig,
+    o.stylesheet,
+    o.lock_level,
+    o.link,
+    o.addparam,
+    o.created_at,
+    o.created_by,
+    o.updated_at,
+    o.updated_by,
+    o.the_geom
+   FROM selector_expl se, omzone o
+  WHERE se.expl_id = ANY(o.expl_id) AND se.cur_user = CURRENT_USER AND o.omzone_id > 0
+  ORDER BY o.omzone_id;
+
+CREATE OR REPLACE VIEW v_ui_sector
+AS SELECT DISTINCT ON (s.sector_id) s.sector_id,
+    s.code,
+    s.name,
+    s.descript,
+    s.active,
+    et.idval AS sector_type,
+    ms.name AS macrosector,
+    s.expl_id,
+    s.muni_id,
+    s.avg_press,
+    s.pattern_id,
+    s.graphconfig::text,
+    s.stylesheet::text,
+    s.lock_level,
+    s.link,
+    s.addparam::text,
+    s.created_at,
+    s.created_by,
+    s.updated_at,
+    s.updated_by
+   FROM selector_sector ss, sector s
+     LEFT JOIN macrosector ms USING (macrosector_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+  WHERE ss.sector_id = s.sector_id AND ss.cur_user = CURRENT_USER AND s.sector_id > 0
+  ORDER BY s.sector_id;
+
+CREATE OR REPLACE VIEW ve_sector
+AS SELECT DISTINCT ON (s.sector_id) s.sector_id,
+    s.code,
+    s.name,
+    s.descript,
+    s.active,
+    s.sector_type,
+    s.macrosector_id,
+    s.expl_id,
+    s.muni_id,
+    s.avg_press,
+    s.pattern_id,
+    s.graphconfig::text,
+    s.stylesheet::text,
+    s.lock_level,
+    s.link,
+    s.addparam::text,
+    s.created_at,
+    s.created_by,
+    s.updated_at,
+    s.updated_by,
+    s.the_geom
+  FROM selector_sector ss, sector s
+  WHERE ss.sector_id = s.sector_id AND ss.cur_user = CURRENT_USER AND s.sector_id > 0
+  ORDER BY s.sector_id;
+
+
+CREATE OR REPLACE VIEW v_ui_dma
+AS SELECT DISTINCT ON (d.dma_id) d.dma_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    et.idval AS dma_type,
+    md.name AS macrodma,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.effc,
+    d.graphconfig::text,
+    d.stylesheet::text,
+    d.lock_level,
+    d.link,
+    d.addparam::text,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
+   FROM selector_expl se, dma d
+     LEFT JOIN macrodma md USING (macrodma_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = d.dma_type::text AND et.typevalue::text = 'dma_type'::text
+  WHERE se.expl_id = ANY(d.expl_id) AND se.cur_user = CURRENT_USER AND d.dma_id > 0
+  ORDER BY d.dma_id;
+
+CREATE OR REPLACE VIEW ve_dma
+AS SELECT DISTINCT ON (d.dma_id) d.dma_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    d.dma_type,
+    d.macrodma_id,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.effc,
+    d.graphconfig::text,
+    d.stylesheet::text,
+    d.lock_level,
+    d.link,
+    d.addparam::text,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by,
+    d.the_geom
+   FROM selector_expl se, dma d
+  WHERE se.expl_id = ANY(d.expl_id) AND se.cur_user = CURRENT_USER AND d.dma_id > 0
+  ORDER BY d.dma_id;
+
+CREATE OR REPLACE VIEW v_ui_dqa
+AS SELECT DISTINCT ON (d.dqa_id) d.dqa_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    et.idval AS dqa_type,
+    md.name AS macrodqa,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.graphconfig::text,
+    d.stylesheet::text,
+    d.lock_level,
+    d.link,
+    d.addparam::text,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
+   FROM selector_expl se, dqa d
+     LEFT JOIN macrodqa md USING (macrodqa_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = d.dqa_type::text AND et.typevalue::text = 'dqa_type'::text
+  WHERE se.expl_id = ANY(d.expl_id) AND se.cur_user = CURRENT_USER AND d.dqa_id > 0
+  ORDER BY d.dqa_id;
+
+CREATE OR REPLACE VIEW ve_dqa
+AS SELECT DISTINCT ON (d.dqa_id) d.dqa_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    d.dqa_type,
+    d.macrodqa_id,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.graphconfig::text,
+    d.stylesheet::text,
+    d.lock_level,
+    d.link,
+    d.addparam::text,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by,
+    d.the_geom
+   FROM selector_expl se, dqa d
+  WHERE se.expl_id = ANY(d.expl_id) AND se.cur_user = CURRENT_USER AND d.dqa_id > 0
+  ORDER BY d.dqa_id;
+
+CREATE OR REPLACE VIEW v_ui_presszone
+AS SELECT DISTINCT ON (p.presszone_id) p.presszone_id,
+    p.code,
+    p.name,
+    p.descript,
+    p.active,
+    et.idval AS presszone_type,
+    p.expl_id,
+    p.sector_id,
+    p.muni_id,
+    p.avg_press,
+    p.head,
+    p.graphconfig::text,
+    p.stylesheet::text,
+    p.lock_level,
+    p.link,
+    p.addparam::text,
+    p.created_at,
+    p.created_by,
+    p.updated_at,
+    p.updated_by
+   FROM selector_expl se, presszone p
+     LEFT JOIN edit_typevalue et ON et.id::text = p.presszone_type::text AND et.typevalue::text = 'presszone_type'::text
+  WHERE se.expl_id = ANY(p.expl_id) AND se.cur_user = CURRENT_USER AND p.presszone_id > 0
+  ORDER BY p.presszone_id;
+
+CREATE OR REPLACE VIEW ve_presszone
+AS SELECT DISTINCT ON (p.presszone_id) p.presszone_id,
+    p.code,
+    p.name,
+    p.descript,
+    p.active,
+    p.presszone_type,
+    p.expl_id,
+    p.sector_id,
+    p.muni_id,
+    p.avg_press,
+    p.head,
+    p.graphconfig::text,
+    p.stylesheet::text,
+    p.lock_level,
+    p.link,
+    p.addparam::text,
+    p.created_at,
+    p.created_by,
+    p.updated_at,
+    p.updated_by,
+    p.the_geom
+   FROM selector_expl se, presszone p
+  WHERE se.expl_id = ANY(p.expl_id) AND se.cur_user = CURRENT_USER AND p.presszone_id > 0
+  ORDER BY p.presszone_id;
+
+CREATE OR REPLACE VIEW v_ui_supplyzone
+AS SELECT DISTINCT ON (supplyzone_id) supplyzone_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    et.idval AS supplyzone_type,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.graphconfig::text,
+    d.stylesheet::text,
+    d.lock_level,
+    d.link,
+    d.addparam::text,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
+   FROM supplyzone d
+     LEFT JOIN edit_typevalue et ON et.id::text = d.supplyzone_type::text AND et.typevalue::text = 'supplyzone_type'::text
+  WHERE supplyzone_id > 0
+  ORDER BY supplyzone_id;
+
+CREATE OR REPLACE VIEW ve_supplyzone
+AS SELECT DISTINCT ON (supplyzone_id) supplyzone_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    d.supplyzone_type,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.graphconfig::text,
+    d.stylesheet::text,
+    d.lock_level,
+    d.link,
+    d.addparam::text,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by,
+    d.the_geom
+   FROM supplyzone d
+  WHERE supplyzone_id > 0
+  ORDER BY supplyzone_id;
+
+CREATE OR REPLACE VIEW v_ui_macroomzone
+AS SELECT DISTINCT ON (macroomzone_id) macroomzone_id,
+    code,
+    name,
+    descript,
+    active,
+    expl_id,
+    sector_id,
+    muni_id,
+    stylesheet::text,
+    lock_level,
+    link,
+    addparam::text,
+    created_at,
+    created_by,
+    updated_at,
+    updated_by
+   FROM macroomzone m
+  WHERE macroomzone_id > 0
+  ORDER BY macroomzone_id;
+
+CREATE OR REPLACE VIEW ve_macroomzone
+AS SELECT DISTINCT ON (macroomzone_id) macroomzone_id,
+    code,
+    name,
+    descript,
+    active,
+    expl_id,
+    sector_id,
+    muni_id,
+    stylesheet::text,
+    lock_level,
+    link,
+    addparam::text,
+    created_at,
+    created_by,
+    updated_at,
+    updated_by,
+    the_geom
+   FROM macroomzone m
+  WHERE macroomzone_id > 0
+  ORDER BY macroomzone_id;
+
+
+CREATE OR REPLACE VIEW v_ui_macrodma
+AS SELECT DISTINCT ON (m.macrodma_id) m.macrodma_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.active,
+    m.expl_id,  
+    m.sector_id,
+    m.muni_id,
+    m.stylesheet::text,
+    m.lock_level,
+    m.link,
+    m.addparam::text,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by
+   FROM selector_expl se,
+    macrodma m
+  WHERE m.macrodma_id > 0
+  ORDER BY m.macrodma_id;
+
+CREATE OR REPLACE VIEW ve_macrodma
+AS SELECT DISTINCT ON (m.macrodma_id) m.macrodma_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.active,
+    m.expl_id,  
+    m.sector_id,
+    m.muni_id,
+    m.stylesheet::text,
+    m.lock_level,
+    m.link,
+    m.addparam::text,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by,
+    m.the_geom
+   FROM selector_expl se,
+    macrodma m
+  WHERE (se.expl_id = ANY (m.expl_id)) AND se.cur_user = CURRENT_USER AND m.active IS TRUE;
+
+CREATE OR REPLACE VIEW v_ui_macrodqa
+AS SELECT DISTINCT ON (m.macrodqa_id) m.macrodqa_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.active,
+    m.expl_id,
+    m.sector_id,
+    m.muni_id,
+    m.stylesheet::text,
+    m.lock_level,
+    m.link,
+    m.addparam::text,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by
+   FROM selector_expl se,
+    macrodqa m
+  WHERE m.macrodqa_id > 0
+  ORDER BY m.macrodqa_id;
+
+CREATE OR REPLACE VIEW ve_macrodqa
+AS SELECT DISTINCT ON (m.macrodqa_id) m.macrodqa_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.active,
+    m.expl_id,
+    m.sector_id,
+    m.muni_id,
+    m.stylesheet::text,
+    m.lock_level,
+    m.link,
+    m.addparam::text,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by,
+    m.the_geom
+   FROM selector_expl se,
+    macrodqa m
+  WHERE m.macrodqa_id > 0
+  ORDER BY m.macrodqa_id;
+
+CREATE OR REPLACE VIEW v_ui_macrosector
+AS SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.active,
+    m.expl_id,
+    m.muni_id,
+    m.stylesheet::text,
+    m.lock_level,
+    m.link,
+    m.addparam::text,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by
+   FROM selector_sector ss,
+    macrosector m
+  WHERE m.macrosector_id > 0
+  ORDER BY m.macrosector_id;
+
+CREATE OR REPLACE VIEW ve_macrosector
+AS SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.active,
+    m.expl_id,
+    m.muni_id,
+    m.stylesheet::text,
+    m.lock_level,
+    m.link,
+    m.addparam::text,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by,
+    m.the_geom
+   FROM selector_sector ss,
+    macrosector m
+  WHERE m.macrosector_id > 0
+  ORDER BY m.macrosector_id;

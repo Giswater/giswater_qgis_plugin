@@ -81,3 +81,59 @@ CREATE INDEX archived_psector_link_index ON archived_psector_link USING gist (th
 CREATE INDEX archived_psector_link_muni ON archived_psector_link USING btree (muni_id);
 
 ALTER TABLE macrodma ALTER COLUMN expl_id DROP NOT NULL;
+ALTER TABLE macroomzone ALTER COLUMN expl_id DROP NOT NULL;
+ALTER TABLE macrodqa ALTER COLUMN expl_id DROP NOT NULL;
+
+DROP RULE IF EXISTS dma_conflict ON dma;
+DROP RULE IF EXISTS dma_undefined ON dma;
+UPDATE dma SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+ALTER TABLE dma ALTER COLUMN expl_id SET NOT NULL;
+
+DROP RULE IF EXISTS dqa_conflict ON dqa;
+DROP RULE IF EXISTS dqa_undefined ON dqa;
+UPDATE dqa SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+ALTER TABLE dqa ALTER COLUMN expl_id SET NOT NULL;
+
+DROP RULE IF EXISTS omzone_conflict ON omzone;
+DROP RULE IF EXISTS omzone_undefined ON omzone;
+UPDATE omzone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+ALTER TABLE omzone ALTER COLUMN expl_id SET NOT NULL;
+
+DROP RULE IF EXISTS presszone_conflict ON presszone;
+DROP RULE IF EXISTS presszone_undefined ON presszone;
+UPDATE presszone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+ALTER TABLE presszone ALTER COLUMN expl_id SET NOT NULL;
+
+-- 25/08/2025
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"omzone", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"omzone", "column":"graphconfig", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"omzone", "column":"stylesheet", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"omzone", "column":"sector_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"supplyzone", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"supplyzone", "column":"sector_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"supplyzone", "column":"muni_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"expl_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"muni_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"stylesheet", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macroomzone", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macroomzone", "column":"expl_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macroomzone", "column":"sector_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macroomzone", "column":"muni_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macroomzone", "column":"stylesheet", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macroomzone", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", "column":"sector_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", "column":"muni_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", "column":"stylesheet", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodqa", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodqa", "column":"sector_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodqa", "column":"muni_id", "dataType":"int4[]", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodqa", "column":"stylesheet", "dataType":"json", "isUtils":"False"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodqa", "column":"link", "dataType":"text", "isUtils":"False"}}$$);

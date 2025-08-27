@@ -769,11 +769,10 @@ BEGIN
 			-- getting id from URN
 			IF v_id IS NULL AND v_isepa IS true THEN
 			    v_id = '';
-			ELSIF v_id IS NULL AND v_tablename in  ('v_ui_dma', 'v_ui_dqa', 'v_ui_sector', 'v_ui_drainzone', 'v_ui_supplyzone', 'v_ui_macrodma', 'v_ui_macrosector', 'v_ui_dwfzone', 'v_ui_omzone', 'v_ui_macroomzone') THEN
-				v_zone = replace(v_tablename,'v_ui_','');
-				v_id = (SELECT nextval(concat('SCHEMA_NAME.',v_zone,'_',v_zone,'_id_seq')));
-			ELSIF v_id IS NULL AND v_tablename = 'v_ui_presszone' THEN
-				 select max(presszone_id::integer)+1 INTO v_id from presszone where presszone_id::text ~ '^[0-9]+$';
+			ELSIF v_id IS NULL AND v_tablename in  ('ve_dma', 've_dqa', 've_sector', 've_drainzone', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_dwfzone', 've_omzone', 've_macroomzone', 've_presszone') THEN
+				v_zone = replace(v_tablename,'ve_','');
+				v_querystring = format('SELECT max(%I_id::integer)+1 FROM %I WHERE %I_id::text ~ ''^[0-9]+$''', v_zone, v_zone, v_zone);
+				EXECUTE v_querystring INTO v_id;
             ELSIF v_id IS NULL AND v_featuretype = 'flwreg' THEN
                 -- WARNING: this code is also in gw_fct_getfeatureupsert. If it needs to be changed here, it will most likely have to be changed there too.
                 -- Get node id from initial clicked point

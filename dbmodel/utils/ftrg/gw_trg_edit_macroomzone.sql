@@ -12,9 +12,8 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_macroomzone()
 $BODY$
 
 DECLARE
-
 	v_view_name TEXT; -- EDIT | UI
-
+	v_macroomzone_id INTEGER;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -49,18 +48,20 @@ BEGIN
 			END IF;
 		END IF;
 
-		IF v_view_name = 'UI' THEN
-			IF NEW.active IS NULL THEN
-				NEW.active = TRUE;
-			END IF;
+		SELECT max(macroomzone_id::integer)+1 INTO v_macroomzone_id FROM macroomzone WHERE macroomzone_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_macroomzone_id::text;
 		END IF;
 
-	   INSERT INTO macroomzone (macroomzone_id, code, name, descript, expl_id, lock_level)
-	   VALUES (NEW.macroomzone_id, NEW.macroomzone_id, NEW.name, NEW.descript, NEW.expl_id, NEW.lock_level);
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
+		END IF;
 
-    	IF v_view_name = 'UI' THEN
-			UPDATE macroomzone SET active = NEW.active WHERE macroomzone_id = NEW.macroomzone_id;
-		ELSIF v_view_name = 'EDIT' THEN
+	   INSERT INTO macroomzone (macroomzone_id, code, name, descript, active, expl_id, sector_id, muni_id, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
+	   VALUES (v_macroomzone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.expl_id, NEW.sector_id, NEW.muni_id, 
+	   NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
+
+    	IF v_view_name = 'EDIT' THEN
 			UPDATE macroomzone SET the_geom = NEW.the_geom WHERE macroomzone_id = NEW.macroomzone_id;
 		END IF;
 
@@ -68,12 +69,11 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE macroomzone
-		SET macroomzone_id=NEW.macroomzone_id, name=NEW.name, descript=NEW.descript, expl_id=NEW.expl_id, lock_level=NEW.lock_level
+		SET macroomzone_id=NEW.macroomzone_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, expl_id=NEW.expl_id, sector_id=NEW.sector_id, 
+		muni_id=NEW.muni_id, stylesheet=NEW.stylesheet::json, link=NEW.link, lock_level=NEW.lock_level, addparam=NEW.addparam::json, updated_at=now(), updated_by = current_user
 		WHERE macroomzone_id=NEW.macroomzone_id;
 
-		IF v_view_name = 'UI' THEN
-			UPDATE macroomzone SET active = NEW.active WHERE macroomzone_id = OLD.macroomzone_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE macroomzone SET the_geom = NEW.the_geom WHERE macroomzone_id = OLD.macroomzone_id;
 		END IF;
 

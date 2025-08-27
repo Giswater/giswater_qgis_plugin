@@ -14,6 +14,7 @@ $BODY$
 DECLARE
 
 	v_view_name TEXT; -- EDIT | UI
+	v_macrodma_id integer;
 
 BEGIN
 
@@ -49,18 +50,20 @@ BEGIN
 			END IF;
 		END IF;
 
-		IF v_view_name = 'UI' THEN
-			IF NEW.active IS NULL THEN
-				NEW.active = TRUE;
-			END IF;
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
 		END IF;
 
-	   INSERT INTO macrodma (macrodma_id, code, name, descript, expl_id, lock_level)
-	   VALUES (NEW.macrodma_id, NEW.macrodma_id, NEW.name, NEW.descript, NEW.expl_id, NEW.lock_level);
+		SELECT max(macrodma_id::integer)+1 INTO v_macrodma_id FROM macrodma WHERE macrodma_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_macrodma_id::text;
+		END IF;
 
-    	IF v_view_name = 'UI' THEN
-			UPDATE macrodma SET active = NEW.active WHERE macrodma_id = NEW.macrodma_id;
-		ELSIF v_view_name = 'EDIT' THEN
+	   INSERT INTO macrodma (macrodma_id, code, name, descript, active, expl_id, sector_id, muni_id, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
+	   VALUES (v_macrodma_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.expl_id, NEW.sector_id, NEW.muni_id, 
+	   NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
+
+    	IF v_view_name = 'EDIT' THEN
 			UPDATE macrodma SET the_geom = NEW.the_geom WHERE macrodma_id = NEW.macrodma_id;
 		END IF;
 
@@ -68,12 +71,11 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE macrodma
-		SET macrodma_id=NEW.macrodma_id, name=NEW.name, descript=NEW.descript, expl_id=NEW.expl_id, lock_level=NEW.lock_level
+		SET macrodma_id=NEW.macrodma_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, expl_id=NEW.expl_id, sector_id=NEW.sector_id, 
+		muni_id=NEW.muni_id, stylesheet=NEW.stylesheet::json, link=NEW.link, lock_level=NEW.lock_level, addparam=NEW.addparam::json, updated_at=now(), updated_by = current_user
 		WHERE macrodma_id=NEW.macrodma_id;
 
-		IF v_view_name = 'UI' THEN
-			UPDATE macrodma SET active = NEW.active WHERE macrodma_id = OLD.macrodma_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE macrodma SET the_geom = NEW.the_geom WHERE macrodma_id = OLD.macrodma_id;
 		END IF;
 

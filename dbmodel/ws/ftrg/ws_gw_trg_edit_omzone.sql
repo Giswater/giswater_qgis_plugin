@@ -11,40 +11,44 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_omzone()  RETURNS trigger A
 $BODY$
 
 DECLARE
-view_name TEXT;
-
+	v_view_name TEXT;
+	v_omzone_id INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	view_name = TG_ARGV[0];
+	v_view_name = TG_ARGV[0];
 
-	IF TG_OP = 'INSERT' THEN
+    IF TG_OP = 'INSERT' THEN
 
 		-- expl_id
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 			RETURN NULL;
 		END IF;
 
-		INSERT INTO omzone (omzone_id, code, name, descript, omzone_type, muni_id, expl_id, macroomzone_id, link, lock_level)
-		VALUES (NEW.omzone_id, NEW.code, NEW.name, NEW.descript, NEW.omzone_type, NEW.muni_id, NEW.expl_id, NEW.macroomzone_id, NEW.link, NEW.lock_level);
+		SELECT max(omzone_id::integer)+1 INTO v_omzone_id FROM omzone WHERE omzone_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_omzone_id::text;
+		END IF;
 
-		IF view_name = 'UI' THEN
-			IF NEW.active IS NULL THEN
-				NEW.active = TRUE;
-			END IF;
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
+		END IF;
 
-			UPDATE omzone SET active = NEW.active WHERE omzone_id = NEW.omzone_id;
-
-		ELSIF view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			IF NEW.the_geom IS NOT NULL THEN
 				IF NEW.expl_id IS NULL THEN
 					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				END IF;
 			END IF;
+		END IF;
 
+		INSERT INTO omzone (omzone_id, code, name, descript, active, macroomzone_id, expl_id, sector_id, muni_id, graphconfig, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
+		VALUES (v_omzone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.macroomzone_id, NEW.expl_id, NEW.sector_id, NEW.muni_id, 
+		NEW.graphconfig::json, NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
+
+		IF v_view_name = 'EDIT' THEN
 			UPDATE omzone SET the_geom = NEW.the_geom WHERE omzone_id = NEW.omzone_id;
-
 		END IF;
 
 		RETURN NEW;
@@ -52,16 +56,13 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE omzone
-		SET code=NEW.code, name=NEW.name, descript=NEW.descript, omzone_type=NEW.omzone_type, muni_id=NEW.muni_id, expl_id=NEW.expl_id,
-		macroomzone_id=NEW.macroomzone_id, link=NEW.link, lock_level=NEW.lock_level
+		SET omzone_id=NEW.omzone_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, macroomzone_id = NEW.macroomzone_id, expl_id=NEW.expl_id,
+		sector_id=NEW.sector_id, muni_id=NEW.muni_id, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet, link=NEW.link, lock_level=NEW.lock_level, addparam=NEW.addparam::json,
+		updated_at=now(), updated_by = current_user
 		WHERE omzone_id=OLD.omzone_id;
 
-		IF view_name = 'UI' THEN
-			UPDATE omzone SET active = NEW.active WHERE omzone_id = OLD.omzone_id;
-
-		ELSIF view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE omzone SET the_geom = NEW.the_geom WHERE omzone_id = OLD.omzone_id;
-
 		END IF;
 
 		RETURN NEW;
