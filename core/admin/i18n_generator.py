@@ -884,7 +884,7 @@ class GwI18NGenerator:
         try:
             # Try JSON first (safer if it's valid JSON)
             # First handle empty values 
-            print(text)
+
             modified = text.replace("False", "false").replace("True", "true").replace("None", "null")
             
             #Save values in special cases
@@ -933,8 +933,8 @@ class GwI18NGenerator:
             # Reload values in special cases
             modified = modified.replace(': "a"', ': ""')
             modified = modified.replace("',a'. ", "','. ").replace("a'T',a'TANK'a", "'T','TANK'").replace("-999,a'ALL", "-999, 'ALL'")
-            print(modified)
-            return json.loads(modified)
+
+            return json.loads(modified.replace("None", "null"))
         except json.JSONDecodeError as e:
             msg = "Error parsing JSON source: {0} - e1: {1} -- {2}"
             msg_params = (source, e, modified)

@@ -10,9 +10,9 @@ from typing import Optional, List, Any, Dict, Union
 import os
 
 from qgis.PyQt.QtCore import QDate, QModelIndex
-from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QIcon
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QTextEdit, QCompleter, \
-    QTableView, QToolBar, QActionGroup, QDialog, QAction, QToolButton, QMenu
+    QTableView, QToolBar, QActionGroup, QDialog
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
