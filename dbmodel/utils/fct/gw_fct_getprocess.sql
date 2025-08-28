@@ -101,7 +101,7 @@ BEGIN
 
 		if v_function_id in (3142, 3110) then
 			-- get enddate proposal for demand dscenarios
-			PERFORM gw_fct_create_dscenario_from_crm($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"step":1, "exploitation":"1"}}}$$);
+			PERFORM gw_fct_create_dscenario_from_crm($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"step":1, "exploitation":"1"}}}$$);
 			PERFORM gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"step":"1"}}}$$)::text;
 		end if;
 
