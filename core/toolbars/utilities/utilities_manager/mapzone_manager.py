@@ -66,8 +66,8 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         tabs = []
-        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa', 'supplyzone', 'macroomzone', 'omzone'],
-                        'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma', 'macroomzone', 'omzone']}
+        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa', 'macroomzone'],
+                        'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma', 'macroomzone']}
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
 
@@ -1391,7 +1391,17 @@ class GwMapzoneManager:
 
         # Get all widget's values
         for widget in widgets:
+            object_name = widget.objectName()
             tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)
+
+            if object_name == 'tab_none_created_at':
+                value = widget.text()
+                if value is not None and 'T' in value and '.' in value:
+                    widget.setText(value.split('.')[0].replace('T', ' - ') + '.' + value.split('.')[1][0:2])
+            if object_name == 'tab_none_updated_at':
+                value = widget.text()
+                if value is not None and 'T' in value and '.' in value:
+                    widget.setText(value.split('.')[0].replace('T', ' - ') + '.' + value.split('.')[1][0:2])
 
         # Remove Nones from self.my_json_add
         keys_to_remove = []
