@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from .campaign import Campaign
 from ..dialog import GwAction
+from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
 from ....libs import tools_qt, tools_db
@@ -35,10 +36,10 @@ class GwAddCampaignButton(GwAction):
         # Fetch and parse the campaign type configuration from the database for other roles
         config_query = "SELECT value FROM cm.config_param_system WHERE parameter = 'admin_campaign_type'"
         config_result = tools_db.get_row(config_query)
-        
+
         show_review = True
         show_visit = True
-        
+
         if config_result and config_result['value']:
             try:
                 config = json.loads(config_result['value'])
@@ -64,17 +65,21 @@ class GwAddCampaignButton(GwAction):
                 self.action.setMenu(self.menu)
                 toolbar.addAction(self.action)
         else:
+            self.menu = None
             # Only one is true: create a simple button
             if show_review:
-                self.action.triggered.connect(lambda: self.clicked_event(tools_qt.tr("Review")))
+                self.action.triggered.connect(partial(self.clicked_event, tools_qt.tr("Review")))
             elif show_visit:
-                self.action.triggered.connect(lambda: self.clicked_event(tools_qt.tr("Visit")))
-            
+                self.action.triggered.connect(partial(self.clicked_event, tools_qt.tr("Visit")))
+
             if toolbar is not None:
                 toolbar.addAction(self.action)
 
     def _fill_action_menu(self):
         """ Fill action menu """
+        if self.menu is None:
+            return
+        
         actions = self.menu.actions()
         for action in actions:
             action.disconnect()
@@ -90,9 +95,27 @@ class GwAddCampaignButton(GwAction):
 
     def clicked_event(self, selected_action):
         """ Open the correct campaign dialog based on user selection """
-        if selected_action == tools_qt.tr("Review"):
-            self.new_campaign.create_campaign(dialog_type="review")
-        elif selected_action == tools_qt.tr("Visit"):
-            self.new_campaign.create_campaign(dialog_type="visit")
-        elif selected_action == tools_qt.tr("Inventory"):
-            self.new_campaign.create_campaign(dialog_type="inventory")
+
+        # Handle direct campaign creation (for simple buttons or menu selections)
+        if selected_action in (tools_qt.tr("Review"), tools_qt.tr("Visit"), tools_qt.tr("Inventory")):
+            if self.menu is not None:
+                self.menu.setProperty("last_selection", selected_action.lower())
+            
+            # Create the campaign
+            if selected_action == tools_qt.tr("Review"):
+                self.new_campaign.create_campaign(dialog_type="review")
+            elif selected_action == tools_qt.tr("Visit"):
+                self.new_campaign.create_campaign(dialog_type="visit")
+            elif selected_action == tools_qt.tr("Inventory"):
+                self.new_campaign.create_campaign(dialog_type="inventory")
+            return
+
+        # Handle button click when menu is present
+        if self.menu is not None:
+            last_selection = self.menu.property('last_selection')
+            if last_selection is not None:
+                self.new_campaign.create_campaign(dialog_type=last_selection)
+            else:
+                button = self.action.associatedWidgets()[1]
+                menu_point = button.mapToGlobal(QPoint(0, button.height()))
+                self.menu.popup(menu_point)

@@ -29,11 +29,13 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmCreateUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmCreateUi, \
+    GwAdminMarkdownGeneratorUi  # noqa: F401
 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
+from .markdown_generator import GwAdminMarkdownGenerator
 from .schema_i18n_update import GwSchemaI18NUpdate
 from .i18n_manager import GwSchemaI18NManager
 from .import_osm import GwImportOsm
@@ -637,7 +639,7 @@ class GwAdminButton:
                     return False
 
         return True
-                
+
     def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False) -> bool:
         """
         Update the patch folders for a given update directory.
@@ -715,10 +717,16 @@ class GwAdminButton:
         # Process each version folder in order
         for major, minor, patch, folder_path in version_folders:
             current_folder_version = f"{major}.{minor}.{patch}"
-            if current_folder_version <= str(self.plugin_version):
-                status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
-                if tools_os.set_boolean(status, False) is False:
-                    return False
+            if new_project:
+                if current_folder_version <= str(self.plugin_version):
+                    status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
+                    if tools_os.set_boolean(status, False) is False:
+                        return False
+            else:
+                if current_folder_version > str(self.project_version) and current_folder_version <= str(self.plugin_version):
+                    status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
+                    if tools_os.set_boolean(status, False) is False:
+                        return False
 
         return True
 
@@ -968,6 +976,9 @@ class GwAdminButton:
         self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
         self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
 
+        # Markdown generator
+        self.dlg_readsql.btn_markdown_generator.clicked.connect(partial(self._markdown_generator))
+
     def _activate_audit(self, other_project):
         """ Activate audit functionality """
 
@@ -996,6 +1007,12 @@ class GwAdminButton:
         if result:
             msg = "Triggers updated successfully"
             tools_qgis.show_success(msg)
+
+    def _markdown_generator(self):
+        """ Initialize the markdown generator functionalities """
+
+        qm_gen = GwAdminMarkdownGenerator()
+        qm_gen.init_dialog()
 
     def _manage_translations(self):
         """ Initialize the translation functionalities """
@@ -1689,14 +1706,34 @@ class GwAdminButton:
             tools_qgis.show_message(msg)
             return
 
-        folders = sorted(os.listdir(self.folder_updates))
-        for folder in folders:
-            sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
-            for sub_folder in sub_folders:
-                if str(sub_folder) > str(self.project_version).replace('.', ''):
-                    folder_aux = os.path.join(self.folder_updates, folder, sub_folder)
-                    if self._process_folder(folder_aux):
-                        self._read_changelog(sorted(os.listdir(folder_aux)), folder_aux)
+        # Collect all version folders and sort them
+        version_folders = []
+
+        # Walk through the updates directory to find all version folders
+        # EX: 3/6/1, 4/2/0 -> 3.6.1, 4.2.0
+        for root, _, _ in os.walk(self.folder_updates):
+            rel_path = os.path.relpath(root, self.folder_updates)
+            if rel_path == '.':
+                continue
+
+            parts = rel_path.split(os.sep)
+            if len(parts) == 3:
+                try:
+                    major, minor, patch = int(parts[0]), int(parts[1]), int(parts[2])
+                    version_folders.append((major, minor, patch, root))
+                except ValueError:
+                    continue
+
+        # Sort by version number (major.minor.patch)
+        version_folders.sort(key=lambda x: (x[0], x[1], x[2]))
+
+        # Process each version folder in order
+        for major, minor, patch, folder_path in version_folders:
+            current_folder_version = f"{major}.{minor}.{patch}"
+            if current_folder_version > str(self.project_version):
+                folder_aux = os.path.join(self.folder_updates, str(major), str(minor), str(patch))
+                if self._process_folder(folder_aux):
+                    self._read_changelog(sorted(os.listdir(folder_aux)), folder_aux)
 
         return True
 
@@ -2068,6 +2105,7 @@ class GwAdminButton:
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         self._run_create_cm_task(['load_parent_schema'], 'Link to parent schema')
         self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
+        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(True)
 
     def on_btn_create_example_clicked(self):
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)

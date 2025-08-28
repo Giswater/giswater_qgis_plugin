@@ -322,7 +322,7 @@ class GwNetscenarioManagerButton(GwAction):
 
     def _execute_current_netscenario(self):
         """ Executes the current netscenario """
-
+        self.current_netscenario_id = tools_gw.get_config_value('plan_netscenario_current')
         if self.current_netscenario_id is None:
             msg = "No current netscenario"
             tools_qgis.show_warning(msg, dialog=self.dlg_netscenario_manager)

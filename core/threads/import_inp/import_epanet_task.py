@@ -110,9 +110,9 @@ class GwImportInpTask(GwTask):
             self._get_units()
             self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            self._manage_catalogs()
-
             self._manage_nonvisual()
+
+            self._manage_catalogs()
 
             self._manage_visual()
 

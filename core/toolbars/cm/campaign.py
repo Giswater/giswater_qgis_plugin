@@ -92,7 +92,7 @@ class Campaign:
         selector = GwSelector()
         selector.open_selector(selector_type, show_lot_tab=show_lot)
 
-    def load_campaign_dialog(self, campaign_id: Optional[int] = None, mode: str = "review"):
+    def load_campaign_dialog(self, campaign_id: Optional[int] = None, mode: str = "review", parent: Optional[QWidget] = None):
         """
         Load and initialize the campaign dialog.
 
@@ -104,6 +104,7 @@ class Campaign:
 
         :param campaign_id: ID of the campaign to load. If None, creates a new campaign.
         :param mode: Type of campaign dialog to load. Options: 'review', 'visit'.
+        :param parent: The parent widget for the dialog.
         """
         self.campaign_id = campaign_id
 
@@ -163,6 +164,8 @@ class Campaign:
             tools_qgis.show_warning(f"Invalid campaign mode: {mode}")
             return
         self.dialog = dialog_class(self)
+        if parent:
+            self.dialog.setParent(parent)
 
         # Pre-calculate saved values before any widgets are manipulated
         saved_dependent_values = {}
@@ -223,8 +226,15 @@ class Campaign:
             )
             organization_widget.blockSignals(False)
 
+        expl_widget = self.get_widget_by_columnname(self.dialog, "expl_id")
+        if expl_widget:
+            expl_widget.currentIndexChanged.connect(
+                lambda: update_sector_combo(self.dialog)
+            )
+
         if campaign_id:
             self._load_campaign_relations(campaign_id)
+            self._check_and_disable_class_combos()
 
         tools_gw.add_icon(self.dialog.btn_insert, '111')
         tools_gw.add_icon(self.dialog.btn_delete, '112')
@@ -292,9 +302,7 @@ class Campaign:
 
     def _on_dialog_rejected(self):
         """Clean up resources when the dialog is rejected."""
-        tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.reset_rubberband(self.rubber_band)
-        tools_gw.remove_selection(True, layers=self.rel_layers)
+        self._cleanup_map_selection()
 
     def _load_campaign_relations(self, campaign_id: int):
         """
@@ -313,7 +321,11 @@ class Campaign:
             view = getattr(self.dialog, table_widget_name, None)
             if view:
                 db_table = f"{table_prefix}{feature}"
-                sql = f"SELECT * FROM cm.{db_table} WHERE campaign_id = {campaign_id}"
+                sql = (
+                    f"SELECT * FROM cm.{db_table} "
+                    f"WHERE campaign_id = {campaign_id} "
+                    f"ORDER BY id"
+                )
                 self.populate_tableview(view, sql)
 
     def create_widget_from_field(self, field: Dict[str, Any], response: Dict[str, Any]) -> Optional[QWidget]:
@@ -463,9 +475,7 @@ class Campaign:
             tools_qgis.show_info(msg, dialog=self.dialog)
             self.campaign_saved = True
             self.is_new_campaign = False
-            tools_gw.remove_selection(True, layers=self.rel_layers)
-            tools_gw.reset_rubberband(self.rubber_band)
-            tools_qgis.force_refresh_map_canvas()
+            self._cleanup_map_selection()
 
             # Update campaign ID in the dialog
             campaign_id = result.get("body", {}).get("campaign_id")
@@ -480,12 +490,17 @@ class Campaign:
                 self.filter_campaigns()
 
             if not from_tab_change:
-                tools_qgis.disconnect_signal_selection_changed()
                 self.dialog.accept()
 
         else:
             msg = "Failed to save campaign"
             tools_qgis.show_warning(result.get("message", msg))
+
+    def _cleanup_map_selection(self):
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.reset_rubberband(self.rubber_band)
+        tools_gw.remove_selection(True, layers=self.rel_layers)
+        tools_qgis.force_refresh_map_canvas()
 
     def _get_checkbox_value_as_string(self, dialog: QDialog, widget: QCheckBox) -> str:
         """Helper to get QCheckBox value as a lowercase string ('true'/'false')."""
@@ -564,6 +579,7 @@ class Campaign:
         self.dialog.btn_insert.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
         )
+        self.dialog.btn_insert.clicked.connect(self._check_and_disable_class_combos)
 
         self.dialog.btn_delete.clicked.connect(
             partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None)
@@ -571,10 +587,8 @@ class Campaign:
         self.dialog.btn_delete.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
         )
+        self.dialog.btn_delete.clicked.connect(self._check_and_disable_class_combos)
 
-        self.dialog.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN),
-        )
         self.dialog.btn_snapping.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
         )
@@ -586,6 +600,33 @@ class Campaign:
         self.dialog.btn_expr_select.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
         )
+
+        # Create menu for btn_snapping
+        tools_gw.menu_btn_snapping(self, self.dialog, table_object, GwSelectionMode.CAMPAIGN)
+        
+    def _check_and_disable_class_combos(self):
+        """Disable review/visit class combos if any relations exist."""
+        if not self.campaign_id:
+            return
+
+        table_prefix = "om_campaign_inventory_x_" if self.campaign_type == 3 else "om_campaign_x_"
+        features = ["arc", "node", "connec", "link"]
+        if self.project_type == 'ud':
+            features.append("gully")
+
+        has_relations = False
+        for feature in features:
+            db_table = f"{table_prefix}{feature}"
+            sql = f"SELECT 1 FROM cm.{db_table} WHERE campaign_id = {self.campaign_id} LIMIT 1"
+            if tools_db.get_row(sql):
+                has_relations = True
+                break
+
+        if has_relations:
+            if self.reviewclass_combo:
+                self.reviewclass_combo.setEnabled(False)
+            if self.visitclass_combo:
+                self.visitclass_combo.setEnabled(False)
 
     def _on_tab_feature_changed(self):
         self.rel_feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
@@ -693,7 +734,9 @@ class Campaign:
         """
         rows = tools_db.get_rows(sql)
         # pull out non-null values
-        return [r["feature_type"] for r in rows if r.get("feature_type")]
+        if rows:
+            return [r["feature_type"] for r in rows if r.get("feature_type")]
+        return []
 
     def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int) -> List[str]:
         """
@@ -962,7 +1005,8 @@ class Campaign:
         try:
             campaign_id = int(campaign_id)
             if campaign_id > 0:
-                self.load_campaign_dialog(campaign_id)
+                self.load_campaign_dialog(campaign_id, parent=self.manager_dialog)
+                self._check_and_disable_class_combos()
         except (ValueError, TypeError):
             msg = "Invalid campaign ID."
             tools_qgis.show_warning(msg)
@@ -980,7 +1024,6 @@ def update_expl_sector_combos(**kwargs: Any):
     try:
         # Find child widgets by their object name
         expl_widget = dialog.findChild(QComboBox, 'tab_data_expl_id')
-        sector_widget = dialog.findChild(QComboBox, 'tab_data_sector_id')
 
         # Get data from the currently selected item in the parent combo
         current_index = parent_widget.currentIndex()
@@ -991,20 +1034,19 @@ def update_expl_sector_combos(**kwargs: Any):
             organization_id = current_data[0]
 
         expl_ids = None
-        sector_ids = None
 
         # If a valid organization is selected, get its specific expl_id and sector_id lists from the database
         if organization_id:
-            org_data_sql = f"SELECT expl_id, sector_id FROM cm.cat_organization WHERE organization_id = {organization_id}"
+            org_data_sql = f"SELECT expl_id FROM cm.cat_organization WHERE organization_id = {organization_id}"
             org_data_row = tools_db.get_row(org_data_sql)
             if org_data_row:
                 expl_ids = org_data_row.get('expl_id')
-                sector_ids = org_data_row.get('sector_id')
 
         schema = lib_vars.schema_name
 
         # --- Update exploitation combo ---
         if expl_widget:
+            current_expl_data = expl_widget.currentData()
             sql_expl = f"SELECT expl_id, name FROM {schema}.exploitation"
             if expl_ids is not None:
                 if expl_ids:
@@ -1022,26 +1064,96 @@ def update_expl_sector_combos(**kwargs: Any):
                 # Create a temporary Campaign object to access the robust set_widget_value
                 temp_campaign_instance = Campaign(None, None, None, None, None)
                 temp_campaign_instance.set_widget_value(expl_widget, saved_expl_id)
+            elif current_expl_data:
+                index = expl_widget.findData(current_expl_data)
+                if index > -1:
+                    expl_widget.setCurrentIndex(index)
 
         # --- Update sector combo ---
-        if sector_widget:
-            sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
-            if sector_ids is not None:
-                if sector_ids:
-                    sql_sector += f" WHERE sector_id = ANY(ARRAY{sector_ids})"
-                else:
-                    sql_sector += " WHERE 1=0"
-            sql_sector += " ORDER BY name"
-
-            rows_sector = tools_db.get_rows(sql_sector)
-            tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)
-
-            # Manually set the value from saved_values after populating
-            saved_sector_id = saved_values.get('sector_id')
-            if saved_sector_id is not None:
-                temp_campaign_instance = Campaign(None, None, None, None, None)
-                temp_campaign_instance.set_widget_value(sector_widget, saved_sector_id)
+        update_sector_combo(dialog, saved_values)
 
     except Exception as e:
         tools_qgis.show_warning(f"CRITICAL ERROR in update_expl_sector_combos: {e}", dialog=dialog)
+
+
+def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
+    """
+    Update sector combo based on selected exploitation and organization.
+    """
+    if saved_values is None:
+        saved_values = {}
+
+    # Check user role to determine if organization filter should be applied
+    username = tools_db.get_current_user()
+    sql_user = f"""
+        SELECT t.role_id
+        FROM cm.cat_user u
+        JOIN cm.cat_team t ON u.team_id = t.team_id
+        WHERE u.username = '{username}'
+    """
+    user_info = tools_db.get_row(sql_user)
+    is_admin = user_info and user_info.get('role_id') == 'role_cm_admin'
+
+    expl_widget = dialog.findChild(QComboBox, 'tab_data_expl_id')
+    sector_widget = dialog.findChild(QComboBox, 'tab_data_sector_id')
+    organization_widget = dialog.findChild(QComboBox, 'tab_data_organization_id')
+
+    if not sector_widget:
+        return
+
+    # Get organization filter
+    organization_id = None
+    if organization_widget:
+        org_data = organization_widget.currentData()
+        if org_data and isinstance(org_data, list):
+            organization_id = org_data[0]
+
+    sector_ids = None
+    if organization_id:
+        org_data_sql = f"SELECT sector_id FROM cm.cat_organization WHERE organization_id = {organization_id}"
+        org_data_row = tools_db.get_row(org_data_sql)
+        if org_data_row:
+            sector_ids = org_data_row.get('sector_id')
+
+    # Get exploitation filter
+    expl_id = None
+    if expl_widget:
+        expl_data = expl_widget.currentData()
+        if expl_data and isinstance(expl_data, list):
+            expl_id = expl_data[0]
+
+    schema = lib_vars.schema_name
+    sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
+
+    filters = []
+    # If an organization is selected, we must respect its sector configuration, unless user is admin.
+    if organization_id and not is_admin:
+        if sector_ids:  # If sector_ids is a non-empty list
+            filters.append(f"sector_id = ANY(ARRAY{sector_ids})")
+        else:  # If sector_ids is None or an empty list []
+            filters.append("1=0")  # Effectively blocks all sectors for this organization
+
+    if expl_id:
+        filters.append(f"macrosector_id = {expl_id}")
+    else:
+        # If no expl_id is selected, no sectors should be shown
+        filters.append("1=0")
+
+    if filters:
+        sql_sector += " WHERE " + " AND ".join(filters)
+
+    sql_sector += " ORDER BY name"
+    print(f"DEBUG: Final SQL Query: {sql_sector}")
+    current_sector_data = sector_widget.currentData()
+    rows_sector = tools_db.get_rows(sql_sector)
+    tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)
+
+    saved_sector_id = saved_values.get('sector_id')
+    if saved_sector_id is not None:
+        temp_campaign_instance = Campaign(None, None, None, None, None)
+        temp_campaign_instance.set_widget_value(sector_widget, saved_sector_id)
+    elif current_sector_data:
+        index = sector_widget.findData(current_sector_data)
+        if index > -1:
+            sector_widget.setCurrentIndex(index)
 

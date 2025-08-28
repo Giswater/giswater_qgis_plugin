@@ -60,7 +60,7 @@ class GwEpaTools(GwAction):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        anl_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}42.png"), tools_qt.tr("Analytics"))
+        anl_menu = self.menu.addMenu(tools_qt.tr("Analytics"))
         cal_menu = self.menu.addMenu(tools_qt.tr("Calibration"))
 
         new_actions = [
@@ -71,10 +71,10 @@ class GwEpaTools(GwAction):
             (cal_menu, ('ws'), tools_qt.tr('Emitter calibration'), None),
             (cal_menu, ('ws'), tools_qt.tr('Static calibration'), None)
         ]
-        # Add Go2Iber action if ibergis plugin is available
-        if tools_qgis.is_plugin_active('ibergis'):
-            ibergis_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"), "IberGIS")
-            new_actions.append((ibergis_menu, ('ud'), tools_qt.tr('Import IberGIS GPKG project'), None))
+        # Add import IberGIS GPKG project action if ibergis plugin is available
+        if tools_qgis.is_plugin_active('IberGIS'):
+            ibergis_menu = self.menu.addMenu("IberGIS")
+            new_actions.append((ibergis_menu, ('ud'), tools_qt.tr('Load IberGIS GPKG project'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png")))
 
         for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:
@@ -84,6 +84,8 @@ class GwEpaTools(GwAction):
                     obj_action = QAction(f"{action}", ag)
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self._get_selected_action, action))
+                if action in [tools_qt.tr('Quantized demands'), tools_qt.tr('Valve operation check')]:
+                    obj_action.setVisible(False)
 
         # Remove menu if it is empty
         for menu in self.menu.findChildren(QMenu):
@@ -117,7 +119,7 @@ class GwEpaTools(GwAction):
             valve_operation_check = ValveOperationCheck()
             valve_operation_check.clicked_event()
 
-        elif name == tools_qt.tr('Import IberGIS GPKG project'):
+        elif name == tools_qt.tr('Load IberGIS GPKG project'):
             go2iber = Go2Iber()
             # Get file path from user
             file_path: Optional[Path] = self._get_file()

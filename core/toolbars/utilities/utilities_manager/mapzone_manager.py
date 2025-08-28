@@ -65,9 +65,9 @@ class GwMapzoneManager:
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "174")
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
-        tabs = ['sector', 'dma', 'macrosector', 'omzone', 'macroomzone']
-        project_tabs = {'ws': ['dqa', 'macrodma', 'macrodqa', 'supplyzone', 'presszone'],
-                        'ud': ['drainzone', 'dwfzone']}
+        tabs = []
+        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa', 'macroomzone'],
+                        'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma', 'macroomzone']}
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
 
@@ -85,6 +85,12 @@ class GwMapzoneManager:
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
             self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
 
+        # Restore last active tab for this project type
+        self._restore_last_tab()
+        
+        # Restore show inactive checkbox state
+        self._restore_show_inactive_state()
+
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
         self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis, self.mapzone_mng_dlg))
@@ -99,6 +105,10 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
         self.mapzone_mng_dlg.finished.connect(partial(self._on_dialog_closed))
+        
+        # Connect checkbox state change to save settings
+        self.mapzone_mng_dlg.chk_active.stateChanged.connect(self._save_show_inactive_state)
+        self.mapzone_mng_dlg.finished.connect(partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, 'mapzone_manager'))
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
 
         self._manage_current_changed()
@@ -255,7 +265,11 @@ class GwMapzoneManager:
         macromapzone_function_id: int = 3482
         mapzone_function_id: int = 2768
         function_id: int = macromapzone_function_id if mapzone_name in self.mapzone_status["enabledMacromapzone"] else mapzone_function_id
-        dlg_functions = toolbox_btn.open_function_by_id(function_id, use_aux_conn=False)
+
+        # Connect signals - refresh table when dialog is closed
+        connect = [self._refresh_mapzone_table_on_close]
+
+        dlg_functions = toolbox_btn.open_function_by_id(function_id, use_aux_conn=False, connect_signal=connect)
 
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
@@ -264,8 +278,16 @@ class GwMapzoneManager:
 
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
-        if run_button:
-            run_button.clicked.connect(lambda: self.mapzone_mng_dlg.btn_flood.setEnabled(True))
+        if run_button and self.mapzone_mng_dlg.btn_flood:
+            run_button.clicked.connect(partial(self.mapzone_mng_dlg.btn_flood.setEnabled, True))
+
+    def _refresh_mapzone_table_on_close(self, result_ignored=None):
+        """ Refreshes the table when the dialog is closed, ignoring the result signal. """
+        if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
+            return
+        show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
+        expr = "" if show_inactive else "active is true"
+        self._fill_mapzone_table(expr=expr)
 
     def _open_flood_analysis(self, dialog, mapzone_name):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
@@ -1236,7 +1258,7 @@ class GwMapzoneManager:
         active = tools_os.set_boolean(active)
         field_id = tableview.model().headerData(0, Qt.Horizontal)
 
-        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
+        sql = f"UPDATE {view.replace('v_ui_', 've_')} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
@@ -1245,7 +1267,7 @@ class GwMapzoneManager:
     def manage_create(self, dialog, tableview=None):
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '')
+        tablename = tableview.objectName().replace('tbl', '').replace('v_ui_', 've_')
         field_id = tableview.model().headerData(0, Qt.Horizontal)
 
         # Execute getinfofromid
@@ -1264,7 +1286,7 @@ class GwMapzoneManager:
         # Get selected row
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '')
+        tablename = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1273,13 +1295,13 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        col_name = f"{tablename.split('_')[-1].lower()}_id"
+        col_name = f"{tablename.split('_')[1].lower()}_id"
         if col_name == 'valve_id':
             col_name = 'node_id'
         col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
 
         mapzone_id = index.sibling(index.row(), col_idx).data()
-        field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
+        field_id = tableview.model().headerData(col_idx, Qt.Horizontal).lower()
 
         # Execute getinfofromid
         _id = f"{mapzone_id}"
@@ -1299,7 +1321,7 @@ class GwMapzoneManager:
     def _manage_delete(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
+        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1326,15 +1348,30 @@ class GwMapzoneManager:
 
     def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
         # Build dlg
+
         self.add_dlg = GwInfoGenericUi(self)
         tools_gw.load_settings(self.add_dlg)
         self.my_json_add = {}
-        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
+
+        # Aplicar la lògica de posicions millorada
+        layout_positions = {}
+
+        # Ordenar els camps per layoutorder abans de construir el diàleg
+        if 'body' in result and 'data' in result['body'] and 'fields' in result['body']['data']:
+            sorted_fields = sorted(result['body']['data']['fields'],
+                                    key=lambda x: x.get('layoutorder', 0))
+            result['body']['data']['fields'] = sorted_fields
+
+        # Construir el diàleg amb la versió millorada
+        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add, layout_positions=layout_positions, tab_name='tab_none')
+
         layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
         self.add_dlg.actionEdit.setVisible(False)
+
         # Disable widgets if updating
         if force_action == "UPDATE":
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)
+
         # Populate netscenario_id
         if self.netscenario_id is not None:
             tools_qt.set_widget_text(self.add_dlg, 'tab_none_netscenario_id', self.netscenario_id)
@@ -1349,11 +1386,23 @@ class GwMapzoneManager:
                 item = layout.itemAtPosition(row, column)
                 if item is not None:
                     widget = item.widget()
-                    if widget is not None and type(widget) is not QLabel:
+                    if widget is not None and not isinstance(widget, QLabel):
                         widgets.append(widget)
+
         # Get all widget's values
         for widget in widgets:
+            object_name = widget.objectName()
             tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)
+
+            if object_name == 'tab_none_created_at':
+                value = widget.text()
+                if value is not None and 'T' in value and '.' in value:
+                    widget.setText(value.split('.')[0].replace('T', ' - ') + '.' + value.split('.')[1][0:2])
+            if object_name == 'tab_none_updated_at':
+                value = widget.text()
+                if value is not None and 'T' in value and '.' in value:
+                    widget.setText(value.split('.')[0].replace('T', ' - ') + '.' + value.split('.')[1][0:2])
+
         # Remove Nones from self.my_json_add
         keys_to_remove = []
         for key, value in self.my_json_add.items():
@@ -1361,12 +1410,14 @@ class GwMapzoneManager:
                 keys_to_remove.append(key)
         for key in keys_to_remove:
             del self.my_json_add[key]
+
         # Signals
         self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))
         self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
         self.add_dlg.dlg_closed.connect(self._manage_current_changed)
         self.add_dlg.btn_accept.clicked.connect(
             partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
+
         # Open dlg
         tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
 
@@ -1376,7 +1427,7 @@ class GwMapzoneManager:
             return
 
         # Change format when expl_id is an array
-        if tablename != 'v_ui_macrodma' and tablename != 'v_ui_drainzone' and tablename != 'v_ui_dwfzone':
+        if tablename != 've_macrodma' and tablename != 've_drainzone' and tablename != 've_dwfzone':
             if 'expl_id' in my_json:
                 expl_id = my_json['expl_id']
                 if expl_id is not None:
@@ -1401,7 +1452,7 @@ class GwMapzoneManager:
                 my_json['muni_id'] = muni_id
 
         # Change format when sector_id is an array
-        if tablename != 'v_ui_sector':
+        if tablename != 've_sector':
             if 'sector_id' in my_json:
                 sector_id = my_json['sector_id']
                 if sector_id is not None:
@@ -1463,3 +1514,35 @@ class GwMapzoneManager:
 
         msg = "Error"
         tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)
+
+    def _restore_last_tab(self):
+        """Restores the last active tab for the current project type."""
+        try:
+            # Get the last active tab from configuration using existing tools_gw functions
+            dlg_name = self.mapzone_mng_dlg.objectName()
+            last_active_tab_name = tools_gw.get_config_parser('dialogs_tab', f"{dlg_name}_mapzone_manager", 'user', 'session')
+
+            if last_active_tab_name:
+                # Find the tab index by name
+                for i in range(self.mapzone_mng_dlg.main_tab.count()):
+                    if self.mapzone_mng_dlg.main_tab.widget(i).objectName() == last_active_tab_name:
+                        self.mapzone_mng_dlg.main_tab.setCurrentIndex(i)
+                        # Refresh table data after restoring tab
+                        self._manage_current_changed()
+                        break
+        except Exception:
+            pass
+            
+    def _restore_show_inactive_state(self):
+        """ Restores the show inactive checkbox state """
+        
+        show_inactive = tools_gw.get_config_parser("dialogs", "mapzone_manager_show_inactive", "user", "session")
+        if show_inactive is not None:
+            is_checked = tools_os.set_boolean(show_inactive, default=False)
+            self.mapzone_mng_dlg.chk_active.setChecked(is_checked)
+            
+    def _save_show_inactive_state(self):
+        """ Saves the current show inactive checkbox state """
+        
+        is_checked = self.mapzone_mng_dlg.chk_active.isChecked()
+        tools_gw.set_config_parser("dialogs", "mapzone_manager_show_inactive", str(is_checked), "user", "session")

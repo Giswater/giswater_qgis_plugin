@@ -1470,7 +1470,7 @@ class GwSchemaI18NManager:
 
     def extract_and_update_strings(self, data):
         """Recursively extract and return list of dictionaries with translatable keys."""
-        translatable_keys = ['label', 'tooltip', 'placeholder', 'text', 'comboNames']
+        translatable_keys = ['label', 'tooltip', 'placeholder', 'text', 'comboNames', 'vdefault_value']
         results = []
 
         def recurse(item):
