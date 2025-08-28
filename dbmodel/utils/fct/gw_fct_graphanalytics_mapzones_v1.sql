@@ -1106,42 +1106,6 @@ BEGIN
 
 			END IF;
 		ELSE
-
-			IF v_class = 'DMA' THEN
-				RAISE NOTICE 'Filling temp_pgr_om_waterbalance_dma_graph ';
-
-				v_query_text = 'INSERT INTO temp_pgr_om_waterbalance_dma_graph (node_id, '||quote_ident(v_field)||', flow_sign)
-				(
-					SELECT DISTINCT n.node_id, a.'||quote_ident(v_field)||',
-					CASE 
-						WHEN n.'||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' THEN 1
-						ELSE -1
-					END AS flow_sign
-					FROM temp_pgr_node n
-					JOIN v_temp_node vn ON vn.node_id = n.node_id
-					JOIN value_state_type sn ON sn.state = vn.state AND sn.id = vn.state_type
-					JOIN temp_pgr_arc a  ON a.node_1 = n.node_id or a.node_2 = n.node_id 
-					JOIN v_temp_arc va ON va.arc_id = a.arc_id
-					JOIN value_state_type sa ON sa.state = va.state AND sa.id = va.state_type
-					WHERE sn.is_operative = true AND sa.is_operative = true AND 
-					n.node_id IN
-					(
-						SELECT (json_array_elements(graphconfig->''use'')->>''nodeParent'')::integer AS nodeparent
-						FROM '||quote_ident(v_table_name)||' WHERE active = true
-					)
-					AND a.'||quote_ident(v_field)||' IN
-					(
-						SELECT '||quote_ident(v_field)||'
-						FROM '||quote_ident(v_table_name)||' WHERE active = true
-					)
-				) ON CONFLICT (node_id, dma_id) DO NOTHING';
-				EXECUTE v_query_text;
-
-				DELETE FROM om_waterbalance_dma_graph WHERE dma_id IN (SELECT DISTINCT dma_id FROM temp_pgr_om_waterbalance_dma_graph);
-				INSERT INTO om_waterbalance_dma_graph SELECT * FROM temp_pgr_om_waterbalance_dma_graph ON CONFLICT (dma_id, node_id) DO NOTHING;
-
-			END IF;
-
 			IF v_from_zero = TRUE THEN
 				IF v_project_type = 'WS' THEN
 					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
@@ -1621,6 +1585,35 @@ BEGIN
 					);
 				';
 				EXECUTE v_query_text;
+			ELSIF v_class = 'DMA' THEN
+				RAISE NOTICE 'Filling temp_pgr_om_waterbalance_dma_graph ';
+
+				v_query_text = 'INSERT INTO temp_pgr_om_waterbalance_dma_graph (node_id, '||quote_ident(v_mapzone_field)||', flow_sign)
+				(
+					SELECT DISTINCT n.node_id, va.'||quote_ident(v_mapzone_field)||',
+					CASE 
+						WHEN vn.'||quote_ident(v_mapzone_field)||' = va.'||quote_ident(v_mapzone_field)||' THEN 1
+						ELSE -1
+					END AS flow_sign
+					FROM temp_pgr_node n
+					JOIN v_temp_node vn ON vn.node_id = n.node_id
+					JOIN temp_pgr_arc a  ON a.node_1 = n.node_id or a.node_2 = n.node_id 
+					JOIN v_temp_arc va ON va.arc_id = a.arc_id
+					WHERE n.node_id IN
+					(
+						SELECT (json_array_elements(graphconfig->''use'')->>''nodeParent'')::integer AS nodeparent
+						FROM '||quote_ident(v_table_name)||' WHERE active = true
+					)
+					AND va.'||quote_ident(v_mapzone_field)||' IN
+					(
+						SELECT '||quote_ident(v_mapzone_field)||'
+						FROM '||quote_ident(v_table_name)||' WHERE active = true
+					)
+				) ON CONFLICT (node_id, dma_id) DO NOTHING';
+				EXECUTE v_query_text;
+
+				DELETE FROM om_waterbalance_dma_graph WHERE dma_id IN (SELECT DISTINCT dma_id FROM temp_pgr_om_waterbalance_dma_graph);
+				INSERT INTO om_waterbalance_dma_graph SELECT * FROM temp_pgr_om_waterbalance_dma_graph ON CONFLICT (dma_id, node_id) DO NOTHING;
 
 			ELSIF v_mapzone_name = 'DWFZONE' THEN
 				WITH outfalls AS (
