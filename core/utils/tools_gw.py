@@ -327,11 +327,24 @@ def open_help_link(context, uiname, dlg=None):
     """ Opens the help link for the given dialog, or a default link if not found. """
 
     # Base URL for the documentation
-    domain = "https://docs.giswater.org"
-    language = "es_CR"  # TODO: get dynamic language
-    plugin_version = "testing"  # TODO: get dynamic version
+    domain = get_config_value('help_domain', table='config_param_system')
+    if domain is None:
+        domain = "https://docs.giswater.org"
+    else:
+        domain = domain[0]
 
-    if plugin_version == "":
+    language = "es_CR"  # TODO: get dynamic language when documentation is ready
+    plugin_version, _ = tools_qgis.get_plugin_version()
+
+    # plugin_version is {major}.{minor}.{patch}
+    # transform to major.minor
+    if plugin_version:
+        parts = plugin_version.split('.')
+        if len(parts) >= 2:
+            plugin_version = f"{parts[0]}.{parts[1]}"
+        else:
+            plugin_version = "latest"
+    else:
         plugin_version = "latest"
 
     base_url = f"{domain}/{plugin_version}/{language}/docs/giswater/for-users"
