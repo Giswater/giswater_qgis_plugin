@@ -87,6 +87,9 @@ class GwMapzoneManager:
 
         # Restore last active tab for this project type
         self._restore_last_tab()
+        
+        # Restore show inactive checkbox state
+        self._restore_show_inactive_state()
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
@@ -102,6 +105,9 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
         self.mapzone_mng_dlg.finished.connect(partial(self._on_dialog_closed))
+        
+        # Connect checkbox state change to save settings
+        self.mapzone_mng_dlg.chk_active.stateChanged.connect(self._save_show_inactive_state)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, 'mapzone_manager'))
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
 
@@ -1516,3 +1522,17 @@ class GwMapzoneManager:
                         break
         except Exception:
             pass
+            
+    def _restore_show_inactive_state(self):
+        """ Restores the show inactive checkbox state """
+        
+        show_inactive = tools_gw.get_config_parser("dialogs", "mapzone_manager_show_inactive", "user", "session")
+        if show_inactive is not None:
+            is_checked = tools_os.set_boolean(show_inactive, default=False)
+            self.mapzone_mng_dlg.chk_active.setChecked(is_checked)
+            
+    def _save_show_inactive_state(self):
+        """ Saves the current show inactive checkbox state """
+        
+        is_checked = self.mapzone_mng_dlg.chk_active.isChecked()
+        tools_gw.set_config_parser("dialogs", "mapzone_manager_show_inactive", str(is_checked), "user", "session")
