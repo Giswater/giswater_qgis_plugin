@@ -290,7 +290,7 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
 
     # Manage translate
     if dlg_name:
-        tools_qt._translate_form(dlg_name, dlg, plugin_dir=plugin_dir, plugin_name=plugin_name)
+        tools_qt._translate_form(dlg_name, dlg)
 
     # Set window title
     if title is not None:
