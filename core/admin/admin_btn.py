@@ -728,7 +728,6 @@ class GwAdminButton:
                     if tools_os.set_boolean(status, False) is False:
                         return False
 
-
         return True
 
     def load_childviews(self):
