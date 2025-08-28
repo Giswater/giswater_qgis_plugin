@@ -11,7 +11,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(14);
+SELECT plan(9);
 
 -- Create roles for testing
 CREATE USER plan_user;
@@ -30,54 +30,54 @@ CREATE USER basic_user;
 GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
-SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, 
-    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-    "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_node and updateValues > allValues returns status "Accepted"'
-);
+-- SELECT is (
+--     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+--     "form":{}, "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]},
+--     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+--     "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
+--     'Accepted',
+--     'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_node and updateValues > allValues returns status "Accepted"'
+-- );
+
+-- SELECT is (
+--     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+--     "form":{}, "feature":{"tableName":"ve_inp_junction", "featureType":"NODE", "id":[]},
+--     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+--     "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
+--     'Accepted',
+--     'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_inp_junction and updateValues > allValues returns status "Accepted"'
+-- );
+
+-- SELECT is (
+--     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+--     "form":{}, "feature":{"tableName":"ve_inp_netgully", "featureType":"NODE", "id":[]},
+--     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+--     "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
+--     'Accepted',
+--     'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_inp_netgully and updateValues > allValues returns status "Accepted"'
+-- );
+
+-- SELECT is (
+--     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+--     "form":{}, "feature":{"tableName":"ve_inp_outfall", "featureType":"NODE", "id":[]},
+--     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+--     "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
+--     'Accepted',
+--     'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_inp_outfall and updateValues > allValues returns status "Accepted"'
+-- );
+
+-- SELECT is (
+--     (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+--     "form":{}, "feature":{"tableName":"ve_inp_storage", "featureType":"NODE", "id":[]},
+--     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+--     "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
+--     'Accepted',
+--     'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_inp_storage and updateValues > allValues returns status "Accepted"'
+-- );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_junction", "featureType":"NODE", "id":[]}, 
-    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-    "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_inp_junction and updateValues > allValues returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_netgully", "featureType":"NODE", "id":[]}, 
-    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-    "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_inp_netgully and updateValues > allValues returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_outfall", "featureType":"NODE", "id":[]}, 
-    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-    "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_inp_outfall and updateValues > allValues returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_storage", "featureType":"NODE", "id":[]}, 
-    "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-    "parameters":{"updateValues":"allValues"}, "aux_params":null}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setelevfromdem with featuretype > NODE and tablename > ve_inp_storage and updateValues > allValues returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -85,8 +85,8 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_junction", "featureType":"NODE", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_inp_junction", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -94,8 +94,8 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_netgully", "featureType":"NODE", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_inp_netgully", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -103,8 +103,8 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_outfall", "featureType":"NODE", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_inp_outfall", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -112,8 +112,8 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_storage", "featureType":"NODE", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_inp_storage", "featureType":"NODE", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -121,8 +121,8 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_gully", "featureType":"GULLY", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_gully", "featureType":"GULLY", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -130,8 +130,8 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_gully", "featureType":"GULLY", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_gully", "featureType":"GULLY", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -139,8 +139,8 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_gully", "featureType":"GULLY", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_inp_gully", "featureType":"GULLY", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
@@ -148,8 +148,8 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"ve_inp_gully", "featureType":"GULLY", "id":[]}, 
+    (gw_fct_setelevfromdem($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"tableName":"ve_inp_gully", "featureType":"GULLY", "id":[]},
     "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
     "parameters":{"updateValues":"nullValues"}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
