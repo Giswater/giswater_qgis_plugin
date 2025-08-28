@@ -35,6 +35,7 @@ v_querytext_add text = '';
 v_querytext_end text = ' ORDER BY 2 ASC';
 v_result text;
 v_result_point json;
+v_result_line json;
 v_project_type text;
 
 
@@ -60,8 +61,9 @@ BEGIN
 
 	END IF;
 
-	IF lower(v_project_type) = 'ws' THEN
-		
+	-- POINTS:
+		IF lower(v_project_type) = 'ws' THEN
+
 		v_querytext = concat ('WITH mapzone_query as (select * from ',v_mapzone,' WHERE active)
 				SELECT n.node_id::text AS feature_id, ''nodeParent''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL::float  AS rotation, n.the_geom
 				FROM ( SELECT (json_array_elements_text((graphconfig::json ->> ''use''::text)::json)::json ->>''nodeParent'')::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
@@ -94,9 +96,9 @@ BEGIN
 				(SELECT (json_array_elements_text((json_array_elements_text((mapzone_query.graphconfig::json ->> ''use''::text)::json)::json ->> ''toArc''::text)::json))::integer AS arc_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,', graphconfig
 				FROM mapzone_query) mp
 				JOIN arc a USING (arc_id)');
-		
+
 		IF v_context = 'NETSCENARIO' THEN
-		
+
 			v_querytext_add = concat ('
 						UNION
 							SELECT concat (''NS-'',v.node_id)::text AS feature_id,''netscenOpenedValve''::text AS graph_type, nd.',v_mapzone_id,'::integer, nd.name, NULL AS rotation, v.the_geom
@@ -123,8 +125,7 @@ BEGIN
 		EXECUTE v_querytext INTO v_result;
 
 	ELSE
-
-	-- todo for ud
+		-- TODO: for ud
 
 	END IF;
 
@@ -136,12 +137,27 @@ BEGIN
 		v_result_point = concat ('{"layerName": "Graphconfig", "geometryType":"Point", "features":',v_result, '}');
 	END IF;
 
+	-- LINES:
+	IF lower(v_project_type) = 'ws' THEN
+
+	ELSE
+		-- TODO: for ud
+	END IF;
+
+		-- profilactic nulls;
+	v_result := COALESCE(v_result, '{}');
+	IF v_result = '{}' THEN
+		v_result_line = '{"layerName": "Graphconfig", "geometryType":"", "features":[]}';
+	ELSE
+		v_result_line = concat ('{"layerName": "Graphconfig", "geometryType":"LineString", "features":',v_result, '}');
+	END IF;
+
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 	     ',"body":{"form":{}'||
 		     ',"data":{ "info":{},'||
 				'"point":'||v_result_point||','||
-				'"line":{},'||
+				'"line":'||v_result_line||','||
 				'"polygon":{}}'||
 	    '}}')::json, 3302, null, null, null);
 
