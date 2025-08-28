@@ -909,5 +909,9 @@ ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'inp_value_weirs', 'inp_typevalue_weir') WHERE dv_querytext ILIKE '%inp_value_weirs%';
 
--- 28/08/2025
-UPDATE config_toolbox SET alias='Macromapzones analysis', functionparams='{"featureType":[]}'::json, inputparams='[{"widgetname": "graphClass", "label": "Graph class:", "widgettype": "combo", "datatype": "text", "tooltip": "Graphanalytics method used", "layoutname": "grl_option_parameters", "layoutorder": 1, "comboIds": ["MACROSECTOR", "MACROOMZONE"], "comboNames": ["MACROSECTOR", "MACROOMZONE"], "selectedId": null}, {"widgetname": "exploitation", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "tooltip": "Choose exploitation to work with", "layoutname": "grl_option_parameters", "layoutorder": 2, "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "selectedId": null}, {"widgetname": "commitChanges", "label": "Commit changes:", "widgettype": "check", "datatype": "boolean", "tooltip": "If True, changes will be applied to DB. If False, algorithm results will be saved in anl tables", "layoutname": "grl_option_parameters", "layoutorder": 8, "value": null}]'::json WHERE id=3482;
+update sys_table set orderby =  1 WHERE id = 've_exploitation';
+update sys_table set orderby =  2 WHERE id = 've_drainzone';
+update sys_table set orderby =  3 WHERE id = 've_dwfzone';
+update sys_table set orderby =  4 WHERE id = 've_sector';
+update sys_table set project_template = null WHERE id = 've_macrosector';
+

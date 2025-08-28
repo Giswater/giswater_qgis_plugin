@@ -109,15 +109,9 @@ BEGIN
 							FROM ve_plan_netscenario_valve v  WHERE v.closed IS TRUE ');
 		END IF;
 
-	ELSE
+		v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);
 
-	-- todo for ud
-
-	END IF;
-
-	v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);
-
-	v_querytext = concat('SELECT jsonb_agg(features.feature)
+		v_querytext = concat('SELECT jsonb_agg(features.feature)
 				FROM (
 				SELECT jsonb_build_object(
 				''type'',       ''Feature'',
@@ -126,7 +120,13 @@ BEGIN
 				) AS feature
 				FROM (', v_querytext, ') row) features');
 
-	EXECUTE v_querytext INTO v_result;
+		EXECUTE v_querytext INTO v_result;
+
+	ELSE
+
+	-- todo for ud
+
+	END IF;
 
 	-- profilactic nulls;
 	v_result := COALESCE(v_result, '{}');
@@ -146,9 +146,9 @@ BEGIN
 	    '}}')::json, 3302, null, null, null);
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$
