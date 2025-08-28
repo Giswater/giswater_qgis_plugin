@@ -930,3 +930,12 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('ve_sector','form_feature','tab_none','updated_by','lyt_data_1',20,'string','text','Updated by:','updated_by',false,false,false,false,'{"setMultiline":false}'::json,false);
 
 UPDATE config_form_fields SET widgettype='list' WHERE formname IN('ve_dma', 've_dqa', 've_sector', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_omzone', 've_macroomzone', 've_presszone') AND columnname IN('expl_id', 'sector_id', 'muni_id');
+
+UPDATE config_form_fields SET iseditable=true WHERE formname IN('ve_dma', 've_dqa', 've_sector', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_omzone', 've_macroomzone', 've_presszone') AND columnname = 'graphconfig';
+UPDATE config_form_fields SET widgettype='text' WHERE formname IN('ve_dma', 've_dqa', 've_sector', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_omzone', 've_macroomzone', 've_presszone') AND columnname IN('created_at', 'updated_at');
+
+UPDATE macrodma SET expl_id = NULL;
+
+DELETE FROM edit_typevalue WHERE typevalue='presszone_type' AND id='WATERWELL';
+
+UPDATE config_form_fields SET placeholder=NULL WHERE formname IN('ve_dma', 've_dqa', 've_sector', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_omzone', 've_macroomzone', 've_presszone') AND columnname IN('expl_id', 'sector_id', 'muni_id') AND iseditable=false;

@@ -975,3 +975,11 @@ UPDATE config_toolbox SET alias='Macromapzones analysis', functionparams='{"feat
 
 
 update sys_table set project_template = null WHERE id IN ('ve_macrosector', 've_dqa','ve_supplyzone','ve_macrodma');
+UPDATE config_form_fields SET iseditable=true WHERE formname IN('ve_dma', 've_dqa', 've_sector', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_omzone', 've_macroomzone', 've_presszone') AND columnname = 'graphconfig';
+UPDATE config_form_fields SET widgettype='text' WHERE formname IN('ve_dma', 've_dqa', 've_sector', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_omzone', 've_macroomzone', 've_presszone') AND columnname IN('created_at', 'updated_at');
+
+UPDATE macrodma SET expl_id = NULL;
+
+DELETE FROM edit_typevalue WHERE typevalue='presszone_type' AND id='WATERWELL';
+
+UPDATE config_form_fields SET placeholder=NULL WHERE formname IN('ve_dma', 've_dqa', 've_sector', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_omzone', 've_macroomzone', 've_presszone') AND columnname IN('expl_id', 'sector_id', 'muni_id') AND iseditable=false;

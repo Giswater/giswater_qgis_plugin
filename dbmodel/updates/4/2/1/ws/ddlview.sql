@@ -545,8 +545,7 @@ AS SELECT DISTINCT ON (m.macrodma_id) m.macrodma_id,
     m.created_by,
     m.updated_at,
     m.updated_by
-   FROM selector_expl se,
-    macrodma m
+   FROM macrodma m
   WHERE m.macrodma_id > 0
   ORDER BY m.macrodma_id;
 
@@ -568,9 +567,9 @@ AS SELECT DISTINCT ON (m.macrodma_id) m.macrodma_id,
     m.updated_at,
     m.updated_by,
     m.the_geom
-   FROM selector_expl se,
-    macrodma m
-  WHERE (se.expl_id = ANY (m.expl_id)) AND se.cur_user = CURRENT_USER AND m.active IS TRUE;
+   FROM macrodma m
+  WHERE m.macrodma_id > 0
+  ORDER BY m.macrodma_id;
 
 CREATE OR REPLACE VIEW v_ui_macrodqa
 AS SELECT DISTINCT ON (m.macrodqa_id) m.macrodqa_id,

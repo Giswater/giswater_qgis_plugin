@@ -898,7 +898,6 @@ INSERT INTO edit_typevalue (typevalue,id,idval)
 INSERT INTO config_typevalue (typevalue,id,idval) VALUES ('widgettype_typevalue','list','list');
 UPDATE config_form_fields SET widgettype='list' WHERE formname IN('ve_dma', 've_sector', 've_macrosector', 've_omzone', 've_macroomzone', 've_dwfzone', 've_drainzone') AND columnname IN('expl_id', 'sector_id', 'muni_id');
 
-
 ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 UPDATE inp_typevalue SET typevalue = 'inp_typevalue_weir' WHERE typevalue='inp_value_weirs';
 
@@ -915,3 +914,7 @@ update sys_table set orderby =  3 WHERE id = 've_dwfzone';
 update sys_table set orderby =  4 WHERE id = 've_sector';
 update sys_table set project_template = null WHERE id = 've_macrosector';
 
+UPDATE config_form_fields SET iseditable=true WHERE formname IN('ve_dma', 've_sector', 've_macrosector', 've_omzone', 've_macroomzone', 've_dwfzone', 've_drainzone') AND columnname = 'graphconfig';
+UPDATE config_form_fields SET widgettype='text' WHERE formname IN('ve_dma', 've_sector', 've_macrosector', 've_omzone', 've_macroomzone', 've_dwfzone', 've_drainzone') AND columnname IN('created_at', 'updated_at');
+
+UPDATE config_form_fields SET placeholder=NULL WHERE formname IN('ve_dma', 've_sector', 've_macrosector', 've_omzone', 've_macroomzone', 've_dwfzone', 've_drainzone') AND columnname IN('expl_id', 'sector_id', 'muni_id') AND iseditable=false;
