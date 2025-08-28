@@ -1363,7 +1363,7 @@ class GwMapzoneManager:
             result['body']['data']['fields'] = sorted_fields
 
         # Construir el diàleg amb la versió millorada
-        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add, layout_positions=layout_positions)
+        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add, layout_positions=layout_positions, tab_name='tab_none')
 
         layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
         self.add_dlg.actionEdit.setVisible(False)

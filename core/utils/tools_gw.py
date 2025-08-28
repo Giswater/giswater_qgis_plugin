@@ -1684,7 +1684,7 @@ def manage_feature_cat():
     return feature_cat
 
 
-def build_dialog_info(dialog, result, my_json=None, layout_positions=None):
+def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_name=None, enable_actions=True, is_inserting=False):
     """
     Builds the dialog and configures fields and actions dynamically based on the provided result.
     Handles tab-specific action visibility and configurations.
@@ -1765,6 +1765,46 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None):
 
     vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
     grid_layout.addItem(vertical_spacer1)
+
+    # Handle actions dynamically based on tab_name
+    form_config = result['body'].get('form', {})
+    visible_tabs = form_config.get('visibleTabs', [])  # Retrieve tab-specific visibility
+    actions_list = dialog.findChildren(QAction)
+
+    # Hide all actions by default
+    for action in actions_list:
+        if not action.objectName():
+            continue
+        action.setVisible(False)
+
+    # Configure actions based on the tab_name
+    # Configure actions based on the tab_name
+    for tab in visible_tabs:
+        if tab['tabName'] == tab_name and 'tabactions' in tab:
+            if tab['tabactions']:  # Ensure tabactions is not None
+                for act in tab['tabactions']:
+                    action = dialog.findChild(QAction, act['actionName'])
+                    if action:
+                        action.setVisible(True)
+                        if 'actionTooltip' in act:
+                            action.setToolTip(act['actionTooltip'])
+
+    # Enable/Disable actions based on global and static rules
+    static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
+                      'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
+
+    for action in actions_list:
+        if action.objectName() not in static_actions:
+            if is_inserting:
+                # For inserting, follow database configuration
+                for tab in visible_tabs:
+                    if tab['tabName'] == tab_name and 'tabactions' in tab:
+                        for act in tab['tabactions']:
+                            if action.objectName() == act['actionName']:
+                                action.setEnabled(not act.get('disabled', False))
+            else:
+                # For editing, enable/disable based on editable state
+                action.setEnabled(enable_actions)
 
     return result
 
