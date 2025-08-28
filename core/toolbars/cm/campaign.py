@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 from typing import Optional, List, Any, Dict, Union
-import os
 
 from qgis.PyQt.QtCore import QDate, QModelIndex
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem

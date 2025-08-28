@@ -376,7 +376,6 @@ class GwCircleSelectManager(QgsMapTool):
             if self.step == 1 and self.center_point and self.current_radius > 0:
                 self._finish_selection(self.center_point, self.current_radius)
 
-
     def _draw_circle(self, center, radius, segments=64):
         """Draw circle with more segments for smoother appearance"""
         if radius <= 0:
@@ -454,6 +453,7 @@ class GwCircleSelectManager(QgsMapTool):
         if hasattr(self.iface, 'statusBarIface'):
             self.iface.statusBarIface().clearMessage()
         QgsMapTool.deactivate(self)
+
 
 class GwFreehandSelectManager(QgsMapTool):
     """Freehand drawing selection tool"""
