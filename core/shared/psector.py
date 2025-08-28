@@ -508,13 +508,13 @@ class GwPsector:
                 tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
             else:
                 tools_qgis.force_refresh_map_canvas()
-        
+
         # Force refresh of selector docker to reflect any value changes
         tools_gw.refresh_selectors()
-        
+
         if form_opened:
             self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
-        
+
     def psector_name_changed(self):
         """ Enable buttons and tabs when name is changed """
 
@@ -869,10 +869,14 @@ class GwPsector:
 
         psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
         cur_psector = tools_gw.get_config_value('plan_psector_current')
+        if cur_psector and cur_psector[0] is not None:
+            cur_psector = int(cur_psector[0])
+        else:
+            cur_psector = None
 
-        if psector_id in (None, "null") or psector_id == int(cur_psector[0]):
+        if psector_id in (None, "null") or psector_id == cur_psector:
             self.insert_or_update_new_psector(close_dlg=False)
-        
+
         self.psector_id = psector_id
         if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
             tableleft = "v_price_compost"
@@ -975,11 +979,11 @@ class GwPsector:
 
         workcat_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_workcat_id')
         status_id = tools_qt.get_combo_value(self.dlg_plan_psector, 'tab_general_status')
-        # Check if psector status is "Executed" (status_id == 4) and has no workcat_id
-        if status_id == 4 and workcat_id in (None, 'null', ''):
+        # Check if psector status is "Executed" (status_id == 5) and has no workcat_id
+        if int(status_id) == 5 and workcat_id in (None, 'null', ''):
             msg = "Psector '{0}' has no workcat_id value set. Do you want to continue with the default value?"
             msg_params = (psector_name,)
-            answer = tools_qgis.ask_question(msg, parameter='Psector', dialog=self.dlg_plan_psector, msg_params=msg_params)
+            answer = tools_qt.show_question(msg, title='Psector', msg_params=msg_params)
             if answer is False:
                 return
 
@@ -1782,7 +1786,7 @@ class GwPsector:
         # Prepare the JSON body for gw_fct_set_toggle_current
         extras = f'"type": "{scenario_type}", "id": "{scenario_id}"'
         body = tools_gw.create_body(extras=extras)
-        
+
         # Execute the stored procedure
         result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
 
@@ -1810,7 +1814,7 @@ class GwPsector:
     def _filter_table(self, dialog, table, widget_txt, chk_active=None, chk_archived=None, tablename=None):
 
         result_select = tools_qt.get_text(dialog, widget_txt)
-        
+
         # Get checkbox states safely
         try:
             active_checked = chk_active.isChecked()
@@ -1991,6 +1995,7 @@ class GwPsector:
             sql = f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;" \
                 f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({psector_id}, current_user);"
             tools_db.execute_sql(sql)
+            self.psector_editable = True if tools_gw.get_config_value('plan_psector_current') is not None else False
             if not cur_psector or (cur_psector and (cur_psector[0] is None or psector_id != int(cur_psector[0]))):
                 # Ask user if they want to set this psector as current
                 msg = "Do you want to set this psector as current?"
@@ -2019,7 +2024,7 @@ class GwPsector:
             return
 
         # Get selected psector_id from the first column (adjust index if needed)
-        psector_id = selected_rows[0].data()        
+        psector_id = selected_rows[0].data()
 
         # Call the SQL function to get the sector features
         extras = f'"psector_id":"{psector_id}"'
@@ -2161,7 +2166,7 @@ class GwPsector:
                 msg = f"Cannot merge archived psector {id_feature}. Please unarchive it first."
                 tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
                 return
-        
+
         # Get selected dscenario id
         value = ""
         for i in range(0, len(selected_list)):
@@ -2400,30 +2405,6 @@ class GwPsector:
         event_point = self.snapper_manager.get_event_point(point=point)
         self.arc_id = None
 
-        # Manage current psector
-        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
-               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
-        row = tools_db.get_row(sql)
-
-        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-
-        if row is None:
-            msg = "Current user does not have 'plan_psector_current'. Value of current psector will be inserted."
-            tools_qt.show_info_box(msg)
-
-            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_current', '{selected_psector}', current_user)")
-            tools_db.execute_sql(sql)
-
-        elif str(row[0]) != str(selected_psector):
-            msg = "This psector does not match the current one. Value of current psector will be updated."
-            tools_qt.show_info_box(msg)
-
-            sql = ("UPDATE config_param_user "
-                   f"SET value = '{selected_psector}' "
-                   "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
-            tools_db.execute_sql(sql)
-
         # Snap point
         result = self.snapper_manager.snap_to_current_layer(event_point)
 
@@ -2504,23 +2485,6 @@ class GwPsector:
 
         event_point = self.snapper_manager.get_event_point(point=point)
         self.arc_id = None
-
-        # Manage current psector
-        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
-               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
-        row = tools_db.get_row(sql)
-        current_psector = row[0]
-        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-
-        if str(current_psector) != str(selected_psector):
-            msg = "This psector does not match the current one. Value of current psector will be updated."
-            tools_qt.show_info_box(msg)
-
-            sql = ("UPDATE config_param_user "
-                   f"SET value = '{selected_psector}' "
-                   "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
-            tools_db.execute_sql(sql)
 
         # Snap point
         result = self.snapper_manager.snap_to_current_layer(event_point)
@@ -2655,22 +2619,7 @@ class GwPsector:
                 self.node_id = snapped_feat.attribute('node_id')
                 self.node_state = snapped_feat.attribute('state')
 
-                # Manage current psector
-                sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
-                       " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-                       " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
-                row = tools_db.get_row(sql)
-                current_psector = row[0]
                 selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-
-                if str(current_psector) != str(selected_psector):
-                    msg = "This psector does not match the current one. Value of current psector will be updated."
-                    tools_qt.show_info_box(msg)
-
-                    sql = ("UPDATE config_param_user "
-                           f"SET value = '{selected_psector}' "
-                           "WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
-                    tools_db.execute_sql(sql)
 
                 # Execute setarcfusion
                 workcat_id = tools_qt.get_combo_value(self.dlg_plan_psector, self.workcat_id)
@@ -3160,12 +3109,12 @@ def close_dlg(**kwargs):
         tools_qgis.disconnect_snapping()
         tools_gw.disconnect_signal('psector')
         tools_qgis.disconnect_signal_selection_changed()
-        
+
         try:
             global_vars.canvas.selectionChanged.disconnect(partial(class_obj._manage_selection_changed))
         except (RuntimeError, TypeError):
             pass
-        
+
         # Apply filters on tableview
         if hasattr(class_obj, 'dlg_psector_mng'):
             class_obj._filter_table(class_obj.dlg_psector_mng, class_obj.qtbl_psm, class_obj.dlg_psector_mng.txt_name, class_obj.dlg_psector_mng.chk_active, class_obj.dlg_psector_mng.chk_archived, 'v_ui_plan_psector')

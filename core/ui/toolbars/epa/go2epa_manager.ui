@@ -112,9 +112,9 @@
        </widget>
       </item>
       <item row="1" column="6">
-       <widget class="QPushButton" name="btn_set_corporate">
+       <widget class="QPushButton" name="btn_toggle_corporate">
         <property name="text">
-         <string>Set corporate</string>
+         <string>Toggle corporate</string>
         </property>
        </widget>
       </item>
@@ -172,7 +172,7 @@
   <tabstop>btn_edit</tabstop>
   <tabstop>btn_show_inp_data</tabstop>
   <tabstop>btn_archive</tabstop>
-  <tabstop>btn_set_corporate</tabstop>
+  <tabstop>btn_toggle_corporate</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>tbl_rpt_cat_result</tabstop>
   <tabstop>tab_log_txt_infolog</tabstop>

@@ -40,7 +40,7 @@ class GwGo2EpaButton(GwAction):
         self.epa_options_list = []
         self.iface = global_vars.iface
 
-        if self.project_type == 'ud':
+        if self.project_type == 'ud' and tools_qgis.is_plugin_active('IberGIS'):
             # Create a menu and add all the actions
             self.menu = QMenu()
             self.menu.setObjectName("GW_epa_tools")
@@ -51,7 +51,7 @@ class GwGo2EpaButton(GwAction):
                 toolbar.addAction(self.action)
 
     def clicked_event(self):
-        if self.project_type == 'ud':
+        if self.project_type == 'ud' and tools_qgis.is_plugin_active('IberGIS'):
             button = self.action.associatedWidgets()[1]
             menu_point = button.mapToGlobal(QPoint(0, button.height()))
             self.menu.exec(menu_point)
@@ -71,8 +71,11 @@ class GwGo2EpaButton(GwAction):
 
         new_actions = [
             (self.menu, ('ud'), tools_qt.tr('Go2EPA'), None),
-            (self.menu, ('ud'), tools_qt.tr('Go2IBER'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"))
         ]
+
+        # Add Go2Iber action if ibergis plugin is available
+        if tools_qgis.is_plugin_active('IberGIS'):
+            new_actions.append((self.menu, ('ud'), tools_qt.tr('Go2IBER'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png")))
 
         for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:
@@ -172,7 +175,7 @@ class GwGo2EpaButton(GwAction):
             :param index: tab index (passed by signal)
         """
         # Set network mode to 1
-        if self.project_type == 'ud':
+        if self.project_type == 'ud' and tools_qgis.is_plugin_active('IberGIS'):
             form = '"formName":"epaoptions"'
             my_json = '[{"widget": "inp_options_networkmode", "value": "1"}]'
             extras = f'"fields":{my_json}'

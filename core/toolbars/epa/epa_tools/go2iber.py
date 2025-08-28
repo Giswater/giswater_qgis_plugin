@@ -34,7 +34,7 @@ class Go2Iber:
     """Button 47: Go2Iber"""
 
     def __init__(self) -> None:
-        self.ibergis_folder = tools_qgis.get_plugin_folder("ibergis")
+        self.ibergis_folder = tools_qgis.get_plugin_folder("IberGIS")
         self.ig_options_class = importlib.import_module('.options', package=f'{self.ibergis_folder}.core.shared') if self.ibergis_folder else None
         self.ig_tools_db = importlib.import_module('.tools_db', package=f'{self.ibergis_folder}.lib') if self.ibergis_folder else None
 
@@ -103,7 +103,7 @@ class Go2Iber:
                 pass
 
         mesh = tools_qt.get_combo_value(self.dlg_go2iber, 'cmb_mesh', 1)
-        if mesh is None or mesh == "":
+        if mesh is None or mesh == "" or mesh == -1:
             msg = "You need to have a mesh"
             tools_qt.show_warning(msg)
             return
@@ -264,7 +264,7 @@ class Go2Iber:
 
         # Reload plugin
         import qgis.utils
-        plugin_name = tools_qgis.get_plugin_folder('ibergis')
+        plugin_name = tools_qgis.get_plugin_folder('IberGIS')
         if plugin_name not in qgis.utils.plugins:
             qgis.utils.loadPlugin(plugin_name)
         else:

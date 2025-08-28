@@ -117,6 +117,7 @@ class AddNewLot:
         if lot_id:
             self._load_lot_relations(lot_id)
             self.enable_feature_tabs_by_campaign(lot_id)
+            self._check_and_disable_campaign_combo()
 
         if tools_gw.get_project_type() == 'ws':
             tools_qt.enable_tab_by_tab_name(self.dlg_lot.tab_widget, 'LoadsTab', False)
@@ -171,8 +172,9 @@ class AddNewLot:
         # Relation feature buttons
         self.dlg_lot.btn_insert.clicked.connect(self._insert_related_feature)
         self.dlg_lot.btn_delete.clicked.connect(self._delete_related_records)
-        self.dlg_lot.btn_snapping.clicked.connect(self._init_snapping_selection)
         self.dlg_lot.btn_expr_select.clicked.connect(self._select_by_expression)
+
+        tools_gw.menu_btn_snapping(self, self.dlg_lot, "lot", GwSelectionMode.LOT, callback=self._init_snapping_selection)
 
         # Always set multi-row and full row selection for relation tables, both on create and edit
         relation_table_names = [
@@ -187,7 +189,7 @@ class AddNewLot:
         for table_name in relation_table_names:
             view = getattr(self.dlg_lot, table_name, None)
             if view:
-                tools_qt.set_tableview_config(view)
+                tools_qt.set_tableview_config(view, sortingEnabled=False)
 
         # Connect selectionChanged signal to select features in relations tables when selecting them on the canvas
         global_vars.canvas.selectionChanged.connect(partial(self._manage_selection_changed))
@@ -461,7 +463,11 @@ class AddNewLot:
             view = getattr(self.dlg_lot, table_widget_name, None)
             if view:
                 db_table = f"om_campaign_lot_x_{feature}"
-                sql = f"SELECT * FROM cm.{db_table} WHERE lot_id = {lot_id}"
+                sql = (
+                    f"SELECT * FROM cm.{db_table} "
+                    f"WHERE lot_id = {lot_id} "
+                    f"ORDER BY id"
+                )
                 self.populate_tableview(view, sql)
 
     def get_widget_by_columnname(self, dialog: QWidget, columnname: str) -> Optional[QWidget]:
@@ -659,11 +665,8 @@ class AddNewLot:
             self.lot_id = result["body"]["feature"]["id"]
             self.is_new_lot = False
 
-            tools_gw.remove_selection(True, layers=self.rel_layers)
-            tools_gw.reset_rubberband(self.rubber_band)
-            tools_qgis.force_refresh_map_canvas()
+            self._cleanup_map_selection()
             if not from_change_tab:
-                tools_qgis.disconnect_signal_selection_changed()
                 self.dlg_lot.accept()
         else:
             msg = "Error saving lot."
@@ -681,19 +684,20 @@ class AddNewLot:
     def manage_rejected(self):
         """Handles the cancellation or rejection of changes by disconnecting selection signals,
         clearing any active feature selections, saving user settings, switching the tool to pan mode, and closing the current dialog."""
-        tools_qgis.disconnect_signal_selection_changed()
-        layer = self.iface.activeLayer()
-        if layer:
-            layer.removeSelection()
+        self._cleanup_map_selection()
         tools_gw.save_settings(self.dlg_lot)
         self.iface.actionPan().trigger()
         tools_gw.close_dialog(self.dlg_lot)
 
     def _on_dialog_rejected(self):
         """Handles cleanup when the dialog is rejected."""
+        self._cleanup_map_selection()
+
+    def _cleanup_map_selection(self):
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
+        tools_qgis.force_refresh_map_canvas()
 
     def _refresh_relations_table(self):
         """Callback to refresh relations using the current lot_id."""
@@ -711,16 +715,17 @@ class AddNewLot:
         tools_gw.insert_feature(self, self.dlg_lot, "lot", GwSelectionMode.LOT, False, None, None,
                                 refresh_callback=self._refresh_relations_table)
         self._update_feature_completer_lot(self.dlg_lot)
+        self._check_and_disable_campaign_combo()
 
     def _delete_related_records(self):
         """Handles the 'delete records' button click action."""
         tools_gw.delete_records(self, self.dlg_lot, "lot", GwSelectionMode.LOT, None, None, None,
                                 refresh_callback=self._refresh_relations_table)
         self._update_feature_completer_lot(self.dlg_lot)
+        self._check_and_disable_campaign_combo()
 
     def _init_snapping_selection(self):
         """Handles the 'snapping selection' button click action."""
-        tools_gw.selection_init(self, self.dlg_lot, "lot", GwSelectionMode.LOT)
         self._update_feature_completer_lot(self.dlg_lot)
 
     def _select_by_expression(self):
@@ -1711,6 +1716,28 @@ class AddNewLot:
             return "role_cm_field"
         else:
             return "role_basic"
+
+    def _check_and_disable_campaign_combo(self):
+        """Disable campaign combo if any relations exist."""
+        if not self.lot_id:
+            return
+
+        features = ["arc", "node", "connec", "link"]
+        if tools_gw.get_project_type() == 'ud':
+            features.append("gully")
+
+        has_relations = False
+        for feature in features:
+            db_table = f"om_campaign_lot_x_{feature}"
+            sql = f"SELECT 1 FROM cm.{db_table} WHERE lot_id = {self.lot_id} LIMIT 1"
+            if tools_db.get_row(sql):
+                has_relations = True
+                break
+
+        if has_relations:
+            campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
+            if campaign_combo:
+                campaign_combo.setEnabled(False)
 
 
 def upsert_team(**kwargs: Any):

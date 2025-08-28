@@ -43,7 +43,7 @@ class GwGo2EpaManagerButton(GwAction):
         reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
         self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
         self.dlg_manager.tab_log_txt_infolog.setReadOnly(True)
-        self.dlg_manager.btn_set_corporate.setEnabled(False)
+        self.dlg_manager.btn_toggle_corporate.setEnabled(False)
         self.dlg_manager.btn_archive.setEnabled(False)
 
         # Fill combo box and table view
@@ -60,7 +60,7 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.btn_show_inp_data.clicked.connect(partial(self._show_inp_data, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_archive.clicked.connect(partial(self._toggle_rpt_archived, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
-        self.dlg_manager.btn_set_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
+        self.dlg_manager.btn_toggle_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
         self.dlg_manager.btn_delete.clicked.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
                                                             'v_ui_rpt_cat_result', 'result_id'))
@@ -92,8 +92,8 @@ class GwGo2EpaManagerButton(GwAction):
         menu.addAction(action_toggle_active)
         
         action_set_corporate = QAction("Set corporate", qtableview)
-        action_set_corporate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_set_corporate"))
-        action_set_corporate.setEnabled(qtableview.window().btn_set_corporate.isEnabled())
+        action_set_corporate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_corporate"))
+        action_set_corporate.setEnabled(qtableview.window().btn_toggle_corporate.isEnabled())
         menu.addAction(action_set_corporate)  
 
         action_delete = QAction("Delete", qtableview)
@@ -259,9 +259,13 @@ class GwGo2EpaManagerButton(GwAction):
                 if status == 'PARTIAL' or status != last_status or tools_os.set_boolean(is_corporate, False):
                     archive_enabled = False
             last_status = status
-        if not selected_rows:
+
+            # check network type
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_type')
+            network_type = index.sibling(row, col_idx).data()
+        if not selected_rows or network_type == 'NETWORK DMA':
             set_corporate_enabled, archive_enabled = False, False
-        self.dlg_manager.btn_set_corporate.setEnabled(set_corporate_enabled)
+        self.dlg_manager.btn_toggle_corporate.setEnabled(set_corporate_enabled)
         self.dlg_manager.btn_archive.setEnabled(archive_enabled)
 
     def _fill_combo_result_id(self):

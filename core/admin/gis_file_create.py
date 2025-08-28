@@ -11,7 +11,7 @@ import json
 from ..utils import tools_gw  # noqa: F401
 from ... import global_vars
 from ...libs import tools_log, tools_qt, tools_db, tools_qgis
-from qgis.core import QgsProject, QgsCoordinateReferenceSystem, QgsLayerTreeLayer
+from qgis.core import QgsProject, QgsCoordinateReferenceSystem, QgsLayerTreeLayer, QgsLayerTreeGroup
 
 
 class GwGisFileCreate:
@@ -78,6 +78,8 @@ class GwGisFileCreate:
         if layers:
             for layer in layers['body']['data']['layers']:
                 template = layer.get('project_template')
+                addparam = layer.get('addparam')
+                properties = addparam.get('layerProp', None) if addparam is not None else None
                 if not template:
                     continue
 
@@ -91,14 +93,18 @@ class GwGisFileCreate:
                             if levels[i] is not None:
                                 old_level = level.findGroup(levels[i])
                                 if old_level is None:
-                                    old_level = level.addGroup(levels[i])
+                                    old_level = level.insertGroup(0, levels[i])
                                 level = old_level
                     rectangle = tools_gw._get_extent_parameters(schema)
                     # Add project layer
                     tools_gw.add_layer_database(layer['tableName'], layer['geomField'], layer['tableId'], levels[0], levels[1] if len(levels) > 1 else None, style_id='-1', alias=layer['layerName'],
                                                  sub_sub_group=levels[2] if len(levels) > 2 else None, schema=layer['tableSchema'], visibility=template.get('visibility'), auth_id=auth_id,
-                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True)
+                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True, force_create_group=False,
+                                                 properties=properties)
 
+        # Hide hidden group
+        tools_gw.hide_group_from_toc('HIDDEN')
+        
         # Set project CRS
         project.setCrs(QgsCoordinateReferenceSystem(auth_id))
 
@@ -106,9 +112,15 @@ class GwGisFileCreate:
         project = self._set_project_vars(project, export_passwd)
 
         # Collapse all layers
-        groups = root.findLayers()
+        layers = root.findLayers()
+        for layer in layers:
+            if isinstance(layer, QgsLayerTreeLayer):
+                layer.setExpanded(False)
+        
+        # Collapse all groups
+        groups = root.findGroups()
         for group in groups:
-            if isinstance(group, QgsLayerTreeLayer):
+            if isinstance(group, QgsLayerTreeGroup):
                 group.setExpanded(False)
 
         # Set camera position on ve_node
@@ -125,7 +137,7 @@ class GwGisFileCreate:
             tools_qgis.show_warning(msg, parameter=qgs_path)
             return False, qgs_path
 
-    # region private functions
+    # region private functions 
 
     def _get_database_parameters(self, schema):
         """ Get database parameters from layer source """

@@ -153,9 +153,9 @@ class GwImportInpTask(GwTask):
                 self._save_files()
                 self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            self._manage_catalogs()
-
             self._manage_nonvisual()
+
+            self._manage_catalogs()
 
             self._manage_visual()
 
@@ -1822,7 +1822,10 @@ class GwImportInpTask(GwTask):
                 self._log_message(f"Node not found: {e}")
                 continue
             xs = self.network[XSECTIONS][c_name]
-            arccat_id = self.catalogs["conduits"][(xs.shape, xs.height, xs.parameter_2, xs.parameter_3, xs.parameter_4)]
+            if xs.shape == "CUSTOM":
+                arccat_id = self.catalogs["conduits"][(xs.shape, xs.height, xs.curve_name, xs.parameter_3, xs.parameter_4)]
+            else:
+                arccat_id = self.catalogs["conduits"][(xs.shape, xs.height, xs.parameter_2, xs.parameter_3, xs.parameter_4)]
             epa_type = "CONDUIT"
             expl_id = self.exploitation
             sector_id = self.sector

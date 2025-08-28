@@ -333,8 +333,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>598</width>
-             <height>799</height>
+             <width>502</width>
+             <height>700</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
@@ -675,46 +675,7 @@
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">
-            <item row="2" column="0">
-             <widget class="QGroupBox" name="grb_i18n">
-              <property name="title">
-               <string>i18n</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_13">
-               <item row="0" column="0">
-                <widget class="QPushButton" name="btn_i18n">
-                 <property name="text">
-                  <string>i18n manager</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QGroupBox" name="grb_files_generator">
-              <property name="title">
-               <string>Plugin files generator</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_16">
-               <item row="1" column="0">
-                <widget class="QPushButton" name="btn_translation">
-                 <property name="text">
-                  <string>Translation files</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QPushButton" name="btn_create_qgis_template">
-                 <property name="text">
-                  <string>QGIS templates</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="1" column="0">
+            <item row="3" column="0">
              <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Schema Utils</string>
@@ -757,7 +718,53 @@
               </layout>
              </widget>
             </item>
-            <item row="3" column="0">
+            <item row="4" column="0">
+             <widget class="QGroupBox" name="grb_i18n">
+              <property name="title">
+               <string>i18n</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_13">
+               <item row="0" column="0">
+                <widget class="QPushButton" name="btn_i18n">
+                 <property name="text">
+                  <string>i18n manager</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="grb_files_generator">
+              <property name="title">
+               <string>Plugin files generator</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_16">
+               <item row="2" column="0">
+                <widget class="QPushButton" name="btn_translation">
+                 <property name="text">
+                  <string>Translation files</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QPushButton" name="btn_create_qgis_template">
+                 <property name="text">
+                  <string>QGIS templates</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QPushButton" name="btn_markdown_generator">
+                 <property name="text">
+                  <string>Markdown generator</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="5" column="0">
              <spacer name="verticalSpacer_4">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -870,7 +877,6 @@
   <tabstop>btn_update_field</tabstop>
   <tabstop>btn_delete_field</tabstop>
   <tabstop>btn_reload_fct_ftrg</tabstop>
-  <tabstop>scrollArea_4</tabstop>
   <tabstop>btn_create_qgis_template</tabstop>
   <tabstop>btn_translation</tabstop>
   <tabstop>cmb_utils_ws</tabstop>

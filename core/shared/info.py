@@ -35,6 +35,7 @@ from .visit import GwVisit
 from .workcat import GwWorkcat
 from ..utils import tools_gw, tools_backend_calls
 from ..threads.toggle_valve_state import GwToggleValveTask
+from ..toolbars.epa.dscenario_manager_btn import GwDscenarioManagerButton
 
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
@@ -707,7 +708,6 @@ class GwInfo(QObject):
         self.action_section = self.dlg_cf.findChild(QAction, "actionSection")
         self.action_orifice = self.dlg_cf.findChild(QAction, "actionOrifice")
         self.action_outlet = self.dlg_cf.findChild(QAction, "actionOutlet")
-        self.action_pump = self.dlg_cf.findChild(QAction, "actionPump")
         self.action_weir = self.dlg_cf.findChild(QAction, "actionWeir")
         self.action_demand = self.dlg_cf.findChild(QAction, "actionDemand")
         self.action_audit = self.dlg_cf.findChild(QAction, "actionAudit")
@@ -733,7 +733,6 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_interpolate, "151")
         tools_gw.add_icon(self.action_orifice, "159")
         tools_gw.add_icon(self.action_outlet, "160")
-        tools_gw.add_icon(self.action_pump, "161")
         tools_gw.add_icon(self.action_weir, "162")
         tools_gw.add_icon(self.action_demand, "163")
         tools_gw.add_icon(self.action_audit, "177")
@@ -906,10 +905,8 @@ class GwInfo(QObject):
         self.action_outlet.triggered.connect(partial(self._open_outlet_dlg))
         self.action_weir.triggered.connect(partial(self._open_weir_dlg))
         if global_vars.project_type == 'ws':
-            self.action_pump.triggered.connect(partial(self._open_pump_additional_dlg))
             self.action_demand.triggered.connect(partial(self._open_demand_dlg))
         elif global_vars.project_type == 'ud':
-            self.action_pump.triggered.connect(partial(self._open_pump_dlg))
             self.action_demand.triggered.connect(partial(self._open_dwf_dlg))
 
         # Disable action edit if user can't edit
@@ -941,26 +938,6 @@ class GwInfo(QObject):
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Outlet", **kwargs)
-
-    def _open_pump_dlg(self):
-        # kwargs
-        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
-                       "tableviews": [
-                        {"tbl": "tbl", "view": "inp_flwreg_pump", "add_view": "ve_inp_flwreg_pump", "pk": "nodarc_id", "add_dlg_title": "Pump - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_pump", "add_view": "ve_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Pump - Dscenario"}
-                       ]}
-        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg("Pump", **kwargs)
-
-    def _open_pump_additional_dlg(self):
-        # kwargs
-        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
-                       "tableviews": [
-                        {"tbl": "tbl", "view": "inp_pump_additional", "add_view": "ve_inp_pump_additional", "pk": ["node_id", "order_id"], "add_dlg_title": "Pump Additional - Base"},
-                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_pump_additional", "add_view": "ve_inp_dscenario_pump_additional", "pk": ["dscenario_id", "node_id", "order_id"], "add_dlg_title": "Pump Additional - Dscenario"}
-                       ]}
-        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg("Additional Pump", **kwargs)
 
     def _open_weir_dlg(self):
         # kwargs
@@ -1763,10 +1740,6 @@ class GwInfo(QObject):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        # Set image
-        img = json_result['body']['data']['shapepng']
-        tools_qt.add_image(dlg_sections, 'lbl_section_image', f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
-
         # Set values into QLineEdits
         for field in json_result['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['columnname'])
@@ -1775,7 +1748,12 @@ class GwInfo(QObject):
                     tools_qt.set_widget_text(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_sections))
+
+        # Open the dialog first
         tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect')
+
+        img = json_result['body']['data']['shapepng']
+        tools_qt.add_image(dlg_sections, 'lbl_section_image', f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
 
     def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
         """
@@ -1927,7 +1905,10 @@ class GwInfo(QObject):
             if global_vars.project_type == 'ws' and self.feature_type == 'connec' and epa_type == 'junction':
                 epa_table_id = 've_epa_connec'
             my_json = json.dumps(self.my_json_epa)
-            feature += f'"tableName":"{epa_table_id}", '
+            if self.feature_type.lower() == 'link':
+                feature += '"tableName":"ve_epa_link", '
+            else:
+                feature += f'"tableName":"{epa_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
             extras = f'"fields":{my_json}, "afterInsert":"{after_insert}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
@@ -1980,7 +1961,7 @@ class GwInfo(QObject):
         try:
             actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
-                              'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
+                              'actionSection', 'actionOrifice', 'actionOutlet', 'actionWeir', 'actionDemand')
 
             for action in actions_list:
                 if action.objectName() not in static_actions and action.objectName() != 'actionAudit':
@@ -2249,14 +2230,17 @@ class GwInfo(QObject):
     def _reload_epa_tab(self, dialog):
         epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
         # call getinfofromid
-        if not epa_type or epa_type.lower() in ('undefined', 'null'):
+        if not epa_type or epa_type.lower() in ('undefined') or (epa_type.lower() == 'null' and self.feature_type.lower() != 'link'):
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
             return
 
         tablename = 've_epa_' + epa_type.lower()
         if global_vars.project_type == 'ws' and self.feature_type == 'connec' and epa_type.lower() == 'junction':
             tablename = 've_epa_connec'
-        feature = f'"tableName":"{tablename}", "id":"{self.feature_id}", "epaType": "{epa_type}"'
+        if self.feature_type.lower() == 'link':
+            feature = f'"tableName":"ve_epa_link", "id":"{self.feature_id}", "epaType": "link"'
+        else:
+            feature = f'"tableName":"{tablename}", "id":"{self.feature_id}", "epaType": "{epa_type}"'
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
         complet_result = tools_gw.execute_procedure(function_name, body)
@@ -2715,15 +2699,7 @@ class GwInfo(QObject):
                 grb_dscenario.setCollapsed(False)
             # Populate widgets
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_elements')
-            # Hide dscenario tabs
-            tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
-            if global_vars.project_type == 'ud':
-                tab_widget.setTabVisible(4, False)
-                tab_widget.setTabEnabled(4, False)
-            elif global_vars.project_type == 'ws':
-                for i in [0, 1, 3]:
-                    tab_widget.setTabVisible(i, False)
-                    tab_widget.setTabEnabled(i, False)
+            self._manage_dscenario_elements_tabs()
             # Init tab
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
@@ -2829,6 +2805,63 @@ class GwInfo(QObject):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self._fill_tab_plan(self.complet_result)
             self.tab_plan_loaded = True
+
+    def _manage_dscenario_elements_tabs(self):
+        """ Manage dscenario elements tabs """
+
+        if global_vars.project_type == 'ud':
+            # Disable dscenario tabs
+            tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
+            tab_widget.setTabVisible(4, False)
+            tab_widget.setTabEnabled(4, False)
+            tab_widget.setTabVisible(5, False)
+            tab_widget.setTabEnabled(5, False)
+        elif global_vars.project_type == 'ws':
+            # Disable dscenario tabs
+            tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
+            for i in [0, 1, 3]:
+                tab_widget.setTabVisible(i, False)
+                tab_widget.setTabEnabled(i, False)
+
+        # Create double click event for dscenario tables
+        tableviews = self.dlg_cf.findChildren(QTableView, QRegularExpression('tbl_frelem_dsc_'))
+        for tableview in tableviews:
+            tableview.doubleClicked.connect(partial(self._open_dscenario_element, self.dlg_cf, tableview))
+
+    def _open_dscenario_element(self, dlg_cf, tableview):
+        """ Open dscenario element """
+        # Create double click event for dscenario tables
+        dscenario_manager_btn = GwDscenarioManagerButton('', None, None, None, None)
+        # Get first column value from the selected row
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dlg_cf)
+            return
+        index = selected_list[0]
+        row = index.row()
+        first_col_value = index.sibling(row, 0).data()
+        dscenario_manager_btn.selected_dscenario_id = int(first_col_value)
+        # Pass a refresh callback so Info tables reload when generic form closes
+        try:
+            def _refresh_dscenario_table():
+                try:
+                    tbl = tableview
+                    dlg = self.dlg_cf
+                    complet_result = self.complet_result
+                    feature_id = complet_result['body']['feature']['id']
+                    id_name = complet_result['body']['feature']['idName']
+                    view = tbl.property('linkedobject')
+                    if not view:
+                        return
+                    complet_list = get_list(view, id_name, feature_id)
+                    fill_tbl(complet_list, tbl, self, view, dlg)
+                    tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=self.schema_name)
+                except Exception:
+                    pass
+            dscenario_manager_btn.manage_update(dlg_cf, tableview, on_close=_refresh_dscenario_table)
+        except Exception:
+            dscenario_manager_btn.manage_update(dlg_cf, tableview)
 
     def force_enable_clear_button(self, widget):
         # Always ensure nulls are allowed

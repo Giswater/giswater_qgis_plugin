@@ -76,6 +76,17 @@ class GwConnectLinkButton(GwMaptool):
         self.max_distance = self.dlg_connect_link.findChild(QWidget, "tab_none_max_distance")
         self.tbl_ids = self.dlg_connect_link.findChild(QWidget, "tab_none_tbl_ids")
 
+        pipe_diameter_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'pipe_diameter', "user", "session")
+        max_distance_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'max_distance', "user", "session")
+        linkcat_id_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'linkcat_id', "user", "session")
+
+        if pipe_diameter_value not in (None, 'None', ''):
+            tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_pipe_diameter", pipe_diameter_value)
+        if max_distance_value not in (None, 'None', ''):
+            tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_max_distance", max_distance_value)
+        if linkcat_id_value not in (None, 'None', ''):
+            tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_linkcat", linkcat_id_value)
+
         # Set combo ids editable
         self.txt_id.setEditable(True)
 
@@ -225,9 +236,12 @@ class GwConnectLinkButton(GwMaptool):
             msg = "gw_fct_setlinktonetwork (Check log messages)"
             tools_qgis.show_warning(msg, title='Function error')
 
+        # Recover dialog values
+        self._save_dlg_values()
+
         # Remove selection from layers
         tools_gw.remove_selection()
-        
+
         # Refresh map canvas
         tools_gw.reset_rubberband(self.rubber_band)
         self.refresh_map_canvas()
@@ -300,6 +314,17 @@ class GwConnectLinkButton(GwMaptool):
         self.fill_tbl_ids(layer)
         self.iface.actionPan().trigger()
 
+    def _save_dlg_values(self):
+        """ Save dialog values """
+
+        pipe_diameter_value = self.pipe_diameter.text()
+        max_distance_value = self.max_distance.text()
+        linkcat_id_value = tools_qt.get_combo_value(self.dlg_connect_link, "tab_none_linkcat")
+
+        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'pipe_diameter', pipe_diameter_value)
+        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'max_distance', max_distance_value)
+        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'linkcat_id', linkcat_id_value)
+
     # endregion
 
 
@@ -349,37 +374,37 @@ def remove(**kwargs):
         # Get the table model and selection model
         model = this.tbl_ids.model()
         selection_model = this.tbl_ids.selectionModel()
-        
+
         if not model or not selection_model:
             return
-            
+
         # Get selected rows
         selected_rows = selection_model.selectedRows()
-        
+
         if not selected_rows:
             message = "Please select rows to remove from the table"
             tools_qgis.show_warning(message, title='Connect to network')
             return
-        
+
         # Get IDs from selected rows
         selected_ids = []
         for index in selected_rows:
             item = model.item(index.row(), 0)  # Get the first column
             if item and item.text():
                 selected_ids.append(item.text())
-        
+
         if not selected_ids:
             return
-            
+
         # Remove selected rows from the model
         # We need to remove rows in reverse order to avoid index issues
         rows_to_remove = sorted([index.row() for index in selected_rows], reverse=True)
         for row in rows_to_remove:
             model.removeRow(row)
-        
+
         # Clear any selection in the combo box
         tools_qt.set_widget_text(this.dlg_connect_link, "tab_none_id", "")
-        
+
         # Update canvas selection to show only remaining items in the table
         layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
         if layer:
@@ -389,7 +414,7 @@ def remove(**kwargs):
                 item = model.item(row, 0)
                 if item and item.text():
                     remaining_ids.append(int(item.text()))
-            
+
             # Clear current selection and select only remaining features
             layer.removeSelection()
             if remaining_ids:
@@ -398,14 +423,14 @@ def remove(**kwargs):
                 is_valid, expr = tools_qt.check_expression_filter(expr_filter)
                 if is_valid:
                     layer.selectByExpression(expr_filter)  # Use expr_filter (string) instead of expr (QgsExpression)
-            
+
             # Refresh the layer to show updated selection
             layer.triggerRepaint()
-        
+
         # Show success message
         removed_count = len(selected_ids)
         tools_qgis.show_info(f"{removed_count} item(s) removed from the list: {', '.join(selected_ids)}")
-            
+
     except Exception as e:
         tools_qgis.show_warning(f"Error removing items: {str(e)}")
         tools_gw.log_info(f"Error in remove function: {str(e)}")
@@ -421,8 +446,8 @@ def accept(**kwargs):
     this.linkcat = tools_qt.get_combo_value(this.dlg_connect_link, "tab_none_linkcat")
 
     # Check input values
-    if this.pipe_diameter.text() == '' or this.max_distance.text() == '' or this.linkcat == '':
-        message = "Please fill all fields in the dialog"
+    if this.linkcat == '':
+        message = "Please fill link catalog field in the dialog"
         tools_qgis.show_warning(message, title='Connect to network', dialog=this.dlg_connect_link)
         return
 
@@ -460,7 +485,7 @@ def accept(**kwargs):
 
     # Remove selection from layers before canceling map tool
     tools_gw.remove_selection()
-    
+
     # Cancel map tool if no features are selected or the layer is not visible
     this.cancel_map_tool()
 
@@ -476,13 +501,13 @@ def close(**kwargs):
 
     # Get class
     this = kwargs['class']
-    
+
     # Remove selection from layers before canceling map tool
     tools_gw.remove_selection()
-    
+
     # Cancel map tool
     this.cancel_map_tool()
-    
+
     # Close dialog
     tools_gw.close_dialog(kwargs['dialog'])
 

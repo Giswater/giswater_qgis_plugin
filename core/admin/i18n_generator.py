@@ -83,7 +83,7 @@ class GwI18NGenerator:
         """ Populate combo with languages values """
 
         self.dlg_qm.btn_translate.setEnabled(True)
-        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host) 
+        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         msg = 'Connected to {0}'
         msg_params = (host,)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
@@ -120,7 +120,7 @@ class GwI18NGenerator:
         # Create the translation files and see which where successful, which failed and which were canceled
         for self.language in self.languages:
             self.lower_lang = self.language.lower()
-            if self.language != 'no_TR':        
+            if self.language != 'no_TR':
                 if py_msg:
                     status_py_msg = self._create_py_files()
                     if status_py_msg is True:
@@ -154,7 +154,7 @@ class GwI18NGenerator:
                 msg += f'''{tools_qt.tr('Python translation canceled:')} {", ".join(canceled_langs['python'])}\n'''
             if translated_langs['python']:
                 msg += f'''{tools_qt.tr('Python translation successful:')} {", ".join(translated_langs['python'])}\n'''
-        
+
         if type_db_file_translated:
             for type_db_file in type_db_file_translated:
                 msg += f'''{tools_qt.tr('Schemas translated:')} {type_db_file}\n'''
@@ -326,7 +326,7 @@ class GwI18NGenerator:
         lrelease_path = f"{self.plugin_dir}{os.sep}resources{os.sep}i18n{os.sep}lrelease.exe"
         try:
             tools_log.log_info(f"Running lrelease: {lrelease_path} {ts_path}")
-            
+
             # Use subprocess.run to capture output and errors
             process = subprocess.run(
                 [lrelease_path, ts_path],
@@ -393,20 +393,26 @@ class GwI18NGenerator:
 
         # Get All table values
         self._write_header(cfg_path + file_name, file_type)
-        dbtables = self.path_dic[file_type]["tables"]
+        dbtables = self.path_dic[file_type]['tables']
         if self.language == 'no_TR':
             if file_type not in ['i18n_ws', 'i18n_ud']:
                 return True, f"{file_type}, not translated"
-            dbtables = ['dbconfig_form_fields', 'dbconfig_param_system', 'dbconfig_typevalue', 
+            dbtables = ['dbconfig_form_fields', 'dbconfig_param_system', 'dbconfig_typevalue',
                               'dbconfig_form_tableview', 'dbconfig_form_fields_feat']
             self.lower_lang = 'en_us'
         for dbtable in dbtables:
-            dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
+            result = self._get_table_values(dbtable)
+            
+            # Handle case where _get_table_values returns unexpected format
+            if not isinstance(result, tuple) or len(result) != 2:
+                return False, f"Invalid return format from _get_table_values for: {dbtable}"
+                
+            dbtable_rows, dbtable_columns = result
             if not dbtable_rows:
                 return False, f"No rows found in: {dbtable}"
             else:
                 if "json" in dbtable:
-                    text_error += self._write_dbjson_values(dbtable_rows, cfg_path + file_name)
+                    text_error += self._write_dbjson_values(dbtable_rows, cfg_path + file_name, file_type)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name, file_type)
         if text_error != "":
@@ -519,17 +525,18 @@ class GwI18NGenerator:
                 sql = (f"SELECT {', '.join(colums)}, {', '.join(lang_colums)} "
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY context;")
+            rows = self._get_rows(sql, self.cursor_i18n)
         except Exception as e:
             msg = "Error getting table values: {0}"
             msg_params = (e,)
             tools_log.log_error(msg, msg_params=msg_params)
             return False, colums
 
-        rows = self._get_rows(sql, self.cursor_i18n)
+
 
         # Return the corresponding information
         if not rows:
-            return False
+            return False, False
         return rows, colums
 
     def _write_table_values(self, rows, columns, table, path, file_type):
@@ -677,12 +684,14 @@ class GwI18NGenerator:
     # endregion
     # region Generate from Json
 
-    def _write_dbjson_values(self, rows, path):
+    def _write_dbjson_values(self, rows, path, file_type):
         closing = False
         values_by_context = {}
 
         updates = {}
         for row in rows:
+            if row['project_type'] not in self.path_dic[file_type]["project_type"]:
+                continue
             # Set key depending on context
             if row["context"] == "config_form_fields":
                 closing = True
@@ -714,7 +723,7 @@ class GwI18NGenerator:
 
             # Translate fields
             for row in related_rows:
-                key_hint = row["hint"].split('_')[0]
+                key_hint = row["hint"].rsplit('_', 1)[0]
                 default_text = row.get("lb_en_us", "")
                 translated = (
                     row.get(f"lb_{self.lower_lang}") or
@@ -722,11 +731,11 @@ class GwI18NGenerator:
                     default_text
                 )
 
-                if ", " in default_text:
+                if ", " in default_text and key_hint == "comboNames":
                     default_list = default_text.split(", ")
                     translated_list = translated.split(", ")
                     for item in json_data:
-                        if isinstance(item, dict) and key_hint in item and "comboNames" in item:
+                        if isinstance(item, dict) and key_hint in item:
                             if set(default_list).intersection(item["comboNames"]):
                                 item["comboNames"] = [
                                     t if d in default_list else d
@@ -765,13 +774,13 @@ class GwI18NGenerator:
                         f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{txt}')"
                         for source, row, txt, col in data
                     ])
-                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
+                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
                 else:
                     values_str = ",\n    ".join([
                         f"({source}, '{txt}')"
                         for source, row, txt, col in data
                     ])
-                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
 
             if closing:
                 file.write("UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';\n")
@@ -870,22 +879,65 @@ class GwI18NGenerator:
             status = False
 
         return status
-    
+
     def safe_parse(self, source, text):
         try:
             # Try JSON first (safer if it's valid JSON)
-            modified = text.replace("'", "\"").replace("False", "false").replace("True", "true").replace("None", "null")
-            return json.loads(modified)
-        except json.JSONDecodeError as e:
-            e1 = e
+            # First handle empty values 
 
-        try:
-            # Try Python literal (e.g., from repr())
-            modified = text.replace("false", "False").replace("true", "True").replace("null", "None")
-            return ast.literal_eval(modified)
-        except (ValueError, SyntaxError) as e2:
-            msg = "Error parsing JSON source: {0} - {1} - {2}"
-            msg_params = (source, e1, e2)
+            modified = text.replace("False", "false").replace("True", "true").replace("None", "null")
+            
+            #Save values in special cases
+            modified = modified.replace(": ''", ': "a"').replace(":''", ': "a"').replace(':""', ': "a"')
+            modified = modified.replace("','. ", "',a'. ").replace("'T','TANK'", "a'T',a'TANK'a")
+            modified = modified.replace("-999,'ALL", "-999,a'ALL")
+            
+            # Adapt " in keys and values
+            modified = modified.replace("': '", '": "').replace("':'", '": "').replace("' :'", '": "').replace("' : '", '": "')
+            modified = modified.replace("': \"", '": "').replace("':\"", '": "').replace("' :\"", '": "').replace("' : \"", '": "')
+            modified = modified.replace("\": '", '": "').replace("\":'", '": "').replace("\" :\"", '": "').replace("\" : \"", '": "')
+            
+            modified = modified.replace("', '", '", "').replace("','", '", "').replace("' ,'", '", "').replace("' , '", '", "')
+            modified = modified.replace("', \"", '", "').replace("',\"", '", "').replace("' ,\"", '", "').replace("' , \"", '", "')
+            modified = modified.replace("\", '", '", "').replace("\",'", '", "').replace("\" ,'", '", "').replace("\" , '", '", "')
+
+            #{ cases
+            modified = modified.replace("{'", '{"').replace("'}", '"}')
+            modified = modified.replace("': {", '": {').replace("':{", '": {').replace("' :{", '": {').replace("' : {", '": {')
+            
+            #Null cases
+            modified = modified.replace("': null", '": null').replace("':null", '": null').replace("' :null", '": null').replace("' : null", '": null')
+            modified = modified.replace("null, '", 'null, "').replace("null,'", 'null, "').replace("null ,'", 'null, "').replace("null , '", 'null, "')
+            
+            #False cases
+            modified = modified.replace("': false", '": false').replace("':false", '": false').replace("' :false", '": false').replace("' : false", '": false')
+            modified = modified.replace("false, '", 'false, "').replace("false,'", 'false, "').replace("false ,'", 'false, "').replace("false , '", 'false, "')
+            
+            #True cases
+            modified = modified.replace("': true", '": true').replace("':true", '": true').replace("' :true", '": true').replace("' : true", '": true')
+            modified = modified.replace("true, '", 'true, "').replace("true,'", 'true, "').replace("true ,'", 'true, "').replace("true , '", 'true, "')
+            
+            #Number cases
+            modified = re.sub(r'(\d+)(\]?)\s*,\s*\'', r'\1\2, "', modified)  # number], ' or number, '
+            modified = re.sub(r'\':\s*(\[?)(\d+)', r'": \1\2', modified)     # ': [number or ': number
+            
+            #Combo cases
+            modified = modified.replace("': ['", '": ["').replace("':'[", '": ["').replace("' :['", '": ["').replace("' : ''[", '": ["')
+            modified = modified.replace("'], '", '"], "').replace("'],'", '"], "').replace("'] ,'", '"], "').replace("'] , ''", '"], "')
+            
+            modified = modified.replace("']}", '"]}')
+            
+            # Replace remaining single quotes with double quotes for JSON compatibility
+            modified = modified.replace("''", "'")
+
+            # Reload values in special cases
+            modified = modified.replace(': "a"', ': ""')
+            modified = modified.replace("',a'. ", "','. ").replace("a'T',a'TANK'a", "'T','TANK'").replace("-999,a'ALL", "-999, 'ALL'")
+
+            return json.loads(modified.replace("None", "null"))
+        except json.JSONDecodeError as e:
+            msg = "Error parsing JSON source: {0} - e1: {1} -- {2}"
+            msg_params = (source, e, modified)
             tools_log.log_error(msg, msg_params=msg_params)
             return None
 
@@ -987,7 +1039,7 @@ class GwI18NGenerator:
                 "name": f"{self.language}.sql",
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
-                "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
+                "tables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
                              "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbtypevalue", "dbfprocess"]
             }
         }

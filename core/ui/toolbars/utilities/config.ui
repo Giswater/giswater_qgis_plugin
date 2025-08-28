@@ -342,6 +342,18 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout_4">
+               <item row="0" column="0">
+                <widget class="QGroupBox" name="grb_arc">
+                 <property name="title">
+                  <string>Arc</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_9">
+                  <item row="0" column="0">
+                   <layout class="QGridLayout" name="lyt_arc"/>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
                <item row="1" column="0">
                 <widget class="QGroupBox" name="grb_connec">
                  <property name="title">
@@ -354,14 +366,14 @@
                  </layout>
                 </widget>
                </item>
-               <item row="0" column="0">
-                <widget class="QGroupBox" name="grb_arc">
+               <item row="2" column="0">
+                <widget class="QGroupBox" name="grb_link">
                  <property name="title">
-                  <string>Arc</string>
+                  <string>Link</string>
                  </property>
-                 <layout class="QGridLayout" name="gridLayout_9">
+                 <layout class="QGridLayout" name="gridLayout_20">
                   <item row="0" column="0">
-                   <layout class="QGridLayout" name="lyt_arc"/>
+                   <layout class="QGridLayout" name="lyt_link"/>
                   </item>
                  </layout>
                 </widget>
@@ -378,7 +390,7 @@
                  </layout>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="4" column="0">
                 <widget class="QGroupBox" name="grb_utils">
                  <property name="title">
                   <string>Utils</string>
@@ -390,7 +402,7 @@
                  </layout>
                 </widget>
                </item>
-               <item row="4" column="0">
+               <item row="5" column="0">
                 <spacer name="verticalSpacer_14">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>

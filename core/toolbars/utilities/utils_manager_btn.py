@@ -71,7 +71,7 @@ class GwUtilsManagerButton(GwAction):
 
         buttons = [['Mapzones manager', '_mapzones_manager'], ['Workcat manager', '_workcat_manager']]
         role = tools_gw.get_role_permissions(lib_vars.project_vars.get('project_role'))
-        if role in ('role_master', 'role_admin', 'role_system'):
+        if role in ('role_plan', 'role_admin', 'role_system'):
             buttons.append(['Style manager', '_style_manager'])
         for button in buttons:
             button_name = button[0]

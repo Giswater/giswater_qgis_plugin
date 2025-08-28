@@ -134,7 +134,7 @@ class GwArcFusionButton(GwMaptool):
         tools_gw.load_settings(self.dlg_fusion)
 
         # Fill ComboBox cmb_nodeaction
-        rows = [[0, 'KEEP OPERATIVE'], [1, 'DOWNGRADE NODE'], [2, 'REMOVE NODE']]
+        rows = [[0, tools_qt.tr('KEEP OPERATIVE')], [1, tools_qt.tr('DOWNGRADE NODE')], [2, tools_qt.tr('REMOVE NODE')]]
         tools_qt.fill_combo_values(self.dlg_fusion.cmb_nodeaction, rows, sort_by=0)
         node_action = tools_gw.get_config_parser("btn_arc_fusion", "cmb_nodeaction", "user", "session")
         if node_action not in (None, 'None', ''):

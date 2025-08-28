@@ -67,7 +67,8 @@ class GwConfigButton(GwAction):
         # Event on change from combo parent
         self._get_event_combo_parent(self.json_result['body']['form']['formTabs'])
 
-        # Load first tab
+        # Load first tab (Basic tab)
+        self.tab_basic_loaded = True
         initial_index = 0
         grbox_list = self.tab_main.widget(initial_index).findChildren(QGroupBox)
         layoutname_list = []

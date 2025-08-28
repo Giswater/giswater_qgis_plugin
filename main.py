@@ -47,6 +47,7 @@ class Giswater(QObject):
         # Initialize plugin
         if self._init_plugin():
             # Force project read (to work with PluginReloader)
+            QgsProject.instance().readProject.connect(tools_qgis.restore_hidden_nodes)
             self._project_read(False, False)
 
     def unload(self, hide_gw_button=None):

@@ -505,13 +505,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_feature_snapping">
+             <widget class="QToolButton" name="btn_snapping">
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
+              <property name="popupMode">
+               <enum>QToolButton::MenuButtonPopup</enum>
               </property>
              </widget>
             </item>
@@ -575,7 +574,6 @@
   <tabstop>campaign_feature_id</tabstop>
   <tabstop>campaign_btn_feature_insert</tabstop>
   <tabstop>btn_feature_delete</tabstop>
-  <tabstop>btn_feature_snapping</tabstop>
   <tabstop>tbl_relation</tabstop>
  </tabstops>
  <resources/>

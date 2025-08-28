@@ -267,7 +267,7 @@ class GwNonVisual:
 
         # Set widget & model properties
         tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=0, stretchLastSection=False)
+                                      sectionResizeMode=1, stretchLastSection=False)
         tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Sort the table by feature id
@@ -677,9 +677,11 @@ class GwNonVisual:
         # Get dialog
         self.dialog = GwNonVisualCurveUi(self)
         tools_gw.load_settings(self.dialog)
+        self.previous_curve_values = None
+        self.undo_enabled = False
 
         # Create plot widget
-        plot_widget = self._create_plot_widget(self.dialog)
+        self.plot_widget = self._create_plot_widget(self.dialog)
 
         # Icons
         tools_gw.add_icon(self.dialog.btn_delete_item, "112")
@@ -693,9 +695,14 @@ class GwNonVisual:
         tbl_curve_value.setContextMenuPolicy(Qt.CustomContextMenu)
         tbl_curve_value.customContextMenuRequested.connect(partial(self._paste_curves_custom_menu, tbl_curve_value))
 
+        # Store previous state for undo
+        self.previous_curve_values = []
+
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_curve_value)
         paste_shortcut.activated.connect(partial(self._paste_curves_values, tbl_curve_value))
+        undo_shortcut = QShortcut(QKeySequence.Undo, tbl_curve_value)
+        undo_shortcut.activated.connect(partial(self._undo_paste, tbl_curve_value))
 
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
@@ -722,14 +729,14 @@ class GwNonVisual:
         cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, self.dialog, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
-        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, plot_widget))
-        self.dialog.btn_delete_item.clicked.connect(partial(self._manage_delete_btn, tbl_curve_value, plot_widget))
+        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, self.plot_widget))
+        self.dialog.btn_delete_item.clicked.connect(partial(self._manage_delete_btn, tbl_curve_value, self.plot_widget))
         self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, is_new))
         self._connect_dialog_signals()
 
         # Set initial curve_value table headers
         self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
-        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, None, None)
+        self._manage_curve_plot(self.dialog, tbl_curve_value, self.plot_widget, None, None)
         # Set scale-to-fit
         tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
@@ -746,6 +753,11 @@ class GwNonVisual:
         menu.exec(QCursor.pos())
 
     def _paste_curves_values(self, tbl_curve_value):
+        # Save the current state of the table before pasting.
+        self.previous_curve_values = self._read_tbl_values(tbl_curve_value)
+        self.undo_enabled = True
+
+        self.is_pasting = True
         selected = tbl_curve_value.selectedRanges()
         if not selected:
             return
@@ -761,6 +773,36 @@ class GwNonVisual:
                 col_pos = selected[0].leftColumn() + c
                 tbl_curve_value.setItem(row_pos, col_pos, item)
 
+    def _undo_paste(self, tbl_curve_value):
+        """Restores the table to its state before the last paste operation."""
+        # Guard clause: only undo if a paste has happened and undo is enabled.
+        if not self.undo_enabled or self.previous_curve_values is None:
+            return
+
+        # Clear the table first
+        tbl_curve_value.clearContents()
+        tbl_curve_value.setRowCount(0)
+
+        # Repopulate with the stored previous values
+        if self.previous_curve_values:
+            tbl_curve_value.setRowCount(len(self.previous_curve_values))
+            for r, row_data in enumerate(self.previous_curve_values):
+                for c, value in enumerate(row_data):
+                    text_to_set = str(value) if value is not None else ''
+                    tbl_curve_value.setItem(r, c, QTableWidgetItem(text_to_set))
+
+        # Ensure there is always one empty row to work with.
+        if tbl_curve_value.rowCount() == 0:
+            tbl_curve_value.insertRow(0)
+
+        # Update plot to reflect the restored data.
+        if hasattr(self, 'plot_widget'):
+            self._manage_curve_plot(self.dialog, tbl_curve_value, self.plot_widget)
+
+        # Reset undo state so it can't be used again until the next paste.
+        self.previous_curve_values = None
+        self.undo_enabled = False
+
     def get_print_curves(self, curve_id, path, file_name, geom1=None, geom2=None):
         """ Opens dialog for curve """
 
@@ -769,7 +811,7 @@ class GwNonVisual:
         tools_gw.load_settings(self.dialog)
 
         # Create plot widget
-        plot_widget = self._create_plot_widget(self.dialog)
+        self.plot_widget = self._create_plot_widget(self.dialog)
 
         # Define variables
         tbl_curve_value = self.dialog.tbl_curve_value
@@ -782,9 +824,9 @@ class GwNonVisual:
         self._populate_curve_widgets(curve_id)
 
         # Set initial curve_value table headers
-        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, file_name, geom1, geom2)
+        self._manage_curve_plot(self.dialog, tbl_curve_value, self.plot_widget, file_name, geom1, geom2)
         output_path = os.path.join(path, file_name)
-        plot_widget.figure.savefig(output_path)
+        self.plot_widget.figure.savefig(output_path)
 
     def _create_curve_type_lists(self):
         """ Creates a list & dict to manage curve_values table headers """
@@ -1006,7 +1048,7 @@ class GwNonVisual:
             for item in lst:
                 try:
                     value = float(item)
-                except ValueError:
+                except (ValueError, TypeError):
                     value = 0
                 temp_lst.append(value)
             float_list.append(temp_lst)
@@ -1235,6 +1277,7 @@ class GwNonVisual:
         # Manage widgets depending on the project_type
         #    calls -> def _manage_ws_patterns_dlg(self):
         #             def _manage_ud_patterns_dlg(self):
+        self.previous_pattern_values = []
         getattr(self, f'_manage_{global_vars.project_type}_patterns_dlg')(pattern_id, duplicate=duplicate)
 
         # Connect dialog signals
@@ -1244,6 +1287,12 @@ class GwNonVisual:
         tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_pattern_{global_vars.project_type}')
 
     def _manage_ws_patterns_dlg(self, pattern_id, duplicate=False):
+        # Get dialog
+        self.dialog = GwNonVisualPatternWSUi(self)
+        tools_gw.load_settings(self.dialog)
+        self.previous_pattern_values = None
+        self.undo_enabled = False
+
         # Variables
         tbl_pattern_value = self.dialog.tbl_pattern_value
         cmb_expl_id = self.dialog.cmb_expl_id
@@ -1255,13 +1304,15 @@ class GwNonVisual:
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_pattern_value)
         paste_shortcut.activated.connect(partial(self._paste_patterns_values, tbl_pattern_value))
+        undo_shortcut = QShortcut(QKeySequence.Undo, tbl_pattern_value)
+        undo_shortcut.activated.connect(partial(self._undo_paste_patterns, tbl_pattern_value))
 
         # Set scale-to-fit for tableview
         tbl_pattern_value.horizontalHeader().setSectionResizeMode(1)
         tbl_pattern_value.horizontalHeader().setMinimumSectionSize(50)
 
         # Create plot widget
-        plot_widget = self._create_plot_widget(self.dialog)
+        self.plot_widget = self._create_plot_widget(self.dialog)
 
         self.dialog.txt_pattern_id.setMaxLength(16)
 
@@ -1273,13 +1324,13 @@ class GwNonVisual:
 
         if pattern_id:
             self._populate_ws_patterns_widgets(pattern_id, duplicate=duplicate)
-            self._manage_ws_patterns_plot(tbl_pattern_value, plot_widget, None, None)
+            self._manage_ws_patterns_plot(tbl_pattern_value, self.plot_widget, None, None)
         else:
             self._load_ws_pattern_widgets(self.dialog)
 
         # Signals
         tbl_pattern_value.cellChanged.connect(partial(self._onCellChanged, tbl_pattern_value))
-        tbl_pattern_value.cellChanged.connect(partial(self._manage_ws_patterns_plot, tbl_pattern_value, plot_widget))
+        tbl_pattern_value.cellChanged.connect(partial(self._manage_ws_patterns_plot, tbl_pattern_value, self.plot_widget))
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = (pattern_id is None) or duplicate
@@ -1295,6 +1346,11 @@ class GwNonVisual:
         menu.exec(QCursor.pos())
 
     def _paste_patterns_values(self, tbl_patter_value):
+        # Save the current state of the table before pasting.
+        self.previous_pattern_values = self._read_tbl_values(tbl_patter_value)
+        self.undo_enabled = True
+
+        self.is_pasting = True
         selected = tbl_patter_value.selectedRanges()
         if not selected:
             return
@@ -1309,6 +1365,49 @@ class GwNonVisual:
                 row_pos = selected[0].topRow() + r
                 col_pos = selected[0].leftColumn() + c
                 tbl_patter_value.setItem(row_pos, col_pos, item)
+
+    def _undo_paste_patterns(self, tbl_pattern_value):
+        """Restores the pattern table to its state before the last paste operation."""
+        # Guard clause: only undo if a paste has happened and undo is enabled.
+        if not self.undo_enabled or self.previous_pattern_values is None:
+            return
+
+        # Clear the table first
+        tbl_pattern_value.clearContents()
+        tbl_pattern_value.setRowCount(0)
+
+        # Repopulate with the stored previous values
+        if self.previous_pattern_values:
+            tbl_pattern_value.setRowCount(len(self.previous_pattern_values))
+            for r, row_data in enumerate(self.previous_pattern_values):
+                for c, cell_data in enumerate(row_data):
+                    text_to_set = str(cell_data) if cell_data is not None else ''
+                    item = QTableWidgetItem(text_to_set)
+                    tbl_pattern_value.setItem(r, c, item)
+
+        # Ensure there's always at least one empty row to work with.
+        if tbl_pattern_value.rowCount() == 0:
+            tbl_pattern_value.insertRow(0)
+
+        # Restore headers
+        if hasattr(self.dialog, 'cmb_pattern_type'):  # UD Dialog
+            if self.dialog.cmb_pattern_type.currentData() == 1:
+                headers = ['Multiplier' for _ in range(tbl_pattern_value.rowCount())]
+                tbl_pattern_value.setVerticalHeaderLabels(headers)
+        else:  # WS Dialog
+            headers = ['Multiplier' for _ in range(tbl_pattern_value.rowCount())]
+            tbl_pattern_value.setVerticalHeaderLabels(headers)
+
+        # Update plot to reflect the restored data.
+        if hasattr(self, 'plot_widget'):
+            if isinstance(self.dialog, GwNonVisualPatternWSUi):
+                self._manage_ws_patterns_plot(tbl_pattern_value, self.plot_widget, None, None)
+            elif isinstance(self.dialog, GwNonVisualPatternUDUi):
+                self._manage_ud_patterns_plot(tbl_pattern_value, self.plot_widget, None, None)
+
+        # Reset undo state so it can't be used again until the next paste.
+        self.previous_pattern_values = None
+        self.undo_enabled = False
 
     def _populate_ws_patterns_widgets(self, pattern_id, duplicate=False):
         """ Fills in all the values for ws pattern dialog """
@@ -1513,10 +1612,12 @@ class GwNonVisual:
         float_list = []
         for lst in clean_list:
             temp_lst = []
+            if len(lst) < 2:
+                continue
             for item in lst:
                 try:
                     value = float(item)
-                except ValueError:
+                except (ValueError, TypeError):
                     value = 0
                 temp_lst.append(value)
             float_list.append(temp_lst)
@@ -1538,6 +1639,13 @@ class GwNonVisual:
         plot_widget.draw()
 
     def _manage_ud_patterns_dlg(self, pattern_id, duplicate=False):
+        """ Opens dialog for ud pattern """
+        # Get dialog
+        self.dialog = GwNonVisualPatternUDUi(self)
+        tools_gw.load_settings(self.dialog)
+        self.previous_pattern_values = None
+        self.undo_enabled = False
+
         # Variables
         cmb_pattern_type = self.dialog.cmb_pattern_type
         cmb_expl_id = self.dialog.cmb_expl_id
@@ -1546,7 +1654,7 @@ class GwNonVisual:
         self._scale_to_fit_pattern_tableviews(self.dialog)
 
         # Create plot widget
-        plot_widget = self._create_plot_widget(self.dialog)
+        self.plot_widget = self._create_plot_widget(self.dialog)
 
         self.dialog.txt_pattern_id.setMaxLength(16)
 
@@ -1567,9 +1675,9 @@ class GwNonVisual:
             self._load_ud_pattern_widgets(self.dialog)
 
         # Signals
-        cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type, plot_widget))
+        cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type, self.plot_widget))
 
-        self._manage_patterns_tableviews(self.dialog, cmb_pattern_type, plot_widget)
+        self._manage_patterns_tableviews(self.dialog, cmb_pattern_type, self.plot_widget)
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = (pattern_id is None) or duplicate
@@ -1668,6 +1776,8 @@ class GwNonVisual:
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, cur_table)
         paste_shortcut.activated.connect(partial(self._paste_patterns_values, cur_table))
+        undo_shortcut = QShortcut(QKeySequence.Undo, cur_table)
+        undo_shortcut.activated.connect(partial(self._undo_paste_patterns, cur_table))
 
         try:
             cur_table.cellChanged.disconnect()
@@ -1821,7 +1931,7 @@ class GwNonVisual:
             for item in lst:
                 try:
                     value = float(item)
-                except ValueError:
+                except (ValueError, TypeError):
                     value = 0
                 temp_lst.append(value)
             float_list.append(temp_lst)
@@ -2896,13 +3006,18 @@ class GwNonVisual:
         for y in range(0, table.rowCount()):
             values.append(list())
             for x in range(0, table.columnCount()):
-                value = "null"
+                value = None
                 item = table.item(y, x)
                 if item is not None and item.data(0) not in (None, ''):
                     value = item.data(0)
-                if clear_nulls and value == "null":
+                if clear_nulls and value is None:
                     continue
                 values[y].append(value)
+        
+        # Filter out trailing empty rows
+        while values and all(v is None for v in values[-1]):
+            values.pop()
+
         return values
 
     def _populate_cmb_sector_id(self, dialog, combobox):

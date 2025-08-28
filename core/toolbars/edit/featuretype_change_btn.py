@@ -40,7 +40,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.feature_id = None
         self.actions = actions
         if not self.actions:
-            self.actions = ['ARC', 'NODE', 'CONNEC']
+            self.actions = [['ARC', tools_qt.tr('ARC')], ['NODE', tools_qt.tr('NODE')], ['CONNEC', tools_qt.tr('CONNEC')]]
         self.list_tables = list_tables
         if not self.list_tables:
             self.list_tables = ['ve_arc', 've_node', 've_connec', 've_gully']
@@ -128,15 +128,15 @@ class GwFeatureTypeChangeButton(GwMaptool):
         ag = QActionGroup(self.iface.mainWindow())
 
         if global_vars.project_type.lower() == 'ud':
-            self.actions.append('GULLY')
+            self.actions.append(['GULLY', tools_qt.tr('GULLY')])
 
-        for action in self.actions:
-            obj_action = QAction(f"{action}", ag)
+        for action_id, action_name in self.actions:
+            obj_action = QAction(f"{action_name}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(super().clicked_event))
-            obj_action.triggered.connect(partial(self._set_active_layer, action))
+            obj_action.triggered.connect(partial(self._set_active_layer, action_id))
             obj_action.triggered.connect(partial(tools_gw.set_config_parser, section="btn_featuretype_change",
-                                                 parameter="last_feature_type", value=action, comment=None))
+                                                 parameter="last_feature_type", value=action_id, comment=None))
 
     def _set_active_layer(self, name):
         """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
