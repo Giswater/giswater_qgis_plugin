@@ -245,7 +245,7 @@ CREATE TABLE inp_subcatchment (
     infil_pattern_id varchar(16) NULL,
     muni_id int4 NULL,
     descript text NULL,
-    the_geom public.geometry(multipolygon, 25831) NULL,
+    the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	CONSTRAINT subcatchment_pkey PRIMARY KEY (subc_id, hydrology_id),
 	CONSTRAINT subcatchment_hydrology_id_fkey FOREIGN KEY (hydrology_id) REFERENCES cat_hydrology(hydrology_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT subcatchment_rg_id_fkey FOREIGN KEY (rg_id) REFERENCES raingage(rg_id) ON DELETE RESTRICT ON UPDATE CASCADE,
