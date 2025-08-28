@@ -25,8 +25,6 @@ DECLARE
 	v_class text;
 	v_expl_id text;
 	v_expl_id_array text[];
-	v_updatemapzgeom integer = 0;
-	v_geomparamupdate float;
 	v_commitchanges boolean;
 
 	v_visible_layer text;
@@ -58,8 +56,6 @@ BEGIN
 	-- Get variables from input JSON
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
 	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
-	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
-	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges')::BOOLEAN;
 
 	-- Dynamic mapping for macro/child tables and fields
@@ -100,7 +96,6 @@ BEGIN
 	-- Log
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MACROMAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, '------------------------------------------------------------------');
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Macromapzone constructor method: ', upper(v_updatemapzgeom::text)));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_commitchanges::text)));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
@@ -116,15 +111,23 @@ BEGIN
 	-- prepare query
 	v_query_geom = '
 	SELECT '||v_macro_id_field||' AS mapzone_id, '||v_child_table||'_id, name as '||v_child_table||'_name , 
-	'||v_child_table||'_type, descript, st_union(the_geom) as the_geom  FROM '|| v_child_table ||' 
+	'||v_child_table||'_type, descript, st_union(the_geom) as the_geom, UNNEST(expl_id) as expl_id,
+	UNNEST(muni_id) as muni_id FROM '|| v_child_table ||' 
 	WHERE '||v_macro_id_field||' IS NOT NULL AND '||quote_literal(v_expl_id_array)||'::integer[] && ARRAY[expl_id]
 	GROUP BY '||v_macro_id_field||', '||v_child_table||'_id,  name, '||v_child_table||'_type, descript';
 
 	IF v_commitchanges THEN -- update macromapzone table
 
 		EXECUTE '
-		UPDATE '|| v_macro_table ||' t SET the_geom = a.the_geom FROM ('||v_query_geom||')a 
-		WHERE t.'||v_macro_id_field||' = a.mapzone_id';
+		UPDATE '|| v_macro_table ||' t SET the_geom = a.the_geom , expl_id = a.expl_id, muni_id = a.muni_id
+		FROM (
+			SELECT mapzone_id, ST_Union(the_geom) as the_geom, array_agg(DISTINCT expl_id) as expl_id,
+			 array_agg(DISTINCT muni_id) as muni_id, array_agg(DISTINCT sector_id) as sector_id
+			FROM ('||v_query_geom||') 
+			GROUP BY mapzone_id
+		) a 
+		WHERE t.'||v_macro_id_field||' = a.mapzone_id
+		';
 
 	ELSE -- temporal layer
 
@@ -141,7 +144,7 @@ BEGIN
 		' INTO v_result;
 
 		v_result_polygon := concat ('{"geometryType":"MultiPolygon", "features":',v_result,'}');
-		
+
 	END IF;
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
@@ -159,16 +162,16 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 
 	RETURN gw_fct_json_create_return(('{
-		"status":"'||v_status||'", 
+		"status":"'||v_status||'",
 		"message":{
-			"level":'||v_level||', 
+			"level":'||v_level||',
 			"text":"'||v_message||'"
-		}, 
+		},
 		"version":"'||v_version||'",
 		"body":{
-			"form":{}, 
+			"form":{},
 			"data":{
-				"graphClass": "'||v_class||'", 
+				"graphClass": "'||v_class||'",
 				"info":'||v_result_info||',
 				"polygon":'||v_result_polygon||'
 			}
